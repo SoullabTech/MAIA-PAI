@@ -85,9 +85,9 @@ export default function IntroPage() {
           <>
             {/* Holoflower */}
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0.3 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 2, ease: "easeOut" }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
               className="mb-16 flex justify-center"
             >
               <Holoflower size="xl" glowIntensity="high" />
@@ -97,10 +97,10 @@ export default function IntroPage() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentMantra}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0.2, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 1 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.6 }}
                 className="h-24 flex items-center justify-center"
               >
                 <h2 className="text-3xl md:text-4xl font-extralight text-amber-50 tracking-wide leading-relaxed px-8">

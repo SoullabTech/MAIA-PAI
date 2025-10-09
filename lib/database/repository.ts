@@ -10,7 +10,7 @@ export interface Repository {
   list(prefix?: string): Promise<any[]>;
 }
 
-class InMemoryRepository implements Repository {
+export class DatabaseRepository implements Repository {
   private store = new Map<string, any>();
 
   async get(key: string): Promise<any> {
@@ -37,4 +37,4 @@ class InMemoryRepository implements Repository {
 }
 
 // Export singleton repository instance
-export const repository = new InMemoryRepository();
+export const repository = new DatabaseRepository();

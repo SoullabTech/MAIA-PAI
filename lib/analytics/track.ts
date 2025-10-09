@@ -10,6 +10,9 @@ export function track(event: string, properties?: Record<string, any>) {
   console.log('[Analytics]', event, properties);
 }
 
+// Alias for trackEvent
+export const trackEvent = track;
+
 export function identify(userId: string, traits?: Record<string, any>) {
   if (typeof window === 'undefined') return;
 
