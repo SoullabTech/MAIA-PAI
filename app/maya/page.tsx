@@ -8,10 +8,13 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LogOut } from 'lucide-react';
 
 export default function MayaPage() {
+  console.log('[MayaPage] Component mounting');
   const router = useRouter();
   const { user, preferences, isOnboarded, isLoading } = useUserAuth();
   const [explorerId, setExplorerId] = useState('guest');
   const [explorerName, setExplorerName] = useState('Explorer');
+
+  console.log('[MayaPage] State:', { explorerId, explorerName, isLoading });
 
   const handleSignOut = () => {
     // Clear all auth data
@@ -89,10 +92,20 @@ export default function MayaPage() {
   //   );
   // }
 
+  // Temporary: Simple test to see if page loads at all
+  return (
+    <div className="min-h-screen bg-blue-500 flex items-center justify-center">
+      <div className="text-white text-2xl">
+        MAYA PAGE LOADING TEST - explorerId: {explorerId}
+      </div>
+    </div>
+  );
+
+  // Original code (commented out for testing)
+  /*
   return (
     <ErrorBoundary>
       <div className="relative min-h-screen bg-[#0a0b14]" style={{ backgroundColor: '#0a0b14' }}>
-        {/* Sign Out Button - Fixed top-right */}
         <button
           onClick={handleSignOut}
           className="fixed top-4 right-4 z-50 p-3 bg-[#1A1F2E]/80 border border-amber-500/20 rounded-full hover:border-amber-500/50 hover:bg-[#1A1F2E] transition-all backdrop-blur-sm"
@@ -116,4 +129,5 @@ export default function MayaPage() {
       </div>
     </ErrorBoundary>
   );
+  */
 }
