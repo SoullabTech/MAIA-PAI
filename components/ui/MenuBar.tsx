@@ -89,7 +89,7 @@ export function MenuBar() {
         className="group relative"
         aria-label="MAIA Training Progress"
       >
-        <div className="relative p-2 md:p-3 rounded-lg bg-amber-500/20 backdrop-blur-md border border-amber-500/30 hover:bg-amber-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-amber-500/40 animate-pulse-subtle">
+        <div className="relative p-2 md:p-3 rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-500/30 hover:bg-amber-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-amber-500/40 animate-pulse-subtle">
           <Brain className="w-4 h-4 md:w-5 md:h-5 text-amber-400 transition-transform group-active:rotate-12" />
 
           {/* Progress Ring */}
@@ -130,7 +130,7 @@ export function MenuBar() {
           className="group relative"
           aria-label="Soul-Building Circle"
         >
-          <div className="p-2 md:p-3 rounded-lg bg-indigo-500/20 backdrop-blur-md border border-indigo-500/30 hover:bg-indigo-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-indigo-500/40">
+          <div className="p-2 md:p-3 rounded-full bg-indigo-500/20 backdrop-blur-md border border-indigo-500/30 hover:bg-indigo-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-indigo-500/40">
             <Users className="w-4 h-4 md:w-5 md:h-5 text-indigo-400 transition-transform group-active:scale-110" />
 
             {/* Tooltip */}
@@ -147,7 +147,7 @@ export function MenuBar() {
         className="group relative"
         aria-label="Conversation Style"
       >
-        <div className="p-2 md:p-3 rounded-lg bg-cyan-500/20 backdrop-blur-md border border-cyan-500/30 hover:bg-cyan-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-cyan-500/40">
+        <div className="p-2 md:p-3 rounded-full bg-cyan-500/20 backdrop-blur-md border border-cyan-500/30 hover:bg-cyan-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-cyan-500/40">
           <MessageSquare className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 transition-all group-active:rotate-[-10deg]" />
 
           {/* Tooltip */}
@@ -163,7 +163,7 @@ export function MenuBar() {
         className="group relative"
         aria-label="Settings"
       >
-        <div className="p-2 md:p-3 rounded-lg bg-amber-500/20 backdrop-blur-md border border-amber-500/30 hover:bg-amber-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-amber-500/40">
+        <div className="p-2 md:p-3 rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-500/30 hover:bg-amber-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-amber-500/40">
           <Settings className="w-4 h-4 md:w-5 md:h-5 text-amber-400 transition-all group-active:rotate-90" />
 
           {/* Tooltip */}
@@ -183,7 +183,7 @@ export function MenuBar() {
         className="group relative"
         aria-label="Report a Problem"
       >
-        <div className="p-2 md:p-3 rounded-lg bg-neutral-400/20 backdrop-blur-md border border-neutral-400/30 hover:bg-neutral-400/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-neutral-400/40">
+        <div className="p-2 md:p-3 rounded-full bg-neutral-400/20 backdrop-blur-md border border-neutral-400/30 hover:bg-neutral-400/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-neutral-400/40">
           <MessageCircle className="w-4 h-4 md:w-5 md:h-5 text-neutral-300 transition-all group-active:scale-110 group-active:rotate-12" />
 
           {/* Tooltip */}
