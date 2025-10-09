@@ -5,11 +5,15 @@
  * Simple test interface for voice conversation
  */
 
-import { useSoullabRealtime } from '@/hooks/useSoullabRealtime';
+import React from 'react';
+import { useElementalVoice } from '@/hooks/useElementalVoice';
 import { Mic, MicOff } from 'lucide-react';
 
 export default function TestVoicePage() {
-  const realtime = useSoullabRealtime({
+  const [status, setStatus] = React.useState('Ready to test...');
+  const [results, setResults] = React.useState<string[]>([]);
+
+  const realtime = useElementalVoice({
     userId: 'test-user',
     userName: 'Explorer',
     sessionId: `test-${Date.now()}`,
