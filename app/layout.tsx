@@ -63,9 +63,9 @@ export default function RootLayout({
               <Toaster position="top-center" />
               <BetaBanner />
               {children}
-              <ConditionalMenuBar />
+              {/* <ConditionalMenuBar /> */}
               {/* <PWAInstallPrompt /> */}
-              <FeedbackWidget />
+              {/* <FeedbackWidget /> */}
               <VoiceDebugOverlay />
               {process.env.NODE_ENV === 'development' && <ToneDebugOverlay />}
             </ToastProvider>
