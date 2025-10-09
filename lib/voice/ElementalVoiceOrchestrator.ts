@@ -17,6 +17,10 @@ import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent';
 import { journalStorage } from '@/lib/storage/journal-storage';
 import { userStore } from '@/lib/storage/userStore';
 import { ConversationalEnhancer, EmotionalTone } from './ConversationalEnhancer';
+import { ConversationBuffer } from './conversation/ConversationBuffer';
+import { Backchanneler } from './conversation/Backchanneler';
+import { inferMoodFromText, inferMoodAndArchetype, Mood, Archetype } from './conversation/AffectDetector';
+import { routeToArchetype } from './ArchetypeRouter';
 
 export interface ElementalVoiceConfig {
   userId: string;
@@ -38,6 +42,8 @@ export interface ConversationMetrics {
   exchangeCount: number;
   emotionalQuality: string;
   lastInteractionTime: number;
+  currentArchetype?: Archetype; // 🌌 Current elemental archetype
+  currentMood?: Mood; // 🎭 Current emotional mood
 }
 
 /**
@@ -53,14 +59,21 @@ export class ElementalVoiceOrchestrator {
   private isConnected: boolean = false;
   private isProcessing: boolean = false;
 
-  constructor(config: SoullabRealtimeConfig) {
+  // 🎬 Samantha-level conversational features
+  private conversationBuffer: ConversationBuffer = new ConversationBuffer();
+  private backchanneler: Backchanneler;
+  private currentAudio: HTMLAudioElement | null = null;
+  private lastUserSpeechAt = 0;
+  private interimCache = "";
+
+  constructor(config: ElementalVoiceConfig) {
     this.config = {
       userName: 'Explorer',
       sessionId: Date.now().toString(),
       onTranscript: () => {},
       onAudioStart: () => {},
       onAudioEnd: () => {},
-      onError: (err) => console.error('Soullab Realtime error:', err),
+      onError: (err) => console.error('Elemental Voice error:', err),
       onConnected: () => {},
       onDisconnected: () => {},
       voice: 'shimmer',
@@ -68,6 +81,9 @@ export class ElementalVoiceOrchestrator {
       enableResponseStreaming: true,
       ...config
     };
+
+    // Initialize backchanneler with quick speak function
+    this.backchanneler = new Backchanneler((text, opts) => this.quickSpeak(text, opts));
 
     this.metrics = {
       depth: 0,
@@ -473,6 +489,83 @@ export class ElementalVoiceOrchestrator {
     } catch (error) {
       console.error('❌ Error processing audio:', error);
       this.config.onError(error as Error);
+    }
+  }
+
+  /**
+   * 🎬 SAMANTHA-LEVEL: Handle user speech start (interruption/barge-in)
+   */
+  handleUserSpeechStart(): void {
+    this.lastUserSpeechAt = Date.now();
+
+    // INTERRUPTION: Stop MAIA immediately
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+      this.currentAudio = null;
+    }
+
+    // Reset backchannel for new turn
+    this.backchanneler.resetTurn();
+
+    console.log('🛑 User interrupted - MAIA stopped speaking');
+  }
+
+  /**
+   * 🎬 SAMANTHA-LEVEL: Handle interim transcript (backchannel opportunity)
+   */
+  handleInterimTranscript(text: string): void {
+    this.interimCache = text;
+    const mood = inferMoodFromText(text);
+    const pausedMs = Date.now() - this.lastUserSpeechAt;
+
+    // Maybe give a backchannel acknowledgment
+    this.backchanneler.maybeAck({
+      interimLen: text.length,
+      userPausedMs: pausedMs,
+      mood: mood === "bright" ? "warm" : mood
+    });
+  }
+
+  /**
+   * 🎬 SAMANTHA-LEVEL: Quick speak (for fillers, doesn't summon full intelligence)
+   */
+  private async quickSpeak(text: string, opts?: { style?: "calm" | "bright" | "concerned" }): Promise<void> {
+    try {
+      console.log(`💬 Quick speak (${opts?.style || 'calm'}):`, text);
+
+      // Synthesize immediately without going through Spiralogic
+      const response = await fetch('/api/voice/synthesize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          voice: this.config.voice,
+          speed: opts?.style === 'bright' ? 1.1 : opts?.style === 'concerned' ? 0.9 : 1.0
+        })
+      });
+
+      if (!response.ok) throw new Error('Quick speak synthesis failed');
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      const audio = new Audio(audioUrl);
+      await audio.play();
+
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      // Add to conversation buffer
+      this.conversationBuffer.add({
+        role: 'maia',
+        text,
+        t0: Date.now()
+      });
+
+    } catch (error) {
+      console.error('❌ Quick speak error:', error);
     }
   }
 

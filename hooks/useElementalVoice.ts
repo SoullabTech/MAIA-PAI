@@ -132,6 +132,13 @@ export function useElementalVoice(options: UseElementalVoiceOptions) {
         mimeType: 'audio/webm;codecs=opus'
       });
 
+      mediaRecorder.onstart = () => {
+        // 🎬 Samantha-level: User started speaking → interrupt MAIA
+        if (orchestratorRef.current) {
+          orchestratorRef.current.handleUserSpeechStart();
+        }
+      };
+
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
