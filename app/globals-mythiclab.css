@@ -1,0 +1,327 @@
+/* Mythic Lab Design System */
+/* Where measurement meets magic, where science becomes sacred */
+
+:root {
+  /* Sacred Colors */
+  --gold-sacred: #FFD700;
+  --gold-dark: #B8860B;
+  --purple-mystery: #6B46C1;
+  --purple-deep: #4C1D95;
+  --blue-depth: #1E3A8A;
+  --crimson-warrior: #DC2626;
+  --emerald-healer: #059669;
+  --void-black: #0A0A0A;
+
+  /* Alchemical Gradients */
+  --gradient-nigredo: linear-gradient(135deg, #1F2937 0%, #000000 100%);
+  --gradient-albedo: linear-gradient(135deg, #F3F4F6 0%, #FFFFFF 100%);
+  --gradient-rubedo: linear-gradient(135deg, #991B1B 0%, #F59E0B 100%);
+  --gradient-mystical: linear-gradient(135deg, rgba(107, 70, 193, 0.3), rgba(255, 215, 0, 0.2));
+}
+
+/* Glass Alchemy - The Mythic Lab aesthetic */
+.glass-alchemy {
+  background: linear-gradient(
+    135deg,
+    rgba(107, 70, 193, 0.08),
+    rgba(255, 215, 0, 0.04)
+  );
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 215, 0, 0.15);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 215, 0, 0.1);
+
+  /* Subtle sacred breathing */
+  animation: sacred-breath 8s ease-in-out infinite;
+}
+
+@keyframes sacred-breath {
+  0%, 100% {
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 215, 0, 0.1),
+      0 0 20px rgba(255, 215, 0, 0.05);
+  }
+  50% {
+    box-shadow:
+      0 4px 32px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 215, 0, 0.15),
+      0 0 30px rgba(255, 215, 0, 0.1);
+  }
+}
+
+/* Gold text variations */
+.text-gold-400 {
+  color: var(--gold-sacred);
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.text-gold-400\/60 {
+  color: rgba(255, 215, 0, 0.6);
+}
+
+.text-gold-400\/80 {
+  color: rgba(255, 215, 0, 0.8);
+}
+
+/* Archetypal force indicators */
+.force-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.force-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 215, 0, 0.1),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.force-card:hover::before {
+  left: 100%;
+}
+
+/* Alchemical symbols glow */
+.alchemical-symbol {
+  filter: drop-shadow(0 0 12px currentColor);
+  animation: symbol-pulse 4s ease-in-out infinite;
+}
+
+@keyframes symbol-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+  50% {
+    filter: drop-shadow(0 0 16px currentColor);
+  }
+}
+
+/* Sacred data visualization */
+.metric-bar {
+  position: relative;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.metric-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    var(--gold-dark),
+    var(--gold-sacred)
+  );
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+  transition: width 1s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Council whispers */
+.council-whisper {
+  border-left: 2px solid rgba(255, 215, 0, 0.3);
+  padding-left: 12px;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.council-whisper::before {
+  content: '"';
+  color: var(--gold-sacred);
+  font-size: 1.5em;
+  line-height: 0;
+  margin-right: 4px;
+}
+
+/* Breakthrough flash */
+@keyframes breakthrough-flash {
+  0% {
+    box-shadow: 0 0 0 rgba(255, 215, 0, 0);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(255, 215, 0, 0);
+  }
+}
+
+.breakthrough-moment {
+  animation: breakthrough-flash 2s ease-out;
+}
+
+/* Sacred scrollbar */
+.mythic-lab-hud::-webkit-scrollbar {
+  width: 8px;
+}
+
+.mythic-lab-hud::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.mythic-lab-hud::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    var(--gold-dark),
+    var(--purple-mystery)
+  );
+  border-radius: 4px;
+}
+
+/* Experiment status indicators */
+.status-active {
+  color: #3B82F6;
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+.status-breakthrough {
+  color: var(--gold-sacred);
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+  animation: breakthrough-glow 2s ease-in-out infinite;
+}
+
+@keyframes breakthrough-glow {
+  0%, 100% {
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 16px rgba(255, 215, 0, 0.8);
+  }
+}
+
+.status-integrating {
+  color: #A78BFA;
+  text-shadow: 0 0 8px rgba(167, 139, 250, 0.5);
+}
+
+/* Phase indicators */
+.phase-nigredo {
+  background: var(--gradient-nigredo);
+}
+
+.phase-albedo {
+  background: var(--gradient-albedo);
+}
+
+.phase-rubedo {
+  background: var(--gradient-rubedo);
+}
+
+/* Collective resonance pulse */
+.collective-pulse {
+  animation: collective-pulse 3s ease-in-out infinite;
+}
+
+@keyframes collective-pulse {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+/* Data point displays */
+.data-point {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  font-size: 0.75rem;
+  color: rgba(255, 215, 0, 0.8);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+/* Mythic lab text blend */
+.mythic-lab-text {
+  /* Scientific precision */
+  font-family: 'Inter', system-ui, sans-serif;
+  letter-spacing: 0.01em;
+
+  /* Mystical shimmer */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 215, 0, 0.8),
+    rgba(255, 255, 255, 0.9)
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  /* Sacred spacing */
+  line-height: 1.618; /* golden ratio */
+
+  /* Subtle shimmer animation */
+  animation: text-shimmer 8s ease-in-out infinite;
+}
+
+@keyframes text-shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Lab note cards */
+.lab-note {
+  background: rgba(0, 0, 0, 0.2);
+  border-left: 3px solid var(--gold-sacred);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.lab-note::before {
+  content: '📝 Lab Note: ';
+  color: rgba(255, 215, 0, 0.8);
+  font-weight: 500;
+}
+
+/* Hover states with sacred energy */
+.mythic-interactive {
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  cursor: pointer;
+}
+
+.mythic-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(255, 215, 0, 0.2);
+  border-color: rgba(255, 215, 0, 0.4);
+}
+
+/* Sacred loading state */
+@keyframes sacred-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sacred-loader {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255, 215, 0, 0.2);
+  border-top-color: var(--gold-sacred);
+  border-radius: 50%;
+  animation: sacred-spin 1s linear infinite;
+}

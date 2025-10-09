@@ -1,0 +1,63 @@
+🔮 CLAUDE PROJECTS - 15-MINUTE QUICK START
+==========================================
+
+AFTER Monday launch, do this to give MAIA deep framework knowledge:
+
+STEP 1: Create Project (5 mins)
+--------------------------------
+1. Go to: https://claude.ai/projects
+2. Click "Create New Project"
+3. Name: "MAIA Framework Knowledge - Elemental Alchemy"
+4. Paste instructions from: 00_UPLOAD_INSTRUCTIONS.md (section "Add Project Instructions")
+5. Click "Save"
+
+
+STEP 2: Upload These 6 Files (5 mins)
+--------------------------------------
+Drag & drop all files from THIS folder:
+✅ INSIDE_OUT_SPIRALOGIC_INTEGRATION.md
+✅ CREATIVE_DIRECTION_BIBLE.md
+✅ ElementalAlchemyKnowledge.md
+✅ MAIA_ARCHITECTURE_ANALYSIS.md
+✅ CRITICAL_FIXES_IMPLEMENTED.md
+✅ MONDAY_LAUNCH_READINESS.md
+
+
+STEP 3: Test It (5 mins)
+-------------------------
+In Claude Projects, ask:
+"User says: I feel stuck in the same patterns"
+
+Expected response should include:
+- Earth energy recognition
+- Dialectical structure (machine + cultural)
+- Sacred language patterns
+
+
+STEP 4: Get Project ID (1 min)
+-------------------------------
+Look at URL: https://claude.ai/projects/proj_xxxxxxxxxxxxx
+Copy: proj_xxxxxxxxxxxxx
+Save it for later (optional API integration)
+
+
+THAT'S IT! ✅
+-----------
+MAIA now has permanent deep knowledge of your framework.
+
+No code changes needed - it works automatically with your API key.
+
+
+LATER (Optional):
+-----------------
+- Add your Elemental Alchemy manuscript
+- Upload Spiralogic Polar Archetype Map
+- Add Soullab vault notes
+- Include white paper & agent designs
+
+Each addition makes MAIA wiser without any code changes!
+
+
+QUESTIONS?
+----------
+See: 00_UPLOAD_INSTRUCTIONS.md for complete step-by-step guide

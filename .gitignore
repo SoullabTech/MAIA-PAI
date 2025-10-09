@@ -1,0 +1,145 @@
+# SECURITY - Sensitive files
+.env*
+*.env
+secrets/
+private/
+credentials/
+keys/
+*.key
+*.pem
+*.cert
+*.crt
+config.json
+config.*.json
+*-config.json
+UPDATE_KEYS_TEMPLATE.md
+
+# Project-specific sensitive data
+BETA_USERS_LIST.md
+beta-users.json
+user-data/
+soul_memory/
+oracle-responses/
+conversation-logs/
+analytics/
+telemetry/
+
+# Documentation that reveals architecture
+*.drawio
+*.diagram
+architecture/
+docs/internal/
+ROADMAP.md
+TODO.md
+NOTES.md
+*_IMPLEMENTATION.md
+*_INTEGRATION.md
+*_COMPLETE.md
+*_MANIFESTO.md
+*_FRAMEWORK.md
+
+# Node/Next.js
+node_modules/
+.pnpm-store/
+.next/
+out/
+dist/
+build/
+.vercel
+*.tsbuildinfo
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+ENV/
+
+# Logs and debug
+*.log
+logs/
+debug-*.wav
+test-*.wav
+maya-*.wav
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.pid
+*.seed
+*.pid.lock
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+database/
+db-backups/
+
+# Testing
+coverage/
+.coverage
+*.lcov
+test-results/
+playwright-report/
+playwright/.cache/
+test-*.js
+test-*.ts
+test-*.html
+*-test.mp3
+*-test.wav
+
+# Audio/Media files
+*.wav
+*.mp3
+*.m4a
+*.ogg
+
+# IDE and OS
+.DS_Store
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime*
+.vs/
+
+# Backups and temps
+*.backup
+*.bak
+*~
+*.orig
+.temp/
+.tmp/
+temp/
+tmp/
+SpiralogicOracleSystem_backup.zip
+legacy-backups.zip
+dev-archive/
+
+# Docker
+docker-volumes/
+.dockerignore
+
+# Deployment triggers
+.vercel-force-rebuild
+trigger.txt
+trigger-build.txt
+
+# Submodule artifacts
+*/node_modules/
+*/dist/
+*/build/
+*/.next/
+
+# Legacy/Deprecated
+oracle-backend/

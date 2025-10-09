@@ -1,0 +1,90 @@
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import "../styles/ios-fallbacks.css";
+import { ErrorOverlay } from "@/components/system/ErrorOverlay";
+import { AudioUnlockBanner } from "@/components/system/AudioUnlockBanner";
+import { ToastProvider } from "@/components/system/ToastProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import ThemeToggle from "@/components/ui/ThemeToggle";
+import Link from "next/link";
+import IOSFixInitializer from "@/components/system/IOSFixInitializer";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Soullab - Maya Voice Chat",
+  description:
+    "Sacred Mirror - Maya Voice AI companion for consciousness exploration",
+  manifest: "/manifest.json",
+  themeColor: "#FFD700",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+    viewportFit: "cover",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Soullab",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} bg-white dark:bg-black text-neutral-900 dark:text-white transition-colors duration-200 overflow-x-hidden`}>
+        <ThemeProvider>
+          <IOSFixInitializer />
+          <ToastProvider>
+            {/* Global Header with Theme Toggle */}
+            <header className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 border-b border-amber-900/20 dark:border-amber-500/20 bg-gradient-to-r from-slate-900 via-amber-900/10 to-slate-900">
+              <Link href="/" className="flex items-center gap-2">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                  <span className="text-white font-bold text-xs sm:text-sm">✺</span>
+                </div>
+                <h1 className="text-base sm:text-lg font-semibold tracking-wide text-amber-50 dark:text-amber-100">
+                  MAIA
+                </h1>
+              </Link>
+
+              <nav className="flex items-center gap-3 sm:gap-6">
+                <Link
+                  href="/"
+                  className="text-xs sm:text-sm text-amber-200/70 hover:text-amber-100 transition-colors"
+                >
+                  Mirror
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className="text-xs sm:text-sm text-amber-200/70 hover:text-amber-100 transition-colors hidden sm:inline"
+                >
+                  Analytics
+                </Link>
+                <div className="w-px h-4 sm:h-5 bg-amber-500/20" />
+                <ThemeToggle />
+              </nav>
+            </header>
+            
+            {/* Main Content */}
+            <main className="min-h-[calc(100vh-73px)]">
+              {children}
+            </main>
+            
+            <AudioUnlockBanner />
+            <ErrorOverlay />
+          </ToastProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}

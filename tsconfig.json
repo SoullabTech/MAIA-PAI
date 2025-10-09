@@ -1,0 +1,66 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "lib": ["dom", "dom.iterable", "es2020"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@/lib/*": ["./lib/*"],
+      "@/app/*": ["./app/*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "backend",
+    "oracle-backend",
+    "oracle-frontend",
+    "frontend",
+    "src",
+    "tests",
+    "soul_memory",
+    "htmlcov",
+    "SpiralogicOracleSystem",
+    "sesame-csm",
+    "sesame_csm_openai",
+    "csm",
+    "**/backend/backend/**",
+    "**/backend/csm/**",
+    "lib/oracle/dashboard/mobile/**",
+    "lib/oracle/admin/archetypes/**",
+    "lib/cognitive-engines/**",
+    "lib/prompts/maya-intelligence-governor.ts",
+    "lib/prompts/maya-master-implementation.ts",
+    "lib/maia-consciousness-lattice.ts",
+    "lib/maya-cohort-tracker.ts",
+    "components/oracle/ModernOracleInterface-Complete.tsx",
+    "**/*.unused.ts",
+    "**/*.backup.ts",
+    "**/*.old.ts",
+    "**/*.working.ts",
+    "**/__tests__/**"
+  ]
+}

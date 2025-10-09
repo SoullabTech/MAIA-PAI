@@ -1,0 +1,495 @@
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Send, Mic, MicOff, Keyboard, Loader2 } from 'lucide-react';
+import { unlockAudioContext as unlockAudio } from '@/lib/audio/audioUnlock';
+import { useToastContext } from '@/components/system/ToastProvider';
+import { ConversationalMagicEngine } from '@/lib/voice/ConversationalMagic';
+
+interface HybridInputProps {
+  onSend: (text: string) => void;
+  onTranscript?: (text: string) => void;
+  disabled?: boolean;
+  placeholder?: string;
+  className?: string;
+}
+
+export default function HybridInput({ 
+  onSend, 
+  onTranscript,
+  disabled = false,
+  placeholder = 'Type or speak to Maia...',
+  className = ''
+}: HybridInputProps) {
+  const [value, setValue] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
+  const [volume, setVolume] = useState(0);
+  const [mode, setMode] = useState<'idle' | 'typing' | 'listening'>('idle');
+  const [error, setError] = useState<string | null>(null);
+  
+  const { showToast } = useToastContext();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const recognitionRef = useRef<any>(null);
+  const rafRef = useRef<number | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const magicEngineRef = useRef<ConversationalMagicEngine | null>(null);
+  const pauseDurationsRef = useRef<number[]>([]);
+  const utteranceLengthsRef = useRef<number[]>([]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+    }
+  }, [value, transcript, interimTranscript]);
+
+  // Update mode based on activity
+  useEffect(() => {
+    if (isListening) {
+      setMode('listening');
+    } else if (value.length > 0) {
+      setMode('typing');
+    } else {
+      setMode('idle');
+    }
+  }, [isListening, value]);
+
+  // Speech recognition setup
+  useEffect(() => {
+    if (!isListening) return;
+
+    const SpeechRecognition = 
+      (window as any).SpeechRecognition || 
+      (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      console.warn('SpeechRecognition not supported');
+      showToast('Voice input not supported in this browser', { type: 'warning' });
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    recognition.maxAlternatives = 1;
+
+    // Initialize conversational magic engine
+    if (!magicEngineRef.current) {
+      magicEngineRef.current = new ConversationalMagicEngine();
+    }
+
+    let silenceTimer: NodeJS.Timeout;
+    let lastSpeechTime = Date.now();
+    let hasSentMessage = false; // Flag to prevent double-sending
+    let utteranceStartTime = Date.now();
+
+    recognition.onstart = () => {
+      setError(null);
+      lastSpeechTime = Date.now();
+      hasSentMessage = false; // Reset flag on new recognition start
+    };
+
+    recognition.onresult = (event: any) => {
+      let interim = '';
+      let final = '';
+
+      // Clear any existing silence timer
+      clearTimeout(silenceTimer);
+      lastSpeechTime = Date.now();
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const transcriptChunk = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          final += transcriptChunk;
+        } else {
+          interim += transcriptChunk;
+        }
+      }
+
+      setInterimTranscript(interim);
+
+      if (final.trim()) {
+        setTranscript(prev => prev + ' ' + final);
+        setInterimTranscript('');
+
+        // Check if this is back-channeling
+        const isBackChannel = magicEngineRef.current?.detectBackChanneling(final);
+
+        if (isBackChannel) {
+          // Don't send back-channels as full messages
+          console.log('Back-channel detected:', final);
+        } else {
+          // Get dynamic silence threshold based on context
+          const silenceThreshold = magicEngineRef.current?.getDynamicSilenceThreshold() || 1800;
+
+          silenceTimer = setTimeout(() => {
+            const fullTranscript = (transcript + ' ' + final).trim();
+            if (fullTranscript && Date.now() - lastSpeechTime > (silenceThreshold * 0.8) && !hasSentMessage) {
+              // Track utterance length for learning
+              const utteranceLength = fullTranscript.split(' ').length;
+              utteranceLengthsRef.current.push(utteranceLength);
+
+              // Track pause duration
+              const pauseDuration = Date.now() - lastSpeechTime;
+              pauseDurationsRef.current.push(pauseDuration);
+
+              // Learn user rhythm
+              magicEngineRef.current?.learnUserRhythm(
+                pauseDurationsRef.current,
+                utteranceLengthsRef.current
+              );
+
+              hasSentMessage = true;
+              onSend(fullTranscript);
+              setTranscript('');
+              setInterimTranscript('');
+              hasSentMessage = false;
+              lastSpeechTime = Date.now();
+              utteranceStartTime = Date.now();
+            }
+          }, silenceThreshold);
+        }
+      }
+      
+      // Notify parent of transcript updates
+      if (onTranscript) {
+        onTranscript(interim || final);
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('❌ Recognition error:', event.error);
+
+      let errorMessage = 'Voice input error';
+      let shouldRestart = true;
+
+      switch (event.error) {
+        case 'no-speech':
+          // Don't show error for no speech - just continue listening
+          errorMessage = '';
+          shouldRestart = true;
+          break;
+        case 'audio-capture':
+          errorMessage = 'Microphone not available';
+          shouldRestart = false;
+          break;
+        case 'not-allowed':
+          errorMessage = 'Microphone access denied';
+          shouldRestart = false;
+          break;
+        case 'network':
+          errorMessage = 'Network error - retrying...';
+          shouldRestart = true;
+          break;
+        case 'aborted':
+          // Aborted - restart to maintain continuous listening
+          errorMessage = '';
+          shouldRestart = true;
+          break;
+      }
+
+      if (errorMessage) {
+        setError(errorMessage);
+        if (event.error !== 'network') {
+          showToast(errorMessage, { type: 'error' });
+        }
+      }
+
+      if (!shouldRestart || !isListening) {
+        setIsListening(false);
+      } else {
+        // Auto-restart on recoverable errors
+        setTimeout(() => {
+          if (isListening) {
+            try {
+              recognition.start();
+            } catch (e) {
+              console.log('Failed to restart after error');
+            }
+          }
+        }, 500);
+      }
+    };
+
+    recognition.onend = () => {
+      // Clear silence timer on end
+      clearTimeout(silenceTimer);
+
+      // Always try to restart if we're supposed to be listening
+      if (isListening) {
+        // Restart recognition to maintain continuous listening
+        setTimeout(() => {
+          try {
+            recognition.start();
+          } catch (e) {
+            console.log('Recognition restart failed, likely already started');
+          }
+        }, 100); // Small delay to prevent immediate restart errors
+      }
+
+      // Don't send transcript here - it's already handled in onresult
+      // This was causing the double-sending bug
+      setTranscript('');
+      setInterimTranscript('');
+    };
+
+    recognition.start();
+    recognitionRef.current = recognition;
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+        recognitionRef.current = null;
+      }
+    };
+  }, [isListening, transcript, interimTranscript, onSend, onTranscript, showToast]);
+
+  // Volume animation for mic glow
+  useEffect(() => {
+    if (!isListening) {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      setVolume(0);
+      return;
+    }
+
+    async function startAudioAnalysis() {
+      try {
+        // Get microphone stream
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        streamRef.current = stream;
+        
+        // Create audio context and analyser
+        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+        audioContextRef.current = audioContext;
+        
+        const source = audioContext.createMediaStreamSource(stream);
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.8;
+        
+        source.connect(analyser);
+        analyserRef.current = analyser;
+        
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        const tick = () => {
+          if (!analyserRef.current) return;
+          
+          analyser.getByteTimeDomainData(dataArray);
+          
+          // Calculate RMS volume
+          let sum = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            const v = (dataArray[i] - 128) / 128;
+            sum += v * v;
+          }
+          const rms = Math.sqrt(sum / dataArray.length);
+          setVolume(Math.min(rms * 2, 1)); // Scale and cap at 1
+          
+          rafRef.current = requestAnimationFrame(tick);
+        };
+        
+        tick();
+      } catch (err) {
+        console.error('❌ Failed to start audio analysis:', err);
+        setError('Microphone access failed');
+        setIsListening(false);
+      }
+    }
+
+    startAudioAnalysis();
+
+    return () => {
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+      analyserRef.current = null;
+    };
+  }, [isListening]);
+
+  const toggleListening = async () => {
+    if (isListening) {
+      // Stop listening
+      setIsListening(false);
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    } else {
+      // Start listening - ensure audio is unlocked first
+      await unlockAudio(showToast);
+      setIsListening(true);
+      setValue(''); // Clear text input when switching to voice
+    }
+  };
+
+  const handleSend = () => {
+    const textToSend = value.trim() || transcript.trim();
+    if (textToSend && !disabled) {
+      onSend(textToSend);
+      setValue('');
+      setTranscript('');
+      setInterimTranscript('');
+      textareaRef.current?.focus();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey && !isListening && !disabled) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  // Get dynamic placeholder
+  const getDynamicPlaceholder = () => {
+    if (isListening) {
+      if (interimTranscript) return '...';
+      return '🎤 Maia is listening...';
+    }
+    if (mode === 'typing') return 'Type your message...';
+    return placeholder;
+  };
+
+  return (
+    <div className={`relative ${className}`}>
+      {/* Error message */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-red-500/90 text-white text-sm rounded-lg"
+          >
+            {error}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Compact mobile-first input with send button inside */}
+      <div className="relative flex items-center gap-2 p-2 bg-white/5 dark:bg-neutral-900/50 border border-white/10 dark:border-neutral-800 rounded-2xl backdrop-blur-md">
+        {/* Textarea with auto-resize and internal send button */}
+        <div className="flex-1 relative flex items-center gap-1">
+          <textarea
+            ref={textareaRef}
+            value={isListening ? (transcript + ' ' + interimTranscript).trim() : value}
+            onChange={(e) => !isListening && setValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={getDynamicPlaceholder()}
+            disabled={disabled || isListening}
+            className={`
+              w-full resize-none rounded-lg px-3 py-2
+              bg-transparent focus:outline-none
+              placeholder-neutral-400 dark:placeholder-neutral-500
+              text-neutral-900 dark:text-white
+              min-h-[40px] max-h-[120px]
+              text-sm md:text-base leading-relaxed
+              transition-all duration-200
+              ${isListening ? 'opacity-80' : ''}
+            `}
+            rows={1}
+          />
+
+          {/* Send Button - Inside text area on right */}
+          {!isListening && value.trim() && (
+            <motion.button
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              onClick={handleSend}
+              disabled={disabled}
+              className="flex-shrink-0 p-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-md transition-all active:scale-95"
+              aria-label="Send message"
+            >
+              <Send className="w-4 h-4" />
+            </motion.button>
+          )}
+        </div>
+
+        {/* Mic Toggle Button - Compact */}
+        <div className="relative flex items-center justify-center flex-shrink-0">
+          {/* Pulsing rings when listening */}
+          {isListening && (
+            <>
+              {[1, 2].map((i) => (
+                <motion.span
+                  key={i}
+                  className="absolute inset-0 rounded-full border-2 border-amber-400"
+                  initial={{ scale: 1, opacity: 0 }}
+                  animate={{
+                    scale: 1 + volume * (i * 0.4),
+                    opacity: [0.5, 0.2, 0],
+                  }}
+                  transition={{
+                    duration: 1 + i * 0.2,
+                    repeat: Infinity,
+                    ease: 'easeOut',
+                  }}
+                  style={{ width: 36, height: 36 }}
+                />
+              ))}
+            </>
+          )}
+
+          <motion.button
+            onClick={toggleListening}
+            disabled={disabled}
+            className={`
+              relative z-10 p-2 rounded-full shadow-md
+              transition-all duration-200 w-9 h-9
+              touch-none select-none
+              ${isListening
+                ? 'bg-gradient-to-r from-red-500 to-orange-600'
+                : 'bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700'
+              }
+              ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+              text-white
+            `}
+            whileTap={{ scale: disabled ? 1 : 0.9 }}
+            aria-label={isListening ? 'Stop recording' : 'Start recording'}
+          >
+            {isListening ? (
+              <MicOff className="w-4 h-4" />
+            ) : (
+              <Mic className="w-4 h-4" />
+            )}
+          </motion.button>
+        </div>
+      </div>
+
+      {/* Mode indicator */}
+      <div className="flex justify-center mt-2">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={mode}
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 5 }}
+            className="text-xs text-neutral-500 dark:text-neutral-400"
+          >
+            {mode === 'listening' && '🎤 Voice mode active'}
+            {mode === 'typing' && '⌨️ Text mode'}
+            {mode === 'idle' && '💫 Ready for input'}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}

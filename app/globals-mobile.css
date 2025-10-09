@@ -1,0 +1,298 @@
+/* Mobile-specific styles and safe areas for iPhone */
+
+/* Safe area padding for iPhone notch and home indicator */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Prevent iOS zoom on input focus */
+@supports (-webkit-touch-callout: none) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Better mobile tap targets */
+@media (max-width: 640px) {
+  button,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Larger touch targets for clickable elements */
+  a,
+  button {
+    position: relative;
+  }
+
+  a::before,
+  button::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    bottom: -8px;
+    left: -8px;
+  }
+}
+
+/* Prevent horizontal scroll on mobile */
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Mobile-optimized scrolling - Enhanced for iOS */
+.mobile-scroll {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  overflow-y: scroll; /* Force scrollbar on iOS */
+  -webkit-transform: translateZ(0); /* Hardware acceleration */
+  transform: translateZ(0);
+  will-change: scroll-position; /* Optimize for scrolling */
+}
+
+/* iOS-specific scroll fixes */
+@supports (-webkit-overflow-scrolling: touch) {
+  .mobile-scroll {
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    -webkit-transform: translate3d(0, 0, 0); /* Force GPU acceleration */
+    position: relative; /* Create stacking context */
+  }
+
+  /* Prevent scroll bounce on boundaries */
+  .mobile-scroll::-webkit-scrollbar {
+    display: none; /* Hide scrollbar on iOS but keep scroll functionality */
+  }
+}
+
+/* Landscape mode adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+  .landscape-compact {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .landscape-hidden {
+    display: none;
+  }
+}
+
+/* Voice mode button for mobile */
+.voice-button-mobile {
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  right: 20px;
+  z-index: 40;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile-friendly modal */
+.modal-mobile {
+  max-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+
+/* Fix for iOS Safari address bar */
+@supports (-webkit-touch-callout: none) {
+  .h-screen {
+    height: -webkit-fill-available;
+  }
+}
+
+/* Dynamic viewport height for modern browsers (iOS & Android) */
+@supports (height: 100dvh) {
+  .h-screen-dynamic,
+  .min-h-screen-dynamic {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+}
+
+/* Android Chrome overscroll effect */
+body {
+  overscroll-behavior-y: contain;
+}
+
+/* Improve Android tap highlighting */
+* {
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+  tap-highlight-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Android-specific optimizations */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a {
+    touch-action: manipulation;
+  }
+
+  input,
+  textarea {
+    touch-action: pan-y;
+  }
+}
+
+/* Cross-platform smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Better Android keyboard handling */
+@media (max-width: 640px) {
+  input:focus,
+  textarea:focus {
+    transform: translateZ(0);
+  }
+}
+
+/* CollectivePulse - Sacred Field Presence */
+.sacred-orb {
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 215, 0, 0.8),
+    rgba(147, 51, 234, 0.3),
+    transparent
+  );
+  border-radius: 50%;
+  animation: sacred-breathe 4s ease-in-out infinite;
+  filter: blur(1px);
+}
+
+@keyframes sacred-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(2);
+    opacity: 0.8;
+    filter: blur(2px);
+  }
+}
+
+.field-whisper {
+  font-size: 11px;
+  color: rgba(255, 215, 0, 0.5);
+  text-align: center;
+  font-weight: 300;
+  letter-spacing: 1px;
+  max-width: 200px;
+}
+
+/* Maia Archetype Mode Indicators */
+.maia-mode-indicator {
+  position: absolute;
+  top: -8px;
+  right: 10px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 0.3s ease;
+}
+
+.maia-mode-indicator:hover {
+  opacity: 0.9;
+}
+
+.mode-icon {
+  font-size: 11px;
+}
+
+.mode-name {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mode-friend {
+  background: rgba(139, 115, 85, 0.3);
+  color: rgba(139, 115, 85, 1);
+  border: 1px solid rgba(139, 115, 85, 0.5);
+}
+
+.mode-guide {
+  background: rgba(107, 70, 193, 0.3);
+  color: rgba(147, 112, 219, 1);
+  border: 1px solid rgba(107, 70, 193, 0.5);
+}
+
+.mode-mentor {
+  background: rgba(202, 138, 4, 0.3);
+  color: rgba(251, 191, 36, 1);
+  border: 1px solid rgba(202, 138, 4, 0.5);
+}
+
+.mode-alchemist {
+  background: rgba(220, 38, 38, 0.3);
+  color: rgba(248, 113, 113, 1);
+  border: 1px solid rgba(220, 38, 38, 0.5);
+}
+
+.mode-lab {
+  background: rgba(59, 130, 246, 0.3);
+  color: rgba(96, 165, 250, 1);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+}
+
+.mode-witness {
+  background: rgba(139, 92, 246, 0.3);
+  color: rgba(167, 139, 250, 1);
+  border: 1px solid rgba(139, 92, 246, 0.5);
+}
+
+.mode-challenger {
+  background: rgba(239, 68, 68, 0.3);
+  color: rgba(248, 113, 113, 1);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+.mode-auto {
+  background: rgba(168, 85, 247, 0.3);
+  color: rgba(192, 132, 252, 1);
+  border: 1px solid rgba(168, 85, 247, 0.5);
+}
