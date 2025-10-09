@@ -290,13 +290,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     };
   }, []);
 
-  // Listen for conversation style changes and show Maya's acknowledgment
+  // Listen for conversation style changes and show MAIA's acknowledgment
   useEffect(() => {
     const handleStyleChange = (event: CustomEvent) => {
       const { mode, acknowledgment } = event.detail;
-      console.log('🎭 Maya acknowledging style change:', mode);
+      console.log('🎭 MAIA acknowledging style change:', mode);
 
-      // Add Maya's acknowledgment as a system message
+      // Add MAIA's acknowledgment as a system message
       const acknowledgmentMessage = {
         id: `style-ack-${Date.now()}`,
         role: 'assistant' as const,
@@ -545,7 +545,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       console.log('✅ Audio enabled successfully - permissions cleared');
 
       // Show success feedback
-      toast.success('Audio enabled! Maya is ready to speak.', {
+      toast.success('Audio enabled! MAIA is ready to speak.', {
         duration: 2000,
         position: 'top-center'
       });
@@ -1092,11 +1092,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     setCurrentlySpeakingId(undefined);
   }, []);
 
-  // EMERGENCY STOP - Stops Maya completely
+  // EMERGENCY STOP - Stops MAIA completely
   const handleEmergencyStop = useCallback(() => {
     console.log('🛑 EMERGENCY STOP activated');
 
-    // Stop Maya's voice
+    // Stop MAIA's voice
     if (maiaVoiceState) {
       try {
         if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -1125,7 +1125,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     setIsMicrophonePaused(true);
     setCurrentlySpeakingId(undefined);
 
-    console.log('🛑 All Maya systems stopped');
+    console.log('🛑 All MAIA systems stopped');
   }, [maiaVoiceState]);
 
   // DIAGNOSTIC LOGGING - Track what's rendering
@@ -1464,7 +1464,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               </motion.div>
             )}
 
-            {/* Voice Visualizer - Maya's voice (clean golden rings) */}
+            {/* Voice Visualizer - MAIA's voice (clean golden rings) */}
             {(isResponding || isAudioPlaying || maiaVoiceState?.isPlaying) && (
               <motion.div
                 className="absolute inset-0 pointer-events-none flex items-center justify-center"
@@ -1472,7 +1472,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                {/* Clean golden pulsing rings for Maya */}
+                {/* Clean golden pulsing rings for MAIA */}
                 {[...Array(2)].map((_, i) => (
                   <motion.div
                     key={`maya-ring-${i}`}
@@ -1480,7 +1480,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     style={{
                       width: `${250 + i * 100}px`,
                       height: `${250 + i * 100}px`,
-                      borderColor: '#D4B896', // Golden for Maya
+                      borderColor: '#D4B896', // Golden for MAIA
                     }}
                     animate={{
                       scale: [1, 1.15, 1],
@@ -1911,7 +1911,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     <div className="flex items-end gap-2">
                       <textarea
                         name="message"
-                        placeholder="Share your thoughts with Maya..."
+                        placeholder="Share your thoughts with MAIA..."
                         disabled={isProcessing}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !e.shiftKey) {
@@ -2123,12 +2123,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             </button>
           )}
 
-          {/* EMERGENCY STOP - Shows when Maya is speaking */}
+          {/* EMERGENCY STOP - Shows when MAIA is speaking */}
           {(isResponding || isAudioPlaying || maiaVoiceState?.isPlaying) && (
             <button
               onClick={handleEmergencyStop}
               className="p-3 rounded-full bg-red-500/80 text-white hover:bg-red-600 transition-all duration-300 pulse-red"
-              title="Stop Maya"
+              title="Stop MAIA"
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <rect x="6" y="6" width="12" height="12" rx="1" />
