@@ -79,14 +79,15 @@ export default function MayaPage() {
     setExplorerName(name);
   }, [router, user]);
 
-  // Show loading state while checking auth
-  if (!explorerId || explorerId === 'guest') {
-    return (
-      <div className="relative min-h-screen bg-[#1a1f3a] flex items-center justify-center">
-        <div className="text-amber-200/60">Loading...</div>
-      </div>
-    );
-  }
+  // Show loading state while checking auth (but allow guest to proceed)
+  // Commenting out this check - it might be too aggressive
+  // if (!explorerId || explorerId === 'guest') {
+  //   return (
+  //     <div className="relative min-h-screen bg-[#1a1f3a] flex items-center justify-center">
+  //       <div className="text-amber-200/60">Loading...</div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <ErrorBoundary>
