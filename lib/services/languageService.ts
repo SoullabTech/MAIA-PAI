@@ -3,6 +3,8 @@
  * Safe, non-breaking implementation that defaults to English
  */
 
+import React from 'react';
+
 export interface LanguageConfig {
   code: string;
   name: string;
