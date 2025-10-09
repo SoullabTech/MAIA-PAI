@@ -10,8 +10,15 @@ export function track(event: string, properties?: Record<string, any>) {
   console.log('[Analytics]', event, properties);
 }
 
-// Alias for trackEvent
-export const trackEvent = track;
+// Enhanced trackEvent with method helpers
+export const trackEvent = Object.assign(track, {
+  apiCall: (endpoint: string, duration: number, success: boolean) => {
+    track('api_call', { endpoint, duration, success });
+  },
+  error: (userId: string, errorType: string, errorMessage: string) => {
+    track('error', { userId, errorType, errorMessage });
+  }
+});
 
 export function identify(userId: string, traits?: Record<string, any>) {
   if (typeof window === 'undefined') return;

@@ -681,6 +681,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000); // UNLEASHED: 60 second timeout for longer conversations
 
+      console.log('📤 Sending text message to API:', { cleanedText, userId, sessionId });
+
       const response = await fetch('/api/oracle/personal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -714,11 +716,16 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       clearTimeout(timeoutId);
 
+      console.log('📥 API response status:', response.status, response.statusText);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ API error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
       }
 
       const responseData = await response.json();
+      console.log('✅ API response data:', responseData);
       const apiTime = Date.now() - startTime;
       console.log(`⏱️ Text API response received in ${apiTime}ms`);
       trackEvent.apiCall('/api/oracle/personal', apiTime, true);
