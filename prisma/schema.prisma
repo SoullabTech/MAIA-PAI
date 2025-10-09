@@ -1,0 +1,338 @@
+// prisma/schema.prisma
+// Main database schema for MAIA's living memory system
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// USERS & AUTHENTICATION
+// ============================================================================
+
+model User {
+  id            String   @id @default(cuid())
+  username      String   @unique
+  soullabName   String?  // Soullab-[NAME]
+  passwordHash  String
+
+  // Metadata
+  createdAt     DateTime @default(now())
+  lastActiveAt  DateTime @default(now())
+  onboarded     Boolean  @default(false)
+  week2Onboarded Boolean @default(false)
+
+  // Agent assignment
+  agentId       String   @default("maya-oracle")
+  agentName     String   @default("Maya")
+
+  // Relations
+  memories      MAIAMemory[]
+  elementalStates ElementalState[]
+  reflections   InternalReflection[]
+  sessions      Session[]
+  quotes        QuoteShared[]
+
+  @@index([username])
+  @@index([lastActiveAt])
+}
+
+model Session {
+  id            String   @id @default(cuid())
+  userId        String
+  sessionId     String   @unique
+  startTime     DateTime @default(now())
+  endTime       DateTime?
+
+  // Session metrics
+  exchangeCount Int      @default(0)
+  conversationDepth Float @default(0)
+  dominantPhase String?
+  dominantArchetype String?
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, startTime])
+  @@index([sessionId])
+}
+
+// ============================================================================
+// MAIA MEMORY SYSTEM
+// ============================================================================
+
+model MAIAMemory {
+  id            String   @id @default(cuid())
+  userId        String
+  sessionId     String?
+
+  // Current state
+  currentPhase  String   // Fire, Water, Earth, Air, Aether
+  previousPhase String
+  currentArchetype String
+  previousArchetype String
+  dominantArchetype String
+
+  // Metrics
+  conversationDepth Float  @default(0)
+  exchangeCount Int       @default(0)
+  totalExchanges Int      @default(0)
+
+  // Timestamps
+  lastInteractionTime DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Spiralogic cycle (JSON for flexibility)
+  spiralogicCycle Json   // {phase, cycleDepth, enteredAt, phaseHistory, progressPercent}
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id])
+  symbolicThreads SymbolicThread[]
+  emotionalMotifs EmotionalMotif[]
+  userIntentions UserIntention[]
+  archetypeHistory ArchetypeHistory[]
+
+  @@index([userId])
+  @@index([lastInteractionTime])
+}
+
+// ============================================================================
+// SYMBOLIC INTELLIGENCE
+// ============================================================================
+
+model SymbolicThread {
+  id            String   @id @default(cuid())
+  memoryId      String
+  motif         String   // river, mountain, fire, door, mirror, etc.
+
+  // Tracking
+  occurrences   Int      @default(1)
+  firstInvoked  DateTime @default(now())
+  lastInvoked   DateTime @default(now())
+
+  // Context
+  associatedPhases String[] // Which phases this symbol appears in
+  emotionalTone String?   // joy, grief, fear, etc.
+
+  // Relations
+  memory        MAIAMemory @relation(fields: [memoryId], references: [id])
+
+  @@unique([memoryId, motif])
+  @@index([memoryId])
+  @@index([motif])
+}
+
+model EmotionalMotif {
+  id            String   @id @default(cuid())
+  memoryId      String
+  theme         String   // overwhelm, stuck, grief, fear, joy, excitement, etc.
+
+  // Tracking
+  intensity     Float    @default(0.5) // 0-1
+  firstDetected DateTime @default(now())
+  lastDetected  DateTime @default(now())
+  occurrences   Json     // Array of timestamps
+
+  // Context
+  dominantArchetype String?
+  associatedSymbols String[] // Related symbolic threads
+
+  // Relations
+  memory        MAIAMemory @relation(fields: [memoryId], references: [id])
+
+  @@index([memoryId])
+  @@index([theme])
+}
+
+model UserIntention {
+  id            String   @id @default(cuid())
+  memoryId      String
+  intention     String   // "I want to...", "I'm working on..."
+
+  // Tracking
+  detectedAt    DateTime @default(now())
+  completed     Boolean  @default(false)
+  completedAt   DateTime?
+
+  // Context
+  phaseWhenDetected String
+  archetypeWhenDetected String
+
+  // Relations
+  memory        MAIAMemory @relation(fields: [memoryId], references: [id])
+
+  @@index([memoryId])
+  @@index([completed])
+}
+
+model ArchetypeHistory {
+  id            String   @id @default(cuid())
+  memoryId      String
+  archetype     String   // Fire, Water, Earth, Air, Aether
+  timestamp     DateTime @default(now())
+  duration      Int      @default(0) // milliseconds
+
+  // Relations
+  memory        MAIAMemory @relation(fields: [memoryId], references: [id])
+
+  @@index([memoryId, timestamp])
+}
+
+// ============================================================================
+// ELEMENTAL CONSCIOUSNESS
+// ============================================================================
+
+model ElementalState {
+  id            String   @id @default(cuid())
+  userId        String
+
+  // Elemental balance (0-1, sum = 1.0)
+  Fire          Float    @default(0.2)
+  Water         Float    @default(0.2)
+  Earth         Float    @default(0.2)
+  Air           Float    @default(0.2)
+  Aether        Float    @default(0.2)
+
+  // Metadata
+  dominantElement String  @default("Aether")
+  lastEvolutionReason String?
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id])
+  evolutions    ElementalEvolution[]
+
+  @@index([userId])
+}
+
+model ElementalEvolution {
+  id            String   @id @default(cuid())
+  stateId       String
+  timestamp     DateTime @default(now())
+
+  // Before/after snapshots
+  before        Json     // {Fire, Water, Earth, Air, Aether}
+  after         Json     // {Fire, Water, Earth, Air, Aether}
+
+  // Context
+  reason        String
+  dominantElement String
+  drift         Float    // Distance between before and after
+
+  // Relations
+  state         ElementalState @relation(fields: [stateId], references: [id])
+
+  @@index([stateId, timestamp])
+}
+
+// ============================================================================
+// SYMBOLIC PREDICTION & REFLECTION
+// ============================================================================
+
+model InternalReflection {
+  id            String   @id @default(cuid())
+  userId        String
+  timestamp     DateTime @default(now())
+
+  // Reflection content
+  phaseContext  String   // Current phase
+  observation   String   // MAIA's internal note
+  symbolsNoticed String[] // Key symbols
+  emotionalUndercurrent String // Subtle emotional pattern
+
+  // Prediction
+  predictedNextPhase String?
+  predictionConfidence Float?
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, timestamp])
+}
+
+model QuoteShared {
+  id            String   @id @default(cuid())
+  userId        String
+  timestamp     DateTime @default(now())
+
+  // Quote details
+  text          String
+  author        String
+  archetype     String   // Which archetype delivered it
+  theme         String   // slowness, beauty, presence, etc.
+
+  // Context
+  conversationDepth Float
+  exchangeCount Int
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, timestamp])
+}
+
+// ============================================================================
+// SYMBOL RESONANCE TRACKING
+// ============================================================================
+
+model SymbolResonance {
+  id            String   @id @default(cuid())
+  userId        String
+  motif         String
+
+  // Resonance metrics
+  score         Float    @default(0.5) // 0-1
+  frequency     Int      @default(1)
+  peakIntensity Float    @default(0.5)
+
+  // Tracking
+  lastMentioned DateTime @default(now())
+  firstMentioned DateTime @default(now())
+
+  // Context
+  associatedPhases String[] // Which phases this symbol appears in
+
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, motif])
+  @@index([userId])
+  @@index([motif])
+  @@index([score])
+}
+
+// ============================================================================
+// ANALYTICS & INSIGHTS
+// ============================================================================
+
+model ConversationAnalytics {
+  id            String   @id @default(cuid())
+  userId        String
+  date          DateTime @default(now())
+
+  // Daily metrics
+  exchangeCount Int      @default(0)
+  avgDepth      Float    @default(0)
+  dominantPhase String?
+  dominantArchetype String?
+
+  // Patterns
+  topSymbols    Json     // Array of {motif, count}
+  topEmotions   Json     // Array of {theme, intensity}
+
+  // Growth indicators
+  depthGrowth   Float?   // Change from previous day
+  symbolDiversity Int?   // Unique symbols used
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
