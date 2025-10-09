@@ -91,7 +91,7 @@ export default function MayaPage() {
 
   return (
     <ErrorBoundary>
-      <div className="relative min-h-screen">
+      <div className="relative min-h-screen bg-[#0a0b14]" style={{ backgroundColor: '#0a0b14' }}>
         {/* Sign Out Button - Fixed top-right */}
         <button
           onClick={handleSignOut}
@@ -101,12 +101,18 @@ export default function MayaPage() {
           <LogOut className="w-5 h-5 text-amber-400/70 hover:text-amber-400" />
         </button>
 
-        <OracleConversation
-          sessionId={Date.now().toString()}
-          userId={explorerId}
-          userName={explorerName}
-          voiceEnabled={preferences?.voice_enabled ?? true}
-        />
+        {explorerId ? (
+          <OracleConversation
+            sessionId={Date.now().toString()}
+            userId={explorerId}
+            userName={explorerName}
+            voiceEnabled={preferences?.voice_enabled ?? true}
+          />
+        ) : (
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-amber-200/60 text-lg">Initializing MAIA...</div>
+          </div>
+        )}
       </div>
     </ErrorBoundary>
   );
