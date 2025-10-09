@@ -2200,8 +2200,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* Voice/Chat Mode Switcher - REMOVED: Always use Realtime voice mode */}
 
-      {/* Soulprint Metrics Widget */}
-      {userId && <SoulprintMetricsWidget userId={userId} />}
+      {/* Soulprint Metrics Widget - DISABLED: Causing 400 errors when userId not authenticated */}
+      {/* {userId && <SoulprintMetricsWidget userId={userId} />} */}
     </div>
   );
 };
