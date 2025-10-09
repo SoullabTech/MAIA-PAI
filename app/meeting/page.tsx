@@ -30,17 +30,61 @@ export default function MeetingRoomPage() {
   const [userName, setUserName] = useState<string>('');
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [hasJoined, setHasJoined] = useState(false);
+  const [isSafari, setIsSafari] = useState(false);
+
+  // Detect Safari
+  useEffect(() => {
+    const ua = navigator.userAgent.toLowerCase();
+    const isSafariBrowser = ua.indexOf('safari') > -1 && ua.indexOf('chrome') === -1;
+    setIsSafari(isSafariBrowser);
+    if (isSafariBrowser) {
+      console.log('Safari detected - using compatibility mode');
+    }
+  }, []);
 
   // Get user from localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem('beta_user');
-    if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      setUserName(userData.username || userData.soullabName || 'Explorer');
+    try {
+      const storedUser = localStorage.getItem('beta_user');
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        setUserName(userData.username || userData.soullabName || 'Explorer');
+      }
+    } catch (error) {
+      console.error('Error loading user:', error);
+      setUserName('Explorer');
     }
   }, []);
 
   // Setup collective listening (only when meeting is active)
+  // Disable for Safari until WebSocket issues are resolved
+  let collectiveListeningHook;
+  try {
+    collectiveListeningHook = useCollectiveListening({
+      teamId: meetingId || 'default',
+      userId: userName || 'guest',
+      mode: 'conversation',
+      alwaysOn: true,
+      onPersonalUtterance: (utterance) => {
+        console.log('Personal utterance captured:', utterance.text.substring(0, 50));
+      },
+      onCollectiveInsight: (insight) => {
+        console.log('Collective insight received:', insight);
+      }
+    });
+  } catch (error) {
+    console.error('Collective listening hook error:', error);
+    collectiveListeningHook = {
+      isListening: false,
+      isConnected: false,
+      activeUsers: 0,
+      lastInsight: null,
+      startListening: async () => {},
+      stopListening: () => {},
+      requestSnapshot: async () => null
+    };
+  }
+
   const {
     isListening,
     isConnected,
@@ -49,18 +93,7 @@ export default function MeetingRoomPage() {
     startListening,
     stopListening,
     requestSnapshot
-  } = useCollectiveListening({
-    teamId: meetingId,
-    userId: userName,
-    mode: 'conversation',
-    alwaysOn: true,
-    onPersonalUtterance: (utterance) => {
-      console.log('Personal utterance captured:', utterance.text.substring(0, 50));
-    },
-    onCollectiveInsight: (insight) => {
-      console.log('Collective insight received:', insight);
-    }
-  });
+  } = collectiveListeningHook;
 
   const handleCreateMeeting = () => {
     const newMeetingId = `meeting-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
@@ -114,6 +147,15 @@ export default function MeetingRoomPage() {
   return (
     <div className="min-h-screen bg-[#1a1f3a] flex items-center justify-center px-4">
       <div className="relative z-10 w-full max-w-4xl">
+        {/* Safari compatibility notice */}
+        {isSafari && (
+          <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg text-center">
+            <p className="text-sm text-amber-200/80">
+              🦁 Safari detected - Some features may have limited functionality. For best experience, use Chrome.
+            </p>
+          </div>
+        )}
+
         <AnimatePresence mode="wait">
           {/* Phase 1: Setup */}
           {phase === 'setup' && !hasJoined && (
