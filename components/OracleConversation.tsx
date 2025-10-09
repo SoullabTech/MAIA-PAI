@@ -2308,6 +2308,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* Soulprint Metrics Widget - DISABLED: Causing 400 errors when userId not authenticated */}
       {/* {userId && <SoulprintMetricsWidget userId={userId} />} */}
+
+      {/* Hidden Voice Capture Component - Provides voiceMicRef for voice detection & visualizer */}
+      {voiceEnabled && !showChatInterface && (
+        <div className="hidden">
+          <SimplifiedOrganicVoice
+            ref={voiceMicRef}
+            onTranscript={handleVoiceTranscript}
+            enabled={!isMuted}
+            isMayaSpeaking={isResponding || isAudioPlaying}
+            onAudioLevelChange={setVoiceAudioLevel}
+          />
+        </div>
+      )}
     </div>
   );
   } catch (error) {
