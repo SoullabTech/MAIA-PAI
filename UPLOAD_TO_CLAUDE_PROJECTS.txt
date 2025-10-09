@@ -1,0 +1,62 @@
+CLAUDE PROJECTS - Documents to Upload
+======================================
+
+TIER 1 - ESSENTIAL (Upload These First):
+=========================================
+
+1. ELEMENTAL ALCHEMY MANUSCRIPT
+   Location: [You need to provide - your book file]
+   Format: PDF or .docx
+   Size: Check if under 10MB
+   Priority: HIGHEST
+
+2. SPIRALOGIC POLAR ARCHETYPE MAP
+   Location: [You need to provide]
+   Format: PDF, .docx, or .md
+   Priority: HIGHEST
+
+3. INSIDE-OUT SPIRALOGIC INTEGRATION
+   Location: docs/INSIDE_OUT_SPIRALOGIC_INTEGRATION.md
+   Status: ✅ READY TO UPLOAD
+   
+4. CREATIVE DIRECTION BIBLE
+   Location: docs/CREATIVE_DIRECTION_BIBLE.md
+   Status: ✅ READY TO UPLOAD
+
+5. SOULLAB VAULT CORE NOTES
+   Location: [Your Obsidian vault - you need to provide path]
+   Note: Export as PDF or combine .md files
+
+
+TIER 2 - IMPORTANT (Upload After Tier 1):
+==========================================
+
+6. MODULAR AGENT DESIGNS
+   Locations to find:
+   - Fire agent design
+   - Water agent design
+   - Earth agent design
+   - Air agent design
+   - Shadow agent design
+   - Aether agent design
+   
+7. WHITE PAPER: Coaching with Biofeedback + Spiralogic
+   Location: [You need to provide]
+
+
+TIER 3 - VALUABLE (Upload When Available):
+===========================================
+
+8. Case studies & transformation examples
+9. User journey maps
+10. Additional framework documentation
+
+
+DOCUMENTS ALREADY IN THIS REPO (Ready to Upload):
+==================================================
+✅ docs/INSIDE_OUT_SPIRALOGIC_INTEGRATION.md
+✅ docs/CREATIVE_DIRECTION_BIBLE.md
+✅ MAIA_ARCHITECTURE_ANALYSIS.md
+✅ CRITICAL_FIXES_IMPLEMENTED.md
+✅ lib/knowledge/ElementalAlchemyKnowledge.ts (convert to .md)
+

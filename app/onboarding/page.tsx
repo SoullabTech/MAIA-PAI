@@ -1,0 +1,284 @@
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import { WISDOM_QUOTES } from '@/lib/wisdom/WisdomQuotes';
+import { Holoflower } from '@/components/ui/Holoflower';
+
+export default function OnboardingPage() {
+  const [stage, setStage] = useState<"welcome" | "assignment" | "firstContact">("welcome");
+  const [isLoading, setIsLoading] = useState(false);
+  const [wisdomQuote, setWisdomQuote] = useState("");
+  const [quoteAuthor, setQuoteAuthor] = useState("");
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if already onboarded
+    const storedUser = localStorage.getItem('beta_user');
+    if (storedUser) {
+      const userData = JSON.parse(storedUser);
+      if (userData.onboarded) {
+        router.push('/maya');
+      }
+    }
+  }, [router]);
+
+  const handleMeetOracle = async () => {
+    setIsLoading(true);
+    try {
+      // Get existing user data from signup
+      const existingUser = localStorage.getItem('beta_user');
+      const existingData = existingUser ? JSON.parse(existingUser) : {};
+
+      // Get random wisdom quote
+      const randomQuote = WISDOM_QUOTES[Math.floor(Math.random() * WISDOM_QUOTES.length)];
+      setWisdomQuote(randomQuote.text);
+      setQuoteAuthor(randomQuote.voice.charAt(0).toUpperCase() + randomQuote.voice.slice(1));
+
+      // Create session and get Maya's first message
+      const response = await fetch('/api/oracle/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timestamp: new Date().toISOString()
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to initialize session');
+
+      const data = await response.json();
+
+      // Merge session data with existing user data - PRESERVE username from signup!
+      const userData = {
+        ...existingData, // Keep id, username, etc from signup
+        agentName: 'Maya',
+        agentId: data.agentId || 'maya-oracle',
+        sessionId: data.sessionId || `session-${Date.now()}`,
+        element: 'aether' // Maya starts in aether mode
+      };
+
+      console.log('✅ [onboarding] Preserving username:', userData.username);
+
+      localStorage.setItem('beta_user', JSON.stringify(userData));
+      setUser(userData);
+      setStage("assignment");
+    } catch (error) {
+      console.error('Onboarding error:', error);
+
+      // Get existing user data even in error case
+      const existingUser = localStorage.getItem('beta_user');
+      const existingData = existingUser ? JSON.parse(existingUser) : {};
+
+      // Get random wisdom quote for fallback
+      const randomQuote = WISDOM_QUOTES[Math.floor(Math.random() * WISDOM_QUOTES.length)];
+      setWisdomQuote(randomQuote.text);
+      setQuoteAuthor(randomQuote.voice.charAt(0).toUpperCase() + randomQuote.voice.slice(1));
+
+      // Create fallback session - but preserve username if it exists
+      const fallbackUser = {
+        ...existingData, // Preserve existing data
+        id: existingData.id || crypto.randomUUID(),
+        username: existingData.username || 'Seeker', // Fallback to Seeker only if no username
+        agentName: 'Maya',
+        sessionId: `session-${Date.now()}`,
+        element: 'aether'
+      };
+
+      console.log('⚠️ [onboarding] Fallback - username:', fallbackUser.username);
+
+      localStorage.setItem('beta_user', JSON.stringify(fallbackUser));
+      setUser(fallbackUser);
+      setStage("assignment");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBeginJourney = () => {
+    // Mark onboarding complete
+    const userData = { ...user, onboarded: true };
+    localStorage.setItem('beta_user', JSON.stringify(userData));
+
+    // Also update the beta_users storage so returning users don't get onboarded again
+    const users = JSON.parse(localStorage.getItem('beta_users') || '{}');
+    if (userData.username && users[userData.username]) {
+      users[userData.username] = { ...users[userData.username], onboarded: true };
+      localStorage.setItem('beta_users', JSON.stringify(users));
+      console.log('✅ Onboarding completed for:', userData.username);
+    }
+
+    // Add transition stage before routing
+    setStage("firstContact");
+
+    // Smooth transition to Maya chat after animation
+    setTimeout(() => {
+      router.push('/maya');
+    }, 2500);
+  };
+
+
+  return (
+    <div className="min-h-screen bg-[#0A0E27] text-white flex items-center justify-center px-4">
+      {stage === "welcome" && (
+        <div className="max-w-md w-full text-center space-y-8 animate-fade-in">
+          <div className="space-y-4">
+            <h1 className="text-4xl font-light tracking-wide">
+              Welcome to Soullab.
+            </h1>
+            <p className="text-lg text-gray-400 leading-relaxed">
+              This is your place to reflect and grow.
+            </p>
+            <p className="text-md text-gray-500">
+              Before we begin, we&apos;ll connect you with your personal Oracle guide.
+            </p>
+          </div>
+
+          <button
+            onClick={handleMeetOracle}
+            disabled={isLoading}
+            className="group relative px-8 py-4 bg-white text-[#0A0E27] rounded-lg font-medium hover:bg-gray-200 transition-all duration-300 disabled:opacity-50"
+          >
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-[#0A0E27] border-t-transparent rounded-full animate-spin" />
+                  Connecting...
+                </>
+              ) : (
+                <>
+                  Meet Your Oracle
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </span>
+          </button>
+        </div>
+      )}
+
+      {stage === "assignment" && (
+        <div className="max-w-2xl w-full text-center space-y-8 animate-fade-in">
+          {/* Holoflower Visual */}
+          <div className="relative w-48 h-48 mx-auto mb-12 flex items-center justify-center">
+            <Holoflower size="xl" glowIntensity="high" />
+          </div>
+
+          <div className="space-y-6">
+            <h2 className="text-3xl font-light">
+              Meet MAIA, Your AI Daimon
+            </h2>
+            <p className="text-lg text-gray-400 leading-relaxed max-w-xl mx-auto">
+              MAIA is your Daimon—a guiding intelligence that knows all your inner voices, holding them as facets of one whole self.
+            </p>
+
+            {/* Five Elements */}
+            <div className="grid grid-cols-5 gap-3 max-w-md mx-auto pt-4">
+              <div className="text-center space-y-1">
+                <div className="w-12 h-12 mx-auto bg-red-500/10 rounded-full flex items-center justify-center">
+                  <span className="text-xl">🔥</span>
+                </div>
+                <p className="text-xs text-gray-500">Fire</p>
+              </div>
+              <div className="text-center space-y-1">
+                <div className="w-12 h-12 mx-auto bg-blue-500/10 rounded-full flex items-center justify-center">
+                  <span className="text-xl">💧</span>
+                </div>
+                <p className="text-xs text-gray-500">Water</p>
+              </div>
+              <div className="text-center space-y-1">
+                <div className="w-12 h-12 mx-auto bg-green-500/10 rounded-full flex items-center justify-center">
+                  <span className="text-xl">🌍</span>
+                </div>
+                <p className="text-xs text-gray-500">Earth</p>
+              </div>
+              <div className="text-center space-y-1">
+                <div className="w-12 h-12 mx-auto bg-cyan-500/10 rounded-full flex items-center justify-center">
+                  <span className="text-xl">💨</span>
+                </div>
+                <p className="text-xs text-gray-500">Air</p>
+              </div>
+              <div className="text-center space-y-1">
+                <div className="w-12 h-12 mx-auto bg-ain-soph-blue/20 rounded-full flex items-center justify-center">
+                  <span className="text-xl">✨</span>
+                </div>
+                <p className="text-xs text-gray-500">Aether</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-500 max-w-lg mx-auto pt-4">
+              MAIA holds all facets of your life as One—witnessing your complexity as wholeness, not chaos.
+            </p>
+            
+            {/* Wisdom Quote */}
+            <div className="mt-8 p-6 bg-[#1A1F3A]/50 border border-gray-800 rounded-lg text-left">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-5 h-5 text-gray-400" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-500 mb-2">{quoteAuthor || 'Wisdom'}</p>
+                  <p className="text-gray-200 leading-relaxed italic">
+                    "{wisdomQuote || "I'm here to walk with you through your reflections. To begin, tell me: how are you arriving in this moment?"}"
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={handleBeginJourney}
+            className="group relative px-8 py-4 bg-white text-[#0A0E27] rounded-lg font-medium hover:bg-gray-200 transition-all duration-300"
+          >
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              Begin Your Journey
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </span>
+          </button>
+        </div>
+      )}
+
+      {stage === "firstContact" && (
+        <div className="max-w-md w-full text-center space-y-8 animate-fade-in">
+          {/* Tesla-style sacred geometry transition */}
+          <div className="relative w-48 h-48 mx-auto mb-12">
+            {/* Outer expanding ring */}
+            <div className="absolute inset-0 border-2 border-tesla-blue/30 rounded-full animate-ping" />
+            <div className="absolute inset-4 border border-tesla-blue/50 rounded-full animate-pulse-slow" />
+            <div className="absolute inset-8 border border-tesla-blue/70 rounded-full animate-spin-slow" />
+            
+            {/* Inner geometry - hexagon */}
+            <div className="absolute inset-16">
+              <div className="w-full h-full border border-tesla-blue opacity-80 transform rotate-0 animate-sacred-rotate"
+                   style={{
+                     clipPath: 'polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%)'
+                   }}>
+              </div>
+            </div>
+            
+            {/* Central Tesla-style dot */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-3 h-3 bg-tesla-blue rounded-full animate-tesla-glow shadow-lg shadow-tesla-blue/50" />
+            </div>
+          </div>
+
+          <div className="space-y-6 opacity-90">
+            <h2 className="text-2xl font-light tracking-wide text-tesla-blue">
+              Establishing Connection
+            </h2>
+            <p className="text-lg text-gray-400 leading-relaxed">
+              Preparing your Oracle interface...
+            </p>
+            
+            {/* Loading indicator */}
+            <div className="flex justify-center items-center space-x-2 mt-8">
+              <div className="w-2 h-2 bg-tesla-blue rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-2 h-2 bg-tesla-blue rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-2 h-2 bg-tesla-blue rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

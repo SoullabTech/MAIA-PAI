@@ -21,6 +21,7 @@ import { OracleResponse, ConversationContext } from '@/lib/oracle-response';
 import { mapResponseToMotion, enrichOracleResponse } from '@/lib/motion-mapper';
 import { VoiceState } from '@/lib/voice/voice-capture';
 import { useMaiaVoice } from '@/hooks/useMaiaVoice';
+import { useMaiaRealtime } from '@/hooks/useMaiaRealtime';
 import { cleanMessage, cleanMessageForVoice, formatMessageForDisplay } from '@/lib/cleanMessage';
 import { getAgentConfig, AgentConfig } from '@/lib/agent-config';
 import { toast } from 'react-hot-toast';
@@ -82,6 +83,41 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 }) => {
   // Maia Voice Integration - Initialize immediately for Voice mode
   const { speak: maiaSpeak, voiceState: maiaVoiceState, isReady: maiaReady } = useMaiaVoice();
+
+  // OpenAI Realtime API Integration - Low-latency voice-to-voice
+  const realtime = useMaiaRealtime({
+    voice: 'shimmer',
+    systemPrompt: `You are MAIA, a sacred guide helping souls recognize their wholeness. Speak with warmth, depth, and presence.`,
+    userId: userId || 'anonymous',
+    onTranscript: (text, isUser) => {
+      if (isUser) {
+        console.log('👤 User said:', text);
+      } else {
+        console.log('🤖 MAIA said:', text);
+        // Add MAIA's response to messages
+        const oracleMessage: ConversationMessage = {
+          id: `msg-${Date.now()}-oracle`,
+          role: 'oracle',
+          text,
+          timestamp: new Date(),
+          motionState: 'responding',
+          source: 'maia'
+        };
+        setMessages(prev => [...prev, oracleMessage]);
+      }
+    },
+    onConnected: () => {
+      console.log('✅ Realtime API connected');
+      toast.success('Voice connected', { duration: 2000 });
+    },
+    onDisconnected: () => {
+      console.log('🔌 Realtime API disconnected');
+    },
+    onError: (error) => {
+      console.error('❌ Realtime API error:', error);
+      toast.error('Voice connection issue', { duration: 3000 });
+    },
+  });
 
   // This effect will be moved after state declarations to avoid hoisting issues
 
@@ -1923,18 +1959,24 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             </>
           ) : (
             <>
-              {/* Simplified Organic Voice - No visual mic, just voice logic */}
-              <SimplifiedOrganicVoice
-                ref={voiceMicRef}
-                onTranscript={(transcript) => {
-                  console.log('📝 Voice transcript received:', transcript);
-                  setUserTranscript(transcript);
-                  handleVoiceTranscript(transcript);
-                }}
-                enabled={!isMuted && !isAudioPlaying && !isResponding && !maiaVoiceState?.isPlaying}
-                isMayaSpeaking={isMicrophonePaused || isResponding || isAudioPlaying || maiaVoiceState?.isPlaying}
-                onAudioLevelChange={setVoiceAudioLevel}
-              />
+              {/* OpenAI Realtime Voice - Auto-connects on mount */}
+              {!realtime.isConnected && !realtime.isConnecting && (
+                <div className="fixed bottom-32 left-1/2 transform -translate-x-1/2 z-50">
+                  <button
+                    onClick={() => realtime.connect()}
+                    className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
+                  >
+                    🎙️ Connect Voice
+                  </button>
+                </div>
+              )}
+              {realtime.isConnecting && (
+                <div className="fixed bottom-32 left-1/2 transform -translate-x-1/2 z-50">
+                  <div className="px-6 py-3 bg-black/60 text-amber-400 rounded-full shadow-lg backdrop-blur-md">
+                    Connecting voice...
+                  </div>
+                </div>
+              )}
             </>
           )}
         </>
