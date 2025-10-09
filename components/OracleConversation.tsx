@@ -112,13 +112,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       }
     },
     onError: (error) => {
-      console.error('❌ Soullab Realtime error:', error);
-      // Debounce error toasts - only show once every 10 seconds to prevent cascading
-      const now = Date.now();
-      if (now - lastVoiceErrorRef.current > 10000) {
-        toast.error('Voice connection issue', { duration: 3000 });
-        lastVoiceErrorRef.current = now;
-      }
+      console.warn('⚠️ Voice system error (voice disabled):', error);
+      // Voice errors suppressed - voice features require OpenAI API key configuration
+      // Users can still use text chat which works independently
     }
   });
 
