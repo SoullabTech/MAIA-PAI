@@ -190,7 +190,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // Client-side only check
   useEffect(() => {
     setIsMounted(true);
-    trackEvent.newSession(userId || 'anonymous', sessionId);
+    trackEvent('session_start', { userId: userId || 'anonymous', sessionId });
 
     // Track real user activity
     const trackingUserId = userId || `anon_${sessionId}`;
