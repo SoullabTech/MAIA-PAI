@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout Sacred Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js Sacred Environment
         uses: actions/setup-node@v4
@@ -75,7 +75,7 @@ jobs:
 
     steps:
       - name: Checkout Sacred Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Sacred Environment
         uses: actions/setup-node@v4
@@ -132,7 +132,7 @@ jobs:
 
     steps:
       - name: Checkout Sacred Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Sacred Environment
         uses: actions/setup-node@v4
@@ -188,7 +188,7 @@ jobs:
 
     steps:
       - name: Checkout Sacred Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download Sacred Artifacts
         uses: actions/download-artifact@v4
@@ -234,7 +234,7 @@ jobs:
 
     steps:
       - name: Checkout Sacred Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Download Sacred Artifacts
         uses: actions/download-artifact@v4
@@ -320,7 +320,7 @@ jobs:
 
     steps:
       - name: Checkout Sacred Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Sacred Metrics Collection
         run: |
