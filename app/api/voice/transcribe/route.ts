@@ -34,6 +34,15 @@ async function transcribeWithSelfHostedWhisper(audioFile: File): Promise<any> {
 }
 
 async function transcribeWithOpenAI(audioFile: File): Promise<any> {
+  console.log('🔍 transcribeWithOpenAI called:', {
+    hasAPIKey: !!OPENAI_API_KEY,
+    apiKeyLength: OPENAI_API_KEY?.length,
+    apiKeyPrefix: OPENAI_API_KEY?.substring(0, 10) + '...',
+    fileName: audioFile.name,
+    fileSize: audioFile.size,
+    fileType: audioFile.type
+  });
+
   if (!OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY not configured');
   }
@@ -44,16 +53,28 @@ async function transcribeWithOpenAI(audioFile: File): Promise<any> {
   const arrayBuffer = await audioFile.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
+  console.log('📦 Prepared audio buffer:', {
+    bufferSize: buffer.length,
+    arrayBufferSize: arrayBuffer.byteLength
+  });
+
   // Create a File-like object that OpenAI SDK accepts
   const file = new File([buffer], audioFile.name || 'audio.webm', {
     type: audioFile.type || 'audio/webm'
   });
+
+  console.log('☁️  Calling OpenAI Whisper API...');
 
   const transcription = await openai.audio.transcriptions.create({
     file: file,
     model: 'whisper-1',
     language: 'en',
     response_format: 'json'
+  });
+
+  console.log('✅ OpenAI Whisper response:', {
+    textLength: transcription.text?.length,
+    textPreview: transcription.text?.substring(0, 50)
   });
 
   return {
@@ -143,10 +164,19 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Transcription error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    console.error('❌ Transcription error:', {
+      message: errorMessage,
+      stack: errorStack,
+      error
+    });
+
     return NextResponse.json({
       success: false,
-      error: 'Failed to transcribe audio'
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? errorStack : undefined
     }, { status: 500 });
   }
 }
