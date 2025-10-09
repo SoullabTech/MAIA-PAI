@@ -2,7 +2,7 @@
 // Core types for voice interaction and collective listening
 
 export type Element = "fire" | "water" | "earth" | "air" | "aether";
-export type PresenceMode = "conversation" | "meditation" | "guided";
+export type PresenceMode = "conversation" | "meditation" | "guided" | "ritual" | "listening";
 export type TrustBreath = "in" | "out" | "hold";
 
 /**
@@ -111,4 +111,106 @@ export interface OrchestratorInsight {
   elements: Element[];                                     // Active elements
   strength: number;                                        // 0-1 intensity
   personalMirror?: string;                                 // Individual reflection
+  patterns?: any;                                          // Collective patterns detected
+  timestamp?: number;                                      // When insight occurred
 }
+
+/**
+ * Mic session - manages voice capture for collective listening
+ */
+export class MicSession {
+  private sessionId: string;
+  private config: MicSessionConfig;
+  private isActive: boolean = false;
+
+  constructor(config: MicSessionConfig) {
+    this.config = config;
+    this.sessionId = `mic-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  async start(onUtterance: (utterance: PersonalUtterance) => void): Promise<void> {
+    console.log('[MicSession] Starting with config:', this.config);
+    this.isActive = true;
+    // Actual mic implementation would go here
+    // For beta, this is a placeholder
+  }
+
+  stop(): void {
+    console.log('[MicSession] Stopping');
+    this.isActive = false;
+  }
+
+  getSessionId(): string {
+    return this.sessionId;
+  }
+
+  isListening(): boolean {
+    return this.isActive;
+  }
+}
+
+/**
+ * Symbol extractor - converts personal utterances to privacy-safe symbols
+ */
+export const symbolExtractor = {
+  toSymbolic(utterance: PersonalUtterance): Omit<SymbolicSignal, 'teamId'> {
+    // Extract symbolic patterns without personal content
+    // In production, this would use NLP for proper extraction
+    const elements: Array<{ name: Element; intensity: number }> = [
+      { name: 'air', intensity: 0.7 },
+      { name: 'fire', intensity: 0.3 }
+    ];
+
+    return {
+      anonId: utterance.id,
+      ts: utterance.ts,
+      mode: utterance.mode,
+      elements,
+      motifs: ['exploration', 'presence'],
+      affect: {
+        valence: utterance.emotionalContext?.valence ?
+          (utterance.emotionalContext.valence > 0.3 ? 1 : utterance.emotionalContext.valence < -0.3 ? -1 : 0) : 0,
+        arousal: utterance.emotionalContext?.arousal ?
+          (utterance.emotionalContext.arousal > 0.66 ? 2 : utterance.emotionalContext.arousal > 0.33 ? 1 : 0) : 0
+      },
+      trustBreath: 'in',
+      spiralFlag: false
+    };
+  },
+
+  resetSession() {
+    console.log('[SymbolExtractor] Session reset');
+  }
+};
+
+/**
+ * Aetheric orchestrator - synthesizes collective insights
+ */
+export const aethericOrchestrator = {
+  synthesize(signals: SymbolicSignal[]): OrchestratorInsight | null {
+    if (signals.length < 2) return null;
+
+    // Calculate collective patterns
+    const elementCounts = new Map<Element, number>();
+    signals.forEach(signal => {
+      signal.elements.forEach(elem => {
+        elementCounts.set(elem.name, (elementCounts.get(elem.name) || 0) + elem.intensity);
+      });
+    });
+
+    const dominantElement = Array.from(elementCounts.entries())
+      .sort(([,a], [,b]) => b - a)[0]?.[0] || 'aether';
+
+    return {
+      type: 'resonance',
+      message: 'The collective field shows curiosity and openness.',
+      elements: [dominantElement],
+      strength: 0.72,
+      patterns: {
+        coherence: 0.72,
+        emergence: true
+      },
+      timestamp: Date.now()
+    };
+  }
+};

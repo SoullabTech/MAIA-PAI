@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserAuth } from '@/lib/hooks/useUserAuth';
 import { OracleConversation } from '@/components/OracleConversation';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LogOut } from 'lucide-react';
 
 export default function MayaPage() {
@@ -78,23 +79,34 @@ export default function MayaPage() {
     setExplorerName(name);
   }, [router, user]);
 
-  return (
-    <div className="relative min-h-screen">
-      {/* Sign Out Button - Fixed top-right */}
-      <button
-        onClick={handleSignOut}
-        className="fixed top-4 right-4 z-50 p-3 bg-[#1A1F2E]/80 border border-amber-500/20 rounded-full hover:border-amber-500/50 hover:bg-[#1A1F2E] transition-all backdrop-blur-sm"
-        title="Sign Out"
-      >
-        <LogOut className="w-5 h-5 text-amber-400/70 hover:text-amber-400" />
-      </button>
+  // Show loading state while checking auth
+  if (!explorerId || explorerId === 'guest') {
+    return (
+      <div className="relative min-h-screen bg-[#1a1f3a] flex items-center justify-center">
+        <div className="text-amber-200/60">Loading...</div>
+      </div>
+    );
+  }
 
-      <OracleConversation
-        sessionId={Date.now().toString()}
-        userId={explorerId}
-        userName={explorerName}
-        voiceEnabled={preferences?.voice_enabled ?? true}
-      />
-    </div>
+  return (
+    <ErrorBoundary>
+      <div className="relative min-h-screen">
+        {/* Sign Out Button - Fixed top-right */}
+        <button
+          onClick={handleSignOut}
+          className="fixed top-4 right-4 z-50 p-3 bg-[#1A1F2E]/80 border border-amber-500/20 rounded-full hover:border-amber-500/50 hover:bg-[#1A1F2E] transition-all backdrop-blur-sm"
+          title="Sign Out"
+        >
+          <LogOut className="w-5 h-5 text-amber-400/70 hover:text-amber-400" />
+        </button>
+
+        <OracleConversation
+          sessionId={Date.now().toString()}
+          userId={explorerId}
+          userName={explorerName}
+          voiceEnabled={preferences?.voice_enabled ?? true}
+        />
+      </div>
+    </ErrorBoundary>
   );
 }
