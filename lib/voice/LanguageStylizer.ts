@@ -10,6 +10,11 @@
  */
 
 import { styleForPhaseArchetype, allowPoetry, getSilenceComfort } from './VoiceStyleMatrix';
+import {
+  enrichWithElementalMetaphor,
+  weaveElementalLanguage,
+  getMetaphorContext
+} from './ElementalMetaphors';
 import type { Archetype } from './conversation/AffectDetector';
 import type { SpiralogicPhase } from '@/lib/spiralogic/PhaseDetector';
 
@@ -32,6 +37,7 @@ export function stylizeResponse(
 ): string {
   const { archetype, phase, userContext } = options;
   const style = styleForPhaseArchetype(archetype, phase);
+  const metaphorLevel = getMetaphorLevel(archetype, phase);
 
   let stylized = responseText;
 
@@ -39,7 +45,10 @@ export function stylizeResponse(
   if (style.poetryLevel === 'none') {
     stylized = stripPoetry(stylized);
   } else if (style.poetryLevel === 'high' && allowPoetry(archetype, phase)) {
-    stylized = enrichWithPoetry(stylized);
+    stylized = enrichWithPoetry(stylized, archetype, metaphorLevel);
+  } else if (style.poetryLevel === 'moderate') {
+    // Weave elemental language subtly
+    stylized = weaveElementalLanguage(stylized, archetype);
   }
 
   // 2. Sentence Length Adjustment
@@ -98,26 +107,15 @@ function stripPoetry(text: string): string {
 }
 
 /**
- * Enrich with subtle poetic language
+ * Enrich with elemental metaphors
  * For Water-Aether, Aether-Aether contexts
+ * Uses archetype-specific symbolic vocabulary
  */
-function enrichWithPoetry(text: string): string {
-  let enriched = text;
+function enrichWithPoetry(text: string, archetype: Archetype, metaphorLevel: number): string {
+  if (metaphorLevel < 2) return text;
 
-  // Add gentle poetic undertones (very subtle)
-  const enrichments: [RegExp, string][] = [
-    [/\bfeel this\b/gi, 'feel this deeply'],
-    [/\bnotice what\b/gi, 'notice what wants to emerge'],
-    [/\bI'm here\b/gi, 'I'm here with all of it'],
-    [/\btake your time\b/gi, 'take all the time you need'],
-    [/\blisten to\b/gi, 'listen beneath']
-  ];
-
-  for (const [pattern, replacement] of enrichments) {
-    enriched = enriched.replace(pattern, replacement);
-  }
-
-  return enriched;
+  // Use elemental metaphor enrichment
+  return enrichWithElementalMetaphor(text, archetype, 2);
 }
 
 /**
