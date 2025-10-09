@@ -64,7 +64,7 @@ export default function RootLayout({
               <BetaBanner />
               {children}
               <ConditionalMenuBar />
-              <PWAInstallPrompt />
+              {/* <PWAInstallPrompt /> */}
               <FeedbackWidget />
               <VoiceDebugOverlay />
               {process.env.NODE_ENV === 'development' && <ToneDebugOverlay />}

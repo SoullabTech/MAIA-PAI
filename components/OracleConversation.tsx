@@ -1126,8 +1126,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   });
 
   return (
-    <div className="oracle-conversation min-h-screen overflow-hidden" style={{ backgroundColor: '#ff0000', minHeight: '100vh' }}>
-      {/* DIAGNOSTIC: Bright red background to verify OracleConversation renders */}
+    <div className="oracle-conversation min-h-screen bg-[#1a1f2e] overflow-hidden">
       {/* iOS Audio Enable Button - DISABLED - causing black screen */}
       {false && needsIOSAudioPermission && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur z-[100] flex items-center justify-center">
