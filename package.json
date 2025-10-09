@@ -178,7 +178,7 @@
     "pwa-asset-generator": "^8.1.1",
     "sharp": "^0.34.3",
     "ts-jest": "^29.1.2",
-    "tsx": "^4.20.5"
+    "tsx": "^4.20.6"
   },
   "engines": {
     "node": ">=18.0.0",
