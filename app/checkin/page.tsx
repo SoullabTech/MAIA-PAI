@@ -23,28 +23,48 @@ export default function CheckInPage() {
       console.log('🔍 [checkin] Looking for username:', username);
 
       // Check if user exists in beta_users
-      const users = JSON.parse(localStorage.getItem('beta_users') || '{}');
+      let users = JSON.parse(localStorage.getItem('beta_users') || '{}');
       console.log('🔍 [checkin] Available users:', Object.keys(users));
 
-      if (!users[username]) {
-        // Check if there's already a beta_user (they might be logged in from a different session)
-        const existingUser = localStorage.getItem('beta_user');
-        if (existingUser) {
-          const userData = JSON.parse(existingUser);
-          console.log('🔍 [checkin] Found existing beta_user:', userData.username);
+      // Check if there's already a beta_user stored
+      const existingUser = localStorage.getItem('beta_user');
+      if (existingUser) {
+        const userData = JSON.parse(existingUser);
+        console.log('🔍 [checkin] Found existing beta_user:', userData.username);
 
-          if (userData.username === username && userData.onboarded === true) {
-            console.log('✅ [checkin] User already logged in, redirecting to Maya');
-            router.push('/maya');
-            return;
+        // If the username matches, use that user
+        if (userData.username.toLowerCase() === username.toLowerCase()) {
+          console.log('✅ [checkin] Matched existing user, redirecting');
+
+          // Restore to beta_users if missing
+          if (!users[userData.username]) {
+            console.log('🔧 [checkin] Restoring user to beta_users');
+            users[userData.username] = {
+              ...userData,
+              password: 'restored', // Placeholder - they can reset via /auth
+              onboarded: true
+            };
+            localStorage.setItem('beta_users', JSON.stringify(users));
           }
-        }
 
+          router.push('/maya');
+          return;
+        }
+      }
+
+      // Case-insensitive username check
+      const normalizedUsername = username.toLowerCase();
+      const matchingUser = Object.keys(users).find(
+        key => key.toLowerCase() === normalizedUsername
+      );
+
+      if (!matchingUser) {
         console.error('❌ [checkin] Username not found in beta_users');
+        console.log('💡 [checkin] Available usernames:', Object.keys(users));
         throw new Error(`Username "${username}" not found. Please sign up first.`);
       }
 
-      const userWithPassword = users[username];
+      const userWithPassword = users[matchingUser];
       console.log('🔍 [checkin] Found user:', { username, onboarded: userWithPassword.onboarded });
 
       // Check if user has completed onboarding
