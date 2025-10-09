@@ -201,10 +201,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     const isIOSSafari = isIOS && /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent);
 
-    if (isIOS && !isIOSAudioEnabled) {
-      setNeedsIOSAudioPermission(true);
-      console.log('📱 iOS detected - audio permission needed', { isIOS, isIOSSafari });
-    }
+    // TEMPORARILY DISABLED - causing black screen overlay on desktop
+    // if (isIOS && !isIOSAudioEnabled) {
+    //   setNeedsIOSAudioPermission(true);
+    //   console.log('📱 iOS detected - audio permission needed', { isIOS, isIOSSafari });
+    // }
 
     // Get oracle agent ID for memory persistence
     if (userId) {

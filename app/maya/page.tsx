@@ -92,17 +92,6 @@ export default function MayaPage() {
   //   );
   // }
 
-  // Temporary: Simple test to see if page loads at all
-  return (
-    <div className="min-h-screen bg-blue-500 flex items-center justify-center">
-      <div className="text-white text-2xl">
-        MAYA PAGE LOADING TEST - explorerId: {explorerId}
-      </div>
-    </div>
-  );
-
-  // Original code (commented out for testing)
-  /*
   return (
     <ErrorBoundary>
       <div className="relative min-h-screen bg-[#0a0b14]" style={{ backgroundColor: '#0a0b14' }}>
@@ -129,5 +118,4 @@ export default function MayaPage() {
       </div>
     </ErrorBoundary>
   );
-  */
 }
