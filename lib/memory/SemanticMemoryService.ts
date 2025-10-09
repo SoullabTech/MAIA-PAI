@@ -80,17 +80,22 @@ export interface UserSemanticProfile {
 // ================================================================
 
 export class SemanticMemoryService {
-  private supabase: ReturnType<typeof createClient>;
+  private supabase: ReturnType<typeof createClient> | null;
+  private enabled: boolean;
 
   constructor() {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Missing Supabase credentials for SemanticMemoryService');
+      console.warn('⚠️ SemanticMemoryService: Missing Supabase credentials - running in degraded mode without persistent memory');
+      this.supabase = null;
+      this.enabled = false;
+      return;
     }
 
     this.supabase = createClient(supabaseUrl, supabaseKey);
+    this.enabled = true;
   }
 
   // ================================================================
@@ -102,6 +107,11 @@ export class SemanticMemoryService {
    * This is called after every MAIA response
    */
   async recordInteraction(observation: PatternObservation): Promise<void> {
+    if (!this.enabled || !this.supabase) {
+      console.log('[SemanticMemory] Skipping recordInteraction - service disabled');
+      return;
+    }
+
     try {
       const {
         userId,
@@ -176,6 +186,8 @@ export class SemanticMemoryService {
    * Get all learned patterns for a user
    */
   async getUserPatterns(userId: string): Promise<LearnedPattern[]> {
+    if (!this.enabled || !this.supabase) return [];
+
     try {
       const { data, error } = await this.supabase
         .from('user_patterns')
@@ -213,6 +225,8 @@ export class SemanticMemoryService {
    * Get user's complete semantic profile
    */
   async getUserProfile(userId: string): Promise<UserSemanticProfile | null> {
+    if (!this.enabled || !this.supabase) return null;
+
     try {
       // Get summary stats
       const { data: summary, error: summaryError } = await this.supabase
@@ -291,11 +305,22 @@ export class SemanticMemoryService {
    * Get user's elemental affinities (what resonates with them)
    */
   async getElementalAffinity(userId: string): Promise<Record<string, number>> {
+    const defaultAffinity: Record<string, number> = {
+      fire: 0.5,
+      water: 0.5,
+      earth: 0.5,
+      air: 0.5,
+      aether: 0.5,
+      shadow: 0.5
+    };
+
+    if (!this.enabled || !this.supabase) return defaultAffinity;
+
     try {
       const { data, error } = await this.supabase
         .rpc('get_user_elemental_affinity', { p_user_id: userId });
 
-      const defaultAffinity: Record<string, number> = {
+      const affinity: Record<string, number> = {
         fire: 0.5,
         water: 0.5,
         earth: 0.5,
@@ -305,17 +330,17 @@ export class SemanticMemoryService {
       };
 
       if (error || !data || data.length === 0) {
-        return defaultAffinity;
+        return affinity;
       }
 
       // Populate from learned patterns
       for (const item of data) {
         if (item.element && typeof item.affinity_score === 'number') {
-          defaultAffinity[item.element] = item.affinity_score;
+          affinity[item.element] = item.affinity_score;
         }
       }
 
-      return defaultAffinity;
+      return affinity;
     } catch (error) {
       console.error('❌ Error in getElementalAffinity:', error);
       return {
@@ -333,6 +358,8 @@ export class SemanticMemoryService {
    * Get effective language patterns for user in specific element
    */
   async getEffectiveLanguage(userId: string, element: string): Promise<string[]> {
+    if (!this.enabled || !this.supabase) return [];
+
     try {
       const { data, error } = await this.supabase
         .rpc('get_effective_language', {
@@ -355,6 +382,8 @@ export class SemanticMemoryService {
    * Get transition patterns (how user moves through Spiralogic)
    */
   async getTransitionPatterns(userId: string): Promise<TransitionPattern[]> {
+    if (!this.enabled || !this.supabase) return [];
+
     try {
       const { data, error } = await this.supabase
         .from('user_patterns')
@@ -378,6 +407,8 @@ export class SemanticMemoryService {
    * Get collective wisdom for an element (what works for most users)
    */
   async getCollectiveWisdom(element: string): Promise<any[]> {
+    if (!this.enabled || !this.supabase) return [];
+
     try {
       const { data, error } = await this.supabase
         .from('collective_patterns')
