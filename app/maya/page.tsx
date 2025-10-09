@@ -92,30 +92,40 @@ export default function MayaPage() {
   //   );
   // }
 
-  return (
-    <ErrorBoundary>
-      <div className="relative min-h-screen bg-[#0a0b14]" style={{ backgroundColor: '#0a0b14' }}>
-        <button
-          onClick={handleSignOut}
-          className="fixed top-4 right-4 z-50 p-3 bg-[#1A1F2E]/80 border border-amber-500/20 rounded-full hover:border-amber-500/50 hover:bg-[#1A1F2E] transition-all backdrop-blur-sm"
-          title="Sign Out"
-        >
-          <LogOut className="w-5 h-5 text-amber-400/70 hover:text-amber-400" />
-        </button>
+  // Try wrapping OracleConversation with explicit error catching
+  try {
+    return (
+      <ErrorBoundary>
+        <div className="relative min-h-screen bg-[#0a0b14]" style={{ backgroundColor: '#0a0b14', minHeight: '100vh', position: 'relative' }}>
+          <button
+            onClick={handleSignOut}
+            className="fixed top-4 right-4 z-50 p-3 bg-[#1A1F2E]/80 border border-amber-500/20 rounded-full hover:border-amber-500/50 hover:bg-[#1A1F2E] transition-all backdrop-blur-sm"
+            title="Sign Out"
+          >
+            <LogOut className="w-5 h-5 text-amber-400/70 hover:text-amber-400" />
+          </button>
 
-        {explorerId ? (
-          <OracleConversation
-            sessionId={Date.now().toString()}
-            userId={explorerId}
-            userName={explorerName}
-            voiceEnabled={preferences?.voice_enabled ?? true}
-          />
-        ) : (
-          <div className="flex items-center justify-center min-h-screen">
-            <div className="text-amber-200/60 text-lg">Initializing MAIA...</div>
-          </div>
-        )}
+          {explorerId ? (
+            <OracleConversation
+              sessionId={Date.now().toString()}
+              userId={explorerId}
+              userName={explorerName}
+              voiceEnabled={preferences?.voice_enabled ?? true}
+            />
+          ) : (
+            <div className="flex items-center justify-center min-h-screen">
+              <div className="text-amber-200/60 text-lg">Initializing MAIA...</div>
+            </div>
+          )}
+        </div>
+      </ErrorBoundary>
+    );
+  } catch (error) {
+    console.error('Maya page error:', error);
+    return (
+      <div className="min-h-screen bg-red-900 flex items-center justify-center text-white p-8">
+        <div>Error loading MAIA: {String(error)}</div>
       </div>
-    </ErrorBoundary>
-  );
+    );
+  }
 }
