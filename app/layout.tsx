@@ -63,10 +63,10 @@ export default function RootLayout({
               <Toaster position="top-center" />
               <BetaBanner />
               {children}
-              {/* <ConditionalMenuBar /> */}
-              {/* <PWAInstallPrompt /> */}
-              {/* <FeedbackWidget /> */}
-              {/* <VoiceDebugOverlay /> */}
+              <ConditionalMenuBar />
+              {/* <PWAInstallPrompt /> - Disabled: was causing black overlay */}
+              <FeedbackWidget />
+              {/* <VoiceDebugOverlay /> - File doesn't exist */}
               {/* {process.env.NODE_ENV === 'development' && <ToneDebugOverlay />} */}
             </ToastProvider>
           </AuthProvider>

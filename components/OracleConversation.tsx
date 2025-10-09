@@ -1166,8 +1166,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Branded Welcome Message - TEMPORARILY DISABLED for debugging */}
-      {false && showWelcome && userName && (
+      {/* Branded Welcome Message */}
+      {showWelcome && userName && (
         <BrandedWelcome
           userName={userName}
           isReturning={isReturningUser}
@@ -1175,13 +1175,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         />
       )}
 
-      {/* MAIA Settings Panel - TEMPORARILY DISABLED for debugging */}
-      {false && showSettingsPanel && (
+      {/* MAIA Settings Panel */}
+      {showSettingsPanel && (
         <MaiaSettingsPanel onClose={() => setShowSettingsPanel(false)} />
       )}
 
-      {/* Agent Customizer - Only show when settings clicked - TEMPORARILY DISABLED for debugging */}
-      {false && showCustomizer && (
+      {/* Agent Customizer - Only show when settings clicked */}
+      {showCustomizer && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={() => setShowCustomizer(false)} />
           <div className="relative z-10">
