@@ -124,7 +124,7 @@ export const BrandedWelcome: React.FC<BrandedWelcomeProps> = ({
                 {getMessage()}
               </motion.h2>
 
-              {/* Subtitle with CHANGE OUR WORLD TO SOUL prominent - HIDDEN on mobile */}
+              {/* Subtitle with YOU GOT SOUL prominent - HIDDEN on mobile */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -133,7 +133,7 @@ export const BrandedWelcome: React.FC<BrandedWelcomeProps> = ({
               >
                 <p className="text-sm font-medium tracking-[0.3em] text-transparent bg-clip-text
                            bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600">
-                  CHANGING THE WORLD TO SOUL
+                  YOU GOT SOUL
                 </p>
                 <p className="text-xs text-amber-200/50 mt-1">
                   {isReturning
