@@ -16,6 +16,7 @@
 import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent';
 import { journalStorage } from '@/lib/storage/journal-storage';
 import { userStore } from '@/lib/storage/userStore';
+import { ConversationalEnhancer, EmotionalTone } from './ConversationalEnhancer';
 
 export interface ElementalVoiceConfig {
   userId: string;
@@ -290,10 +291,28 @@ export class ElementalVoiceOrchestrator {
       this.metrics.exchangeCount
     );
 
+    // 🎬 SAMANTHA-STYLE CONVERSATIONAL ENHANCEMENT
+    const emotionalTone = ConversationalEnhancer.detectEmotionalTone(userInput);
+    const enhanced = ConversationalEnhancer.enhance(governedResponse, {
+      userMessage: userInput,
+      emotionalTone,
+      conversationDepth: this.metrics.depth,
+      exchangeCount: this.metrics.exchangeCount,
+      recentMessages: this.transcriptBuffer
+    });
+
+    const finalResponse = ConversationalEnhancer.buildOutput(enhanced);
+
+    console.log('🎬 Conversational enhancement:', {
+      tone: emotionalTone,
+      pacing: enhanced.pacing,
+      acknowledgment: enhanced.acknowledgment || 'none'
+    });
+
     const processingTime = Date.now() - startTime;
     console.log(`⏱️ Spiralogic processing: ${processingTime}ms`);
 
-    return governedResponse;
+    return finalResponse;
   }
 
   /**
