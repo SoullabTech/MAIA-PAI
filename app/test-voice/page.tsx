@@ -1,10 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+/**
+ * 🌀 Soullab Realtime Voice Test Page
+ * Simple test interface for voice conversation
+ */
+
+import { useSoullabRealtime } from '@/hooks/useSoullabRealtime';
+import { Mic, MicOff } from 'lucide-react';
 
 export default function TestVoicePage() {
-  const [status, setStatus] = useState<string>('Ready to test...');
-  const [results, setResults] = useState<string[]>([]);
+  const realtime = useSoullabRealtime({
+    userId: 'test-user',
+    userName: 'Explorer',
+    sessionId: `test-${Date.now()}`,
+    voice: 'shimmer',
+    enableSmartCache: true,
+    enableResponseStreaming: true,
+    autoConnect: false
+  });
 
   const addResult = (message: string, isError = false) => {
     const timestamp = new Date().toLocaleTimeString();

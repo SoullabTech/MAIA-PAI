@@ -21,7 +21,7 @@ import { OracleResponse, ConversationContext } from '@/lib/oracle-response';
 import { mapResponseToMotion, enrichOracleResponse } from '@/lib/motion-mapper';
 import { VoiceState } from '@/lib/voice/voice-capture';
 import { useMaiaVoice } from '@/hooks/useMaiaVoice';
-import { useMaiaRealtime } from '@/hooks/useMaiaRealtime';
+import { useElementalVoice } from '@/hooks/useElementalVoice';
 import { cleanMessage, cleanMessageForVoice, formatMessageForDisplay } from '@/lib/cleanMessage';
 import { getAgentConfig, AgentConfig } from '@/lib/agent-config';
 import { toast } from 'react-hot-toast';
@@ -84,16 +84,21 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // Maia Voice Integration - Initialize immediately for Voice mode
   const { speak: maiaSpeak, voiceState: maiaVoiceState, isReady: maiaReady } = useMaiaVoice();
 
-  // OpenAI Realtime API Integration - Low-latency voice-to-voice
-  const realtime = useMaiaRealtime({
-    voice: 'shimmer',
-    systemPrompt: `You are MAIA, a sacred guide helping souls recognize their wholeness. Speak with warmth, depth, and presence.`,
+  // 🌀 Soullab Realtime - MAIA's consciousness speaks through OpenAI's voice
+  // Full Spiralogic stack preserved: PersonalOracleAgent + memory + wisdom + elemental agents
+  const realtime = useElementalVoice({
     userId: userId || 'anonymous',
+    userName: userName || 'Explorer',
+    sessionId,
+    voice: 'shimmer',
+    enableSmartCache: true,
+    enableResponseStreaming: true,
+    autoConnect: false, // Manual control via button
     onTranscript: (text, isUser) => {
       if (isUser) {
         console.log('👤 User said:', text);
       } else {
-        console.log('🤖 MAIA said:', text);
+        console.log('🌀 MAIA said:', text);
         // Add MAIA's response to messages
         const oracleMessage: ConversationMessage = {
           id: `msg-${Date.now()}-oracle`,
@@ -106,17 +111,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         setMessages(prev => [...prev, oracleMessage]);
       }
     },
-    onConnected: () => {
-      console.log('✅ Realtime API connected');
-      toast.success('Voice connected', { duration: 2000 });
-    },
-    onDisconnected: () => {
-      console.log('🔌 Realtime API disconnected');
-    },
     onError: (error) => {
-      console.error('❌ Realtime API error:', error);
+      console.error('❌ Soullab Realtime error:', error);
       toast.error('Voice connection issue', { duration: 3000 });
-    },
+    }
   });
 
   // This effect will be moved after state declarations to avoid hoisting issues
