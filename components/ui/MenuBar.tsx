@@ -81,8 +81,8 @@ export function MenuBar() {
         </div>
       )}
 
-      {/* Mobile-First: Full Menu Bar */}
-      <div className="flex fixed right-4 z-50 items-center gap-2 md:gap-3" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 0.75rem)' }}>
+      {/* Mobile-First: Full Menu Bar - Positioned left of sign out button */}
+      <div className="flex fixed right-16 z-50 items-center gap-2 md:gap-3" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 0.75rem)' }}>
       {/* MAIA Training Progress Icon */}
       <Link
         href="/maya/training"
