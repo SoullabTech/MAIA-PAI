@@ -7,8 +7,8 @@ import { BetaBanner } from "@/components/ui/BetaBanner";
 import { FeedbackWidget } from "@/components/ui/FeedbackWidget";
 import { PWAInstallPrompt } from "@/components/ui/PWAInstallPrompt";
 import { ConditionalMenuBar } from "@/components/ui/ConditionalMenuBar";
-import VoiceDebugOverlay from "@/components/debug/VoiceDebugOverlay";
-import { ToneDebugOverlay } from "@/components/voice/ToneDebugOverlay";
+// import VoiceDebugOverlay from "@/components/debug/VoiceDebugOverlay"; // File doesn't exist
+// import { ToneDebugOverlay } from "@/components/voice/ToneDebugOverlay"; // Disabled for debugging
 import { Toaster } from 'react-hot-toast';
 import "./globals.css";
 import "./globals-mobile.css";
@@ -66,8 +66,8 @@ export default function RootLayout({
               {/* <ConditionalMenuBar /> */}
               {/* <PWAInstallPrompt /> */}
               {/* <FeedbackWidget /> */}
-              <VoiceDebugOverlay />
-              {process.env.NODE_ENV === 'development' && <ToneDebugOverlay />}
+              {/* <VoiceDebugOverlay /> */}
+              {/* {process.env.NODE_ENV === 'development' && <ToneDebugOverlay />} */}
             </ToastProvider>
           </AuthProvider>
         </PWAProvider>
