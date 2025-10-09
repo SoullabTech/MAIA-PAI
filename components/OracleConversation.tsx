@@ -113,7 +113,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     },
     onError: (error) => {
       console.error('❌ Soullab Realtime error:', error);
-      toast.error('Voice connection issue', { duration: 3000 });
+      // Debounce error toasts - only show once every 10 seconds to prevent cascading
+      const now = Date.now();
+      if (now - lastVoiceErrorRef.current > 10000) {
+        toast.error('Voice connection issue', { duration: 3000 });
+        lastVoiceErrorRef.current = now;
+      }
     }
   });
 
@@ -179,6 +184,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [isMounted, setIsMounted] = useState(false);
   const [echoSuppressUntil, setEchoSuppressUntil] = useState<number>(0);
   const lastMaiaResponseRef = useRef<string>('');
+  const lastVoiceErrorRef = useRef<number>(0);
 
   // Oracle Agent ID for memory persistence
   const [oracleAgentId, setOracleAgentId] = useState<string | null>(null);
