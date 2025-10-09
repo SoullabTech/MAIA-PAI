@@ -162,7 +162,7 @@
     "@next/bundle-analyzer": "^14.0.0",
     "@storybook/nextjs": "^9.1.8",
     "@storybook/react": "^9.1.8",
-    "@testing-library/jest-dom": "^6.1.5",
+    "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^14.1.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/jest": "^29.5.11",
