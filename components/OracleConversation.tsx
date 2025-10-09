@@ -1166,8 +1166,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Branded Welcome Message - Shows above everything */}
-      {showWelcome && userName && (
+      {/* Branded Welcome Message - TEMPORARILY DISABLED for debugging */}
+      {false && showWelcome && userName && (
         <BrandedWelcome
           userName={userName}
           isReturning={isReturningUser}
