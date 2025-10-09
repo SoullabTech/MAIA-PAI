@@ -91,8 +91,8 @@ function Week2CheckInContent() {
     // Store that they've seen Week 2 welcome
     localStorage.setItem('week2_welcome_seen', 'true');
     localStorage.setItem('beta_code', code);
-    // Redirect to login
-    router.push('/login?week2=true');
+    // Redirect to signup (new users create account, existing users can click "sign in")
+    router.push(`/signup?code=${code}&name=${name}&week2=true`);
   };
 
   return (
