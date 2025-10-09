@@ -1115,6 +1115,16 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     console.log('🛑 All Maya systems stopped');
   }, [maiaVoiceState]);
 
+  // DIAGNOSTIC LOGGING - Track what's rendering
+  console.log('[OracleConversation] Rendering with state:', {
+    showWelcome,
+    showSettingsPanel,
+    showCustomizer,
+    needsIOSAudioPermission,
+    userName,
+    explorerId: userId
+  });
+
   return (
     <div className="oracle-conversation min-h-screen bg-[#1a1f2e] overflow-hidden">
       {/* iOS Audio Enable Button - DISABLED - causing black screen */}
@@ -1163,13 +1173,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         />
       )}
 
-      {/* MAIA Settings Panel */}
-      {showSettingsPanel && (
+      {/* MAIA Settings Panel - TEMPORARILY DISABLED for debugging */}
+      {false && showSettingsPanel && (
         <MaiaSettingsPanel onClose={() => setShowSettingsPanel(false)} />
       )}
 
-      {/* Agent Customizer - Only show when settings clicked */}
-      {showCustomizer && (
+      {/* Agent Customizer - Only show when settings clicked - TEMPORARILY DISABLED for debugging */}
+      {false && showCustomizer && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={() => setShowCustomizer(false)} />
           <div className="relative z-10">
