@@ -22,6 +22,17 @@ import { Backchanneler } from './conversation/Backchanneler';
 import { inferMoodFromText, inferMoodAndArchetype, Mood, Archetype } from './conversation/AffectDetector';
 import { routeToArchetype } from './ArchetypeRouter';
 
+// 🧬 New memory evolution systems
+import { completeMemoryUpdate } from '@/lib/memory/MemoryUpdater';
+import { completeSymbolicPrediction, getMostResonantSymbols, type SymbolResonance } from '@/lib/memory/SymbolicPredictor';
+import { playgroundTick, blendElementalStyle, getElementalSignature, hasSignificantDrift, seedFromPhase, type ElementalState } from '@/lib/memory/ElementalState';
+import { buildVoiceContext } from './VoicePromptFromMemory';
+import { whisperQuote } from './QuoteWhisperer';
+import { detectUserPacing, createModulationStrategy, applyPacingModulation } from './PacingModulation';
+import { DEFAULT_SLOWNESS, shouldGiveEmptyResponse, applySlownessProtocol } from '@/lib/prompts/SlownessProtocol';
+import { resolveVoice } from './ArchetypalVoiceMapping';
+import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
+
 export interface ElementalVoiceConfig {
   userId: string;
   userName?: string;
@@ -35,6 +46,12 @@ export interface ElementalVoiceConfig {
   voice?: string; // OpenAI TTS voice
   enableSmartCache?: boolean;
   enableResponseStreaming?: boolean;
+  voicePreference?: {
+    mode: 'auto' | 'manual';
+    enableTransitions?: boolean;
+    manualVoice?: string;
+  };
+  slownessMode?: 'default' | 'fast' | 'ritual';
 }
 
 export interface ConversationMetrics {
@@ -66,6 +83,13 @@ export class ElementalVoiceOrchestrator {
   private lastUserSpeechAt = 0;
   private interimCache = "";
 
+  // 🧬 Memory evolution systems
+  private memory: AINMemoryPayload | null = null;
+  private elementalState: ElementalState;
+  private symbolResonance: Map<string, SymbolResonance> = new Map();
+  private lastEchoedSymbol: string | undefined;
+  private userExchangeHistory: Array<{ text: string; timestamp: number }> = [];
+
   constructor(config: ElementalVoiceConfig) {
     this.config = {
       userName: 'Explorer',
@@ -79,6 +103,11 @@ export class ElementalVoiceOrchestrator {
       voice: 'shimmer',
       enableSmartCache: true,
       enableResponseStreaming: true,
+      voicePreference: {
+        mode: 'auto',
+        enableTransitions: true
+      },
+      slownessMode: 'default',
       ...config
     };
 
@@ -91,6 +120,9 @@ export class ElementalVoiceOrchestrator {
       emotionalQuality: 'peaceful',
       lastInteractionTime: Date.now()
     };
+
+    // Initialize elemental state (will be seeded from memory on connect)
+    this.elementalState = seedFromPhase('Aether');
 
     this.initializeWisdomCache();
   }
@@ -130,16 +162,78 @@ export class ElementalVoiceOrchestrator {
         persona: 'warm'
       });
 
+      // Load or initialize memory
+      await this.loadMemory();
+
       this.isConnected = true;
       this.config.onConnected();
 
       console.log('✅ Soullab Realtime connected');
+      console.log('🧬 Memory initialized:', {
+        phase: this.memory?.currentPhase,
+        archetype: this.memory?.currentArchetype,
+        depth: this.memory?.conversationDepth,
+        exchanges: this.memory?.exchangeCount
+      });
 
     } catch (error) {
       console.error('❌ Connection error:', error);
       this.config.onError(error as Error);
       throw error;
     }
+  }
+
+  /**
+   * Load or initialize AIN memory
+   */
+  private async loadMemory(): Promise<void> {
+    // TODO: Load from database
+    // const saved = await loadMemory(this.config.userId);
+    // if (saved) {
+    //   this.memory = saved;
+    //   this.elementalState = seedFromPhase(saved.currentPhase);
+    //   return;
+    // }
+
+    // Initialize new memory
+    this.memory = {
+      userId: this.config.userId,
+      sessionId: this.config.sessionId,
+      userName: this.config.userName || 'Explorer',
+      currentPhase: 'Aether', // Start with integration/mystery
+      previousPhase: 'Aether',
+      currentArchetype: 'Aether',
+      previousArchetype: 'Aether',
+      dominantArchetype: 'Aether',
+      conversationDepth: 0,
+      exchangeCount: 0,
+      totalExchanges: 0,
+      lastInteractionTime: new Date(),
+      createdAt: new Date(),
+      spiralogicCycle: {
+        phase: 'Aether',
+        cycleDepth: 0,
+        enteredAt: new Date(),
+        phaseHistory: [{
+          phase: 'Aether',
+          timestamp: new Date()
+        }]
+      },
+      archetypeHistory: [{
+        archetype: 'Aether',
+        timestamp: new Date(),
+        duration: 0
+      }],
+      symbolicThreads: [],
+      emotionalMotifs: [],
+      userIntentions: [],
+      quotesShared: []
+    };
+
+    // Seed elemental state from starting phase
+    this.elementalState = seedFromPhase(this.memory.currentPhase);
+
+    console.log('🌱 New memory initialized');
   }
 
   /**
@@ -266,7 +360,7 @@ export class ElementalVoiceOrchestrator {
 
   /**
    * Process through full Spiralogic Consciousness Architecture
-   * WITH PARALLEL OPTIMIZATION
+   * WITH PARALLEL OPTIMIZATION + MEMORY EVOLUTION
    */
   private async processThroughSpiralogic(userInput: string): Promise<string> {
     const startTime = Date.now();
@@ -274,6 +368,40 @@ export class ElementalVoiceOrchestrator {
     if (!this.oracleAgent) {
       throw new Error('Oracle Agent not initialized');
     }
+
+    if (!this.memory) {
+      throw new Error('Memory not loaded');
+    }
+
+    // Add to exchange history for pacing detection
+    this.userExchangeHistory.push({
+      text: userInput,
+      timestamp: Date.now()
+    });
+
+    // Keep only last 10 exchanges
+    if (this.userExchangeHistory.length > 10) {
+      this.userExchangeHistory.shift();
+    }
+
+    // 1️⃣ DETECT USER PACING
+    const userPacing = detectUserPacing(
+      userInput,
+      this.userExchangeHistory,
+      this.metrics.depth
+    );
+
+    const pacingStrategy = createModulationStrategy(
+      userPacing,
+      this.metrics.exchangeCount,
+      this.metrics.depth
+    );
+
+    console.log('🎵 User pacing detected:', {
+      speed: userPacing.speed,
+      energy: userPacing.energy,
+      strategy: `${pacingStrategy.mirrorPhaseExchanges} mirror → ${pacingStrategy.transitionExchanges} transition`
+    });
 
     // Update conversation depth
     this.metrics.depth = this.calculateDepth(userInput);
@@ -300,35 +428,117 @@ export class ElementalVoiceOrchestrator {
       exchangeCount: this.metrics.exchangeCount
     } as any);
 
-    // Apply Maya's Intelligence Governance
-    const governedResponse = this.applyMayaGovernance(
-      agentResponse.response,
+    let response = agentResponse.response;
+
+    // 2️⃣ CHECK FOR EMPTY RESPONSE (Slowness Protocol)
+    const slownessSettings = DEFAULT_SLOWNESS; // TODO: respect config.slownessMode
+    const shouldBeEmpty = shouldGiveEmptyResponse(
+      slownessSettings,
       this.metrics.depth,
-      this.metrics.exchangeCount
+      userInput
     );
 
-    // 🎬 SAMANTHA-STYLE CONVERSATIONAL ENHANCEMENT
-    const emotionalTone = ConversationalEnhancer.detectEmotionalTone(userInput);
-    const enhanced = ConversationalEnhancer.enhance(governedResponse, {
-      userMessage: userInput,
-      emotionalTone,
-      conversationDepth: this.metrics.depth,
-      exchangeCount: this.metrics.exchangeCount,
-      recentMessages: this.transcriptBuffer
-    });
+    if (shouldBeEmpty) {
+      response = '...'; // Profound silence
+      console.log('🌌 Empty response (profound moment)');
+    } else {
+      // Apply Maya's Intelligence Governance
+      response = this.applyMayaGovernance(
+        response,
+        this.metrics.depth,
+        this.metrics.exchangeCount
+      );
 
-    const finalResponse = ConversationalEnhancer.buildOutput(enhanced);
+      // 3️⃣ APPLY PACING MODULATION
+      response = applyPacingModulation(
+        response,
+        pacingStrategy,
+        this.metrics.exchangeCount
+      );
 
-    console.log('🎬 Conversational enhancement:', {
-      tone: emotionalTone,
-      pacing: enhanced.pacing,
-      acknowledgment: enhanced.acknowledgment || 'none'
-    });
+      // 4️⃣ WHISPER QUOTE (if appropriate)
+      const { text: withQuote, quoteShared } = whisperQuote(
+        response,
+        this.memory,
+        this.memory.currentArchetype,
+        this.metrics.depth,
+        userInput
+      );
+
+      response = withQuote;
+
+      // 🎬 SAMANTHA-STYLE CONVERSATIONAL ENHANCEMENT
+      const emotionalTone = ConversationalEnhancer.detectEmotionalTone(userInput);
+      const enhanced = ConversationalEnhancer.enhance(response, {
+        userMessage: userInput,
+        emotionalTone,
+        conversationDepth: this.metrics.depth,
+        exchangeCount: this.metrics.exchangeCount,
+        recentMessages: this.transcriptBuffer
+      });
+
+      response = ConversationalEnhancer.buildOutput(enhanced);
+
+      console.log('🎬 Conversational enhancement:', {
+        tone: emotionalTone,
+        pacing: enhanced.pacing,
+        acknowledgment: enhanced.acknowledgment || 'none',
+        quoteShared: quoteShared ? `"${quoteShared.text.substring(0, 30)}..."` : 'none'
+      });
+
+      // 5️⃣ UPDATE MEMORY (complete evolution pipeline)
+      this.memory = completeMemoryUpdate(
+        this.memory,
+        userInput,
+        response,
+        quoteShared
+      );
+
+      // 6️⃣ SYMBOLIC PREDICTION + RESONANCE UPDATE
+      const prediction = completeSymbolicPrediction(this.memory, userInput);
+      this.symbolResonance = prediction.symbolResonance;
+
+      console.log('🔮 Symbolic prediction:', {
+        nextPhase: prediction.phaseVector.nextPhaseLikely,
+        confidence: `${(prediction.phaseVector.confidence * 100).toFixed(0)}%`,
+        reflection: prediction.internalReflection.observation
+      });
+
+      // Log resonant symbols
+      const resonantSymbols = getMostResonantSymbols(this.symbolResonance, 3);
+      if (resonantSymbols.length > 0) {
+        console.log('🌊 Resonant symbols:', resonantSymbols.map(s => `${s.motif} (${s.score.toFixed(2)})`));
+      }
+
+      // 7️⃣ ELEMENTAL STATE EVOLUTION (playground tick)
+      const before = { ...this.elementalState };
+      const { state: newState, evolution } = playgroundTick(
+        this.elementalState,
+        this.memory,
+        this.symbolResonance
+      );
+
+      this.elementalState = newState;
+
+      // Log significant elemental drift
+      if (hasSignificantDrift(before, newState, 0.08)) {
+        console.log('🌀 Elemental evolution:', {
+          signature: getElementalSignature(newState),
+          dominant: evolution.dominantElement,
+          reason: evolution.reason
+        });
+      }
+
+      // TODO: Persist memory + elemental state to database
+      // await saveMemory(this.config.userId, this.memory);
+      // await saveElementalState(this.config.userId, this.elementalState);
+      // await saveReflection(this.config.userId, prediction.internalReflection);
+    }
 
     const processingTime = Date.now() - startTime;
     console.log(`⏱️ Spiralogic processing: ${processingTime}ms`);
 
-    return finalResponse;
+    return response;
   }
 
   /**
@@ -429,18 +639,34 @@ export class ElementalVoiceOrchestrator {
 
   /**
    * Synthesize text to speech and play
+   * Uses blended elemental style + archetype voice mapping
    */
   private async synthesizeAndPlay(text: string): Promise<void> {
     try {
       this.config.onAudioStart();
 
-      // Use ElevenLabs for synthesis
+      // Get blended elemental style
+      const elementalStyle = blendElementalStyle(this.elementalState);
+
+      // Resolve voice based on archetype + user preference
+      const currentArchetype = this.memory?.currentArchetype || 'Aether';
+      const voice = resolveVoice(currentArchetype, this.config.voicePreference);
+
+      console.log('🎙️ Voice synthesis:', {
+        voice,
+        archetype: currentArchetype,
+        speed: elementalStyle.pacing,
+        elementalSignature: getElementalSignature(this.elementalState)
+      });
+
+      // Use OpenAI TTS for synthesis
       const response = await fetch('/api/voice/synthesize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text,
-          voice: this.config.voice,
+          voice,
+          speed: elementalStyle.pacing,
           stream: this.config.enableResponseStreaming
         })
       });
@@ -453,17 +679,26 @@ export class ElementalVoiceOrchestrator {
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
 
+      // Apply slowness protocol pause before speaking
+      const slownessSettings = DEFAULT_SLOWNESS; // TODO: respect config.slownessMode
+      if (slownessSettings.pauseBeforeResponse > 0) {
+        await new Promise(resolve => setTimeout(resolve, slownessSettings.pauseBeforeResponse));
+      }
+
       // Play audio
       const audio = new Audio(audioUrl);
+      this.currentAudio = audio; // Store for interruption support
       await audio.play();
 
       audio.onended = () => {
         URL.revokeObjectURL(audioUrl);
+        this.currentAudio = null;
         this.config.onAudioEnd();
       };
 
     } catch (error) {
       console.error('❌ Synthesis error:', error);
+      this.currentAudio = null;
       this.config.onAudioEnd();
       this.config.onError(error as Error);
     }
