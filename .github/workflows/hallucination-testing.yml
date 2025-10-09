@@ -96,7 +96,7 @@ jobs:
 
     - name: Comment PR with Results
       if: github.event_name == 'pull_request' && always()
-      uses: actions/github-script@v6
+      uses: actions/github-script@v8
       with:
         script: |
           const fs = require('fs');
@@ -150,7 +150,7 @@ jobs:
 
     - name: File GitHub Issue on Quality Gate Failure
       if: steps.parse_results.outputs.gates_passed == 'false' && github.ref == 'refs/heads/main'
-      uses: actions/github-script@v6
+      uses: actions/github-script@v8
       with:
         script: |
           const fs = require('fs');
