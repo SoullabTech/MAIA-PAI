@@ -1125,14 +1125,16 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     explorerId: userId
   });
 
-  return (
-    <div className="oracle-conversation min-h-screen bg-[#1a1f2e] overflow-hidden">
-      {/* DIAGNOSTIC: High z-index text - if this doesn't show, something with z-[10000+] is covering */}
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none">
-        <div className="text-white text-6xl font-bold bg-red-600 p-8">
-          MAIA IS HERE - Z:9999
+  // Wrap entire return in try-catch
+  try {
+    return (
+      <div className="oracle-conversation min-h-screen bg-[#1a1f2e] overflow-hidden">
+        {/* DIAGNOSTIC: High z-index text - if this doesn't show, something with z-[10000+] is covering */}
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none">
+          <div className="text-white text-6xl font-bold bg-red-600 p-8">
+            MAIA IS HERE - Z:9999
+          </div>
         </div>
-      </div>
       {/* iOS Audio Enable Button - DISABLED - causing black screen */}
       {false && needsIOSAudioPermission && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur z-[100] flex items-center justify-center">
@@ -2261,6 +2263,17 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {/* {userId && <SoulprintMetricsWidget userId={userId} />} */}
     </div>
   );
+  } catch (error) {
+    console.error('[OracleConversation] RENDER ERROR:', error);
+    return (
+      <div className="fixed inset-0 z-[99999] bg-yellow-500 flex items-center justify-center p-8">
+        <div className="bg-white text-black p-8 rounded-xl max-w-2xl">
+          <h1 className="text-3xl font-bold mb-4">OracleConversation Render Error</h1>
+          <pre className="text-sm overflow-auto">{String(error)}</pre>
+        </div>
+      </div>
+    );
+  }
 };
 
 export default OracleConversation;
