@@ -1880,9 +1880,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
               {/* Compact text input area - mobile-first, fixed at bottom */}
               {showChatInterface && (
-              <div className="fixed inset-x-0 bottom-0 z-40 pb-safe">
-                {/* Text input area - Ultra compact mobile design */}
-                <div className="bg-black/40 backdrop-blur-md px-2 py-2 border-t border-gold-divine/20">
+              <div className="fixed inset-x-0 bottom-0 z-[60] pb-safe">
+                {/* Text input area - Ultra compact mobile design - Raised above bottom menu bar */}
+                <div className="bg-black/40 backdrop-blur-md px-2 py-2 pb-20 border-t border-gold-divine/20">
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
