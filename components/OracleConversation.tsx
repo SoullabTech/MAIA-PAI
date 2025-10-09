@@ -339,19 +339,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Initialize voice when in voice mode
-  useEffect(() => {
-    if (isMounted && !showChatInterface && voiceEnabled && !isMuted) {
-      // Delay to ensure component is ready
-      const timer = setTimeout(async () => {
-        if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
-          await voiceMicRef.current.startListening();
-          console.log('🎤 Voice auto-started in voice mode');
-        }
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [isMounted, showChatInterface, voiceEnabled, isMuted, isProcessing, isResponding]);
+  // Initialize voice when in voice mode - DISABLED: Causing cascading connection errors without API keys
+  // useEffect(() => {
+  //   if (isMounted && !showChatInterface && voiceEnabled && !isMuted) {
+  //     // Delay to ensure component is ready
+  //     const timer = setTimeout(async () => {
+  //       if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
+  //         await voiceMicRef.current.startListening();
+  //         console.log('🎤 Voice auto-started in voice mode');
+  //       }
+  //     }, 500);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [isMounted, showChatInterface, voiceEnabled, isMuted, isProcessing, isResponding]);
   const [audioEnabled, setAudioEnabled] = useState(false); // Track if user has enabled audio
   const audioContextRef = useRef<AudioContext | null>(null);
   
