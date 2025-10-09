@@ -2034,8 +2034,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Redesigned Bottom Icon Bar - Sacred Style - Hidden in chat mode to avoid overlap */}
-      {!showChatInterface && (
+      {/* Redesigned Bottom Icon Bar - Sacred Style - Always visible */}
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 pb-safe">
         <div className="flex justify-center items-center gap-8 py-4 px-8 bg-black/60 backdrop-blur-lg rounded-full border border-[#D4B896]/20">
           {/* Voice Toggle - Activate mic when switching to voice mode */}
@@ -2246,7 +2245,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           </button>
         </div>
       </div>
-      )}
 
       {/* Floating Quick Settings Button */}
       {/* QuickSettingsButton removed - now in bottom nav bar */}
