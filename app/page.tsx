@@ -9,15 +9,15 @@ export default function HomePage() {
   const [isOnboarded, setIsOnboarded] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // SIMPLIFIED: If onboarded, go to Maya. Otherwise, go to signup.
-    const betaOnboarded = localStorage.getItem("betaOnboardingComplete") === "true";
+    // Week 2: Force ALL users through Week 2 welcome ritual
+    const week2Onboarded = localStorage.getItem("week2_onboarded") === "true";
 
-    if (betaOnboarded) {
-      // Already onboarded - go straight to Maya
-      router.replace('/maya');
+    if (week2Onboarded) {
+      // Completed Week 2 onboarding - go to check-in
+      router.replace('/checkin');
     } else {
-      // Not onboarded - go to signup
-      router.replace('/beta-signup');
+      // Everyone goes through Week 2 welcome
+      router.replace('/week2-welcome');
     }
   }, [router]);
 

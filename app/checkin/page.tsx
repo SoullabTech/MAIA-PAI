@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 
@@ -9,6 +9,14 @@ export default function CheckInPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Force Week 2 onboarding for all users (including returning)
+  useEffect(() => {
+    const week2Complete = localStorage.getItem('week2_onboarded');
+    if (week2Complete !== 'true') {
+      router.push('/week2-welcome');
+    }
+  }, [router]);
 
   const handleCheckIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,9 +153,14 @@ export default function CheckInPage() {
           Need to sign up or use password?
         </button>
 
-        <p className="text-center text-xs text-amber-200/20 mt-8">
-          Quick check-in for returning explorers
-        </p>
+        <div className="mt-8 space-y-2 text-center">
+          <p className="text-xs text-amber-200/20">
+            Quick check-in for returning explorers
+          </p>
+          <p className="text-xs text-amber-200/30">
+            💡 Tip: Logout button is in the top-right Maia Voice/Chat menu
+          </p>
+        </div>
       </div>
     </div>
   );
