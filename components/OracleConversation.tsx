@@ -1127,6 +1127,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   return (
     <div className="oracle-conversation min-h-screen bg-[#1a1f2e] overflow-hidden">
+      {/* DIAGNOSTIC: High z-index text - if this doesn't show, something with z-[10000+] is covering */}
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none">
+        <div className="text-white text-6xl font-bold bg-red-600 p-8">
+          MAIA IS HERE - Z:9999
+        </div>
+      </div>
       {/* iOS Audio Enable Button - DISABLED - causing black screen */}
       {false && needsIOSAudioPermission && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur z-[100] flex items-center justify-center">
