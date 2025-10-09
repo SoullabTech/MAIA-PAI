@@ -1,22 +1,22 @@
 /**
  * 🎤 Elemental Voice Transcription Endpoint
  *
- * Tries Whisper (self-hosted, $0 cost) first, falls back to Deepgram
- * Path to 100% sovereignty
+ * Uses OpenAI Whisper API (cloud, fast, reliable)
+ * Optional: Can use self-hosted Whisper for sovereignty
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@deepgram/sdk';
+import OpenAI from 'openai';
 
 const WHISPER_API_URL = process.env.WHISPER_API_URL || 'http://localhost:8001';
-const DEEPGRAM_API_KEY = process.env.DEEPGRAM_API_KEY || '';
-const USE_WHISPER_PRIMARY = process.env.USE_WHISPER_PRIMARY === 'true';
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
+const USE_WHISPER_SELF_HOSTED = process.env.USE_WHISPER_PRIMARY === 'true';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-async function transcribeWithWhisper(audioFile: File): Promise<any> {
+async function transcribeWithSelfHostedWhisper(audioFile: File): Promise<any> {
   const formData = new FormData();
   formData.append('audio', audioFile);
 
@@ -27,35 +27,39 @@ async function transcribeWithWhisper(audioFile: File): Promise<any> {
   });
 
   if (!response.ok) {
-    throw new Error(`Whisper API error: ${response.status}`);
+    throw new Error(`Self-hosted Whisper API error: ${response.status}`);
   }
 
   return response.json();
 }
 
-async function transcribeWithDeepgram(audioFile: File): Promise<any> {
-  const audioBuffer = Buffer.from(await audioFile.arrayBuffer());
-  const deepgram = createClient(DEEPGRAM_API_KEY);
-
-  const { result, error } = await deepgram.listen.prerecorded.transcribeFile(
-    audioBuffer,
-    {
-      model: 'nova-2',
-      language: 'en-US',
-      smart_format: true,
-      punctuate: true,
-      utterances: true
-    }
-  );
-
-  if (error) {
-    throw new Error(`Deepgram error: ${error}`);
+async function transcribeWithOpenAI(audioFile: File): Promise<any> {
+  if (!OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY not configured');
   }
 
-  const transcript = result?.results?.channels?.[0]?.alternatives?.[0]?.transcript || '';
-  const confidence = result?.results?.channels?.[0]?.alternatives?.[0]?.confidence || 0;
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
-  return { transcript, confidence };
+  // Convert File to Node.js compatible format
+  const arrayBuffer = await audioFile.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  // Create a File-like object that OpenAI SDK accepts
+  const file = new File([buffer], audioFile.name || 'audio.webm', {
+    type: audioFile.type || 'audio/webm'
+  });
+
+  const transcription = await openai.audio.transcriptions.create({
+    file: file,
+    model: 'whisper-1',
+    language: 'en',
+    response_format: 'json'
+  });
+
+  return {
+    transcript: transcription.text,
+    confidence: 1.0 // OpenAI doesn't provide confidence scores
+  };
 }
 
 export async function POST(req: NextRequest) {
@@ -75,7 +79,7 @@ export async function POST(req: NextRequest) {
     console.log('🎤 Transcribing audio:', {
       size: audioFile.size,
       type: audioFile.type,
-      primary: USE_WHISPER_PRIMARY ? 'Whisper (self-hosted)' : 'Deepgram (cloud)'
+      primary: USE_WHISPER_SELF_HOSTED ? 'Whisper (self-hosted, $0)' : 'OpenAI Whisper (cloud)'
     });
 
     let transcript = '';
@@ -84,43 +88,43 @@ export async function POST(req: NextRequest) {
 
     // Try primary provider
     try {
-      if (USE_WHISPER_PRIMARY) {
-        // Try Whisper first (self-hosted, $0 cost)
-        console.log('🔥 Trying Whisper (self-hosted)...');
-        const result = await transcribeWithWhisper(audioFile);
+      if (USE_WHISPER_SELF_HOSTED) {
+        // Try self-hosted Whisper first ($0 cost, sovereignty)
+        console.log('🔥 Trying self-hosted Whisper...');
+        const result = await transcribeWithSelfHostedWhisper(audioFile);
         transcript = result.transcript;
         confidence = result.confidence;
-        provider = 'whisper';
-        console.log(`✅ Whisper success: ${result.processingTime}ms`);
+        provider = 'whisper-self-hosted';
+        console.log(`✅ Self-hosted Whisper success: ${result.processingTime}ms`);
       } else {
-        // Try Deepgram first
-        console.log('☁️  Trying Deepgram (cloud)...');
-        const result = await transcribeWithDeepgram(audioFile);
+        // Use OpenAI Whisper API (cloud, reliable)
+        console.log('☁️  Using OpenAI Whisper API...');
+        const result = await transcribeWithOpenAI(audioFile);
         transcript = result.transcript;
         confidence = result.confidence;
-        provider = 'deepgram';
+        provider = 'openai-whisper';
       }
     } catch (primaryError) {
       console.log(`⚠️  Primary provider failed: ${primaryError}`);
 
       // Fallback to secondary provider
       try {
-        if (USE_WHISPER_PRIMARY) {
-          console.log('☁️  Falling back to Deepgram...');
-          const result = await transcribeWithDeepgram(audioFile);
+        if (USE_WHISPER_SELF_HOSTED) {
+          console.log('☁️  Falling back to OpenAI Whisper...');
+          const result = await transcribeWithOpenAI(audioFile);
           transcript = result.transcript;
           confidence = result.confidence;
-          provider = 'deepgram';
+          provider = 'openai-whisper-fallback';
         } else {
-          console.log('🔥 Falling back to Whisper...');
-          const result = await transcribeWithWhisper(audioFile);
+          console.log('🔥 Falling back to self-hosted Whisper...');
+          const result = await transcribeWithSelfHostedWhisper(audioFile);
           transcript = result.transcript;
           confidence = result.confidence;
-          provider = 'whisper';
+          provider = 'whisper-self-hosted-fallback';
         }
       } catch (fallbackError) {
-        console.error('❌ Both providers failed:', fallbackError);
-        throw new Error('All transcription providers failed');
+        console.error('❌ Both Whisper providers failed:', fallbackError);
+        throw new Error('All Whisper transcription providers failed');
       }
     }
 
