@@ -1998,27 +1998,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               </div>
               )}
             </>
-          ) : (
-            <>
-              {/* OpenAI Realtime Voice - Auto-connects on mount */}
-              {!realtime.isConnected && !realtime.isConnecting && (
-                <div className="fixed bottom-32 left-1/2 transform -translate-x-1/2 z-50">
-                  <button
-                    onClick={() => realtime.connect()}
-                    className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all"
-                  >
-                    🎙️ Connect Voice
-                  </button>
-                </div>
-              )}
-              {realtime.isConnecting && (
-                <div className="fixed bottom-32 left-1/2 transform -translate-x-1/2 z-50">
-                  <div className="px-6 py-3 bg-black/60 text-amber-400 rounded-full shadow-lg backdrop-blur-md">
-                    Connecting voice...
-                  </div>
-                </div>
-              )}
-            </>
           )}
         </>
       )}
