@@ -86,10 +86,10 @@ async function transcribeWithOpenAI(audioFile: File): Promise<any> {
 
   console.log('☁️  Calling OpenAI Whisper API via direct fetch...');
 
-  // Use direct fetch + FormData for Edge runtime compatibility (SDK may not work)
+  // Use direct fetch + FormData (Node.js runtime)
+  // IMPORTANT: Pass the original File object to preserve all metadata
   const formData = new FormData();
-  const blob = new Blob([buffer], { type: 'audio/webm' });
-  formData.append('file', blob, filename);
+  formData.append('file', file); // Use the File object, not a new Blob
   formData.append('model', 'whisper-1');
   formData.append('language', 'en');
   formData.append('response_format', 'json');
