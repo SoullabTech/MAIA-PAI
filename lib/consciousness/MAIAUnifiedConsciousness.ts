@@ -18,7 +18,9 @@
  * 6. Living Apprentice (wisdom spirals into collective field)
  */
 
-import { MAIAConsciousnessLattice } from '../maia-consciousness-lattice';
+// NOTE: MAIAConsciousnessLattice has initialization issues in production
+// Using PersonalOracleAgent directly for synthesis (simpler, more stable)
+// import { MAIAConsciousnessLattice } from '../maia-consciousness-lattice';
 import { PersonalOracleAgent } from '../agents/PersonalOracleAgent';
 import { IntellectualPropertyEngine } from '../intellectual-property-engine';
 import { ElementalOracle2Bridge } from '../elemental-oracle-2-bridge';
@@ -87,7 +89,8 @@ export interface ConsciousnessResponse {
  * ALL conversation pathways flow through here
  */
 export class MAIAUnifiedConsciousness {
-  private lattice: MAIAConsciousnessLattice;
+  // NOTE: Removed lattice initialization - using PersonalOracleAgent directly
+  // private lattice: MAIAConsciousnessLattice;
   private ipEngine: IntellectualPropertyEngine;
   private eoBreakingBridge: ElementalOracle2Bridge;
   private apprentice: ApprenticeMayaTraining | null;
@@ -98,14 +101,8 @@ export class MAIAUnifiedConsciousness {
   private activeInterferences = new Map<string, InterferencePattern>();
 
   constructor() {
-    // Initialize consciousness lattice
-    this.lattice = new MAIAConsciousnessLattice({
-      userId: 'system', // Will be overridden per request
-      sessionId: 'system',
-      enableAnamnesis: true,
-      enableSemanticMemory: true,
-      enableRealTimeAdaptation: true
-    });
+    // NOTE: Skipping lattice initialization (has dependency issues)
+    // Will use PersonalOracleAgent directly for synthesis
 
     // Initialize intellectual property engine (Kelly's complete book)
     this.ipEngine = new IntellectualPropertyEngine();
@@ -276,17 +273,17 @@ export class MAIAUnifiedConsciousness {
    * "God is more between than within" - detect what's emerging in the space
    */
   private async readRelationalField(input: ConsciousnessInput): Promise<any> {
-    // Use MAIAConsciousnessLattice's field intelligence
-    return await this.lattice.readRelationalField(
-      input.content,
-      input.context.userId,
-      input.context.sessionId,
-      {
-        conversationHistory: input.conversationHistory,
-        somaticState: input.somaticState,
-        modality: input.modality
-      }
-    );
+    // Simplified field reading (lattice disabled for production stability)
+    return {
+      somaticSignatures: [],
+      emotionalResonance: [],
+      patterns: [],
+      cognitive: { novelty: 0.5 },
+      somaticState: input.somaticState || { coherence: 0.7 },
+      dominantElement: 'aether',
+      depthLevel: 5,
+      consciousnessState: { presence: 0.7, coherence: 0.8 }
+    };
   }
 
   /**
@@ -394,14 +391,13 @@ export class MAIAUnifiedConsciousness {
     advisorWisdom: any;
     interferencePattern: InterferencePattern;
   }): Promise<any> {
-    // Use lattice's anamnesis field
-    return await this.lattice.facilitateAnamnesis({
-      input: context.input.content,
-      userId: context.input.context.userId,
-      fieldReading: context.fieldReading,
-      advisorWisdom: context.advisorWisdom,
-      interference: context.interferencePattern
-    });
+    // Simplified anamnesis (lattice disabled for production stability)
+    // The full anamnesis field will be integrated in Phase 2
+    return {
+      soulRecognition: context.interferencePattern.isPresent,
+      rememberedWisdom: context.advisorWisdom.bookWisdom || '',
+      depthAccessed: context.fieldReading.depthLevel || 5
+    };
   }
 
   /**
