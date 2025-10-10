@@ -689,7 +689,7 @@ That's the entire work.
       // Build context as LIVING NARRATIVE not data extraction
       // Use conversation style preference (walking/classic/adaptive)
       // Check localStorage first (for voice command changes), then settings
-      let conversationStyle = this.settings?.conversationStyle || 'classic';
+      let conversationStyle = this.settings?.conversationStyle || 'walking'; // DEFAULT: walking mode (changed from 'classic')
 
       // Map "her" mode to "walking" mode (they're the same - brief/natural)
       if (conversationStyle === 'her') {
@@ -699,14 +699,16 @@ That's the entire work.
       // Override with localStorage if available (allows voice command mode switching)
       if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
         const savedMode = localStorage.getItem('conversation_mode');
+        console.log('🔍 localStorage conversation_mode:', savedMode);
         if (savedMode && ['walking', 'classic', 'adaptive'].includes(savedMode)) {
+          console.log(`🔄 Overriding ${conversationStyle} with localStorage: ${savedMode}`);
           conversationStyle = savedMode as 'walking' | 'classic' | 'adaptive';
         }
       }
 
       let systemPrompt = getPromptForConversationStyle(conversationStyle);
 
-      console.log(`💬 Using conversation style: ${conversationStyle}`);
+      console.log(`💬 FINAL conversation style: ${conversationStyle}`);
 
       // Add their actual words if journal entries available
       if (journalEntries.length > 0) {
