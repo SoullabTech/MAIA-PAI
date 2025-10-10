@@ -669,26 +669,14 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
       // Reset accumulated transcript to prevent old text from being sent
       accumulatedTranscriptRef.current = '';
 
-      // 🚨 NUCLEAR OPTION: Completely destroy recognition instance to clear ALL buffered events
+      // IMMEDIATELY stop recognition while Maia speaks
       if (recognitionRef.current) {
         try {
-          const oldRecognition = recognitionRef.current;
-
-          // Remove ALL event handlers to prevent any further events from firing
-          oldRecognition.onresult = null;
-          oldRecognition.onerror = null;
-          oldRecognition.onend = null;
-          oldRecognition.onstart = null;
-
-          // Abort (not stop - abort clears buffer immediately)
-          oldRecognition.abort();
-          console.log('💥 Recognition ABORTED and destroyed for Maia');
-
-          // Nullify the reference
-          recognitionRef.current = null;
+          recognitionRef.current.abort(); // Use abort() instead of stop() to clear buffer immediately
+          console.log('💥 Recognition ABORTED for Maia (clears buffer)');
           setIsListening(false);
         } catch (e) {
-          console.log('Recognition already destroyed');
+          console.log('Recognition already stopped');
         }
       }
 
@@ -702,7 +690,7 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
     } else if (!isMayaSpeaking && isPausedForMaya && enabled) {
       console.log('🔊 Resuming voice recognition - Maia finished speaking');
       setIsPausedForMaya(false);
-      isPausedForMayaRef.current = false; // CRITICAL: Update ref for onresult closure
+      isPausedForMayaRef.current = false; // CRITICAL: Update ref immediately
       setTranscript('');
 
       // Clear any accumulated text to prevent sending old speech
@@ -715,113 +703,33 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
         });
       }
 
-      // 🔄 REBUILD recognition from scratch with fresh instance (clears all event buffers)
+      // Resume recognition after a delay to ensure audio has fully stopped and buffer is clear
       setTimeout(() => {
-        if (!isMayaSpeaking && !isStartingRef.current && enabled && !isMuted) {
+        if (recognitionRef.current && !isMayaSpeaking && !isStartingRef.current && !isListening) {
           try {
-            // Create a completely fresh recognition instance
-            if (typeof window !== 'undefined') {
-              const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-              if (SpeechRecognition) {
-                console.log('🏗️ Building fresh recognition instance after Maia speech');
-
-                // Create new instance
-                const newRecognition = new SpeechRecognition();
-                newRecognition.continuous = true;
-                newRecognition.interimResults = true;
-                newRecognition.lang = 'en-US';
-                newRecognition.maxAlternatives = 1;
-
-                // Set up ALL event handlers on the fresh instance
-                newRecognition.onresult = (event: any) => {
-                  // 🚨 CRITICAL: Reject ALL recognition events if Maya is speaking (prevents echo)
-                  if (isPausedForMayaRef.current) {
-                    console.log('🛑 [ECHO BLOCKED] Ignoring recognition event - Maia is speaking');
-                    return;
-                  }
-
-                  if (!isConnected || !isActiveRef.current) {
-                    console.log('🛑 Not connected or inactive, skipping result');
-                    return;
-                  }
-
-                  console.log('🎤 Speech recognition event:', event);
-                  // ... (rest of onresult handler - keeping existing logic)
-                  for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const result = event.results[i];
-                    const transcript = result[0].transcript.trim();
-                    const isFinal = result.isFinal;
-
-                    console.log(`📝 Result ${i}: ${transcript} isFinal: ${isFinal}`);
-
-                    if (isFinal) {
-                      if (transcript.length > 0) {
-                        console.log('✅ Final transcript:', transcript);
-                        accumulatedTranscriptRef.current = transcript;
-                        setTranscript(transcript);
-                        onTranscript?.(transcript);
-                        setTimeout(() => {
-                          setTranscript('');
-                        }, 1000);
-                      }
-                    } else {
-                      setTranscript(transcript);
-                    }
-                  }
-                };
-
-                newRecognition.onerror = (event: any) => {
-                  console.log('❌ Speech recognition error:', event.error);
-                  if (event.error === 'no-speech') {
-                    setTranscript('');
-                  } else if (event.error !== 'aborted') {
-                    console.log('Recognition error:', event.error);
-                  }
-                };
-
-                newRecognition.onend = () => {
-                  console.log('🏁 Recognition session ended');
-                  setIsListening(false);
-                  if (enabled && !isMuted && !isPausedForMayaRef.current && isActiveRef.current) {
-                    console.log('🔄 Auto-restarting recognition...');
-                    setTimeout(() => {
-                      if (recognitionRef.current && !isStartingRef.current) {
-                        try {
-                          isStartingRef.current = true;
-                          recognitionRef.current.start();
-                          setIsListening(true);
-                          setTimeout(() => { isStartingRef.current = false; }, 500);
-                        } catch (e: any) {
-                          isStartingRef.current = false;
-                          if (!e?.message?.includes('already started')) {
-                            console.log('Could not restart:', e?.message);
-                          }
-                        }
-                      }
-                    }, 100);
-                  }
-                };
-
-                // Replace old reference with new fresh instance
-                recognitionRef.current = newRecognition;
-
-                // Start the fresh instance
-                isStartingRef.current = true;
-                newRecognition.start();
-                setIsListening(true);
-                console.log('✅ Fresh recognition started after Maia speech');
-
-                setTimeout(() => {
-                  isStartingRef.current = false;
-                }, 500);
-              }
+            // Only start if we're enabled and not muted
+            if (enabled && !isMuted) {
+              isStartingRef.current = true;
+              recognitionRef.current.start();
+              setIsListening(true);
+              console.log('✅ Voice recognition resumed after Maia finished');
+              setTimeout(() => {
+                isStartingRef.current = false;
+              }, 500);
             }
           } catch (e: any) {
             isStartingRef.current = false;
-            console.log('Could not build fresh recognition:', e?.message || e);
+            console.log('Could not resume recognition:', e?.message || e);
+            // If already started, that's okay - just continue
+            if (e?.message?.includes('already started')) {
+              console.log('Recognition already active, continuing...');
+              setIsListening(true);
+            }
           }
+        } else if (isListening) {
+          console.log('Recognition already listening, skipping resume');
         }
-      }, 500);
+      }, 800); // Longer delay - wait for TTS to fully finish
     }
   }, [isMayaSpeaking, isListening, enabled, isPausedForMaya, isMuted, toggleListening]);
 
