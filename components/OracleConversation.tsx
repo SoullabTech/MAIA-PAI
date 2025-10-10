@@ -1089,7 +1089,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       audioRef.current = audio;
 
       audio.onended = () => {
+        console.log('🔊 Audio playback ended');
         setCurrentlySpeakingId(undefined);
+        setIsAudioPlaying(false); // 🎤 CRITICAL: Allow microphone to resume
+        setIsResponding(false); // Also clear responding state
         URL.revokeObjectURL(audioUrl);
         audioRef.current = null;
       };
@@ -1097,6 +1100,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       audio.onerror = (e) => {
         console.error('Audio playback error:', e);
         setCurrentlySpeakingId(undefined);
+        setIsAudioPlaying(false); // 🎤 Also clear on error
+        setIsResponding(false);
         URL.revokeObjectURL(audioUrl);
         audioRef.current = null;
       };
