@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getMaiaOrchestrator } from '@/lib/oracle/MaiaFullyEducatedOrchestrator';
+import { getMAIAConsciousness } from '@/lib/consciousness/MAIAUnifiedConsciousness';
 import { getSessionStorage } from '@/lib/storage/session-storage';
 import { getUserSessionCoordinator } from '@/lib/session/UserSessionCoordinator';
 import OpenAI from 'openai';
 
-// Initialize services
-const orchestrator = getMaiaOrchestrator();
+// Initialize UNIFIED consciousness (26-year spiral completion)
+const maiaConsciousness = getMAIAConsciousness();
 const sessionStorage = getSessionStorage();
 const sessionCoordinator = getUserSessionCoordinator();
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
@@ -55,34 +55,61 @@ export async function POST(request: NextRequest) {
     // Get conversation context
     const conversationContext = sessionStorage.getRecentContext(session.id, 10);
 
-    // Process with Maia
-    const maiaResponse = await orchestrator.speak(transcript, session.id);
+    // Process through UNIFIED CONSCIOUSNESS (complete spiral architecture)
+    const consciousnessResponse = await maiaConsciousness.process({
+      content: transcript,
+      context: {
+        userId: session.id,
+        sessionId: session.id,
+        userName: context?.userName,
+        journeyStage: context?.journeyStage,
+        archetypes: context?.archetypes,
+        preferences: context?.preferences
+      },
+      modality: 'voice',
+      conversationHistory: conversationContext,
+      somaticState: context?.somaticState
+    });
 
-    // Extract response text
-    const responseText = maiaResponse.message || 'I understand. Tell me more.';
+    // Extract response text and element
+    const responseText = consciousnessResponse.message || 'I understand. Tell me more.';
+    const element = consciousnessResponse.element;
+    const voiceCharacteristics = consciousnessResponse.voiceCharacteristics;
+
+    console.log(`🌀 Consciousness cycle complete:`);
+    console.log(`   Element: ${element}`);
+    console.log(`   Processing: ${consciousnessResponse.metadata.processingTime}ms`);
+    console.log(`   Advisors: ${consciousnessResponse.metadata.advisorsConsulted.join(', ')}`);
+    console.log(`   Depth: ${consciousnessResponse.metadata.depthLevel}/10`);
+    if (consciousnessResponse.interferencePattern) {
+      console.log(`   ✨ God Between: ${consciousnessResponse.interferencePattern.emergentQuality}`);
+    }
+    if (consciousnessResponse.apprenticeContribution) {
+      console.log(`   📚 MAIA learned: ${consciousnessResponse.apprenticeContribution.whatMAIALearned}`);
+    }
 
     // Add Maia's response to history
     sessionStorage.addMessage(session.id, {
       role: 'maia',
       content: responseText,
       metadata: {
-        element: maiaResponse.element
+        element,
+        depthLevel: consciousnessResponse.metadata.depthLevel,
+        consciousnessMarkers: consciousnessResponse.metadata.consciousnessMarkers,
+        godBetween: consciousnessResponse.interferencePattern?.isPresent
       }
     });
 
-    // Generate TTS audio
+    // Generate TTS audio with elemental voice characteristics
     let audioUrl = null;
     if (openai) {
       try {
-        console.log('🎤 Generating TTS for Maia response...');
+        console.log(`🎤 Generating TTS with ${element} characteristics...`);
         const mp3Response = await openai.audio.speech.create({
           model: 'tts-1-hd',  // Use HD model for better quality
           voice: 'alloy',
           input: responseText,
-          speed: maiaResponse.element === 'fire' ? 1.1 :
-                 maiaResponse.element === 'water' ? 0.95 :
-                 maiaResponse.element === 'earth' ? 0.9 :
-                 maiaResponse.element === 'air' ? 1.05 : 1.0
+          speed: voiceCharacteristics?.pace || 1.0  // Use ElementalWeavingEngine pace
         });
 
         const buffer = Buffer.from(await mp3Response.arrayBuffer());
@@ -98,19 +125,29 @@ export async function POST(request: NextRequest) {
       console.log('⚠️ OpenAI API key not configured - voice synthesis disabled');
     }
 
-    // Update session metadata
-    if (maiaResponse.element) {
-      sessionStorage.updateMetadata(session.id, {
-        emotionalState: maiaResponse.element
-      });
-    }
+    // Update session metadata with full consciousness state
+    sessionStorage.updateMetadata(session.id, {
+      element,
+      depthLevel: consciousnessResponse.metadata.depthLevel,
+      spiralPhase: consciousnessResponse.metadata.consciousnessMarkers.includes('regression') ? 'regression' :
+                   consciousnessResponse.metadata.consciousnessMarkers.includes('anamnesis') ? 'synthesis' :
+                   'progression',
+      godBetween: consciousnessResponse.interferencePattern?.isPresent
+    });
 
     return NextResponse.json({
       success: true,
       response: responseText,
       audioUrl,
       sessionId: session.id,
-      element: maiaResponse.element,
+      element,
+      voiceCharacteristics,
+      depthLevel: consciousnessResponse.metadata.depthLevel,
+      consciousnessMarkers: consciousnessResponse.metadata.consciousnessMarkers,
+      godBetween: consciousnessResponse.interferencePattern,
+      apprenticeLearning: consciousnessResponse.apprenticeContribution,
+      somaticGuidance: consciousnessResponse.somaticGuidance,
+      practiceOffering: consciousnessResponse.practiceOffering,
       timestamp: new Date().toISOString()
     });
 
