@@ -17,8 +17,8 @@ import { IntellectualPropertyEngine } from '@/lib/intellectual-property-engine';
 // 🧠 Advanced Memory & Intelligence Modules
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
 import { createEmptyMemoryPayload, getUserHistorySummary, updateMemoryAfterExchange } from '@/lib/memory/AINMemoryPayload';
-import { extractSymbolicMotifs, detectEmotionalThemes, updateMemoryAfterInteraction } from '@/lib/memory/MemoryUpdater';
-import { predictNextPhase, calculateSymbolResonance } from '@/lib/memory/SymbolicPredictor';
+import { extractSymbolicMotifs, detectEmotionalThemes } from '@/lib/memory/MemoryUpdater';
+import { predictNextPhase } from '@/lib/memory/SymbolicPredictor';
 import { detectSpiralogicPhase } from '@/lib/spiralogic/PhaseDetector';
 import { inferMoodAndArchetype } from '@/lib/voice/conversation/AffectDetector';
 
@@ -643,21 +643,23 @@ That's the entire work.
       }
 
       // 🧠 EXTRACT SYMBOLIC INTELLIGENCE from user input
-      const newSymbolicMotifs = await extractSymbolicMotifs(trimmedInput);
-      const emotionalThemes = await detectEmotionalThemes(trimmedInput);
-      const detectedPhase = await detectSpiralogicPhase(trimmedInput, ainMemory.currentPhase);
-      const { mood, archetype: detectedArchetype } = await inferMoodAndArchetype(trimmedInput);
+      const newSymbolicMotifs = extractSymbolicMotifs(trimmedInput);
+      const emotionalDetection = detectEmotionalThemes(trimmedInput);
+      const emotionalThemes = emotionalDetection.themes;
+      const detectedPhaseResult = detectSpiralogicPhase(trimmedInput);
+      const { mood, archetype: detectedArchetype } = inferMoodAndArchetype(trimmedInput);
 
       console.log(`🔮 Symbolic Intelligence:`, {
         motifs: newSymbolicMotifs,
         themes: emotionalThemes,
-        detectedPhase,
+        detectedPhase: detectedPhaseResult.phase,
+        phaseConfidence: detectedPhaseResult.confidence,
         mood,
         archetype: detectedArchetype
       });
 
       // 🔮 PREDICT PHASE TRANSITIONS
-      const phaseTransitionPrediction = await predictNextPhase(ainMemory, trimmedInput);
+      const phaseTransitionPrediction = predictNextPhase(ainMemory, trimmedInput);
       console.log(`📊 Phase Prediction:`, phaseTransitionPrediction);
 
       // Extract symbolic patterns from journal history
@@ -739,13 +741,13 @@ That's the entire work.
 
       // Add current phase and archetype intelligence
       systemPrompt += `\n## Current State\n\n`;
-      systemPrompt += `- **Spiralogic Phase**: ${ainMemory.currentPhase} (${detectedPhase.confidence}% confidence)\n`;
+      systemPrompt += `- **Spiralogic Phase**: ${ainMemory.currentPhase} → ${detectedPhaseResult.phase} (${Math.round(detectedPhaseResult.confidence * 100)}% confidence)\n`;
       systemPrompt += `- **Archetype**: ${detectedArchetype || ainMemory.currentArchetype}\n`;
       if (mood) {
         systemPrompt += `- **Emotional Tone**: ${mood}\n`;
       }
-      if (phaseTransitionPrediction.predictedNextPhase) {
-        systemPrompt += `- **Phase Prediction**: Likely moving toward ${phaseTransitionPrediction.predictedNextPhase} (${Math.round(phaseTransitionPrediction.confidence * 100)}% confidence)\n`;
+      if (phaseTransitionPrediction.nextPhaseLikely) {
+        systemPrompt += `- **Phase Prediction**: ${phaseTransitionPrediction.reasoning} - likely moving toward ${phaseTransitionPrediction.nextPhaseLikely} (${Math.round(phaseTransitionPrediction.confidence * 100)}% confidence)\n`;
       }
       systemPrompt += `\n`;
 
@@ -1063,7 +1065,7 @@ That's the entire work.
       // 🧠 UPDATE AIN MEMORY with learned intelligence
       const updatedMemory = updateMemoryAfterExchange(ainMemory, {
         newArchetype: detectedArchetype || ainMemory.currentArchetype,
-        newPhase: detectedPhase.phase || ainMemory.currentPhase,
+        newPhase: detectedPhaseResult.phase || ainMemory.currentPhase,
         userInput: trimmedInput,
         maiaResponse: responseText,
         symbolicMotifs: newSymbolicMotifs,
@@ -1079,7 +1081,7 @@ That's the entire work.
         element: dominantElement,
         metadata: {
           sessionId: `session_${Date.now()}`,
-          phase: detectedPhase.phase || 'reflection',
+          phase: detectedPhaseResult.phase || 'reflection',
           symbols,
           archetypes,
           ainMemory: {
