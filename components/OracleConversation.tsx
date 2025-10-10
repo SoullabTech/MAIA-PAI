@@ -816,10 +816,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         const cleanVoiceText = cleanMessageForVoice(responseText);
         console.log('🧹 Cleaned for voice:', cleanVoiceText);
 
+        // ECHO SUPPRESSION: Define cooldown OUTSIDE try block so finally can access it
+        const cooldownMs = 3500; // 3.5 second cooldown (audio can linger in speakers)
+
         try {
           // Start speaking immediately
-          // ECHO SUPPRESSION: Define cooldown at block scope so finally can access it
-          const cooldownMs = 3500; // 3.5 second cooldown (audio can linger in speakers)
 
           const startSpeakTime = Date.now();
           console.log('⏱️ Starting speech at:', startSpeakTime);
