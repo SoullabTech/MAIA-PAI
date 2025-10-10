@@ -4,7 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,6 +19,8 @@ export async function GET(request: NextRequest) {
     }
 
     console.log(`🧠 Fetching AIN memory context for user ${userId}`);
+
+    const supabase = createClient();
 
     // Fetch AIN memory from Supabase
     const { data, error } = await supabase
