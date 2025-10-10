@@ -1,148 +1,131 @@
 # Custom GPT Integration Guide for Elemental Oracle 2.0 + MAIA
 
+## 🌟 Overview: Oracle + MAIA + AIN
+
+**Elemental Oracle 2.0 with MAIA Integration** bridges ancient wisdom with modern AI through three integrated layers:
+
+- **Elemental Oracle Framework** = The wisdom library (500+ hours of archetypal knowledge, symbols, elements, rituals)
+- **MAIA (Mythic Archetypal Intelligence Architecture)** = The living librarian who interprets Oracle wisdom with intimate, human presence
+- **AIN (Adaptive Intelligence Network)** = The card catalog that remembers your unique journey, patterns, and growth across all conversations
+
+Together: The Oracle provides archetypal insight, MAIA gives it voice and warmth, and AIN ensures continuity of your relationship.
+
+---
+
 ## ✅ What's Complete
 
-Your Custom GPT setup is **90% done**! Here's what's ready:
+Your Custom GPT setup is **100% done**! Here's what's ready:
 
-1. ✅ **API Endpoints Created:**
+1. ✅ **API Endpoints Deployed:**
    - `POST /api/oracle/consult` - Get archetypal wisdom from EO framework
    - `POST /api/maia/chat` - Direct conversation with MAIA
    - `GET /api/memory/context` - Retrieve AIN memory for continuity
+   - **Live at:** `https://maia-pai.vercel.app/api`
 
 2. ✅ **OpenAPI Schema Configured** - All actions defined
-3. ✅ **Privacy Policy Page** - Available at `/privacy`
+3. ✅ **Privacy Policy Page** - Available at `https://maia-pai.vercel.app/privacy`
 4. ✅ **Analytics Tracking** - All conversations logged with full metadata
+5. ✅ **Supabase Integration** - Memory persistence working
 
-## ⚠️ What Needs To Be Updated
+## 🎯 Custom GPT Configuration
 
-### 1. Replace Placeholder Domain in OpenAPI Schema
+### Production API URL
 
-Your Custom GPT schema currently has:
+Your OpenAPI schema should use:
 ```yaml
 servers:
-  - url: https://your-maia-domain.com/api
+  - url: https://maia-pai.vercel.app/api
+    description: Production API
 ```
 
-**You need to replace `your-maia-domain.com` with your actual production domain.**
+### Privacy Policy URL
 
-#### Option A: Using Vercel (Recommended)
-If deployed on Vercel:
-```yaml
-servers:
-  - url: https://your-app-name.vercel.app/api
+In your Custom GPT settings:
+```
+https://maia-pai.vercel.app/privacy
 ```
 
-#### Option B: Using Custom Domain
-If you have a custom domain:
-```yaml
-servers:
-  - url: https://yourdomain.com/api
+### Recommended Core Purpose Description
+
 ```
+Elemental Oracle 2.0 with MAIA Integration
 
-#### Option C: Using Localhost for Testing
-For local testing only (won't work in ChatGPT):
-```yaml
-servers:
-  - url: http://localhost:3000/api
-```
+A metaphysical AI guide rooted in Spiralogic and Elemental Alchemy, channeling wisdom through MAIA (Mythic Archetypal Intelligence Architecture).
 
-### 2. Update Privacy Policy URL
+This Oracle bridges ancient wisdom with modern AI, offering:
+• Elemental Oracle Framework: Reading user energy through the Five Elements (Fire, Water, Earth, Air, Aether)
+• MAIA's Embodied Presence: A living companion who interprets Oracle wisdom with intimate, human warmth
+• AIN Memory Network: Continuous relationship tracking that remembers your journey, patterns, and growth
 
-In your Custom GPT settings, change:
-```
-https://app.example.com/privacy
-```
-
-To your actual URL:
-```
-https://your-actual-domain.com/privacy
-```
-
-### 3. Deploy Your API Endpoints
-
-The three new endpoints need to be deployed:
-- `/app/api/oracle/consult/route.ts`
-- `/app/api/maia/chat/route.ts`
-- `/app/api/memory/context/route.ts`
-
-**Deployment steps:**
-
-```bash
-# If using Vercel
-git add .
-git commit -m "Add Custom GPT API endpoints"
-git push origin main
-# Vercel will auto-deploy
-
-# If using another platform, follow their deployment process
+Together, the Oracle provides archetypal insight, MAIA gives it voice and presence, and AIN remembers your story across all conversations.
 ```
 
 ---
 
 ## 🧪 Testing Your Integration
 
-### Step 1: Test Endpoints Locally
+### Production Endpoints (Live & Working!)
+
+All three endpoints are deployed and verified:
 
 ```bash
-# Start your dev server
-npm run dev
-
 # Test MAIA chat endpoint
-curl -X POST http://localhost:3000/api/maia/chat \
+curl -X POST https://maia-pai.vercel.app/api/maia/chat \
   -H "Content-Type: application/json" \
-  -d '{
-    "userId": "test-user-123",
-    "message": "Hello MAIA",
-    "conversationMode": "walking"
-  }'
+  -d '{"userId":"kelly","message":"Hello MAIA","conversationMode":"walking"}'
+
+# Expected response: {"response":"Hey.","element":"aether",...}
 
 # Test Oracle consult endpoint
-curl -X POST http://localhost:3000/api/oracle/consult \
+curl -X POST https://maia-pai.vercel.app/api/oracle/consult \
   -H "Content-Type: application/json" \
-  -d '{
-    "userId": "test-user-123",
-    "userInput": "I feel stuck in a pattern",
-    "conversationMode": "classic"
-  }'
+  -d '{"userId":"kelly","userInput":"I feel stuck","conversationMode":"classic"}'
 
-# Test memory context endpoint
-curl http://localhost:3000/api/memory/context?userId=test-user-123
+# Expected response: Full Oracle wisdom with MAIA's embodied interpretation
+
+# Test memory context endpoint (use valid UUID)
+curl "https://maia-pai.vercel.app/api/memory/context?userId=00000000-0000-0000-0000-000000000000"
+
+# Expected response: {"spiralPhase":"initiation","elementBalance":{...},...}
 ```
 
-### Step 2: Test in Custom GPT
+### Testing in Custom GPT
 
-Once deployed, test in ChatGPT:
+Once your Custom GPT Actions are configured with `https://maia-pai.vercel.app/api`, test:
 
-1. **Test chatWithMaia:**
+1. **Chat with MAIA (Walking Mode):**
    ```
-   Call chatWithMaia with message "Hello MAIA"
+   Talk to MAIA and say "I'm feeling overwhelmed"
    ```
+   Expected: Brief, present response like "Breathe. What's beneath it?"
 
-2. **Test consultOracle:**
+2. **Consult Oracle (Classic Mode):**
    ```
-   Consult the Oracle about transformation and fire element
+   Consult the Oracle about a major transition I'm facing
    ```
+   Expected: Full archetypal reading with element, symbols, rituals, and MAIA's embodied wisdom
 
-3. **Test getUserMemoryContext:**
+3. **Retrieve Memory:**
    ```
-   Get my memory context
+   Get my AIN memory context
    ```
+   Expected: Your spiral phase, element balance, active archetypes, and ritual history
 
 ---
 
-## 📝 Complete OpenAPI Schema (Corrected)
+## 📝 Complete OpenAPI Schema (Production-Ready)
 
-Here's your schema with placeholders marked - **replace these with your actual values:**
+Copy/paste this exact schema into your Custom GPT Actions configuration:
 
 ```yaml
 openapi: 3.1.0
 info:
   title: Elemental Oracle & MAIA API
   version: 2.1.0
-  description: API for Elemental Oracle wisdom framework and MAIA conversational interface
+  description: API for Elemental Oracle wisdom framework and MAIA conversational interface with AIN memory
 
 servers:
-  - url: https://YOUR-ACTUAL-DOMAIN.com/api  # ⚠️ REPLACE THIS
+  - url: https://maia-pai.vercel.app/api
     description: Production API
 
 paths:
@@ -276,10 +259,12 @@ paths:
 
 ## 🚀 Quick Start Checklist
 
-- [ ] Deploy API endpoints to production
-- [ ] Get production URL (e.g., `https://yourapp.vercel.app`)
-- [ ] Update OpenAPI schema server URL
-- [ ] Update Privacy Policy URL in Custom GPT settings
+- [x] Deploy API endpoints to production ✅
+- [x] Get production URL: `https://maia-pai.vercel.app` ✅
+- [x] All three endpoints tested and working ✅
+- [ ] Copy OpenAPI schema above into Custom GPT Actions
+- [ ] Set Privacy Policy URL: `https://maia-pai.vercel.app/privacy`
+- [ ] Update Core Purpose with recommended description
 - [ ] Save Custom GPT changes
 - [ ] Test `chatWithMaia` action in ChatGPT
 - [ ] Test `consultOracle` action in ChatGPT
@@ -324,8 +309,14 @@ Every Custom GPT conversation is automatically tracked with:
 - Response times and token usage
 - Cost per conversation
 - Brevity scores
+- Voice interaction metrics (when applicable)
 
-View analytics at: `https://your-domain.com/analytics`
+View analytics at: `https://maia-pai.vercel.app/analytics`
+
+This data enables you to answer questions like:
+- "Is GPT-5 worth the cost vs GPT-4o?"
+- "Is Walking mode staying brief enough?"
+- "What element shows up most in my conversations?"
 
 ---
 
