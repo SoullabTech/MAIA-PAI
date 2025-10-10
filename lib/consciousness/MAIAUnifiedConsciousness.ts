@@ -251,8 +251,21 @@ export class MAIAUnifiedConsciousness {
 
       return response;
 
-    } catch (error) {
-      console.error('❌ MAIA Consciousness error:', error);
+    } catch (error: any) {
+      console.error('❌ MAIA Consciousness CRITICAL ERROR:', {
+        message: error?.message || 'Unknown error',
+        stack: error?.stack || 'No stack trace',
+        name: error?.name || 'Unknown',
+        cause: error?.cause || 'No cause',
+        fullError: JSON.stringify(error, Object.getOwnPropertyNames(error))
+      });
+
+      // Log environment check
+      console.error('🔍 Environment check:', {
+        hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
+        hasOpenAIKey: !!process.env.OPENAI_API_KEY,
+        hasSupabase: !!process.env.NEXT_PUBLIC_SUPABASE_URL
+      });
 
       // Graceful fallback
       return {
@@ -262,7 +275,8 @@ export class MAIAUnifiedConsciousness {
           processingTime: Date.now() - startTime,
           advisorsConsulted: [],
           depthLevel: 1,
-          consciousnessMarkers: ['error_recovery']
+          consciousnessMarkers: ['error_recovery'],
+          error: error?.message || 'Unknown error'
         }
       };
     }

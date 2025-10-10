@@ -150,6 +150,15 @@ export async function POST(request: NextRequest) {
       console.log('✅ MAIAUnifiedConsciousness response successful:', responseTime + 'ms');
       console.log(`   Element: ${element}, Depth: ${consciousnessResponse.metadata.depthLevel}/10`);
 
+      // Log full metadata to diagnose any errors
+      console.log('📊 Full consciousness response metadata:', JSON.stringify(consciousnessResponse.metadata, null, 2));
+
+      // Check if this is an error recovery fallback
+      if (consciousnessResponse.metadata.consciousnessMarkers?.includes('error_recovery')) {
+        console.error('⚠️ WARNING: Response came from error recovery fallback!');
+        console.error('   Error details:', consciousnessResponse.metadata.error || 'No error details available');
+      }
+
       const soulprint = await getSoulprintForUser(requestUserId);
       const voiceTone = getToneFromSoulprint(soulprint);
 
