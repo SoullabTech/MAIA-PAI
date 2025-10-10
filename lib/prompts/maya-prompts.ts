@@ -195,6 +195,21 @@ ADAPTIVE CALIBRATION:
 // Default is Her mode
 export const MAYA_NATURAL_PROMPT = MAYA_HER_MODE_PROMPT;
 
+/**
+ * Get the appropriate prompt based on conversation style preference
+ */
+export function getPromptForConversationStyle(style?: 'her' | 'classic' | 'adaptive'): string {
+  switch (style) {
+    case 'classic':
+      return MAYA_CLASSIC_MODE_PROMPT;
+    case 'adaptive':
+      return MAYA_ADAPTIVE_MODE_PROMPT;
+    case 'her':
+    default:
+      return MAYA_HER_MODE_PROMPT;
+  }
+}
+
 export const MAYA_FALLBACK_RESPONSES = [
   "Hey! What's on your mind?",
   "Good to see you. What's going on?",

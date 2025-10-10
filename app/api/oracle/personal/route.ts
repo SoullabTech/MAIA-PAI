@@ -87,7 +87,8 @@ export async function POST(request: NextRequest) {
     console.log('🔮 Attempting PersonalOracleAgent (primary MAIA path)...');
     try {
       const agent = await PersonalOracleAgent.loadAgent(requestUserId, {
-        persona: preferences?.communicationStyle || 'warm'
+        persona: preferences?.communicationStyle || 'warm',
+        conversationStyle: preferences?.conversationStyle || 'her' // her (Natural Dialogue) | classic (Consciousness Guide) | adaptive
       });
 
       const agentResponse = await agent.processInteraction(userInput, {

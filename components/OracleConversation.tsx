@@ -31,6 +31,7 @@ import { generateGreeting } from '@/lib/services/greetingService';
 import { BrandedWelcome } from './BrandedWelcome';
 import { userTracker } from '@/lib/tracking/userActivityTracker';
 import { ModeSwitcher } from './ui/ModeSwitcher';
+import { ConversationStylePreference } from '@/lib/preferences/conversation-style-preference';
 
 interface OracleConversationProps {
   userId?: string;
@@ -679,6 +680,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       console.log('📤 Sending text message to API:', { cleanedText, userId, sessionId });
 
+      // Get user's conversation style preference
+      const conversationStyle = ConversationStylePreference.get();
+
       const response = await fetch('/api/oracle/personal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -698,6 +702,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             previousInteractions: messages.length,
             inputType: 'text',
             hasAttachments: attachments && attachments.length > 0,
+            conversationStyle, // Pass user's preferred style (her/classic/adaptive)
             userPreferences: {
               voice: {
                 enabled: false,

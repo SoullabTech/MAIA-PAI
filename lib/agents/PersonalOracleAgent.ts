@@ -10,6 +10,7 @@ import { MAIASafetyPipeline } from '@/lib/safety-pipeline';
 import { ActiveListeningCore } from '@/lib/oracle/ActiveListeningCore';
 import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '@/lib/knowledge/ElementalAlchemyKnowledge';
 import { SemanticMemoryService } from '@/lib/memory/SemanticMemoryService';
+import { getPromptForConversationStyle } from '@/lib/prompts/maya-prompts';
 
 export interface PersonalOracleQuery {
   input: string;
@@ -53,6 +54,7 @@ export interface PersonalOracleSettings {
     volume: number;
   };
   persona?: "warm" | "formal" | "playful";
+  conversationStyle?: "her" | "classic" | "adaptive"; // User's preferred conversation style
 }
 
 /**
@@ -552,7 +554,11 @@ That's the entire work.
       const dominantElement = this.detectDominantElement(journalEntries);
 
       // Build context as LIVING NARRATIVE not data extraction
-      let systemPrompt = PersonalOracleAgent.MAIA_SYSTEM_PROMPT;
+      // Use conversation style preference (her/classic/adaptive)
+      const conversationStyle = this.settings?.conversationStyle || 'her';
+      let systemPrompt = getPromptForConversationStyle(conversationStyle);
+
+      console.log(`💬 Using conversation style: ${conversationStyle}`);
 
       // Add their actual words if journal entries available
       if (journalEntries.length > 0) {
