@@ -710,6 +710,11 @@ That's the entire work.
 
       console.log(`💬 FINAL conversation style: ${conversationStyle}`);
 
+      // 🤖 MODEL SELECTION: Use GPT-4o for Walking mode (conversational), Claude for depth
+      const useGPT = conversationStyle === 'walking';
+      const modelName = useGPT ? 'gpt-4o' : 'claude-3-5-sonnet-20241022';
+      console.log(`🤖 Using model: ${modelName} (Walking mode needs conversational training)`);
+
       // Add their actual words if journal entries available
       if (journalEntries.length > 0) {
         systemPrompt += `\n\n## Living Context (Their Actual Words)\n\n`;
@@ -968,65 +973,107 @@ That's the entire work.
         throw new Error('ANTHROPIC_API_KEY not configured - cannot call Claude');
       }
 
-      for (let attempt = 0; attempt <= maxRetries; attempt++) {
-        if (attempt > 0) {
-          const delay = Math.pow(2, attempt) * 1000;
-          console.log(`🔄 Retry attempt ${attempt}/${maxRetries} after ${delay}ms delay`);
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
+      // 🔀 MODEL ROUTING: GPT-4o for Walking (conversational), Claude+EO for depth
+      let responseText: string;
 
-        console.log(`🤖 Calling Claude API (attempt ${attempt + 1}/${maxRetries + 1})...`);
-        console.log('📝 System Prompt Length:', systemPrompt.length, 'chars');
-        console.log('📝 System Prompt Preview:', systemPrompt.substring(0, 300) + '...');
+      if (useGPT) {
+        // === GPT-4o PATH: Conversational companion (Walking mode only) ===
+        console.log(`🤖 Calling OpenAI GPT-4o for Walking mode...`);
 
-        claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
+        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'x-api-key': process.env.ANTHROPIC_API_KEY || '',
-            'anthropic-version': '2023-06-01',
-            'content-type': 'application/json',
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'claude-3-5-sonnet-20241022',
-            max_tokens: 300,
-            system: systemPrompt,
+            model: 'gpt-4o',
             messages: [
               {
-                role: 'user',
-                content: trimmedInput,
+                role: 'system',
+                content: systemPrompt
               },
+              {
+                role: 'user',
+                content: trimmedInput
+              }
             ],
-            temperature: 0.75,
-            // Request faster streaming response
-            stream: false // Keep non-streaming for simplicity, but Claude processes faster
+            max_tokens: 150, // Walking mode = brief responses
+            temperature: 0.8,
           }),
         });
 
-        console.log(`📡 Claude API response: ${claudeResponse.status} ${claudeResponse.statusText}`);
-
-        if (claudeResponse.ok) {
-          console.log('✅ Claude API call successful');
-          break;
+        if (!openaiResponse.ok) {
+          const errorBody = await openaiResponse.text();
+          console.error(`❌ OpenAI API error ${openaiResponse.status}:`, errorBody);
+          throw new Error(`OpenAI API error: ${openaiResponse.status}`);
         }
 
-        if (claudeResponse.status === 529 && attempt < maxRetries) {
-          lastError = `Claude API overloaded (529), retrying... (attempt ${attempt + 1}/${maxRetries})`;
-          console.warn(`⚠️ ${lastError}`);
-          continue;
+        const openaiData = await openaiResponse.json();
+        responseText = openaiData.choices[0].message.content;
+        console.log('✅ GPT-4o response received');
+
+      } else {
+        // === CLAUDE PATH: Deep conversations with full EO framework (Classic/Adaptive) ===
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+          if (attempt > 0) {
+            const delay = Math.pow(2, attempt) * 1000;
+            console.log(`🔄 Retry attempt ${attempt}/${maxRetries} after ${delay}ms delay`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+
+          console.log(`🤖 Calling Claude API with full EO framework (attempt ${attempt + 1}/${maxRetries + 1})...`);
+          console.log('📝 System Prompt Length:', systemPrompt.length, 'chars');
+          console.log('📝 EO Framework included: 500+ hours of Kelly\'s work');
+
+          claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'x-api-key': process.env.ANTHROPIC_API_KEY || '',
+              'anthropic-version': '2023-06-01',
+              'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: modelName,
+              max_tokens: 300,
+              system: systemPrompt,
+              messages: [
+                {
+                  role: 'user',
+                  content: trimmedInput,
+                },
+              ],
+              temperature: 0.75,
+              stream: false
+            }),
+          });
+
+          console.log(`📡 Claude API response: ${claudeResponse.status} ${claudeResponse.statusText}`);
+
+          if (claudeResponse.ok) {
+            console.log('✅ Claude API call successful with EO framework');
+            break;
+          }
+
+          if (claudeResponse.status === 529 && attempt < maxRetries) {
+            lastError = `Claude API overloaded (529), retrying... (attempt ${attempt + 1}/${maxRetries})`;
+            console.warn(`⚠️ ${lastError}`);
+            continue;
+          }
+
+          // Log error details for debugging
+          const errorBody = await claudeResponse.text();
+          console.error(`❌ Claude API error ${claudeResponse.status}:`, errorBody);
+          throw new Error(`Claude API error: ${claudeResponse.status} - ${errorBody}`);
         }
 
-        // Log error details for debugging
-        const errorBody = await claudeResponse.text();
-        console.error(`❌ Claude API error ${claudeResponse.status}:`, errorBody);
-        throw new Error(`Claude API error: ${claudeResponse.status} - ${errorBody}`);
-      }
+        if (!claudeResponse || !claudeResponse.ok) {
+          throw new Error(lastError || `Claude API error after ${maxRetries} retries`);
+        }
 
-      if (!claudeResponse || !claudeResponse.ok) {
-        throw new Error(lastError || `Claude API error after ${maxRetries} retries`);
+        const data = await claudeResponse.json();
+        responseText = data.content[0].text;
       }
-
-      const data = await claudeResponse.json();
-      const responseText = data.content[0].text;
 
       // 🔥 NEW: Capture this conversation turn for memory
       console.log('[DEBUG] Attempting memory capture in PersonalOracleAgent', {
