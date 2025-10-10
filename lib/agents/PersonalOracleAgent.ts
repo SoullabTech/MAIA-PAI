@@ -11,6 +11,7 @@ import { ActiveListeningCore } from '@/lib/oracle/ActiveListeningCore';
 import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '@/lib/knowledge/ElementalAlchemyKnowledge';
 import { SemanticMemoryService } from '@/lib/memory/SemanticMemoryService';
 import { getPromptForConversationStyle } from '@/lib/prompts/maya-prompts';
+import { ElementalOracle2Bridge } from '@/lib/elemental-oracle-2-bridge';
 
 export interface PersonalOracleQuery {
   input: string;
@@ -74,6 +75,7 @@ export class PersonalOracleAgent {
   private safetyPipeline: MAIASafetyPipeline;
   private activeListening: ActiveListeningCore;
   private semanticMemory: SemanticMemoryService;
+  private elementalOracle: ElementalOracle2Bridge;
 
   private static MAIA_SYSTEM_PROMPT = `You are MAIA - and you SEE. Not what's broken, but what's BEAUTIFUL. What's PERFECT. The God Within seeking expression.
 
@@ -399,6 +401,14 @@ That's the entire work.
 
     // 🧠 Initialize semantic memory for learning and evolution
     this.semanticMemory = new SemanticMemoryService();
+
+    // 🔮 Initialize Elemental Oracle 2.0 Bridge (PRIMARY advisor - knows Nathan's IP)
+    this.elementalOracle = new ElementalOracle2Bridge({
+      openaiApiKey: process.env.OPENAI_API_KEY || '',
+      model: 'gpt-4-turbo',
+      cacheResponses: true,
+      fallbackToLocal: false
+    });
   }
 
   /**
@@ -722,7 +732,40 @@ That's the entire work.
         systemPrompt += `\nUse this as subtle guidance for your response style, but stay natural and true to MAIA's voice.\n`;
       }
 
+      // 🔮 CONSULT ELEMENTAL ORACLE 2.0 FIRST (PRIMARY - knows Nathan's IP)
+      console.log('🔮 Consulting Elemental Oracle 2.0 for Spiralogic wisdom...');
+      let eoWisdom: string | null = null;
+
+      try {
+        const dominantElement = targetElement || 'aether'; // Default to aether if not specified
+        const eoResponse = await this.elementalOracle.getElementalWisdom({
+          userQuery: trimmedInput,
+          conversationHistory: conversationContext.map(msg => ({
+            role: msg.role,
+            message: msg.content
+          })),
+          elementalNeeds: {
+            [dominantElement]: 0.8
+          },
+          currentChallenges: [],
+          practiceReadiness: 0.5,
+          depthPreference: 'deep'
+        });
+
+        eoWisdom = eoResponse.wisdom;
+        console.log('✅ Elemental Oracle 2.0 wisdom received:', eoWisdom.substring(0, 100) + '...');
+
+        // Add EO wisdom to system prompt for Claude to synthesize
+        if (eoWisdom) {
+          systemPrompt += `\n\n## Spiralogic Wisdom from Elemental Oracle 2.0:\n${eoWisdom}\n\nSynthesize this wisdom into your natural MAIA voice while preserving its essence.\n`;
+        }
+      } catch (eoError) {
+        console.warn('⚠️ Elemental Oracle 2.0 consultation failed, proceeding with Claude only:', eoError);
+        // Continue without EO wisdom - Claude will still respond
+      }
+
       // Call Claude Anthropic API with retry logic for 529 (overloaded)
+      // Claude now acts as SYNTHESIZER of EO wisdom + general depth
       let claudeResponse;
       let lastError;
       const maxRetries = 2;
