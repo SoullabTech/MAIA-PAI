@@ -703,15 +703,15 @@ export class ElementalVoiceOrchestrator {
         elementalSignature: getElementalSignature(this.elementalState)
       });
 
-      // Use OpenAI TTS for synthesis
-      const response = await fetch('/api/voice/synthesize', {
+      // Use evolved MAIA TTS (sovereign system with elemental styling)
+      const dominantElement = this.getDominantElement();
+      const response = await fetch('/api/tts/maya', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text,
-          voice,
-          speed: elementalStyle.pacing,
-          stream: this.config.enableResponseStreaming
+          voice: 'maya',
+          element: dominantElement.toLowerCase() // fire, water, earth, air, aether
         })
       });
 
@@ -719,8 +719,15 @@ export class ElementalVoiceOrchestrator {
         throw new Error('Synthesis failed');
       }
 
-      // Get audio data
-      const audioBlob = await response.blob();
+      // Get audio data (base64 from evolved TTS)
+      const data = await response.json();
+      if (!data.success || !data.audio) {
+        throw new Error('No audio data received from evolved TTS');
+      }
+
+      // Convert base64 to blob
+      const audioBytes = Uint8Array.from(atob(data.audio), c => c.charCodeAt(0));
+      const audioBlob = new Blob([audioBytes], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
 
       // Apply slowness protocol pause before speaking
@@ -813,20 +820,28 @@ export class ElementalVoiceOrchestrator {
     try {
       console.log(`💬 Quick speak (${opts?.style || 'calm'}):`, text);
 
-      // Synthesize immediately without going through Spiralogic
-      const response = await fetch('/api/voice/synthesize', {
+      // Synthesize immediately without going through Spiralogic (use evolved TTS)
+      const element = opts?.style === 'bright' ? 'air' : opts?.style === 'concerned' ? 'earth' : 'aether';
+      const response = await fetch('/api/tts/maya', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text,
-          voice: this.config.voice,
-          speed: opts?.style === 'bright' ? 1.1 : opts?.style === 'concerned' ? 0.9 : 1.0
+          voice: 'maya',
+          element
         })
       });
 
       if (!response.ok) throw new Error('Quick speak synthesis failed');
 
-      const audioBlob = await response.blob();
+      const data = await response.json();
+      if (!data.success || !data.audio) {
+        throw new Error('Quick speak: No audio data received');
+      }
+
+      // Convert base64 to blob
+      const audioBytes = Uint8Array.from(atob(data.audio), c => c.charCodeAt(0));
+      const audioBlob = new Blob([audioBytes], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
 
       const audio = new Audio(audioUrl);
