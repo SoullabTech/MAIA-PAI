@@ -7,6 +7,8 @@ import { SimplifiedOrganicVoice, VoiceActivatedMaiaRef } from './ui/SimplifiedOr
 import { SacredHoloflower } from './sacred/SacredHoloflower';
 import { EnhancedVoiceMicButton } from './ui/EnhancedVoiceMicButton';
 import AdaptiveVoiceMicButton from './ui/AdaptiveVoiceMicButton';
+import { detectVoiceCommand, isOnlyModeSwitch, getModeConfirmation } from '@/lib/voice/VoiceCommandDetector';
+import { QuickModeToggle } from './ui/QuickModeToggle';
 // import MaiaChatInterface from './chat/MaiaChatInterface'; // File doesn't exist
 import { EmergencyChatInterface } from './ui/EmergencyChatInterface';
 import { SimpleVoiceMic } from './ui/SimpleVoiceMic';
@@ -935,6 +937,46 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       return;
     }
 
+    // 🎤 VOICE COMMAND DETECTION - Check for mode switching commands
+    const commandResult = detectVoiceCommand(t);
+    if (commandResult.detected && commandResult.mode) {
+      console.log(`🔄 Voice command detected: switching to ${commandResult.mode} mode`);
+
+      // Save new mode
+      localStorage.setItem('conversation_mode', commandResult.mode);
+      window.dispatchEvent(new Event('conversationStyleChanged'));
+
+      // Get confirmation message
+      const confirmation = getModeConfirmation(commandResult.mode);
+
+      // If command was standalone (no other text), just acknowledge and return
+      if (isOnlyModeSwitch(t)) {
+        console.log('✅ Mode switch confirmed, no additional message to process');
+
+        // Speak confirmation if voice is enabled
+        if (maiaReady && maiaSpeak && !isMuted) {
+          await maiaSpeak(confirmation);
+        }
+
+        // Show visual confirmation
+        toast.success(confirmation);
+        return;
+      }
+
+      // If there's additional text, show confirmation but continue processing
+      if (commandResult.cleanedText.length > 0) {
+        toast.success(confirmation);
+        // Continue with cleaned text below
+      }
+
+      // Use cleaned text (command stripped out) for processing
+      const textToProcess = commandResult.cleanedText || t;
+      if (!textToProcess) return;
+
+      // Continue with normal processing using cleaned text
+      transcript = textToProcess;
+    }
+
     // ECHO SUPPRESSION: Check if we're in cooldown period
     const now = Date.now();
     if (now < echoSuppressUntil) {
@@ -944,7 +986,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
 
     // ECHO SUPPRESSION: Check if transcript matches MAIA's last response
-    if (lastMaiaResponseRef.current && t.includes(lastMaiaResponseRef.current.substring(0, 50))) {
+    if (lastMaiaResponseRef.current && transcript.includes(lastMaiaResponseRef.current.substring(0, 50))) {
       console.warn('[Echo Suppressed] Transcript matches MAIA\'s recent response');
       return;
     }
@@ -957,12 +999,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
     // Deduplicate: check if this is the same as the last message
     const lastMessage = messages[messages.length - 1];
-    if (lastMessage?.role === 'user' && lastMessage.text === t) {
+    if (lastMessage?.role === 'user' && lastMessage.text === transcript) {
       console.log('⚠️ Duplicate transcript detected, ignoring');
       return;
     }
 
-    console.log('🎯 Voice transcript received:', t);
+    console.log('🎯 Voice transcript received:', transcript);
     console.log('📊 Current states:', {
       isProcessing,
       isResponding,
@@ -974,13 +1016,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     console.log('📞 Calling handleTextMessage...');
 
     const voiceStartTime = Date.now();
-    trackEvent.voiceResult(userId || 'anonymous', t, 0);
+    trackEvent.voiceResult(userId || 'anonymous', transcript, 0);
 
     try {
       // Route all voice through text message handler for reliability
-      await handleTextMessage(t);
+      await handleTextMessage(transcript);
       const duration = Date.now() - voiceStartTime;
-      trackEvent.voiceResult(userId || 'anonymous', t, duration);
+      trackEvent.voiceResult(userId || 'anonymous', transcript, duration);
       console.log('✅ handleTextMessage completed');
     } catch (error) {
       console.error('❌ Error in handleTextMessage:', error);
@@ -989,7 +1031,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setIsProcessing(false);
       setIsResponding(false);
     }
-  }, [handleTextMessage, isProcessing, isResponding, isAudioPlaying, messages, echoSuppressUntil]);
+  }, [handleTextMessage, isProcessing, isResponding, isAudioPlaying, messages, echoSuppressUntil, maiaReady, maiaSpeak, isMuted]);
 
   // Clear all check-ins
   const clearCheckIns = useCallback(() => {
@@ -2280,6 +2322,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
           </label>
+
+          {/* Quick Mode Toggle - Easy mode switching */}
+          <QuickModeToggle />
 
           {/* Quick Settings - Opens comprehensive MAIA settings - GOLD HIGHLIGHT */}
           <button

@@ -687,8 +687,18 @@ That's the entire work.
       const dominantElement = this.detectDominantElement(journalEntries);
 
       // Build context as LIVING NARRATIVE not data extraction
-      // Use conversation style preference (her/classic/adaptive)
-      const conversationStyle = this.settings?.conversationStyle || 'classic';
+      // Use conversation style preference (walking/classic/adaptive)
+      // Check localStorage first (for voice command changes), then settings
+      let conversationStyle = this.settings?.conversationStyle || 'classic';
+
+      // Override with localStorage if available (allows voice command mode switching)
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        const savedMode = localStorage.getItem('conversation_mode');
+        if (savedMode && ['walking', 'classic', 'adaptive'].includes(savedMode)) {
+          conversationStyle = savedMode as 'walking' | 'classic' | 'adaptive';
+        }
+      }
+
       let systemPrompt = getPromptForConversationStyle(conversationStyle);
 
       console.log(`💬 Using conversation style: ${conversationStyle}`);

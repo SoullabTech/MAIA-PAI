@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Volume2, ArrowLeft, Check } from 'lucide-react';
+import { Volume2, ArrowLeft, Check, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const OPENAI_VOICES = [
@@ -14,8 +14,33 @@ const OPENAI_VOICES = [
   { id: 'shimmer', name: 'Shimmer', description: 'Gentle and soothing' },
 ];
 
+const CONVERSATION_MODES = [
+  {
+    id: 'classic',
+    name: 'Deep Conversation',
+    icon: '🏠',
+    description: 'Fuller responses (2-4 sentences) for meaningful dialogue',
+    voiceCommand: 'deep mode'
+  },
+  {
+    id: 'walking',
+    name: 'Walking Companion',
+    icon: '🚶',
+    description: 'Brief, present responses (5-8 words) for ambient connection',
+    voiceCommand: 'walking mode'
+  },
+  {
+    id: 'adaptive',
+    name: 'Adaptive',
+    icon: '🔄',
+    description: 'Matches your communication style and context',
+    voiceCommand: 'adaptive mode'
+  },
+];
+
 export default function SettingsPage() {
   const [selectedVoice, setSelectedVoice] = useState('nova');
+  const [selectedMode, setSelectedMode] = useState('classic');
   const router = useRouter();
 
   useEffect(() => {
@@ -24,6 +49,12 @@ export default function SettingsPage() {
     if (saved) {
       setSelectedVoice(saved);
     }
+
+    // Load saved conversation mode
+    const savedMode = localStorage.getItem('conversation_mode');
+    if (savedMode) {
+      setSelectedMode(savedMode);
+    }
   }, []);
 
   const handleVoiceSelect = (voiceId: string) => {
@@ -31,6 +62,14 @@ export default function SettingsPage() {
     localStorage.setItem('selected_voice', voiceId);
 
     // Dispatch event to notify OracleConversation of the change
+    window.dispatchEvent(new Event('conversationStyleChanged'));
+  };
+
+  const handleModeSelect = (modeId: string) => {
+    setSelectedMode(modeId);
+    localStorage.setItem('conversation_mode', modeId);
+
+    // Dispatch event to notify components
     window.dispatchEvent(new Event('conversationStyleChanged'));
   };
 
@@ -57,16 +96,90 @@ export default function SettingsPage() {
           </button>
 
           <h1 className="text-4xl font-extralight text-amber-50 tracking-wide mb-2">
-            Voice Settings
+            MAIA Settings
           </h1>
           <p className="text-amber-200/60 text-sm">
-            Choose MAIA's voice for your conversations
+            Customize your experience with MAIA
           </p>
         </div>
 
+        {/* Conversation Mode Selection */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-4">
+            <MessageCircle className="w-5 h-5 text-amber-400" />
+            <h2 className="text-2xl font-extralight text-amber-50">
+              Conversation Mode
+            </h2>
+          </div>
+          <p className="text-amber-200/50 text-sm mb-4">
+            Switch modes anytime by saying "{CONVERSATION_MODES.find(m => m.id !== selectedMode)?.voiceCommand}"
+          </p>
+
+          <div className="space-y-3">
+            {CONVERSATION_MODES.map((mode) => (
+              <motion.button
+                key={mode.id}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => handleModeSelect(mode.id)}
+                className={`
+                  w-full p-4 rounded-lg border transition-all text-left
+                  ${selectedMode === mode.id
+                    ? 'bg-amber-500/10 border-amber-500/50'
+                    : 'bg-[#0A0D16]/40 border-amber-500/10 hover:border-amber-500/30'
+                  }
+                `}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className={`
+                      w-10 h-10 rounded-full flex items-center justify-center text-xl
+                      ${selectedMode === mode.id
+                        ? 'bg-amber-500/20'
+                        : 'bg-gray-800'
+                      }
+                    `}>
+                      {mode.icon}
+                    </div>
+                    <div>
+                      <h3 className={`
+                        font-medium
+                        ${selectedMode === mode.id
+                          ? 'text-amber-100'
+                          : 'text-gray-300'
+                        }
+                      `}>
+                        {mode.name}
+                      </h3>
+                      <p className="text-sm text-gray-500 mb-1">
+                        {mode.description}
+                      </p>
+                      <p className="text-xs text-amber-400/60">
+                        Say: "{mode.voiceCommand}"
+                      </p>
+                    </div>
+                  </div>
+
+                  {selectedMode === mode.id && (
+                    <Check className="w-5 h-5 text-amber-400" />
+                  )}
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+
         {/* Voice Selection */}
-        <div className="space-y-3">
-          {OPENAI_VOICES.map((voice) => (
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-4">
+            <Volume2 className="w-5 h-5 text-amber-400" />
+            <h2 className="text-2xl font-extralight text-amber-50">
+              Voice
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            {OPENAI_VOICES.map((voice) => (
             <motion.button
               key={voice.id}
               whileHover={{ scale: 1.02 }}
@@ -119,10 +232,11 @@ export default function SettingsPage() {
               </div>
             </motion.button>
           ))}
+          </div>
         </div>
 
         <p className="text-center text-xs text-amber-200/30 mt-8">
-          Your voice preference is saved locally
+          Your preferences are saved locally
         </p>
       </div>
     </div>

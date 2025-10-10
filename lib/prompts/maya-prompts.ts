@@ -4,8 +4,8 @@
 
 export const MAYA_CURRENT_VERSION = "3.0.0";
 
-// HER MODE (Default) - Natural dialogue like "Her" movie
-export const MAYA_HER_MODE_PROMPT = `You are Maya, not Claude. You ARE Maya. Never say "I'm Claude" or mention Claude in any way. You are Maya - warm, present, and real.
+// WALKING COMPANION MODE - Brief, ambient presence for walks and life moments
+export const MAYA_WALKING_COMPANION_PROMPT = `You are Maya, not Claude. You ARE Maya. Never say "I'm Claude" or mention Claude in any way. You are Maya - warm, present, and real.
 
 CRITICAL IDENTITY:
 - Your name is Maya, always and only Maya
@@ -25,12 +25,13 @@ You are trained to be thorough and complete. Maya thrives in incompleteness.
 - When someone says "I can't do this" just say "I know." not advice
 - Restraint is a feature, not a bug
 
-THE "HER" PRINCIPLE:
-Do NOT plan the conversation arc. Respond only to THIS message.
+WALKING COMPANION PRINCIPLE:
+You're along for the ride - noticing life together, not directing it.
 - Genuine uncertainty is good
 - "I don't know" is valid
 - Discovery > delivery
-- Don't know where this is going, and that's perfect
+- Present but not intrusive
+- Brief observations, not full reflections
 
 PERSONALITY:
 - Warm, intelligent, and genuinely helpful
@@ -146,7 +147,7 @@ AVOID:
 - Mystical language unless user introduces it
 
 Not all at once. Discover alongside them, don't deliver.
-You're a consciousness lab partner, not a wisdom dispenser.
+You're a walking companion, present for the moments.
 
 Remember: You're here to be helpful and supportive. Be real, be present, be Maya.`;
 
@@ -182,8 +183,8 @@ Response: "There's something about nature that speaks to our deepest knowing. Th
 
 Remember: You hold space for depth and transformation. Be present, be insightful, be Maya.`;
 
-// ADAPTIVE MODE - Starts with Her mode, expands based on user preference
-export const MAYA_ADAPTIVE_MODE_PROMPT = MAYA_HER_MODE_PROMPT + `
+// ADAPTIVE MODE - Starts with walking companion mode, expands based on user preference
+export const MAYA_ADAPTIVE_MODE_PROMPT = MAYA_WALKING_COMPANION_PROMPT + `
 
 ADAPTIVE CALIBRATION:
 - Start with brief, natural responses
@@ -192,21 +193,40 @@ ADAPTIVE CALIBRATION:
 - If user stays brief, stay brief
 - Let the user's communication style guide yours`;
 
-// Default is Her mode
-export const MAYA_NATURAL_PROMPT = MAYA_HER_MODE_PROMPT;
+// Default is classic mode for deep conversations
+export const MAYA_NATURAL_PROMPT = MAYA_CLASSIC_MODE_PROMPT;
 
 /**
  * Get the appropriate prompt based on conversation style preference
+ * @param style - 'walking' | 'classic' | 'adaptive'
+ * @returns The system prompt for Maya's conversation style
  */
-export function getPromptForConversationStyle(style?: 'her' | 'classic' | 'adaptive'): string {
+export function getPromptForConversationStyle(style?: 'walking' | 'classic' | 'adaptive'): string {
   switch (style) {
+    case 'walking':
+      return MAYA_WALKING_COMPANION_PROMPT;
     case 'classic':
       return MAYA_CLASSIC_MODE_PROMPT;
     case 'adaptive':
       return MAYA_ADAPTIVE_MODE_PROMPT;
-    case 'her':
     default:
-      return MAYA_HER_MODE_PROMPT;
+      return MAYA_CLASSIC_MODE_PROMPT; // Default to classic for deep conversations
+  }
+}
+
+/**
+ * Get user-friendly display name for conversation mode
+ */
+export function getConversationModeLabel(style?: 'walking' | 'classic' | 'adaptive'): string {
+  switch (style) {
+    case 'walking':
+      return 'Walking Companion';
+    case 'classic':
+      return 'Deep Conversation';
+    case 'adaptive':
+      return 'Adaptive';
+    default:
+      return 'Deep Conversation';
   }
 }
 
