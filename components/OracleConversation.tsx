@@ -88,50 +88,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // Maia Voice Integration - Initialize immediately for Voice mode
   const { speak: maiaSpeak, voiceState: maiaVoiceState, isReady: maiaReady } = useMaiaVoice();
 
-  // 🌀 Soullab Realtime - FIXED: Now accumulates chunks into complete audio before transcription
-  const realtime = useElementalVoice({
-    userId: userId || 'anonymous',
-    userName: userName || 'Explorer',
-    sessionId,
-    voice: 'shimmer',
-    enableSmartCache: true,
-    enableResponseStreaming: true,
-    autoConnect: false, // Manual control via button
-    onTranscript: (text, isUser) => {
-      if (isUser) {
-        console.log('👤 User said:', text);
-
-        // Track voice transcript
-        trackEvent.voiceResult(userId || 'anonymous', text, 0);
-
-        // Add user message to conversation
-        const userMessage: ConversationMessage = {
-          id: `msg-${Date.now()}-user`,
-          role: 'user',
-          text,
-          timestamp: new Date(),
-          motionState: 'listening',
-          source: 'voice'
-        };
-        setMessages(prev => [...prev, userMessage]);
-      } else {
-        console.log('🌀 MAIA said:', text);
-        // Add MAIA's response to messages
-        const oracleMessage: ConversationMessage = {
-          id: `msg-${Date.now()}-oracle`,
-          role: 'oracle',
-          text,
-          timestamp: new Date(),
-          motionState: 'responding',
-          source: 'maia'
-        };
-        setMessages(prev => [...prev, oracleMessage]);
-      }
-    },
-    onError: (error) => {
-      console.warn('⚠️ Voice system error:', error);
-    }
-  });
+  // 🌀 Soullab Realtime - DISABLED
+  // This was trying to use OpenAI Realtime API in browser (not supported without dangerouslyAllowBrowser)
+  // We're using SimplifiedOrganicVoice (browser speech recognition) + standard API calls instead
+  // const realtime = useElementalVoice({
+  //   userId: userId || 'anonymous',
+  //   userName: userName || 'Explorer',
+  //   sessionId,
+  //   voice: 'shimmer',
+  //   enableSmartCache: true,
+  //   enableResponseStreaming: true,
+  //   autoConnect: false,
+  //   onTranscript: (text, isUser) => { ... },
+  //   onError: (error) => { console.warn('⚠️ Voice system error:', error); }
+  // });
 
   // This effect will be moved after state declarations to avoid hoisting issues
 
