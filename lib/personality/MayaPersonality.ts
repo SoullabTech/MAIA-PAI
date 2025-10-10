@@ -17,9 +17,9 @@ export class MayaPersonality extends BasePersonality {
   protected generateCasualResponse(userInput: string): string {
     const responses: Record<string, string[]> = {
       greeting: [
-        "Oh hey! How's today treating you?",
-        "Hey there! What's up?",
-        "Hi! What's going on?"
+        "Hi! How are you doing?",
+        "Hey! Good to see you.",
+        "Oh hi! What's on your mind?"
       ],
       morning: [
         "Morning! Sleep well?",
