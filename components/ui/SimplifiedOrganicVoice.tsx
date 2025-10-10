@@ -915,40 +915,9 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
         });
       }
 
-      // Resume recognition after a delay to ensure audio has fully stopped and buffer is clear
-      setTimeout(() => {
-        console.log('🔄 Attempting restart:', {
-          hasRecognition: !!recognitionRef.current,
-          isMayaSpeaking,
-          isStarting: isStartingRef.current,
-          isListening,
-          enabled,
-          isMuted
-        });
-
-        if (recognitionRef.current && !isMayaSpeaking && !isStartingRef.current) {
-          try {
-            // Only start if we're enabled and not muted
-            if (enabled && !isMuted) {
-              isStartingRef.current = true;
-              recognitionRef.current.start();
-              setIsListening(true);
-              console.log('✅ Voice recognition resumed after Maia finished');
-              setTimeout(() => {
-                isStartingRef.current = false;
-              }, 500);
-            }
-          } catch (e: any) {
-            isStartingRef.current = false;
-            console.log('Could not resume recognition:', e?.message || e);
-            // If already started, that's okay - just set listening to true
-            if (e?.message?.includes('already started')) {
-              console.log('Recognition already active, continuing...');
-              setIsListening(true);
-            }
-          }
-        }
-      }, 800); // Longer delay - wait for TTS to fully finish
+      // DON'T manually restart here - let the onend handler do it
+      // This prevents double-restart conflicts
+      console.log('⏳ Waiting for onend auto-restart (preventing double-restart)');
     }
   }, [isMayaSpeaking, isListening, enabled, isPausedForMaya, isMuted, toggleListening]);
 
