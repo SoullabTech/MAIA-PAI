@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Paperclip, X, Copy } from 'lucide-react';
-import { SimplifiedOrganicVoice, VoiceActivatedMaiaRef } from './ui/SimplifiedOrganicVoice';
+// import { SimplifiedOrganicVoice, VoiceActivatedMaiaRef } from './ui/SimplifiedOrganicVoice'; // REPLACED with Whisper
+import { WhisperVoiceRecognition } from './ui/WhisperVoiceRecognition';
 import { SacredHoloflower } from './sacred/SacredHoloflower';
 import { EnhancedVoiceMicButton } from './ui/EnhancedVoiceMicButton';
 import AdaptiveVoiceMicButton from './ui/AdaptiveVoiceMicButton';
@@ -2325,13 +2326,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {/* Soulprint Metrics Widget - DISABLED: Causing 400 errors when userId not authenticated */}
       {/* {userId && <SoulprintMetricsWidget userId={userId} />} */}
 
-      {/* Hidden Voice Capture Component - Provides voiceMicRef for voice detection & visualizer */}
+      {/* Whisper Voice Recognition - Clean, stable, production-ready */}
       {voiceEnabled && !showChatInterface && (
         <div className="hidden">
-          <SimplifiedOrganicVoice
-            ref={voiceMicRef}
+          <WhisperVoiceRecognition
             onTranscript={handleVoiceTranscript}
             enabled={!isMuted}
+            isMuted={isMuted}
             isMayaSpeaking={isResponding || isAudioPlaying}
             onAudioLevelChange={setVoiceAudioLevel}
           />
