@@ -288,9 +288,10 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
 
       setTranscript(currentTranscript);
 
-      // 🔧 FALLBACK: If we have stable interim results, process them after 3 seconds
+      // 🔧 FALLBACK: If we have stable interim results, process them after 2 seconds
       // This handles cases where Web Speech API gets stuck in interim mode
-      if (interimTranscript && !finalTranscript && !isPausedForMaya) {
+      // CRITICAL: Don't check isPausedForMaya here - we want to capture speech even if state is confused
+      if (interimTranscript && !finalTranscript) {
         const trimmedInterim = interimTranscript.trim();
 
         // Clear previous timer
@@ -301,11 +302,21 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
         // If interim transcript changed significantly, reset timer
         if (trimmedInterim !== lastInterimTranscriptRef.current) {
           lastInterimTranscriptRef.current = trimmedInterim;
+          console.log('⏱️ Interim transcript changed, starting 2s fallback timer:', trimmedInterim);
 
-          // Set a 3-second timer to process interim if it stabilizes
+          // Set a 2-second timer to process interim if it stabilizes (reduced from 3s)
           interimStableTimerRef.current = setTimeout(() => {
             const stableInterim = lastInterimTranscriptRef.current;
-            if (stableInterim && stableInterim.length > 3 && !isPausedForMayaRef.current) {
+            console.log('⏰ Fallback timer fired! stableInterim:', stableInterim, 'isPausedForMaya:', isPausedForMayaRef.current);
+
+            if (stableInterim && stableInterim.length > 3) {
+              // Only send if MAIA is not currently speaking
+              if (isPausedForMayaRef.current) {
+                console.log('🛑 MAIA speaking - queuing transcript for after she finishes');
+                // Don't clear - will retry when MAIA finishes
+                return;
+              }
+
               console.log('🔧 Processing stable interim transcript:', stableInterim);
 
               // Treat it as final and send
@@ -326,7 +337,7 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
               setIsActivelyExpressing(false);
               consecutiveWords.current = 0;
             }
-          }, 3000); // 3 seconds of stable interim = send it
+          }, 2000); // 2 seconds (reduced from 3) of stable interim = send it
         }
       }
 
