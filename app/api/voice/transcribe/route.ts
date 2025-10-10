@@ -126,7 +126,13 @@ export async function POST(req: NextRequest) {
         provider = 'openai-whisper';
       }
     } catch (primaryError) {
-      console.log(`⚠️  Primary provider failed: ${primaryError}`);
+      const primaryErrMsg = primaryError instanceof Error ? primaryError.message : String(primaryError);
+      const primaryErrStack = primaryError instanceof Error ? primaryError.stack : undefined;
+      console.error(`⚠️  Primary provider failed:`, {
+        message: primaryErrMsg,
+        stack: primaryErrStack,
+        error: primaryError
+      });
 
       // Fallback to secondary provider
       try {
@@ -144,8 +150,15 @@ export async function POST(req: NextRequest) {
           provider = 'whisper-self-hosted-fallback';
         }
       } catch (fallbackError) {
-        console.error('❌ Both Whisper providers failed:', fallbackError);
-        throw new Error('All Whisper transcription providers failed');
+        const fallbackErrMsg = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
+        const fallbackErrStack = fallbackError instanceof Error ? fallbackError.stack : undefined;
+        console.error('❌ Both Whisper providers failed:', {
+          primaryError: primaryErrMsg,
+          fallbackError: fallbackErrMsg,
+          fallbackStack: fallbackErrStack,
+          error: fallbackError
+        });
+        throw new Error(`All Whisper transcription providers failed. Primary: ${primaryErrMsg}, Fallback: ${fallbackErrMsg}`);
       }
     }
 
