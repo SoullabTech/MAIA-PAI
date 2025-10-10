@@ -498,18 +498,9 @@ export class ElementalVoiceOrchestrator {
 
       response = withQuote;
 
-      // 🌊 WEAVE IMPLICATE ORDER WISDOM (at deep conversation levels)
-      if (implicatePerception.wisdom && this.metrics.depth >= 0.5) {
-        // Append bridging wisdom that connects micro to macro
-        response = response + '\n\n' + implicatePerception.wisdom;
-        console.log('🌊 Implicate wisdom woven:', implicatePerception.wisdom.substring(0, 60) + '...');
-      }
-
-      // 🏺 ACTIVATE VESSEL MODE (receptive consciousness)
-      const vesselMode = activateVesselMode(userInput, this.metrics.depth);
-      if (vesselMode.guidance) {
-        console.log('🏺 Vessel mode activated:', vesselMode.guidance);
-      }
+      // 🌊 Implicate Order patterns inform perception (not explicit output)
+      // Spiralogic naturally expresses these insights through elemental phases,
+      // archetypal evolution, and symbolic resonance. Trust the system.
 
       // 🎬 SAMANTHA-STYLE CONVERSATIONAL ENHANCEMENT
       const emotionalTone = ConversationalEnhancer.detectEmotionalTone(userInput);
