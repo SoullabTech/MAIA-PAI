@@ -2,9 +2,11 @@
  * Elemental Refiner
  * Simplified version of SesameMayaRefiner for web app
  * Shapes responses with elemental consciousness (Fire/Water/Earth/Air/Aether)
+ * + Phenomenological presence (lived-experience language)
  */
 
 import { suggestElementalPhrase } from './ElementalPhrasebook';
+import { phenomenologize } from './PhenomenologicalPhrasebook';
 
 export type Element = 'air' | 'fire' | 'water' | 'earth' | 'aether';
 
@@ -28,6 +30,11 @@ export class ElementalRefiner {
     refined = tonedText;
     transformations.push(...toneTransforms);
 
+    // Phenomenologize: swap abstract language for lived presence
+    const { text: phenomenalText, transformations: phenomenalTransforms } = phenomenologize(refined);
+    refined = phenomenalText;
+    transformations.push(...phenomenalTransforms);
+
     // Tighten style (remove filler, hedging)
     const { text: tightenedText, transformations: tightenTransforms } = this.tightenStyle(refined);
     refined = tightenedText;
@@ -39,10 +46,11 @@ export class ElementalRefiner {
     transformations.push(...softenTransforms);
 
     // Optionally add natural elemental phrase (only if response feels too generic)
+    // MAX 1 phrase per turn to avoid over-injection
     const suggestedPhrase = suggestElementalPhrase(refined, element, { onlyIfGeneric: true });
     if (suggestedPhrase) {
       refined = `${refined} ${suggestedPhrase}`;
-      transformations.push('phrase:added');
+      transformations.push('phrase:elemental');
     }
 
     return {
