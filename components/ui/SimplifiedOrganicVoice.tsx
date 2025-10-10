@@ -342,6 +342,7 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
 
         if (cleanTranscript) {
           accumulatedTranscriptRef.current += ' ' + cleanTranscript;
+          console.log('📝 Accumulated transcript:', accumulatedTranscriptRef.current.trim());
 
           // Reset silence timer
           if (silenceTimerRef.current) {
@@ -352,10 +353,16 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
           const accumulated = accumulatedTranscriptRef.current.trim();
           const endsWithPunctuation = /[.!?]$/.test(accumulated);
           const hasQuestionWords = /^(what|where|when|why|how|who|can|could|would|should|is|are|do|does)/i.test(accumulated);
+          const wordCount = accumulated.split(/\s+/).length;
 
           // 🚀 IMMEDIATE SEND for complete thoughts - don't wait for silence
-          if (endsWithPunctuation && accumulated.length > 5) {
-            console.log('🚀 Complete sentence detected, sending immediately:', accumulated);
+          const shouldSendImmediately =
+            (endsWithPunctuation && accumulated.length > 5) ||  // Complete sentence
+            (hasQuestionWords && wordCount >= 3) ||              // Question with at least 3 words
+            (wordCount >= 7);                                     // Substantial statement (7+ words)
+
+          if (shouldSendImmediately) {
+            console.log('🚀 Complete thought detected, sending immediately:', accumulated);
 
             // Prevent duplicates
             const now = Date.now();
