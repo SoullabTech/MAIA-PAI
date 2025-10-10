@@ -705,7 +705,16 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
 
       // Resume recognition after a delay to ensure audio has fully stopped and buffer is clear
       setTimeout(() => {
-        if (recognitionRef.current && !isMayaSpeaking && !isStartingRef.current && !isListening) {
+        console.log('🔄 Attempting restart:', {
+          hasRecognition: !!recognitionRef.current,
+          isMayaSpeaking,
+          isStarting: isStartingRef.current,
+          isListening,
+          enabled,
+          isMuted
+        });
+
+        if (recognitionRef.current && !isMayaSpeaking && !isStartingRef.current) {
           try {
             // Only start if we're enabled and not muted
             if (enabled && !isMuted) {
@@ -720,14 +729,12 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
           } catch (e: any) {
             isStartingRef.current = false;
             console.log('Could not resume recognition:', e?.message || e);
-            // If already started, that's okay - just continue
+            // If already started, that's okay - just set listening to true
             if (e?.message?.includes('already started')) {
               console.log('Recognition already active, continuing...');
               setIsListening(true);
             }
           }
-        } else if (isListening) {
-          console.log('Recognition already listening, skipping resume');
         }
       }, 800); // Longer delay - wait for TTS to fully finish
     }
