@@ -92,6 +92,10 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
   const lastSentMessageRef = useRef<string>('');
   const lastSentTimeRef = useRef<number>(0);
 
+  // 🔧 FALLBACK: Track interim transcript for stuck recognition
+  const lastInterimTranscriptRef = useRef<string>('');
+  const interimStableTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // 🌀 CONVERSATIONAL MAGIC ENGINE
   const magicEngineRef = useRef<ConversationalMagicEngine>(new ConversationalMagicEngine());
   const pauseDurationsRef = useRef<number[]>([]);
@@ -283,8 +287,56 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
 
       setTranscript(currentTranscript);
 
+      // 🔧 FALLBACK: If we have stable interim results, process them after 3 seconds
+      // This handles cases where Web Speech API gets stuck in interim mode
+      if (interimTranscript && !finalTranscript && !isPausedForMaya) {
+        const trimmedInterim = interimTranscript.trim();
+
+        // Clear previous timer
+        if (interimStableTimerRef.current) {
+          clearTimeout(interimStableTimerRef.current);
+        }
+
+        // If interim transcript changed significantly, reset timer
+        if (trimmedInterim !== lastInterimTranscriptRef.current) {
+          lastInterimTranscriptRef.current = trimmedInterim;
+
+          // Set a 3-second timer to process interim if it stabilizes
+          interimStableTimerRef.current = setTimeout(() => {
+            const stableInterim = lastInterimTranscriptRef.current;
+            if (stableInterim && stableInterim.length > 3 && !isPausedForMayaRef.current) {
+              console.log('🔧 Processing stable interim transcript:', stableInterim);
+
+              // Treat it as final and send
+              const expressionDuration = Date.now() - expressionStartTime.current;
+              console.log(`📊 User spoke for ${expressionDuration}ms`);
+
+              // 🌀 CALCULATE ENGAGEMENT SCORE
+              const engagementScore = magicEngineRef.current.calculateEngagementScore();
+              console.log('🎯 Engagement score:', engagementScore);
+
+              console.log('🚀 Sending to Maya:', stableInterim);
+              onTranscript(stableInterim);
+
+              // Clear state
+              lastInterimTranscriptRef.current = '';
+              accumulatedTranscriptRef.current = '';
+              setTranscript('');
+              setIsActivelyExpressing(false);
+              consecutiveWords.current = 0;
+            }
+          }, 3000); // 3 seconds of stable interim = send it
+        }
+      }
+
       // Always process speech without wake word requirement
       if (finalTranscript && !isPausedForMaya) {
+        // Clear interim fallback timer since we got a final result
+        if (interimStableTimerRef.current) {
+          clearTimeout(interimStableTimerRef.current);
+          interimStableTimerRef.current = null;
+        }
+        lastInterimTranscriptRef.current = '';
         // Accumulate transcript
         const cleanTranscript = finalTranscript.trim();
 
