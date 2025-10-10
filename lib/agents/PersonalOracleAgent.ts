@@ -691,6 +691,11 @@ That's the entire work.
       // Check localStorage first (for voice command changes), then settings
       let conversationStyle = this.settings?.conversationStyle || 'classic';
 
+      // Map "her" mode to "walking" mode (they're the same - brief/natural)
+      if (conversationStyle === 'her') {
+        conversationStyle = 'walking';
+      }
+
       // Override with localStorage if available (allows voice command mode switching)
       if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
         const savedMode = localStorage.getItem('conversation_mode');

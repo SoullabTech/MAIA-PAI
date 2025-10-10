@@ -79,5 +79,5 @@ export const CONVERSATION_STYLE_DESCRIPTIONS = {
   }
 };
 
-// Default for new users - changed to classic to provide fuller responses
-export const DEFAULT_CONVERSATION_STYLE: ConversationMode = 'classic';
+// Default for new users - "her" mode for natural, brief conversation
+export const DEFAULT_CONVERSATION_STYLE: ConversationMode = 'her';
