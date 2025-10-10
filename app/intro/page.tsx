@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Holoflower } from '@/components/ui/Holoflower';
 import { WISDOM_QUOTES } from '@/lib/wisdom/WisdomQuotes';
+
+// Track render count across all instances
+let globalRenderCount = 0;
+let globalMountCount = 0;
 
 const MANTRAS = [
   "You are a pattern to witness.",
@@ -37,11 +41,34 @@ const getRandomQuote = () => {
 };
 
 export default function IntroPage() {
+  globalRenderCount++;
+  const renderCount = useRef(0);
+  const isMountedRef = useRef(false);
+  renderCount.current++;
+
+  console.log(`🎬 IntroPage render #${renderCount.current} (global renders: ${globalRenderCount}, global mounts: ${globalMountCount})`);
+  console.log(`🎬 Stack trace:`, new Error().stack?.split('\n').slice(1, 4).join('\n'));
+
   const [shuffledMantras] = useState(() => shuffleArray(MANTRAS));
   const [currentMantra, setCurrentMantra] = useState(0);
   const [showFinal, setShowFinal] = useState(false);
   const [wisdomQuote, setWisdomQuote] = useState(getRandomQuote());
   const router = useRouter();
+
+  // Track component mount/unmount
+  useEffect(() => {
+    if (!isMountedRef.current) {
+      globalMountCount++;
+      isMountedRef.current = true;
+      console.log(`🎬 IntroPage MOUNTED (mount #${globalMountCount})`);
+      console.log(`🎬 Current URL:`, window.location.href);
+      console.log(`🎬 Referrer:`, document.referrer);
+    }
+
+    return () => {
+      console.log(`🎬 IntroPage UNMOUNTING`);
+    };
+  }, []);
 
   // Rotate wisdom quote every 8 seconds for enchantment
   useEffect(() => {
@@ -54,10 +81,15 @@ export default function IntroPage() {
   useEffect(() => {
     // Cycle through shuffled mantras (3 seconds each)
     if (currentMantra < shuffledMantras.length && !showFinal) {
+      console.log(`🎬 Mantra cycle ${currentMantra + 1}/${shuffledMantras.length}: "${shuffledMantras[currentMantra]}"`);
       const timer = setTimeout(() => {
         if (currentMantra === shuffledMantras.length - 1) {
           // After last mantra, show final message
-          setTimeout(() => setShowFinal(true), 3000);
+          console.log(`🎬 Last mantra completed, showing final message in 3s`);
+          setTimeout(() => {
+            console.log(`🎬 Showing final "Meet MAIA" screen`);
+            setShowFinal(true);
+          }, 3000);
         } else {
           setCurrentMantra(currentMantra + 1);
         }
@@ -206,15 +238,20 @@ export default function IntroPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 2 }}
               onClick={() => {
+                console.log(`🎬 Continue button clicked`);
                 const storedUser = localStorage.getItem('beta_user');
                 if (storedUser) {
                   const userData = JSON.parse(storedUser);
+                  console.log(`🎬 User data:`, userData);
                   if (userData.onboarded === true) {
+                    console.log(`🎬 Navigating to /maya (onboarded user)`);
                     router.push('/maya');
                   } else {
+                    console.log(`🎬 Navigating to /onboarding (not onboarded)`);
                     router.push('/onboarding');
                   }
                 } else {
+                  console.log(`🎬 Navigating to /onboarding (no stored user)`);
                   router.push('/onboarding');
                 }
               }}
@@ -232,15 +269,20 @@ export default function IntroPage() {
           whileHover={{ opacity: 1 }}
           transition={{ duration: 1, delay: 2 }}
           onClick={() => {
+            console.log(`🎬 Skip button clicked`);
             const storedUser = localStorage.getItem('beta_user');
             if (storedUser) {
               const userData = JSON.parse(storedUser);
+              console.log(`🎬 User data:`, userData);
               if (userData.onboarded === true) {
+                console.log(`🎬 Navigating to /maya (onboarded user)`);
                 router.push('/maya');
               } else {
+                console.log(`🎬 Navigating to /onboarding (not onboarded)`);
                 router.push('/onboarding');
               }
             } else {
+              console.log(`🎬 Navigating to /onboarding (no stored user)`);
               router.push('/onboarding');
             }
           }}
