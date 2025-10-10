@@ -401,16 +401,23 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
         message: event.message,
         timeStamp: event.timeStamp
       });
-      // Auto-restart on ALL errors to maintain continuous listening
-      if (!isPausedForMaya && enabled && !isMuted) {
-        // Don't auto-restart on 'aborted' - this usually means another instance is trying to start
+
+      // DON'T auto-restart on 'aborted' - this is intentional (MAIA speaking or manual stop)
+      if (event.error === 'aborted') {
+        console.log('🛑 Recognition aborted intentionally - not restarting');
+        setIsListening(false);
+        return;
+      }
+
+      // Auto-restart on other errors to maintain continuous listening
+      if (!isPausedForMayaRef.current && enabled && !isMuted) {
         setTimeout(() => {
-          if (recognitionRef.current && isListening && !isPausedForMaya && !isStartingRef.current) {
+          if (recognitionRef.current && isListening && !isPausedForMayaRef.current && !isStartingRef.current) {
             try {
               recognitionRef.current.stop();
               setTimeout(() => {
                 try {
-                  if (!isPausedForMaya && !isStartingRef.current) {
+                  if (!isPausedForMayaRef.current && !isStartingRef.current) {
                     isStartingRef.current = true;
                     recognitionRef.current.start();
                     console.log('Speech recognition restarted after error');
