@@ -55,12 +55,26 @@ async function transcribeWithOpenAI(audioFile: File): Promise<any> {
 
   console.log('📦 Prepared audio buffer:', {
     bufferSize: buffer.length,
-    arrayBufferSize: arrayBuffer.byteLength
+    arrayBufferSize: arrayBuffer.byteLength,
+    originalFileName: audioFile.name,
+    originalFileType: audioFile.type
+  });
+
+  // Ensure filename has .webm extension for OpenAI to recognize format
+  let filename = audioFile.name || 'audio.webm';
+  if (!filename.endsWith('.webm')) {
+    filename = filename.replace(/\.[^.]*$/, '.webm') || 'audio.webm';
+  }
+
+  console.log('🎯 Creating File for OpenAI:', {
+    filename,
+    mimeType: 'audio/webm',
+    bufferLength: buffer.length
   });
 
   // Create a File-like object that OpenAI SDK accepts
-  const file = new File([buffer], audioFile.name || 'audio.webm', {
-    type: audioFile.type || 'audio/webm'
+  const file = new File([buffer], filename, {
+    type: 'audio/webm'
   });
 
   console.log('☁️  Calling OpenAI Whisper API...');

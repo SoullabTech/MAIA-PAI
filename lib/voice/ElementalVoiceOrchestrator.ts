@@ -242,7 +242,8 @@ export class ElementalVoiceOrchestrator {
   async transcribeAudio(audioBlob: Blob): Promise<string> {
     try {
       const formData = new FormData();
-      formData.append('audio', audioBlob);
+      // Explicitly set filename with .webm extension so OpenAI recognizes the format
+      formData.append('audio', audioBlob, 'audio.webm');
 
       const response = await fetch('/api/voice/transcribe', {
         method: 'POST',
