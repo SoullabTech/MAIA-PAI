@@ -68,14 +68,14 @@ async function transcribeWithOpenAI(audioFile: File): Promise<any> {
 
   console.log('🎯 Creating File for OpenAI:', {
     filename,
-    mimeType: 'audio/webm',
+    mimeType: 'audio/webm;codecs=opus',
     bufferLength: buffer.length
   });
 
   // Create a File-like object that OpenAI SDK accepts
-  // Use 'audio/webm' (no codec param) as OpenAI expects plain MIME types
+  // MediaRecorder sends audio/webm;codecs=opus which is a supported Whisper format
   const file = new File([buffer], filename, {
-    type: 'audio/webm'
+    type: 'audio/webm;codecs=opus'
   });
 
   console.log('📤 Sending to OpenAI:', {
