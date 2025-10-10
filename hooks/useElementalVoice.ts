@@ -41,6 +41,7 @@ export function useElementalVoice(options: UseElementalVoiceOptions) {
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const isSpeakingRef = useRef(false);
+  const audioStreamRef = useRef<MediaStream | null>(null);
 
   /**
    * Initialize orchestrator
@@ -138,7 +139,7 @@ export function useElementalVoice(options: UseElementalVoiceOptions) {
     const isNowSpeaking = average > SPEECH_THRESHOLD;
 
     if (isNowSpeaking && !wasSpeaking) {
-      // User started speaking
+      // User started speaking - start fresh recording
       console.log('🎤 User started speaking');
       isSpeakingRef.current = true;
 
@@ -152,10 +153,32 @@ export function useElementalVoice(options: UseElementalVoiceOptions) {
         clearTimeout(silenceTimerRef.current);
         silenceTimerRef.current = null;
       }
+
+      // Start new MediaRecorder session for this utterance
+      if (audioStreamRef.current && (!mediaRecorderRef.current || mediaRecorderRef.current.state !== 'recording')) {
+        audioChunksRef.current = [];
+        const newRecorder = new MediaRecorder(audioStreamRef.current, {
+          mimeType: 'audio/webm;codecs=opus'
+        });
+
+        newRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data);
+          }
+        };
+
+        newRecorder.start();
+        mediaRecorderRef.current = newRecorder;
+      }
     } else if (!isNowSpeaking && wasSpeaking) {
-      // User stopped speaking - start silence timer
+      // User stopped speaking - stop recorder and wait for silence confirmation
       console.log('🔇 User stopped speaking - waiting for silence confirmation');
       isSpeakingRef.current = false;
+
+      // Stop the recorder to get a complete, valid webm file
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.stop();
+      }
 
       // Wait for sustained silence before processing
       if (silenceTimerRef.current) {
@@ -164,7 +187,7 @@ export function useElementalVoice(options: UseElementalVoiceOptions) {
 
       silenceTimerRef.current = setTimeout(async () => {
         if (audioChunksRef.current.length > 0 && orchestratorRef.current) {
-          // Combine all chunks into one complete audio file
+          // Combine chunks from THIS recording session (should be valid webm)
           const completeAudio = new Blob(audioChunksRef.current, { type: 'audio/webm;codecs=opus' });
           console.log('🎤 Sending complete audio:', completeAudio.size, 'bytes,', audioChunksRef.current.length, 'chunks');
 
@@ -178,8 +201,8 @@ export function useElementalVoice(options: UseElementalVoiceOptions) {
       }, 800); // 800ms of silence before processing
     }
 
-    // Continue monitoring
-    if (mediaRecorderRef.current?.state === 'recording') {
+    // Continue monitoring (check if stream is still active)
+    if (audioStreamRef.current && audioStreamRef.current.active) {
       requestAnimationFrame(detectSpeech);
     }
   }, []);
@@ -198,6 +221,9 @@ export function useElementalVoice(options: UseElementalVoiceOptions) {
         }
       });
 
+      // Save stream reference for creating new MediaRecorders
+      audioStreamRef.current = stream;
+
       // Create audio context for speech detection
       audioContextRef.current = new AudioContext();
       const source = audioContextRef.current.createMediaStreamSource(stream);
@@ -205,31 +231,8 @@ export function useElementalVoice(options: UseElementalVoiceOptions) {
       analyserRef.current.fftSize = 2048;
       source.connect(analyserRef.current);
 
-      // Create MediaRecorder for audio chunks
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        console.log('🎤 Audio capture stopped');
-        audioChunksRef.current = [];
-        isSpeakingRef.current = false;
-
-        if (silenceTimerRef.current) {
-          clearTimeout(silenceTimerRef.current);
-          silenceTimerRef.current = null;
-        }
-      };
-
-      // Start recording with 100ms chunks for low latency buffering
-      mediaRecorder.start(100);
-      mediaRecorderRef.current = mediaRecorder;
+      // Don't start MediaRecorder yet - wait for speech detection to start it
+      // This ensures each utterance gets its own valid webm file
 
       // Start speech detection
       detectSpeech();
