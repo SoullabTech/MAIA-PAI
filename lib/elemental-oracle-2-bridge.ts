@@ -16,6 +16,10 @@ export interface ElementalOracle2Config {
   assistantId?: string; // Your Elemental Oracle 2.0 GPT ID
   model?: string; // Usually 'gpt-4' or 'gpt-4-turbo'
 
+  // Direct API configuration (preferred)
+  eoApiUrl?: string; // https://api.elementaloracle.com
+  eoApiKey?: string; // API key for direct access
+
   // Knowledge sync configuration
   syncFrequency?: 'real-time' | 'hourly' | 'daily' | 'manual';
   cacheResponses?: boolean;
@@ -239,11 +243,17 @@ Respond with the depth and authenticity that your full knowledge base provides.
 
   /**
    * Call your Elemental Oracle 2.0 GPT
+   * Now supports direct API calls to api.elementaloracle.com
    */
   private async callElementalOracle2(query: string): Promise<string> {
     try {
+      // PRIMARY: Try direct EO 2.0 API if configured
+      if (this.config.eoApiUrl && this.config.eoApiKey) {
+        return await this.callElementalOracleDirectAPI(query);
+      }
+
+      // FALLBACK 1: Use GPT Assistant if configured
       if (this.config.assistantId) {
-        // Use GPT Assistant if you have one configured
         const thread = await this.openai.beta.threads.create({
           messages: [{ role: 'user', content: query }]
         });
@@ -271,7 +281,7 @@ Respond with the depth and authenticity that your full knowledge base provides.
         throw new Error('Unexpected response format from Assistant');
 
       } else {
-        // Use standard Chat Completions
+        // FALLBACK 2: Use standard Chat Completions
         const response = await this.openai.chat.completions.create({
           model: this.config.model || 'gpt-4-turbo-preview',
           messages: [
@@ -305,6 +315,74 @@ Respond with the full depth and authenticity of this knowledge base. Provide pra
       console.error('[Oracle2Bridge] API call failed:', error);
       throw error;
     }
+  }
+
+  /**
+   * Call Elemental Oracle 2.0 Direct API
+   * Uses the actual EO 2.0 service at api.elementaloracle.com
+   */
+  private async callElementalOracleDirectAPI(query: string): Promise<string> {
+    try {
+      console.log('[Oracle2Bridge] Calling direct EO 2.0 API...');
+
+      // Extract context from query to map to API parameters
+      const dominantElement = this.extractDominantElementFromQuery(query);
+
+      const response = await fetch(`${this.config.eoApiUrl}/storyRequest`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.config.eoApiKey}`
+        },
+        body: JSON.stringify({
+          focusArea: query,
+          elementalTheme: dominantElement,
+          archetype: 'sage', // Could be dynamic based on context
+          emotionalTone: 'reflective',
+          spiralPhase: 'integration',
+          depthLevel: 8 // 1-10 scale
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`EO 2.0 API error: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('[Oracle2Bridge] ✅ Direct EO 2.0 API response received');
+
+      return data.wisdom || data.story || data.response || JSON.stringify(data);
+
+    } catch (error) {
+      console.error('[Oracle2Bridge] Direct API call failed:', error);
+      // Fall through to let main method handle fallback
+      throw error;
+    }
+  }
+
+  /**
+   * Extract dominant element from query context
+   */
+  private extractDominantElementFromQuery(query: string): 'fire' | 'water' | 'earth' | 'air' | 'aether' {
+    const lowerQuery = query.toLowerCase();
+
+    // Look for elemental keywords
+    if (lowerQuery.includes('fire:') || lowerQuery.includes('breakthrough') || lowerQuery.includes('catalyst')) {
+      return 'fire';
+    }
+    if (lowerQuery.includes('water:') || lowerQuery.includes('emotion') || lowerQuery.includes('flow')) {
+      return 'water';
+    }
+    if (lowerQuery.includes('earth:') || lowerQuery.includes('ground') || lowerQuery.includes('embod')) {
+      return 'earth';
+    }
+    if (lowerQuery.includes('air:') || lowerQuery.includes('clarity') || lowerQuery.includes('perspective')) {
+      return 'air';
+    }
+
+    // Default to aether for transcendent/unified wisdom
+    return 'aether';
   }
 
   /**

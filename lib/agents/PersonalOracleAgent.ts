@@ -406,6 +406,11 @@ That's the entire work.
     this.elementalOracle = new ElementalOracle2Bridge({
       openaiApiKey: process.env.OPENAI_API_KEY || '',
       model: 'gpt-4-turbo',
+
+      // Direct API configuration (preferred - uses real EO 2.0 with your IP)
+      eoApiUrl: process.env.ELEMENTAL_ORACLE_API_URL,
+      eoApiKey: process.env.ELEMENTAL_ORACLE_API_KEY,
+
       cacheResponses: true,
       fallbackToLocal: false
     });
