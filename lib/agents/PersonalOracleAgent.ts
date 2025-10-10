@@ -497,18 +497,28 @@ That's the entire work.
         .eq('user_id', this.userId)
         .single();
 
-      if (error || !data) {
-        // Create new memory payload for first-time user
+      if (error) {
+        // Check if table doesn't exist or other error
+        if (error.message?.includes('relation') || error.message?.includes('does not exist')) {
+          console.warn('⚠️ ain_memory table does not exist yet. Using in-memory state.');
+        } else {
+          console.warn('⚠️ Could not load AIN memory:', error.message);
+        }
+        // Return new memory without saving (non-blocking)
+        return createEmptyMemoryPayload(this.userId, 'User');
+      }
+
+      if (!data) {
+        // No existing memory - create new (but don't save yet to avoid errors)
         console.log('🆕 Creating new AIN memory for user:', this.userId.substring(0, 8) + '...');
-        const newMemory = createEmptyMemoryPayload(this.userId, 'User');
-        await this.saveUserMemory(newMemory);
-        return newMemory;
+        return createEmptyMemoryPayload(this.userId, 'User');
       }
 
       // Parse stored memory (stored as JSONB)
+      console.log('✅ Loaded existing AIN memory for user:', this.userId.substring(0, 8) + '...');
       return data.memory_data as AINMemoryPayload;
-    } catch (err) {
-      console.error('❌ Error loading AIN memory:', err);
+    } catch (err: any) {
+      console.error('❌ Error loading AIN memory:', err?.message || err);
       return createEmptyMemoryPayload(this.userId, 'User');
     }
   }
@@ -527,10 +537,17 @@ That's the entire work.
         });
 
       if (error) {
-        console.error('❌ Error saving AIN memory:', error);
+        // Check if table doesn't exist - gracefully degrade
+        if (error.message?.includes('relation') || error.message?.includes('does not exist')) {
+          console.warn('⚠️ ain_memory table does not exist yet. Memory will not persist.');
+        } else {
+          console.error('❌ Error saving AIN memory:', error.message);
+        }
+      } else {
+        console.log('✅ AIN memory saved successfully');
       }
-    } catch (err) {
-      console.error('❌ Error saving AIN memory:', err);
+    } catch (err: any) {
+      console.error('❌ Error saving AIN memory:', err?.message || err);
     }
   }
 
