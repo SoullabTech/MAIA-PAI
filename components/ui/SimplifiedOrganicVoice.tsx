@@ -413,25 +413,34 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
     };
 
     recognition.onend = () => {
-      console.log('Speech recognition ended');
+      console.log('🏁 Speech recognition ended, isPausedForMaya:', isPausedForMayaRef.current);
       isStartingRef.current = false; // Clear flag on end
-      // Auto-restart for continuous listening only if Maya is not speaking and not paused
-      if (isListening && !isMayaSpeaking && !isPausedForMaya) {
+      setIsListening(false); // Update state
+
+      // Auto-restart for continuous listening ONLY if:
+      // 1. Not paused for Maia (use ref for current value)
+      // 2. Enabled and not muted
+      // 3. Not already starting
+      if (!isPausedForMayaRef.current && enabled && !isMuted && !isStartingRef.current) {
+        console.log('🔄 Auto-restarting recognition after onend...');
         setTimeout(() => {
-          if (recognitionRef.current && !isMayaSpeaking && !isPausedForMaya && !isStartingRef.current) {
+          if (recognitionRef.current && !isPausedForMayaRef.current && !isStartingRef.current) {
             try {
               isStartingRef.current = true;
               recognitionRef.current.start();
-              console.log('Speech recognition restarted');
+              setIsListening(true);
+              console.log('✅ Speech recognition auto-restarted');
               setTimeout(() => {
                 isStartingRef.current = false;
-              }, 500); // Reduced for faster recovery
+              }, 500);
             } catch (e) {
               isStartingRef.current = false;
-              console.log('Could not restart:', e);
+              console.log('Could not auto-restart:', e);
             }
           }
         }, 500);
+      } else {
+        console.log('⏸️ Skipping auto-restart (paused or disabled)');
       }
     };
 
