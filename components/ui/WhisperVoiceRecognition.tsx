@@ -43,39 +43,6 @@ export function WhisperVoiceRecognition({
   const silenceCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isProcessingRef = useRef<boolean>(false);
 
-  /**
-   * Initialize audio visualization
-   */
-  const initializeAudioVisualization = useCallback((stream: MediaStream) => {
-    if (typeof window === 'undefined') return;
-
-    const audioContext = new AudioContext();
-    const analyser = audioContext.createAnalyser();
-    const source = audioContext.createMediaStreamSource(stream);
-
-    analyser.fftSize = 256;
-    source.connect(analyser);
-
-    audioContextRef.current = audioContext;
-    analyserRef.current = analyser;
-
-    // Start visualization loop
-    const updateLevel = () => {
-      if (!analyserRef.current) return;
-
-      const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-      analyserRef.current.getByteFrequencyData(dataArray);
-
-      const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-      const level = average / 255;
-
-      onAudioLevelChange?.(level);
-
-      animationFrameRef.current = requestAnimationFrame(updateLevel);
-    };
-
-    updateLevel();
-  }, [onAudioLevelChange]);
 
   /**
    * Send audio to Whisper for transcription
@@ -145,8 +112,37 @@ export function WhisperVoiceRecognition({
 
       streamRef.current = stream;
 
-      // Initialize visualization
-      initializeAudioVisualization(stream);
+      // Initialize visualization AND silence detection
+      const audioContext = new AudioContext();
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+
+      audioContextRef.current = audioContext;
+      analyserRef.current = analyser;
+
+      // Start audio level monitoring (for silence detection)
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      const checkAudioLevel = () => {
+        if (!analyserRef.current) return;
+
+        analyserRef.current.getByteFrequencyData(dataArray);
+        const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+        const level = average / 255;
+
+        // Update audio visualization
+        onAudioLevelChange?.(level);
+
+        // Update last speech time if we detect sound (threshold: 0.01)
+        if (level > 0.01) {
+          lastSpeechTimeRef.current = Date.now();
+          console.log('🎤 Audio detected, level:', level.toFixed(3));
+        }
+
+        animationFrameRef.current = requestAnimationFrame(checkAudioLevel);
+      };
+      checkAudioLevel();
 
       // Create MediaRecorder
       const mediaRecorder = new MediaRecorder(stream, {
@@ -160,17 +156,21 @@ export function WhisperVoiceRecognition({
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
-          lastSpeechTimeRef.current = Date.now();
+          console.log('📼 Audio chunk collected:', event.data.size, 'bytes');
         }
       };
 
       // When recording stops, send to Whisper
       mediaRecorder.onstop = () => {
+        console.log('⏹️ Recording stopped');
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
 
-        // Only transcribe if we have meaningful audio (>100ms worth)
+        // Only transcribe if we have meaningful audio (>1KB)
         if (audioBlob.size > 1000) {
+          console.log('📤 Sending to Whisper, size:', audioBlob.size);
           transcribeAudio(audioBlob);
+        } else {
+          console.log('⏭️ Audio too small, skipping transcription');
         }
 
         audioChunksRef.current = [];
@@ -187,14 +187,20 @@ export function WhisperVoiceRecognition({
       silenceCheckIntervalRef.current = setInterval(() => {
         const silenceDuration = Date.now() - lastSpeechTimeRef.current;
 
+        console.log('🔍 Silence check:', {
+          silenceDuration: `${silenceDuration}ms`,
+          recording: mediaRecorderRef.current?.state
+        });
+
         // If 2 seconds of silence, stop and transcribe
         if (silenceDuration > 2000 && mediaRecorderRef.current?.state === 'recording') {
-          console.log('🔇 Silence detected, stopping recording...');
+          console.log('🔇 Silence detected (2s+), stopping recording...');
           mediaRecorderRef.current?.stop();
 
           // Restart recording for next phrase
           setTimeout(() => {
             if (!isMayaSpeaking && enabled && !isMuted) {
+              console.log('🔄 Restarting recording for next phrase...');
               mediaRecorderRef.current?.start(1000);
               lastSpeechTimeRef.current = Date.now();
             }
@@ -206,7 +212,7 @@ export function WhisperVoiceRecognition({
       console.error('❌ Failed to start recording:', error);
       setIsListening(false);
     }
-  }, [enabled, isMuted, isMayaSpeaking, initializeAudioVisualization, transcribeAudio]);
+  }, [enabled, isMuted, isMayaSpeaking, onAudioLevelChange, transcribeAudio]);
 
   /**
    * Stop recording
