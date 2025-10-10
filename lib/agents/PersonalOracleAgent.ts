@@ -15,6 +15,7 @@ import { ElementalOracle2Bridge } from '@/lib/elemental-oracle-2-bridge';
 import { IntellectualPropertyEngine } from '@/lib/intellectual-property-engine';
 import { ConversationalEnhancer } from '@/lib/voice/ConversationalEnhancer';
 import { ConversationFlowTracker } from '@/lib/voice/ConversationFlowTracker';
+import { ElementalRefiner, type Element } from '@/lib/voice/ElementalRefiner';
 
 // 🧠 Advanced Memory & Intelligence Modules
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
@@ -1152,6 +1153,16 @@ That's the entire work.
         hadAcknowledgment: enhancedOutput.shouldUseAcknowledgment,
         acknowledgment: enhancedOutput.acknowledgment,
         pacing: enhancedOutput.pacing
+      });
+
+      // 🔥 ELEMENTAL REFINEMENT: Subtle archetypal language shifts (non-cringe, everyday)
+      console.log('🔥 Applying elemental refinement...');
+      const elementalRefinement = ElementalRefiner.refine(responseText, dominantElement as Element);
+      responseText = elementalRefinement.refined;
+      console.log('✅ Elemental refinement applied:', {
+        element: dominantElement,
+        transformations: elementalRefinement.transformationsApplied.length,
+        examples: elementalRefinement.transformationsApplied.slice(0, 3)
       });
 
       // 🔥 NEW: Capture this conversation turn for memory
