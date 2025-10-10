@@ -1116,17 +1116,29 @@ That's the entire work.
         suggestions,
       };
     } catch (error: any) {
-      console.error('❌ PersonalOracleAgent error:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-        cause: error.cause
+      console.error('❌ PersonalOracleAgent CRITICAL ERROR - Full details:', {
+        message: error?.message || 'Unknown',
+        stack: error?.stack || 'No stack',
+        name: error?.name || 'Unknown',
+        cause: error?.cause || 'No cause',
+        fullError: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+        errorType: typeof error,
+        errorConstructor: error?.constructor?.name
       });
 
       // Check if it's an API key issue
       if (!process.env.ANTHROPIC_API_KEY) {
         console.error('🔑 CRITICAL: ANTHROPIC_API_KEY is not set in environment variables');
       }
+
+      // Environment diagnostics
+      console.error('🔍 Environment diagnostics:', {
+        hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
+        hasOpenAIKey: !!process.env.OPENAI_API_KEY,
+        hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+        hasSupabaseServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+        nodeEnv: process.env.NODE_ENV
+      });
 
       // Graceful fallback with personality
       return {
@@ -1135,8 +1147,9 @@ That's the entire work.
         metadata: {
           sessionId: `session_${Date.now()}`,
           phase: "reflection",
-          error: error.message,
-          errorType: error.name
+          error: error?.message || 'Unknown error',
+          errorType: error?.name || 'Unknown',
+          errorStack: error?.stack?.substring(0, 500) || 'No stack trace'
         },
       };
     }
