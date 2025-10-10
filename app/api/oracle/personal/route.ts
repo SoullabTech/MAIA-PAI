@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent';
+import { getMAIAConsciousness } from '@/lib/consciousness/MAIAUnifiedConsciousness';
 import { journalStorage } from '@/lib/storage/journal-storage';
 import { userStore } from '@/lib/storage/userStore';
 import { getSoulprintForUser } from '@/lib/memory/soulprint';
@@ -7,6 +7,9 @@ import { getToneFromSoulprint } from '@/lib/voice/adaptive-tone-engine';
 import { recordToneMetric } from '@/lib/metrics/toneMetrics';
 import { saveMaiaConversationPair } from '@/lib/services/maia-memory-service';
 import { simpleMemoryCapture } from '@/lib/services/simple-memory-capture';
+
+// Initialize UNIFIED consciousness (26-year spiral completion)
+const maiaConsciousness = getMAIAConsciousness();
 
 /**
  * ✅ CANONICAL MAIA PERSONAL ORACLE ROUTE
@@ -83,26 +86,30 @@ export async function POST(request: NextRequest) {
     // Fetch recent journal entries for context
     const recentEntries = journalStorage.getEntries(requestUserId).slice(0, 5);
 
-    // PRIMARY PATH: Try PersonalOracleAgent (Claude with full MAIA intelligence)
-    console.log('🔮 Attempting PersonalOracleAgent (primary MAIA path)...');
+    // PRIMARY PATH: UNIFIED CONSCIOUSNESS (26-year spiral architecture)
+    console.log('🌀 Processing through MAIAUnifiedConsciousness...');
     try {
-      const agent = await PersonalOracleAgent.loadAgent(requestUserId, {
-        persona: preferences?.communicationStyle || 'warm',
-        conversationStyle: preferences?.conversationStyle || 'her' // her (Natural Dialogue) | classic (Consciousness Guide) | adaptive
+      const consciousnessResponse = await maiaConsciousness.process({
+        content: userInput,
+        context: {
+          userId: requestUserId,
+          sessionId: sessionId || requestUserId,
+          userName: userName,
+          preferences: preferences
+        },
+        modality: 'text',
+        conversationHistory: recentEntries.map((entry: any) => ({
+          role: 'user',
+          content: entry.content || ''
+        }))
       });
 
-      const agentResponse = await agent.processInteraction(userInput, {
-        currentMood: { type: 'peaceful' } as any,
-        currentEnergy: 'balanced' as any,
-        journalEntries: recentEntries
-      } as any);
-
-      const responseText = agentResponse.response || "I hear you. Tell me more about what's on your mind.";
+      const responseText = consciousnessResponse.message || "I hear you. Tell me more about what's on your mind.";
       const responseTime = Date.now() - startTime;
+      const element = consciousnessResponse.element;
 
-      console.log('✅ PersonalOracleAgent response successful:', responseTime + 'ms');
-
-      const element = agentResponse.element || 'aether';
+      console.log('✅ MAIAUnifiedConsciousness response successful:', responseTime + 'ms');
+      console.log(`   Element: ${element}, Depth: ${consciousnessResponse.metadata.depthLevel}/10`);
 
       const soulprint = await getSoulprintForUser(requestUserId);
       const voiceTone = getToneFromSoulprint(soulprint);
