@@ -193,8 +193,8 @@ ADAPTIVE CALIBRATION:
 - If user stays brief, stay brief
 - Let the user's communication style guide yours`;
 
-// Default is classic mode for deep conversations
-export const MAYA_NATURAL_PROMPT = MAYA_CLASSIC_MODE_PROMPT;
+// Default is walking companion mode for casual, natural conversations
+export const MAYA_NATURAL_PROMPT = MAYA_WALKING_COMPANION_PROMPT;
 
 /**
  * Get the appropriate prompt based on conversation style preference
@@ -210,7 +210,7 @@ export function getPromptForConversationStyle(style?: 'walking' | 'classic' | 'a
     case 'adaptive':
       return MAYA_ADAPTIVE_MODE_PROMPT;
     default:
-      return MAYA_CLASSIC_MODE_PROMPT; // Default to classic for deep conversations
+      return MAYA_WALKING_COMPANION_PROMPT; // Default to walking companion - casual, brief
   }
 }
 
