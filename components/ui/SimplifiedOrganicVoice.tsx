@@ -421,7 +421,15 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
     };
 
     recognition.onerror = (event: any) => {
-      // Always log errors for debugging
+      // 'no-speech' is normal - just means user didn't speak within timeout (~5-8 seconds)
+      // This happens naturally in conversation and should be silent
+      if (event.error === 'no-speech') {
+        console.log('⏱️ No speech detected within timeout - will auto-restart');
+        // Let onend handler restart it seamlessly
+        return;
+      }
+
+      // Log other errors for debugging
       console.error('❌ Speech recognition error:', event.error, event);
       console.log('Error details:', {
         error: event.error,
