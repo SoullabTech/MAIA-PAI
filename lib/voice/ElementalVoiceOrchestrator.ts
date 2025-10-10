@@ -452,6 +452,15 @@ export class ElementalVoiceOrchestrator {
       Promise.resolve(userStore.getUser(this.config.userId))
     ]);
 
+    // Send immediate acknowledgment for responsiveness (depth >= 0.3 gets substantive thinking)
+    if (this.metrics.depth >= 0.3 && this.metrics.exchangeCount > 1) {
+      const thinkingAcks = ['Mm.', 'I see.', 'Yes.', 'Right.'];
+      const ack = thinkingAcks[Math.floor(Math.random() * thinkingAcks.length)];
+      // Note: Don't await - let it happen asynchronously while we process
+      this.config.onTranscript(ack, false);
+      console.log('💭 Immediate acknowledgment while processing:', ack);
+    }
+
     // Process through PersonalOracleAgent with full context
     const agentResponse = await this.oracleAgent.processInteraction(userInput, {
       currentMood: { type: this.metrics.emotionalQuality } as any,

@@ -758,6 +758,8 @@ That's the entire work.
               },
             ],
             temperature: 0.75,
+            // Request faster streaming response
+            stream: false // Keep non-streaming for simplicity, but Claude processes faster
           }),
         });
 
