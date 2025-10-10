@@ -688,7 +688,7 @@ That's the entire work.
 
       // Build context as LIVING NARRATIVE not data extraction
       // Use conversation style preference (her/classic/adaptive)
-      const conversationStyle = this.settings?.conversationStyle || 'her';
+      const conversationStyle = this.settings?.conversationStyle || 'classic';
       let systemPrompt = getPromptForConversationStyle(conversationStyle);
 
       console.log(`💬 Using conversation style: ${conversationStyle}`);

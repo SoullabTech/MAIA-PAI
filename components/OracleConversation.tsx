@@ -1922,10 +1922,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
-                            const form = e.currentTarget.form;
-                            if (form && e.currentTarget.value.trim()) {
-                              const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-                              form.dispatchEvent(submitEvent);
+                            const textarea = e.currentTarget;
+                            if (textarea.value.trim()) {
+                              handleTextMessage(textarea.value);
+                              textarea.value = '';
                             }
                           }
                         }}
