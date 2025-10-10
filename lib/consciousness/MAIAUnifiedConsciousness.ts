@@ -465,18 +465,18 @@ export class MAIAUnifiedConsciousness {
 
     // Enhance with consciousness metadata
     return {
-      message: response.message,
-      element: (response.dominantElement?.toLowerCase() || 'aether') as Element,
+      message: response.response, // PersonalOracleAgent returns .response not .message
+      element: (response.element?.toLowerCase() || 'aether') as Element,
       voiceCharacteristics: {
-        pace: response.dominantElement === 'Fire' ? 1.1 :
-              response.dominantElement === 'Water' ? 0.95 :
-              response.dominantElement === 'Earth' ? 0.9 :
-              response.dominantElement === 'Air' ? 1.05 : 1.0,
+        pace: response.element === 'fire' ? 1.1 :
+              response.element === 'water' ? 0.95 :
+              response.element === 'earth' ? 0.9 :
+              response.element === 'air' ? 1.05 : 1.0,
         tone: context.elementalSynthesis.weavingPattern,
         energy: context.interferencePattern.isPresent ? 'elevated' : 'balanced'
       },
-      somaticGuidance: response.somaticGuidance,
-      practiceOffering: response.practiceOffering,
+      somaticGuidance: response.metadata?.somaticGuidance,
+      practiceOffering: response.ritual,
       interferencePattern: context.interferencePattern.isPresent ? context.interferencePattern : undefined,
       metadata: {
         processingTime: 0, // Will be set by caller
