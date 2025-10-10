@@ -168,10 +168,10 @@ export class RelaxedConversationSystem {
       "How can I help?",
       "What's going on?",
       "Tell me.",
-      "What's up?",
+      "I'm here.",
       "Talk to me.",
       "I'm listening.",
-      "Go ahead.",
+      "How are you?",
       "What's happening?",
     ];
     return prompts[Math.floor(Math.random() * prompts.length)];

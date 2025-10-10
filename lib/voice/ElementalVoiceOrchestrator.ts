@@ -144,7 +144,7 @@ export class ElementalVoiceOrchestrator {
     // Pre-cache common openings (with pre-synthesized audio URLs later)
     this.wisdomCache.set('greeting_hi', "I'm here with you. What's on your mind?");
     this.wisdomCache.set('greeting_hello', "Hello. What's here for you today?");
-    this.wisdomCache.set('greeting_hey', "Hey. What's up?");
+    this.wisdomCache.set('greeting_hey', "Hey. How are you?");
 
     // Pre-cache common acknowledgments
     this.wisdomCache.set('ack_listening', "Mm-hmm.");
