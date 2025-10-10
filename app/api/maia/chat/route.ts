@@ -30,7 +30,10 @@ export async function POST(request: NextRequest) {
     });
 
     // Process message through MAIA
-    const response = await agent.processMessage(message);
+    const response = await agent.processInteraction(message, {
+      sessionId: `chatgpt_${Date.now()}`,
+      timestamp: Date.now()
+    });
 
     // Save conversation with analytics
     try {

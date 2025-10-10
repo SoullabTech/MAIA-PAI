@@ -27,7 +27,10 @@ export async function POST(request: NextRequest) {
     });
 
     // Process through full Oracle framework
-    const response = await agent.processMessage(userInput);
+    const response = await agent.processInteraction(userInput, {
+      sessionId: `oracle_${Date.now()}`,
+      timestamp: Date.now()
+    });
 
     // Return Oracle wisdom + MAIA's embodied integration
     return NextResponse.json({
