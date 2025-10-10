@@ -92,10 +92,37 @@ export default function MayaPage() {
   //   );
   // }
 
-  // RE-ENABLED: Testing OracleConversation with red background diagnostic
-  try {
+  // Enhanced error handling and logging
+  console.log('[MayaPage] Rendering with:', { explorerId, explorerName, voiceEnabled: preferences?.voice_enabled });
+
+  if (!explorerId || explorerId === '') {
+    console.log('[MayaPage] No explorerId yet, showing loading state');
     return (
-      <ErrorBoundary>
+      <div className="relative min-h-screen bg-[#0a0b14] flex items-center justify-center">
+        <div className="text-amber-200/60 text-lg">Initializing MAIA...</div>
+      </div>
+    );
+  }
+
+  try {
+    console.log('[MayaPage] Rendering OracleConversation');
+    return (
+      <ErrorBoundary
+        fallback={
+          <div className="min-h-screen bg-[#0a0b14] flex items-center justify-center text-amber-200 p-8">
+            <div className="max-w-md text-center space-y-4">
+              <h2 className="text-2xl">Something went wrong</h2>
+              <p className="text-amber-200/60">MAIA encountered an error. Please refresh the page.</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-3 bg-amber-500/80 hover:bg-amber-500 rounded-lg transition-all"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+        }
+      >
         <div className="relative min-h-screen bg-[#0a0b14]" style={{ backgroundColor: '#0a0b14', minHeight: '100vh', position: 'relative' }}>
           <button
             onClick={handleSignOut}
@@ -105,26 +132,29 @@ export default function MayaPage() {
             <LogOut className="w-5 h-5 text-amber-400/70 hover:text-amber-400" />
           </button>
 
-          {explorerId ? (
-            <OracleConversation
-              sessionId={Date.now().toString()}
-              userId={explorerId}
-              userName={explorerName}
-              voiceEnabled={preferences?.voice_enabled ?? true}
-            />
-          ) : (
-            <div className="flex items-center justify-center min-h-screen">
-              <div className="text-amber-200/60 text-lg">Initializing MAIA...</div>
-            </div>
-          )}
+          <OracleConversation
+            sessionId={Date.now().toString()}
+            userId={explorerId}
+            userName={explorerName}
+            voiceEnabled={preferences?.voice_enabled ?? true}
+          />
         </div>
       </ErrorBoundary>
     );
   } catch (error) {
-    console.error('Maya page error:', error);
+    console.error('[MayaPage] Render error:', error);
     return (
-      <div className="min-h-screen bg-red-900 flex items-center justify-center text-white p-8">
-        <div>Error loading MAIA: {String(error)}</div>
+      <div className="min-h-screen bg-[#0a0b14] flex items-center justify-center text-amber-200 p-8">
+        <div className="max-w-md text-center space-y-4">
+          <h2 className="text-2xl">Error loading MAIA</h2>
+          <p className="text-amber-200/60">{String(error)}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-amber-500/80 hover:bg-amber-500 rounded-lg transition-all"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
     );
   }
