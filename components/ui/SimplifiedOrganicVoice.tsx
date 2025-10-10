@@ -86,6 +86,7 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
   const micStreamRef = useRef<MediaStream | null>(null);
   const isStartingRef = useRef<boolean>(false); // Prevent multiple starts
   const isPausedForMayaRef = useRef<boolean>(false); // CRITICAL: Use ref to access current value in onresult closure
+  const lastRestartAttemptRef = useRef<number>(0); // Prevent restart thrashing
   const animationFrameRef = useRef<number>(0);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const accumulatedTranscriptRef = useRef<string>('');
@@ -586,11 +587,20 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
       isStartingRef.current = false; // Clear flag on end
       setIsListening(false); // Update state
 
+      // 🛡️ ANTI-THRASHING: Prevent restart attempts within 1 second
+      const now = Date.now();
+      const timeSinceLastRestart = now - lastRestartAttemptRef.current;
+      if (timeSinceLastRestart < 1000) {
+        console.log('⏸️ Restart throttled - too soon after last attempt');
+        return;
+      }
+
       // Auto-restart for continuous listening ONLY if:
       // 1. Not paused for Maia (use ref for current value)
       // 2. Enabled and not muted
       // 3. Not already starting
       if (!isPausedForMayaRef.current && enabled && !isMuted && !isStartingRef.current) {
+        lastRestartAttemptRef.current = now;
         console.log('🔄 Auto-restarting recognition after onend...');
         setTimeout(() => {
           if (recognitionRef.current && !isPausedForMayaRef.current && !isStartingRef.current) {
