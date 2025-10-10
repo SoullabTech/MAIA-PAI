@@ -73,14 +73,22 @@ async function transcribeWithOpenAI(audioFile: File): Promise<any> {
   });
 
   // Create a File-like object that OpenAI SDK accepts
+  // Use 'audio/webm' (no codec param) as OpenAI expects plain MIME types
   const file = new File([buffer], filename, {
     type: 'audio/webm'
   });
 
+  console.log('📤 Sending to OpenAI:', {
+    fileName: file.name,
+    fileType: file.type,
+    fileSize: file.size
+  });
+
   console.log('☁️  Calling OpenAI Whisper API...');
 
+  // Use toFile() method for better Edge runtime compatibility
   const transcription = await openai.audio.transcriptions.create({
-    file: file,
+    file: await openai.toFile(buffer, filename, { type: 'audio/webm' }),
     model: 'whisper-1',
     language: 'en',
     response_format: 'json'
