@@ -359,7 +359,7 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
           const shouldSendImmediately =
             (endsWithPunctuation && accumulated.length > 5) ||  // Complete sentence
             (hasQuestionWords && wordCount >= 3) ||              // Question with at least 3 words
-            (wordCount >= 7);                                     // Substantial statement (7+ words)
+            (wordCount >= 4);                                     // 4+ words (lowered from 7)
 
           if (shouldSendImmediately) {
             console.log('🚀 Complete thought detected, sending immediately:', accumulated);
