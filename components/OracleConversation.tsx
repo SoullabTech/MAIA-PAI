@@ -1996,23 +1996,22 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               </div>
               )}
             </>
+          ) : null}
+
+          {/* Mic Hint Message */}
+          {!showChatInterface && isMuted && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50"
+            >
+              <div className="bg-white/10 backdrop-blur-md rounded-lg px-4 py-2 border border-white/20">
+                <p className="text-white/80 text-sm">Click the holoflower to activate voice</p>
+              </div>
+            </motion.div>
           )}
         </>
-      )}
-
-
-      {/* Mic Hint Message */}
-      {!showChatInterface && voiceEnabled && isMuted && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50"
-        >
-          <div className="bg-white/10 backdrop-blur-md rounded-lg px-4 py-2 border border-white/20">
-            <p className="text-white/80 text-sm">Click the holoflower to activate voice</p>
-          </div>
-        </motion.div>
       )}
 
 
