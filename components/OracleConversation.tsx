@@ -21,7 +21,7 @@ import { OracleResponse, ConversationContext } from '@/lib/oracle-response';
 import { mapResponseToMotion, enrichOracleResponse } from '@/lib/motion-mapper';
 import { VoiceState } from '@/lib/voice/voice-capture';
 import { useMaiaVoice } from '@/hooks/useMaiaVoice';
-import { useElementalVoice } from '@/hooks/useElementalVoice';
+// import { useElementalVoice } from '@/hooks/useElementalVoice'; // Disabled - streaming chunk issue
 import { cleanMessage, cleanMessageForVoice, formatMessageForDisplay } from '@/lib/cleanMessage';
 import { getAgentConfig, AgentConfig } from '@/lib/agent-config';
 import { toast } from 'react-hot-toast';
@@ -85,8 +85,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // Maia Voice Integration - Initialize immediately for Voice mode
   const { speak: maiaSpeak, voiceState: maiaVoiceState, isReady: maiaReady } = useMaiaVoice();
 
-  // 🌀 Soullab Realtime - MAIA's consciousness speaks through OpenAI's voice
-  // Full Spiralogic stack preserved: PersonalOracleAgent + memory + wisdom + elemental agents
+  // 🌀 Soullab Realtime - DISABLED temporarily due to streaming chunk issue
+  // The hook sends 100ms WebM chunks to Whisper API, but OpenAI requires complete audio files
+  // SimplifiedOrganicVoice (browser Web Speech API) is working perfectly - use that instead
+  // TODO: Fix by accumulating chunks into complete audio file before transcription
+  /*
   const realtime = useElementalVoice({
     userId: userId || 'anonymous',
     userName: userName || 'Explorer',
@@ -118,6 +121,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       // Users can still use text chat which works independently
     }
   });
+  */
+  // Dummy realtime object to replace the disabled hook
+  const realtime = {
+    isConnected: false,
+    isConnecting: false,
+    connect: () => console.log('ElementalVoice disabled - use SimplifiedOrganicVoice instead')
+  };
 
   // This effect will be moved after state declarations to avoid hoisting issues
 
