@@ -576,6 +576,8 @@ That's the entire work.
   ): Promise<{ response: string; element?: string; metadata?: any; suggestions?: string[]; ritual?: any }> {
     const startTime = Date.now(); // Track response time for semantic memory
 
+    console.log('🎯 PersonalOracleAgent.processInteraction called with input:', input?.substring(0, 50));
+
     try {
       // Validate input
       const trimmedInput = (input || '').trim();
@@ -957,6 +959,9 @@ That's the entire work.
         }
 
         console.log(`🤖 Calling Claude API (attempt ${attempt + 1}/${maxRetries + 1})...`);
+        console.log('📝 System Prompt Length:', systemPrompt.length, 'chars');
+        console.log('📝 System Prompt Preview:', systemPrompt.substring(0, 300) + '...');
+
         claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: {
