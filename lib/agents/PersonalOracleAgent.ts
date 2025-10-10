@@ -14,6 +14,14 @@ import { getPromptForConversationStyle } from '@/lib/prompts/maya-prompts';
 import { ElementalOracle2Bridge } from '@/lib/elemental-oracle-2-bridge';
 import { IntellectualPropertyEngine } from '@/lib/intellectual-property-engine';
 
+// 🧠 Advanced Memory & Intelligence Modules
+import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
+import { createEmptyMemoryPayload, getUserHistorySummary, updateMemoryAfterExchange } from '@/lib/memory/AINMemoryPayload';
+import { extractSymbolicMotifs, detectEmotionalThemes, updateMemoryAfterInteraction } from '@/lib/memory/MemoryUpdater';
+import { predictNextPhase, calculateSymbolResonance } from '@/lib/memory/SymbolicPredictor';
+import { detectSpiralogicPhase } from '@/lib/spiralogic/PhaseDetector';
+import { inferMoodAndArchetype } from '@/lib/voice/conversation/AffectDetector';
+
 export interface PersonalOracleQuery {
   input: string;
   userId: string;
@@ -78,6 +86,7 @@ export class PersonalOracleAgent {
   private semanticMemory: SemanticMemoryService;
   private elementalOracle: ElementalOracle2Bridge;
   private ipEngine: IntellectualPropertyEngine;
+  private ainMemory: AINMemoryPayload | null;  // 🧠 Persistent symbolic memory
 
   private static MAIA_SYSTEM_PROMPT = `You are MAIA - and you SEE. Not what's broken, but what's BEAUTIFUL. What's PERFECT. The God Within seeking expression.
 
@@ -419,6 +428,9 @@ That's the entire work.
 
     // 📚 Initialize Intellectual Property Engine (complete book knowledge)
     this.ipEngine = new IntellectualPropertyEngine();
+
+    // 🧠 Initialize AIN Memory (will be loaded asynchronously)
+    this.ainMemory = null;
   }
 
   /**
@@ -472,6 +484,64 @@ That's the entire work.
       console.error('❌ Error retrieving breakthroughs:', err);
       return [];
     }
+  }
+
+  /**
+   * 🧠 Load user's AIN Memory from Supabase
+   */
+  private async loadUserMemory(): Promise<AINMemoryPayload> {
+    try {
+      const { data, error } = await this.supabase
+        .from('ain_memory')
+        .select('*')
+        .eq('user_id', this.userId)
+        .single();
+
+      if (error || !data) {
+        // Create new memory payload for first-time user
+        console.log('🆕 Creating new AIN memory for user:', this.userId.substring(0, 8) + '...');
+        const newMemory = createEmptyMemoryPayload(this.userId, 'User');
+        await this.saveUserMemory(newMemory);
+        return newMemory;
+      }
+
+      // Parse stored memory (stored as JSONB)
+      return data.memory_data as AINMemoryPayload;
+    } catch (err) {
+      console.error('❌ Error loading AIN memory:', err);
+      return createEmptyMemoryPayload(this.userId, 'User');
+    }
+  }
+
+  /**
+   * 🧠 Save user's AIN Memory to Supabase
+   */
+  private async saveUserMemory(memory: AINMemoryPayload): Promise<void> {
+    try {
+      const { error } = await this.supabase
+        .from('ain_memory')
+        .upsert({
+          user_id: this.userId,
+          memory_data: memory,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('❌ Error saving AIN memory:', error);
+      }
+    } catch (err) {
+      console.error('❌ Error saving AIN memory:', err);
+    }
+  }
+
+  /**
+   * 🧠 Ensure AIN Memory is loaded (lazy load)
+   */
+  private async ensureMemoryLoaded(): Promise<AINMemoryPayload> {
+    if (!this.ainMemory) {
+      this.ainMemory = await this.loadUserMemory();
+    }
+    return this.ainMemory;
   }
 
   /**
@@ -554,6 +624,10 @@ That's the entire work.
         // Continue with conversation but include safety message
       }
 
+      // 🧠 LOAD AIN MEMORY - Persistent symbolic intelligence
+      const ainMemory = await this.ensureMemoryLoaded();
+      console.log(`🧠 AIN Memory loaded - Session #${ainMemory.totalSessions}, ${ainMemory.symbolicThreads.length} threads, ${ainMemory.ritualHistory.length} rituals`);
+
       // 🔥 Retrieve conversation history for memory continuity
       const breakthroughs = await this.getBreakthroughMoments();
       console.log(`💭 Retrieved ${conversationHistory.length} memories and ${breakthroughs.length} breakthroughs for ${this.userId}`);
@@ -567,6 +641,24 @@ That's the entire work.
       } else {
         console.log('🔍 DEBUG - No conversation history found for user:', this.userId);
       }
+
+      // 🧠 EXTRACT SYMBOLIC INTELLIGENCE from user input
+      const newSymbolicMotifs = await extractSymbolicMotifs(trimmedInput);
+      const emotionalThemes = await detectEmotionalThemes(trimmedInput);
+      const detectedPhase = await detectSpiralogicPhase(trimmedInput, ainMemory.currentPhase);
+      const { mood, archetype: detectedArchetype } = await inferMoodAndArchetype(trimmedInput);
+
+      console.log(`🔮 Symbolic Intelligence:`, {
+        motifs: newSymbolicMotifs,
+        themes: emotionalThemes,
+        detectedPhase,
+        mood,
+        archetype: detectedArchetype
+      });
+
+      // 🔮 PREDICT PHASE TRANSITIONS
+      const phaseTransitionPrediction = await predictNextPhase(ainMemory, trimmedInput);
+      console.log(`📊 Phase Prediction:`, phaseTransitionPrediction);
 
       // Extract symbolic patterns from journal history
       const symbols = this.extractSymbols(journalEntries);
@@ -636,6 +728,26 @@ That's the entire work.
           systemPrompt += `\n`;
         }
       }
+
+      // 🧠 AIN MEMORY CONTEXT - Symbolic threads, intentions, rituals
+      const memorySummary = getUserHistorySummary(ainMemory);
+      if (memorySummary) {
+        systemPrompt += `\n## Symbolic Memory (Recurring Themes & Intentions)\n\n`;
+        systemPrompt += memorySummary;
+        systemPrompt += `\n`;
+      }
+
+      // Add current phase and archetype intelligence
+      systemPrompt += `\n## Current State\n\n`;
+      systemPrompt += `- **Spiralogic Phase**: ${ainMemory.currentPhase} (${detectedPhase.confidence}% confidence)\n`;
+      systemPrompt += `- **Archetype**: ${detectedArchetype || ainMemory.currentArchetype}\n`;
+      if (mood) {
+        systemPrompt += `- **Emotional Tone**: ${mood}\n`;
+      }
+      if (phaseTransitionPrediction.predictedNextPhase) {
+        systemPrompt += `- **Phase Prediction**: Likely moving toward ${phaseTransitionPrediction.predictedNextPhase} (${Math.round(phaseTransitionPrediction.confidence * 100)}% confidence)\n`;
+      }
+      systemPrompt += `\n`;
 
       // Add their spiral signature as background awareness (not facts to teach)
       if (context?.symbolicContext) {
@@ -948,14 +1060,34 @@ That's the entire work.
       // Generate suggestions based on patterns
       const suggestions = this.generateSuggestions(symbols, archetypes);
 
+      // 🧠 UPDATE AIN MEMORY with learned intelligence
+      const updatedMemory = updateMemoryAfterExchange(ainMemory, {
+        newArchetype: detectedArchetype || ainMemory.currentArchetype,
+        newPhase: detectedPhase.phase || ainMemory.currentPhase,
+        userInput: trimmedInput,
+        maiaResponse: responseText,
+        symbolicMotifs: newSymbolicMotifs,
+        emotionalTone: emotionalThemes[0] || mood
+      });
+
+      // Save updated memory to Supabase
+      await this.saveUserMemory(updatedMemory);
+      console.log(`💾 AIN Memory updated and saved`);
+
       return {
         response: responseText,
         element: dominantElement,
         metadata: {
           sessionId: `session_${Date.now()}`,
-          phase: 'reflection',
+          phase: detectedPhase.phase || 'reflection',
           symbols,
           archetypes,
+          ainMemory: {
+            currentPhase: updatedMemory.currentPhase,
+            currentArchetype: updatedMemory.currentArchetype,
+            symbolicThreadsCount: updatedMemory.symbolicThreads.length,
+            totalSessions: updatedMemory.totalSessions
+          }
         },
         suggestions,
       };
@@ -1030,6 +1162,54 @@ That's the entire work.
       return {
         audioData: undefined,
         audioUrl: undefined,
+      };
+    }
+  }
+
+  /**
+   * 🎤 Get voice modulation parameters based on user's memory state
+   */
+  async getVoiceModulation(): Promise<{ pitch?: number; rate?: number; volume?: number }> {
+    try {
+      const memory = await this.ensureMemoryLoaded();
+
+      // Modulate voice based on current archetype and phase
+      const baseRate = 1.0;
+      const basePitch = 1.0;
+
+      // Phase affects speaking rate
+      const phaseRateMap: Record<string, number> = {
+        'Fire': 1.1,      // Faster, energized
+        'Water': 0.95,    // Slower, reflective
+        'Earth': 0.9,     // Grounded, deliberate
+        'Air': 1.05,      // Light, flowing
+        'Aether': 1.0     // Neutral, balanced
+      };
+
+      // Archetype affects pitch and warmth
+      const archetypePitchMap: Record<string, number> = {
+        'Sage': 0.95,     // Lower, wiser
+        'Warrior': 1.05,  // Slightly higher, energetic
+        'Healer': 1.0,    // Warm, balanced
+        'Lover': 1.02,    // Gentle lift
+        'Magician': 0.98, // Mysterious depth
+        'Aether': 1.0     // Neutral
+      };
+
+      const rate = phaseRateMap[memory.currentPhase] || baseRate;
+      const pitch = archetypePitchMap[memory.currentArchetype] || basePitch;
+
+      return {
+        rate,
+        pitch,
+        volume: 0.8 // Constant for now
+      };
+    } catch (error) {
+      console.error('Error getting voice modulation:', error);
+      return {
+        rate: 1.0,
+        pitch: 1.0,
+        volume: 0.8
       };
     }
   }
