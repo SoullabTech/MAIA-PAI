@@ -353,6 +353,55 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
           const endsWithPunctuation = /[.!?]$/.test(accumulated);
           const hasQuestionWords = /^(what|where|when|why|how|who|can|could|would|should|is|are|do|does)/i.test(accumulated);
 
+          // 🚀 IMMEDIATE SEND for complete thoughts - don't wait for silence
+          if (endsWithPunctuation && accumulated.length > 5) {
+            console.log('🚀 Complete sentence detected, sending immediately:', accumulated);
+
+            // Prevent duplicates
+            const now = Date.now();
+            const timeSinceLastSent = now - lastSentTimeRef.current;
+            const isDuplicate = accumulated === lastSentMessageRef.current && timeSinceLastSent < 5000;
+
+            if (!isDuplicate) {
+              // Track analytics
+              if (userSpeechStartTime.current > 0) {
+                const speechDuration = Date.now() - userSpeechStartTime.current;
+                totalUserSpeechDuration.current += speechDuration;
+                console.log(`📊 User spoke for ${speechDuration}ms`);
+              }
+              exchangeCount.current++;
+
+              // Send immediately
+              onTranscript(accumulated);
+              lastSentMessageRef.current = accumulated;
+              lastSentTimeRef.current = now;
+              accumulatedTranscriptRef.current = '';
+              setTranscript('');
+              setIsActivelyExpressing(false);
+              consecutiveWords.current = 0;
+
+              // Clear any pending timer
+              if (silenceTimerRef.current) {
+                clearTimeout(silenceTimerRef.current);
+                silenceTimerRef.current = null;
+              }
+
+              // Reset contemplation mode
+              if (isContemplationMode) {
+                setIsContemplationMode(false);
+                setConversationMode('active');
+              }
+
+              // Don't set a new timer - message already sent
+              return;
+            } else {
+              console.log('⚠️ Duplicate complete sentence, skipping');
+              accumulatedTranscriptRef.current = '';
+              setTranscript('');
+              return;
+            }
+          }
+
           // Track silence duration and learn user rhythm
           const silenceDuration = Date.now() - lastSpeechTime.current;
           lastSpeechTime.current = Date.now();
@@ -375,8 +424,8 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
           if (isContemplationMode) {
             // In contemplation mode, use elemental contemplation threshold
             threshold = CONTEMPLATION_THRESHOLD;
-          } else if (endsWithPunctuation || (hasQuestionWords && accumulated.length > 20)) {
-            // Quick response for complete thoughts and questions
+          } else if (hasQuestionWords && accumulated.length > 20) {
+            // Quick response for questions
             threshold = Math.min(SMART_THRESHOLD, dynamicThreshold * 0.7);
           } else {
             // Use dynamic threshold from MagicEngine
@@ -391,10 +440,10 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
             const seemsComplete = finalMessage.endsWith('.') ||
                                   finalMessage.endsWith('!') ||
                                   finalMessage.endsWith('?') ||
-                                  finalMessage.split(' ').length > 50; // Long enough to be complete
+                                  finalMessage.split(' ').length > 15; // Reduced from 50 - send after ~15 words
 
-            // Only send if expression seems complete or we've been silent long enough
-            if (finalMessage && finalMessage.length > 0 && (seemsComplete || !isActivelyExpressing)) {
+            // Send if we have ANY message after silence threshold
+            if (finalMessage && finalMessage.length > 3) {
               // Prevent duplicate sends (but allow if 5+ seconds have passed)
               const now = Date.now();
               const timeSinceLastSent = now - lastSentTimeRef.current;
