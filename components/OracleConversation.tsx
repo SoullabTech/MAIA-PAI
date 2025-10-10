@@ -1141,15 +1141,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     console.log('🛑 All MAIA systems stopped');
   }, [maiaVoiceState]);
 
-  // DIAGNOSTIC LOGGING - Track what's rendering
-  console.log('[OracleConversation] Rendering with state:', {
-    showWelcome,
-    showSettingsPanel,
-    showCustomizer,
-    needsIOSAudioPermission,
-    userName,
-    explorerId: userId
-  });
+  // DIAGNOSTIC LOGGING - Removed to reduce console noise and improve performance
 
   // Wrap entire return in try-catch
   try {
