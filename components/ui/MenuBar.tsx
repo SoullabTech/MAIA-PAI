@@ -3,9 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, Users, Brain, MessageSquare, Settings, X } from 'lucide-react';
-import { ConversationMode, CONVERSATION_STYLE_DESCRIPTIONS } from '@/lib/types/conversation-style';
-import { ConversationStylePreference } from '@/lib/preferences/conversation-style-preference';
+import { MessageCircle, Users, Brain, MessageSquare, Settings } from 'lucide-react';
 
 /**
  * Unified Menu Bar
@@ -19,19 +17,12 @@ import { ConversationStylePreference } from '@/lib/preferences/conversation-styl
 export function MenuBar() {
   const pathname = usePathname();
   const [trainingProgress] = useState(0); // TODO: Connect to actual training data
-  const [showStyleModal, setShowStyleModal] = useState(false);
-  const [selectedMode, setSelectedMode] = useState<ConversationMode>('classic');
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showRotateHint, setShowRotateHint] = useState(true);
 
   // Don't show on community pages
   const hideCommunityLink = pathname?.startsWith('/community');
 
   useEffect(() => {
-    // Load saved preference
-    const saved = ConversationStylePreference.get();
-    setSelectedMode(saved);
-
     // Auto-hide rotate hint after 5 seconds, or if already dismissed
     const hintDismissed = localStorage.getItem('rotateHintDismissed');
     if (hintDismissed) {
@@ -43,20 +34,6 @@ export function MenuBar() {
       return () => clearTimeout(timer);
     }
   }, []);
-
-  const handleModeChange = (mode: ConversationMode) => {
-    setSelectedMode(mode);
-    ConversationStylePreference.set(mode);
-    setShowStyleModal(false);
-
-    // Dispatch custom event to notify OracleConversation of the change
-    const event = new CustomEvent('conversationStyleChanged');
-    window.dispatchEvent(event);
-
-    console.log('🎭 Conversation style changed to:', mode);
-  };
-
-  const modes: ConversationMode[] = ['her', 'classic', 'adaptive'];
 
   const dismissRotateHint = () => {
     setShowRotateHint(false);
@@ -141,21 +118,21 @@ export function MenuBar() {
         </Link>
       )}
 
-      {/* Conversation Style Toggle */}
-      <button
-        onClick={() => setShowStyleModal(true)}
+      {/* Conversation Mode - Links to Settings */}
+      <Link
+        href="/settings"
         className="group relative"
-        aria-label="Conversation Style"
+        aria-label="Conversation Mode"
       >
         <div className="p-2 md:p-3 rounded-full bg-cyan-500/20 backdrop-blur-md border border-cyan-500/30 hover:bg-cyan-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-cyan-500/40">
           <MessageSquare className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 transition-all group-active:rotate-[-10deg]" />
 
           {/* Tooltip */}
           <span className="absolute -bottom-10 right-0 bg-black/80 backdrop-blur-sm text-cyan-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-            {CONVERSATION_STYLE_DESCRIPTIONS[selectedMode].title}
+            Conversation Mode
           </span>
         </div>
-      </button>
+      </Link>
 
       {/* Settings */}
       <Link
@@ -192,81 +169,6 @@ export function MenuBar() {
           </span>
         </div>
       </button>
-
-      {/* Mobile-First Style Selection Modal */}
-      {showStyleModal && (
-        <div
-          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm"
-          onClick={() => setShowStyleModal(false)}
-        >
-          <div
-            className="fixed bottom-0 left-0 right-0 bg-gradient-to-b from-slate-900 to-slate-950 border-t border-cyan-500/30 rounded-t-3xl shadow-2xl shadow-cyan-500/20 animate-slide-up"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Handle Bar */}
-            <div className="flex justify-center pt-3 pb-2">
-              <div className="w-12 h-1 bg-white/20 rounded-full" />
-            </div>
-
-            <div className="px-6 pb-8 pt-2">
-              <h3 className="text-lg font-semibold text-white/90 mb-1">
-                How should Maya speak?
-              </h3>
-              <p className="text-sm text-white/60 mb-4">
-                Choose your preferred conversation style
-              </p>
-
-              <div className="space-y-3">
-                {modes.map((mode) => {
-                  const description = CONVERSATION_STYLE_DESCRIPTIONS[mode];
-                  const isSelected = selectedMode === mode;
-
-                  return (
-                    <button
-                      key={mode}
-                      onClick={() => handleModeChange(mode)}
-                      className={`
-                        w-full text-left p-4 rounded-xl border transition-all active:scale-98
-                        ${isSelected
-                          ? 'border-cyan-400/50 bg-cyan-500/10 shadow-lg shadow-cyan-500/20'
-                          : 'border-white/10 bg-white/5 active:bg-white/10'
-                        }
-                      `}
-                    >
-                      <div className="flex items-start gap-3">
-                        <span className="text-2xl mt-0.5">{description.icon}</span>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-medium text-white/90 text-base">
-                              {description.title}
-                            </h4>
-                            {isSelected && (
-                              <span className="text-xs text-cyan-400 font-medium">✓</span>
-                            )}
-                          </div>
-                          <p className="text-sm text-white/70 leading-snug mb-2">
-                            {description.description}
-                          </p>
-                          <p className="text-xs text-white/50 italic leading-relaxed">
-                            {description.example}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <button
-                onClick={() => setShowStyleModal(false)}
-                className="w-full mt-4 p-3 rounded-xl bg-white/5 border border-white/10 text-white/70 font-medium text-sm active:bg-white/10 transition-all"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       </div>
     </>
   );
