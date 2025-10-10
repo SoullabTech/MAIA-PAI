@@ -17,6 +17,9 @@ export const trackEvent = Object.assign(track, {
   },
   error: (userId: string, errorType: string, errorMessage: string) => {
     track('error', { userId, errorType, errorMessage });
+  },
+  voiceResult: (userId: string, transcript: string, duration: number) => {
+    track('voice_result', { userId, transcript, duration });
   }
 });
 
