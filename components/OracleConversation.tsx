@@ -18,6 +18,7 @@ import { MaiaSettingsPanel } from './MaiaSettingsPanel';
 import { SoulprintMetricsWidget } from './SoulprintMetricsWidget';
 import { MotionState, CoherenceShift } from './motion/MotionOrchestrator';
 import { OracleResponse, ConversationContext } from '@/lib/oracle-response';
+import { useElementalVoice } from '@/hooks/useElementalVoice';
 import { mapResponseToMotion, enrichOracleResponse } from '@/lib/motion-mapper';
 import { VoiceState } from '@/lib/voice/voice-capture';
 import { useMaiaVoice } from '@/hooks/useMaiaVoice';
