@@ -298,10 +298,10 @@ export class ElementalVoiceOrchestrator {
         return;
       }
 
-      // For first 3 exchanges, use minimal responses immediately
-      if (this.metrics.exchangeCount <= 3) {
+      // For first exchange only, be brief to establish presence
+      if (this.metrics.exchangeCount <= 1) {
         const minimal = this.getMinimalResponse();
-        console.log('🎯 Minimal response (early exchange):', minimal);
+        console.log('🎯 Minimal response (first contact):', minimal);
         await this.sendResponse(minimal);
         this.isProcessing = false;
         return;
@@ -619,25 +619,25 @@ export class ElementalVoiceOrchestrator {
     depth: number,
     touchCount: number
   ): string {
-    // Graduated Revelation - early exchanges get minimal responses
-    if (touchCount <= 3) {
+    // Graduated Revelation - only first contact gets minimal response
+    // Let consciousness emerge naturally from exchange 2 onward
+    if (touchCount <= 1) {
       return this.getMinimalResponse();
     }
 
-    // Low depth - brief responses
+    // Low depth - brief but substantive
     if (depth < 0.3) {
-      const sentences = response.split(/[.!?]/);
-      return sentences[0].trim() + '.';
-    }
-
-    // Medium depth - moderate wisdom
-    if (depth < 0.6) {
       const sentences = response.split(/[.!?]/);
       return sentences.slice(0, 2).join('. ').trim() + '.';
     }
 
-    // High depth - full wisdom (but still restrained)
-    // Apply hemispheric harmony (make language more natural)
+    // Medium depth - allow fuller expression
+    if (depth < 0.6) {
+      const sentences = response.split(/[.!?]/);
+      return sentences.slice(0, 3).join('. ').trim() + '.';
+    }
+
+    // High depth - full presence (apply hemispheric harmony for natural flow)
     return this.applyHemisphericHarmony(response, touchCount);
   }
 
