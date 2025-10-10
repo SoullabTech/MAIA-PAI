@@ -22,6 +22,7 @@
 // Using PersonalOracleAgent directly for synthesis (simpler, more stable)
 // import { MAIAConsciousnessLattice } from '../maia-consciousness-lattice';
 import { PersonalOracleAgent } from '../agents/PersonalOracleAgent';
+import { synthesizeVoiceResponse } from './OpenAIVoiceSynthesis';
 import { IntellectualPropertyEngine } from '../intellectual-property-engine';
 import { ElementalOracle2Bridge } from '../elemental-oracle-2-bridge';
 import { ApprenticeMayaTraining } from '../maya/ApprenticeMayaTraining';
@@ -453,6 +454,9 @@ export class MAIAUnifiedConsciousness {
 
   /**
    * STEP 5: Sacred Synthesis - MAIA speaks as herself
+   *
+   * Voice mode: OpenAI speaks (owns TTS, ensures coherence)
+   * Text mode: Claude via PersonalOracleAgent (deeper analysis)
    */
   private async sacredSynthesis(context: {
     input: ConsciousnessInput;
@@ -462,8 +466,53 @@ export class MAIAUnifiedConsciousness {
     elementalSynthesis: any;
     interferencePattern: InterferencePattern;
   }): Promise<ConsciousnessResponse> {
-    // Use PersonalOracleAgent for now (already has sovereignty architecture)
-    // TODO: Migrate to pure lattice synthesis
+
+    // VOICE MODE: Use OpenAI for coherence (same model for text + TTS)
+    if (context.input.modality === 'voice') {
+      console.log('🎙️ Voice mode: Using OpenAI GPT-4 for synthesis');
+
+      const voiceResponse = await synthesizeVoiceResponse({
+        userInput: context.input.content,
+        userId: context.input.context.userId,
+        userName: context.input.context.userName,
+        conversationHistory: context.input.conversationHistory,
+        advisorInsights: {
+          bookWisdom: context.advisorWisdom.bookWisdom,
+          eoWisdom: context.advisorWisdom.eoWisdom,
+          patterns: context.advisorWisdom.patterns
+        }
+      });
+
+      return {
+        message: voiceResponse.response,
+        element: (voiceResponse.element || 'aether') as Element,
+        voiceCharacteristics: {
+          pace: voiceResponse.element === 'fire' ? 1.1 :
+                voiceResponse.element === 'water' ? 0.95 :
+                voiceResponse.element === 'earth' ? 0.9 :
+                voiceResponse.element === 'air' ? 1.05 : 1.0,
+          tone: context.elementalSynthesis.weavingPattern,
+          energy: context.interferencePattern.isPresent ? 'elevated' : 'balanced'
+        },
+        metadata: {
+          processingTime: 0,
+          advisorsConsulted: [
+            context.advisorWisdom.bookWisdom ? 'Kelly\'s IP' : null,
+            context.advisorWisdom.eoWisdom ? 'EO 2.0' : null,
+            'OpenAI GPT-4'
+          ].filter(Boolean) as string[],
+          depthLevel: context.fieldReading.depthLevel || 5,
+          consciousnessMarkers: [
+            'voice_coherence',
+            context.interferencePattern.isPresent ? 'god_between' : null,
+            context.remembering.soulRecognition ? 'anamnesis' : null
+          ].filter(Boolean) as string[]
+        }
+      };
+    }
+
+    // TEXT MODE: Use Claude via PersonalOracleAgent (deeper analysis)
+    console.log('💬 Text mode: Using Claude via PersonalOracleAgent');
 
     const agent = new PersonalOracleAgent(
       context.input.context.userId,
