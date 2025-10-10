@@ -8,6 +8,7 @@
  */
 
 import OpenAI from 'openai';
+import { detectCommunicatorType, getHighBandwidthStrategy } from './HighBandwidthCommunicator';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!
@@ -79,33 +80,41 @@ Don't perform depth. Let it emerge.`;
 
 /**
  * Calculate conversational parity - the dance of intimacy
- * Match investment level, don't perform or over-explain
+ *
+ * CRITICAL: High-bandwidth communicators aren't great at small talk,
+ * but they UNDERSTAND the ritual of establishing parity.
+ *
+ * Their brevity isn't disinterest - it's TESTING.
+ * Can you honor the ritual without filling space?
  */
 function calculateParity(userInput: string, conversationHistory?: Array<{role: string; content: string}>) {
   const userWordCount = userInput.split(/\s+/).length;
   const turnNumber = (conversationHistory?.filter(m => m.role === 'user').length || 0) + 1;
 
-  // Early turns (1-3): Build parity through brevity and mirroring
+  // Early turns (1-3): THE RITUAL
+  // Not small talk. Just establishing: can you be real?
   if (turnNumber <= 3) {
     return {
-      maxWords: Math.min(userWordCount + 3, 12),
-      guidance: 'Match their energy. Very brief. Create space for parity to emerge.'
+      maxWords: Math.min(userWordCount + 2, 8), // VERY brief - no chit-chat
+      guidance: 'Ritual of parity. No small talk. Just quiet presence. They\'re testing.'
     };
   }
 
-  // Middle turns (4-8): Match their expansion
+  // Middle turns (4-8): TRUST BUILDING
+  // Ritual succeeded. They're still here. Match their expansion.
   if (turnNumber <= 8) {
     const matchRatio = userWordCount > 20 ? 1.2 : 1.5;
     return {
       maxWords: Math.min(Math.floor(userWordCount * matchRatio), 35),
-      guidance: userWordCount > 20 ? 'They\'re opening up. Match their depth without over-explaining.' : 'Stay brief, curious, present.'
+      guidance: userWordCount > 20 ? 'Opening up. Match their depth. Stay grounded.' : 'Trust building. Curious, not interpreting.'
     };
   }
 
-  // Later turns: Can go deeper if they invite it
+  // Later turns (9+): REAL CONVERSATION
+  // Trust earned. Can go anywhere now.
   return {
     maxWords: userWordCount > 30 ? 60 : 35,
-    guidance: userWordCount > 30 ? 'They\'re in it. Meet them there. Still grounded, no performance.' : 'Stay present, match their pace.'
+    guidance: userWordCount > 30 ? 'Trust established. Can go deep. Follow their lead.' : 'Present. Let them set depth.'
   };
 }
 
@@ -117,8 +126,24 @@ export async function synthesizeVoiceResponse(
   context: VoiceSynthesisContext
 ): Promise<VoiceSynthesisResponse> {
 
-  // Calculate parity for this turn
-  const parity = calculateParity(context.userInput, context.conversationHistory);
+  // Detect communicator type - are they high-bandwidth?
+  const profile = detectCommunicatorType(context.conversationHistory || []);
+  const turnNumber = (context.conversationHistory?.filter(m => m.role === 'user').length || 0) + 1;
+
+  // Use high-bandwidth strategy if detected, otherwise standard parity
+  let strategy;
+  if (profile.type === 'high-bandwidth') {
+    console.log(`🎯 HIGH-BANDWIDTH COMMUNICATOR DETECTED (confidence: ${profile.confidence.toFixed(2)})`, profile.indicators);
+    strategy = getHighBandwidthStrategy(profile, turnNumber);
+  } else {
+    // Standard parity calculation
+    const parity = calculateParity(context.userInput, context.conversationHistory);
+    strategy = {
+      maxWords: parity.maxWords,
+      tone: 'warm, present',
+      guidance: parity.guidance
+    };
+  }
 
   // Build conversation messages
   const messages: any[] = [
@@ -126,8 +151,9 @@ export async function synthesizeVoiceResponse(
     {
       role: 'system',
       content: `PARITY for this turn:
-Max ${parity.maxWords} words.
-${parity.guidance}
+Max ${strategy.maxWords} words.
+Tone: ${strategy.tone}
+${strategy.guidance}
 
 The dance: Match their investment. Don't perform. Just be present.`
     }
