@@ -994,9 +994,16 @@ That's the entire work.
       // 🔀 MODEL ROUTING: GPT-4o for Walking (conversational), Claude+EO for depth
       let responseText: string;
 
+      // === ANALYTICS: Track timing and performance ===
+      const apiStartTime = Date.now();
+      let apiRetries = 0;
+      let totalTokens = 0;
+      let inputTokens = 0;
+      let outputTokens = 0;
+
       if (useGPT) {
         // === GPT-4o PATH: Conversational companion (Walking mode only) ===
-        console.log(`🤖 Calling OpenAI GPT-4o for Walking mode...`);
+        console.log(`🤖 Calling OpenAI ${modelName} for ${conversationStyle} mode...`);
 
         const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -1005,7 +1012,7 @@ That's the entire work.
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-4o',
+            model: modelName, // Use selected model (gpt-4o or gpt-5)
             messages: [
               {
                 role: 'system',
@@ -1029,7 +1036,15 @@ That's the entire work.
 
         const openaiData = await openaiResponse.json();
         responseText = openaiData.choices[0].message.content;
-        console.log('✅ GPT-4o response received');
+
+        // Capture token usage from OpenAI response
+        if (openaiData.usage) {
+          totalTokens = openaiData.usage.total_tokens || 0;
+          inputTokens = openaiData.usage.prompt_tokens || 0;
+          outputTokens = openaiData.usage.completion_tokens || 0;
+        }
+
+        console.log(`✅ ${modelName} response received (${outputTokens} tokens)`);
 
       } else {
         // === CLAUDE PATH: Deep conversations with full EO framework (Classic/Adaptive) ===
@@ -1038,6 +1053,7 @@ That's the entire work.
             const delay = Math.pow(2, attempt) * 1000;
             console.log(`🔄 Retry attempt ${attempt}/${maxRetries} after ${delay}ms delay`);
             await new Promise(resolve => setTimeout(resolve, delay));
+            apiRetries++;
           }
 
           console.log(`🤖 Calling Claude API with full EO framework (attempt ${attempt + 1}/${maxRetries + 1})...`);
@@ -1091,6 +1107,13 @@ That's the entire work.
 
         const data = await claudeResponse.json();
         responseText = data.content[0].text;
+
+        // Capture token usage from Claude response
+        if (data.usage) {
+          inputTokens = data.usage.input_tokens || 0;
+          outputTokens = data.usage.output_tokens || 0;
+          totalTokens = inputTokens + outputTokens;
+        }
       }
 
       // 🔥 NEW: Capture this conversation turn for memory
@@ -1180,6 +1203,34 @@ That's the entire work.
       await this.saveUserMemory(updatedMemory);
       console.log(`💾 AIN Memory updated and saved`);
 
+      // === ANALYTICS: Calculate performance metrics ===
+      const apiResponseTime = Date.now() - apiStartTime;
+      const responseWordCount = responseText.split(/\s+/).length;
+      const responseSentenceCount = responseText.split(/[.!?]+/).filter(s => s.trim()).length;
+      const userWordCount = trimmedInput.split(/\s+/).length;
+
+      // Calculate brevity score (0-1, higher = more brief)
+      // Walking mode target: 5-8 words (score 1.0)
+      // Classic mode allows 50+ words (score 0.3-0.5)
+      let brevityScore = 0.5;
+      if (conversationStyle === 'walking' || conversationStyle === 'her') {
+        brevityScore = Math.max(0, Math.min(1, (15 - responseWordCount) / 10));
+      }
+
+      // Estimate cost (approximate based on model pricing as of Jan 2025)
+      let costUsd = 0;
+      if (modelConfig.provider === 'openai') {
+        if (modelName === 'gpt-5') {
+          costUsd = (inputTokens * 1.25 / 1000000) + (outputTokens * 10 / 1000000);
+        } else { // gpt-4o
+          costUsd = (inputTokens * 2.50 / 1000000) + (outputTokens * 10 / 1000000);
+        }
+      } else { // claude
+        costUsd = (inputTokens * 3 / 1000000) + (outputTokens * 15 / 1000000);
+      }
+
+      console.log(`📊 Analytics: ${responseWordCount} words, ${apiResponseTime}ms, $${costUsd.toFixed(6)}, brevity=${brevityScore.toFixed(2)}`);
+
       return {
         response: responseText,
         element: dominantElement,
@@ -1193,6 +1244,24 @@ That's the entire work.
             currentArchetype: updatedMemory.currentArchetype,
             symbolicThreadsCount: updatedMemory.symbolicThreads.length,
             totalSessions: updatedMemory.totalSessions
+          },
+          // === ANALYTICS METADATA ===
+          modelMetrics: {
+            model: modelName,
+            provider: modelConfig.provider,
+            responseTimeMs: apiResponseTime,
+            totalTokens,
+            inputTokens,
+            outputTokens,
+            costUsd,
+            retries: apiRetries
+          },
+          qualityMetrics: {
+            conversationMode: conversationStyle,
+            responseWordCount,
+            responseSentenceCount,
+            userWordCount,
+            brevityScore
           }
         },
         suggestions,

@@ -90,6 +90,16 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
   const lastSentMessageRef = useRef<string>('');
   const lastSentTimeRef = useRef<number>(0);
 
+  // === ANALYTICS: Voice interaction tracking ===
+  const sessionStartTime = useRef<number>(Date.now());
+  const sessionId = useRef<string>(`voice_${Date.now()}`);
+  const exchangeCount = useRef<number>(0);
+  const userSpeechStartTime = useRef<number>(0);
+  const totalUserSpeechDuration = useRef<number>(0);
+  const totalMaiaSpeechDuration = useRef<number>(0);
+  const listeningPauseCount = useRef<number>(0);
+  const interruptionCount = useRef<number>(0);
+
   // No wake words needed - always listening when active
   const WAKE_WORDS: string[] = [];
   // Optimized timing for natural conversation flow
@@ -190,6 +200,7 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
 
     recognition.onstart = () => {
       console.log('🟢 Speech recognition started');
+      userSpeechStartTime.current = Date.now(); // Track when user starts speaking
       console.log('Recognition settings:', {
         continuous: recognition.continuous,
         interimResults: recognition.interimResults,
@@ -321,6 +332,14 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
                 setIsActivelyExpressing(false);
                 return;
               }
+
+              // === ANALYTICS: Track user speech duration ===
+              if (userSpeechStartTime.current > 0) {
+                const speechDuration = Date.now() - userSpeechStartTime.current;
+                totalUserSpeechDuration.current += speechDuration;
+                console.log(`📊 User spoke for ${speechDuration}ms`);
+              }
+              exchangeCount.current++;
 
               console.log('🚀 Sending to Maya:', finalMessage);
               onTranscript(finalMessage);
@@ -666,6 +685,7 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
       console.log('🔇 Pausing voice - Maia speaking');
       setIsPausedForMaya(true);
       isPausedForMayaRef.current = true; // CRITICAL: Update ref for onresult closure
+      listeningPauseCount.current++; // Track listening pauses
       setIsWaitingForInput(false);
       setTranscript('🔇 Paused while Maia speaks...');
 
@@ -774,6 +794,28 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
         micStreamRef.current.getTracks().forEach(track => track.stop());
       }
     };
+  }, []);
+
+  // === ANALYTICS: Export voice metrics ===
+  // This function can be called from parent components to retrieve analytics
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__getVoiceAnalytics = () => ({
+        sessionId: sessionId.current,
+        sessionDurationMs: Date.now() - sessionStartTime.current,
+        exchangeCount: exchangeCount.current,
+        totalUserSpeechDurationMs: totalUserSpeechDuration.current,
+        totalMaiaSpeechDurationMs: totalMaiaSpeechDuration.current,
+        listeningPauses: listeningPauseCount.current,
+        interruptions: interruptionCount.current,
+        avgUserSpeechDurationMs: exchangeCount.current > 0
+          ? totalUserSpeechDuration.current / exchangeCount.current
+          : 0,
+        avgMaiaSpeechDurationMs: exchangeCount.current > 0
+          ? totalMaiaSpeechDuration.current / exchangeCount.current
+          : 0
+      });
+    }
   }, []);
 
   // Return minimal UI - voice logic only

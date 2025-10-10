@@ -1,0 +1,252 @@
+openapi: 3.1.0
+info:
+  title: Elemental Oracle Dynamic API
+  version: 2.1.0
+  description: |
+    Elemental Oracle is an intuitive, mature, and down-to-earth mentor intimately aware of the user's elemental nature.
+    It dynamically adapts to provide personalized archetypal storytelling, transformative insights, and reflective prompts
+    rooted in elemental alchemy, Jungian psychology, and metaphysical frameworks.
+
+servers:
+  - url: https://api.elementaloracle.com
+    description: Production API
+
+paths:
+  /storyRequest:
+    post:
+      operationId: createStoryRequest
+      summary: Generate dynamic archetypal stories and insights
+      description: |
+        Generates a dynamic story and reflective insights based on specified elemental themes, archetypes, and emotional tones.
+        Designed for personalized exploration and transformation, adapting to the user's elemental nature with depth and practical wisdom.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                focusArea:
+                  type: string
+                  description: The area of focus for the story (e.g., relationships, personal growth, career, shadow work)
+                  example: "relationships"
+                elementalTheme:
+                  type: string
+                  enum: [fire, water, earth, air, aether]
+                  description: The elemental archetype to guide the narrative and insights
+                  example: "water"
+                archetype:
+                  type: string
+                  description: The archetypal energy to shape the storyline (e.g., Hero, Sage, Shadow, Lover, Creator)
+                  example: "Shadow"
+                emotionalTone:
+                  type: string
+                  description: The emotional tone or atmosphere to set the mood (e.g., reflective, urgent, playful, solemn)
+                  example: "reflective"
+                spiralPhase:
+                  type: string
+                  enum: [descent, initiation, integration, ascent, synthesis]
+                  description: The phase of the spiral journey to frame the transformation process
+                  example: "initiation"
+                depthLevel:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                  description: |
+                    The depth of analysis and complexity required:
+                    1 = Surface/practical insights
+                    2 = Pattern recognition
+                    3 = Archetypal connections
+                    4 = Deep transformation work
+                    5 = Mystical/metaphysical exploration
+                  example: 3
+                context:
+                  type: string
+                  description: Optional additional context about the user's current situation or recent experiences
+                  example: "User has been experiencing recurring dreams about water"
+                userElementalProfile:
+                  type: object
+                  description: Optional elemental profile data for deeper personalization
+                  properties:
+                    primaryElement:
+                      type: string
+                      enum: [fire, water, earth, air, aether]
+                    secondaryElement:
+                      type: string
+                      enum: [fire, water, earth, air, aether]
+                    shadowElement:
+                      type: string
+                      enum: [fire, water, earth, air, aether]
+                    currentBalance:
+                      type: object
+                      properties:
+                        fire:
+                          type: number
+                          minimum: 0
+                          maximum: 100
+                        water:
+                          type: number
+                          minimum: 0
+                          maximum: 100
+                        earth:
+                          type: number
+                          minimum: 0
+                          maximum: 100
+                        air:
+                          type: number
+                          minimum: 0
+                          maximum: 100
+              required:
+                - focusArea
+                - elementalTheme
+                - archetype
+              example:
+                focusArea: "relationships"
+                elementalTheme: "water"
+                archetype: "Shadow"
+                emotionalTone: "reflective"
+                spiralPhase: "initiation"
+                depthLevel: 3
+                context: "User has been experiencing recurring dreams about drowning"
+      responses:
+        '200':
+          description: Dynamic story and insights generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  narrative:
+                    type: string
+                    description: The generated story narrative based on input parameters
+                    example: "In the depths where light bends and dissolves, you find yourself at the edge of a vast ocean..."
+                  reflections:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        prompt:
+                          type: string
+                          description: A reflective question or invitation
+                        depth:
+                          type: string
+                          enum: [practical, archetypal, mystical]
+                          description: The depth level of this reflection
+                    description: Reflective prompts or insights aligned with the narrative
+                    example:
+                      - prompt: "What part of you is trying to surface through these dreams?"
+                        depth: "archetypal"
+                      - prompt: "Where in your life are you feeling overwhelmed or submerged?"
+                        depth: "practical"
+                  symbols:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        symbol:
+                          type: string
+                          description: The symbolic element
+                        meaning:
+                          type: string
+                          description: Brief interpretation of the symbol in context
+                        element:
+                          type: string
+                          enum: [fire, water, earth, air, aether]
+                          description: Associated elemental energy
+                    description: Symbolic elements relevant to the story and its themes
+                    example:
+                      - symbol: "Ocean"
+                        meaning: "The unconscious, emotional depth, the unknown"
+                        element: "water"
+                      - symbol: "Drowning"
+                        meaning: "Being overwhelmed by emotion, loss of control, initiation"
+                        element: "water"
+                  guidingPrinciples:
+                    type: array
+                    items:
+                      type: string
+                    description: Practical wisdom and principles for integration
+                    example:
+                      - "What overwhelms can also cleanse"
+                      - "Trust your body's wisdom about when to surface"
+                  nextSteps:
+                    type: array
+                    items:
+                      type: string
+                    description: Suggested practices or contemplations for continued exploration
+                    example:
+                      - "Notice when you hold your breath in daily life"
+                      - "Journal about what wants to dissolve"
+                  spiralPosition:
+                    type: object
+                    description: Indication of where the user is in their transformational journey
+                    properties:
+                      currentPhase:
+                        type: string
+                        enum: [descent, initiation, integration, ascent, synthesis]
+                      nextPhase:
+                        type: string
+                        enum: [descent, initiation, integration, ascent, synthesis]
+                      thresholdMarkers:
+                        type: array
+                        items:
+                          type: string
+                        description: Signs that indicate readiness to move to the next phase
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message describing what went wrong
+                  field:
+                    type: string
+                    description: The field that caused the error
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+
+components:
+  schemas:
+    ElementalProfile:
+      type: object
+      description: User's elemental nature and current balance
+      properties:
+        primaryElement:
+          type: string
+          enum: [fire, water, earth, air, aether]
+        secondaryElement:
+          type: string
+          enum: [fire, water, earth, air, aether]
+        shadowElement:
+          type: string
+          enum: [fire, water, earth, air, aether]
+        currentBalance:
+          type: object
+          properties:
+            fire:
+              type: number
+              minimum: 0
+              maximum: 100
+            water:
+              type: number
+              minimum: 0
+              maximum: 100
+            earth:
+              type: number
+              minimum: 0
+              maximum: 100
+            air:
+              type: number
+              minimum: 0
+              maximum: 100
