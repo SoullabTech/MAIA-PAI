@@ -727,12 +727,19 @@ That's the entire work.
       let lastError;
       const maxRetries = 2;
 
+      // Check API key before attempting
+      if (!process.env.ANTHROPIC_API_KEY) {
+        throw new Error('ANTHROPIC_API_KEY not configured - cannot call Claude');
+      }
+
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         if (attempt > 0) {
           const delay = Math.pow(2, attempt) * 1000;
+          console.log(`🔄 Retry attempt ${attempt}/${maxRetries} after ${delay}ms delay`);
           await new Promise(resolve => setTimeout(resolve, delay));
         }
 
+        console.log(`🤖 Calling Claude API (attempt ${attempt + 1}/${maxRetries + 1})...`);
         claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
           method: 'POST',
           headers: {
@@ -754,17 +761,23 @@ That's the entire work.
           }),
         });
 
+        console.log(`📡 Claude API response: ${claudeResponse.status} ${claudeResponse.statusText}`);
+
         if (claudeResponse.ok) {
+          console.log('✅ Claude API call successful');
           break;
         }
 
         if (claudeResponse.status === 529 && attempt < maxRetries) {
           lastError = `Claude API overloaded (529), retrying... (attempt ${attempt + 1}/${maxRetries})`;
-          console.warn(lastError);
+          console.warn(`⚠️ ${lastError}`);
           continue;
         }
 
-        throw new Error(`Claude API error: ${claudeResponse.status}`);
+        // Log error details for debugging
+        const errorBody = await claudeResponse.text();
+        console.error(`❌ Claude API error ${claudeResponse.status}:`, errorBody);
+        throw new Error(`Claude API error: ${claudeResponse.status} - ${errorBody}`);
       }
 
       if (!claudeResponse || !claudeResponse.ok) {
@@ -859,9 +872,19 @@ That's the entire work.
         suggestions,
       };
     } catch (error: any) {
-      console.error('PersonalOracleAgent error:', error);
+      console.error('❌ PersonalOracleAgent error:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+        cause: error.cause
+      });
 
-      // Graceful fallback
+      // Check if it's an API key issue
+      if (!process.env.ANTHROPIC_API_KEY) {
+        console.error('🔑 CRITICAL: ANTHROPIC_API_KEY is not set in environment variables');
+      }
+
+      // Graceful fallback with personality
       return {
         response: "I hear you. Tell me more about what's on your mind.",
         element: "aether",
@@ -869,6 +892,7 @@ That's the entire work.
           sessionId: `session_${Date.now()}`,
           phase: "reflection",
           error: error.message,
+          errorType: error.name
         },
       };
     }
