@@ -121,8 +121,12 @@ export function MaiaSettingsPanel({ onClose }: { onClose?: () => void }) {
       localStorage.setItem('maia_settings', JSON.stringify(settings));
       setOriginalSettings(settings);
 
+      // Also save voice selection to the key OracleConversation uses
+      localStorage.setItem('selected_voice', settings.voice.openaiVoice);
+
       // Trigger a custom event for components to react to settings changes
       window.dispatchEvent(new CustomEvent('maia-settings-changed', { detail: settings }));
+      window.dispatchEvent(new Event('conversationStyleChanged'));
 
       // Optional: Save to backend
       await fetch('/api/maia/settings', {
