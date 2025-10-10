@@ -85,11 +85,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // Maia Voice Integration - Initialize immediately for Voice mode
   const { speak: maiaSpeak, voiceState: maiaVoiceState, isReady: maiaReady } = useMaiaVoice();
 
-  // 🌀 Soullab Realtime - DISABLED temporarily due to streaming chunk issue
-  // The hook sends 100ms WebM chunks to Whisper API, but OpenAI requires complete audio files
-  // SimplifiedOrganicVoice (browser Web Speech API) is working perfectly - use that instead
-  // TODO: Fix by accumulating chunks into complete audio file before transcription
-  /*
+  // 🌀 Soullab Realtime - FIXED: Now accumulates chunks into complete audio before transcription
   const realtime = useElementalVoice({
     userId: userId || 'anonymous',
     userName: userName || 'Explorer',
@@ -101,6 +97,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     onTranscript: (text, isUser) => {
       if (isUser) {
         console.log('👤 User said:', text);
+
+        // Track voice transcript
+        trackEvent.voiceResult(userId || 'anonymous', text, 0);
+
+        // Add user message to conversation
+        const userMessage: ConversationMessage = {
+          id: `msg-${Date.now()}-user`,
+          role: 'user',
+          text,
+          timestamp: new Date(),
+          motionState: 'listening',
+          source: 'voice'
+        };
+        setMessages(prev => [...prev, userMessage]);
       } else {
         console.log('🌀 MAIA said:', text);
         // Add MAIA's response to messages
@@ -116,18 +126,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       }
     },
     onError: (error) => {
-      console.warn('⚠️ Voice system error (voice disabled):', error);
-      // Voice errors suppressed - voice features require OpenAI API key configuration
-      // Users can still use text chat which works independently
+      console.warn('⚠️ Voice system error:', error);
     }
   });
-  */
-  // Dummy realtime object to replace the disabled hook
-  const realtime = {
-    isConnected: false,
-    isConnecting: false,
-    connect: () => console.log('ElementalVoice disabled - use SimplifiedOrganicVoice instead')
-  };
 
   // This effect will be moved after state declarations to avoid hoisting issues
 

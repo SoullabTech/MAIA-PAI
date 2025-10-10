@@ -35,6 +35,10 @@ export function useElementalVoice(options: UseElementalVoiceOptions) {
   const orchestratorRef = useRef<ElementalVoiceOrchestrator | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const isSpeakingRef = useRef(false);
 
   /**
    * Initialize orchestrator
@@ -114,6 +118,71 @@ export function useElementalVoice(options: UseElementalVoiceOptions) {
   }, []);
 
   /**
+   * Detect if user is speaking using volume analysis
+   */
+  const detectSpeech = useCallback(() => {
+    if (!analyserRef.current) return;
+
+    const bufferLength = analyserRef.current.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    analyserRef.current.getByteFrequencyData(dataArray);
+
+    // Calculate average volume
+    const average = dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
+
+    // Volume threshold for speech detection (adjust as needed)
+    const SPEECH_THRESHOLD = 15;
+    const wasSpeaking = isSpeakingRef.current;
+    const isNowSpeaking = average > SPEECH_THRESHOLD;
+
+    if (isNowSpeaking && !wasSpeaking) {
+      // User started speaking
+      console.log('🎤 User started speaking');
+      isSpeakingRef.current = true;
+
+      // Trigger interruption handler
+      if (orchestratorRef.current) {
+        orchestratorRef.current.handleUserSpeechStart();
+      }
+
+      // Clear any pending silence timer
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+        silenceTimerRef.current = null;
+      }
+    } else if (!isNowSpeaking && wasSpeaking) {
+      // User stopped speaking - start silence timer
+      console.log('🔇 User stopped speaking - waiting for silence confirmation');
+      isSpeakingRef.current = false;
+
+      // Wait for sustained silence before processing
+      if (silenceTimerRef.current) {
+        clearTimeout(silenceTimerRef.current);
+      }
+
+      silenceTimerRef.current = setTimeout(async () => {
+        if (audioChunksRef.current.length > 0 && orchestratorRef.current) {
+          // Combine all chunks into one complete audio file
+          const completeAudio = new Blob(audioChunksRef.current, { type: 'audio/webm;codecs=opus' });
+          console.log('🎤 Sending complete audio:', completeAudio.size, 'bytes,', audioChunksRef.current.length, 'chunks');
+
+          // Send complete audio to orchestrator
+          await orchestratorRef.current.sendAudio(completeAudio);
+
+          // Clear chunks after sending
+          audioChunksRef.current = [];
+        }
+        silenceTimerRef.current = null;
+      }, 800); // 800ms of silence before processing
+    }
+
+    // Continue monitoring
+    if (mediaRecorderRef.current?.state === 'recording') {
+      requestAnimationFrame(detectSpeech);
+    }
+  }, []);
+
+  /**
    * Start capturing audio from microphone
    */
   const startAudioCapture = useCallback(async () => {
@@ -127,44 +196,48 @@ export function useElementalVoice(options: UseElementalVoiceOptions) {
         }
       });
 
+      // Create audio context for speech detection
+      audioContextRef.current = new AudioContext();
+      const source = audioContextRef.current.createMediaStreamSource(stream);
+      analyserRef.current = audioContextRef.current.createAnalyser();
+      analyserRef.current.fftSize = 2048;
+      source.connect(analyserRef.current);
+
       // Create MediaRecorder for audio chunks
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: 'audio/webm;codecs=opus'
       });
 
-      mediaRecorder.onstart = () => {
-        // 🎬 Samantha-level: User started speaking → interrupt MAIA
-        if (orchestratorRef.current) {
-          orchestratorRef.current.handleUserSpeechStart();
-        }
-      };
-
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
-
-          // Send audio chunk to orchestrator
-          if (orchestratorRef.current) {
-            orchestratorRef.current.sendAudio(event.data);
-          }
         }
       };
 
       mediaRecorder.onstop = () => {
         console.log('🎤 Audio capture stopped');
         audioChunksRef.current = [];
+        isSpeakingRef.current = false;
+
+        if (silenceTimerRef.current) {
+          clearTimeout(silenceTimerRef.current);
+          silenceTimerRef.current = null;
+        }
       };
 
-      // Start recording with 100ms chunks for low latency
+      // Start recording with 100ms chunks for low latency buffering
       mediaRecorder.start(100);
       mediaRecorderRef.current = mediaRecorder;
 
-      console.log('🎤 Audio capture started');
+      // Start speech detection
+      detectSpeech();
+
+      console.log('🎤 Audio capture started with speech detection');
     } catch (error) {
       console.error('Failed to start audio capture:', error);
       onError?.(error as Error);
     }
-  }, []);
+  }, [detectSpeech, onError]);
 
   /**
    * Stop audio capture
@@ -175,6 +248,19 @@ export function useElementalVoice(options: UseElementalVoiceOptions) {
       mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
       mediaRecorderRef.current = null;
     }
+
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+
+    if (silenceTimerRef.current) {
+      clearTimeout(silenceTimerRef.current);
+      silenceTimerRef.current = null;
+    }
+
+    analyserRef.current = null;
+    isSpeakingRef.current = false;
   }, []);
 
   /**
