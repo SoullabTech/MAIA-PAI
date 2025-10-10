@@ -218,6 +218,12 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
     };
 
     recognition.onresult = (event: any) => {
+      // 🚨 CRITICAL: Reject ALL recognition events if Maya is speaking (prevents echo)
+      if (isPausedForMaya) {
+        console.log('🛑 [ECHO BLOCKED] Ignoring recognition event - Maya is speaking');
+        return;
+      }
+
       console.log('🎤 Speech recognition event:', {
         results: event.results,
         resultIndex: event.resultIndex,
