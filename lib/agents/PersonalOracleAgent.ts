@@ -1162,7 +1162,8 @@ That's the entire work.
       console.log('✅ Elemental refinement applied:', {
         element: dominantElement,
         transformations: elementalRefinement.transformationsApplied.length,
-        examples: elementalRefinement.transformationsApplied.slice(0, 3)
+        examples: elementalRefinement.transformationsApplied.slice(0, 3),
+        phraseAdded: elementalRefinement.phraseAdded || 'none'
       });
 
       // 🔥 NEW: Capture this conversation turn for memory

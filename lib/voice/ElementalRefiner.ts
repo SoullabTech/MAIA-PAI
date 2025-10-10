@@ -4,12 +4,15 @@
  * Shapes responses with elemental consciousness (Fire/Water/Earth/Air/Aether)
  */
 
+import { suggestElementalPhrase } from './ElementalPhrasebook';
+
 export type Element = 'air' | 'fire' | 'water' | 'earth' | 'aether';
 
 export interface ElementalRefinement {
   refined: string;
   element: Element;
   transformationsApplied: string[];
+  phraseAdded?: string;
 }
 
 export class ElementalRefiner {
@@ -35,10 +38,18 @@ export class ElementalRefiner {
     refined = softenedText;
     transformations.push(...softenTransforms);
 
+    // Optionally add natural elemental phrase (only if response feels too generic)
+    const suggestedPhrase = suggestElementalPhrase(refined, element, { onlyIfGeneric: true });
+    if (suggestedPhrase) {
+      refined = `${refined} ${suggestedPhrase}`;
+      transformations.push('phrase:added');
+    }
+
     return {
       refined,
       element,
-      transformationsApplied: transformations
+      transformationsApplied: transformations,
+      phraseAdded: suggestedPhrase || undefined
     };
   }
 
