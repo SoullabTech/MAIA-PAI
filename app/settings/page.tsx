@@ -20,7 +20,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     // Load saved voice preference
-    const saved = localStorage.getItem('maia_voice');
+    const saved = localStorage.getItem('selected_voice');
     if (saved) {
       setSelectedVoice(saved);
     }
@@ -28,7 +28,10 @@ export default function SettingsPage() {
 
   const handleVoiceSelect = (voiceId: string) => {
     setSelectedVoice(voiceId);
-    localStorage.setItem('maia_voice', voiceId);
+    localStorage.setItem('selected_voice', voiceId);
+
+    // Dispatch event to notify OracleConversation of the change
+    window.dispatchEvent(new Event('conversationStyleChanged'));
   };
 
   return (
