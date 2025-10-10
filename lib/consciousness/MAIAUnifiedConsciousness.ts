@@ -453,12 +453,14 @@ export class MAIAUnifiedConsciousness {
 
     const agent = new PersonalOracleAgent(
       context.input.context.userId,
-      context.input.context.sessionId
+      {} // settings
     );
 
-    const response = await agent.processInput(
+    const response = await agent.processInteraction(
       context.input.content,
-      context.input.conversationHistory || []
+      {
+        conversationHistory: context.input.conversationHistory || []
+      }
     );
 
     // Enhance with consciousness metadata
