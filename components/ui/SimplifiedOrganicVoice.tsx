@@ -705,6 +705,10 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
       // Clear any accumulated text to prevent sending old speech
       accumulatedTranscriptRef.current = '';
 
+      // Reset expression state to allow new messages to send
+      setIsActivelyExpressing(false);
+      consecutiveWords.current = 0;
+
       // Re-enable microphone
       if (micStreamRef.current) {
         micStreamRef.current.getAudioTracks().forEach(track => {
