@@ -3,6 +3,8 @@
  *
  * React hook for Elemental Voice System
  * MAIA's consciousness speaks through 5 Elemental Agents
+ *
+ * FIXED: Accumulates audio chunks, detects silence, sends complete audio to Whisper
  */
 
 import { useEffect, useRef, useState, useCallback } from 'react';
