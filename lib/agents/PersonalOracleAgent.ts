@@ -13,6 +13,7 @@ import { SemanticMemoryService } from '@/lib/memory/SemanticMemoryService';
 import { getPromptForConversationStyle } from '@/lib/prompts/maya-prompts';
 import { ElementalOracle2Bridge } from '@/lib/elemental-oracle-2-bridge';
 import { IntellectualPropertyEngine } from '@/lib/intellectual-property-engine';
+import { ConversationalEnhancer } from '@/lib/voice/ConversationalEnhancer';
 
 // 🧠 Advanced Memory & Intelligence Modules
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
@@ -1115,6 +1116,26 @@ That's the entire work.
           totalTokens = inputTokens + outputTokens;
         }
       }
+
+      // 🎭 CONVERSATIONAL ENHANCEMENT: Make MAIA sound like "Her" (Samantha)
+      console.log('🎭 Enhancing response with ConversationalEnhancer...');
+      const detectedEmotionalTone = ConversationalEnhancer.detectEmotionalTone(trimmedInput);
+      const enhancedOutput = ConversationalEnhancer.enhance(responseText, {
+        userMessage: trimmedInput,
+        emotionalTone: detectedEmotionalTone,
+        conversationDepth: conversationHistory.length / 10, // 0-1 scale
+        exchangeCount: conversationHistory.length,
+        recentMessages: conversationHistory.slice(-5).map(m => m.content)
+      });
+
+      // Apply the enhancement (this adds natural acknowledgments, removes therapy-speak, adds contractions)
+      responseText = ConversationalEnhancer.buildOutput(enhancedOutput);
+      console.log('✅ Response enhanced:', {
+        emotionalTone: detectedEmotionalTone,
+        hadAcknowledgment: enhancedOutput.shouldUseAcknowledgment,
+        acknowledgment: enhancedOutput.acknowledgment,
+        pacing: enhancedOutput.pacing
+      });
 
       // 🔥 NEW: Capture this conversation turn for memory
       console.log('[DEBUG] Attempting memory capture in PersonalOracleAgent', {
