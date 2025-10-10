@@ -20,6 +20,9 @@ export const trackEvent = Object.assign(track, {
   },
   voiceResult: (userId: string, transcript: string, duration: number) => {
     track('voice_result', { userId, transcript, duration });
+  },
+  ttsSpoken: (userId: string, text: string, duration: number) => {
+    track('tts_spoken', { userId, text, duration });
   }
 });
 
