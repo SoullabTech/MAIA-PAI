@@ -126,8 +126,12 @@ export async function POST(request: NextRequest) {
       throw new Error('MAIA Consciousness initialization failed');
     }
 
+    // Detect if this is a voice conversation (from voice UI)
+    const isVoiceConversation = preferences?.isVoice || body.isVoice || body.modality === 'voice';
+    const modality = isVoiceConversation ? 'voice' : 'text';
+
     try {
-      console.log('🚀 Calling maiaConsciousness.process()...');
+      console.log(`🚀 Calling maiaConsciousness.process() in ${modality} mode...`);
       const consciousnessResponse = await maiaConsciousness!.process({
         content: userInput,
         context: {
@@ -136,7 +140,7 @@ export async function POST(request: NextRequest) {
           userName: userName,
           preferences: preferences
         },
-        modality: 'text',
+        modality: modality as 'voice' | 'text',
         conversationHistory: recentEntries.map((entry: any) => ({
           role: 'user',
           content: entry.content || ''

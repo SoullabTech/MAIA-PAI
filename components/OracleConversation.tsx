@@ -693,13 +693,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           })) : undefined,
           preferences: {
             previousInteractions: messages.length,
-            inputType: 'text',
+            inputType: voiceEnabled && !showChatInterface ? 'voice' : 'text',
             hasAttachments: attachments && attachments.length > 0,
             conversationStyle, // Pass user's preferred style (her/classic/adaptive)
+            isVoice: voiceEnabled && !showChatInterface, // Mark as voice conversation for OpenAI synthesis
             userPreferences: {
               voice: {
-                enabled: false,
-                autoSpeak: false,
+                enabled: voiceEnabled,
+                autoSpeak: voiceEnabled && !showChatInterface,
                 agentConfig
               }
             }
