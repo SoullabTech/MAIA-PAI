@@ -287,11 +287,19 @@ ${calibration.guidance}`;
   }
 
   private async getUniqueUsers(): Promise<number> {
-    const { data } = await this.supabase
+    // Get unique user IDs using PostgreSQL DISTINCT
+    const { data, error } = await this.supabase
       .from('maya_training_corpus')
-      .select('userId')
-      .distinct();
-    return data?.length || 0;
+      .select('userId');
+
+    if (error) {
+      console.error('Error getting unique users:', error);
+      return 0;
+    }
+
+    // Count unique userIds manually
+    const uniqueUserIds = new Set(data?.map(row => row.userId) || []);
+    return uniqueUserIds.size;
   }
 
   private async getSacredMomentCount(): Promise<number> {
