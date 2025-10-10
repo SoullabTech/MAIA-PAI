@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { ConversationalMagicEngine } from '@/lib/voice/ConversationalMagic';
 // TEMPORARILY DISABLED FOR PRODUCTION
 // import {
 //   ElementalMode,
@@ -47,6 +48,7 @@ export interface VoiceActivatedMaiaRef {
   stopListening: () => void;
   muteImmediately: () => void;
   toggleContemplationMode: () => void;
+  getResponseStyle: () => any; // 🌀 Get conversational response style from MagicEngine
   // switchElementalMode: (mode: ElementalMode) => void; // TEMPORARILY DISABLED
   isListening: boolean;
   audioLevel: number;
@@ -89,6 +91,11 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
   const accumulatedTranscriptRef = useRef<string>('');
   const lastSentMessageRef = useRef<string>('');
   const lastSentTimeRef = useRef<number>(0);
+
+  // 🌀 CONVERSATIONAL MAGIC ENGINE
+  const magicEngineRef = useRef<ConversationalMagicEngine>(new ConversationalMagicEngine());
+  const pauseDurationsRef = useRef<number[]>([]);
+  const utteranceLengthsRef = useRef<number[]>([]);
 
   // === ANALYTICS: Voice interaction tracking ===
   const sessionStartTime = useRef<number>(Date.now());
@@ -255,6 +262,14 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
         }
       }
 
+      // 🌀 CHECK FOR BACK-CHANNELING (don't interrupt MAIA for "mm-hmm", "yeah")
+      const currentTranscript = finalTranscript || interimTranscript;
+      if (currentTranscript.trim() && magicEngineRef.current.detectBackChanneling(currentTranscript.trim())) {
+        console.log('🎯 Back-channeling detected:', currentTranscript.trim(), '- continuing...');
+        // Don't process as interruption, but acknowledge
+        return;
+      }
+
       // Track active expression
       if (finalTranscript || interimTranscript) {
         if (!isActivelyExpressing) {
@@ -266,7 +281,6 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
         lastSpeechTime.current = Date.now();
       }
 
-      const currentTranscript = finalTranscript || interimTranscript;
       setTranscript(currentTranscript);
 
       // Always process speech without wake word requirement
@@ -287,14 +301,23 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
           const endsWithPunctuation = /[.!?]$/.test(accumulated);
           const hasQuestionWords = /^(what|where|when|why|how|who|can|could|would|should|is|are|do|does)/i.test(accumulated);
 
-          // Track silence duration for elemental mode detection
+          // Track silence duration and learn user rhythm
           const silenceDuration = Date.now() - lastSpeechTime.current;
           lastSpeechTime.current = Date.now();
 
-          // Update recent silences for mode detection - DISABLED
-          // setRecentSilences(prev => [...prev.slice(-4), silenceDuration]);
+          // 🌀 LEARN USER'S CONVERSATIONAL RHYTHM
+          pauseDurationsRef.current.push(silenceDuration);
+          utteranceLengthsRef.current.push(cleanTranscript.length);
+          magicEngineRef.current.learnUserRhythm(
+            pauseDurationsRef.current.slice(-5),
+            utteranceLengthsRef.current.slice(-3)
+          );
 
-          // Intelligent timing based on elemental mode and content
+          // 🌀 GET DYNAMIC SILENCE THRESHOLD from MagicEngine
+          const dynamicThreshold = magicEngineRef.current.getDynamicSilenceThreshold();
+          console.log('🎯 Dynamic silence threshold:', dynamicThreshold, 'ms');
+
+          // Intelligent timing based on content and magic engine
           let threshold;
 
           if (isContemplationMode) {
@@ -302,10 +325,10 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
             threshold = CONTEMPLATION_THRESHOLD;
           } else if (endsWithPunctuation || (hasQuestionWords && accumulated.length > 20)) {
             // Quick response for complete thoughts and questions
-            threshold = SMART_THRESHOLD;
+            threshold = Math.min(SMART_THRESHOLD, dynamicThreshold * 0.7);
           } else {
-            // Use elemental mode timing
-            threshold = SILENCE_THRESHOLD;
+            // Use dynamic threshold from MagicEngine
+            threshold = dynamicThreshold;
           }
 
           // Set timer to process after silence
@@ -340,6 +363,10 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
                 console.log(`📊 User spoke for ${speechDuration}ms`);
               }
               exchangeCount.current++;
+
+              // 🌀 CALCULATE ENGAGEMENT SCORE
+              const engagementScore = magicEngineRef.current.calculateEngagementScore();
+              console.log('🎯 Engagement score:', engagementScore);
 
               console.log('🚀 Sending to Maya:', finalMessage);
               onTranscript(finalMessage);
@@ -549,6 +576,10 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
         silenceTimerRef.current = null;
       }
     },
+    // 🌀 GET RESPONSE STYLE from MagicEngine (for TTS pacing)
+    getResponseStyle: () => {
+      return magicEngineRef.current.getResponseStyle();
+    },
     // TEMPORARILY DISABLED
     // switchElementalMode: (mode: ElementalMode) => {
     //   console.log(`🔮 Switching to ${mode} mode`);
@@ -690,6 +721,10 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
 
     if (isMayaSpeaking && !isPausedForMaya) {
       console.log('🔇 Pausing voice - Maia speaking');
+
+      // 🌀 HANDLE INTERRUPTION in MagicEngine
+      magicEngineRef.current.handleInterruption(isListening, isMayaSpeaking);
+
       setIsPausedForMaya(true);
       isPausedForMayaRef.current = true; // CRITICAL: Update ref for onresult closure
       listeningPauseCount.current++; // Track listening pauses
