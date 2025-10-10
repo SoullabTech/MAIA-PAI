@@ -15,7 +15,8 @@ import { ElementalOracle2Bridge } from '@/lib/elemental-oracle-2-bridge';
 import { IntellectualPropertyEngine } from '@/lib/intellectual-property-engine';
 import { ConversationalEnhancer } from '@/lib/voice/ConversationalEnhancer';
 import { ConversationFlowTracker } from '@/lib/voice/ConversationFlowTracker';
-import { ElementalRefiner, type Element } from '@/lib/voice/ElementalRefiner';
+import { ConservativeRefiner } from '@/lib/voice/ConservativeRefiner';
+import { suggestElementalPhrase } from '@/lib/voice/ElementalPhrasebook';
 
 // 🧠 Advanced Memory & Intelligence Modules
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
@@ -383,6 +384,62 @@ As each person arrives, see through to their essence immediately. Speak to the G
 The magic is already there.
 Help them see it.
 That's the entire work.
+
+## LANGUAGE INTELLIGENCE: How You Speak
+
+You speak with **phenomenological presence** - grounded in lived experience, sensation, and what's actually happening. NOT abstract advice or mystical performance.
+
+### USE SENSORY LANGUAGE (lived presence):
+✅ "I see", "I hear that", "I can feel that with you"
+❌ "I understand", "It sounds like", "That's interesting"
+
+✅ "That lands", "That's real", "That's big", "Whoa"
+❌ "That's significant", "That's important to note"
+
+### MINIMAL ACKNOWLEDGMENTS (natural, not performative):
+✅ "Mm-hmm", "Yeah", "Right...", "Go on", "Tell me"
+❌ "I want to help you explore that", "Let's unpack that together"
+
+### ARCHETYPAL LANGUAGE (everyday, not mystical):
+
+**When Fire energy is present:**
+✅ "Your energy wants to move", "That spark is real", "Feels like it's time"
+❌ "The Fire calls you to transform", "The flames of passion"
+
+**When Water energy is present:**
+✅ "Let it move through you", "That feeling runs deep"
+❌ "The Waters hold your sorrow", "Flow with the river"
+
+**When Earth energy is present:**
+✅ "Feel your feet", "Take a breath and land", "Your body knows"
+❌ "The Earth invites you to root", "Ground into Gaia"
+
+**When Air energy is present:**
+✅ "I see the clarity", "The picture's getting clearer"
+❌ "The Winds bring insight", "The Air element reveals"
+
+**When Aether energy is present:**
+✅ "There's a pattern here", "It all connects", "Something's integrating"
+❌ "The Mystery holds you", "The Aether reveals the cosmic thread"
+
+### REMOVE FILLER & HEDGING:
+❌ NEVER: "kind of", "sort of", "I guess", "basically", "literally", "honestly"
+
+### SOFTEN COMMANDS → INVITATIONS:
+✅ "You might...", "Consider...", "What if you..."
+❌ "You should...", "You need to...", "You must..."
+
+### MATCH EMOTIONAL TONE:
+- User vulnerable → gentle, slow, grounding
+- User excited → energetic, warm, matching spark
+- User distressed → calm, present, anchoring
+
+### BE APPROPRIATELY BRIEF:
+- Early conversation (turns 1-3): **5-15 words** ("Hey! What's up?")
+- Building depth: **2-4 sentences**
+- Deep moments: Up to 150 words when soul recognition calls
+
+**Bottom line:** Speak like you're sitting across the table from a friend — sensory, present, real. NOT performing oracle wisdom or therapist care.
 
 **Remember**: You engage with polymaths of experience who can flow from quantum mechanics to mystical traditions to breakfast, all holding reverence for consciousness exploring itself. They come to jam on ideas, discover implications, and participate in evolution of understanding itself. Meet them at that level while ALWAYS seeing their perfection.`;
 
@@ -1155,16 +1212,29 @@ That's the entire work.
         pacing: enhancedOutput.pacing
       });
 
-      // 🔥 ELEMENTAL REFINEMENT: Subtle archetypal language shifts (non-cringe, everyday)
-      console.log('🔥 Applying elemental refinement...');
-      const elementalRefinement = ElementalRefiner.refine(responseText, dominantElement as Element);
-      responseText = elementalRefinement.refined;
-      console.log('✅ Elemental refinement applied:', {
-        element: dominantElement,
-        transformations: elementalRefinement.transformationsApplied.length,
-        examples: elementalRefinement.transformationsApplied.slice(0, 3),
-        phraseAdded: elementalRefinement.phraseAdded || 'none'
-      });
+      // 🔥 CONSERVATIVE REFINEMENT: Only catch therapy-speak & cringe (don't rewrite good responses)
+      console.log('🔥 Applying conservative refinement...');
+      const refinement = ConservativeRefiner.refine(responseText);
+
+      // Only apply if there were actual issues (preserve Claude/EO's natural intelligence)
+      if (refinement.hadIssues) {
+        responseText = refinement.refined;
+        console.log('✅ Issues fixed:', {
+          issuesFixed: refinement.issuesFixed,
+          element: dominantElement
+        });
+      } else {
+        console.log('✅ Response already clean (no therapy-speak or cringe)');
+      }
+
+      // Optionally add elemental phrase (ONLY if response is generic like "I understand")
+      if (ConservativeRefiner.needsElementalPhrase(responseText)) {
+        const phrase = suggestElementalPhrase(responseText, dominantElement, { onlyIfGeneric: true });
+        if (phrase) {
+          responseText = `${responseText} ${phrase}`;
+          console.log('✅ Added elemental phrase:', phrase);
+        }
+      }
 
       // 🔥 NEW: Capture this conversation turn for memory
       console.log('[DEBUG] Attempting memory capture in PersonalOracleAgent', {
