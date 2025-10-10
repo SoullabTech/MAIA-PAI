@@ -103,7 +103,14 @@ export async function POST(request: NextRequest) {
 
     // PRIMARY PATH: UNIFIED CONSCIOUSNESS (26-year spiral architecture)
     console.log('🌀 Processing through MAIAUnifiedConsciousness...');
+    console.log('📊 Input data:', {
+      userInput: userInput.substring(0, 100),
+      userId: requestUserId,
+      sessionId: sessionId,
+      historyLength: recentEntries.length
+    });
     try {
+      console.log('🚀 Calling maiaConsciousness.process()...');
       const consciousnessResponse = await maiaConsciousness.process({
         content: userInput,
         context: {
@@ -190,7 +197,13 @@ export async function POST(request: NextRequest) {
       });
 
     } catch (agentError: any) {
-      console.error('❌ PersonalOracleAgent failed:', agentError.message || agentError);
+      console.error('❌ PersonalOracleAgent CRITICAL ERROR:', {
+        message: agentError.message,
+        stack: agentError.stack,
+        name: agentError.name,
+        cause: agentError.cause,
+        fullError: JSON.stringify(agentError, Object.getOwnPropertyNames(agentError))
+      });
       console.log('🔄 Falling back to OpenAI...');
     }
 
