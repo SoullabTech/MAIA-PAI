@@ -387,13 +387,23 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // Sync local audio state with Maia voice state to prevent conflicts
   useEffect(() => {
+    console.log('🔍 Voice state sync check:', {
+      maiaIsPlaying: maiaVoiceState?.isPlaying,
+      isAudioPlaying,
+      isResponding,
+      willUpdateAudio: maiaVoiceState?.isPlaying !== isAudioPlaying,
+      willUpdateResponding: maiaVoiceState?.isPlaying !== isResponding
+    });
+
     if (maiaVoiceState?.isPlaying !== isAudioPlaying) {
+      console.log(`🔄 Syncing isAudioPlaying: ${isAudioPlaying} → ${maiaVoiceState?.isPlaying || false}`);
       setIsAudioPlaying(maiaVoiceState?.isPlaying || false);
     }
     if (maiaVoiceState?.isPlaying !== isResponding) {
+      console.log(`🔄 Syncing isResponding: ${isResponding} → ${maiaVoiceState?.isPlaying || false}`);
       setIsResponding(maiaVoiceState?.isPlaying || false);
     }
-  }, [maiaVoiceState?.isPlaying]);
+  }, [maiaVoiceState?.isPlaying, isAudioPlaying, isResponding]);
 
   // Update motion state based on voice activity
   useEffect(() => {
