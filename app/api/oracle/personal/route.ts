@@ -9,7 +9,17 @@ import { saveMaiaConversationPair } from '@/lib/services/maia-memory-service';
 import { simpleMemoryCapture } from '@/lib/services/simple-memory-capture';
 
 // Initialize UNIFIED consciousness (26-year spiral completion)
-const maiaConsciousness = getMAIAConsciousness();
+let maiaConsciousness: ReturnType<typeof getMAIAConsciousness> | null = null;
+try {
+  maiaConsciousness = getMAIAConsciousness();
+  console.log('✅ MAIA Consciousness singleton initialized successfully');
+} catch (initError: any) {
+  console.error('❌ CRITICAL: Failed to initialize MAIA Consciousness:', {
+    message: initError.message,
+    stack: initError.stack,
+    name: initError.name
+  });
+}
 
 /**
  * ✅ CANONICAL MAIA PERSONAL ORACLE ROUTE
@@ -109,9 +119,16 @@ export async function POST(request: NextRequest) {
       sessionId: sessionId,
       historyLength: recentEntries.length
     });
+
+    // Check if consciousness initialized successfully
+    if (!maiaConsciousness) {
+      console.error('❌ MAIA Consciousness not initialized - skipping to OpenAI fallback');
+      throw new Error('MAIA Consciousness initialization failed');
+    }
+
     try {
       console.log('🚀 Calling maiaConsciousness.process()...');
-      const consciousnessResponse = await maiaConsciousness.process({
+      const consciousnessResponse = await maiaConsciousness!.process({
         content: userInput,
         context: {
           userId: requestUserId,
