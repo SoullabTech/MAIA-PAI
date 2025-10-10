@@ -703,31 +703,56 @@ export class ElementalVoiceOrchestrator {
         elementalSignature: getElementalSignature(this.elementalState)
       });
 
-      // Use evolved MAIA TTS (sovereign system with elemental styling)
+      // Hybrid TTS: Try evolved sovereign TTS first, fallback to OpenAI
       const dominantElement = this.getDominantElement();
-      const response = await fetch('/api/tts/maya', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text,
-          voice: 'maya',
-          element: dominantElement.toLowerCase() // fire, water, earth, air, aether
-        })
-      });
+      let audioBlob: Blob;
 
-      if (!response.ok) {
-        throw new Error('Synthesis failed');
+      try {
+        // PRIMARY: Evolved MAIA TTS (sovereign system with elemental styling)
+        console.log('🎙️ Attempting evolved TTS with element:', dominantElement);
+        const evolvedResponse = await fetch('/api/tts/maya', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text,
+            voice: 'maya',
+            element: dominantElement.toLowerCase() // fire, water, earth, air, aether
+          })
+        });
+
+        if (evolvedResponse.ok) {
+          const data = await evolvedResponse.json();
+          if (data.success && data.audio) {
+            // Convert base64 to blob
+            const audioBytes = Uint8Array.from(atob(data.audio), c => c.charCodeAt(0));
+            audioBlob = new Blob([audioBytes], { type: 'audio/mpeg' });
+            console.log('✅ Evolved TTS synthesis successful');
+          } else {
+            throw new Error('No audio data from evolved TTS');
+          }
+        } else {
+          throw new Error(`Evolved TTS failed: ${evolvedResponse.status}`);
+        }
+      } catch (evolvedError) {
+        // FALLBACK: OpenAI TTS (reliable backup)
+        console.warn('⚠️ Evolved TTS failed, falling back to OpenAI:', evolvedError);
+        const fallbackResponse = await fetch('/api/voice/synthesize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text,
+            voice,
+            speed: elementalStyle.pacing
+          })
+        });
+
+        if (!fallbackResponse.ok) {
+          throw new Error('Both evolved TTS and OpenAI fallback failed');
+        }
+
+        audioBlob = await fallbackResponse.blob();
+        console.log('✅ OpenAI TTS fallback successful');
       }
-
-      // Get audio data (base64 from evolved TTS)
-      const data = await response.json();
-      if (!data.success || !data.audio) {
-        throw new Error('No audio data received from evolved TTS');
-      }
-
-      // Convert base64 to blob
-      const audioBytes = Uint8Array.from(atob(data.audio), c => c.charCodeAt(0));
-      const audioBlob = new Blob([audioBytes], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
 
       // Apply slowness protocol pause before speaking
@@ -820,28 +845,52 @@ export class ElementalVoiceOrchestrator {
     try {
       console.log(`💬 Quick speak (${opts?.style || 'calm'}):`, text);
 
-      // Synthesize immediately without going through Spiralogic (use evolved TTS)
+      // Hybrid TTS: Try evolved TTS first, fallback to OpenAI
       const element = opts?.style === 'bright' ? 'air' : opts?.style === 'concerned' ? 'earth' : 'aether';
-      const response = await fetch('/api/tts/maya', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text,
-          voice: 'maya',
-          element
-        })
-      });
+      let audioBlob: Blob;
 
-      if (!response.ok) throw new Error('Quick speak synthesis failed');
+      try {
+        // PRIMARY: Evolved MAIA TTS
+        const evolvedResponse = await fetch('/api/tts/maya', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text,
+            voice: 'maya',
+            element
+          })
+        });
 
-      const data = await response.json();
-      if (!data.success || !data.audio) {
-        throw new Error('Quick speak: No audio data received');
+        if (evolvedResponse.ok) {
+          const data = await evolvedResponse.json();
+          if (data.success && data.audio) {
+            const audioBytes = Uint8Array.from(atob(data.audio), c => c.charCodeAt(0));
+            audioBlob = new Blob([audioBytes], { type: 'audio/mpeg' });
+          } else {
+            throw new Error('No audio from evolved TTS');
+          }
+        } else {
+          throw new Error(`Evolved TTS failed: ${evolvedResponse.status}`);
+        }
+      } catch (evolvedError) {
+        // FALLBACK: OpenAI TTS
+        console.warn('Quick speak fallback to OpenAI:', evolvedError);
+        const fallbackResponse = await fetch('/api/voice/synthesize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text,
+            voice: this.config.voice,
+            speed: opts?.style === 'bright' ? 1.1 : opts?.style === 'concerned' ? 0.9 : 1.0
+          })
+        });
+
+        if (!fallbackResponse.ok) {
+          throw new Error('Both TTS systems failed for quick speak');
+        }
+
+        audioBlob = await fallbackResponse.blob();
       }
-
-      // Convert base64 to blob
-      const audioBytes = Uint8Array.from(atob(data.audio), c => c.charCodeAt(0));
-      const audioBlob = new Blob([audioBytes], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
 
       const audio = new Audio(audioUrl);
