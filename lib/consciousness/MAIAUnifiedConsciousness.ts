@@ -299,7 +299,7 @@ export class MAIAUnifiedConsciousness {
       tears: fieldReading.emotionalResonance?.includes('tears'),
       synchronicity: fieldReading.patterns?.includes('synchronicity'),
       unexpectedInsight: fieldReading.cognitive?.novelty > 0.7,
-      somatic Shift: fieldReading.somaticState?.coherence > 0.8
+      somaticShift: fieldReading.somaticState?.coherence > 0.8
     };
 
     const detectionScore = Object.values(markers).filter(Boolean).length;
