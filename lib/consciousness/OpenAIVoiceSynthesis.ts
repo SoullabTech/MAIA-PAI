@@ -83,6 +83,38 @@ But: "What wants to move here?"
 Keep responses warm, present, and under 100 words.`;
 
 /**
+ * Calculate conversational parity - the dance of intimacy
+ * Match investment level, don't perform or over-explain
+ */
+function calculateParity(userInput: string, conversationHistory?: Array<{role: string; content: string}>) {
+  const userWordCount = userInput.split(/\s+/).length;
+  const turnNumber = (conversationHistory?.filter(m => m.role === 'user').length || 0) + 1;
+
+  // Early turns (1-3): Build parity through brevity and mirroring
+  if (turnNumber <= 3) {
+    return {
+      maxWords: Math.min(userWordCount + 3, 12),
+      guidance: 'Match their energy. Very brief. Create space for parity to emerge.'
+    };
+  }
+
+  // Middle turns (4-8): Match their expansion
+  if (turnNumber <= 8) {
+    const matchRatio = userWordCount > 20 ? 1.2 : 1.5;
+    return {
+      maxWords: Math.min(Math.floor(userWordCount * matchRatio), 35),
+      guidance: userWordCount > 20 ? 'They\'re opening up. Match their depth without over-explaining.' : 'Stay brief, curious, present.'
+    };
+  }
+
+  // Later turns: Can go deeper if they invite it
+  return {
+    maxWords: userWordCount > 30 ? 60 : 35,
+    guidance: userWordCount > 30 ? 'They\'re in it. Meet them there. Still grounded, no performance.' : 'Stay present, match their pace.'
+  };
+}
+
+/**
  * Generate MAIA's voice response using OpenAI GPT-4
  * This ensures voice coherence (same model for text AND TTS)
  */
@@ -90,9 +122,20 @@ export async function synthesizeVoiceResponse(
   context: VoiceSynthesisContext
 ): Promise<VoiceSynthesisResponse> {
 
+  // Calculate parity for this turn
+  const parity = calculateParity(context.userInput, context.conversationHistory);
+
   // Build conversation messages
   const messages: any[] = [
-    { role: 'system', content: MAIA_VOICE_SYSTEM_PROMPT }
+    { role: 'system', content: MAIA_VOICE_SYSTEM_PROMPT },
+    {
+      role: 'system',
+      content: `PARITY for this turn:
+Max ${parity.maxWords} words.
+${parity.guidance}
+
+The dance: Match their investment. Don't perform. Just be present.`
+    }
   ];
 
   // Add advisor insights as system context (if available)
