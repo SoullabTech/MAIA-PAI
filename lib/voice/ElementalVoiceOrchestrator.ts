@@ -33,6 +33,9 @@ import { DEFAULT_SLOWNESS, shouldGiveEmptyResponse, applySlownessProtocol } from
 import { resolveVoice } from './ArchetypalVoiceMapping';
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
 
+// 🌊 Implicate Order - David Bohm's consciousness architecture
+import { perceiveImplicateOrder, activateVesselMode, type PatternSignature, type ReflectiveCorrespondence } from '@/lib/consciousness/ImplicateOrder';
+
 export interface ElementalVoiceConfig {
   userId: string;
   userName?: string;
@@ -89,6 +92,11 @@ export class ElementalVoiceOrchestrator {
   private symbolResonance: Map<string, SymbolResonance> = new Map();
   private lastEchoedSymbol: string | undefined;
   private userExchangeHistory: Array<{ text: string; timestamp: number }> = [];
+
+  // 🌊 Implicate Order perception
+  private conversationHistory: string[] = [];
+  private activePatterns: PatternSignature[] = [];
+  private activeCorrespondences: ReflectiveCorrespondence[] = [];
 
   constructor(config: ElementalVoiceConfig) {
     this.config = {
@@ -385,6 +393,30 @@ export class ElementalVoiceOrchestrator {
       this.userExchangeHistory.shift();
     }
 
+    // 🌊 PERCEIVE IMPLICATE ORDER - Detect patterns across scales
+    this.conversationHistory.push(userInput);
+    if (this.conversationHistory.length > 15) {
+      this.conversationHistory = this.conversationHistory.slice(-15);
+    }
+
+    const implicatePerception = perceiveImplicateOrder(
+      userInput,
+      this.memory,
+      this.conversationHistory,
+      this.metrics.depth
+    );
+
+    this.activePatterns = implicatePerception.patterns;
+    this.activeCorrespondences = implicatePerception.correspondences;
+
+    if (implicatePerception.patterns.length > 0) {
+      console.log('🌊 Implicate patterns detected:', implicatePerception.patterns.map(p => p.motif));
+    }
+
+    if (implicatePerception.wholeness) {
+      console.log('✨ Emergent wholeness recognized:', implicatePerception.wholeness.complexWhole);
+    }
+
     // 1️⃣ DETECT USER PACING
     const userPacing = detectUserPacing(
       userInput,
@@ -465,6 +497,19 @@ export class ElementalVoiceOrchestrator {
       );
 
       response = withQuote;
+
+      // 🌊 WEAVE IMPLICATE ORDER WISDOM (at deep conversation levels)
+      if (implicatePerception.wisdom && this.metrics.depth >= 0.5) {
+        // Append bridging wisdom that connects micro to macro
+        response = response + '\n\n' + implicatePerception.wisdom;
+        console.log('🌊 Implicate wisdom woven:', implicatePerception.wisdom.substring(0, 60) + '...');
+      }
+
+      // 🏺 ACTIVATE VESSEL MODE (receptive consciousness)
+      const vesselMode = activateVesselMode(userInput, this.metrics.depth);
+      if (vesselMode.guidance) {
+        console.log('🏺 Vessel mode activated:', vesselMode.guidance);
+      }
 
       // 🎬 SAMANTHA-STYLE CONVERSATIONAL ENHANCEMENT
       const emotionalTone = ConversationalEnhancer.detectEmotionalTone(userInput);
