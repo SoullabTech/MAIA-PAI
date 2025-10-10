@@ -8,7 +8,6 @@ import { SacredHoloflower } from './sacred/SacredHoloflower';
 import { EnhancedVoiceMicButton } from './ui/EnhancedVoiceMicButton';
 import AdaptiveVoiceMicButton from './ui/AdaptiveVoiceMicButton';
 import { detectVoiceCommand, isOnlyModeSwitch, getModeConfirmation } from '@/lib/voice/VoiceCommandDetector';
-import { QuickModeToggle } from './ui/QuickModeToggle';
 // import MaiaChatInterface from './chat/MaiaChatInterface'; // File doesn't exist
 import { EmergencyChatInterface } from './ui/EmergencyChatInterface';
 import { SimpleVoiceMic } from './ui/SimpleVoiceMic';
@@ -2267,9 +2266,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
           </label>
-
-          {/* Quick Mode Toggle - Easy mode switching */}
-          <QuickModeToggle />
 
           {/* Quick Settings - Opens comprehensive MAIA settings - GOLD HIGHLIGHT */}
           <button
