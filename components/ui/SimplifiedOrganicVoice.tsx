@@ -367,11 +367,11 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
           const hasQuestionWords = /^(what|where|when|why|how|who|can|could|would|should|is|are|do|does)/i.test(accumulated);
           const wordCount = accumulated.split(/\s+/).length;
 
-          // 🚀 IMMEDIATE SEND for complete thoughts - don't wait for silence
+          // 🚀 IMMEDIATE SEND only for COMPLETE thoughts
+          // Don't send mid-sentence - wait for natural pause
           const shouldSendImmediately =
-            (endsWithPunctuation && accumulated.length > 5) ||  // Complete sentence
-            (hasQuestionWords && wordCount >= 3) ||              // Question with at least 3 words
-            (wordCount >= 3);                                     // 3+ words (catches "not too much", "sounds good")
+            (endsWithPunctuation && accumulated.length > 5) ||  // Complete sentence with punctuation
+            (hasQuestionWords && wordCount >= 4 && endsWithPunctuation);  // Complete question
 
           if (shouldSendImmediately) {
             console.log('🚀 Complete thought detected, sending immediately:', accumulated);
