@@ -58,8 +58,20 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const handleUpdate = () => {
+    console.log('🔄 Update requested, registration:', registration);
+
     if (registration?.waiting) {
+      console.log('✅ Waiting worker found, sending SKIP_WAITING');
       registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+
+      // Listen for controlling state change
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log('🔄 Controller changed, reloading...');
+        window.location.reload();
+      });
+    } else {
+      // Fallback: just reload if no waiting worker
+      console.log('⚠️ No waiting worker, forcing reload');
       window.location.reload();
     }
   };
