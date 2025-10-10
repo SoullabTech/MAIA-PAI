@@ -669,13 +669,26 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
       // Reset accumulated transcript to prevent old text from being sent
       accumulatedTranscriptRef.current = '';
 
-      // IMMEDIATELY stop recognition while Maia speaks
+      // 🚨 NUCLEAR OPTION: Completely destroy recognition instance to clear ALL buffered events
       if (recognitionRef.current) {
         try {
-          recognitionRef.current.stop();
-          console.log('🛑 Recognition stopped for Maia');
+          const oldRecognition = recognitionRef.current;
+
+          // Remove ALL event handlers to prevent any further events from firing
+          oldRecognition.onresult = null;
+          oldRecognition.onerror = null;
+          oldRecognition.onend = null;
+          oldRecognition.onstart = null;
+
+          // Abort (not stop - abort clears buffer immediately)
+          oldRecognition.abort();
+          console.log('💥 Recognition ABORTED and destroyed for Maia');
+
+          // Nullify the reference
+          recognitionRef.current = null;
+          setIsListening(false);
         } catch (e) {
-          console.log('Recognition already stopped');
+          console.log('Recognition already destroyed');
         }
       }
 
@@ -702,31 +715,111 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
         });
       }
 
-      // Resume recognition after a longer delay to ensure audio has fully stopped
+      // 🔄 REBUILD recognition from scratch with fresh instance (clears all event buffers)
       setTimeout(() => {
-        if (recognitionRef.current && !isMayaSpeaking && !isStartingRef.current && !isListening) {
+        if (!isMayaSpeaking && !isStartingRef.current && enabled && !isMuted) {
           try {
-            // Only start if we're enabled and not muted
-            if (enabled && !isMuted) {
-              isStartingRef.current = true;
-              recognitionRef.current.start();
-              setIsListening(true);
-              console.log('✅ Voice recognition resumed after Maya finished');
-              setTimeout(() => {
-                isStartingRef.current = false;
-              }, 500);
+            // Create a completely fresh recognition instance
+            if (typeof window !== 'undefined') {
+              const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+              if (SpeechRecognition) {
+                console.log('🏗️ Building fresh recognition instance after Maia speech');
+
+                // Create new instance
+                const newRecognition = new SpeechRecognition();
+                newRecognition.continuous = true;
+                newRecognition.interimResults = true;
+                newRecognition.lang = 'en-US';
+                newRecognition.maxAlternatives = 1;
+
+                // Set up ALL event handlers on the fresh instance
+                newRecognition.onresult = (event: any) => {
+                  // 🚨 CRITICAL: Reject ALL recognition events if Maya is speaking (prevents echo)
+                  if (isPausedForMayaRef.current) {
+                    console.log('🛑 [ECHO BLOCKED] Ignoring recognition event - Maia is speaking');
+                    return;
+                  }
+
+                  if (!isConnected || !isActiveRef.current) {
+                    console.log('🛑 Not connected or inactive, skipping result');
+                    return;
+                  }
+
+                  console.log('🎤 Speech recognition event:', event);
+                  // ... (rest of onresult handler - keeping existing logic)
+                  for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const result = event.results[i];
+                    const transcript = result[0].transcript.trim();
+                    const isFinal = result.isFinal;
+
+                    console.log(`📝 Result ${i}: ${transcript} isFinal: ${isFinal}`);
+
+                    if (isFinal) {
+                      if (transcript.length > 0) {
+                        console.log('✅ Final transcript:', transcript);
+                        accumulatedTranscriptRef.current = transcript;
+                        setTranscript(transcript);
+                        onTranscript?.(transcript);
+                        setTimeout(() => {
+                          setTranscript('');
+                        }, 1000);
+                      }
+                    } else {
+                      setTranscript(transcript);
+                    }
+                  }
+                };
+
+                newRecognition.onerror = (event: any) => {
+                  console.log('❌ Speech recognition error:', event.error);
+                  if (event.error === 'no-speech') {
+                    setTranscript('');
+                  } else if (event.error !== 'aborted') {
+                    console.log('Recognition error:', event.error);
+                  }
+                };
+
+                newRecognition.onend = () => {
+                  console.log('🏁 Recognition session ended');
+                  setIsListening(false);
+                  if (enabled && !isMuted && !isPausedForMayaRef.current && isActiveRef.current) {
+                    console.log('🔄 Auto-restarting recognition...');
+                    setTimeout(() => {
+                      if (recognitionRef.current && !isStartingRef.current) {
+                        try {
+                          isStartingRef.current = true;
+                          recognitionRef.current.start();
+                          setIsListening(true);
+                          setTimeout(() => { isStartingRef.current = false; }, 500);
+                        } catch (e: any) {
+                          isStartingRef.current = false;
+                          if (!e?.message?.includes('already started')) {
+                            console.log('Could not restart:', e?.message);
+                          }
+                        }
+                      }
+                    }, 100);
+                  }
+                };
+
+                // Replace old reference with new fresh instance
+                recognitionRef.current = newRecognition;
+
+                // Start the fresh instance
+                isStartingRef.current = true;
+                newRecognition.start();
+                setIsListening(true);
+                console.log('✅ Fresh recognition started after Maia speech');
+
+                setTimeout(() => {
+                  isStartingRef.current = false;
+                }, 500);
+              }
             }
           } catch (e: any) {
             isStartingRef.current = false;
-            console.log('Could not resume recognition:', e?.message || e);
-            // If already started, that's okay - just continue
-            if (e?.message?.includes('already started')) {
-              console.log('Recognition already active, continuing...');
-              setIsListening(true);
-            }
+            console.log('Could not build fresh recognition:', e?.message || e);
           }
-        } else if (isListening) {
-          console.log('Recognition already listening, skipping resume');
         }
       }, 500);
     }

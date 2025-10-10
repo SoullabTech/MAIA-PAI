@@ -49,7 +49,7 @@ interface QuickModeToggleProps {
 }
 
 export function QuickModeToggle({ className = '' }: QuickModeToggleProps) {
-  const [currentMode, setCurrentMode] = useState<ConversationMode>('classic');
+  const [currentMode, setCurrentMode] = useState<ConversationMode>('walking'); // 🚶 DEFAULT: Walking mode
   const [showMenu, setShowMenu] = useState(false);
 
   // Load current mode from localStorage
@@ -57,6 +57,11 @@ export function QuickModeToggle({ className = '' }: QuickModeToggleProps) {
     const savedMode = localStorage.getItem('conversation_mode');
     if (savedMode && ['classic', 'walking', 'adaptive'].includes(savedMode)) {
       setCurrentMode(savedMode as ConversationMode);
+    } else {
+      // No valid mode - set Walking as default
+      setCurrentMode('walking');
+      localStorage.setItem('conversation_mode', 'walking');
+      window.dispatchEvent(new Event('conversationStyleChanged'));
     }
 
     // Listen for mode changes from other components

@@ -40,7 +40,7 @@ const CONVERSATION_MODES = [
 
 export default function SettingsPage() {
   const [selectedVoice, setSelectedVoice] = useState('nova');
-  const [selectedMode, setSelectedMode] = useState('classic');
+  const [selectedMode, setSelectedMode] = useState('walking'); // 🚶 DEFAULT: Walking Companion mode
   const router = useRouter();
 
   useEffect(() => {
@@ -50,10 +50,15 @@ export default function SettingsPage() {
       setSelectedVoice(saved);
     }
 
-    // Load saved conversation mode
+    // Load saved conversation mode (default to 'walking' if not set)
     const savedMode = localStorage.getItem('conversation_mode');
-    if (savedMode) {
+    if (savedMode && ['classic', 'walking', 'adaptive'].includes(savedMode)) {
       setSelectedMode(savedMode);
+    } else {
+      // No valid mode saved - set Walking as default
+      setSelectedMode('walking');
+      localStorage.setItem('conversation_mode', 'walking');
+      window.dispatchEvent(new Event('conversationStyleChanged'));
     }
   }, []);
 
