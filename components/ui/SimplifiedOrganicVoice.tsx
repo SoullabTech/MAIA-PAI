@@ -83,6 +83,7 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
   const analyserRef = useRef<AnalyserNode | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
   const isStartingRef = useRef<boolean>(false); // Prevent multiple starts
+  const isPausedForMayaRef = useRef<boolean>(false); // CRITICAL: Use ref to access current value in onresult closure
   const animationFrameRef = useRef<number>(0);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const accumulatedTranscriptRef = useRef<string>('');
@@ -219,8 +220,9 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
 
     recognition.onresult = (event: any) => {
       // 🚨 CRITICAL: Reject ALL recognition events if Maya is speaking (prevents echo)
-      if (isPausedForMaya) {
-        console.log('🛑 [ECHO BLOCKED] Ignoring recognition event - Maya is speaking');
+      // MUST use ref to access current value inside this closure
+      if (isPausedForMayaRef.current) {
+        console.log('🛑 [ECHO BLOCKED] Ignoring recognition event - Maia is speaking');
         return;
       }
 
@@ -652,10 +654,11 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
     // console.log('🔄 Voice state check:', { isMayaSpeaking, isListening, isPausedForMaya, enabled });
 
     if (isMayaSpeaking && !isPausedForMaya) {
-      console.log('🔇 Pausing voice - Maya speaking');
+      console.log('🔇 Pausing voice - Maia speaking');
       setIsPausedForMaya(true);
+      isPausedForMayaRef.current = true; // CRITICAL: Update ref for onresult closure
       setIsWaitingForInput(false);
-      setTranscript('🔇 Paused while Maya speaks...');
+      setTranscript('🔇 Paused while Maia speaks...');
 
       // Clear any pending silence timers
       if (silenceTimerRef.current) {
@@ -666,11 +669,11 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
       // Reset accumulated transcript to prevent old text from being sent
       accumulatedTranscriptRef.current = '';
 
-      // IMMEDIATELY stop recognition while Maya speaks
+      // IMMEDIATELY stop recognition while Maia speaks
       if (recognitionRef.current) {
         try {
           recognitionRef.current.stop();
-          console.log('🛑 Recognition stopped for Maya');
+          console.log('🛑 Recognition stopped for Maia');
         } catch (e) {
           console.log('Recognition already stopped');
         }
@@ -684,8 +687,9 @@ export const SimplifiedOrganicVoice = React.forwardRef<VoiceActivatedMaiaRef, Si
         });
       }
     } else if (!isMayaSpeaking && isPausedForMaya && enabled) {
-      console.log('🔊 Resuming voice recognition - Maya finished speaking');
+      console.log('🔊 Resuming voice recognition - Maia finished speaking');
       setIsPausedForMaya(false);
+      isPausedForMayaRef.current = false; // CRITICAL: Update ref for onresult closure
       setTranscript('');
 
       // Clear any accumulated text to prevent sending old speech
