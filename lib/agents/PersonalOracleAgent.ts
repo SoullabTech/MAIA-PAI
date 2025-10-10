@@ -710,10 +710,28 @@ That's the entire work.
 
       console.log(`💬 FINAL conversation style: ${conversationStyle}`);
 
-      // 🤖 MODEL SELECTION: Use GPT-4o for Walking mode (conversational), Claude for depth
-      const useGPT = conversationStyle === 'walking';
-      const modelName = useGPT ? 'gpt-4o' : 'claude-3-5-sonnet-20241022';
-      console.log(`🤖 Using model: ${modelName} (Walking mode needs conversational training)`);
+      // 🤖 MODEL SELECTION: Allow user to choose model, with smart defaults
+      let selectedModel = 'gpt-4o'; // Default
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        const savedModel = localStorage.getItem('ai_model');
+        if (savedModel && ['gpt-4o', 'gpt-5', 'claude'].includes(savedModel)) {
+          selectedModel = savedModel;
+          console.log(`🤖 User selected model: ${selectedModel}`);
+        }
+      }
+
+      // Map model selection to API model names
+      const modelMap: Record<string, { api: string, provider: 'openai' | 'anthropic' }> = {
+        'gpt-4o': { api: 'gpt-4o', provider: 'openai' },
+        'gpt-5': { api: 'gpt-5', provider: 'openai' }, // When released
+        'claude': { api: 'claude-3-5-sonnet-20241022', provider: 'anthropic' }
+      };
+
+      const modelConfig = modelMap[selectedModel];
+      const useGPT = modelConfig.provider === 'openai';
+      const modelName = modelConfig.api;
+
+      console.log(`🤖 Using ${modelConfig.provider.toUpperCase()}: ${modelName}`);
 
       // Add their actual words if journal entries available
       if (journalEntries.length > 0) {
