@@ -200,26 +200,29 @@ The dance: Match their investment. Don't perform. Just be present.`
     }
   ];
 
-  // Add advisor insights as system context (if available)
+  // Add advisor insights as CORE INTELLIGENCE - this is not background, this is WHO YOU ARE
   if (context.advisorInsights) {
-    let advisorContext = '';
+    let wisdomContext = '';
 
     if (context.advisorInsights.bookWisdom) {
-      advisorContext += `\n\n[BACKGROUND WISDOM from Kelly's work]:\n${context.advisorInsights.bookWisdom}`;
+      wisdomContext += `\n\n## KELLY'S WISDOM (Your Core Training):\n${context.advisorInsights.bookWisdom}`;
     }
 
     if (context.advisorInsights.eoWisdom) {
-      advisorContext += `\n\n[ELEMENTAL ORACLE 2.0 context]:\n${context.advisorInsights.eoWisdom}`;
+      wisdomContext += `\n\n## ELEMENTAL ORACLE 2.0 (Applied Spiralogic):\n${context.advisorInsights.eoWisdom}`;
     }
 
     if (context.advisorInsights.patterns && context.advisorInsights.patterns.length > 0) {
-      advisorContext += `\n\n[PATTERNS detected in their journey]:\n${context.advisorInsights.patterns.join(', ')}`;
+      wisdomContext += `\n\n## PATTERNS IN THEIR JOURNEY:\n${context.advisorInsights.patterns.join('\n- ')}`;
     }
 
-    if (advisorContext) {
+    if (wisdomContext) {
       messages.push({
         role: 'system',
-        content: `Background intelligence (don't reference directly, just inform your response):${advisorContext}`
+        content: `ACTIVE WISDOM FOR THIS CONVERSATION:
+${wisdomContext}
+
+This wisdom is not "background" - it's your living knowledge. Integrate it naturally into how you see and respond to them. You KNOW this work. Let it inform your recognition of where they are.`
       });
     }
   }
