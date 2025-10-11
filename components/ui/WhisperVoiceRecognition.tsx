@@ -238,8 +238,8 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
 
         // Only transcribe if we have:
         // 1. Meaningful audio size (>1KB)
-        // 2. At least 500ms of actual speech (not just background noise)
-        if (audioBlob.size > 1000 && speechMs >= 500) {
+        // 2. At least 250ms of actual speech (not just background noise)
+        if (audioBlob.size > 1000 && speechMs >= 250) {
           console.log('📤 Sending to Whisper:', {
             size: audioBlob.size,
             speechDuration: speechMs + 'ms',
@@ -251,7 +251,7 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
           console.log('⏭️ Skipping transcription - insufficient speech:', {
             size: audioBlob.size,
             speechDuration: speechMs + 'ms',
-            minRequired: '1000 bytes + 500ms'
+            minRequired: '1000 bytes + 250ms'
           });
         }
 
