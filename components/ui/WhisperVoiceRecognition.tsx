@@ -224,12 +224,35 @@ export function WhisperVoiceRecognition({
   }, [enabled, isMuted, isMayaSpeaking, onAudioLevelChange, transcribeAudio]);
 
   /**
-   * Stop recording
+   * Pause recording (when MAIA is speaking)
    */
-  const stopRecording = useCallback(() => {
-    console.log('🛑 Stopping Whisper recording...');
+  const pauseRecording = useCallback(() => {
+    console.log('⏸️ Pausing Whisper recording (MAIA speaking)...');
 
     if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.pause();
+    }
+  }, []);
+
+  /**
+   * Resume recording (when MAIA finishes speaking)
+   */
+  const resumeRecording = useCallback(() => {
+    console.log('▶️ Resuming Whisper recording (MAIA finished)...');
+
+    if (mediaRecorderRef.current?.state === 'paused') {
+      mediaRecorderRef.current.resume();
+      lastSpeechTimeRef.current = Date.now(); // Reset silence timer
+    }
+  }, []);
+
+  /**
+   * Stop recording completely (cleanup)
+   */
+  const stopRecording = useCallback(() => {
+    console.log('🛑 Stopping Whisper recording completely...');
+
+    if (mediaRecorderRef.current?.state === 'recording' || mediaRecorderRef.current?.state === 'paused') {
       mediaRecorderRef.current.stop();
     }
 
@@ -257,17 +280,29 @@ export function WhisperVoiceRecognition({
   }, []);
 
   /**
-   * Effect: Start/stop based on props
+   * Effect: Start/stop/pause based on props
    */
   useEffect(() => {
-    const shouldBeListening = enabled && !isMuted && !isMayaSpeaking;
-
-    if (shouldBeListening && !isListening) {
+    // Start recording if enabled and not already listening
+    if (enabled && !isMuted && !isListening) {
       startRecording();
-    } else if (!shouldBeListening && isListening) {
+      return;
+    }
+
+    // Handle MAIA speaking state changes
+    if (isListening) {
+      if (isMayaSpeaking) {
+        pauseRecording();
+      } else {
+        resumeRecording();
+      }
+    }
+
+    // Stop completely if disabled or muted
+    if ((!enabled || isMuted) && isListening) {
       stopRecording();
     }
-  }, [enabled, isMuted, isMayaSpeaking, isListening, startRecording, stopRecording]);
+  }, [enabled, isMuted, isMayaSpeaking, isListening, startRecording, pauseRecording, resumeRecording, stopRecording]);
 
   /**
    * Cleanup on unmount
