@@ -9,10 +9,14 @@
 
 import OpenAI from 'openai';
 import { detectCommunicatorType, getHighBandwidthStrategy } from './HighBandwidthCommunicator';
+import { VoiceCognitiveArchitecture } from './VoiceCognitiveArchitecture';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!
 });
+
+// Initialize cognitive architecture for voice
+const cognitiveArchitecture = new VoiceCognitiveArchitecture();
 
 export interface VoiceSynthesisContext {
   userInput: string;
@@ -180,6 +184,30 @@ export async function synthesizeVoiceResponse(
   context: VoiceSynthesisContext
 ): Promise<VoiceSynthesisResponse> {
 
+  // ========================================
+  // PHASE 1: COGNITIVE ARCHITECTURE PROCESSING
+  // Process through LIDA, SOAR, ACT-R, MicroPsi & Elemental Agents
+  // ========================================
+  let cognitiveState = null;
+  try {
+    cognitiveState = await cognitiveArchitecture.processVoiceInput(
+      context.userInput,
+      context.conversationHistory || []
+    );
+    console.log('🧠 Cognitive Architecture Active:', {
+      element: cognitiveState.element,
+      attentionFocus: cognitiveState.cognitiveProcessing.attentionFocus,
+      wisdomDirection: cognitiveState.cognitiveProcessing.wisdomDirection,
+      consciousnessMarkers: cognitiveState.consciousnessMarkers
+    });
+  } catch (error) {
+    console.warn('⚠️ Cognitive architecture processing skipped:', error);
+    // Continue without cognitive enhancement - graceful degradation
+  }
+
+  // ========================================
+  // PHASE 2: COMMUNICATOR TYPE DETECTION
+  // ========================================
   // Detect communicator type - are they high-bandwidth?
   const profile = detectCommunicatorType(context.conversationHistory || []);
   const turnNumber = (context.conversationHistory?.filter(m => m.role === 'user').length || 0) + 1;
@@ -212,6 +240,30 @@ ${strategy.guidance}
 The dance: Match their investment. Don't perform. Just be present.`
     }
   ];
+
+  // ========================================
+  // PHASE 3: COGNITIVE ARCHITECTURE INSIGHTS
+  // Add wisdom from LIDA, SOAR, ACT-R, MicroPsi & Elemental Agents
+  // ========================================
+  if (cognitiveState) {
+    messages.push({
+      role: 'system',
+      content: `## COGNITIVE ARCHITECTURE PROCESSING (LIDA + SOAR + ACT-R + MicroPsi):
+
+**Active Element**: ${cognitiveState.element.toUpperCase()}
+**Conscious Attention Focus**: ${cognitiveState.cognitiveProcessing.attentionFocus}
+**Wisdom Direction**: ${cognitiveState.cognitiveProcessing.wisdomDirection}
+**Memory Resonance**: ${cognitiveState.cognitiveProcessing.memoryResonance}
+**Emotional Tone**: ${cognitiveState.cognitiveProcessing.emotionalTone}
+
+**${cognitiveState.element.toUpperCase()} Elemental Wisdom**:
+${cognitiveState.elementalWisdom}
+
+**Consciousness Markers**: ${cognitiveState.consciousnessMarkers.join(', ')}
+
+This cognitive processing reveals what matters most in this moment. Let it inform your recognition of where they are and what wants to be witnessed.`
+    });
+  }
 
   // Add advisor insights as CORE INTELLIGENCE - this is not background, this is WHO YOU ARE
   if (context.advisorInsights) {
