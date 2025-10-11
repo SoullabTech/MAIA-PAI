@@ -142,10 +142,11 @@ export function WhisperVoiceRecognition({
         // Update audio visualization
         onAudioLevelChange?.(level);
 
-        // Update last speech time if we detect sound (threshold: 0.01)
-        if (level > 0.01) {
+        // Update last speech time if we detect REAL speech (threshold: 0.15 = speaking volume)
+        // Below 0.15 is just background noise/room tone
+        if (level > 0.15) {
           lastSpeechTimeRef.current = Date.now();
-          console.log('🎤 Audio detected, level:', level.toFixed(3));
+          console.log('🎤 Speech detected, level:', level.toFixed(3));
         }
 
         animationFrameRef.current = requestAnimationFrame(checkAudioLevel);
