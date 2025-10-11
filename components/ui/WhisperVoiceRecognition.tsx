@@ -43,6 +43,10 @@ export function WhisperVoiceRecognition({
   const silenceCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const isProcessingRef = useRef<boolean>(false);
 
+  // Track total speech duration (only count time above threshold)
+  const speechDurationRef = useRef<number>(0);
+  const lastSpeechCheckRef = useRef<number>(0);
+
 
   /**
    * Send audio to Whisper for transcription
@@ -145,8 +149,19 @@ export function WhisperVoiceRecognition({
         // Update last speech time if we detect REAL speech (threshold: 0.15 = speaking volume)
         // Below 0.15 is just background noise/room tone
         if (level > 0.15) {
-          lastSpeechTimeRef.current = Date.now();
-          console.log('🎤 Speech detected, level:', level.toFixed(3));
+          const now = Date.now();
+
+          // Track accumulated speech duration
+          if (lastSpeechCheckRef.current > 0) {
+            const timeSinceLastCheck = now - lastSpeechCheckRef.current;
+            speechDurationRef.current += timeSinceLastCheck;
+          }
+
+          lastSpeechTimeRef.current = now;
+          lastSpeechCheckRef.current = now;
+          console.log('🎤 Speech detected, level:', level.toFixed(3), 'total:', speechDurationRef.current + 'ms');
+        } else {
+          lastSpeechCheckRef.current = 0; // Reset check when no speech
         }
 
         animationFrameRef.current = requestAnimationFrame(checkAudioLevel);
@@ -173,22 +188,35 @@ export function WhisperVoiceRecognition({
       mediaRecorder.onstop = () => {
         console.log('⏹️ Recording stopped');
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const speechMs = speechDurationRef.current;
 
-        // Only transcribe if we have meaningful audio (>1KB)
-        if (audioBlob.size > 1000) {
-          console.log('📤 Sending to Whisper, size:', audioBlob.size);
+        console.log('📊 Speech stats:', {
+          blobSize: audioBlob.size,
+          speechDuration: speechMs + 'ms'
+        });
+
+        // Only transcribe if we have:
+        // 1. Meaningful audio size (>1KB)
+        // 2. At least 500ms of actual speech (not just background noise)
+        if (audioBlob.size > 1000 && speechMs >= 500) {
+          console.log('📤 Sending to Whisper, size:', audioBlob.size, 'speech:', speechMs + 'ms');
           transcribeAudio(audioBlob);
         } else {
-          console.log('⏭️ Audio too small, skipping transcription');
+          console.log('⏭️ Skipping transcription - insufficient speech (size:', audioBlob.size, 'speech:', speechMs + 'ms)');
         }
 
+        // Reset for next recording
         audioChunksRef.current = [];
+        speechDurationRef.current = 0;
+        lastSpeechCheckRef.current = 0;
       };
 
       // Start recording
       mediaRecorder.start(1000); // Collect 1-second chunks
       setIsListening(true);
       lastSpeechTimeRef.current = Date.now();
+      speechDurationRef.current = 0;
+      lastSpeechCheckRef.current = 0;
 
       console.log('✅ Recording started');
 
@@ -243,6 +271,8 @@ export function WhisperVoiceRecognition({
     if (mediaRecorderRef.current?.state === 'paused') {
       mediaRecorderRef.current.resume();
       lastSpeechTimeRef.current = Date.now(); // Reset silence timer
+      speechDurationRef.current = 0; // Reset speech duration for new phrase
+      lastSpeechCheckRef.current = 0;
     }
   }, []);
 
