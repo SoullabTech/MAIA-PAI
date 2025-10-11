@@ -10,7 +10,7 @@
 
 'use client';
 
-import { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useRef, useState, useCallback, useEffect, useImperativeHandle, forwardRef } from 'react';
 
 interface WhisperVoiceProps {
   enabled: boolean;
@@ -20,16 +20,28 @@ interface WhisperVoiceProps {
   onAudioLevelChange?: (level: number) => void;
 }
 
-export function WhisperVoiceRecognition({
+export interface VoiceActivatedMaiaRef {
+  isListening: boolean;
+  audioLevel: number;
+}
+
+export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, WhisperVoiceProps>(({
   enabled,
   isMuted,
   isMayaSpeaking,
   onTranscript,
   onAudioLevelChange
-}: WhisperVoiceProps) {
+}, ref) => {
 
   const [isListening, setIsListening] = useState(false);
+  const [audioLevel, setAudioLevel] = useState(0);
   const [transcript, setTranscript] = useState('');
+
+  // Expose ref interface for parent component
+  useImperativeHandle(ref, () => ({
+    isListening,
+    audioLevel
+  }), [isListening, audioLevel]);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -170,6 +182,7 @@ export function WhisperVoiceRecognition({
         const level = average / 255;
 
         // Update audio visualization
+        setAudioLevel(level);
         onAudioLevelChange?.(level);
 
         // Update last speech time if we detect REAL speech (threshold: 0.25 = speaking volume)
@@ -389,4 +402,6 @@ export function WhisperVoiceRecognition({
       )}
     </div>
   );
-}
+});
+
+WhisperVoiceRecognition.displayName = 'WhisperVoiceRecognition';

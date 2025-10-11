@@ -918,35 +918,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       return;
     }
 
-    // 🚫 GHOST TRANSCRIPT DETECTION - Block YouTube/video outros and common false transcriptions
-    const ghostPatterns = [
-      /thank you for watching/i,
-      /thanks for watching/i,
-      /see you (in )?the next video/i,
-      /today'?s video ends here/i,
-      /click the (link|thumbnail)/i,
-      /free gift/i,
-      /happy holidays/i,
-      /bye bye bye/i,
-      /subscribe and like/i,
-      /don'?t forget to (like|subscribe)/i,
-      /hit the bell/i,
-      /notification bell/i,
-      /george.*video/i,
-      /video.*george/i,
-      /enjoy (your|our) meal/i,
-      /happy (eating|microwaving)/i,
-      /^\s*thank you\s*$/i,
-      /^\s*bye\s*$/i
-    ];
-
-    const isGhostTranscript = ghostPatterns.some(pattern => pattern.test(t));
-    if (isGhostTranscript) {
-      console.error('👻 GHOST TRANSCRIPT DETECTED AND BLOCKED:', t);
-      console.error('🔍 This transcript was NOT spoken by the user - likely system audio leaking into microphone');
-      return;
-    }
-
     // 🎤 VOICE COMMAND DETECTION - Check for mode switching commands
     const commandResult = detectVoiceCommand(t);
     if (commandResult.detected && commandResult.mode) {
@@ -2377,6 +2348,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {voiceEnabled && !showChatInterface && (
         <div className="hidden">
           <WhisperVoiceRecognition
+            ref={voiceMicRef}
             onTranscript={handleVoiceTranscript}
             enabled={!isMuted}
             isMuted={isMuted}

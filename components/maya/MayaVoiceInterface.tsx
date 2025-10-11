@@ -56,7 +56,7 @@ export default function MayaVoiceInterface() {
     <div className="flex flex-col h-screen bg-gradient-to-br from-gray-900 via-amber-900/20 to-gray-900">
       {/* Background Pattern */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.02]">
-        <svg viewBox="0 0 1000 1000" className="w-full h-full">
+        <svg viewBox="0 0 1000 1000" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
           <circle cx="500" cy="500" r="400" fill="none" stroke="#F6AD55" strokeWidth="0.5" strokeDasharray="4 4" />
           <circle cx="500" cy="500" r="300" fill="none" stroke="#F6AD55" strokeWidth="0.5" strokeDasharray="2 6" />
           <circle cx="500" cy="500" r="200" fill="none" stroke="#F6AD55" strokeWidth="0.5" />
