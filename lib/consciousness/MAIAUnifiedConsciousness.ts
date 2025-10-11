@@ -516,7 +516,9 @@ export class MAIAUnifiedConsciousness {
 
     const agent = new PersonalOracleAgent(
       context.input.context.userId,
-      {} // settings
+      {
+        conversationStyle: context.input.context.preferences?.conversationStyle || 'classic'
+      } // settings with conversation style from preferences
     );
 
     const response = await agent.processInteraction(
