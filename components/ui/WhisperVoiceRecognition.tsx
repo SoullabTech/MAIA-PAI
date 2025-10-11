@@ -146,9 +146,9 @@ export function WhisperVoiceRecognition({
         // Update audio visualization
         onAudioLevelChange?.(level);
 
-        // Update last speech time if we detect REAL speech (threshold: 0.15 = speaking volume)
-        // Below 0.15 is just background noise/room tone
-        if (level > 0.15) {
+        // Update last speech time if we detect REAL speech (threshold: 0.25 = speaking volume)
+        // Below 0.25 is just background noise/room tone/fan/electrical hum
+        if (level > 0.25) {
           const now = Date.now();
 
           // Track accumulated speech duration
