@@ -958,6 +958,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       transcript = textToProcess;
     }
 
+    // FILTER: Ignore empty or punctuation-only transcripts
+    const meaningfulText = transcript.replace(/[.,!?;:\s]+/g, '');
+    if (meaningfulText.length === 0) {
+      console.log('⚠️ Ignoring empty/punctuation-only transcript:', transcript);
+      return;
+    }
+
     // ECHO SUPPRESSION: Check if we're in cooldown period
     const now = Date.now();
     if (now < echoSuppressUntil) {
@@ -966,10 +973,21 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       return;
     }
 
-    // ECHO SUPPRESSION: Check if transcript matches MAIA's last response
-    if (lastMaiaResponseRef.current && transcript.includes(lastMaiaResponseRef.current.substring(0, 50))) {
-      console.warn('[Echo Suppressed] Transcript matches MAIA\'s recent response');
-      return;
+    // ECHO SUPPRESSION: Check if transcript is MAIA's voice being picked up by mic
+    // Only suppress if the transcript is a near-exact match of MAIA's recent words
+    if (lastMaiaResponseRef.current) {
+      const maiaWords = lastMaiaResponseRef.current.toLowerCase().trim();
+      const transcriptWords = transcript.toLowerCase().trim();
+
+      // Check similarity - transcript must be 80%+ match of MAIA's response
+      const similarity = transcriptWords.length > 0
+        ? (maiaWords.includes(transcriptWords) || transcriptWords.includes(maiaWords.substring(0, transcriptWords.length)))
+        : false;
+
+      if (similarity && transcriptWords.length > 10) {
+        console.warn('[Echo Suppressed] Transcript appears to be MAIA\'s voice:', transcriptWords.substring(0, 50));
+        return;
+      }
     }
 
     // Prevent duplicate processing if already handling a message
