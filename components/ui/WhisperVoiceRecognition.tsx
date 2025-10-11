@@ -114,15 +114,41 @@ export function WhisperVoiceRecognition({
     try {
       console.log('🎙️ Starting Whisper voice recording...');
 
+      // DIAGNOSTIC: List all available audio input devices
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const audioInputs = devices.filter(d => d.kind === 'audioinput');
+      console.log('🎧 Available audio input devices:', audioInputs.map(d => ({
+        id: d.deviceId,
+        label: d.label,
+        groupId: d.groupId
+      })));
+
+      // Request ONLY microphone input - block system audio routing
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: true
-        }
+          autoGainControl: true,
+          // Advanced constraints to ensure we get REAL microphone, not virtual/system audio
+          suppressLocalAudioPlayback: true  // Don't capture browser audio playback
+        },
+        video: false  // Explicitly no video
       });
 
       streamRef.current = stream;
+
+      // DIAGNOSTIC: Log which audio input is actually being used
+      const audioTrack = stream.getAudioTracks()[0];
+      const settings = audioTrack.getSettings();
+      console.log('🎤 ACTIVE AUDIO INPUT:', {
+        label: audioTrack.label,
+        deviceId: settings.deviceId,
+        echoCancellation: settings.echoCancellation,
+        noiseSuppression: settings.noiseSuppression,
+        autoGainControl: settings.autoGainControl,
+        sampleRate: settings.sampleRate,
+        channelCount: settings.channelCount
+      });
 
       // Initialize visualization AND silence detection
       const audioContext = new AudioContext();
@@ -192,17 +218,28 @@ export function WhisperVoiceRecognition({
 
         console.log('📊 Speech stats:', {
           blobSize: audioBlob.size,
-          speechDuration: speechMs + 'ms'
+          speechDuration: speechMs + 'ms',
+          chunks: audioChunksRef.current.length,
+          activeInput: streamRef.current?.getAudioTracks()[0]?.label || 'unknown'
         });
 
         // Only transcribe if we have:
         // 1. Meaningful audio size (>1KB)
         // 2. At least 500ms of actual speech (not just background noise)
         if (audioBlob.size > 1000 && speechMs >= 500) {
-          console.log('📤 Sending to Whisper, size:', audioBlob.size, 'speech:', speechMs + 'ms');
+          console.log('📤 Sending to Whisper:', {
+            size: audioBlob.size,
+            speechDuration: speechMs + 'ms',
+            inputDevice: streamRef.current?.getAudioTracks()[0]?.label,
+            timestamp: new Date().toISOString()
+          });
           transcribeAudio(audioBlob);
         } else {
-          console.log('⏭️ Skipping transcription - insufficient speech (size:', audioBlob.size, 'speech:', speechMs + 'ms)');
+          console.log('⏭️ Skipping transcription - insufficient speech:', {
+            size: audioBlob.size,
+            speechDuration: speechMs + 'ms',
+            minRequired: '1000 bytes + 500ms'
+          });
         }
 
         // Reset for next recording
