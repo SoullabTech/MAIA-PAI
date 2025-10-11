@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, Mic, FileText, Link, MessageCircle, ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent';
+import { generateUUID } from '@/lib/utils/uuid';
 
 interface InitiationPhase {
   id: string;
@@ -49,8 +50,12 @@ export function MayaInitiation() {
 
   const initializeMaya = async () => {
     setIsProcessing(true);
-    // Initialize Maya with calibrated settings
-    const userId = localStorage.getItem('user_id') || `user_${Date.now()}`;
+    // Initialize Maya with calibrated settings - use proper UUID for Supabase
+    let userId = localStorage.getItem('user_id');
+    if (!userId) {
+      userId = generateUUID();
+      localStorage.setItem('user_id', userId);
+    }
     const agent = await PersonalOracleAgent.loadAgent(userId);
     
     // Apply calibration

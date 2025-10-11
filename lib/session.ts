@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
+import { randomUUID } from 'crypto';
 
 export interface Session {
   id: string;
@@ -20,10 +21,10 @@ export async function getSession(request: NextRequest): Promise<Session> {
     }
   }
 
-  // Create new session
+  // Create new session with proper UUIDs for Supabase compatibility
   const session: Session = {
-    id: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    userId: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: randomUUID(),
+    userId: randomUUID(),
     createdAt: Date.now(),
     lastActivity: Date.now()
   };
