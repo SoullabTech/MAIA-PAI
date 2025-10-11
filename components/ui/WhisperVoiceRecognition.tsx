@@ -236,9 +236,11 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
           activeInput: streamRef.current?.getAudioTracks()[0]?.label || 'unknown'
         });
 
-        // Only transcribe if we have meaningful audio size (>1KB)
-        // Let Whisper handle silence detection - it's better at it than our threshold
-        if (audioBlob.size > 1000) {
+        // Only transcribe if we have:
+        // 1. Meaningful audio size (>1KB)
+        // 2. At least SOME speech detected (speechMs > 0)
+        // This prevents Whisper from hallucinating transcripts from pure silence
+        if (audioBlob.size > 1000 && speechMs > 0) {
           console.log('📤 Sending to Whisper:', {
             size: audioBlob.size,
             speechDuration: speechMs + 'ms',
@@ -247,9 +249,10 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
           });
           transcribeAudio(audioBlob);
         } else {
-          console.log('⏭️ Skipping transcription - audio too small:', {
+          console.log('⏭️ Skipping transcription - no speech detected:', {
             size: audioBlob.size,
-            minRequired: '1000 bytes'
+            speechDuration: speechMs + 'ms',
+            reason: audioBlob.size <= 1000 ? 'audio too small' : 'no speech energy detected'
           });
         }
 
