@@ -1644,24 +1644,24 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                {/* Multiple amber plasma field layers with slow, thick fluidity */}
+                {/* Multiple amber plasma field layers with slow, thick fluidity - emanate far */}
                 {[...Array(3)].map((_, i) => (
                   <motion.div
                     key={`voice-field-${i}`}
                     className="absolute rounded-full"
                     style={{
-                      width: `${220 + i * 100}px`,
-                      height: `${220 + i * 100}px`,
+                      width: `${300 + i * 150}px`,
+                      height: `${300 + i * 150}px`,
                       background: i === 0
-                        ? 'radial-gradient(circle, rgba(251, 191, 36, 0.2) 0%, rgba(251, 191, 36, 0.06) 50%, transparent 100%)'
+                        ? 'radial-gradient(circle, rgba(251, 191, 36, 0.25) 0%, rgba(251, 191, 36, 0.08) 50%, transparent 100%)'
                         : i === 1
-                        ? 'radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.04) 50%, transparent 100%)'
-                        : 'radial-gradient(circle, rgba(217, 119, 6, 0.1) 0%, rgba(217, 119, 6, 0.02) 50%, transparent 100%)',
-                      filter: `blur(${16 + i * 6}px)`,
+                        ? 'radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.05) 50%, transparent 100%)'
+                        : 'radial-gradient(circle, rgba(217, 119, 6, 0.12) 0%, rgba(217, 119, 6, 0.03) 50%, transparent 100%)',
+                      filter: `blur(${20 + i * 8}px)`,
                     }}
                     animate={{
-                      scale: [1, 1.05, 1],
-                      opacity: [0.5 - i * 0.1, 0.3, 0.5 - i * 0.1],
+                      scale: [1, 1.06, 1],
+                      opacity: [0.6 - i * 0.12, 0.35, 0.6 - i * 0.12],
                     }}
                     transition={{
                       duration: 8 + i * 3,
@@ -1677,14 +1677,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                   <motion.div
                     className="absolute rounded-full"
                     style={{
-                      width: '200px',
-                      height: '200px',
-                      background: 'radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.08) 60%, transparent 100%)',
-                      filter: 'blur(14px)',
+                      width: '280px',
+                      height: '280px',
+                      background: 'radial-gradient(circle, rgba(251, 191, 36, 0.35) 0%, rgba(251, 191, 36, 0.1) 60%, transparent 100%)',
+                      filter: 'blur(18px)',
                     }}
                     animate={{
-                      scale: 1 + voiceAudioLevel * 0.15,
-                      opacity: 0.4 + voiceAudioLevel * 0.15,
+                      scale: 1 + voiceAudioLevel * 0.2,
+                      opacity: 0.5 + voiceAudioLevel * 0.2,
                     }}
                     transition={{
                       duration: 0.3,
