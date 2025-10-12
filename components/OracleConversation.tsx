@@ -1470,8 +1470,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             }, 200);
           }
         }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+        transition={{ duration: 0.15 }}
       >
         {/* Holoflower container - smaller, upper-left, visible but not dominating */}
         <div className="flex items-center justify-center"
@@ -1858,7 +1858,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* Message flow - Star Wars crawl: text flows from beneath holoflower */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
-        <div className={`fixed top-44 sm:top-48 md:top-44 lg:top-40 z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
+        <div className={`fixed top-52 sm:top-56 md:top-52 lg:top-48 z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
           showChatInterface
             ? 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[600px] lg:w-[680px] xl:w-[720px] opacity-100'
             : 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[520px] lg:w-[560px] opacity-70'
