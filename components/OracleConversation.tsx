@@ -121,11 +121,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     const updateSize = () => {
       const width = window.innerWidth;
       if (width < 640) {
-        setHoloflowerSize(Math.min(width - 64, 350)); // Mobile
+        // Mobile: Smaller, more ambient (250-300px instead of 350)
+        setHoloflowerSize(Math.min(width - 100, 280));
       } else if (width < 1024) {
-        setHoloflowerSize(400); // Tablet
+        // Tablet: Medium ambient size
+        setHoloflowerSize(350);
       } else {
-        setHoloflowerSize(500); // Desktop
+        // Desktop: Comfortable left-side presence
+        setHoloflowerSize(450);
       }
     };
 
@@ -1375,10 +1378,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Beautiful Sacred Holoflower - Responsive sizing - Always show */}
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
-        {/* Centered holoflower container */}
-        <div className="flex items-center justify-center"
+      {/* Beautiful Sacred Holoflower - REDESIGNED: Ambient presence, not dominant */}
+      <div className="fixed inset-0 flex items-center md:items-center justify-center md:justify-start pointer-events-none">
+        {/* Holoflower container - smaller/offset on mobile, left-positioned on desktop */}
+        <div className="flex items-center justify-center md:ml-[10%] lg:ml-[15%]"
              style={{
                width: holoflowerSize,
                height: holoflowerSize,
@@ -1403,10 +1406,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
           {/* Central Holoflower Logo with Glow and Sparkles */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            {/* Radiant glow behind the holoflower - ENHANCED - Dimmed in chat mode */}
+            {/* Radiant glow behind the holoflower - ENHANCED - Very subtle on mobile with messages */}
             <motion.div
               className={`absolute flex items-center justify-center pointer-events-none ${
-                showChatInterface ? 'opacity-20 md:opacity-60' : 'opacity-40 md:opacity-100'
+                showChatInterface || messages.length > 0
+                  ? 'opacity-15 md:opacity-50'  // Subtle when text present
+                  : 'opacity-30 md:opacity-80'  // More present when just listening
               }`}
               animate={{
                 scale: [1, 1.4, 1],
@@ -1454,13 +1459,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               />
             </motion.div>
 
-            {/* Holoflower Image - Dimmed in chat mode - NON-INTERACTIVE */}
+            {/* Holoflower Image - Ambient presence, text takes priority */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <img
                 src="/holoflower.svg"
                 alt="Holoflower"
                 className={`w-32 h-32 object-contain ${
-                  showChatInterface ? 'opacity-30 md:opacity-60' : 'opacity-60 md:opacity-100'
+                  showChatInterface || messages.length > 0
+                    ? 'opacity-25 md:opacity-55'  // Ambient when conversing
+                    : 'opacity-50 md:opacity-90'  // Present when listening
                 }`}
                 style={{
                   filter: showChatInterface
@@ -1888,12 +1895,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </motion.button>
       </div>
 
-      {/* Message flow - Show in both Chat mode and optionally in Voice mode */}
+      {/* Message flow - REDESIGNED: Full-width mobile, right panel desktop */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
         <div className={`fixed top-20 sm:top-16 z-30 transition-all duration-500 ${
           showChatInterface
-            ? 'inset-x-4 sm:right-8 sm:left-auto sm:w-96 opacity-100'
-            : 'inset-x-4 sm:right-8 sm:left-auto sm:w-80 opacity-60'
+            ? 'inset-x-2 sm:inset-x-4 md:right-8 md:left-auto md:w-[600px] lg:w-[700px] opacity-100'
+            : 'inset-x-2 sm:inset-x-4 md:right-8 md:left-auto md:w-[500px] opacity-70'
         }`}
              style={{
                height: showChatInterface
