@@ -79,12 +79,11 @@ export function useMaiaVoice() {
   const speak = useCallback(async (text: string, context?: any): Promise<void> => {
     console.log('🔊 [useMaiaVoice.speak] Called with:', {
       hasVoiceRef: !!maiaVoiceRef.current,
-      isReady,
       textLength: text?.length
     });
 
-    if (!maiaVoiceRef.current || !isReady) {
-      console.warn('⚠️  [useMaiaVoice.speak] Early return - voice not ready');
+    if (!maiaVoiceRef.current) {
+      console.warn('⚠️  [useMaiaVoice.speak] Early return - voice system not initialized');
       return;
     }
 
@@ -95,7 +94,7 @@ export function useMaiaVoice() {
     } catch (error) {
       console.error('❌ [useMaiaVoice.speak] Failed:', error);
     }
-  }, [isReady]);
+  }, []);
 
   const playGreeting = useCallback(async (): Promise<void> => {
     if (!maiaVoiceRef.current || !isReady) return;
