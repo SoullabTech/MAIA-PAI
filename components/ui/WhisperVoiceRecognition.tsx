@@ -11,6 +11,7 @@
 'use client';
 
 import React, { useRef, useState, useCallback, useEffect, useImperativeHandle, forwardRef } from 'react';
+import { voiceLock } from '@/lib/services/VoiceLock';
 
 interface WhisperVoiceProps {
   enabled: boolean;
@@ -59,8 +60,6 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
   const speechDurationRef = useRef<number>(0);
   const lastSpeechCheckRef = useRef<number>(0);
 
-  // Track if we stopped because MAIA is speaking (don't transcribe this chunk)
-  const stoppedForMaiaRef = useRef<boolean>(false);
 
 
   /**
@@ -131,6 +130,12 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
    * Send audio to Whisper for transcription
    */
   const transcribeAudio = useCallback(async (audioBlob: Blob) => {
+    // 🔒 Check VoiceLock FIRST - don't process if MAIA is speaking
+    if (voiceLock.isLocked) {
+      console.log('🔒 Skipping transcription - VoiceLock active:', voiceLock.isLocked);
+      return;
+    }
+
     if (isProcessingRef.current) {
       console.log('⏸️ Already processing, skipping this chunk');
       return;
@@ -199,6 +204,13 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
       const text = data.text?.trim();
 
       console.log('✅ Whisper transcript:', text);
+
+      // 🔒 Double-check VoiceLock before using transcript
+      // (Lock could have activated during transcription)
+      if (voiceLock.isLocked) {
+        console.log('🔒 Discarding transcript - VoiceLock activated during processing');
+        return;
+      }
 
       if (text && text.length > 0) {
         setTranscript(text);
@@ -319,17 +331,6 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
       // When recording stops, send to Whisper
       mediaRecorder.onstop = () => {
         console.log('⏹️ Recording stopped');
-
-        // If we stopped because MAIA is speaking, don't transcribe - just discard
-        if (stoppedForMaiaRef.current) {
-          console.log('🚫 Skipping transcription - stopped for MAIA speaking');
-          audioChunksRef.current = [];
-          speechDurationRef.current = 0;
-          lastSpeechCheckRef.current = 0;
-          stoppedForMaiaRef.current = false;
-          return; // DON'T transcribe this chunk
-        }
-
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         const speechMs = speechDurationRef.current;
 
@@ -413,44 +414,38 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
 
   /**
    * Pause recording (when MAIA is speaking)
-   * STOP completely instead of pause - pause() still records audio!
+   * VoiceLock ensures this is called at the right time
    */
   const pauseRecording = useCallback(() => {
-    console.log('🛑 STOPPING Whisper recording (MAIA speaking)...', {
-      currentState: mediaRecorderRef.current?.state,
-      willStop: mediaRecorderRef.current?.state === 'recording'
+    console.log('⏸️ Pausing Whisper recording (MAIA speaking)...', {
+      currentState: mediaRecorderRef.current?.state
     });
 
     if (mediaRecorderRef.current?.state === 'recording') {
-      // Mark that we're stopping for MAIA (don't transcribe this chunk)
-      stoppedForMaiaRef.current = true;
-      // STOP completely - this prevents microphone from picking up MAIA's voice
-      mediaRecorderRef.current.stop();
-      console.log('✅ Whisper recording STOPPED (will not transcribe this chunk)');
+      mediaRecorderRef.current.pause();
+      console.log('✅ Whisper recording PAUSED');
     } else {
-      console.log('⚠️ Cannot stop - recorder not in recording state');
+      console.log('⚠️ Cannot pause - recorder state:', mediaRecorderRef.current?.state);
     }
   }, []);
 
   /**
    * Resume recording (when MAIA finishes speaking)
-   * RESTART recording from scratch
+   * VoiceLock ensures this is called at the right time
    */
   const resumeRecording = useCallback(() => {
-    console.log('▶️ RESTARTING Whisper recording (MAIA finished)...', {
+    console.log('▶️ Resuming Whisper recording (MAIA finished)...', {
       currentState: mediaRecorderRef.current?.state
     });
 
-    // If recorder was stopped, restart it
-    if (mediaRecorderRef.current?.state === 'inactive') {
-      console.log('🔄 Restarting MediaRecorder...');
-      mediaRecorderRef.current.start(1000);
+    if (mediaRecorderRef.current?.state === 'paused') {
+      mediaRecorderRef.current.resume();
       lastSpeechTimeRef.current = Date.now(); // Reset silence timer
       speechDurationRef.current = 0; // Reset speech duration for new phrase
       lastSpeechCheckRef.current = 0;
-      console.log('✅ Whisper recording RESTARTED');
+      console.log('✅ Whisper recording RESUMED');
     } else {
-      console.log('⚠️ Recorder in unexpected state:', mediaRecorderRef.current?.state);
+      console.log('⚠️ Cannot resume - recorder state:', mediaRecorderRef.current?.state);
     }
   }, []);
 
@@ -488,33 +483,42 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
   }, []);
 
   /**
-   * Effect: Start/stop/pause based on props
+   * Effect: Start/stop based on enabled/muted
    */
   useEffect(() => {
-    console.log('🔄 Whisper state change:', { enabled, isMuted, isMayaSpeaking, isListening });
-
     // Start recording if enabled and not already listening
     if (enabled && !isMuted && !isListening) {
       startRecording();
       return;
     }
 
-    // Handle MAIA speaking state changes
-    if (isListening) {
-      if (isMayaSpeaking) {
-        console.log('🛑 MAIA is speaking - pausing Whisper');
-        pauseRecording();
-      } else {
-        console.log('▶️ MAIA finished - resuming Whisper');
-        resumeRecording();
-      }
-    }
-
     // Stop completely if disabled or muted
     if ((!enabled || isMuted) && isListening) {
       stopRecording();
     }
-  }, [enabled, isMuted, isMayaSpeaking, isListening, startRecording, pauseRecording, resumeRecording, stopRecording]);
+  }, [enabled, isMuted, isListening, startRecording, stopRecording]);
+
+  /**
+   * Effect: Subscribe to VoiceLock for pause/resume
+   * This is the SINGLE SOURCE OF TRUTH for microphone state
+   */
+  useEffect(() => {
+    const unsubscribe = voiceLock.subscribe((locked) => {
+      console.log('🔄 VoiceLock state changed:', locked ? 'LOCKED' : 'UNLOCKED');
+
+      if (isListening) {
+        if (locked) {
+          console.log('🛑 MAIA is speaking - pausing Whisper');
+          pauseRecording();
+        } else {
+          console.log('▶️ MAIA finished - resuming Whisper');
+          resumeRecording();
+        }
+      }
+    });
+
+    return unsubscribe;
+  }, [isListening, pauseRecording, resumeRecording]);
 
   /**
    * Cleanup on unmount

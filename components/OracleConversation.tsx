@@ -28,6 +28,7 @@ import { useMaiaVoice } from '@/hooks/useMaiaVoice';
 import { cleanMessage, cleanMessageForVoice, formatMessageForDisplay } from '@/lib/cleanMessage';
 import { getAgentConfig, AgentConfig } from '@/lib/agent-config';
 import { toast } from 'react-hot-toast';
+import { voiceLock } from '@/lib/services/VoiceLock';
 import { trackEvent } from '@/lib/analytics/track';
 import { saveConversationMemory, getOracleAgentId } from '@/lib/services/memoryService';
 import { generateGreeting } from '@/lib/services/greetingService';
@@ -1277,22 +1278,36 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       audio.preload = 'auto';
       audioRef.current = audio;
 
+      // 🔒 VOICE LOCK: Lock when audio starts playing
+      audio.onplay = () => {
+        console.log('🎵 TTS audio started playing');
+        voiceLock.lock(); // Pause Whisper microphone
+      };
+
       audio.onended = () => {
         console.log('🔊 Audio playback ended');
         setCurrentlySpeakingId(undefined);
-        setIsAudioPlaying(false); // 🎤 CRITICAL: Allow microphone to resume
-        setIsResponding(false); // Also clear responding state
+        setIsAudioPlaying(false);
+        setIsResponding(false);
         URL.revokeObjectURL(audioUrl);
         audioRef.current = null;
+
+        // 🔓 VOICE LOCK: Unlock with 1s safety delay
+        setTimeout(() => {
+          voiceLock.unlock(); // Resume Whisper microphone
+        }, 1000);
       };
 
       audio.onerror = (e) => {
         console.error('Audio playback error:', e);
         setCurrentlySpeakingId(undefined);
-        setIsAudioPlaying(false); // 🎤 Also clear on error
+        setIsAudioPlaying(false);
         setIsResponding(false);
         URL.revokeObjectURL(audioUrl);
         audioRef.current = null;
+
+        // 🔓 VOICE LOCK: Unlock on error too
+        voiceLock.unlock();
       };
 
       await audio.play();
