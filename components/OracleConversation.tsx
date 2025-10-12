@@ -121,14 +121,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     const updateSize = () => {
       const width = window.innerWidth;
       if (width < 640) {
-        // Mobile: Compact upper-left (150-180px)
-        setHoloflowerSize(Math.min(width / 3, 180));
+        // Mobile: Small top presence (120-140px) for Star Wars text flow
+        setHoloflowerSize(Math.min(width / 4, 140));
       } else if (width < 1024) {
-        // Tablet: Subtle upper-left
-        setHoloflowerSize(220);
+        // Tablet: Compact (160px)
+        setHoloflowerSize(160);
       } else {
-        // Desktop: Visible but not dominating upper-left
-        setHoloflowerSize(280);
+        // Desktop: Visible but gives text space (200px)
+        setHoloflowerSize(200);
       }
     };
 
@@ -1856,9 +1856,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         />
       )}
 
-      {/* Message flow - CENTERED LAYOUT: Messages centered on screen */}
+      {/* Message flow - Star Wars crawl: text flows from beneath holoflower */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
-        <div className={`fixed top-28 sm:top-32 z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
+        <div className={`fixed top-44 sm:top-48 md:top-52 z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
           showChatInterface
             ? 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[600px] lg:w-[680px] xl:w-[720px] opacity-100'
             : 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[520px] lg:w-[560px] opacity-70'
