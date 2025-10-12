@@ -136,18 +136,29 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
     isProcessingRef.current = true;
 
     try {
-      console.log('🎤 Converting webm to WAV for Whisper compatibility...');
-      const wavBlob = await convertToMp3(audioBlob);
+      // Try WAV conversion first, fallback to webm if it fails
+      let audioToSend = audioBlob;
+      let filename = 'audio.webm';
+
+      try {
+        console.log('🎤 Converting webm to WAV for Whisper compatibility...');
+        const wavBlob = await convertToMp3(audioBlob);
+        audioToSend = wavBlob;
+        filename = 'audio.wav';
+        console.log('✅ WAV conversion successful:', wavBlob.size, 'bytes');
+      } catch (conversionError) {
+        console.warn('⚠️ WAV conversion failed, sending webm directly:', conversionError);
+        // Continue with original webm blob
+      }
 
       console.log('🎤 Sending audio to Whisper...', {
-        originalSize: audioBlob.size,
-        originalType: audioBlob.type,
-        convertedSize: wavBlob.size,
-        convertedType: wavBlob.type
+        size: audioToSend.size,
+        type: audioToSend.type,
+        filename
       });
 
       const formData = new FormData();
-      formData.append('file', wavBlob, 'audio.wav');
+      formData.append('file', audioToSend, filename);
       formData.append('model', 'whisper-1');
       formData.append('language', 'en');
 
@@ -264,9 +275,9 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
         setAudioLevel(level);
         onAudioLevelChange?.(level);
 
-        // Update last speech time if we detect REAL speech (threshold: 0.20 = clear speaking volume)
-        // Below 0.20 is just background noise/room tone/fan/electrical hum/ambient TV audio
-        if (level > 0.20) {
+        // Update last speech time if we detect REAL speech (threshold: 0.12 = speaking volume)
+        // Below 0.12 is just background noise/room tone/fan/electrical hum
+        if (level > 0.12) {
           const now = Date.now();
 
           // Track accumulated speech duration
