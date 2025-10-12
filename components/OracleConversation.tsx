@@ -1932,7 +1932,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* Message flow - ASYMMETRIC INSTRUMENT LAYOUT: Left=geometry, Right=conversation */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
-        <div className={`fixed top-24 sm:top-28 z-30 transition-all duration-500 ${
+        <div className={`fixed top-28 sm:top-32 z-30 transition-all duration-500 ${
           showChatInterface
             ? 'inset-x-2 sm:inset-x-4 md:right-8 md:left-auto md:w-[600px] lg:w-[680px] xl:w-[720px] opacity-100'
             : 'inset-x-2 sm:inset-x-4 md:right-8 md:left-auto md:w-[520px] lg:w-[560px] opacity-70'
