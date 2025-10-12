@@ -69,6 +69,23 @@
   .bg-gradient-radial {
     background: radial-gradient(circle, var(--tw-gradient-from), var(--tw-gradient-to));
   }
+
+  /* 🫀 Hearthlight Breathing - The Earth breathes with you */
+  @keyframes hearthlight {
+    0%, 100% {
+      opacity: 0.95;
+      filter: brightness(1.0);
+    }
+    50% {
+      opacity: 1.0;
+      filter: brightness(1.03);
+    }
+  }
+
+  /* Apply breathing to soul-background */
+  .bg-soul-background {
+    animation: hearthlight 14s ease-in-out infinite;
+  }
 }
 
 /* Ensure inputs are always readable - prevents white text on white background */
