@@ -198,7 +198,7 @@ export default function IntroPage() {
               transition={{ duration: 1, delay: 1.2 }}
               className="text-lg text-amber-200/60 max-w-2xl mx-auto leading-relaxed"
             >
-              A companion for self-reflection. MAIA witnesses your patterns, supports your growth, and holds space for your becoming—one conversation at a time.
+              A companion for self-reflection. MAIA witnesses your patterns and holds space for your becoming.
             </motion.p>
 
             {/* Rotating Wisdom Quote - Synchronistic */}
