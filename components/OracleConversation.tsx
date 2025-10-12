@@ -1435,9 +1435,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Beautiful Sacred Holoflower - Top center, below icons, text flows below */}
+      {/* Beautiful Sacred Holoflower - Top center, higher on desktop to avoid text competition */}
       <motion.div
-        className="fixed top-20 md:top-24 left-1/2 -translate-x-1/2 z-[25] cursor-pointer"
+        className="fixed top-20 md:top-16 lg:top-12 left-1/2 -translate-x-1/2 z-[25] cursor-pointer"
         onClick={async (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -1858,7 +1858,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* Message flow - Star Wars crawl: text flows from beneath holoflower */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
-        <div className={`fixed top-44 sm:top-48 md:top-52 z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
+        <div className={`fixed top-44 sm:top-48 md:top-44 lg:top-40 z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
           showChatInterface
             ? 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[600px] lg:w-[680px] xl:w-[720px] opacity-100'
             : 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[520px] lg:w-[560px] opacity-70'
