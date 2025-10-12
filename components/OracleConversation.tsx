@@ -1099,7 +1099,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
 
     // ECHO SUPPRESSION: Check if we're in cooldown period
-    const now = Date.now();
     if (now < echoSuppressUntil) {
       const remainingMs = echoSuppressUntil - now;
       console.warn(`[Echo Suppressed] Ignoring input during ${remainingMs}ms cooldown`);
