@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Mic, MicOff, Loader2, Activity, Wifi, WifiOff } from "lucide-react";
+import VoiceFeedbackPrevention from "@/lib/voice/voice-feedback-prevention";
 // import { Analytics } from "../../lib/analytics/supabaseAnalytics"; // Disabled for Vercel build
 
 interface ContinuousConversationProps {
@@ -92,6 +93,11 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     recognition.interimResults = true;
     recognition.lang = 'en-US';
     recognition.maxAlternatives = 1;
+
+    // CRITICAL: Register with feedback prevention to stop mic when Maya speaks
+    const feedbackPrevention = VoiceFeedbackPrevention.getInstance();
+    feedbackPrevention.registerRecognition(recognition);
+    console.log('✅ [ContinuousConversation] Registered with VoiceFeedbackPrevention');
 
     recognition.onstart = () => {
       setIsRecording(true);
