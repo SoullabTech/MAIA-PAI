@@ -1401,10 +1401,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Beautiful Sacred Holoflower - REDESIGNED: Ambient presence, not dominant */}
-      <div className="fixed inset-0 flex items-center md:items-center justify-center md:justify-start pointer-events-none">
-        {/* Holoflower container - smaller/offset on mobile, left-positioned on desktop */}
-        <div className="flex items-center justify-center md:ml-[10%] lg:ml-[15%]"
+      {/* Beautiful Sacred Holoflower - Clear presence with smart dimming */}
+      <div className="fixed inset-0 flex items-end md:items-end justify-center pointer-events-none pb-32 md:pb-24">
+        {/* Holoflower container - bottom third placement for better composition */}
+        <div className="flex items-center justify-center"
              style={{
                width: holoflowerSize,
                height: holoflowerSize,
@@ -1482,20 +1482,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               />
             </motion.div>
 
-            {/* Holoflower Image - RECEDES to barely-there when conversation active */}
+            {/* Holoflower Image - Clear detail with smart dimming when text present */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <img
                 src="/holoflower.svg"
                 alt="Holoflower"
-                className={`w-32 h-32 object-contain transition-opacity duration-700 ${
+                className={`w-48 h-48 md:w-56 md:h-56 object-contain transition-all duration-700 ${
                   showChatInterface || messages.length > 0
-                    ? 'opacity-8 md:opacity-12'  // Barely visible ghost - text wins completely
-                    : 'opacity-40 md:opacity-80'  // Present when listening
+                    ? 'opacity-20 blur-sm'  // Gentle fade when text appears
+                    : 'opacity-90'  // Clear and visible when listening
                 }`}
                 style={{
-                  filter: showChatInterface
-                    ? 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.1))'
-                    : 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.3))',
+                  filter: showChatInterface || messages.length > 0
+                    ? 'drop-shadow(0 0 8px rgba(212, 184, 150, 0.15))'
+                    : 'drop-shadow(0 0 24px rgba(212, 184, 150, 0.4))',
                 }}
               />
             </div>
