@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, Users, Brain, MessageSquare, Settings } from 'lucide-react';
+import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles } from 'lucide-react';
 
 /**
  * Unified Menu Bar
@@ -96,6 +96,22 @@ export function MenuBar() {
           {/* Tooltip - Matte instrument label */}
           <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Training {Math.round(trainingProgress * 100)}%
+          </span>
+        </div>
+      </Link>
+
+      {/* Astrology / Natal Chart */}
+      <Link
+        href="/astrology"
+        className="group relative"
+        aria-label="Astrology & Natal Chart"
+      >
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-highlight/40">
+          <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-highlight/70 transition-all group-hover:text-soul-highlight" />
+
+          {/* Tooltip - Matte instrument label */}
+          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Astrology
           </span>
         </div>
       </Link>
