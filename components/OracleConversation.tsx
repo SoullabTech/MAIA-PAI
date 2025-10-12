@@ -2,7 +2,7 @@
 // 🔄 MOBILE-FIRST DEPLOYMENT - Oct 2 12:15PM - Compact input, hidden overlays, fixed scroll
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Paperclip, X, Copy } from 'lucide-react';
+import { Paperclip, X, Copy, BookOpen } from 'lucide-react';
 // import { SimplifiedOrganicVoice, VoiceActivatedMaiaRef } from './ui/SimplifiedOrganicVoice'; // REPLACED with Whisper
 import { WhisperVoiceRecognition } from './ui/WhisperVoiceRecognition';
 import { SacredHoloflower } from './sacred/SacredHoloflower';
@@ -35,6 +35,7 @@ import { BrandedWelcome } from './BrandedWelcome';
 import { userTracker } from '@/lib/tracking/userActivityTracker';
 import { ModeSwitcher } from './ui/ModeSwitcher';
 import { ConversationStylePreference } from '@/lib/preferences/conversation-style-preference';
+import { detectJournalCommand, detectBreakthroughPotential } from '@/lib/services/conversationEssenceExtractor';
 
 interface OracleConversationProps {
   userId?: string;
@@ -175,6 +176,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [showWelcome, setShowWelcome] = useState(true);
   const [isReturningUser, setIsReturningUser] = useState(false);
 
+  // Journal state
+  const [isSavingJournal, setIsSavingJournal] = useState(false);
+  const [showJournalSuggestion, setShowJournalSuggestion] = useState(false);
+  const [breakthroughScore, setBreakthroughScore] = useState(0);
+
   // Client-side only check
   useEffect(() => {
     setIsMounted(true);
@@ -241,7 +247,25 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-  
+
+  // Detect breakthrough potential for journal suggestions
+  useEffect(() => {
+    if (messages.length < 4) return; // Need some conversation depth
+
+    const conversationMessages = messages.map(msg => ({
+      role: msg.role === 'oracle' ? 'assistant' as const : 'user' as const,
+      content: msg.text
+    }));
+
+    const score = detectBreakthroughPotential(conversationMessages);
+    setBreakthroughScore(score);
+
+    // Suggest journaling if breakthrough potential is high and we haven't suggested yet
+    if (score >= 70 && !showJournalSuggestion && messages.length >= 6) {
+      setShowJournalSuggestion(true);
+    }
+  }, [messages, showJournalSuggestion]);
+
   // Agent configuration with persistence
   const [agentConfig, setAgentConfig] = useState<AgentConfig>(() => {
     // Load saved voice preference from localStorage
@@ -582,13 +606,84 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       const delay = Math.max(50, Math.min(150, words[i].length * 20));
       await new Promise(resolve => setTimeout(resolve, delay));
     }
-    
+
     setIsStreaming(false);
   }, []);
+
+  // Save conversation as journal entry
+  const handleSaveAsJournal = useCallback(async () => {
+    if (!userId) {
+      toast.error('Please sign in to save journal entries');
+      return;
+    }
+
+    if (messages.length < 2) {
+      toast.error('Have a conversation first before journaling');
+      return;
+    }
+
+    setIsSavingJournal(true);
+
+    try {
+      // Convert messages to the format expected by the extractor
+      const conversationMessages = messages.map(msg => ({
+        role: msg.role === 'oracle' ? 'assistant' as const : 'user' as const,
+        content: msg.text,
+        timestamp: msg.timestamp.toISOString()
+      }));
+
+      const response = await fetch('/api/journal/save-conversation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: conversationMessages,
+          userId,
+          conversationId: sessionId,
+          sessionId
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save journal entry');
+      }
+
+      const data = await response.json();
+
+      toast.success(
+        <div>
+          <div className="font-semibold">{data.essence.title}</div>
+          <div className="text-sm text-white/70">Saved to your journal</div>
+        </div>,
+        { duration: 4000 }
+      );
+
+      setShowJournalSuggestion(false);
+
+      // Track the journal save
+      trackEvent('journal_saved_from_conversation', {
+        userId,
+        sessionId,
+        messageCount: messages.length,
+        title: data.essence.title
+      });
+    } catch (error) {
+      console.error('Error saving journal entry:', error);
+      toast.error('Failed to save journal entry. Please try again.');
+    } finally {
+      setIsSavingJournal(false);
+    }
+  }, [userId, messages, sessionId]);
 
   // Handle text messages from chat interface - MUST be defined before handleVoiceTranscript
   const handleTextMessage = useCallback(async (text: string, attachments?: File[]) => {
     console.log('📝 Text message received:', { text, isProcessing, isAudioPlaying, isResponding });
+
+    // Check for journal command
+    if (detectJournalCommand(text)) {
+      console.log('📖 Journal command detected - saving conversation');
+      await handleSaveAsJournal();
+      return;
+    }
 
     // IMMEDIATELY mute microphone to prevent Maia from hearing herself
     if (voiceMicRef.current && voiceMicRef.current.muteImmediately) {
@@ -2004,6 +2099,24 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         autoFocus={false}
                       />
 
+                      {/* Journal button - shows when conversation has substance */}
+                      {messages.length >= 2 && (
+                        <button
+                          type="button"
+                          onClick={handleSaveAsJournal}
+                          disabled={isSavingJournal}
+                          className={`flex-shrink-0 w-10 h-10 border rounded-full flex items-center justify-center
+                                   active:scale-95 transition-all ${
+                            breakthroughScore >= 70
+                              ? 'bg-cyan-500/20 border-cyan-400/50 text-cyan-300 hover:bg-cyan-500/30 animate-pulse'
+                              : 'bg-gold-divine/10 border-gold-divine/30 text-gold-divine hover:bg-gold-divine/20'
+                          } ${isSavingJournal ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          title={breakthroughScore >= 70 ? 'Breakthrough detected - Save to journal' : 'Save as journal entry'}
+                        >
+                          <BookOpen className="w-5 h-5" />
+                        </button>
+                      )}
+
                       {/* File upload button */}
                       <input
                         type="file"
@@ -2065,6 +2178,50 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               </div>
             </motion.div>
           )}
+
+          {/* Journal Suggestion - Appears when breakthrough is detected */}
+          <AnimatePresence>
+            {showJournalSuggestion && (
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 max-w-sm"
+              >
+                <div className="bg-gradient-to-br from-cyan-500/20 to-purple-500/20 backdrop-blur-xl rounded-2xl p-4 border border-cyan-400/30 shadow-2xl">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 bg-cyan-400/20 rounded-full flex items-center justify-center">
+                      <BookOpen className="w-5 h-5 text-cyan-300" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-cyan-200 font-medium mb-1">Breakthrough Detected</h3>
+                      <p className="text-white/70 text-sm mb-3">
+                        This feels like sacred ground. Would you like to capture the essence of this conversation in your journal?
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleSaveAsJournal}
+                          disabled={isSavingJournal}
+                          className="px-4 py-2 bg-cyan-500/30 hover:bg-cyan-500/40 border border-cyan-400/50
+                                   rounded-lg text-cyan-200 text-sm font-medium transition-all active:scale-95
+                                   disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isSavingJournal ? 'Saving...' : 'Save to Journal'}
+                        </button>
+                        <button
+                          onClick={() => setShowJournalSuggestion(false)}
+                          className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/20
+                                   rounded-lg text-white/60 text-sm transition-all active:scale-95"
+                        >
+                          Not Now
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </>
       )}
 
