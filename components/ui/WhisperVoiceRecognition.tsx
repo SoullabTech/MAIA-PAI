@@ -61,6 +61,70 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
 
 
   /**
+   * Convert webm to MP3 for Whisper API compatibility
+   * Whisper claims to support webm but often rejects it
+   */
+  const convertToMp3 = async (webmBlob: Blob): Promise<Blob> => {
+    const audioContext = new AudioContext();
+    const arrayBuffer = await webmBlob.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+    // Create offline context for rendering to WAV first
+    const offlineContext = new OfflineAudioContext(
+      audioBuffer.numberOfChannels,
+      audioBuffer.length,
+      audioBuffer.sampleRate
+    );
+
+    const source = offlineContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(offlineContext.destination);
+    source.start(0);
+
+    const renderedBuffer = await offlineContext.startRendering();
+
+    // Convert to 16-bit PCM WAV (MP3 encoding requires external library, WAV is more reliable)
+    const numberOfChannels = renderedBuffer.numberOfChannels;
+    const length = renderedBuffer.length * numberOfChannels * 2;
+    const buffer = new ArrayBuffer(44 + length);
+    const view = new DataView(buffer);
+
+    // WAV header
+    const writeString = (offset: number, string: string) => {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+      }
+    };
+
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + length, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true); // fmt chunk size
+    view.setUint16(20, 1, true); // PCM format
+    view.setUint16(22, numberOfChannels, true);
+    view.setUint32(24, renderedBuffer.sampleRate, true);
+    view.setUint32(28, renderedBuffer.sampleRate * numberOfChannels * 2, true); // byte rate
+    view.setUint16(32, numberOfChannels * 2, true); // block align
+    view.setUint16(34, 16, true); // bits per sample
+    writeString(36, 'data');
+    view.setUint32(40, length, true);
+
+    // Write PCM samples
+    const offset = 44;
+    let index = offset;
+    for (let i = 0; i < renderedBuffer.length; i++) {
+      for (let channel = 0; channel < numberOfChannels; channel++) {
+        const sample = Math.max(-1, Math.min(1, renderedBuffer.getChannelData(channel)[i]));
+        view.setInt16(index, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+        index += 2;
+      }
+    }
+
+    return new Blob([buffer], { type: 'audio/wav' });
+  };
+
+  /**
    * Send audio to Whisper for transcription
    */
   const transcribeAudio = useCallback(async (audioBlob: Blob) => {
@@ -72,13 +136,18 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
     isProcessingRef.current = true;
 
     try {
+      console.log('🎤 Converting webm to WAV for Whisper compatibility...');
+      const wavBlob = await convertToMp3(audioBlob);
+
       console.log('🎤 Sending audio to Whisper...', {
-        size: audioBlob.size,
-        type: audioBlob.type
+        originalSize: audioBlob.size,
+        originalType: audioBlob.type,
+        convertedSize: wavBlob.size,
+        convertedType: wavBlob.type
       });
 
       const formData = new FormData();
-      formData.append('file', audioBlob, 'audio.webm');
+      formData.append('file', wavBlob, 'audio.wav');
       formData.append('model', 'whisper-1');
       formData.append('language', 'en');
 
@@ -195,9 +264,9 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
         setAudioLevel(level);
         onAudioLevelChange?.(level);
 
-        // Update last speech time if we detect REAL speech (threshold: 0.10 = speaking volume)
-        // Below 0.10 is just background noise/room tone/fan/electrical hum
-        if (level > 0.10) {
+        // Update last speech time if we detect REAL speech (threshold: 0.15 = speaking volume)
+        // Below 0.15 is just background noise/room tone/fan/electrical hum
+        if (level > 0.15) {
           const now = Date.now();
 
           // Track accumulated speech duration

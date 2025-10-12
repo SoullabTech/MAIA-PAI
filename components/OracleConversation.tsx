@@ -1634,7 +1634,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               ))}
             </div>
 
-            {/* Voice Visualizer - User's voice (plasma field with radial gradients) */}
+            {/* Voice Visualizer - User's voice (amber plasma field with radial gradients) */}
             {isMounted && !showChatInterface && voiceEnabled && voiceMicRef.current?.isListening && (
               <motion.div
                 className="absolute inset-0 pointer-events-none flex items-center justify-center"
@@ -1642,49 +1642,47 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                {/* Multiple plasma field layers with radial gradients */}
-                {[...Array(4)].map((_, i) => (
+                {/* Multiple amber plasma field layers with thicker fluidity */}
+                {[...Array(3)].map((_, i) => (
                   <motion.div
                     key={`voice-field-${i}`}
                     className="absolute rounded-full"
                     style={{
-                      width: `${200 + i * 80}px`,
-                      height: `${200 + i * 80}px`,
+                      width: `${220 + i * 100}px`,
+                      height: `${220 + i * 100}px`,
                       background: i === 0
-                        ? 'radial-gradient(circle, rgba(167, 139, 250, 0.4) 0%, rgba(167, 139, 250, 0.1) 50%, transparent 100%)'
+                        ? 'radial-gradient(circle, rgba(251, 191, 36, 0.25) 0%, rgba(251, 191, 36, 0.08) 50%, transparent 100%)'
                         : i === 1
-                        ? 'radial-gradient(circle, rgba(129, 140, 248, 0.3) 0%, rgba(129, 140, 248, 0.08) 50%, transparent 100%)'
-                        : i === 2
-                        ? 'radial-gradient(circle, rgba(107, 155, 209, 0.25) 0%, rgba(107, 155, 209, 0.06) 50%, transparent 100%)'
-                        : 'radial-gradient(circle, rgba(147, 197, 253, 0.2) 0%, rgba(147, 197, 253, 0.04) 50%, transparent 100%)',
-                      filter: `blur(${8 + i * 2}px)`,
+                        ? 'radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.05) 50%, transparent 100%)'
+                        : 'radial-gradient(circle, rgba(217, 119, 6, 0.12) 0%, rgba(217, 119, 6, 0.03) 50%, transparent 100%)',
+                      filter: `blur(${14 + i * 4}px)`,
                     }}
                     animate={{
-                      scale: [1, 1.12, 1],
-                      opacity: [0.8 - i * 0.15, 0.4, 0.8 - i * 0.15],
+                      scale: [1, 1.08, 1],
+                      opacity: [0.6 - i * 0.12, 0.35, 0.6 - i * 0.12],
                     }}
                     transition={{
-                      duration: 4 + i * 1.2,
+                      duration: 6 + i * 2,
                       repeat: Infinity,
-                      delay: i * 0.5,
-                      ease: "easeInOut"
+                      delay: i * 0.8,
+                      ease: [0.45, 0.05, 0.55, 0.95]
                     }}
                   />
                 ))}
 
-                {/* Audio level responsive center field glow */}
+                {/* Audio level responsive center field glow (amber) */}
                 {voiceAudioLevel > 0.05 && (
                   <motion.div
                     className="absolute rounded-full"
                     style={{
-                      width: '180px',
-                      height: '180px',
-                      background: 'radial-gradient(circle, rgba(167, 139, 250, 0.6) 0%, rgba(167, 139, 250, 0.2) 60%, transparent 100%)',
-                      filter: 'blur(6px)',
+                      width: '200px',
+                      height: '200px',
+                      background: 'radial-gradient(circle, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.12) 60%, transparent 100%)',
+                      filter: 'blur(10px)',
                     }}
                     animate={{
-                      scale: 1 + voiceAudioLevel * 0.5,
-                      opacity: 0.7 + voiceAudioLevel * 0.3,
+                      scale: 1 + voiceAudioLevel * 0.3,
+                      opacity: 0.5 + voiceAudioLevel * 0.2,
                     }}
                     transition={{
                       duration: 0.1,
@@ -2026,7 +2024,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
               {/* Compact text input area - mobile-first, fixed at bottom */}
               {showChatInterface && (
-              <div className="fixed inset-x-0 bottom-20 z-[60]">
+              <div className="fixed inset-x-0 bottom-16 z-[60]">
                 {/* Text input area - Ultra compact mobile design - Raised above bottom menu bar */}
                 <div className="bg-soul-surface/90 px-2 py-2 border-t border-soul-border/40">
                   <form
