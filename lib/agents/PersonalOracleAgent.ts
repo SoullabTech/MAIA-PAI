@@ -814,7 +814,7 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
       // Build context as LIVING NARRATIVE not data extraction
       // Use conversation style preference (walking/classic/adaptive)
       // Check localStorage first (for voice command changes), then settings
-      let conversationStyle = this.settings?.conversationStyle || 'walking'; // DEFAULT: walking mode (changed from 'classic')
+      let conversationStyle = this.settings?.conversationStyle || 'classic'; // DEFAULT: classic mode (Mysterium Coniunctionis)
 
       // Map "her" mode to "walking" mode (they're the same - brief/natural)
       if (conversationStyle === 'her') {
