@@ -1435,14 +1435,49 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Beautiful Sacred Holoflower - Upper-left subtle ambient presence, above scrim */}
-      <div className="fixed top-20 left-4 md:top-24 md:left-8 pointer-events-none z-[25]">
+      {/* Beautiful Sacred Holoflower - Upper-left, clickable for voice activation */}
+      <motion.div
+        className="fixed top-20 left-4 md:top-24 md:left-8 z-[25] cursor-pointer"
+        onClick={async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('🌸 Holoflower clicked!');
+          await enableAudio();
+
+          if (!showChatInterface && voiceEnabled) {
+            if (!isMuted) {
+              setIsMuted(true);
+              if (voiceMicRef.current?.stopListening) {
+                voiceMicRef.current.stopListening();
+                console.log('🔇 Voice stopped via holoflower');
+              }
+            } else {
+              setIsMuted(false);
+              setTimeout(async () => {
+                if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
+                  await voiceMicRef.current.startListening();
+                  console.log('🎤 Voice started via holoflower');
+                }
+              }, 100);
+            }
+          } else if (showChatInterface) {
+            setShowChatInterface(false);
+            setIsMuted(false);
+            setTimeout(async () => {
+              if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
+                await voiceMicRef.current.startListening();
+              }
+            }, 200);
+          }
+        }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+      >
         {/* Holoflower container - smaller, upper-left, visible but not dominating */}
         <div className="flex items-center justify-center"
              style={{
                width: holoflowerSize,
                height: holoflowerSize,
-               pointerEvents: 'none',
                background: 'transparent',
                overflow: 'visible'
              }}>
@@ -1785,10 +1820,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               </div>
             )}
 
-            {/* OLD BUTTON REMOVED - Now using separate overlay button outside pointer-events-none hierarchy */}
+            {/* OLD BUTTON REMOVED - Holoflower itself is now clickable */}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Shadow petal overlay */}
       {shadowPetals.length > 0 && (
@@ -1807,120 +1842,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* INTERACTIVE HOLOFLOWER BUTTON - Separate overlay with pointer-events enabled */}
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
-        <motion.button
-          onClick={async (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('🌸 Holoflower clicked!', {
-              showChatInterface,
-              voiceEnabled,
-              isMuted,
-              isProcessing,
-              isResponding,
-              contemplationMode: voiceMicRef.current?.isContemplationMode
-            });
-            // Always enable audio first
-            await enableAudio();
-
-            // In voice mode, handle contemplation and listening modes
-            if (!showChatInterface && voiceEnabled) {
-              // If in contemplation mode, exit it and resume normal conversation
-              if (voiceMicRef.current?.isContemplationMode) {
-                voiceMicRef.current.toggleContemplationMode();
-                console.log('🔙 Exited contemplation mode - ready for conversation');
-                return;
-              }
-
-              if (!isMuted) {
-                // Currently listening, so stop
-                setIsMuted(true);
-                if (voiceMicRef.current?.stopListening) {
-                  voiceMicRef.current.stopListening();
-                  console.log('🔇 Voice stopped via holoflower click');
-                }
-              } else {
-                // Currently muted, so start listening
-                setIsMuted(false);
-                // Small delay to ensure component is ready
-                setTimeout(async () => {
-                  if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
-                    await voiceMicRef.current.startListening();
-                    console.log('🎤 Voice started via holoflower click');
-                  }
-                }, 100);
-              }
-            } else if (showChatInterface) {
-              // In chat mode, switch to voice mode and activate
-              setShowChatInterface(false);
-              setIsMuted(false);
-              setTimeout(async () => {
-                if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
-                  await voiceMicRef.current.startListening();
-                  console.log('🎤 Voice started via mode switch from holoflower');
-                }
-              }, 200);
-            }
-          }}
-          className="relative cursor-pointer bg-transparent border-none p-8 hover:bg-white/5 rounded-full touch-manipulation"
-          style={{
-            width: '200px',
-            height: '200px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 100,
-            WebkitTapHighlightColor: 'transparent',
-            touchAction: 'manipulation',
-            pointerEvents: 'auto'
-          }}
-          onContextMenu={(e) => {
-            e.preventDefault(); // Prevent default context menu
-            if (!showChatInterface && voiceEnabled && voiceMicRef.current?.toggleContemplationMode) {
-              voiceMicRef.current.toggleContemplationMode();
-              console.log('🧘 Contemplation mode toggled via right-click');
-            }
-          }}
-          onTouchStart={(e) => {
-            const touchStartTime = Date.now();
-            let longPressTimer: NodeJS.Timeout;
-
-            // Set up long press detection
-            longPressTimer = setTimeout(() => {
-              if (!showChatInterface && voiceEnabled && voiceMicRef.current?.toggleContemplationMode) {
-                e.preventDefault();
-                voiceMicRef.current.toggleContemplationMode();
-                console.log('🧘 Contemplation mode toggled via long press');
-              }
-            }, 800);
-
-            // Clear timer on touch end or if touch moves
-            const clearTimer = () => {
-              clearTimeout(longPressTimer);
-              e.currentTarget.removeEventListener('touchend', clearTimer);
-              e.currentTarget.removeEventListener('touchmove', clearTimer);
-            };
-
-            e.currentTarget.addEventListener('touchend', clearTimer);
-            e.currentTarget.addEventListener('touchmove', clearTimer);
-          }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          type="button"
-        >
-          {/* Visual feedback circle */}
-          <motion.div
-            className="absolute inset-0 rounded-full border-2 border-white/0"
-            animate={{
-              borderColor: !showChatInterface && voiceEnabled && !isMuted
-                ? 'rgba(255, 255, 255, 0.3)'
-                : 'rgba(255, 255, 255, 0)'
-            }}
-            transition={{ duration: 0.3 }}
-          />
-        </motion.button>
-      </div>
+      {/* REMOVED: Separate white circle button - holoflower itself is now clickable */}
 
       {/* Text Scrim - Warm volcanic veil when messages appear (absorbs light, doesn't just dim) */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
