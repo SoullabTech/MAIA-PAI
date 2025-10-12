@@ -1253,48 +1253,53 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
         strategy: responseGuidance.style
       });
 
-      // 🎭 CONVERSATIONAL ENHANCEMENT: Make MAIA sound like "Her" (Samantha)
-      console.log('🎭 Enhancing response with ConversationalEnhancer...');
-      const detectedEmotionalTone = ConversationalEnhancer.detectEmotionalTone(trimmedInput);
-      const enhancedOutput = ConversationalEnhancer.enhance(responseText, {
-        userMessage: trimmedInput,
-        emotionalTone: detectedEmotionalTone,
-        conversationDepth: flowState.depth / 10, // Use flow tracker depth (0-1 scale)
-        exchangeCount: flowState.turnCount, // Use actual turn count from flow tracker
-        recentMessages: conversationHistory.slice(-5).map(m => m.content)
-      });
-
-      // Apply the enhancement (this adds natural acknowledgments, removes therapy-speak, adds contractions)
-      responseText = ConversationalEnhancer.buildOutput(enhancedOutput);
-      console.log('✅ Response enhanced:', {
-        emotionalTone: detectedEmotionalTone,
-        hadAcknowledgment: enhancedOutput.shouldUseAcknowledgment,
-        acknowledgment: enhancedOutput.acknowledgment,
-        pacing: enhancedOutput.pacing
-      });
-
-      // 🔥 CONSERVATIVE REFINEMENT: Only catch therapy-speak & cringe (don't rewrite good responses)
-      console.log('🔥 Applying conservative refinement...');
-      const refinement = ConservativeRefiner.refine(responseText);
-
-      // Only apply if there were actual issues (preserve Claude/EO's natural intelligence)
-      if (refinement.hadIssues) {
-        responseText = refinement.refined;
-        console.log('✅ Issues fixed:', {
-          issuesFixed: refinement.issuesFixed,
-          element: dominantElement
+      // 🎭 CONVERSATIONAL ENHANCEMENT: Only for adaptive/walking modes
+      // Skip for classic mode (Mysterium Coniunctionis) which needs pure, unmodified responses
+      if (conversationStyle !== 'classic') {
+        console.log('🎭 Enhancing response with ConversationalEnhancer...');
+        const detectedEmotionalTone = ConversationalEnhancer.detectEmotionalTone(trimmedInput);
+        const enhancedOutput = ConversationalEnhancer.enhance(responseText, {
+          userMessage: trimmedInput,
+          emotionalTone: detectedEmotionalTone,
+          conversationDepth: flowState.depth / 10, // Use flow tracker depth (0-1 scale)
+          exchangeCount: flowState.turnCount, // Use actual turn count from flow tracker
+          recentMessages: conversationHistory.slice(-5).map(m => m.content)
         });
-      } else {
-        console.log('✅ Response already clean (no therapy-speak or cringe)');
-      }
 
-      // Optionally add elemental phrase (ONLY if response is generic like "I understand")
-      if (ConservativeRefiner.needsElementalPhrase(responseText)) {
-        const phrase = suggestElementalPhrase(responseText, dominantElement, { onlyIfGeneric: true });
-        if (phrase) {
-          responseText = `${responseText} ${phrase}`;
-          console.log('✅ Added elemental phrase:', phrase);
+        // Apply the enhancement (this adds natural acknowledgments, removes therapy-speak, adds contractions)
+        responseText = ConversationalEnhancer.buildOutput(enhancedOutput);
+        console.log('✅ Response enhanced:', {
+          emotionalTone: detectedEmotionalTone,
+          hadAcknowledgment: enhancedOutput.shouldUseAcknowledgment,
+          acknowledgment: enhancedOutput.acknowledgment,
+          pacing: enhancedOutput.pacing
+        });
+
+        // 🔥 CONSERVATIVE REFINEMENT: Only catch therapy-speak & cringe (don't rewrite good responses)
+        console.log('🔥 Applying conservative refinement...');
+        const refinement = ConservativeRefiner.refine(responseText);
+
+        // Only apply if there were actual issues (preserve Claude/EO's natural intelligence)
+        if (refinement.hadIssues) {
+          responseText = refinement.refined;
+          console.log('✅ Issues fixed:', {
+            issuesFixed: refinement.issuesFixed,
+            element: dominantElement
+          });
+        } else {
+          console.log('✅ Response already clean (no therapy-speak or cringe)');
         }
+
+        // Optionally add elemental phrase (ONLY if response is generic like "I understand")
+        if (ConservativeRefiner.needsElementalPhrase(responseText)) {
+          const phrase = suggestElementalPhrase(responseText, dominantElement, { onlyIfGeneric: true });
+          if (phrase) {
+            responseText = `${responseText} ${phrase}`;
+            console.log('✅ Added elemental phrase:', phrase);
+          }
+        }
+      } else {
+        console.log('🜃 Classic mode (Mysterium Coniunctionis) - Using pure LLM response without enhancements');
       }
 
       // 🔥 NEW: Capture this conversation turn for memory
