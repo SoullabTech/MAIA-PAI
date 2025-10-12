@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Mic, MicOff, Loader2, Activity, Wifi, WifiOff } from "lucide-react";
-import { Analytics } from "../../lib/analytics/supabaseAnalytics";
+// import { Analytics } from "../../lib/analytics/supabaseAnalytics"; // Disabled for Vercel build
 
 interface ContinuousConversationProps {
   onTranscript: (text: string) => void;
@@ -287,12 +287,12 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     // Send transcript
     onTranscript(transcript);
     
-    // Track analytics
-    Analytics.transcriptionSuccess({
-      transcription_duration_ms: Date.now() - lastSpeechTime.current,
-      transcription_length: transcript.length,
-      mode: 'continuous'
-    });
+    // Track analytics (disabled for Vercel build)
+    // Analytics.transcriptionSuccess({
+    //   transcription_duration_ms: Date.now() - lastSpeechTime.current,
+    //   transcription_length: transcript.length,
+    //   mode: 'continuous'
+    // });
     
     // Clear accumulated
     accumulatedTranscript.current = "";
@@ -384,12 +384,12 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         recognitionRef.current.start();
         console.log('🎙️ [ContinuousConversation] Recognition started');
 
-        // Track analytics
-        Analytics.startRecording({
-          timestamp: new Date().toISOString(),
-          mode: 'continuous',
-          user_agent: window.navigator.userAgent
-        });
+        // Track analytics (disabled for Vercel build)
+        // Analytics.startRecording({
+        //   timestamp: new Date().toISOString(),
+        //   mode: 'continuous',
+        //   user_agent: window.navigator.userAgent
+        // });
       } catch (err) {
         console.error('❌ [ContinuousConversation] Error starting recognition:', err);
       }
@@ -437,12 +437,12 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       audioContextRef.current = null;
     }
 
-    // Track analytics
-    Analytics.stopRecording({
-      recording_duration_ms: Date.now() - lastSpeechTime.current,
-      success: true,
-      mode: 'continuous'
-    });
+    // Track analytics (disabled for Vercel build)
+    // Analytics.stopRecording({
+    //   recording_duration_ms: Date.now() - lastSpeechTime.current,
+    //   success: true,
+    //   mode: 'continuous'
+    // });
   }, []);
 
   // Toggle listening
