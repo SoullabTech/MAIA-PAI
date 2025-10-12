@@ -1456,10 +1456,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               />
             </motion.div>
 
-            {/* Holoflower Image - Sharp initially, fades when text cascades over */}
+            {/* Holoflower Image - Warm amber tone, sharp initially, fades when text cascades over */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <img
-                src="/holoflower.svg"
+                src="/holoflower-amber.png"
                 alt="Holoflower"
                 className={`w-48 h-48 md:w-56 md:h-56 object-contain transition-all duration-700 ${
                   showChatInterface || messages.length > 0
