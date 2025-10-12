@@ -99,7 +99,11 @@ export function QuickModeToggle({ className = '' }: QuickModeToggleProps) {
       {/* Current Mode Button */}
       <button
         ref={buttonRef}
-        onClick={() => setShowMenu(!showMenu)}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          setShowMenu(!showMenu);
+        }}
         className="flex items-center gap-2 px-3 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 transition-all duration-300"
         title={`Current mode: ${currentModeConfig.name}\nSay: "${currentModeConfig.voiceCommand}"`}
       >
@@ -130,6 +134,7 @@ export function QuickModeToggle({ className = '' }: QuickModeToggleProps) {
                 bottom: buttonRect ? `${window.innerHeight - buttonRect.top + 8}px` : '100px',
                 right: buttonRect ? `${window.innerWidth - buttonRect.right}px` : '16px'
               }}
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="p-2 border-b border-amber-500/20">
                 <div className="flex items-center gap-2 px-2 py-1">
