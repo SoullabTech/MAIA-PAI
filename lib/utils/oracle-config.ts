@@ -24,7 +24,7 @@ export interface OraclePersonality {
 
 export const ORACLE_PERSONALITIES: Record<string, OraclePersonality> = {
   maya: {
-    name: 'Maya',
+    name: 'Maia',
     essence: 'warm_curious_presence',
     voice: 'melodic_inviting',
     archetypes: ['Oracle', 'Guide', 'Friend'],
