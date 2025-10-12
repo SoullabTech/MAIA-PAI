@@ -362,10 +362,18 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
 
       try {
         // CRITICAL FIX: Stop first if already running to prevent "already started" error
+        // Need to check actual state before attempting to start
+        const isCurrentlyRecording = isRecording;
+
+        if (isCurrentlyRecording) {
+          console.log('⏸️ [ContinuousConversation] Recognition already active, skipping start');
+          return;
+        }
+
         try {
           recognitionRef.current.stop();
-          // Wait a tick for stop to complete
-          await new Promise(resolve => setTimeout(resolve, 50));
+          // Wait for stop to complete (increased from 50ms to 200ms)
+          await new Promise(resolve => setTimeout(resolve, 200));
         } catch (stopErr) {
           // Ignore error if not running
         }
