@@ -592,7 +592,8 @@ Please structure this as a comprehensive knowledge transfer that could enable an
   }
 
   private generateCacheKey(context: Oracle2Context): string {
-    return `oracle2_${context.userQuery.substring(0, 50)}_${context.depthPreference}_${JSON.stringify(context.elementalNeeds)}`.replace(/\s/g, '_');
+    const queryKey = context.userQuery ? context.userQuery.substring(0, 50) : 'no_query';
+    return `oracle2_${queryKey}_${context.depthPreference || 'default'}_${JSON.stringify(context.elementalNeeds || {})}`.replace(/\s/g, '_');
   }
 
   private setupPeriodicSync(): void {

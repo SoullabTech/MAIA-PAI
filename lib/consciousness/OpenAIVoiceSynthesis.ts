@@ -296,10 +296,13 @@ This wisdom is not "background" - it's your living knowledge. Integrate it natur
   if (context.conversationHistory && context.conversationHistory.length > 0) {
     // Take last 10 messages for context
     const recentHistory = context.conversationHistory.slice(-10);
+    console.log(`📜 Adding conversation history: ${recentHistory.length} messages`);
     messages.push(...recentHistory.map(msg => ({
       role: msg.role === 'user' ? 'user' : 'assistant',
       content: msg.content
     })));
+  } else {
+    console.log('📜 No conversation history available - fresh conversation');
   }
 
   // Add current user input
@@ -309,13 +312,25 @@ This wisdom is not "background" - it's your living knowledge. Integrate it natur
   });
 
   try {
+    console.log('🔑 OpenAI API Key check:', {
+      exists: !!process.env.OPENAI_API_KEY,
+      length: process.env.OPENAI_API_KEY?.length,
+      prefix: process.env.OPENAI_API_KEY?.substring(0, 7)
+    });
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-4',
       messages,
-      temperature: 0.8, // Warm, present, natural
+      temperature: 0.95, // High variation - MAIA should feel alive, not robotic
       max_tokens: 150, // Keep responses concise for voice
-      presence_penalty: 0.3, // Reduce repetition
-      frequency_penalty: 0.3
+      presence_penalty: 0.6, // Stronger penalty to prevent exact repetition
+      frequency_penalty: 0.5 // Encourage word variety
+    });
+
+    console.log('✅ OpenAI completion received:', {
+      hasChoices: !!completion.choices?.[0],
+      hasContent: !!completion.choices?.[0]?.message?.content,
+      contentLength: completion.choices?.[0]?.message?.content?.length
     });
 
     const response = completion.choices[0].message.content || "I'm here. Tell me more.";
@@ -344,14 +359,22 @@ This wisdom is not "background" - it's your living knowledge. Integrate it natur
     };
 
   } catch (error: any) {
-    console.error('OpenAI voice synthesis error:', error);
+    console.error('❌ OpenAI voice synthesis error:', {
+      message: error?.message,
+      status: error?.status,
+      statusText: error?.statusText,
+      type: error?.type,
+      code: error?.code,
+      fullError: error
+    });
 
-    // Warm fallback
+    // Warm fallback - NEVER echo user input
     return {
-      response: "I'm here with you. What's on your mind?",
+      response: "I'm experiencing a moment of integration. Could you share that again?",
       element: 'aether',
       metadata: {
-        model: 'gpt-4-fallback'
+        model: 'gpt-4-fallback',
+        error: error?.message || 'Unknown error'
       }
     };
   }

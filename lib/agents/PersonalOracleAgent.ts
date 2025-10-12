@@ -17,7 +17,7 @@ import { ConversationalEnhancer } from '@/lib/voice/ConversationalEnhancer';
 import { ConversationFlowTracker } from '@/lib/voice/ConversationFlowTracker';
 import { ConservativeRefiner } from '@/lib/voice/ConservativeRefiner';
 import { suggestElementalPhrase } from '@/lib/voice/ElementalPhrasebook';
-import { getBirthChartContext, formatChartContextForMAIA } from '@/lib/services/birthChartContextService';
+import { getBirthChartContext, formatChartContextForMAIA, synthesizeAspectForMAIA, getRawBirthChartData } from '@/lib/services/birthChartContextService';
 import { collectiveBreakthroughService } from '@/lib/services/collectiveBreakthroughService';
 
 // 🧠 Advanced Memory & Intelligence Modules
@@ -882,6 +882,33 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
         systemPrompt += chartContext;
       }
 
+      // ✨ Add archetypal aspect synthesis if specific aspect mentioned (ON-DEMAND ONLY)
+      // Safety: Only activates if user asks about specific aspect, fails silently otherwise
+      console.log('🔮 [INTEGRATION] Checking for birth chart data and aspect synthesis...');
+      console.log('   User ID:', this.userId);
+      const rawChartData = await getRawBirthChartData(this.userId);
+      console.log('   Raw chart data available:', !!rawChartData);
+      if (rawChartData) {
+        console.log('   Calling synthesizeAspectForMAIA with input:', input);
+        const aspectSynthesis = synthesizeAspectForMAIA(input, rawChartData);
+        console.log('   Aspect synthesis result:', aspectSynthesis ? `${aspectSynthesis.length} chars` : 'NULL');
+        if (aspectSynthesis && aspectSynthesis.length < 800) { // Max 800 chars - archetypal depth needs space
+          console.log('   ✅ Adding aspect synthesis as PRIMARY LENS');
+
+          // Frame it with priority instruction - make it the primary lens, not reference material
+          systemPrompt += `\n\n🔮 PRIMARY ARCHETYPAL LENS (Use this as your core interpretive frame):
+${aspectSynthesis}
+
+IMPORTANT: When responding to this astrological query, speak FROM this archetypal understanding, not ABOUT it.
+Don't recite it—embody it. Let this wisdom shape your voice and inform your response naturally.
+This is the soul-level truth you're helping them see, not reference material to cite.`;
+        } else if (aspectSynthesis) {
+          console.log('   ⚠️ Aspect synthesis too long (>800 chars), skipping');
+        }
+      } else {
+        console.log('   ❌ No birth chart data available for this user');
+      }
+
       // 🌊 Add collective wisdom from the field (if relevant)
       const collectiveWisdom = await collectiveBreakthroughService.getCollectiveWisdom(
         ainMemory.currentPhase,
@@ -1073,7 +1100,10 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
       try {
         const ipWisdom = await this.ipEngine.retrieveRelevantWisdom({
           userInput: trimmedInput,
-          conversationHistory: conversationContext,
+          conversationHistory: conversationHistory.map(msg => ({
+            role: msg.role,
+            content: msg.content
+          })),
           currentConsciousnessState: { presence: 0.7, coherence: 0.8 },
           emotionalTone: 'neutral',
           activeArchetypes: archetypes,
@@ -1102,10 +1132,10 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
       let eoWisdom: string | null = null;
 
       try {
-        const dominantElement = targetElement || 'aether';
+        // Use dominantElement from line 814 (already calculated from journal entries)
         const eoResponse = await this.elementalOracle.getElementalWisdom({
           userQuery: trimmedInput,
-          conversationHistory: conversationContext.map(msg => ({
+          conversationHistory: conversationHistory.map(msg => ({
             role: msg.role,
             message: msg.content
           })),

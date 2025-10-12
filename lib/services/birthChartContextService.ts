@@ -15,6 +15,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { getZodiacArchetype, generateArchetypalDescription } from '@/lib/astrology/archetypeLibrary';
 import { getSpiralogicFacet } from '@/lib/astrology/spiralogicMapping';
+import { synthesizeAspect, findRelevantAspect, extractAspectsFromChart, type AspectType } from '@/lib/astrology/aspectSynthesis';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -37,6 +38,91 @@ export interface BirthChartContext {
     earth: string[];
     air: string[];
   };
+}
+
+/**
+ * HARDCODED BIRTH CHARTS
+ * For users whose IDs don't match database UUID format
+ * TODO: Remove this once proper user authentication is implemented
+ */
+const HARDCODED_CHARTS: Record<string, any> = {
+  'user_1760278086001': {
+    // Kelly Nezat's Chart - Dec 9, 1966, 10:29 PM CST, Baton Rouge, LA
+    sun: { sign: 'Sagittarius', degree: 17.23, house: 4, element: 'fire' },
+    moon: { sign: 'Pisces', degree: 23.45, house: 7, element: 'water' },
+    ascendant: { sign: 'Leo', degree: 28.12, element: 'fire' },
+    mercury: { sign: 'Sagittarius', degree: 9.34, house: 4, element: 'fire' },
+    venus: { sign: 'Capricorn', degree: 2.56, house: 5, element: 'earth' },
+    mars: { sign: 'Libra', degree: 19.87, house: 2, element: 'air' },
+    jupiter: { sign: 'Cancer', degree: 26.43, house: 11, element: 'water' },
+    saturn: { sign: 'Pisces', degree: 23.12, house: 7, element: 'water' },
+    uranus: { sign: 'Virgo', degree: 23.67, house: 1, element: 'earth' },
+    neptune: { sign: 'Scorpio', degree: 22.89, house: 3, element: 'water' },
+    pluto: { sign: 'Virgo', degree: 20.45, house: 1, element: 'earth' },
+    elementalBalance: { fire: 30, water: 35, earth: 25, air: 10 },
+    aspects: [
+      { planet1: 'sun', planet2: 'saturn', type: 'square', orb: 5.89, applying: false },
+      { planet1: 'moon', planet2: 'saturn', type: 'conjunction', orb: 0.33, applying: true },
+      { planet1: 'sun', planet2: 'jupiter', type: 'quincunx', orb: 9.2, applying: false },
+      { planet1: 'moon', planet2: 'neptune', type: 'trine', orb: 0.56, applying: true },
+      { planet1: 'venus', planet2: 'mars', type: 'square', orb: 7.31, applying: false },
+      { planet1: 'uranus', planet2: 'pluto', type: 'conjunction', orb: 3.22, applying: true },
+      { planet1: 'sun', planet2: 'uranus', type: 'square', orb: 6.44, applying: false }
+    ]
+  }
+};
+
+/**
+ * Fetch RAW birth chart data (for aspect synthesis)
+ * Returns the full chart object with aspects, planets, etc.
+ */
+export async function getRawBirthChartData(userId: string): Promise<any | null> {
+  try {
+    console.log('📊 [getRawBirthChartData] Fetching chart for user:', userId);
+
+    // Check hardcoded charts first (for non-UUID userIds)
+    if (HARDCODED_CHARTS[userId]) {
+      console.log('   ✅ Found HARDCODED chart for user:', userId);
+      return HARDCODED_CHARTS[userId];
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const { data: profile, error } = await supabase
+      .from('oracle_user_profiles')
+      .select('birth_chart_data, birth_chart_calculated')
+      .eq('user_id', userId)
+      .single();
+
+    console.log('   Query result:', {
+      hasData: !!profile,
+      hasError: !!error,
+      errorMsg: error?.message,
+      hasChartData: !!profile?.birth_chart_data,
+      isCalculated: profile?.birth_chart_calculated
+    });
+
+    if (error) {
+      console.log('   ❌ Supabase error:', error);
+      return null;
+    }
+
+    if (!profile?.birth_chart_calculated) {
+      console.log('   ⚠️ Chart not calculated for this user');
+      return null;
+    }
+
+    if (!profile?.birth_chart_data) {
+      console.log('   ⚠️ birth_chart_data is null/undefined');
+      return null;
+    }
+
+    console.log('   ✅ Found chart data:', Object.keys(profile.birth_chart_data));
+    return profile.birth_chart_data;
+  } catch (error) {
+    console.error('   ❌ Exception in getRawBirthChartData:', error);
+    return null;
+  }
 }
 
 /**
@@ -178,4 +264,59 @@ export function formatChartContextForMAIA(chart: BirthChartContext | null): stri
 function extractSignFromPlacement(placement: string): string {
   const match = placement.match(/^([A-Za-z]+)/);
   return match ? match[1] : '';
+}
+
+/**
+ * Get archetypal synthesis for a specific aspect (ON-DEMAND ONLY)
+ * Called when user asks about a specific aspect in their chart
+ * Returns poetic 2-4 sentence interpretation, not textbook description
+ */
+export function synthesizeAspectForMAIA(
+  userQuery: string,
+  chartData: any
+): string | null {
+  try {
+    console.log('🔮 [ASPECT SYNTHESIS] Checking if query requires aspect synthesis...');
+    console.log('   Query:', userQuery);
+    console.log('   Chart data available:', !!chartData);
+
+    if (!chartData || !userQuery) {
+      console.log('   ❌ No chart data or query - skipping');
+      return null;
+    }
+
+    // Extract aspects from chart
+    const aspects = extractAspectsFromChart(chartData);
+    console.log(`   📊 Found ${aspects.length} aspects in chart`);
+    if (aspects.length === 0) return null;
+
+    // Find most relevant aspect based on query
+    const relevantAspect = findRelevantAspect(userQuery, aspects);
+    console.log('   🎯 Relevant aspect:', relevantAspect);
+    if (!relevantAspect) {
+      console.log('   ❌ No relevant aspect found for query');
+      return null;
+    }
+
+    // Synthesize archetypal interpretation
+    const synthesis = synthesizeAspect(
+      relevantAspect.planet1,
+      relevantAspect.planet2,
+      relevantAspect.aspectType
+    );
+    console.log('   ✨ Synthesis result:', synthesis ? 'SUCCESS' : 'FAILED');
+
+    if (!synthesis) return null;
+
+    // Return poetic synthesis with soul question
+    const result = `\n\n✨ ARCHETYPAL INSIGHT:\n${synthesis.essence}\n\nCore Question: ${synthesis.coreQuestion}${synthesis.elementalDynamic ? `\n(${synthesis.elementalDynamic})` : ''}`;
+    console.log('   ✅ Returning archetypal synthesis (', result.length, 'chars)');
+    console.log('   📝 [SYNTHESIS CONTENT]:');
+    console.log('   ', synthesis.essence.substring(0, 150) + '...');
+    console.log('   ', 'Core Question:', synthesis.coreQuestion);
+    return result;
+  } catch (error) {
+    console.error('❌ [ASPECT SYNTHESIS ERROR]:', error);
+    return null; // Fail silently
+  }
 }

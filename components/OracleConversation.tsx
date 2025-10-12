@@ -148,6 +148,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // Motion states
   const [currentMotionState, setCurrentMotionState] = useState<MotionState>('idle');
   const [voiceAudioLevel, setVoiceAudioLevel] = useState(0);
+  const [smoothedAudioLevel, setSmoothedAudioLevel] = useState(0); // Exponentially smoothed for accessibility
   const [coherenceLevel, setCoherenceLevel] = useState(0.5);
   const [coherenceShift, setCoherenceShift] = useState<CoherenceShift>('stable');
   const [shadowPetals, setShadowPetals] = useState<string[]>([]);
@@ -252,6 +253,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Smooth audio level changes for accessibility (prevents flashing from sudden spikes)
+  useEffect(() => {
+    const smoothingFactor = 0.3; // Lower = smoother, slower response
+    setSmoothedAudioLevel(prev => prev * (1 - smoothingFactor) + voiceAudioLevel * smoothingFactor);
+  }, [voiceAudioLevel]);
 
   // Detect breakthrough potential for journal suggestions
   useEffect(() => {
@@ -1680,7 +1687,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 ))}
 
                 {/* Audio level responsive center field glow - only show for strong speech */}
-                {voiceAudioLevel > 0.2 && (
+                {/* Accessibility: High threshold (0.5) + exponential smoothing prevents keyboard flashing (seizure risk) */}
+                {smoothedAudioLevel > 0.5 && (
                   <motion.div
                     className="absolute rounded-full"
                     style={{
@@ -1690,12 +1698,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       filter: 'blur(18px)',
                     }}
                     animate={{
-                      scale: 1 + voiceAudioLevel * 0.2,
-                      opacity: 0.5 + voiceAudioLevel * 0.2,
+                      scale: 1 + smoothedAudioLevel * 0.15,
+                      opacity: 0.4 + smoothedAudioLevel * 0.15,
                     }}
                     transition={{
-                      duration: 0.3,
-                      ease: "easeOut"
+                      duration: 0.8,
+                      ease: "easeInOut"
                     }}
                   />
                 )}

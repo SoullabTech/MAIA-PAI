@@ -22,6 +22,10 @@ try {
   });
 }
 
+// Disable Vercel caching - MAIA should always be fresh and responsive
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 /**
  * ✅ CANONICAL MAIA PERSONAL ORACLE ROUTE
  *

@@ -63,17 +63,14 @@ export class UserActivityTracker {
     // Try to store in database
     if (this.supabase) {
       try {
+        // Use users table instead of beta_users (correct schema)
         await this.supabase
-          .from('beta_users')
+          .from('users')
           .upsert({
-            user_id: userId,
+            id: userId,
             name,
             email,
-            registered_at: new Date().toISOString(),
-            last_active: new Date().toISOString(),
-            session_count: 1
-          }, {
-            onConflict: 'user_id'
+            last_login: new Date().toISOString(),
           });
       } catch (error) {
         console.log('Database write failed, continuing with in-memory storage');
@@ -101,13 +98,11 @@ export class UserActivityTracker {
       if (this.supabase) {
         try {
           await this.supabase
-            .from('beta_users')
+            .from('users')
             .update({
-              last_active: new Date().toISOString(),
-              message_count: user.messageCount,
-              engagement_score: user.engagement
+              last_login: new Date().toISOString(),
             })
-            .eq('user_id', userId);
+            .eq('id', userId);
         } catch (error) {
           // Silent fail, in-memory is the fallback
         }
@@ -157,9 +152,9 @@ export class UserActivityTracker {
     if (this.supabase) {
       try {
         const { data } = await this.supabase
-          .from('beta_users')
+          .from('users')
           .select('*')
-          .order('last_active', { ascending: false });
+          .order('last_login', { ascending: false });
 
         if (data && data.length > 0) {
           return data;
@@ -171,13 +166,10 @@ export class UserActivityTracker {
 
     // Fallback to in-memory data
     return Array.from(activeUsers.values()).map(user => ({
-      user_id: user.userId,
+      id: user.userId,
       name: user.name,
       email: user.email,
-      last_active: user.lastActivity.toISOString(),
-      message_count: user.messageCount,
-      engagement_score: user.engagement,
-      session_count: 1,
+      last_login: user.lastActivity.toISOString(),
       status: this.getUserStatus(user.lastActivity)
     }));
   }

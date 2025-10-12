@@ -100,21 +100,6 @@ export function MenuBar() {
         </div>
       </Link>
 
-      {/* Soul Map (Elemental Archetype Patterns) */}
-      <Link
-        href="/soulmap"
-        className="group relative"
-        aria-label="Soul Map - Elemental Patterns"
-      >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-accentGlow/40">
-          <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accentGlow/70 transition-all group-hover:text-soul-accentGlow" />
-
-          {/* Tooltip - Matte instrument label */}
-          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-            Soul Map
-          </span>
-        </div>
-      </Link>
 
       {/* Soul-Building Circle (Community) */}
       {!hideCommunityLink && (

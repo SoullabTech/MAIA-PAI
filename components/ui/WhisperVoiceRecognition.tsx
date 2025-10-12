@@ -60,74 +60,9 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
   const speechDurationRef = useRef<number>(0);
   const lastSpeechCheckRef = useRef<number>(0);
 
-
-
-  /**
-   * Convert webm to MP3 for Whisper API compatibility
-   * Whisper claims to support webm but often rejects it
-   */
-  const convertToMp3 = async (webmBlob: Blob): Promise<Blob> => {
-    const audioContext = new AudioContext();
-    const arrayBuffer = await webmBlob.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-    // Create offline context for rendering to WAV first
-    const offlineContext = new OfflineAudioContext(
-      audioBuffer.numberOfChannels,
-      audioBuffer.length,
-      audioBuffer.sampleRate
-    );
-
-    const source = offlineContext.createBufferSource();
-    source.buffer = audioBuffer;
-    source.connect(offlineContext.destination);
-    source.start(0);
-
-    const renderedBuffer = await offlineContext.startRendering();
-
-    // Convert to 16-bit PCM WAV (MP3 encoding requires external library, WAV is more reliable)
-    const numberOfChannels = renderedBuffer.numberOfChannels;
-    const length = renderedBuffer.length * numberOfChannels * 2;
-    const buffer = new ArrayBuffer(44 + length);
-    const view = new DataView(buffer);
-
-    // WAV header
-    const writeString = (offset: number, string: string) => {
-      for (let i = 0; i < string.length; i++) {
-        view.setUint8(offset + i, string.charCodeAt(i));
-      }
-    };
-
-    writeString(0, 'RIFF');
-    view.setUint32(4, 36 + length, true);
-    writeString(8, 'WAVE');
-    writeString(12, 'fmt ');
-    view.setUint32(16, 16, true); // fmt chunk size
-    view.setUint16(20, 1, true); // PCM format
-    view.setUint16(22, numberOfChannels, true);
-    view.setUint32(24, renderedBuffer.sampleRate, true);
-    view.setUint32(28, renderedBuffer.sampleRate * numberOfChannels * 2, true); // byte rate
-    view.setUint16(32, numberOfChannels * 2, true); // block align
-    view.setUint16(34, 16, true); // bits per sample
-    writeString(36, 'data');
-    view.setUint32(40, length, true);
-
-    // Write PCM samples
-    const offset = 44;
-    let index = offset;
-    for (let i = 0; i < renderedBuffer.length; i++) {
-      for (let channel = 0; channel < numberOfChannels; channel++) {
-        const sample = Math.max(-1, Math.min(1, renderedBuffer.getChannelData(channel)[i]));
-        view.setInt16(index, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
-        index += 2;
-      }
-    }
-
-    return new Blob([buffer], { type: 'audio/wav' });
-  };
-
   /**
    * Send audio to Whisper for transcription
+   * Uses server-side endpoint to keep API keys secure
    */
   const transcribeAudio = useCallback(async (audioBlob: Blob) => {
     // 🔒 Check VoiceLock FIRST - don't process if MAIA is speaking
@@ -144,66 +79,37 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
     isProcessingRef.current = true;
 
     try {
-      // Try WAV conversion first, fallback to webm if it fails
-      let audioToSend = audioBlob;
-      let filename = 'audio.webm';
-
-      try {
-        console.log('🎤 Converting webm to WAV for Whisper compatibility...');
-        const wavBlob = await convertToMp3(audioBlob);
-        audioToSend = wavBlob;
-        filename = 'audio.wav';
-        console.log('✅ WAV conversion successful:', wavBlob.size, 'bytes');
-      } catch (conversionError) {
-        console.warn('⚠️ WAV conversion failed, sending webm directly:', conversionError);
-        // Continue with original webm blob
-      }
-
-      console.log('🎤 Sending audio to Whisper...', {
-        size: audioToSend.size,
-        type: audioToSend.type,
-        filename
+      console.log('🎤 Sending audio to server for transcription...', {
+        size: audioBlob.size,
+        type: audioBlob.type
       });
 
       const formData = new FormData();
-      formData.append('file', audioToSend, filename);
-      formData.append('model', 'whisper-1');
-      formData.append('language', 'en');
+      formData.append('audio', audioBlob, 'audio.webm');
 
-      const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-
-      if (!apiKey) {
-        throw new Error('OpenAI API key not configured');
-      }
-
-      console.log('🔑 Using API key:', apiKey.substring(0, 20) + '...');
-
-      const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      // Use server-side endpoint instead of calling OpenAI directly
+      const response = await fetch('/api/voice/transcribe', {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiKey}`
-        },
         body: formData
       });
 
       if (!response.ok) {
-        // Get detailed error message from Whisper API
         const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.error?.message || errorData.message || 'Unknown error';
-        console.error('❌ Whisper API error details:', {
+        const errorMessage = errorData.error || 'Transcription failed';
+        console.error('❌ Transcription API error:', {
           status: response.status,
           statusText: response.statusText,
           errorData,
           audioSize: audioBlob.size,
           audioType: audioBlob.type
         });
-        throw new Error(`Whisper API error (${response.status}): ${errorMessage}`);
+        throw new Error(`Transcription error (${response.status}): ${errorMessage}`);
       }
 
       const data = await response.json();
-      const text = data.text?.trim();
+      const text = data.transcript?.trim();
 
-      console.log('✅ Whisper transcript:', text);
+      console.log('✅ Transcription received:', text);
 
       // 🔒 Double-check VoiceLock before using transcript
       // (Lock could have activated during transcription)
