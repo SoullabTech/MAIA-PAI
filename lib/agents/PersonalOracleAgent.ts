@@ -18,6 +18,7 @@ import { ConversationFlowTracker } from '@/lib/voice/ConversationFlowTracker';
 import { ConservativeRefiner } from '@/lib/voice/ConservativeRefiner';
 import { suggestElementalPhrase } from '@/lib/voice/ElementalPhrasebook';
 import { getBirthChartContext, formatChartContextForMAIA } from '@/lib/services/birthChartContextService';
+import { collectiveBreakthroughService } from '@/lib/services/collectiveBreakthroughService';
 
 // 🧠 Advanced Memory & Intelligence Modules
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
@@ -879,6 +880,23 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
       const chartContext = formatChartContextForMAIA(birthChart);
       if (chartContext) {
         systemPrompt += chartContext;
+      }
+
+      // 🌊 Add collective wisdom from the field (if relevant)
+      const collectiveWisdom = await collectiveBreakthroughService.getCollectiveWisdom(
+        ainMemory.currentPhase,
+        dominantElement,
+        ainMemory.currentArchetype
+      );
+      if (collectiveWisdom && collectiveWisdom.synchronicity_detected) {
+        systemPrompt += `\n\n---\n\nFROM THE COLLECTIVE FIELD (Others' Journeys):\n\n`;
+        if (collectiveWisdom.active_movements.length > 0) {
+          systemPrompt += `Active movements: ${collectiveWisdom.active_movements.join(', ')}\n\n`;
+        }
+        if (collectiveWisdom.suggested_reflection) {
+          systemPrompt += `Field wisdom: ${collectiveWisdom.suggested_reflection}\n`;
+        }
+        systemPrompt += `\nUse this gently if it feels relevant - not everyone wants to know they're part of a collective movement. Trust your sense of what fits.\n\n---\n`;
       }
 
       // 🔥 NEW: Add conversation history for memory continuity
