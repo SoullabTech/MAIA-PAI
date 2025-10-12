@@ -1978,7 +1978,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           }
                         }}
                         className="flex-1 min-h-[42px] max-h-[100px] px-3 py-2
-                                 bg-black/60 backdrop-blur-sm
+                                 bg-[#1a1f2e]/95 backdrop-blur-md
                                  border border-gold-divine/30 rounded-2xl
                                  text-gold-divine placeholder-gold-divine/50
                                  text-sm leading-relaxed
