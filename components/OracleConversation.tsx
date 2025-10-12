@@ -2218,6 +2218,29 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             </svg>
           </button>
 
+          {/* Birth Chart / Astrology - Holoflower Icon */}
+          <button
+            onClick={() => window.location.href = '/birth-chart'}
+            className="p-3 rounded-full text-[#D4B896]/40 hover:text-[#D4B896]/60 transition-all duration-300 group"
+            title="Your Cosmic Blueprint"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              {/* Outer circle (zodiac wheel) */}
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" fill="none" />
+              {/* Inner holoflower petals */}
+              <path d="M12 4 L12 8" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* North */}
+              <path d="M17.66 6.34 L15.18 8.82" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* NE */}
+              <path d="M20 12 L16 12" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* East */}
+              <path d="M17.66 17.66 L15.18 15.18" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* SE */}
+              <path d="M12 20 L12 16" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* South */}
+              <path d="M6.34 17.66 L8.82 15.18" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* SW */}
+              <path d="M4 12 L8 12" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* West */}
+              <path d="M6.34 6.34 L8.82 8.82" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* NW */}
+              {/* Center point */}
+              <circle cx="12" cy="12" r="1.5" fill="currentColor" className="group-hover:animate-pulse" />
+            </svg>
+          </button>
+
           {/* Lab Notes */}
           <button
             onClick={() => window.location.href = '/lab-notes'}
