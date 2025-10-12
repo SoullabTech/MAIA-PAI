@@ -1832,11 +1832,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 0 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className="bg-black/60 md:bg-black/40 backdrop-blur-sm rounded-2xl p-4 text-white
+                      className="bg-black/70 md:bg-black/40 backdrop-blur-md rounded-2xl p-4 text-white
                                border border-gold-divine/30 shadow-lg max-w-full
-                               cursor-pointer hover:bg-black/70 md:hover:bg-black/50 transition-colors group"
+                               cursor-pointer hover:bg-black/80 md:hover:bg-black/50 transition-colors group"
                       onClick={handleCopyMessage}
-                      style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
+                      style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)' }}
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div className="text-xs text-gold-divine/60">
