@@ -1402,9 +1402,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       )}
 
       {/* Beautiful Sacred Holoflower - Clear presence with smart dimming */}
-      <div className="fixed inset-0 flex items-end md:items-end justify-center pointer-events-none pb-32 md:pb-24">
-        {/* Holoflower container - bottom third placement for better composition */}
-        <div className="flex items-center justify-center"
+      <div className="fixed inset-0 flex items-center md:items-center justify-center md:justify-start pointer-events-none">
+        {/* Holoflower container - left-positioned on desktop, centered on mobile */}
+        <div className="flex items-center justify-center md:ml-[10%] lg:ml-[15%]"
              style={{
                width: holoflowerSize,
                height: holoflowerSize,
@@ -1493,9 +1493,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     : 'opacity-90'  // Clear and visible when listening
                 }`}
                 style={{
-                  filter: showChatInterface || messages.length > 0
-                    ? 'drop-shadow(0 0 8px rgba(212, 184, 150, 0.15))'
-                    : 'drop-shadow(0 0 24px rgba(212, 184, 150, 0.4))',
+                  filter: 'none',  // No filters - keep holoflower clean, let glow layers handle the ambiance
                 }}
               />
             </div>
