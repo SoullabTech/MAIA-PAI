@@ -58,16 +58,16 @@ export function MenuBar() {
         </div>
       )}
 
-      {/* Mobile-First: Full Menu Bar - Positioned left of sign out button */}
-      <div className="flex fixed right-16 z-50 items-center gap-2 md:gap-3" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 0.75rem)' }}>
+      {/* INSTRUMENT PANEL: Ancient-future navigation - Positioned left of sign out button */}
+      <div className="flex fixed right-16 z-40 items-center gap-1.5 md:gap-2" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 0.75rem)' }}>
       {/* MAIA Training Progress Icon */}
       <Link
         href="/maya/training"
         className="group relative"
         aria-label="MAIA Training Progress"
       >
-        <div className="relative p-2 md:p-3 rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-500/30 hover:bg-amber-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-amber-500/40 animate-pulse-subtle">
-          <Brain className="w-4 h-4 md:w-5 md:h-5 text-amber-400 transition-transform group-active:rotate-12" />
+        <div className="relative p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-accent/40">
+          <Brain className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent/70 transition-all group-hover:text-soul-accent" />
 
           {/* Progress Ring */}
           <svg className="absolute inset-0 w-full h-full -rotate-90" style={{ filter: 'drop-shadow(0 0 2px rgba(251, 191, 36, 0.3))' }}>
@@ -93,9 +93,9 @@ export function MenuBar() {
             />
           </svg>
 
-          {/* Tooltip */}
-          <span className="absolute -bottom-10 right-0 bg-black/80 backdrop-blur-sm text-amber-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-            MAIA Training {Math.round(trainingProgress * 100)}%
+          {/* Tooltip - Matte instrument label */}
+          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Training {Math.round(trainingProgress * 100)}%
           </span>
         </div>
       </Link>
@@ -107,12 +107,12 @@ export function MenuBar() {
           className="group relative"
           aria-label="Soul-Building Circle"
         >
-          <div className="p-2 md:p-3 rounded-full bg-indigo-500/20 backdrop-blur-md border border-indigo-500/30 hover:bg-indigo-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-indigo-500/40">
-            <Users className="w-4 h-4 md:w-5 md:h-5 text-indigo-400 transition-transform group-active:scale-110" />
+          <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-waterWarm/40">
+            <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-waterWarm/70 transition-all group-hover:text-soul-waterWarm" />
 
-            {/* Tooltip */}
-            <span className="absolute -bottom-10 right-0 bg-black/80 backdrop-blur-sm text-indigo-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-              Soul-Building Circle
+            {/* Tooltip - Matte instrument label */}
+            <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              Circle
             </span>
           </div>
         </Link>
@@ -124,12 +124,12 @@ export function MenuBar() {
         className="group relative"
         aria-label="Conversation Mode"
       >
-        <div className="p-2 md:p-3 rounded-full bg-cyan-500/20 backdrop-blur-md border border-cyan-500/30 hover:bg-cyan-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-cyan-500/40">
-          <MessageSquare className="w-4 h-4 md:w-5 md:h-5 text-cyan-400 transition-all group-active:rotate-[-10deg]" />
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-link/40">
+          <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-link/70 transition-all group-hover:text-soul-link" />
 
-          {/* Tooltip */}
-          <span className="absolute -bottom-10 right-0 bg-black/80 backdrop-blur-sm text-cyan-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-            Conversation Mode
+          {/* Tooltip - Matte instrument label */}
+          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Mode
           </span>
         </div>
       </Link>
@@ -140,11 +140,11 @@ export function MenuBar() {
         className="group relative"
         aria-label="Settings"
       >
-        <div className="p-2 md:p-3 rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-500/30 hover:bg-amber-500/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-amber-500/40">
-          <Settings className="w-4 h-4 md:w-5 md:h-5 text-amber-400 transition-all group-active:rotate-90" />
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-accent/40">
+          <Settings className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent/70 transition-all group-hover:text-soul-accent group-hover:rotate-45" />
 
-          {/* Tooltip */}
-          <span className="absolute -bottom-10 right-0 bg-black/80 backdrop-blur-sm text-amber-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          {/* Tooltip - Matte instrument label */}
+          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Settings
           </span>
         </div>
@@ -160,12 +160,12 @@ export function MenuBar() {
         className="group relative"
         aria-label="Report a Problem"
       >
-        <div className="p-2 md:p-3 rounded-full bg-neutral-400/20 backdrop-blur-md border border-neutral-400/30 hover:bg-neutral-400/30 transition-all hover:scale-110 active:scale-95 shadow-lg active:shadow-xl active:shadow-neutral-400/40">
-          <MessageCircle className="w-4 h-4 md:w-5 md:h-5 text-neutral-300 transition-all group-active:scale-110 group-active:rotate-12" />
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-textTertiary/40">
+          <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-textTertiary/70 transition-all group-hover:text-soul-textTertiary" />
 
-          {/* Tooltip */}
-          <span className="absolute -bottom-10 right-0 bg-black/80 backdrop-blur-sm text-neutral-300 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-            Beta Feedback
+          {/* Tooltip - Matte instrument label */}
+          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Feedback
           </span>
         </div>
       </button>
