@@ -2079,9 +2079,21 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Redesigned Bottom Icon Bar - Sacred Style - Always visible */}
-      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 pb-safe mb-2">
-        <div className="flex justify-center items-center gap-8 py-4 px-8 bg-black/60 backdrop-blur-lg rounded-full border border-[#D4B896]/20">
+      {/* Redesigned Bottom Icon Bar - Sacred Style - Always visible - Scrollable on mobile */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 pb-safe mb-2 overflow-x-auto overflow-y-hidden
+                      md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 md:overflow-x-visible"
+           style={{
+             WebkitOverflowScrolling: 'touch',
+             scrollbarWidth: 'none',
+             msOverflowStyle: 'none'
+           }}>
+        <style jsx>{`
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+        <div className="flex justify-start items-center gap-4 md:gap-8 py-4 px-4 md:px-8 bg-black/60 backdrop-blur-lg rounded-full border border-[#D4B896]/20
+                        md:justify-center min-w-max md:min-w-0">
           {/* Voice Toggle - Activate mic when switching to voice mode */}
           <button
             onClick={async () => {
