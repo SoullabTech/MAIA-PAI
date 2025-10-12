@@ -88,7 +88,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     }
 
     const recognition = new SpeechRecognition();
-    recognition.continuous = false; // CHANGED: auto-stop after phrase to prevent stuck mic
+    recognition.continuous = true; // REVERTED: Need continuous=true for mute button to work
     recognition.interimResults = true;
     recognition.lang = 'en-US';
     recognition.maxAlternatives = 1;
