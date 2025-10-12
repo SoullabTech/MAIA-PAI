@@ -40,6 +40,11 @@ export function useMaiaVoice() {
 
   useEffect(() => {
     // Initialize Maya Voice System
+    console.log('🔍 [useMaiaVoice] Starting voice initialization...');
+    console.log('   - Window available:', typeof window !== 'undefined');
+    console.log('   - AudioContext available:', !!(typeof window !== 'undefined' && (window.AudioContext || (window as any).webkitAudioContext)));
+    console.log('   - OpenAI API Key present:', !!process.env.NEXT_PUBLIC_OPENAI_API_KEY);
+
     try {
       maiaVoiceRef.current = getMaiaVoice({
         elevenLabsApiKey: process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY,
@@ -48,29 +53,47 @@ export function useMaiaVoice() {
         agentConfig // Pass agent configuration for voice selection
       });
 
+      console.log('✅ [useMaiaVoice] MaiaVoiceSystem created');
+
       // Subscribe to voice state changes
       const unsubscribe = maiaVoiceRef.current.subscribe(setVoiceState);
 
       // Check capabilities
       const capabilities = maiaVoiceRef.current.getCapabilities();
-      setIsSupported(capabilities.webSpeech || capabilities.elevenLabs || capabilities.sesame);
+      console.log('🎤 [useMaiaVoice] Capabilities:', capabilities);
+
+      const isSupported = capabilities.webSpeech || capabilities.elevenLabs || capabilities.sesame;
+      setIsSupported(isSupported);
       setIsReady(true);
+
+      console.log(`✅ [useMaiaVoice] Voice ready! isSupported: ${isSupported}, isReady: true`);
 
       return unsubscribe;
     } catch (error) {
-      console.error('Failed to initialize Maya Voice:', error);
+      console.error('❌ [useMaiaVoice] Failed to initialize Maya Voice:', error);
       setIsSupported(false);
       setIsReady(false);
     }
   }, [agentConfig]);
 
   const speak = useCallback(async (text: string, context?: any): Promise<void> => {
-    if (!maiaVoiceRef.current || !isReady) return;
+    console.log('🔊 [useMaiaVoice.speak] Called with:', {
+      hasVoiceRef: !!maiaVoiceRef.current,
+      isReady,
+      textLength: text?.length
+    });
+
+    if (!maiaVoiceRef.current || !isReady) {
+      console.warn('⚠️  [useMaiaVoice.speak] Early return - voice not ready');
+      return;
+    }
 
     try {
+      console.log('📢 [useMaiaVoice.speak] Calling MaiaVoiceSystem.speak()...');
       await maiaVoiceRef.current.speak(text, context);
+      console.log('✅ [useMaiaVoice.speak] Completed successfully');
     } catch (error) {
-      console.error('Maya speak failed:', error);
+      console.error('❌ [useMaiaVoice.speak] Failed:', error);
     }
   }, [isReady]);
 
