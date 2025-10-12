@@ -17,6 +17,7 @@ import { ConversationalEnhancer } from '@/lib/voice/ConversationalEnhancer';
 import { ConversationFlowTracker } from '@/lib/voice/ConversationFlowTracker';
 import { ConservativeRefiner } from '@/lib/voice/ConservativeRefiner';
 import { suggestElementalPhrase } from '@/lib/voice/ElementalPhrasebook';
+import { getBirthChartContext, formatChartContextForMAIA } from '@/lib/services/birthChartContextService';
 
 // 🧠 Advanced Memory & Intelligence Modules
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
@@ -871,6 +872,13 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
           systemPrompt += `**${timeLabel}** (${entry.mode}):\n`;
           systemPrompt += `"${entry.entry.trim()}"\n\n`;
         });
+      }
+
+      // 🌟 Add birth chart context if available (gentle whisper, not constraint)
+      const birthChart = await getBirthChartContext(this.userId);
+      const chartContext = formatChartContextForMAIA(birthChart);
+      if (chartContext) {
+        systemPrompt += chartContext;
       }
 
       // 🔥 NEW: Add conversation history for memory continuity
