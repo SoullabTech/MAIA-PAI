@@ -1401,10 +1401,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Beautiful Sacred Holoflower - Clear presence with smart dimming */}
-      <div className="fixed inset-0 flex items-center md:items-center justify-center md:justify-start pointer-events-none">
-        {/* Holoflower container - left-positioned on desktop, centered on mobile */}
-        <div className="flex items-center justify-center md:ml-[10%] lg:ml-[15%]"
+      {/* Beautiful Sacred Holoflower - Dune/Blade Runner aesthetic: lower-left ambient presence */}
+      <div className="fixed inset-0 flex items-end justify-center md:justify-start pointer-events-none pb-32 md:pb-24 md:pl-12 lg:pl-16">
+        {/* Holoflower container - bottom-left, off-center, cinematic asymmetric composition */}
+        <div className="flex items-center justify-center"
              style={{
                width: holoflowerSize,
                height: holoflowerSize,
