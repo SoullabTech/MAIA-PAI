@@ -1,10 +1,12 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mic, Brain, Sparkles, Settings as SettingsIcon, Users } from 'lucide-react';
+import { X, Mic, Brain, Sparkles, Settings as SettingsIcon, Users, MessageSquare } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@/lib/supabase';
 import type { ArchetypeId } from '@/lib/services/archetypePreferenceService';
+import { ConversationMode, CONVERSATION_STYLE_DESCRIPTIONS } from '@/lib/types/conversation-style';
+import { ConversationStylePreference } from '@/lib/preferences/conversation-style-preference';
 
 interface QuickSettingsSheetProps {
   isOpen: boolean;
@@ -24,6 +26,7 @@ interface MaiaSettings {
     warmth: number;
   };
   archetype: ArchetypeId;
+  conversationMode: ConversationMode;
 }
 
 const VOICE_OPTIONS = [
@@ -54,6 +57,7 @@ const DEFAULT_SETTINGS: MaiaSettings = {
     warmth: 0.8,
   },
   archetype: 'AUTO' as ArchetypeId,
+  conversationMode: 'her',
 };
 
 export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps) {
@@ -65,6 +69,7 @@ export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps)
       if (typeof window === 'undefined') return;
 
       const explorerId = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
+      const conversationMode = ConversationStylePreference.get();
 
       try {
         if (explorerId) {
@@ -88,6 +93,7 @@ export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps)
                 warmth: data.tone ? data.tone / 100 : 0.8,
               },
               archetype: (data.archetype as ArchetypeId) || 'AUTO',
+              conversationMode: conversationMode,
             });
             localStorage.setItem('maia_settings', JSON.stringify(settings));
             return;
@@ -96,13 +102,26 @@ export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps)
 
         const saved = localStorage.getItem('maia_settings');
         if (saved) {
-          setSettings(JSON.parse(saved));
+          const parsedSettings = JSON.parse(saved);
+          setSettings({
+            ...parsedSettings,
+            conversationMode: conversationMode, // Always use latest from preference
+          });
+        } else {
+          setSettings({
+            ...DEFAULT_SETTINGS,
+            conversationMode: conversationMode,
+          });
         }
       } catch (e) {
         console.error('Failed to load settings', e);
         const saved = localStorage.getItem('maia_settings');
         if (saved) {
-          setSettings(JSON.parse(saved));
+          const parsedSettings = JSON.parse(saved);
+          setSettings({
+            ...parsedSettings,
+            conversationMode: conversationMode,
+          });
         }
       }
     };
@@ -132,6 +151,17 @@ export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps)
         localStorage.setItem('maia_settings', JSON.stringify(newSettings));
         window.dispatchEvent(new CustomEvent('maia-settings-changed', { detail: newSettings }));
 
+        // Special handling for conversation mode
+        if (path === 'conversationMode') {
+          ConversationStylePreference.set(value as ConversationMode);
+          window.dispatchEvent(new CustomEvent('maya-style-changed', {
+            detail: {
+              mode: value,
+              acknowledgment: getStyleAcknowledgment(value as ConversationMode)
+            }
+          }));
+        }
+
         const explorerId = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
         if (explorerId) {
           saveToSupabase(explorerId, newSettings);
@@ -140,6 +170,15 @@ export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps)
 
       return newSettings;
     });
+  };
+
+  const getStyleAcknowledgment = (mode: ConversationMode): string => {
+    const acknowledgments = {
+      her: "Okay, natural mode. I'll keep it short and present.",
+      classic: "Switching to classic style - more reflective.",
+      adaptive: "Got it. I'll match your rhythm and energy."
+    };
+    return acknowledgments[mode];
   };
 
   const saveToSupabase = async (userId: string, settings: MaiaSettings) => {
@@ -401,10 +440,64 @@ export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps)
                   </div>
                 </motion.div>
 
+                {/* Conversation Style Selector */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
+                >
+                  <label className="flex items-center gap-2 text-sm font-medium text-amber-200/80 mb-3">
+                    <MessageSquare size={16} />
+                    Conversation Style
+                  </label>
+                  <div className="space-y-2">
+                    {(['her', 'classic', 'adaptive'] as ConversationMode[]).map((mode) => {
+                      const description = CONVERSATION_STYLE_DESCRIPTIONS[mode];
+                      const isSelected = settings.conversationMode === mode;
+
+                      return (
+                        <motion.button
+                          key={mode}
+                          onClick={() => updateSetting('conversationMode', mode)}
+                          className={`w-full text-left p-3 rounded-xl border transition-all ${
+                            isSelected
+                              ? 'border-cyan-500/50 bg-cyan-500/15 text-cyan-300'
+                              : 'border-white/10 bg-black/20 text-white/60'
+                          }`}
+                          whileTap={{ scale: 0.98 }}
+                          whileHover={{ scale: 1.01 }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{description.icon}</span>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium">{description.title}</span>
+                                {isSelected && (
+                                  <motion.span
+                                    className="text-xs text-cyan-400"
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                                  >
+                                    Active
+                                  </motion.span>
+                                )}
+                              </div>
+                              <p className="text-xs text-white/50 mt-0.5">
+                                {description.description}
+                              </p>
+                            </div>
+                          </div>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.45 }}
                 >
                 <motion.button
                   onClick={() => {
