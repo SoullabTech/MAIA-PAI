@@ -839,6 +839,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       let responseText = oracleResponse.message || oracleResponse.content || oracleResponse.text || oracleResponse.response || 'Tell me your truth.';
       responseText = cleanMessage(responseText);
 
+      // 🩺 Monitor MAIA personality health (dev mode only)
+      // Detects degradation and auto-recovers if needed
+      if (process.env.NODE_ENV === 'development') {
+        const { monitorMAIAResponse } = await import('@/lib/monitoring/personality-health');
+        monitorMAIAResponse(responseText);
+      }
+
       const element = oracleResponse.element || 'aether';
       const facetId = mapElementToFacetId(element);
       setActiveFacetId(facetId);

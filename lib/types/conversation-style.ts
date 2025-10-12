@@ -79,5 +79,14 @@ export const CONVERSATION_STYLE_DESCRIPTIONS = {
   }
 };
 
-// Default for new users - "her" mode for natural, brief conversation
-export const DEFAULT_CONVERSATION_STYLE: ConversationMode = 'her';
+/**
+ * Default conversation style
+ *
+ * DEVELOPMENT: Always use 'classic' mode to prevent personality degradation during HMR
+ * PRODUCTION: Use 'her' mode for natural, brief conversation
+ *
+ * This prevents the personality regression issue where HMR resets MAIA to
+ * overly brief responses during active development.
+ */
+export const DEFAULT_CONVERSATION_STYLE: ConversationMode =
+  process.env.NODE_ENV === 'development' ? 'classic' : 'her';
