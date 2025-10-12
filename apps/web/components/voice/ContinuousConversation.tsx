@@ -60,11 +60,27 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     isRecording
   }));
 
-  // Auto-restart listening when Maya stops speaking
+  // Auto-restart listening when Maya stops speaking, but with timeout to stop if no response
+  const conversationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (!isSpeaking && isListening && !isRecording && !isProcessing) {
       // Maya stopped speaking, restart listening
       console.log('🎤 Maya stopped speaking, restarting microphone...');
+
+      // Clear any existing conversation timeout
+      if (conversationTimeoutRef.current) {
+        clearTimeout(conversationTimeoutRef.current);
+      }
+
+      // Set timeout to stop listening if no user response within 15 seconds
+      conversationTimeoutRef.current = setTimeout(() => {
+        if (isListening && !isRecording && !isSpeaking && !isProcessing) {
+          console.log('⏹️ No user response after 15 seconds, stopping microphone to prevent dead air recording');
+          stopListening();
+        }
+      }, 15000);
+
       setTimeout(() => {
         if (recognitionRef.current && isListening && !isRecording) {
           try {
@@ -85,6 +101,13 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         }
       }, 300); // Small delay to ensure audio context is ready
     }
+
+    // Clear timeout when component unmounts or state changes
+    return () => {
+      if (conversationTimeoutRef.current) {
+        clearTimeout(conversationTimeoutRef.current);
+      }
+    };
   }, [isSpeaking, isListening, isRecording, isProcessing]);
 
   // Initialize Web Speech API
@@ -109,7 +132,13 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       setIsRecording(true);
       onRecordingStateChange?.(true);
       accumulatedTranscript.current = "";
-      
+
+      // Clear conversation timeout when user starts speaking
+      if (conversationTimeoutRef.current) {
+        clearTimeout(conversationTimeoutRef.current);
+        conversationTimeoutRef.current = null;
+      }
+
       // Set timeout to auto-stop recognition after 30 seconds (increased from 6)
       if (recognitionTimeoutRef.current) {
         clearTimeout(recognitionTimeoutRef.current);
@@ -373,39 +402,45 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
 
   // Stop listening
   const stopListening = useCallback(() => {
-    
+    console.log('🛑 [ContinuousConversation] stopListening called');
+
     setIsListening(false);
     setIsRecording(false);
     setAudioLevel(0);
-    
+
     // Stop speech recognition
     if (recognitionRef.current) {
       recognitionRef.current.stop();
       recognitionRef.current = null;
     }
-    
+
     // Clear timers
     if (silenceTimerRef.current) {
       clearTimeout(silenceTimerRef.current);
       silenceTimerRef.current = null;
     }
-    
+
     if (recognitionTimeoutRef.current) {
       clearTimeout(recognitionTimeoutRef.current);
       recognitionTimeoutRef.current = null;
     }
-    
+
+    if (conversationTimeoutRef.current) {
+      clearTimeout(conversationTimeoutRef.current);
+      conversationTimeoutRef.current = null;
+    }
+
     // Stop audio monitoring
     if (micStreamRef.current) {
       micStreamRef.current.getTracks().forEach(track => track.stop());
       micStreamRef.current = null;
     }
-    
+
     if (audioContextRef.current) {
       audioContextRef.current.close();
       audioContextRef.current = null;
     }
-    
+
     // Track analytics
     Analytics.stopRecording({
       recording_duration_ms: Date.now() - lastSpeechTime.current,
