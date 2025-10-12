@@ -63,48 +63,17 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   // Auto-restart listening when Maya stops speaking, but with timeout to stop if no response
   const conversationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    if (!isSpeaking && isListening && !isRecording && !isProcessing) {
-      // Maya stopped speaking, restart listening
-      console.log('🎤 Maya stopped speaking, restarting microphone...');
-
-      // Clear any existing conversation timeout
-      if (conversationTimeoutRef.current) {
-        clearTimeout(conversationTimeoutRef.current);
-      }
-
-      // Set timeout to stop listening if no user response within 15 seconds
-      conversationTimeoutRef.current = setTimeout(() => {
-        if (isListening && !isRecording && !isSpeaking && !isProcessing) {
-          console.log('⏹️ No user response after 15 seconds, stopping microphone to prevent dead air recording');
-          stopListening();
-        }
-      }, 15000);
-
-      // CRITICAL: Wait 2 seconds for Maya's audio to fully finish playing
-      // This prevents echo loops where Maya hears herself and responds infinitely
-      setTimeout(() => {
-        if (recognitionRef.current && isListening && !isRecording && !isSpeaking) {
-          try {
-            console.log('🎤 Restarting microphone after Maya finished speaking');
-            recognitionRef.current.start();
-          } catch (err: any) {
-            // Silently ignore "already started" - recognition is already running
-            if (!err.message?.includes('already started')) {
-              console.error('Error restarting recognition after speech:', err);
-            }
-          }
-        }
-      }, 2000); // 2 second delay to prevent echo loops
-    }
-
-    // Clear timeout when component unmounts or state changes
-    return () => {
-      if (conversationTimeoutRef.current) {
-        clearTimeout(conversationTimeoutRef.current);
-      }
-    };
-  }, [isSpeaking, isListening, isRecording, isProcessing]);
+  // DISABLED: Auto-restart causes echo loops - OracleConversation handles restart via startListening()
+  // useEffect(() => {
+  //   if (!isSpeaking && isListening && !isRecording && !isProcessing) {
+  //     console.log('🎤 Maya stopped speaking, restarting microphone...');
+  //     setTimeout(() => {
+  //       if (recognitionRef.current && isListening && !isRecording && !isSpeaking) {
+  //         recognitionRef.current.start();
+  //       }
+  //     }, 2000);
+  //   }
+  // }, [isSpeaking, isListening, isRecording, isProcessing]);
 
   // Initialize Web Speech API
   const initializeSpeechRecognition = useCallback(() => {
