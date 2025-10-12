@@ -15,13 +15,13 @@ export const BrandedWelcome: React.FC<BrandedWelcomeProps> = ({
   const [isVisible, setIsVisible] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
 
-  // Auto-hide after 5 minutes or delayed after first interaction
+  // Auto-hide after 30 seconds or delayed after first interaction
   useEffect(() => {
-    // Set up auto-hide timer (1 minute)
+    // Set up auto-hide timer (30 seconds)
     const timer = setTimeout(() => {
       setIsVisible(false);
       onComplete?.();
-    }, 60000); // 1 minute
+    }, 30000); // 30 seconds
 
     // Set up interaction listener
     const handleInteraction = () => {
@@ -90,7 +90,7 @@ export const BrandedWelcome: React.FC<BrandedWelcomeProps> = ({
             duration: 0.8,
             ease: "easeOut"
           }}
-          className="fixed top-4 sm:top-16 left-4 sm:left-8 md:left-12 z-40
+          className="fixed top-20 sm:top-24 left-4 sm:left-8 md:left-12 z-40
                      pointer-events-none select-none"
         >
           <div className="relative">
