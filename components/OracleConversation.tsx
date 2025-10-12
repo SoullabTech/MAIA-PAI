@@ -1895,6 +1895,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </motion.button>
       </div>
 
+      {/* Text Scrim - Darkened backdrop when messages appear */}
+      {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
+        <div className="fixed inset-0 bg-soul-background/40 backdrop-blur-[2px] z-20 transition-opacity duration-700" />
+      )}
+
       {/* Message flow - ASYMMETRIC INSTRUMENT LAYOUT: Left=geometry, Right=conversation */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
         <div className={`fixed top-20 sm:top-16 z-30 transition-all duration-500 ${
