@@ -105,7 +105,7 @@ export function QuickModeToggle({ className = '' }: QuickModeToggleProps) {
           <>
             {/* Backdrop */}
             <div
-              className="fixed inset-0 z-40"
+              className="fixed inset-0 z-[65]"
               onClick={() => setShowMenu(false)}
             />
 
@@ -115,7 +115,7 @@ export function QuickModeToggle({ className = '' }: QuickModeToggleProps) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute bottom-full right-0 mb-2 w-64 bg-[#0A0D16] border border-amber-500/30 rounded-lg shadow-xl z-50 overflow-hidden"
+              className="absolute bottom-full right-0 mb-2 w-64 bg-[#0A0D16] border border-amber-500/30 rounded-lg shadow-xl z-[70] overflow-hidden"
             >
               <div className="p-2 border-b border-amber-500/20">
                 <div className="flex items-center gap-2 px-2 py-1">

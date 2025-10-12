@@ -415,24 +415,17 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
   }, [isProcessing, isResponding, resetAllStates]);
 
-  // Sync local audio state with Maia voice state to prevent conflicts
+  // Don't sync voice state - it creates race conditions where sync happens
+  // before TTS audio starts playing, killing the audio before it can play.
+  // The local state (isAudioPlaying, isResponding) is managed correctly by
+  // the handleTextMessage flow and MaiaVoiceSystem callbacks.
   useEffect(() => {
-    console.log('🔍 Voice state sync check:', {
+    // Only log for debugging - no state changes
+    console.log('🔍 Voice state check:', {
       maiaIsPlaying: maiaVoiceState?.isPlaying,
       isAudioPlaying,
-      isResponding,
-      willUpdateAudio: maiaVoiceState?.isPlaying !== isAudioPlaying,
-      willUpdateResponding: maiaVoiceState?.isPlaying !== isResponding
+      isResponding
     });
-
-    if (maiaVoiceState?.isPlaying !== isAudioPlaying) {
-      console.log(`🔄 Syncing isAudioPlaying: ${isAudioPlaying} → ${maiaVoiceState?.isPlaying || false}`);
-      setIsAudioPlaying(maiaVoiceState?.isPlaying || false);
-    }
-    if (maiaVoiceState?.isPlaying !== isResponding) {
-      console.log(`🔄 Syncing isResponding: ${isResponding} → ${maiaVoiceState?.isPlaying || false}`);
-      setIsResponding(maiaVoiceState?.isPlaying || false);
-    }
   }, [maiaVoiceState?.isPlaying, isAudioPlaying, isResponding]);
 
   // Auto-focus text input in chat mode after MAIA responds
@@ -1470,8 +1463,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             }, 200);
           }
         }}
-        whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-        transition={{ duration: 0.15 }}
+        style={{ willChange: 'auto' }}
       >
         {/* Holoflower container - smaller, upper-left, visible but not dominating */}
         <div className="flex items-center justify-center"
