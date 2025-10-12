@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Home, BookOpen, Shuffle, Moon, Settings } from 'lucide-react';
+import { Home, BookOpen, Moon, Settings } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { QuickSettingsSheet } from '../QuickSettingsSheet';
 
@@ -29,13 +29,6 @@ const createNavItems = (onSettingsClick: () => void): NavItem[] => [
     icon: <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />,
     path: '/journal',
     color: '#4A90E2',
-  },
-  {
-    id: 'wild-petal',
-    label: 'Wild Petal',
-    icon: <Shuffle className="w-4 h-4 sm:w-5 sm:h-5" />,
-    path: '/wild-petal',
-    color: '#FF6B6B',
   },
   {
     id: 'dream',
@@ -74,8 +67,6 @@ export function BottomNavigation() {
 
     if (item.action) {
       item.action();
-    } else if (item.path === '/wild-petal') {
-      window.dispatchEvent(new CustomEvent('drawWildPetal'));
     } else if (item.path) {
       router.push(item.path);
     }
@@ -125,24 +116,6 @@ export function BottomNavigation() {
                 >
                   {item.label}
                 </motion.span>
-
-                {item.id === 'wild-petal' && (
-                  <motion.div
-                    className="absolute inset-0 rounded-xl pointer-events-none"
-                    animate={{
-                      boxShadow: [
-                        '0 0 0 0 rgba(255, 107, 107, 0)',
-                        '0 0 0 10px rgba(255, 107, 107, 0.1)',
-                        '0 0 0 0 rgba(255, 107, 107, 0)',
-                      ],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      repeatDelay: 3,
-                    }}
-                  />
-                )}
 
                 {item.id === 'settings' && (
                   <motion.div
