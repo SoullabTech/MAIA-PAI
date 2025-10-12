@@ -129,9 +129,9 @@ export function QuickModeToggle({ className = '' }: QuickModeToggleProps) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="fixed w-64 bg-[#0A0D16] border border-amber-500/30 rounded-lg shadow-xl z-[70] overflow-hidden"
+              className="fixed w-64 bg-[#0A0D16]/95 backdrop-blur-md border border-amber-500/30 rounded-lg shadow-xl z-[70] overflow-hidden"
               style={{
-                bottom: buttonRect ? `${window.innerHeight - buttonRect.top + 16}px` : '100px',
+                bottom: buttonRect ? `${window.innerHeight - buttonRect.top + 80}px` : '140px',
                 right: buttonRect ? `${window.innerWidth - buttonRect.right}px` : '16px'
               }}
               onClick={(e) => e.stopPropagation()}
