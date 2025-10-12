@@ -1939,9 +1939,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 0 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className="bg-black/70 md:bg-black/40 backdrop-blur-md rounded-2xl p-4 text-white
+                      className={`bg-black/70 md:bg-black/40 backdrop-blur-md rounded-2xl p-4 text-white
                                border border-gold-divine/30 shadow-lg max-w-full
-                               cursor-pointer hover:bg-black/80 md:hover:bg-black/50 transition-colors group"
+                               cursor-pointer hover:bg-black/80 md:hover:bg-black/50 transition-colors group
+                               ${message.role === 'user' ? 'message-user' : 'message-maia'}`}
+                      data-role={message.role === 'user' ? 'user' : 'assistant'}
                       onClick={handleCopyMessage}
                       style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)' }}
                     >

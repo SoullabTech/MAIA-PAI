@@ -12,6 +12,7 @@ import { ConditionalMenuBar } from "@/components/ui/ConditionalMenuBar";
 import { Toaster } from 'react-hot-toast';
 import "./globals.css";
 import "./globals-mobile.css";
+import "@/styles/typography-refresh.css"; // 🎨 Phase 1: Typography refresh
 
 const inter = Inter({ subsets: ["latin"] });
 
