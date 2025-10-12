@@ -201,15 +201,19 @@ export class MaiaVoiceSystem {
 
   // OpenAI TTS with Alloy voice - PRIMARY METHOD
   private async speakWithOpenAI(text: string): Promise<void> {
+    console.log('🎯 [speakWithOpenAI] Starting...');
+
     // iOS Fix: Ensure audio context is active before speaking
     await this.ensureAudioContextActive();
+    console.log('   ✓ AudioContext active');
 
     const isAnthony = this.config.agentConfig?.voice === 'anthony';
     const voiceName = isAnthony ? 'onyx' : 'alloy';
-    console.log(`🎯 Attempting OpenAI TTS with ${voiceName} voice for ${isAnthony ? 'Anthony' : 'Maya'}...`);
+    console.log(`   ✓ Using ${voiceName} voice for ${isAnthony ? 'Anthony' : 'Maya'}`);
     this.updateState({ isLoading: true, currentText: text, voiceType: 'elevenlabs' }); // Keep as 'elevenlabs' for compatibility
 
     try {
+      console.log('   → Calling /api/voice/openai-tts...');
       const response = await fetch('/api/voice/openai-tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -221,15 +225,20 @@ export class MaiaVoiceSystem {
         })
       });
 
+      console.log('   ← API response status:', response.status);
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('❌ OpenAI TTS API error:', response.status, errorText);
         throw new Error(`OpenAI TTS error: ${response.status}`);
       }
 
-      console.log('✅ OpenAI TTS response received, playing audio...');
+      console.log('   ✓ Converting to blob...');
       const audioBlob = await response.blob();
+      console.log('   ✓ Blob size:', audioBlob.size, 'bytes');
+
       const audioUrl = URL.createObjectURL(audioBlob);
+      console.log('   ✓ Created blob URL, attempting playback...');
 
       return this.playAudioUrl(audioUrl);
     } catch (error) {
@@ -486,7 +495,14 @@ export class MaiaVoiceSystem {
 
         // Use feedback prevention wrapper
         playAudioWithFeedbackPrevention(audio).catch(error => {
-          console.error('Audio play failed:', error);
+          console.error('❌ Audio play failed - likely needs user interaction:', error);
+          console.error('   Error name:', error?.name);
+          console.error('   Error message:', error?.message);
+          this.updateState({
+            isPlaying: false,
+            isLoading: false,
+            error: 'Audio playback blocked - click to enable audio'
+          });
           reject(error);
         });
       } catch (error) {
