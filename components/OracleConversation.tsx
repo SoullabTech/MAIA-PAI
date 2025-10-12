@@ -1435,8 +1435,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Beautiful Sacred Holoflower - Upper-left subtle ambient presence */}
-      <div className="fixed top-20 left-4 md:top-24 md:left-8 pointer-events-none">
+      {/* Beautiful Sacred Holoflower - Upper-left subtle ambient presence, above scrim */}
+      <div className="fixed top-20 left-4 md:top-24 md:left-8 pointer-events-none z-[25]">
         {/* Holoflower container - smaller, upper-left, visible but not dominating */}
         <div className="flex items-center justify-center"
              style={{
@@ -1490,16 +1490,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               />
             </motion.div>
 
-            {/* Holoflower Image - Warm amber tone, sharp initially, fades when text cascades over */}
+            {/* Holoflower Image - Warm amber tone, always visible in upper-left */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <img
                 src="/holoflower-amber.png"
                 alt="Holoflower"
-                className={`w-48 h-48 md:w-56 md:h-56 object-contain transition-all duration-700 ${
-                  showChatInterface || messages.length > 0
-                    ? 'opacity-20 blur-sm'  // Fade and blur when text flows over
-                    : 'opacity-90'  // Sharp and clear when listening
-                }`}
+                className="w-48 h-48 md:w-56 md:h-56 object-contain opacity-90"
                 style={{
                   filter: 'none',
                 }}
