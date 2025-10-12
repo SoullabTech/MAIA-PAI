@@ -1429,16 +1429,16 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
           {/* Central Holoflower Logo with Glow and Sparkles */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            {/* Radiant glow behind the holoflower - RECEDES when conversation active */}
+            {/* Radiant glow behind the holoflower - VERY subtle, no visible edges */}
             <motion.div
               className={`absolute flex items-center justify-center pointer-events-none ${
                 showChatInterface || messages.length > 0
-                  ? 'opacity-5 md:opacity-15'  // Nearly invisible when text present - text wins
-                  : 'opacity-30 md:opacity-70'  // Present when just listening
+                  ? 'opacity-0'  // Invisible when text present
+                  : 'opacity-20'  // Very subtle when listening
               }`}
               animate={{
-                scale: [1, 1.4, 1],
-                opacity: showChatInterface || messages.length > 0 ? [0.05, 0.1, 0.05] : [0.5, 0.8, 0.5]
+                scale: [1, 1.3, 1],
+                opacity: showChatInterface || messages.length > 0 ? 0 : [0.15, 0.25, 0.15]
               }}
               transition={{
                 duration: 4,
@@ -1447,37 +1447,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               }}
             >
               <div
-                className="w-48 h-48 rounded-full"
+                className="w-56 h-56 rounded-full"
                 style={{
-                  background: 'radial-gradient(circle, rgba(212, 184, 150, 1) 0%, rgba(212, 184, 150, 0.7) 30%, rgba(212, 184, 150, 0.3) 60%, transparent 100%)',
-                  filter: 'blur(30px)',
-                  transform: 'translate(0, 0)' /* Center the main glow */
-                }}
-              />
-            </motion.div>
-
-            {/* Secondary outer glow layer for extra radiance - Dimmed in chat mode */}
-            <motion.div
-              className={`absolute flex items-center justify-center pointer-events-none ${
-                showChatInterface ? 'opacity-15 md:opacity-40' : 'opacity-30 md:opacity-100'
-              }`}
-              animate={{
-                scale: [1.2, 1.6, 1.2],
-                opacity: showChatInterface ? [0.2, 0.3, 0.2] : [0.3, 0.5, 0.3]
-              }}
-              transition={{
-                duration: 5,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.5
-              }}
-            >
-              <div
-                className="w-64 h-64 rounded-full"
-                style={{
-                  background: 'radial-gradient(circle, rgba(212, 184, 150, 0.6) 0%, rgba(212, 184, 150, 0.2) 50%, transparent 100%)',
-                  filter: 'blur(40px)',
-                  transform: 'translate(0, 0)' /* Center the secondary glow */
+                  background: 'radial-gradient(circle, rgba(212, 184, 150, 0.3) 0%, rgba(212, 184, 150, 0.1) 40%, transparent 70%)',
+                  filter: 'blur(50px)',  // More blur = softer, no hard edges
+                  transform: 'translate(0, 0)'
                 }}
               />
             </motion.div>
@@ -1656,7 +1630,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               </motion.div>
             )}
 
-            {/* Voice Visualizer - MAIA's voice (clean golden rings) */}
+            {/* Voice Visualizer - MAIA's voice (soft pulsing glow, NO rings/borders) */}
             {(isResponding || isAudioPlaying || maiaVoiceState?.isPlaying) && (
               <motion.div
                 className="absolute inset-0 pointer-events-none flex items-center justify-center"
@@ -1664,19 +1638,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                {/* Clean golden pulsing rings for MAIA */}
+                {/* Soft golden pulsing glow layers - NO BORDERS */}
                 {[...Array(2)].map((_, i) => (
                   <motion.div
-                    key={`maya-ring-${i}`}
-                    className="absolute rounded-full border-2"
+                    key={`maya-glow-${i}`}
+                    className="absolute rounded-full"
                     style={{
                       width: `${250 + i * 100}px`,
                       height: `${250 + i * 100}px`,
-                      borderColor: '#D4B896', // Golden for MAIA
+                      background: `radial-gradient(circle, rgba(212, 184, 150, ${0.15 - i * 0.05}) 0%, transparent 70%)`,
+                      filter: 'blur(40px)',
                     }}
                     animate={{
                       scale: [1, 1.15, 1],
-                      opacity: [0.7, 0.3, 0.7],
+                      opacity: [0.4, 0.2, 0.4],
                     }}
                     transition={{
                       duration: 2.5 + i * 0.5,
@@ -1693,11 +1668,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                   style={{
                     width: '200px',
                     height: '200px',
-                    background: 'radial-gradient(circle, rgba(212, 184, 150, 0.2) 0%, transparent 60%)',
+                    background: 'radial-gradient(circle, rgba(212, 184, 150, 0.15) 0%, transparent 60%)',
+                    filter: 'blur(30px)',
                   }}
                   animate={{
                     scale: [1, 1.2, 1],
-                    opacity: [0.5, 0.8, 0.5],
+                    opacity: [0.3, 0.5, 0.3],
                   }}
                   transition={{
                     duration: 3,
