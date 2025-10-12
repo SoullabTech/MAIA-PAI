@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { PWAProvider } from "@/components/providers/PWAProvider";
 import { ToastProvider } from "@/components/system/ToastProvider";
+import { MaiaPresenceProvider } from "@/lib/contexts/MaiaPresenceContext";
+import { AmbientVoiceIndicator } from "@/components/voice/AmbientVoiceIndicator";
 import { BetaBanner } from "@/components/ui/BetaBanner";
 import { FeedbackWidget } from "@/components/ui/FeedbackWidget";
 import { PWAInstallPrompt } from "@/components/ui/PWAInstallPrompt";
@@ -61,14 +63,21 @@ export default function RootLayout({
         <PWAProvider>
           <AuthProvider>
             <ToastProvider>
-              <Toaster position="top-center" />
-              <BetaBanner />
-              {children}
-              <ConditionalMenuBar />
-              {/* <PWAInstallPrompt /> - Disabled: was causing black overlay */}
-              <FeedbackWidget />
-              {/* <VoiceDebugOverlay /> - File doesn't exist */}
-              {/* {process.env.NODE_ENV === 'development' && <ToneDebugOverlay />} */}
+              {/* 🎙️ MAIA Ambient Presence - Voice-first layer */}
+              <MaiaPresenceProvider>
+                <Toaster position="top-center" />
+                <BetaBanner />
+                {children}
+                <ConditionalMenuBar />
+                {/* <PWAInstallPrompt /> - Disabled: was causing black overlay */}
+                <FeedbackWidget />
+
+                {/* 🎙️ Ambient Voice Indicator - Shows when voice active */}
+                <AmbientVoiceIndicator />
+
+                {/* <VoiceDebugOverlay /> - File doesn't exist */}
+                {/* {process.env.NODE_ENV === 'development' && <ToneDebugOverlay />} */}
+              </MaiaPresenceProvider>
             </ToastProvider>
           </AuthProvider>
         </PWAProvider>
