@@ -1098,6 +1098,40 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       return;
     }
 
+    // GHOST TRANSCRIPT FILTER: Block common YouTube/video/ambient audio phrases
+    const ghostPhrases = [
+      'thank you for watching',
+      'thanks for watching',
+      'subscribe',
+      'like and subscribe',
+      'hit the bell',
+      'turn on notifications',
+      'check out the link',
+      'link in description',
+      'patreon',
+      'sponsor',
+      'this video is sponsored',
+      'before we begin',
+      'let\'s get started',
+      'welcome back',
+      'today we\'re going to',
+      'in today\'s video',
+      'don\'t forget to',
+      'make sure to',
+      'if you enjoyed',
+      'leave a comment',
+      'smash that',
+      'hit that like button'
+    ];
+
+    const lowerTranscript = transcript.toLowerCase();
+    const isGhostPhrase = ghostPhrases.some(phrase => lowerTranscript.includes(phrase));
+
+    if (isGhostPhrase) {
+      console.warn('👻 Ghost transcript detected (YouTube/video audio):', transcript);
+      return;
+    }
+
     // ECHO SUPPRESSION: Check if we're in cooldown period
     if (now < echoSuppressUntil) {
       const remainingMs = echoSuppressUntil - now;
