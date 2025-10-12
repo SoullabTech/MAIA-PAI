@@ -99,7 +99,17 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
       });
 
       if (!response.ok) {
-        throw new Error(`Whisper API error: ${response.status}`);
+        // Get detailed error message from Whisper API
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error?.message || errorData.message || 'Unknown error';
+        console.error('❌ Whisper API error details:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData,
+          audioSize: audioBlob.size,
+          audioType: audioBlob.type
+        });
+        throw new Error(`Whisper API error (${response.status}): ${errorMessage}`);
       }
 
       const data = await response.json();
@@ -238,9 +248,10 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
 
         // Only transcribe if we have:
         // 1. Meaningful audio size (>1KB)
-        // 2. At least SOME speech detected (speechMs > 0)
-        // This prevents Whisper from hallucinating transcripts from pure silence
-        if (audioBlob.size > 1000 && speechMs > 0) {
+        // 2. At least 300ms of actual speech (Whisper needs minimum duration)
+        // This prevents Whisper from hallucinating transcripts from pure silence or brief noise
+        const MIN_SPEECH_DURATION_MS = 300;
+        if (audioBlob.size > 1000 && speechMs >= MIN_SPEECH_DURATION_MS) {
           console.log('📤 Sending to Whisper:', {
             size: audioBlob.size,
             speechDuration: speechMs + 'ms',
@@ -249,10 +260,11 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
           });
           transcribeAudio(audioBlob);
         } else {
-          console.log('⏭️ Skipping transcription - no speech detected:', {
+          console.log('⏭️ Skipping transcription - insufficient speech:', {
             size: audioBlob.size,
             speechDuration: speechMs + 'ms',
-            reason: audioBlob.size <= 1000 ? 'audio too small' : 'no speech energy detected'
+            required: MIN_SPEECH_DURATION_MS + 'ms',
+            reason: audioBlob.size <= 1000 ? 'audio too small' : `need ${MIN_SPEECH_DURATION_MS}ms+ speech (got ${speechMs}ms)`
           });
         }
 
