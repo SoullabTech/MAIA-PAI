@@ -207,7 +207,7 @@ export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps)
       {isOpen && (
         <>
           <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -216,7 +216,7 @@ export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps)
 
           <motion.div
             className="fixed bottom-0 left-0 right-0 bg-gradient-to-b from-[#1a1a2e] to-[#16162b]
-                     rounded-t-3xl z-[201] max-h-[85vh] overflow-y-auto shadow-2xl
+                     rounded-t-3xl z-[10000] max-h-[85vh] overflow-y-auto shadow-2xl
                      border-t border-amber-500/10"
             style={{
               paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
