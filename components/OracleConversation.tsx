@@ -1271,12 +1271,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* Beautiful Sacred Holoflower - Responsive sizing - Always show */}
       <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
-        {/* Adjusted container to shift light up and left */}
+        {/* Centered holoflower container */}
         <div className="flex items-center justify-center"
              style={{
                width: holoflowerSize,
                height: holoflowerSize,
-               transform: 'translate(-20px, -30px)',
                pointerEvents: 'none',
                background: 'transparent',
                overflow: 'visible'
@@ -1731,8 +1730,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             zIndex: 100,
             WebkitTapHighlightColor: 'transparent',
             touchAction: 'manipulation',
-            pointerEvents: 'auto',
-            transform: 'translate(-20px, -30px)' // Match holoflower position
+            pointerEvents: 'auto'
           }}
           onContextMenu={(e) => {
             e.preventDefault(); // Prevent default context menu
