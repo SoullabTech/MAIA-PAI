@@ -275,7 +275,7 @@ export const SacredHoloflower: React.FC<SacredHoloflowerProps> = ({
           );
         })}
 
-        {/* Center sacred geometry preservation */}
+        {/* Center sacred geometry preservation - HIDDEN (distracting) */}
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -283,7 +283,7 @@ export const SacredHoloflower: React.FC<SacredHoloflowerProps> = ({
           fill="none"
           stroke="white"
           strokeWidth="0.5"
-          opacity="0.3"
+          opacity="0"
           className={`center-aether ${
             currentMotionState === 'responding' && activeFacetId ? 'center-aether-active' : ''
           }`}
