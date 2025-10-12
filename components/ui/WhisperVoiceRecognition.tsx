@@ -59,6 +59,9 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
   const speechDurationRef = useRef<number>(0);
   const lastSpeechCheckRef = useRef<number>(0);
 
+  // Track if we stopped because MAIA is speaking (don't transcribe this chunk)
+  const stoppedForMaiaRef = useRef<boolean>(false);
+
 
   /**
    * Convert webm to MP3 for Whisper API compatibility
@@ -316,6 +319,17 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
       // When recording stops, send to Whisper
       mediaRecorder.onstop = () => {
         console.log('⏹️ Recording stopped');
+
+        // If we stopped because MAIA is speaking, don't transcribe - just discard
+        if (stoppedForMaiaRef.current) {
+          console.log('🚫 Skipping transcription - stopped for MAIA speaking');
+          audioChunksRef.current = [];
+          speechDurationRef.current = 0;
+          lastSpeechCheckRef.current = 0;
+          stoppedForMaiaRef.current = false;
+          return; // DON'T transcribe this chunk
+        }
+
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         const speechMs = speechDurationRef.current;
 
@@ -377,12 +391,15 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
           console.log('🔇 Silence detected (2s+), stopping recording...');
           mediaRecorderRef.current?.stop();
 
-          // Restart recording for next phrase
+          // Restart recording for next phrase (only if MAIA is NOT speaking)
           setTimeout(() => {
-            if (!isMayaSpeaking && enabled && !isMuted) {
+            if (!isMayaSpeaking && enabled && !isMuted && mediaRecorderRef.current?.state === 'inactive') {
               console.log('🔄 Restarting recording for next phrase...');
               mediaRecorderRef.current?.start(1000);
               lastSpeechTimeRef.current = Date.now();
+              speechDurationRef.current = 0;
+            } else {
+              console.log('⏭️ Not restarting - MAIA is speaking or recorder not ready');
             }
           }, 100);
         }
@@ -396,38 +413,44 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
 
   /**
    * Pause recording (when MAIA is speaking)
+   * STOP completely instead of pause - pause() still records audio!
    */
   const pauseRecording = useCallback(() => {
-    console.log('⏸️ Pausing Whisper recording (MAIA speaking)...', {
+    console.log('🛑 STOPPING Whisper recording (MAIA speaking)...', {
       currentState: mediaRecorderRef.current?.state,
-      willPause: mediaRecorderRef.current?.state === 'recording'
+      willStop: mediaRecorderRef.current?.state === 'recording'
     });
 
     if (mediaRecorderRef.current?.state === 'recording') {
-      mediaRecorderRef.current.pause();
-      console.log('✅ Whisper recording PAUSED');
+      // Mark that we're stopping for MAIA (don't transcribe this chunk)
+      stoppedForMaiaRef.current = true;
+      // STOP completely - this prevents microphone from picking up MAIA's voice
+      mediaRecorderRef.current.stop();
+      console.log('✅ Whisper recording STOPPED (will not transcribe this chunk)');
     } else {
-      console.log('⚠️ Cannot pause - recorder not in recording state');
+      console.log('⚠️ Cannot stop - recorder not in recording state');
     }
   }, []);
 
   /**
    * Resume recording (when MAIA finishes speaking)
+   * RESTART recording from scratch
    */
   const resumeRecording = useCallback(() => {
-    console.log('▶️ Resuming Whisper recording (MAIA finished)...', {
-      currentState: mediaRecorderRef.current?.state,
-      willResume: mediaRecorderRef.current?.state === 'paused'
+    console.log('▶️ RESTARTING Whisper recording (MAIA finished)...', {
+      currentState: mediaRecorderRef.current?.state
     });
 
-    if (mediaRecorderRef.current?.state === 'paused') {
-      mediaRecorderRef.current.resume();
+    // If recorder was stopped, restart it
+    if (mediaRecorderRef.current?.state === 'inactive') {
+      console.log('🔄 Restarting MediaRecorder...');
+      mediaRecorderRef.current.start(1000);
       lastSpeechTimeRef.current = Date.now(); // Reset silence timer
       speechDurationRef.current = 0; // Reset speech duration for new phrase
       lastSpeechCheckRef.current = 0;
-      console.log('✅ Whisper recording RESUMED');
+      console.log('✅ Whisper recording RESTARTED');
     } else {
-      console.log('⚠️ Cannot resume - recorder not in paused state');
+      console.log('⚠️ Recorder in unexpected state:', mediaRecorderRef.current?.state);
     }
   }, []);
 
