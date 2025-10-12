@@ -264,9 +264,9 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
         setAudioLevel(level);
         onAudioLevelChange?.(level);
 
-        // Update last speech time if we detect REAL speech (threshold: 0.15 = speaking volume)
-        // Below 0.15 is just background noise/room tone/fan/electrical hum
-        if (level > 0.15) {
+        // Update last speech time if we detect REAL speech (threshold: 0.20 = clear speaking volume)
+        // Below 0.20 is just background noise/room tone/fan/electrical hum/ambient TV audio
+        if (level > 0.20) {
           const now = Date.now();
 
           // Track accumulated speech duration

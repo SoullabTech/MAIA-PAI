@@ -121,14 +121,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     const updateSize = () => {
       const width = window.innerWidth;
       if (width < 640) {
-        // Mobile: Small top presence (120-140px) for Star Wars text flow
-        setHoloflowerSize(Math.min(width / 4, 140));
+        // Mobile: Small top presence (110-130px) for Star Wars text flow
+        setHoloflowerSize(Math.min(width / 4, 130));
       } else if (width < 1024) {
-        // Tablet: Compact (160px)
-        setHoloflowerSize(160);
+        // Tablet: Compact (150px)
+        setHoloflowerSize(150);
       } else {
-        // Desktop: Visible but gives text space (200px)
-        setHoloflowerSize(200);
+        // Desktop: Smaller, centered in dotted ring (180px)
+        setHoloflowerSize(180);
       }
     };
 
@@ -1525,13 +1525,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               />
             </motion.div>
 
-            {/* Holoflower Image - Warm amber tone, always visible in upper-left */}
+            {/* Holoflower Image - Warm amber tone, perfectly centered in container */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <img
                 src="/holoflower-amber.png"
                 alt="Holoflower"
-                className="w-48 h-48 md:w-56 md:h-56 object-contain opacity-90"
+                className="object-contain opacity-90"
                 style={{
+                  width: `${holoflowerSize * 0.85}px`,
+                  height: `${holoflowerSize * 0.85}px`,
                   filter: 'none',
                 }}
               />
@@ -1642,7 +1644,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                {/* Multiple amber plasma field layers with thicker fluidity */}
+                {/* Multiple amber plasma field layers with slow, thick fluidity */}
                 {[...Array(3)].map((_, i) => (
                   <motion.div
                     key={`voice-field-${i}`}
@@ -1651,42 +1653,42 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       width: `${220 + i * 100}px`,
                       height: `${220 + i * 100}px`,
                       background: i === 0
-                        ? 'radial-gradient(circle, rgba(251, 191, 36, 0.25) 0%, rgba(251, 191, 36, 0.08) 50%, transparent 100%)'
+                        ? 'radial-gradient(circle, rgba(251, 191, 36, 0.2) 0%, rgba(251, 191, 36, 0.06) 50%, transparent 100%)'
                         : i === 1
-                        ? 'radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.05) 50%, transparent 100%)'
-                        : 'radial-gradient(circle, rgba(217, 119, 6, 0.12) 0%, rgba(217, 119, 6, 0.03) 50%, transparent 100%)',
-                      filter: `blur(${14 + i * 4}px)`,
+                        ? 'radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.04) 50%, transparent 100%)'
+                        : 'radial-gradient(circle, rgba(217, 119, 6, 0.1) 0%, rgba(217, 119, 6, 0.02) 50%, transparent 100%)',
+                      filter: `blur(${16 + i * 6}px)`,
                     }}
                     animate={{
-                      scale: [1, 1.08, 1],
-                      opacity: [0.6 - i * 0.12, 0.35, 0.6 - i * 0.12],
+                      scale: [1, 1.05, 1],
+                      opacity: [0.5 - i * 0.1, 0.3, 0.5 - i * 0.1],
                     }}
                     transition={{
-                      duration: 6 + i * 2,
+                      duration: 8 + i * 3,
                       repeat: Infinity,
-                      delay: i * 0.8,
-                      ease: [0.45, 0.05, 0.55, 0.95]
+                      delay: i * 1.2,
+                      ease: [0.42, 0, 0.58, 1]
                     }}
                   />
                 ))}
 
-                {/* Audio level responsive center field glow (amber) */}
-                {voiceAudioLevel > 0.05 && (
+                {/* Audio level responsive center field glow - only show for strong speech */}
+                {voiceAudioLevel > 0.2 && (
                   <motion.div
                     className="absolute rounded-full"
                     style={{
                       width: '200px',
                       height: '200px',
-                      background: 'radial-gradient(circle, rgba(251, 191, 36, 0.4) 0%, rgba(251, 191, 36, 0.12) 60%, transparent 100%)',
-                      filter: 'blur(10px)',
+                      background: 'radial-gradient(circle, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.08) 60%, transparent 100%)',
+                      filter: 'blur(14px)',
                     }}
                     animate={{
-                      scale: 1 + voiceAudioLevel * 0.3,
-                      opacity: 0.5 + voiceAudioLevel * 0.2,
+                      scale: 1 + voiceAudioLevel * 0.15,
+                      opacity: 0.4 + voiceAudioLevel * 0.15,
                     }}
                     transition={{
-                      duration: 0.1,
-                      ease: "linear"
+                      duration: 0.3,
+                      ease: "easeOut"
                     }}
                   />
                 )}
@@ -1749,7 +1751,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
             {/* Status text below holoflower */}
             {isMounted && !showChatInterface && voiceEnabled && (
-              <div className="absolute bottom-[-80px] left-1/2 transform -translate-x-1/2 text-center">
+              <div className="absolute bottom-[-110px] left-1/2 transform -translate-x-1/2 text-center">
                 {/* Elemental Mode Indicator - TEMPORARILY DISABLED
                 {voiceMicRef.current?.elementalMode && (
                   <motion.div
@@ -1782,29 +1784,29 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     </span>
                   </motion.div>
                 )} */}
-                {/* Status messages */}
+                {/* Status messages - Processing state takes priority */}
                 <AnimatePresence mode="wait">
-                  {voiceMicRef.current?.isListening && !isResponding && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="text-[#6B9BD1] text-sm font-medium"
-                    >
-                      Listening...
-                    </motion.div>
-                  )}
-                  {(isResponding || isAudioPlaying) && (
+                  {(isResponding || isAudioPlaying || isProcessing) && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
                       className="text-[#D4B896] text-sm font-medium"
                     >
-                      Speaking...
+                      {isProcessing && !isResponding && !isAudioPlaying ? 'Processing...' : 'Speaking...'}
                     </motion.div>
                   )}
-                  {!voiceMicRef.current?.isListening && !isResponding && !isAudioPlaying && (
+                  {voiceMicRef.current?.isListening && !isResponding && !isAudioPlaying && !isProcessing && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="text-amber-400/80 text-sm font-medium"
+                    >
+                      Listening...
+                    </motion.div>
+                  )}
+                  {!voiceMicRef.current?.isListening && !isResponding && !isAudioPlaying && !isProcessing && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
