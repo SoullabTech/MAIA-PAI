@@ -1401,21 +1401,21 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             isProcessing={isProcessing}
             isResponding={isResponding}
             showBreakthrough={showBreakthrough}
-            dimmed={conversationMode === 'chat'}
+            dimmed={conversationMode === 'chat' || messages.length > 0}
           />
 
           {/* Central Holoflower Logo with Glow and Sparkles */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            {/* Radiant glow behind the holoflower - ENHANCED - Very subtle on mobile with messages */}
+            {/* Radiant glow behind the holoflower - RECEDES when conversation active */}
             <motion.div
               className={`absolute flex items-center justify-center pointer-events-none ${
                 showChatInterface || messages.length > 0
-                  ? 'opacity-15 md:opacity-50'  // Subtle when text present
-                  : 'opacity-30 md:opacity-80'  // More present when just listening
+                  ? 'opacity-5 md:opacity-15'  // Nearly invisible when text present - text wins
+                  : 'opacity-30 md:opacity-70'  // Present when just listening
               }`}
               animate={{
                 scale: [1, 1.4, 1],
-                opacity: showChatInterface ? [0.3, 0.5, 0.3] : [0.6, 0.9, 0.6]
+                opacity: showChatInterface || messages.length > 0 ? [0.05, 0.1, 0.05] : [0.5, 0.8, 0.5]
               }}
               transition={{
                 duration: 4,
@@ -1459,15 +1459,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               />
             </motion.div>
 
-            {/* Holoflower Image - Ambient presence, text takes priority */}
+            {/* Holoflower Image - RECEDES to barely-there when conversation active */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <img
                 src="/holoflower.svg"
                 alt="Holoflower"
-                className={`w-32 h-32 object-contain ${
+                className={`w-32 h-32 object-contain transition-opacity duration-700 ${
                   showChatInterface || messages.length > 0
-                    ? 'opacity-25 md:opacity-55'  // Ambient when conversing
-                    : 'opacity-50 md:opacity-90'  // Present when listening
+                    ? 'opacity-8 md:opacity-12'  // Barely visible ghost - text wins completely
+                    : 'opacity-40 md:opacity-80'  // Present when listening
                 }`}
                 style={{
                   filter: showChatInterface
@@ -1895,12 +1895,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </motion.button>
       </div>
 
-      {/* Message flow - REDESIGNED: Full-width mobile, right panel desktop */}
+      {/* Message flow - ASYMMETRIC INSTRUMENT LAYOUT: Left=geometry, Right=conversation */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
         <div className={`fixed top-20 sm:top-16 z-30 transition-all duration-500 ${
           showChatInterface
-            ? 'inset-x-2 sm:inset-x-4 md:right-8 md:left-auto md:w-[600px] lg:w-[700px] opacity-100'
-            : 'inset-x-2 sm:inset-x-4 md:right-8 md:left-auto md:w-[500px] opacity-70'
+            ? 'inset-x-2 sm:inset-x-4 md:right-8 md:left-auto md:w-[600px] lg:w-[680px] xl:w-[720px] opacity-100'
+            : 'inset-x-2 sm:inset-x-4 md:right-8 md:left-auto md:w-[520px] lg:w-[560px] opacity-70'
         }`}
              style={{
                height: showChatInterface
