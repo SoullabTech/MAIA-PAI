@@ -11,7 +11,15 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, userId, conversationId, sessionId } = await req.json();
 
+    console.log('📝 [API] save-conversation called', {
+      messageCount: messages?.length,
+      userId,
+      conversationId: conversationId?.substring(0, 10) + '...',
+      sessionId: sessionId?.substring(0, 10) + '...'
+    });
+
     if (!messages || !Array.isArray(messages)) {
+      console.error('❌ [API] Missing or invalid messages array');
       return NextResponse.json(
         { error: 'Messages array is required' },
         { status: 400 }
@@ -19,6 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!userId) {
+      console.error('❌ [API] Missing userId');
       return NextResponse.json(
         { error: 'User ID is required' },
         { status: 400 }
@@ -26,13 +35,19 @@ export async function POST(req: NextRequest) {
     }
 
     // Extract the essence using MAIA
+    console.log('🔮 [API] Extracting conversation essence...');
     const essence = await extractConversationEssence(messages, {
       conversationId,
       userId,
       focusOnBreakthroughs: true
     });
+    console.log('✅ [API] Essence extracted:', {
+      title: essence.title,
+      hasInsight: !!essence.coreInsight
+    });
 
     // Store in the journal_entries table
+    console.log('💾 [API] Saving to Supabase journal_entries...');
     const { data, error } = await supabase
       .from('journal_entries')
       .insert({
@@ -55,13 +70,14 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Error saving journal entry:', error);
+      console.error('❌ [API] Supabase error:', error);
       return NextResponse.json(
         { error: 'Failed to save journal entry', details: error.message },
         { status: 500 }
       );
     }
 
+    console.log('✅ [API] Journal entry saved successfully:', data.id);
     return NextResponse.json({
       success: true,
       entry: data,

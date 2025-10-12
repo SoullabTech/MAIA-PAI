@@ -617,13 +617,17 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // Save conversation as journal entry
   const handleSaveAsJournal = useCallback(async () => {
+    console.log('📝 [Journal] handleSaveAsJournal called', { userId, messageCount: messages.length });
+
     if (!userId) {
       toast.error('Please sign in to save journal entries');
+      console.error('❌ [Journal] No userId provided');
       return;
     }
 
     if (messages.length < 2) {
       toast.error('Have a conversation first before journaling');
+      console.error('❌ [Journal] Not enough messages:', messages.length);
       return;
     }
 
@@ -637,6 +641,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         timestamp: msg.timestamp.toISOString()
       }));
 
+      console.log('📤 [Journal] Sending request to /api/journal/save-conversation', {
+        messageCount: conversationMessages.length,
+        userId,
+        sessionId
+      });
+
       const response = await fetch('/api/journal/save-conversation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -648,15 +658,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         })
       });
 
+      console.log('📥 [Journal] Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to save journal entry');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('❌ [Journal] API error:', errorData);
+        throw new Error(errorData.error || errorData.details || 'Failed to save journal entry');
       }
 
       const data = await response.json();
+      console.log('✅ [Journal] Successfully saved:', data);
 
       toast.success(
         <div>
-          <div className="font-semibold">{data.essence.title}</div>
+          <div className="font-semibold">{data.essence?.title || 'Journal Entry Saved'}</div>
           <div className="text-sm text-white/70">Saved to your journal</div>
         </div>,
         { duration: 4000 }
@@ -671,9 +686,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         messageCount: messages.length,
         title: data.essence.title
       });
-    } catch (error) {
-      console.error('Error saving journal entry:', error);
-      toast.error('Failed to save journal entry. Please try again.');
+    } catch (error: any) {
+      console.error('❌ [Journal] Error saving journal entry:', error);
+      toast.error(
+        <div>
+          <div className="font-semibold">Failed to save journal entry</div>
+          <div className="text-sm text-white/70">{error.message || 'Please try again'}</div>
+        </div>,
+        { duration: 5000 }
+      );
     } finally {
       setIsSavingJournal(false);
     }
