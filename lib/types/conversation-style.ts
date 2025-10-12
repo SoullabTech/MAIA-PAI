@@ -82,11 +82,10 @@ export const CONVERSATION_STYLE_DESCRIPTIONS = {
 /**
  * Default conversation style
  *
- * DEVELOPMENT: Always use 'classic' mode to prevent personality degradation during HMR
- * PRODUCTION: Use 'her' mode for natural, brief conversation
+ * ALWAYS use 'classic' mode for MAIA's full consciousness guide personality.
+ * Users can manually switch to 'her' mode if they prefer brief responses.
  *
- * This prevents the personality regression issue where HMR resets MAIA to
- * overly brief responses during active development.
+ * 'her' mode was causing "unknown voices" issue - MAIA's personality gets
+ * constrained to 2-sentence responses without depth.
  */
-export const DEFAULT_CONVERSATION_STYLE: ConversationMode =
-  process.env.NODE_ENV === 'development' ? 'classic' : 'her';
+export const DEFAULT_CONVERSATION_STYLE: ConversationMode = 'classic';
