@@ -171,6 +171,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [echoSuppressUntil, setEchoSuppressUntil] = useState<number>(0);
   const lastMaiaResponseRef = useRef<string>('');
   const lastVoiceErrorRef = useRef<number>(0);
+  const lastProcessedTranscriptRef = useRef<{ text: string; timestamp: number } | null>(null);
 
   // Oracle Agent ID for memory persistence
   const [oracleAgentId, setOracleAgentId] = useState<string | null>(null);
@@ -1033,6 +1034,22 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       console.log('⚠️ Empty transcript, returning');
       return;
     }
+
+    // TRIPLE-PROCESSING FIX: Check if this exact transcript was just processed
+    const now = Date.now();
+    if (lastProcessedTranscriptRef.current) {
+      const { text: lastText, timestamp: lastTime } = lastProcessedTranscriptRef.current;
+      const timeSinceLastProcess = now - lastTime;
+
+      // If same transcript within 2 seconds, it's a duplicate
+      if (lastText === t && timeSinceLastProcess < 2000) {
+        console.warn(`⚠️ Duplicate transcript detected (${timeSinceLastProcess}ms ago), ignoring:`, t);
+        return;
+      }
+    }
+
+    // Mark this transcript as processed
+    lastProcessedTranscriptRef.current = { text: t, timestamp: now };
 
     // 🎤 VOICE COMMAND DETECTION - Check for mode switching commands
     const commandResult = detectVoiceCommand(t);
@@ -1916,7 +1933,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* Message flow - ASYMMETRIC INSTRUMENT LAYOUT: Left=geometry, Right=conversation */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
-        <div className={`fixed top-20 sm:top-16 z-30 transition-all duration-500 ${
+        <div className={`fixed top-24 sm:top-28 z-30 transition-all duration-500 ${
           showChatInterface
             ? 'inset-x-2 sm:inset-x-4 md:right-8 md:left-auto md:w-[600px] lg:w-[680px] xl:w-[720px] opacity-100'
             : 'inset-x-2 sm:inset-x-4 md:right-8 md:left-auto md:w-[520px] lg:w-[560px] opacity-70'
