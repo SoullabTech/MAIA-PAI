@@ -3,9 +3,18 @@
  *
  * Provides birth chart data as subtle context for MAIA.
  * No constraints, no protocols - just information available if relevant.
+ *
+ * Includes access to the complete Spiralogic Archetypal Library:
+ * - Mythological correlations
+ * - Jungian archetypes
+ * - Developmental psychology (Erikson, Maslow, etc.)
+ * - Cultural heroes and figures
+ * - Hero's Journey stages
  */
 
 import { createClient } from '@supabase/supabase-js';
+import { getZodiacArchetype, generateArchetypalDescription } from '@/lib/astrology/archetypeLibrary';
+import { getSpiralogicFacet } from '@/lib/astrology/spiralogicMapping';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -111,6 +120,8 @@ function extractSpiralogicPhases(chartData: any): any {
 /**
  * Format birth chart context as a gentle whisper for MAIA
  * This is added to her context, not her instructions
+ *
+ * Includes archetypal correlations from the Spiralogic Library
  */
 export function formatChartContextForMAIA(chart: BirthChartContext | null): string {
   if (!chart || !chart.hasChart) {
@@ -119,11 +130,31 @@ export function formatChartContextForMAIA(chart: BirthChartContext | null): stri
 
   // Simple, clean format - just data, no interpretation
   let context = '\n\n---\n\n';
-  context += 'AVAILABLE CONTEXT (Birth Chart):\n\n';
+  context += 'AVAILABLE CONTEXT (Birth Chart + Archetypal Correlations):\n\n';
 
-  if (chart.sun) context += `Sun: ${chart.sun}\n`;
-  if (chart.moon) context += `Moon: ${chart.moon}\n`;
-  if (chart.rising) context += `Rising: ${chart.rising}\n`;
+  // Core placements with archetypal context
+  if (chart.sun) {
+    context += `Sun: ${chart.sun}\n`;
+    const sunSign = extractSignFromPlacement(chart.sun);
+    const sunArchetype = getZodiacArchetype(sunSign);
+    if (sunArchetype) {
+      context += `  → Archetypes: ${sunArchetype.archetypes.jungian?.slice(0, 2).join(', ') || 'N/A'}\n`;
+      context += `  → Mythological: ${sunArchetype.archetypes.mythological?.slice(0, 2).join(', ') || 'N/A'}\n`;
+    }
+  }
+
+  if (chart.moon) {
+    context += `\nMoon: ${chart.moon}\n`;
+    const moonSign = extractSignFromPlacement(chart.moon);
+    const moonArchetype = getZodiacArchetype(moonSign);
+    if (moonArchetype) {
+      context += `  → Archetypes: ${moonArchetype.archetypes.jungian?.slice(0, 2).join(', ') || 'N/A'}\n`;
+    }
+  }
+
+  if (chart.rising) {
+    context += `\nRising: ${chart.rising}\n`;
+  }
 
   if (chart.elementalBalance) {
     context += `\nElemental Balance: Fire ${chart.elementalBalance.fire}%, Water ${chart.elementalBalance.water}%, Earth ${chart.elementalBalance.earth}%, Air ${chart.elementalBalance.air}%\n`;
@@ -133,7 +164,18 @@ export function formatChartContextForMAIA(chart: BirthChartContext | null): stri
     context += `\nOther Placements:\n${chart.significantPlacements.map(p => `- ${p}`).join('\n')}\n`;
   }
 
+  context += '\n💡 Archetypal wisdom available from: Mythology, Jung, Erikson, Maslow, Hero\'s Journey, Cultural Heroes\n';
+  context += 'Use naturally when relevant - no need to lecture about systems.\n';
   context += '\n---\n';
 
   return context;
+}
+
+/**
+ * Helper: Extract sign name from placement string
+ * e.g., "Sagittarius 17° (House 4)" -> "Sagittarius"
+ */
+function extractSignFromPlacement(placement: string): string {
+  const match = placement.match(/^([A-Za-z]+)/);
+  return match ? match[1] : '';
 }
