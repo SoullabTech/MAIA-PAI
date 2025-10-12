@@ -1456,14 +1456,18 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               />
             </motion.div>
 
-            {/* Holoflower Image - Always clear and sharp, words cascade over it */}
+            {/* Holoflower Image - Sharp initially, fades when text cascades over */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <img
                 src="/holoflower.svg"
                 alt="Holoflower"
-                className="w-48 h-48 md:w-56 md:h-56 object-contain opacity-90"
+                className={`w-48 h-48 md:w-56 md:h-56 object-contain transition-all duration-700 ${
+                  showChatInterface || messages.length > 0
+                    ? 'opacity-20 blur-sm'  // Fade and blur when text flows over
+                    : 'opacity-90'  // Sharp and clear when listening
+                }`}
                 style={{
-                  filter: 'none',  // No filters - keep holoflower completely clear
+                  filter: 'none',
                 }}
               />
             </div>
