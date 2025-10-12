@@ -461,7 +461,7 @@ export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps)
                           onClick={() => updateSetting('conversationMode', mode)}
                           className={`w-full text-left p-3 rounded-xl border transition-all ${
                             isSelected
-                              ? 'border-cyan-500/50 bg-cyan-500/15 text-cyan-300'
+                              ? 'border-amber-500/50 bg-amber-500/15 text-amber-300'
                               : 'border-white/10 bg-black/20 text-white/60'
                           }`}
                           whileTap={{ scale: 0.98 }}
@@ -474,7 +474,7 @@ export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps)
                                 <span className="text-sm font-medium">{description.title}</span>
                                 {isSelected && (
                                   <motion.span
-                                    className="text-xs text-cyan-400"
+                                    className="text-xs text-amber-400"
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ type: 'spring', stiffness: 500, damping: 25 }}
