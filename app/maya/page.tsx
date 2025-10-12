@@ -98,8 +98,8 @@ export default function MayaPage() {
   if (!explorerId || explorerId === '') {
     console.log('[MayaPage] No explorerId yet, showing loading state');
     return (
-      <div className="relative min-h-screen bg-[#0a0b14] flex items-center justify-center">
-        <div className="text-amber-200/60 text-lg">Initializing MAIA...</div>
+      <div className="relative min-h-screen bg-soul-background flex items-center justify-center">
+        <div className="text-soul-textSecondary text-lg">Initializing MAIA...</div>
       </div>
     );
   }
@@ -109,13 +109,13 @@ export default function MayaPage() {
     return (
       <ErrorBoundary
         fallback={
-          <div className="min-h-screen bg-[#0a0b14] flex items-center justify-center text-amber-200 p-8">
+          <div className="min-h-screen bg-soul-background flex items-center justify-center text-soul-textPrimary p-8">
             <div className="max-w-md text-center space-y-4">
               <h2 className="text-2xl">Something went wrong</h2>
-              <p className="text-amber-200/60">MAIA encountered an error. Please refresh the page.</p>
+              <p className="text-soul-textSecondary">MAIA encountered an error. Please refresh the page.</p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-3 bg-amber-500/80 hover:bg-amber-500 rounded-lg transition-all"
+                className="px-6 py-3 bg-soul-accent/90 hover:bg-soul-accentHover text-soul-background rounded-lg transition-all"
               >
                 Refresh
               </button>
@@ -123,13 +123,13 @@ export default function MayaPage() {
           </div>
         }
       >
-        <div className="relative min-h-screen bg-[#0a0b14]" style={{ backgroundColor: '#0a0b14', minHeight: '100vh', position: 'relative' }}>
+        <div className="relative min-h-screen bg-soul-background" style={{ backgroundColor: '#1C1614', minHeight: '100vh', position: 'relative' }}>
           <button
             onClick={handleSignOut}
-            className="fixed top-4 right-4 z-[200] p-3 bg-[#1A1F2E]/80 border border-amber-500/20 rounded-full hover:border-amber-500/50 hover:bg-[#1A1F2E] transition-all backdrop-blur-sm"
+            className="fixed top-4 right-4 z-[200] p-3 bg-soul-surface/80 border border-soul-accent/20 rounded-full hover:border-soul-accent/50 hover:bg-soul-surface transition-all backdrop-blur-sm"
             title="Sign Out"
           >
-            <LogOut className="w-5 h-5 text-amber-400/70 hover:text-amber-400" />
+            <LogOut className="w-5 h-5 text-soul-accent/70 hover:text-soul-accent" />
           </button>
 
           <OracleConversation
@@ -144,13 +144,13 @@ export default function MayaPage() {
   } catch (error) {
     console.error('[MayaPage] Render error:', error);
     return (
-      <div className="min-h-screen bg-[#0a0b14] flex items-center justify-center text-amber-200 p-8">
+      <div className="min-h-screen bg-soul-background flex items-center justify-center text-soul-textPrimary p-8">
         <div className="max-w-md text-center space-y-4">
           <h2 className="text-2xl">Error loading MAIA</h2>
-          <p className="text-amber-200/60">{String(error)}</p>
+          <p className="text-soul-textSecondary">{String(error)}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-amber-500/80 hover:bg-amber-500 rounded-lg transition-all"
+            className="px-6 py-3 bg-soul-accent/90 hover:bg-soul-accentHover text-soul-background rounded-lg transition-all"
           >
             Refresh
           </button>

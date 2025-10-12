@@ -1297,7 +1297,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // DIAGNOSTIC LOGGING - Removed to reduce console noise and improve performance
 
   return (
-    <div className="oracle-conversation min-h-screen bg-[#1a1f2e] overflow-hidden">
+    <div className="oracle-conversation min-h-screen bg-soul-background overflow-hidden">
       {/* iOS Audio Enable Button - DISABLED - causing black screen */}
       {false && needsIOSAudioPermission && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur z-[100] flex items-center justify-center">
@@ -1939,9 +1939,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 0 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className={`bg-black/70 md:bg-black/40 backdrop-blur-md rounded-2xl p-4 text-white
-                               border border-gold-divine/30 shadow-lg max-w-full
-                               cursor-pointer hover:bg-black/80 md:hover:bg-black/50 transition-colors group
+                      className={`bg-soul-surface/80 md:bg-soul-surface/60 backdrop-blur-md rounded-2xl p-4 text-soul-textPrimary
+                               border border-soul-accent/30 shadow-lg max-w-full
+                               cursor-pointer hover:bg-soul-surface/90 md:hover:bg-soul-surface/70 transition-colors group
                                ${message.role === 'user' ? 'message-user' : 'message-maia'}`}
                       data-role={message.role === 'user' ? 'user' : 'assistant'}
                       onClick={handleCopyMessage}
@@ -2060,7 +2060,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               {showChatInterface && (
               <div className="fixed inset-x-0 bottom-20 z-[60]">
                 {/* Text input area - Ultra compact mobile design - Raised above bottom menu bar */}
-                <div className="bg-black/40 backdrop-blur-md px-2 py-2 border-t border-gold-divine/20">
+                <div className="bg-soul-surface/40 backdrop-blur-md px-2 py-2 border-t border-soul-accent/20">
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -2266,7 +2266,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             display: none;
           }
         `}</style>
-        <div className="flex justify-start items-center gap-4 md:gap-8 py-4 px-4 md:px-8 bg-black/60 backdrop-blur-lg rounded-full border border-[#D4B896]/20
+        <div className="flex justify-start items-center gap-4 md:gap-8 py-4 px-4 md:px-8 bg-soul-surface/70 backdrop-blur-lg rounded-full border border-soul-accent/20
                         md:justify-center min-w-max md:min-w-0">
           {/* Voice Toggle - Activate mic when switching to voice mode */}
           <button

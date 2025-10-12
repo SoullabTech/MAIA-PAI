@@ -26,17 +26,45 @@ const config: Config = {
         "sacred-radial": "radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%)",
       },
       colors: {
-        // Spiralogic Oracle Primary Elemental Colors
+        // 🫀 PHYSIOLOGICAL PALETTE - Designed for parasympathetic nervous system activation
+        // Warm darks invite the body to relax, breath to slow, shoulders to drop
+        // Cool blues keep people mental/intellectual. Warm umber/plum invites depth.
+        soul: {
+          // Base warm darks - where the body can rest
+          background: '#1C1614',      // Deep umber plum - primary background
+          surface: '#2A201E',         // Slightly lighter - cards, containers
+          surfaceHover: '#342923',    // Interactive surface states
+
+          // Text hierarchy - soft ivory instead of stark white
+          textPrimary: '#FDFBF9',     // Soft ivory white - primary text
+          textSecondary: '#CBBFAD',   // Muted sand - secondary text
+          textTertiary: '#9B8A78',    // Warm gray - tertiary text
+
+          // Warm accent palette - living light
+          accent: '#E3B778',          // Warm gold - primary accent
+          accentHover: '#F0C98A',     // Lighter gold - hover states
+          highlight: '#FF8F70',       // Coral flame - fire element
+          link: '#AFCEDB',            // Gentle water blue - links/interactive
+
+          // Elemental warmth - grounded in earth tones
+          fireWarm: '#E06B67',        // Warm coral-red
+          waterWarm: '#83B3E9',       // Soft sky blue
+          earthWarm: '#92B27D',       // Sage green
+          airWarm: '#F0D4B2',         // Warm sand
+          aetherWarm: '#B89DD9',      // Soft lavender
+        },
+
+        // Spiralogic Oracle Primary Elemental Colors (preserved for compatibility)
         spiralogic: {
           fire: '#FF6B6B',
           water: '#4ECDC4',
           earth: '#95E77E',
           air: '#A8DADC',
           aether: '#9B5DE5',
-          dark: '#0A0E27',
-          'dark-secondary': '#1a1f3a',
+          dark: '#1C1614',            // Updated to warm umber
+          'dark-secondary': '#2A201E', // Updated to warm surface tone
           light: '#F7F9FB',
-          gold: '#FFD700',
+          gold: '#E3B778',            // Updated to warm gold
         },
 
         // Earth Tone Sacred Palette - Based on Facet Colors
