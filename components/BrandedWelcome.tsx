@@ -90,7 +90,7 @@ export const BrandedWelcome: React.FC<BrandedWelcomeProps> = ({
             duration: 0.8,
             ease: "easeOut"
           }}
-          className="fixed top-4 sm:top-[18vh] left-1/2 transform -translate-x-1/2 z-40
+          className="fixed top-4 sm:top-16 left-4 sm:left-8 md:left-12 z-40
                      pointer-events-none select-none"
         >
           <div className="relative">
