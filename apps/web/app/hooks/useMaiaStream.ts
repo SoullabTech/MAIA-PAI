@@ -31,10 +31,17 @@ export function useMayaStream() {
   };
 
   const enqueueSpeech = (phrase: string, lang: string) => {
+    // ❌ DISABLED: Browser TTS causes "robo voice" interference with OpenAI TTS
+    // The backend sends OpenAI TTS audio via /api/voice/openai-tts
+    // OracleVoicePlayer component handles playback
+    // Browser speechSynthesis was playing simultaneously, creating double voices
+    return;
+
+    /* ORIGINAL BROWSER TTS CODE - COMMENTED OUT
     if (typeof window === 'undefined' || !window.speechSynthesis) {
       return; // Skip speech on server-side
     }
-    
+
     speakQueue.current.push(phrase);
     if (!speaking.current) {
       speaking.current = true;
@@ -54,6 +61,7 @@ export function useMayaStream() {
       };
       pump();
     }
+    */
   };
 
   const stream = (opts: StreamOptions, userText: string) => {
