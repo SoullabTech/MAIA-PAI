@@ -235,12 +235,17 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   // Process accumulated transcript
   const processAccumulatedTranscript = useCallback(() => {
     const transcript = accumulatedTranscript.current.trim();
-    
+
     if (!transcript) {
       return;
     }
-    
+
+    // CRITICAL FIX: If already processing, schedule retry instead of abandoning
     if (isProcessingRef.current) {
+      console.log('⏳ [ContinuousConversation] Already processing, will retry in 500ms');
+      setTimeout(() => {
+        processAccumulatedTranscript();
+      }, 500);
       return;
     }
     
