@@ -2078,7 +2078,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           className={`flex-shrink-0 w-10 h-10 border rounded-full flex items-center justify-center
                                    active:scale-95 transition-all ${
                             breakthroughScore >= 70
-                              ? 'bg-cyan-500/20 border-cyan-400/50 text-cyan-300 hover:bg-cyan-500/30 animate-pulse'
+                              ? 'bg-amber-500/20 border-amber-400/50 text-amber-300 hover:bg-amber-500/30 animate-pulse'
                               : 'bg-gold-divine/10 border-gold-divine/30 text-gold-divine hover:bg-gold-divine/20'
                           } ${isSavingJournal ? 'opacity-50 cursor-not-allowed' : ''}`}
                           title={breakthroughScore >= 70 ? 'Breakthrough detected - Save to journal' : 'Save as journal entry'}
@@ -2158,13 +2158,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 exit={{ opacity: 0, y: 20, scale: 0.95 }}
                 className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 max-w-sm"
               >
-                <div className="bg-gradient-to-br from-cyan-500/20 to-purple-500/20 backdrop-blur-xl rounded-2xl p-4 border border-cyan-400/30 shadow-2xl">
+                <div className="bg-gradient-to-br from-amber-500/20 to-gold-divine/20 backdrop-blur-xl rounded-2xl p-4 border border-amber-400/30 shadow-2xl">
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 bg-cyan-400/20 rounded-full flex items-center justify-center">
-                      <BookOpen className="w-5 h-5 text-cyan-300" />
+                    <div className="flex-shrink-0 w-10 h-10 bg-amber-400/20 rounded-full flex items-center justify-center">
+                      <BookOpen className="w-5 h-5 text-amber-300" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-cyan-200 font-medium mb-1">Breakthrough Detected</h3>
+                      <h3 className="text-amber-200 font-medium mb-1">Breakthrough Detected</h3>
                       <p className="text-white/70 text-sm mb-3">
                         This feels like sacred ground. Would you like to capture the essence of this conversation in your journal?
                       </p>
@@ -2172,8 +2172,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         <button
                           onClick={handleSaveAsJournal}
                           disabled={isSavingJournal}
-                          className="px-4 py-2 bg-cyan-500/30 hover:bg-cyan-500/40 border border-cyan-400/50
-                                   rounded-lg text-cyan-200 text-sm font-medium transition-all active:scale-95
+                          className="px-4 py-2 bg-amber-500/30 hover:bg-amber-500/40 border border-amber-400/50
+                                   rounded-lg text-amber-200 text-sm font-medium transition-all active:scale-95
                                    disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isSavingJournal ? 'Saving...' : 'Save to Journal'}
