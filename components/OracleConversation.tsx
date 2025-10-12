@@ -1435,9 +1435,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Beautiful Sacred Holoflower - Upper-left, clickable for voice activation */}
+      {/* Beautiful Sacred Holoflower - Lower-third center, like phone receiver position */}
       <motion.div
-        className="fixed top-20 left-4 md:top-24 md:left-8 z-[25] cursor-pointer"
+        className="fixed bottom-32 md:bottom-40 left-1/2 -translate-x-1/2 z-[25] cursor-pointer"
         onClick={async (e) => {
           e.preventDefault();
           e.stopPropagation();
