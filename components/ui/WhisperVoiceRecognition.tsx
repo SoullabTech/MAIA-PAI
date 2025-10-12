@@ -398,10 +398,16 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
    * Pause recording (when MAIA is speaking)
    */
   const pauseRecording = useCallback(() => {
-    console.log('⏸️ Pausing Whisper recording (MAIA speaking)...');
+    console.log('⏸️ Pausing Whisper recording (MAIA speaking)...', {
+      currentState: mediaRecorderRef.current?.state,
+      willPause: mediaRecorderRef.current?.state === 'recording'
+    });
 
     if (mediaRecorderRef.current?.state === 'recording') {
       mediaRecorderRef.current.pause();
+      console.log('✅ Whisper recording PAUSED');
+    } else {
+      console.log('⚠️ Cannot pause - recorder not in recording state');
     }
   }, []);
 
@@ -409,13 +415,19 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
    * Resume recording (when MAIA finishes speaking)
    */
   const resumeRecording = useCallback(() => {
-    console.log('▶️ Resuming Whisper recording (MAIA finished)...');
+    console.log('▶️ Resuming Whisper recording (MAIA finished)...', {
+      currentState: mediaRecorderRef.current?.state,
+      willResume: mediaRecorderRef.current?.state === 'paused'
+    });
 
     if (mediaRecorderRef.current?.state === 'paused') {
       mediaRecorderRef.current.resume();
       lastSpeechTimeRef.current = Date.now(); // Reset silence timer
       speechDurationRef.current = 0; // Reset speech duration for new phrase
       lastSpeechCheckRef.current = 0;
+      console.log('✅ Whisper recording RESUMED');
+    } else {
+      console.log('⚠️ Cannot resume - recorder not in paused state');
     }
   }, []);
 
@@ -456,6 +468,8 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
    * Effect: Start/stop/pause based on props
    */
   useEffect(() => {
+    console.log('🔄 Whisper state change:', { enabled, isMuted, isMayaSpeaking, isListening });
+
     // Start recording if enabled and not already listening
     if (enabled && !isMuted && !isListening) {
       startRecording();
@@ -465,8 +479,10 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
     // Handle MAIA speaking state changes
     if (isListening) {
       if (isMayaSpeaking) {
+        console.log('🛑 MAIA is speaking - pausing Whisper');
         pauseRecording();
       } else {
+        console.log('▶️ MAIA finished - resuming Whisper');
         resumeRecording();
       }
     }
