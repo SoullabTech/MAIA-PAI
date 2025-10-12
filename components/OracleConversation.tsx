@@ -1946,9 +1946,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 0 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className={`bg-soul-surface/80 md:bg-soul-surface/60 backdrop-blur-md rounded-2xl p-4 text-soul-textPrimary
-                               border border-soul-accent/30 shadow-lg max-w-full
-                               cursor-pointer hover:bg-soul-surface/90 md:hover:bg-soul-surface/70 transition-colors group
+                      className={`bg-soul-surface/95 rounded-lg p-4 text-soul-textPrimary
+                               border border-soul-border/40 shadow-[0_2px_12px_rgba(0,0,0,0.6)] max-w-full
+                               cursor-pointer hover:bg-soul-surfaceHover transition-all duration-300 group
                                ${message.role === 'user' ? 'message-user' : 'message-maia'}`}
                       data-role={message.role === 'user' ? 'user' : 'assistant'}
                       onClick={handleCopyMessage}
@@ -2067,7 +2067,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               {showChatInterface && (
               <div className="fixed inset-x-0 bottom-20 z-[60]">
                 {/* Text input area - Ultra compact mobile design - Raised above bottom menu bar */}
-                <div className="bg-soul-surface/40 backdrop-blur-md px-2 py-2 border-t border-soul-accent/20">
+                <div className="bg-soul-surface/90 px-2 py-2 border-t border-soul-border/40">
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -2273,7 +2273,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             display: none;
           }
         `}</style>
-        <div className="flex justify-start items-center gap-4 md:gap-8 py-4 px-4 md:px-8 bg-soul-surface/70 backdrop-blur-lg rounded-full border border-soul-accent/20
+        <div className="flex justify-start items-center gap-4 md:gap-8 py-4 px-4 md:px-8 bg-soul-surface/90 rounded-full border border-soul-border/30
                         md:justify-center min-w-max md:min-w-0">
           {/* Voice Toggle - Activate mic when switching to voice mode */}
           <button

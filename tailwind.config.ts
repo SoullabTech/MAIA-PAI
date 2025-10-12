@@ -26,32 +26,36 @@ const config: Config = {
         "sacred-radial": "radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%)",
       },
       colors: {
-        // 🫀 PHYSIOLOGICAL PALETTE - Designed for parasympathetic nervous system activation
-        // Warm darks invite the body to relax, breath to slow, shoulders to drop
-        // Cool blues keep people mental/intellectual. Warm umber/plum invites depth.
+        // 🜃 ANCIENT-FUTURE PALETTE - Technology as temple instrument
+        // "Surfaces absorb light instead of emitting it" - cinematic and grounded
+        // Aesthetic ontology: ritual tool + instrument panel
         soul: {
-          // Base warm darks - where the body can rest
-          background: '#1C1614',      // Deep umber plum - primary background
-          surface: '#2A201E',         // Slightly lighter - cards, containers
-          surfaceHover: '#342923',    // Interactive surface states
+          // Earth-Tech Fusion - volcanic basalt to oxidized bronze
+          background: '#1A1513',      // Volcanic basalt - primary background (darker, more absorptive)
+          surface: '#2C231F',         // Oxidized bronze - cards, panels (matte, not glassy)
+          surfaceHover: '#3A2F28',    // Aged bronze - hover states
 
-          // Text hierarchy - soft ivory instead of stark white
-          textPrimary: '#FDFBF9',     // Soft ivory white - primary text
-          textSecondary: '#CBBFAD',   // Muted sand - secondary text
-          textTertiary: '#9B8A78',    // Warm gray - tertiary text
+          // Hairline geometry - barely visible instrument guides
+          border: '#2D241E',          // Subsurface divider - hairline only
+          borderSubtle: '#1F1A17',    // Even subtler - etched lines
 
-          // Warm accent palette - living light
-          accent: '#E3B778',          // Warm gold - primary accent
-          accentHover: '#F0C98A',     // Lighter gold - hover states
-          highlight: '#FF8F70',       // Coral flame - fire element
-          link: '#AFCEDB',            // Gentle water blue - links/interactive
+          // Text hierarchy - archive records
+          textPrimary: '#FDFBF9',     // Soft ivory - primary text (ancient record clarity)
+          textSecondary: '#CBBFAD',   // Muted sand - secondary (weathered inscription)
+          textTertiary: '#8C6A4A',    // Aged copper - tertiary (faded etching)
 
-          // Elemental warmth - grounded in earth tones
-          fireWarm: '#E06B67',        // Warm coral-red
-          waterWarm: '#83B3E9',       // Soft sky blue
-          earthWarm: '#92B27D',       // Sage green
-          airWarm: '#F0D4B2',         // Warm sand
-          aetherWarm: '#B89DD9',      // Soft lavender
+          // Light behavior - candle + circuitry
+          accent: '#E3B778',          // Sun-touched sand - primary accent
+          accentGlow: '#F0C98A',      // Amber edge glow - 10-15px blur
+          highlight: '#D4A574',       // Warm brass - threshold moments
+          link: '#9B8774',            // Dusty bronze - interactive elements
+
+          // Elemental signatures - reclaimed technology
+          fireWarm: '#D67E5C',        // Ember glow
+          waterWarm: '#7A9299',       // Weathered steel
+          earthWarm: '#8C8165',       // Ancient clay
+          airWarm: '#BFA98A',         // Desert haze
+          aetherWarm: '#A38E9D',      // Twilight stone
         },
 
         // Spiralogic Oracle Primary Elemental Colors (preserved for compatibility)
@@ -166,6 +170,10 @@ const config: Config = {
       fontFamily: {
         'sacred-primary': ['Inter', 'SF Pro Display', '-apple-system', 'sans-serif'],
         'sacred-accent': ['Crimson Pro', 'Georgia', 'serif'],
+      },
+      letterSpacing: {
+        'archive': '0.015em',     // Open tracking - "dust between letters"
+        'etched': '0.02em',       // Even more air - for headings/mantras
       },
       animation: {
         // Premium Sacred Animations

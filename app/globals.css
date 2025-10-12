@@ -86,6 +86,23 @@
   .bg-soul-background {
     animation: hearthlight 14s ease-in-out infinite;
   }
+
+  /* 🜃 Lumen - Precision instrument calibration breathing */
+  @keyframes lumen {
+    0%, 100% {
+      filter: brightness(0.95);
+      opacity: 0.95;
+    }
+    50% {
+      filter: brightness(1.0);
+      opacity: 1.0;
+    }
+  }
+
+  /* Apply lumen to ambient halos and glows */
+  .animate-lumen {
+    animation: lumen 14s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  }
 }
 
 /* Ensure inputs are always readable - prevents white text on white background */

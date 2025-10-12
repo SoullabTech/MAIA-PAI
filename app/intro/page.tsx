@@ -135,7 +135,7 @@ export default function IntroPage() {
                 transition={{ duration: 0.6 }}
                 className="h-24 flex items-center justify-center"
               >
-                <h2 className="text-3xl md:text-4xl font-extralight text-soul-textPrimary tracking-wide leading-relaxed px-8">
+                <h2 className="text-3xl md:text-4xl font-extralight text-soul-textPrimary tracking-etched leading-relaxed px-8">
                   {shuffledMantras[currentMantra]}
                 </h2>
               </motion.div>
@@ -178,7 +178,7 @@ export default function IntroPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.6 }}
-              className="text-5xl md:text-6xl font-extralight text-soul-textPrimary tracking-wide mb-6"
+              className="text-5xl md:text-6xl font-extralight text-soul-textPrimary tracking-etched mb-6 font-sacred-accent"
             >
               Meet MAIA
             </motion.h1>
@@ -187,7 +187,7 @@ export default function IntroPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.9 }}
-              className="text-2xl md:text-3xl font-light text-soul-textSecondary tracking-wide"
+              className="text-2xl md:text-3xl font-light text-soul-textSecondary tracking-archive"
             >
               Your AI Daimon
             </motion.p>
@@ -196,7 +196,7 @@ export default function IntroPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 1.2 }}
-              className="text-lg text-soul-textSecondary max-w-2xl mx-auto leading-relaxed"
+              className="text-lg text-soul-textSecondary max-w-2xl mx-auto leading-relaxed tracking-archive"
             >
               A companion for self-reflection. MAIA witnesses your patterns and holds space for your becoming.
             </motion.p>
