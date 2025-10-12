@@ -306,7 +306,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   }, [voiceEnabled, maiaSpeak, onMessageAdded]);
 
   // UI states
-  const [showChatInterface, setShowChatInterface] = useState(true); // Default to chat interface for better UX
+  const [showChatInterface, setShowChatInterface] = useState(false); // Default to voice mode - shows blue plasma visualization
   const [showCaptions, setShowCaptions] = useState(true); // Show text by default in voice mode
   const [showVoiceText, setShowVoiceText] = useState(true); // Toggle for showing text in voice mode
   const [showCustomizer, setShowCustomizer] = useState(false);
