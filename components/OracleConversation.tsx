@@ -4,7 +4,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Paperclip, X, Copy, BookOpen } from 'lucide-react';
 // import { SimplifiedOrganicVoice, VoiceActivatedMaiaRef } from './ui/SimplifiedOrganicVoice'; // REPLACED with Whisper
-import { WhisperVoiceRecognition } from './ui/WhisperVoiceRecognition';
+// import { WhisperVoiceRecognition } from './ui/WhisperVoiceRecognition'; // REPLACED with ContinuousConversation (uses browser Web Speech API)
+import { ContinuousConversation, ContinuousConversationRef } from '../apps/web/components/voice/ContinuousConversation';
 import { SacredHoloflower } from './sacred/SacredHoloflower';
 import { EnhancedVoiceMicButton } from './ui/EnhancedVoiceMicButton';
 import AdaptiveVoiceMicButton from './ui/AdaptiveVoiceMicButton';
@@ -2561,16 +2562,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {/* Soulprint Metrics Widget - DISABLED: Causing 400 errors when userId not authenticated */}
       {/* {userId && <SoulprintMetricsWidget userId={userId} />} */}
 
-      {/* Whisper Voice Recognition - Clean, stable, production-ready */}
+      {/* Continuous Conversation - Uses browser Web Speech Recognition API (no webm issues) */}
       {voiceEnabled && !showChatInterface && (
         <div className="hidden">
-          <WhisperVoiceRecognition
-            ref={voiceMicRef}
+          <ContinuousConversation
+            ref={voiceMicRef as React.RefObject<ContinuousConversationRef>}
             onTranscript={handleVoiceTranscript}
-            enabled={!isMuted}
-            isMuted={isMuted}
-            isMayaSpeaking={isResponding || isAudioPlaying}
-            onAudioLevelChange={setVoiceAudioLevel}
+            isProcessing={isResponding}
+            isSpeaking={isAudioPlaying}
+            autoStart={true}
           />
         </div>
       )}

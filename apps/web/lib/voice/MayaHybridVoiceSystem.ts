@@ -298,6 +298,13 @@ export class MayaHybridVoiceSystem {
    * Speak using Web Speech API fallback
    */
   private speakWithFallback(text: string, brief: boolean = false): Promise<void> {
+    // ❌ DISABLED: Browser TTS causes "robo voice" interference with OpenAI TTS
+    // OpenAI TTS is handled by the backend via /api/voice/openai-tts
+    // Browser speechSynthesis was playing simultaneously, creating double voices
+    console.log('🔇 Browser TTS disabled - using OpenAI TTS only');
+    return Promise.resolve();
+
+    /* ORIGINAL BROWSER TTS CODE - COMMENTED OUT
     return new Promise((resolve, reject) => {
       if (!this.synthesis) {
         reject(new Error('Speech synthesis not available'));
@@ -333,6 +340,7 @@ export class MayaHybridVoiceSystem {
       this.currentUtterance = utterance;
       this.synthesis.speak(utterance);
     });
+    */
   }
 
   /**

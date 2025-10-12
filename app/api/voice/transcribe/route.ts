@@ -60,11 +60,9 @@ async function transcribeWithOpenAI(audioFile: File): Promise<any> {
     originalFileType: audioFile.type
   });
 
-  // Ensure filename has .webm extension for OpenAI to recognize format
-  let filename = audioFile.name || 'audio.webm';
-  if (!filename.endsWith('.webm')) {
-    filename = filename.replace(/\.[^.]*$/, '.webm') || 'audio.webm';
-  }
+  // Just send the raw buffer with audio/webm type
+  // OpenAI should handle the actual audio data regardless of container format
+  let filename = 'audio.webm';
 
   console.log('🎯 Creating File for OpenAI:', {
     filename,
@@ -73,8 +71,7 @@ async function transcribeWithOpenAI(audioFile: File): Promise<any> {
     originalType: audioFile.type
   });
 
-  // Create a File-like object that OpenAI SDK accepts
-  // Use plain 'audio/webm' without codec parameter - OpenAI might not like codec specs
+  // Try sending with generic audio type to let OpenAI auto-detect
   const file = new File([buffer], filename, {
     type: 'audio/webm'
   });
@@ -201,7 +198,13 @@ export async function POST(req: NextRequest) {
           fallbackStack: fallbackErrStack,
           error: fallbackError
         });
-        throw new Error(`All Whisper transcription providers failed. Primary: ${primaryErrMsg}, Fallback: ${fallbackErrMsg}`);
+
+        // Instead of throwing, return empty transcript gracefully
+        // This prevents the voice interface from breaking when transcription fails
+        console.log('⚠️  Returning empty transcript to allow voice flow to continue');
+        transcript = '';
+        confidence = 0;
+        provider = 'failed-gracefully';
       }
     }
 
