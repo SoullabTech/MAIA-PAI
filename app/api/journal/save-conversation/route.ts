@@ -47,24 +47,43 @@ export async function POST(req: NextRequest) {
     });
 
     // Store in the journal_entries table
+    // Schema expects: oracle_agent_id, title, content, entry_type, ritual_practice, elemental_focus, is_private
+    console.log('💾 [API] Getting oracle agent for user...');
+
+    // Get or create oracle agent for this user
+    const { data: agent, error: agentError } = await supabase
+      .from('oracle_agents')
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (agentError) {
+      console.error('❌ [API] Failed to get oracle agent:', agentError);
+      return NextResponse.json(
+        { error: 'Failed to get oracle agent', details: agentError.message },
+        { status: 500 }
+      );
+    }
+
+    if (!agent) {
+      console.error('❌ [API] No oracle agent found for user:', userId);
+      return NextResponse.json(
+        { error: 'Oracle agent not found. Please complete onboarding first.' },
+        { status: 404 }
+      );
+    }
+
     console.log('💾 [API] Saving to Supabase journal_entries...');
     const { data, error } = await supabase
       .from('journal_entries')
       .insert({
-        user_id: userId,
-        entry: essence.synthesizedEntry,
-        reflection: {
-          title: essence.title,
-          coreInsight: essence.coreInsight,
-          spiralMovement: essence.spiralMovement,
-          userVoiceExcerpts: essence.userVoiceExcerpts,
-          breakthroughMoment: essence.breakthroughMoment,
-          elementalSignature: essence.elementalSignature
-        },
-        mode: 'conversation', // New mode for conversation-based entries
-        element: determineElement(essence.elementalSignature),
-        session_id: sessionId,
-        conversation_id: conversationId
+        oracle_agent_id: agent.id,
+        title: essence.title || 'Conversation Reflection',
+        content: essence.synthesizedEntry,
+        entry_type: 'reflection',
+        elemental_focus: determineElement(essence.elementalSignature),
+        ritual_practice: 'conversation',
+        is_private: true
       })
       .select()
       .single();
