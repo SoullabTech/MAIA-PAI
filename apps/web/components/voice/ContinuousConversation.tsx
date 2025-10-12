@@ -81,25 +81,21 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         }
       }, 15000);
 
+      // CRITICAL: Wait 2 seconds for Maya's audio to fully finish playing
+      // This prevents echo loops where Maya hears herself and responds infinitely
       setTimeout(() => {
-        if (recognitionRef.current && isListening && !isRecording) {
+        if (recognitionRef.current && isListening && !isRecording && !isSpeaking) {
           try {
+            console.log('🎤 Restarting microphone after Maya finished speaking');
             recognitionRef.current.start();
-          } catch (err) {
-            console.error('Error restarting recognition after speech:', err);
-            // Try again after a longer delay
-            setTimeout(() => {
-              if (recognitionRef.current && isListening && !isRecording) {
-                try {
-                  recognitionRef.current.start();
-                } catch (err2) {
-                  console.error('Error restarting recognition (retry):', err2);
-                }
-              }
-            }, 500);
+          } catch (err: any) {
+            // Silently ignore "already started" - recognition is already running
+            if (!err.message?.includes('already started')) {
+              console.error('Error restarting recognition after speech:', err);
+            }
           }
         }
-      }, 300); // Small delay to ensure audio context is ready
+      }, 2000); // 2 second delay to prevent echo loops
     }
 
     // Clear timeout when component unmounts or state changes
