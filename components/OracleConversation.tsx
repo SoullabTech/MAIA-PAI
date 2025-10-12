@@ -1959,7 +1959,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           <span className="sm:hidden">Tap to copy</span>
                         </div>
                       </div>
-                      <div className="text-sm sm:text-base leading-relaxed break-words">
+                      <div className="text-sm sm:text-base leading-relaxed break-words text-white/95">
                         {message.role === 'oracle' ? (
                           <FormattedMessage text={message.text} />
                         ) : (
