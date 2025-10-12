@@ -1472,7 +1472,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               ))}
             </div>
 
-            {/* Voice Visualizer - User's voice (thick aether plasma field) */}
+            {/* Voice Visualizer - User's voice (plasma field with radial gradients) */}
             {isMounted && !showChatInterface && voiceEnabled && voiceMicRef.current?.isListening && (
               <motion.div
                 className="absolute inset-0 pointer-events-none flex items-center justify-center"
@@ -1480,46 +1480,49 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                {/* Multiple thick aether plasma rings */}
+                {/* Multiple plasma field layers with radial gradients */}
                 {[...Array(4)].map((_, i) => (
                   <motion.div
-                    key={`voice-ring-${i}`}
+                    key={`voice-field-${i}`}
                     className="absolute rounded-full"
                     style={{
-                      width: `${180 + i * 60}px`,
-                      height: `${180 + i * 60}px`,
-                      border: `${8 - i * 1.5}px solid`,
-                      borderColor: i === 0 ? '#a78bfa' : i === 1 ? '#818cf8' : i === 2 ? '#6B9BD1' : '#93c5fd',
-                      boxShadow: `0 0 ${30 - i * 5}px ${10 - i * 2}px ${i === 0 ? '#a78bfa' : i === 1 ? '#818cf8' : i === 2 ? '#6B9BD1' : '#93c5fd'}`,
-                      filter: `blur(${1 + i * 0.5}px)`,
+                      width: `${200 + i * 80}px`,
+                      height: `${200 + i * 80}px`,
+                      background: i === 0
+                        ? 'radial-gradient(circle, rgba(167, 139, 250, 0.4) 0%, rgba(167, 139, 250, 0.1) 50%, transparent 100%)'
+                        : i === 1
+                        ? 'radial-gradient(circle, rgba(129, 140, 248, 0.3) 0%, rgba(129, 140, 248, 0.08) 50%, transparent 100%)'
+                        : i === 2
+                        ? 'radial-gradient(circle, rgba(107, 155, 209, 0.25) 0%, rgba(107, 155, 209, 0.06) 50%, transparent 100%)'
+                        : 'radial-gradient(circle, rgba(147, 197, 253, 0.2) 0%, rgba(147, 197, 253, 0.04) 50%, transparent 100%)',
+                      filter: `blur(${8 + i * 2}px)`,
                     }}
                     animate={{
-                      scale: [1, 1.08, 1],
-                      opacity: [0.7 - i * 0.1, 0.3, 0.7 - i * 0.1],
+                      scale: [1, 1.12, 1],
+                      opacity: [0.8 - i * 0.15, 0.4, 0.8 - i * 0.15],
                     }}
                     transition={{
-                      duration: 3 + i * 0.8,
+                      duration: 4 + i * 1.2,
                       repeat: Infinity,
-                      delay: i * 0.4,
+                      delay: i * 0.5,
                       ease: "easeInOut"
                     }}
                   />
                 ))}
 
-                {/* Audio level responsive center glow */}
+                {/* Audio level responsive center field glow */}
                 {voiceAudioLevel > 0.05 && (
                   <motion.div
                     className="absolute rounded-full"
                     style={{
-                      width: '160px',
-                      height: '160px',
-                      border: '6px solid #a78bfa',
-                      boxShadow: '0 0 40px 15px #a78bfa, inset 0 0 30px 10px #a78bfa',
-                      filter: 'blur(2px)',
+                      width: '180px',
+                      height: '180px',
+                      background: 'radial-gradient(circle, rgba(167, 139, 250, 0.6) 0%, rgba(167, 139, 250, 0.2) 60%, transparent 100%)',
+                      filter: 'blur(6px)',
                     }}
                     animate={{
-                      scale: 1 + voiceAudioLevel * 0.4,
-                      opacity: 0.6 + voiceAudioLevel * 0.4,
+                      scale: 1 + voiceAudioLevel * 0.5,
+                      opacity: 0.7 + voiceAudioLevel * 0.3,
                     }}
                     transition={{
                       duration: 0.1,
