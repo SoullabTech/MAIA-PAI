@@ -940,7 +940,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         console.log('🧹 Cleaned for voice:', cleanVoiceText);
 
         // ECHO SUPPRESSION: Define cooldown OUTSIDE try block so finally can access it
-        const cooldownMs = 3500; // 3.5 second cooldown (audio can linger in speakers)
+        const cooldownMs = 2000; // 2 second cooldown (reduced from 3.5s for faster mic restart)
 
         try {
           // Start speaking immediately

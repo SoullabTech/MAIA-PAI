@@ -27,11 +27,11 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   const { 
     onTranscript, 
     onInterimTranscript, 
-    onRecordingStateChange, 
+    onRecordingStateChange,
     isProcessing = false,
     isSpeaking = false,
     autoStart = true,
-    silenceThreshold = 1200,
+    silenceThreshold = 2500, // Increased from 1200ms to 2.5s for more natural pauses
     vadSensitivity = 0.3
   } = props;
 
