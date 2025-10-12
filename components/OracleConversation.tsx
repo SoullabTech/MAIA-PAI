@@ -121,14 +121,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     const updateSize = () => {
       const width = window.innerWidth;
       if (width < 640) {
-        // Mobile: Smaller, more ambient (250-300px instead of 350)
-        setHoloflowerSize(Math.min(width - 100, 280));
+        // Mobile: Compact upper-left (150-180px)
+        setHoloflowerSize(Math.min(width / 3, 180));
       } else if (width < 1024) {
-        // Tablet: Medium ambient size
-        setHoloflowerSize(350);
+        // Tablet: Subtle upper-left
+        setHoloflowerSize(220);
       } else {
-        // Desktop: Comfortable left-side presence
-        setHoloflowerSize(450);
+        // Desktop: Visible but not dominating upper-left
+        setHoloflowerSize(280);
       }
     };
 
@@ -1435,9 +1435,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Beautiful Sacred Holoflower - Dune/Blade Runner aesthetic: lower-left ambient presence */}
-      <div className="fixed inset-0 flex items-end justify-center md:justify-start pointer-events-none pb-32 md:pb-24 md:pl-12 lg:pl-16">
-        {/* Holoflower container - bottom-left, off-center, cinematic asymmetric composition */}
+      {/* Beautiful Sacred Holoflower - Upper-left subtle ambient presence */}
+      <div className="fixed top-20 left-4 md:top-24 md:left-8 pointer-events-none">
+        {/* Holoflower container - smaller, upper-left, visible but not dominating */}
         <div className="flex items-center justify-center"
              style={{
                width: holoflowerSize,
