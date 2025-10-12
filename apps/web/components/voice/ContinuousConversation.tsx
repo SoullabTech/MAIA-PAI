@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Mic, MicOff, Loader2, Activity, Wifi, WifiOff } from "lucide-react";
-import { Analytics } from "../../lib/analytics/supabaseAnalytics";
+import { Analytics } from "@/lib/analytics/supabaseAnalytics";
 
 interface ContinuousConversationProps {
   onTranscript: (text: string) => void;
