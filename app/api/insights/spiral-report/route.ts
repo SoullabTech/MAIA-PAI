@@ -4,7 +4,7 @@ import {
   loadUserInsights,
   saveSpiralReport,
   getLatestSpiralReport
-} from '@/lib/database/unified-insights-storage';
+} from '@/lib/storage/unified-insights-storage';
 
 // Mark as dynamic route
 export const dynamic = 'force-dynamic';

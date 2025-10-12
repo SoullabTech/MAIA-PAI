@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { loadUserInsights, getConvergingInsights } from '@/lib/database/unified-insights-storage';
+import { loadUserInsights, getConvergingInsights } from '@/lib/storage/unified-insights-storage';
 
 // Mark as dynamic route
 export const dynamic = 'force-dynamic';
