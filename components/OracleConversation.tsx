@@ -160,6 +160,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [isMicrophonePaused, setIsMicrophonePaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false); // Start unmuted in voice mode for immediate use
   const voiceMicRef = useRef<VoiceActivatedMaiaRef>(null);
+  const textInputRef = useRef<HTMLTextAreaElement>(null);
   const [userTranscript, setUserTranscript] = useState('');
   const [maiaResponseText, setMaiaResponseText] = useState('');
   const [isMounted, setIsMounted] = useState(false);
@@ -405,6 +406,16 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setIsResponding(maiaVoiceState?.isPlaying || false);
     }
   }, [maiaVoiceState?.isPlaying, isAudioPlaying, isResponding]);
+
+  // Auto-focus text input in chat mode after MAIA responds
+  useEffect(() => {
+    if (showChatInterface && !isProcessing && textInputRef.current) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        textInputRef.current?.focus();
+      }, 100);
+    }
+  }, [showChatInterface, isProcessing, messages.length]);
 
   // Update motion state based on voice activity
   useEffect(() => {
@@ -1964,6 +1975,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     {/* Compact input with inline send button */}
                     <div className="flex items-end gap-2">
                       <textarea
+                        ref={textInputRef}
                         name="message"
                         placeholder="Share your thoughts with MAIA..."
                         disabled={isProcessing}
