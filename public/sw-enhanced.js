@@ -104,12 +104,12 @@ self.addEventListener('fetch', event => {
   // Skip non-HTTP requests
   if (!url.protocol.startsWith('http')) return;
 
-  // Handle PWA navigation - redirect root to /maya when in standalone mode
+  // Handle PWA navigation - redirect root to /maia when in standalone mode (Claude Code enhanced)
   if (request.mode === 'navigate' && url.pathname === '/' &&
       (url.searchParams.get('utm_source') === 'homescreen' ||
        request.referrer.includes('android-app://') ||
        self.clients.matchAll().then(clients => clients.some(c => c.url.includes('standalone=true'))))) {
-    event.respondWith(Response.redirect('/maya', 302));
+    event.respondWith(Response.redirect('/maia', 302));
     return;
   }
 
