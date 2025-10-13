@@ -123,14 +123,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     const updateSize = () => {
       const width = window.innerWidth;
       if (width < 640) {
-        // Mobile: Small top presence (110-130px) for Star Wars text flow
-        setHoloflowerSize(Math.min(width / 4, 130));
+        // Mobile: Very subtle presence
+        setHoloflowerSize(80);
       } else if (width < 1024) {
-        // Tablet: Compact (150px)
-        setHoloflowerSize(150);
+        // Tablet: Small and unobtrusive
+        setHoloflowerSize(100);
       } else {
-        // Desktop: Smaller, centered in dotted ring (180px)
-        setHoloflowerSize(180);
+        // Desktop: Modest size
+        setHoloflowerSize(120);
       }
     };
 
@@ -1472,9 +1472,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Beautiful Sacred Holoflower - Top center, higher on desktop to avoid text competition */}
+      {/* Subtle Holoflower - Lower position, not dominating */}
       <motion.div
-        className="fixed top-16 md:top-12 lg:top-8 left-1/2 -translate-x-1/2 z-[25] cursor-pointer"
+        className="fixed top-32 md:top-28 lg:top-24 left-1/2 -translate-x-1/2 z-[25] cursor-pointer opacity-60 hover:opacity-80 transition-opacity"
         onClick={async (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -1534,39 +1534,39 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
           {/* Central Holoflower Logo with Glow and Sparkles */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            {/* Radiant glow behind the holoflower - VERY subtle, no visible edges */}
+            {/* Minimal glow - almost imperceptible */}
             <motion.div
               className={`absolute flex items-center justify-center pointer-events-none ${
                 showChatInterface || messages.length > 0
                   ? 'opacity-0'  // Invisible when text present
-                  : 'opacity-20'  // Very subtle when listening
+                  : 'opacity-10'  // Barely visible when listening
               }`}
               animate={{
-                scale: [1, 1.3, 1],
-                opacity: showChatInterface || messages.length > 0 ? 0 : [0.15, 0.25, 0.15]
+                scale: [1, 1.1, 1],
+                opacity: showChatInterface || messages.length > 0 ? 0 : [0.05, 0.1, 0.05]
               }}
               transition={{
-                duration: 4,
+                duration: 6,
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
             >
               <div
-                className="w-56 h-56 rounded-full"
+                className="w-32 h-32 rounded-full"
                 style={{
-                  background: 'radial-gradient(circle, rgba(212, 184, 150, 0.3) 0%, rgba(212, 184, 150, 0.1) 40%, transparent 70%)',
-                  filter: 'blur(50px)',  // More blur = softer, no hard edges
+                  background: 'radial-gradient(circle, rgba(212, 184, 150, 0.15) 0%, transparent 60%)',
+                  filter: 'blur(40px)',
                   transform: 'translate(0, 0)'
                 }}
               />
             </motion.div>
 
-            {/* Holoflower Image - Warm amber tone, perfectly centered in container */}
+            {/* Holoflower Image - Subtle presence */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <img
                 src="/holoflower-amber.png"
                 alt="Holoflower"
-                className="object-contain opacity-90"
+                className="object-contain opacity-50"
                 style={{
                   width: `${holoflowerSize * 0.85}px`,
                   height: `${holoflowerSize * 0.85}px`,
