@@ -9,12 +9,16 @@ interface UseVoiceChatOptions {
   onMessage: (message: string) => void;
   onListeningChange?: (isListening: boolean) => void;
   autoListen?: boolean; // Automatically start listening after Maya speaks
+  conversationDepth?: 'quick' | 'normal' | 'deep'; // Adaptive silence threshold
+  onManualStop?: () => void; // Manual "I'm done speaking" callback
 }
 
 export function useVoiceChat({
   onMessage,
   onListeningChange,
-  autoListen = true
+  autoListen = true,
+  conversationDepth = 'normal',
+  onManualStop
 }: UseVoiceChatOptions) {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -30,6 +34,30 @@ export function useVoiceChat({
   const micStreamRef = useRef<MediaStream | null>(null);
   const volumeIntervalRef = useRef<NodeJS.Timer | null>(null);
   const silenceTimeoutRef = useRef<NodeJS.Timer | null>(null);
+
+  // Get adaptive silence threshold based on conversation depth
+  const getSilenceThreshold = useCallback(() => {
+    switch (conversationDepth) {
+      case 'quick': return 3000;  // 3 seconds for quick exchanges
+      case 'deep': return 8000;   // 8 seconds for deep reflection
+      case 'normal':
+      default: return 6000;       // 6 seconds default (up from 1.5s!)
+    }
+  }, [conversationDepth]);
+
+  // Manual stop function
+  const manualStop = useCallback(() => {
+    console.log('🛑 Manual stop triggered');
+    if (silenceTimeoutRef.current) {
+      clearTimeout(silenceTimeoutRef.current);
+    }
+    if (transcript.trim()) {
+      onMessage(transcript.trim());
+      setTranscript('');
+      setInterimTranscript('');
+    }
+    onManualStop?.();
+  }, [transcript, onMessage, onManualStop]);
 
   // Initialize speech recognition
   useEffect(() => {
@@ -119,15 +147,17 @@ export function useVoiceChat({
           finalTranscript += transcriptPart + ' ';
           setTranscript(finalTranscript.trim());
 
-          // Set a timer to send the message after silence
+          // Set a timer to send the message after adaptive silence
+          const threshold = getSilenceThreshold();
           silenceTimeoutRef.current = setTimeout(() => {
             if (finalTranscript.trim()) {
+              console.log(`🔇 Silence detected (${threshold}ms), sending message`);
               onMessage(finalTranscript.trim());
               finalTranscript = '';
               setTranscript('');
               setInterimTranscript('');
             }
-          }, 1500); // 1.5 seconds of silence triggers send
+          }, threshold); // Adaptive silence threshold (3-8 seconds)
         } else {
           interim += transcriptPart;
         }
@@ -330,6 +360,7 @@ export function useVoiceChat({
     toggleListening,
     speak,
     stopSpeaking,
+    manualStop, // NEW: Manual stop function
 
     // Combined display transcript
     displayTranscript: transcript || interimTranscript

@@ -10,6 +10,7 @@ export default function MayaVoiceInterface() {
   const { messages, isStreaming, sendMessage } = useMayaStream();
   const [mode, setMode] = useState<'voice' | 'chat'>('voice');
   const [textInput, setTextInput] = useState('');
+  const [conversationDepth, setConversationDepth] = useState<'quick' | 'normal' | 'deep'>('normal');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const {
@@ -20,12 +21,15 @@ export default function MayaVoiceInterface() {
     volume,
     error,
     toggleListening,
-    speak
+    speak,
+    manualStop
   } = useVoiceChat({
     onMessage: (message) => {
       sendMessage(message);
     },
-    autoListen: true // Auto-resume listening after Maya speaks
+    autoListen: true, // Auto-resume listening after Maya speaks
+    conversationDepth, // NEW: Adaptive silence threshold
+    onManualStop: () => console.log('User manually stopped speaking')
   });
 
   // Auto-scroll messages
