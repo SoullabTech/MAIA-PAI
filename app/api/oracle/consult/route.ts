@@ -1,6 +1,7 @@
 /**
- * Oracle Consultation Endpoint for Custom GPT
- * Provides archetypal wisdom from Elemental Oracle 2.0 framework
+ * Oracle Consultation Endpoint - DREAMWEAVER ENHANCED
+ * MAIA with Kelly's 27 years + Claude's pattern recognition
+ * The I-Thou made technology
  */
 
 import { NextRequest, NextResponse } from 'next/server';

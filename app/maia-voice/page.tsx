@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { VoiceActivatedMaya } from '@/components/ui/VoiceActivatedMayaFixed';
+import { EnhancedVoiceControl } from '@/components/ui/EnhancedVoiceControl';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Message {
@@ -15,6 +16,8 @@ export default function MayaVoicePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [conversationDepth, setConversationDepth] = useState<'quick' | 'normal' | 'deep'>('normal');
+  const [useEnhancedMode, setUseEnhancedMode] = useState(true); // Toggle between old and new UI
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const speechSynthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
 
@@ -191,14 +194,43 @@ export default function MayaVoicePage() {
 
         {/* Voice Control Center */}
         <div className="flex flex-col items-center space-y-4">
-          <VoiceActivatedMaya
-            onTranscript={handleVoiceTranscript}
-            isProcessing={isProcessing}
-            enabled={voiceEnabled}
-          />
+          {useEnhancedMode ? (
+            <EnhancedVoiceControl
+              enabled={voiceEnabled}
+              isMuted={!voiceEnabled}
+              isMayaSpeaking={isProcessing}
+              onTranscript={handleVoiceTranscript}
+              conversationDepth={conversationDepth}
+            />
+          ) : (
+            <VoiceActivatedMaya
+              onTranscript={handleVoiceTranscript}
+              isProcessing={isProcessing}
+              enabled={voiceEnabled}
+            />
+          )}
+
+          {/* Conversation Depth Selector */}
+          {useEnhancedMode && (
+            <div className="flex space-x-2">
+              {(['quick', 'normal', 'deep'] as const).map((depth) => (
+                <button
+                  key={depth}
+                  onClick={() => setConversationDepth(depth)}
+                  className={`px-4 py-2 rounded-lg transition font-medium capitalize ${
+                    conversationDepth === depth
+                      ? 'bg-amber-500 text-white shadow-lg'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {depth}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Additional Controls */}
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 flex-wrap justify-center">
             <button
               onClick={clearConversation}
               className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
@@ -215,22 +247,45 @@ export default function MayaVoicePage() {
             >
               Voice {voiceEnabled ? 'On' : 'Off'}
             </button>
+            <button
+              onClick={() => setUseEnhancedMode(!useEnhancedMode)}
+              className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition"
+            >
+              {useEnhancedMode ? 'Classic Mode' : 'Enhanced Mode'}
+            </button>
           </div>
         </div>
 
         {/* Instructions */}
         <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
           <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2">
-            How to use Voice Conversation:
+            {useEnhancedMode ? '✨ Enhanced Voice Mode Features:' : 'How to use Voice Conversation:'}
           </h3>
-          <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
-            <li>• Click the microphone to start (you&apos;ll be asked for permission first time)</li>
-            <li>• Speak naturally - Maya listens continuously</li>
-            <li>• After you stop speaking for 1.5 seconds, Maya will respond</li>
-            <li>• The conversation flows naturally - no need to press anything</li>
-            <li>• Maya speaks her responses out loud</li>
-            <li>• Click the microphone again to stop</li>
-          </ul>
+          {useEnhancedMode ? (
+            <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-2">
+              <li>
+                <strong>🎚️ Adaptive Silence Detection:</strong>
+                <ul className="ml-4 mt-1 space-y-1">
+                  <li>• <strong>Quick</strong> (3s): Fast back-and-forth exchanges</li>
+                  <li>• <strong>Normal</strong> (6s): Comfortable pauses for thought</li>
+                  <li>• <strong>Deep</strong> (8s): Long pauses for reflection and processing</li>
+                </ul>
+              </li>
+              <li>• <strong>🛑 Manual Stop Button:</strong> Appears when you&apos;re speaking - click &quot;Done Speaking&quot; to end your turn immediately</li>
+              <li>• <strong>🔔 Audio Cues:</strong> Gentle chime plays when MAIA is about to respond</li>
+              <li>• <strong>📊 Visual Feedback:</strong> Enhanced waveforms show your voice level in real-time</li>
+              <li>• <strong>🔄 Mode Toggle:</strong> Switch between Classic and Enhanced modes anytime</li>
+            </ul>
+          ) : (
+            <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
+              <li>• Click the microphone to start (you&apos;ll be asked for permission first time)</li>
+              <li>• Speak naturally - Maya listens continuously</li>
+              <li>• After you stop speaking for 1.5 seconds, Maya will respond</li>
+              <li>• The conversation flows naturally - no need to press anything</li>
+              <li>• Maya speaks her responses out loud</li>
+              <li>• Click the microphone again to stop</li>
+            </ul>
+          )}
         </div>
       </div>
     </div>

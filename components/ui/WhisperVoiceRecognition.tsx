@@ -19,11 +19,14 @@ interface WhisperVoiceProps {
   isMayaSpeaking: boolean;
   onTranscript: (text: string) => void;
   onAudioLevelChange?: (level: number) => void;
+  conversationDepth?: 'quick' | 'normal' | 'deep'; // Adaptive silence threshold
+  onManualStop?: () => void; // Manual "I'm done speaking" callback
 }
 
 export interface VoiceActivatedMaiaRef {
   isListening: boolean;
   audioLevel: number;
+  manualStop: () => void; // Allow parent to trigger manual stop
 }
 
 export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, WhisperVoiceProps>(({
@@ -31,18 +34,42 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
   isMuted,
   isMayaSpeaking,
   onTranscript,
-  onAudioLevelChange
+  onAudioLevelChange,
+  conversationDepth = 'normal',
+  onManualStop
 }, ref) => {
 
   const [isListening, setIsListening] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const [transcript, setTranscript] = useState('');
 
+  // Adaptive silence thresholds based on conversation depth
+  const getSilenceThreshold = useCallback(() => {
+    switch (conversationDepth) {
+      case 'quick': return 3000;  // 3 seconds for quick exchanges
+      case 'deep': return 8000;   // 8 seconds for deep reflection
+      case 'normal':
+      default: return 6000;       // 6 seconds default
+    }
+  }, [conversationDepth]);
+
+  /**
+   * Manual stop - user signals they're done speaking
+   */
+  const manualStop = useCallback(() => {
+    console.log('🛑 Manual stop triggered by user');
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      onManualStop?.(); // Notify parent component
+    }
+  }, [onManualStop]);
+
   // Expose ref interface for parent component
   useImperativeHandle(ref, () => ({
     isListening,
-    audioLevel
-  }), [isListening, audioLevel]);
+    audioLevel,
+    manualStop
+  }), [isListening, audioLevel, manualStop]);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -287,15 +314,18 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
       // Check for silence every 500ms
       silenceCheckIntervalRef.current = setInterval(() => {
         const silenceDuration = Date.now() - lastSpeechTimeRef.current;
+        const threshold = getSilenceThreshold();
 
         console.log('🔍 Silence check:', {
           silenceDuration: `${silenceDuration}ms`,
+          threshold: `${threshold}ms`,
+          conversationDepth,
           recording: mediaRecorderRef.current?.state
         });
 
-        // If 2 seconds of silence, stop and transcribe
-        if (silenceDuration > 2000 && mediaRecorderRef.current?.state === 'recording') {
-          console.log('🔇 Silence detected (2s+), stopping recording...');
+        // Stop and transcribe after adaptive silence threshold
+        if (silenceDuration > threshold && mediaRecorderRef.current?.state === 'recording') {
+          console.log(`🔇 Silence detected (${threshold}ms+), stopping recording...`);
           mediaRecorderRef.current?.stop();
 
           // Restart recording for next phrase (only if MAIA is NOT speaking)
@@ -316,7 +346,7 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
       console.error('❌ Failed to start recording:', error);
       setIsListening(false);
     }
-  }, [enabled, isMuted, isMayaSpeaking, onAudioLevelChange, transcribeAudio]);
+  }, [enabled, isMuted, isMayaSpeaking, onAudioLevelChange, transcribeAudio, getSilenceThreshold, conversationDepth]);
 
   /**
    * Pause recording (when MAIA is speaking)
