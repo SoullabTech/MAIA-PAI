@@ -1,18 +1,54 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserAuth } from '@/lib/hooks/useUserAuth';
 import { OracleConversation } from '@/components/OracleConversation';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LogOut } from 'lucide-react';
 
+// Helper to get initial user state from localStorage (runs before first render)
+function getInitialUserData() {
+  if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
+
+  // Check NEW auth system
+  const betaUser = localStorage.getItem('beta_user');
+  if (betaUser) {
+    try {
+      const userData = JSON.parse(betaUser);
+      if (userData.onboarded === true && userData.id && userData.username) {
+        return { id: userData.id, name: userData.username };
+      }
+    } catch (e) {}
+  }
+
+  // Check OLD auth system
+  if (localStorage.getItem('betaOnboardingComplete') === 'true') {
+    const id = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
+    const name = localStorage.getItem('explorerName');
+    if (id && name) {
+      return { id, name };
+    }
+  }
+
+  return { id: 'guest', name: 'Explorer' };
+}
+
 export default function MayaPage() {
-  console.log('[MayaPage] Component mounting');
+  console.log('[MayaPage] Component mounting - Stack trace:', new Error().stack?.split('\n').slice(0, 3));
   const router = useRouter();
   const { user, preferences, isOnboarded, isLoading } = useUserAuth();
-  const [explorerId, setExplorerId] = useState('guest');
-  const [explorerName, setExplorerName] = useState('Explorer');
+
+  // Initialize state from localStorage to prevent re-mount when auth loads
+  const initialData = getInitialUserData();
+  const [explorerId, setExplorerId] = useState(initialData.id);
+  const [explorerName, setExplorerName] = useState(initialData.name);
+
+  // Create session ID once and keep it stable across renders
+  const [sessionId] = useState(() => Date.now().toString());
+
+  // Track if we've already run auth checks to prevent redirect loops
+  const hasCheckedAuth = useRef(false);
 
   console.log('[MayaPage] State:', { explorerId, explorerName, isLoading });
 
@@ -30,6 +66,12 @@ export default function MayaPage() {
   };
 
   useEffect(() => {
+    // Only run auth checks once to prevent redirect loops during conversation
+    if (hasCheckedAuth.current) {
+      return;
+    }
+    hasCheckedAuth.current = true;
+
     // Check NEW auth system first
     const newUser = localStorage.getItem('beta_user');
     if (newUser) {
@@ -43,20 +85,22 @@ export default function MayaPage() {
           return;
         }
 
-        // Check if user has seen intro today
-        const lastIntroDate = localStorage.getItem('last_intro_date');
-        const today = new Date().toDateString();
-
-        if (lastIntroDate !== today) {
-          console.log('✨ [maya] New day - showing intro sequence');
-          localStorage.setItem('last_intro_date', today);
-          router.replace('/intro');
-          return;
-        }
+        // Check if user has seen intro today - COMMENTED OUT TO PREVENT INTERRUPTIONS
+        // const lastIntroDate = localStorage.getItem('last_intro_date');
+        // const today = new Date().toDateString();
+        // if (lastIntroDate !== today) {
+        //   console.log('✨ [maya] New day - showing intro sequence');
+        //   localStorage.setItem('last_intro_date', today);
+        //   router.replace('/intro');
+        //   return;
+        // }
 
         console.log('✅ [maya] User onboarded, loading Maya');
-        setExplorerId(userData.id || 'guest');
-        setExplorerName(userData.username || 'Explorer');
+        // Only update state if values actually changed
+        const newId = userData.id || 'guest';
+        const newName = userData.username || 'Explorer';
+        if (explorerId !== newId) setExplorerId(newId);
+        if (explorerName !== newName) setExplorerName(newName);
         return;
       } catch (e) {
         console.error('❌ [maya] Error parsing new user data:', e);
@@ -78,9 +122,10 @@ export default function MayaPage() {
     const id = user?.id || localStorage.getItem('explorerId') || localStorage.getItem('betaUserId') || 'guest';
     const name = user?.name || user?.sacredName || localStorage.getItem('explorerName') || 'Explorer';
 
-    setExplorerId(id);
-    setExplorerName(name);
-  }, [router, user]);
+    // Only update state if values actually changed
+    if (explorerId !== id) setExplorerId(id);
+    if (explorerName !== name) setExplorerName(name);
+  }, [router, user]); // FIXED: Removed explorerId/explorerName to prevent infinite loop
 
   // Show loading state while checking auth (but allow guest to proceed)
   // Commenting out this check - it might be too aggressive
@@ -133,7 +178,7 @@ export default function MayaPage() {
           </button>
 
           <OracleConversation
-            sessionId={Date.now().toString()}
+            sessionId={sessionId}
             userId={explorerId}
             userName={explorerName}
             voiceEnabled={preferences?.voice_enabled ?? true}

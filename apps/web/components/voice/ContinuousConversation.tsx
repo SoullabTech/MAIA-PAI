@@ -89,7 +89,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     }
 
     const recognition = new SpeechRecognition();
-    recognition.continuous = true; // REVERTED: Need continuous=true for mute button to work
+    recognition.continuous = false; // EMERGENCY FIX: continuous=true not firing onresult at all
     recognition.interimResults = true;
     recognition.lang = 'en-US';
     recognition.maxAlternatives = 1;
@@ -133,12 +133,17 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     };
 
     recognition.onresult = (event: any) => {
+      console.log('🎤 [onresult] FIRED - event:', event.results.length, 'results');
+
       let interimTranscript = '';
       let finalTranscript = '';
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
+        const isFinal = event.results[i].isFinal;
+        console.log(`  Result [${i}]: "${transcript}" (isFinal: ${isFinal})`);
+
+        if (isFinal) {
           finalTranscript += transcript + ' ';
         } else {
           interimTranscript += transcript;
@@ -148,84 +153,91 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       // Update speech time on any speech
       if (interimTranscript || finalTranscript) {
         lastSpeechTime.current = Date.now();
-        
+
+        // CRITICAL FIX: Store interim results immediately in case isFinal never comes
+        // This prevents the 30-second timeout issue
+        if (finalTranscript) {
+          console.log('✅ Got FINAL transcript:', finalTranscript);
+          // Replace with final (don't add, since interim already set it)
+          accumulatedTranscript.current = finalTranscript.trim();
+        } else if (interimTranscript) {
+          console.log('📝 Got INTERIM transcript:', interimTranscript);
+          // Replace with latest interim (don't accumulate)
+          accumulatedTranscript.current = interimTranscript.trim();
+        }
+
+        console.log('📊 Accumulated so far:', accumulatedTranscript.current);
+
         // Reset silence timer on speech
         if (silenceTimerRef.current) {
           clearTimeout(silenceTimerRef.current);
         }
-        
-        // Start new silence timer
+
+        // Start new silence timer - REDUCED to 900ms for faster response
         silenceTimerRef.current = setTimeout(() => {
+          console.log('🔕 Silence detected - processing transcript');
           if (isRecording && !isProcessingRef.current && accumulatedTranscript.current.trim()) {
             processAccumulatedTranscript();
           }
-        }, silenceThreshold);
+        }, 900); // REDUCED from 2500ms to 900ms
       }
 
       if (interimTranscript) {
         onInterimTranscript?.(interimTranscript);
       }
-
-      if (finalTranscript) {
-        accumulatedTranscript.current += finalTranscript;
-      }
     };
 
     recognition.onerror = (event: any) => {
-      console.error('❌ [Continuous] Speech recognition error:', event.error);
+      // Only log critical errors (not no-speech, which is common)
+      if (event.error !== 'no-speech') {
+        console.error('❌ [Continuous] Speech recognition error:', event.error);
+      }
+
       if (event.error === 'no-speech') {
         // Process accumulated transcript before restarting
         if (accumulatedTranscript.current.trim()) {
           processAccumulatedTranscript();
-        } else {
-          // Restart recognition if no speech detected and no accumulated text
-          if (isListening) {
-            setTimeout(() => {
-              if (recognitionRef.current && isListening) {
-                recognitionRef.current.start();
-              }
-            }, 100);
-          }
         }
+        // No-speech is normal in continuous mode, auto-restart happens in onend
+      } else if (event.error === 'network') {
+        console.warn('⚠️ Network error in speech recognition, will retry on restart');
+        // Network errors will be retried by the auto-restart mechanism
+      } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        console.error('🚫 Microphone permission denied');
+        // Stop listening permanently if permission denied
+        setIsListening(false);
+        onError?.(new Error('Microphone permission denied'));
+      } else if (event.error === 'aborted') {
+        // Aborted is expected when manually stopping
+        console.log('⏹️ Recognition aborted (expected)');
       }
     };
 
     recognition.onend = () => {
+      console.log('🏁 [onend] Recognition stopped');
       setIsRecording(false);
       onRecordingStateChange?.(false);
-      
+
       // Clear timeout
       if (recognitionTimeoutRef.current) {
         clearTimeout(recognitionTimeoutRef.current);
         recognitionTimeoutRef.current = null;
       }
-      
-      // Process any accumulated transcript before restarting
-      if (accumulatedTranscript.current.trim() && !isProcessingRef.current) {
-        processAccumulatedTranscript();
-      }
-      
-      // Restart if we're still listening and not processing/speaking
+
+      // CRITICAL: In continuous=false mode, auto-restart immediately to simulate continuous
+      // Don't process here - the silence timer already handled it
       if (isListening && !isProcessingRef.current && !isSpeaking) {
+        console.log('🔄 [onend] Auto-restarting recognition...');
         setTimeout(() => {
           if (recognitionRef.current && isListening && !isRecording) {
             try {
               recognitionRef.current.start();
+              console.log('✅ [onend] Recognition restarted');
             } catch (err) {
               console.error('Error restarting recognition:', err);
-              // Try again after a longer delay
-              setTimeout(() => {
-                if (recognitionRef.current && isListening && !isRecording) {
-                  try {
-                    recognitionRef.current.start();
-                  } catch (err2) {
-                    console.error('Error restarting recognition (retry):', err2);
-                  }
-                }
-              }, 500);
             }
           }
-        }, 100);
+        }, 50); // REDUCED from 100ms to 50ms for faster restart
       }
     };
 
