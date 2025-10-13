@@ -1,5 +1,5 @@
 /**
- * Silent Witness Mode for MAIA
+ * Scribe Mode for MAIA
  * Allows MAIA to observe, take notes, and process conversations without actively interjecting
  * Provides post-session reflection and personalized insights
  */
@@ -9,7 +9,7 @@ import { StoredJournalEntry } from '@/lib/storage/journal-storage';
 import type { SymbolicContext } from '@/lib/memory/soulprint';
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
 
-export interface WitnessObservation {
+export interface ScribeObservation {
   timestamp: number;
   speaker: string;
   content: string;
@@ -21,14 +21,14 @@ export interface WitnessObservation {
   contextualNotes?: string;
 }
 
-export interface WitnessSession {
+export interface ScribeSession {
   sessionId: string;
   userId: string;
   startTime: number;
   endTime?: number;
-  mode: 'silent_witness' | 'active_participant';
+  mode: 'scribe' | 'active_participant';
   participants: string[];
-  observations: WitnessObservation[];
+  observations: ScribeObservation[];
   keyMoments: {
     timestamp: number;
     type: 'breakthrough' | 'tension' | 'insight' | 'question' | 'resolution';
@@ -50,7 +50,7 @@ export interface WitnessSession {
   };
 }
 
-export interface WitnessReflection {
+export interface ScribeReflection {
   sessionId: string;
   userId: string;
   personalizedInsights: string[];
@@ -66,22 +66,22 @@ export interface WitnessReflection {
 }
 
 /**
- * Silent Witness Agent - Extension of PersonalOracleAgent with observation capabilities
+ * Scribe Agent - Extension of PersonalOracleAgent with observation capabilities
  */
-export class SilentWitnessAgent extends PersonalOracleAgent {
-  private currentSession: WitnessSession | null = null;
-  private isWitnessing: boolean = false;
-  private observationBuffer: WitnessObservation[] = [];
-  private sessionStorage: Map<string, WitnessSession> = new Map();
+export class ScribeAgent extends PersonalOracleAgent {
+  private currentSession: ScribeSession | null = null;
+  private isScribing: boolean = false;
+  private observationBuffer: ScribeObservation[] = [];
+  private sessionStorage: Map<string, ScribeSession> = new Map();
 
   constructor(userId: string, settings?: any) {
     super(userId, settings);
   }
 
   /**
-   * Start a silent witness session
+   * Start a scribe session
    */
-  async startWitnessSession(
+  async startScribeSession(
     sessionId: string,
     participants: string[] = [],
     metadata?: {
@@ -90,14 +90,14 @@ export class SilentWitnessAgent extends PersonalOracleAgent {
     }
   ): Promise<{ success: boolean; sessionId: string }> {
     if (this.currentSession) {
-      await this.endWitnessSession();
+      await this.endScribeSession();
     }
 
     this.currentSession = {
       sessionId,
       userId: this.userId,
       startTime: Date.now(),
-      mode: 'silent_witness',
+      mode: 'scribe',
       participants,
       observations: [],
       keyMoments: [],
@@ -110,7 +110,7 @@ export class SilentWitnessAgent extends PersonalOracleAgent {
       }
     };
 
-    this.isWitnessing = true;
+    this.isScribing = true;
     this.observationBuffer = [];
 
     console.log(`👁️ MAIA entering Silent Witness mode for session ${sessionId}`);
@@ -134,13 +134,13 @@ export class SilentWitnessAgent extends PersonalOracleAgent {
       context?: any;
     }
   ): Promise<void> {
-    if (!this.isWitnessing || !this.currentSession) {
+    if (!this.isScribing || !this.currentSession) {
       console.warn('⚠️ Not in witness mode or no active session');
       return;
     }
 
     // Create observation
-    const observation: WitnessObservation = {
+    const observation: ScribeObservation = {
       timestamp: Date.now(),
       speaker,
       content,
@@ -186,7 +186,7 @@ export class SilentWitnessAgent extends PersonalOracleAgent {
   /**
    * End witness session and prepare reflection
    */
-  async endWitnessSession(): Promise<WitnessSession | null> {
+  async endScribeSession(): Promise<ScribeSession | null> {
     if (!this.currentSession) {
       return null;
     }
@@ -203,7 +203,7 @@ export class SilentWitnessAgent extends PersonalOracleAgent {
 
     const completedSession = this.currentSession;
     this.currentSession = null;
-    this.isWitnessing = false;
+    this.isScribing = false;
     this.observationBuffer = [];
 
     console.log(`🔚 Witness session ${completedSession.sessionId} completed`);
@@ -224,7 +224,7 @@ export class SilentWitnessAgent extends PersonalOracleAgent {
       currentPhase?: string;
       symbolicContext?: SymbolicContext;
     }
-  ): Promise<WitnessReflection> {
+  ): Promise<ScribeReflection> {
     const session = this.sessionStorage.get(sessionId);
     if (!session) {
       throw new Error(`Session ${sessionId} not found`);
@@ -347,7 +347,7 @@ export class SilentWitnessAgent extends PersonalOracleAgent {
   }
 
   private async detectKeyMoment(
-    observation: WitnessObservation,
+    observation: ScribeObservation,
     index: number
   ): Promise<void> {
     if (!this.currentSession) return;
@@ -429,9 +429,9 @@ export class SilentWitnessAgent extends PersonalOracleAgent {
   }
 
   private async processWitnessedSession(
-    session: WitnessSession,
+    session: ScribeSession,
     userContext?: any
-  ): Promise<WitnessReflection> {
+  ): Promise<ScribeReflection> {
     // Generate personalized reflection using MAIA's knowledge of the user
     const personalizedInsights: string[] = [];
     const relevantToYourJourney: string[] = [];
@@ -512,27 +512,27 @@ export class SilentWitnessAgent extends PersonalOracleAgent {
    * Check if currently in witness mode
    */
   isInWitnessMode(): boolean {
-    return this.isWitnessing;
+    return this.isScribing;
   }
 
   /**
    * Get current session info
    */
-  getCurrentSession(): WitnessSession | null {
+  getCurrentSession(): ScribeSession | null {
     return this.currentSession;
   }
 
   /**
    * Retrieve a stored session
    */
-  getSession(sessionId: string): WitnessSession | null {
+  getSession(sessionId: string): ScribeSession | null {
     return this.sessionStorage.get(sessionId) || null;
   }
 
   /**
    * List all sessions for user
    */
-  getAllSessions(): WitnessSession[] {
+  getAllSessions(): ScribeSession[] {
     return Array.from(this.sessionStorage.values())
       .filter(session => session.userId === this.userId)
       .sort((a, b) => b.startTime - a.startTime);

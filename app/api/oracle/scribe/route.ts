@@ -1,15 +1,15 @@
 /**
- * Silent Witness Mode API Endpoints
+ * Scribe Mode API Endpoints
  * Allows MAIA to observe sessions and provide personalized reflections
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { SilentWitnessAgent } from '@/lib/agents/SilentWitnessAgent';
+import { ScribeAgent } from '@/lib/agents/ScribeAgent';
 import { CreativeExpressionAnalyzer, ElementalWitnessResponses } from '@/lib/agents/CreativeWitnessMode';
 import { MuseReceiverAgent } from '@/lib/agents/MuseReceiverMode';
 
 // Store active witness sessions in memory (in production, use Redis or similar)
-const activeWitnessSessions = new Map<string, SilentWitnessAgent>();
+const activeWitnessSessions = new Map<string, ScribeAgent>();
 const activeMuseSessions = new Map<string, MuseReceiverAgent>();
 
 /**
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        agent = new SilentWitnessAgent(userId);
+        agent = new ScribeAgent(userId);
         activeWitnessSessions.set(`${userId}_${sessionId}`, agent);
 
         const startResult = await agent.startWitnessSession(
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
       case 'creative':
         // Receive and analyze creative expression (poetry, lyrics, etc)
         if (!agent) {
-          agent = new SilentWitnessAgent(userId);
+          agent = new ScribeAgent(userId);
           activeWitnessSessions.set(`${userId}_${sessionId || 'creative'}`, agent);
         }
 
@@ -255,7 +255,7 @@ export async function POST(request: NextRequest) {
 
         // Create new agent if needed for reflection
         if (!agent) {
-          agent = new SilentWitnessAgent(userId);
+          agent = new ScribeAgent(userId);
         }
 
         const reflection = await agent.generatePersonalReflection(

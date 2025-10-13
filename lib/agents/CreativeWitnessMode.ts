@@ -3,7 +3,7 @@
  * Elemental reception of poetry, lyrics, songs, and creative expressions
  */
 
-import { WitnessObservation, WitnessSession } from './SilentWitnessAgent';
+import { ScribeObservation, ScribeSession } from './ScribeAgent';
 
 export interface CreativeExpression {
   id: string;

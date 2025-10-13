@@ -1,5 +1,5 @@
 /**
- * Silent Witness Mode UI Component
+ * Scribe Mode UI Component
  * Allows MAIA to silently observe and take notes during conversations
  */
 
@@ -22,7 +22,7 @@ interface CreativeExpressionForm {
   title?: string;
 }
 
-export function SilentWitnessMode({ userId }: { userId: string }) {
+export function ScribeMode({ userId }: { userId: string }) {
   const [isWitnessing, setIsWitnessing] = useState(false);
   const [currentSession, setCurrentSession] = useState<WitnessSession | null>(null);
   const [participants, setParticipants] = useState<string[]>([]);
@@ -41,7 +41,7 @@ export function SilentWitnessMode({ userId }: { userId: string }) {
   // Start witness session
   const startWitnessSession = async () => {
     try {
-      const response = await fetch('/api/oracle/witness', {
+      const response = await fetch('/api/oracle/scribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -76,7 +76,7 @@ export function SilentWitnessMode({ userId }: { userId: string }) {
     if (!currentSession || !observationInput || !currentSpeaker) return;
 
     try {
-      await fetch('/api/oracle/witness', {
+      await fetch('/api/oracle/scribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -107,7 +107,7 @@ export function SilentWitnessMode({ userId }: { userId: string }) {
 
     setIsProcessing(true);
     try {
-      const response = await fetch('/api/oracle/witness', {
+      const response = await fetch('/api/oracle/scribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,7 +148,7 @@ export function SilentWitnessMode({ userId }: { userId: string }) {
     setIsProcessing(true);
     try {
       // End session
-      const endResponse = await fetch('/api/oracle/witness', {
+      const endResponse = await fetch('/api/oracle/scribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -162,7 +162,7 @@ export function SilentWitnessMode({ userId }: { userId: string }) {
 
       // Get reflection
       if (endData.success) {
-        const reflectResponse = await fetch('/api/oracle/witness', {
+        const reflectResponse = await fetch('/api/oracle/scribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

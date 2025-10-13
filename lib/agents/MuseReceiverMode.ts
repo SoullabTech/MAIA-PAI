@@ -4,7 +4,7 @@
  * MAIA listens without interrupting, then helps sort meaning and process afterwards
  */
 
-import { SilentWitnessAgent } from './SilentWitnessAgent';
+import { ScribeAgent } from './ScribeAgent';
 import { CreativeExpressionAnalyzer } from './CreativeWitnessMode';
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
 
@@ -119,7 +119,7 @@ export interface MuseSynthesis {
 /**
  * Muse Receiver Agent - Extended Silent Witness for stream-of-consciousness
  */
-export class MuseReceiverAgent extends SilentWitnessAgent {
+export class MuseReceiverAgent extends ScribeAgent {
   private currentMuseStream: MuseStream | null = null;
   private isReceiving: boolean = false;
   private entryBuffer: MuseEntry[] = [];
