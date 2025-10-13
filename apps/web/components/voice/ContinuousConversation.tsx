@@ -176,7 +176,9 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         // Start new silence timer - REDUCED to 900ms for faster response
         silenceTimerRef.current = setTimeout(() => {
           console.log('🔕 Silence detected - processing transcript');
-          if (isRecording && !isProcessingRef.current && accumulatedTranscript.current.trim()) {
+          // CRITICAL FIX: Don't check isRecording - onend fires before this timer
+          // Just check if we have a transcript to send
+          if (!isProcessingRef.current && accumulatedTranscript.current.trim()) {
             processAccumulatedTranscript();
           }
         }, 900); // REDUCED from 2500ms to 900ms
