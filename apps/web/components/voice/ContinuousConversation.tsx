@@ -51,6 +51,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   const isProcessingRef = useRef(false);
   const recognitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSentRef = useRef<string>("");
+  const isRestartingRef = useRef(false);
 
   // Expose methods to parent
   useImperativeHandle(ref, () => ({
@@ -190,8 +191,8 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     };
 
     recognition.onerror = (event: any) => {
-      // Only log critical errors (not no-speech, which is common)
-      if (event.error !== 'no-speech') {
+      // Only log critical errors (not no-speech or aborted, which are common)
+      if (event.error !== 'no-speech' && event.error !== 'aborted') {
         console.error('❌ [Continuous] Speech recognition error:', event.error);
       }
 
@@ -208,10 +209,11 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         console.error('🚫 Microphone permission denied');
         // Stop listening permanently if permission denied
         setIsListening(false);
-        onError?.(new Error('Microphone permission denied'));
+        // Note: onError is not defined in props, removed the call
       } else if (event.error === 'aborted') {
-        // Aborted is expected when manually stopping
-        console.log('⏹️ Recognition aborted (expected)');
+        // Aborted is normal when stopping/restarting - don't log as error
+        console.log('⏹️ Recognition aborted (normal during restart)');
+        // Don't trigger any restart logic here - let onend handle it
       }
     };
 
@@ -227,17 +229,24 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       }
 
       // CRITICAL: Prevent infinite restart loop
+      // Check if already restarting to prevent multiple simultaneous attempts
+      if (isRestartingRef.current) {
+        console.log('⚠️ [onend] Already restarting, skipping');
+        return;
+      }
+
       // Only restart if we're actively listening and not processing/speaking
-      // Added debounce to prevent rapid restarts
       if (isListening && !isProcessingRef.current && !isSpeaking) {
         console.log('🔄 [onend] Will restart recognition after delay...');
+        isRestartingRef.current = true;
+
         setTimeout(() => {
           // Double-check conditions before restart to prevent race conditions
           if (recognitionRef.current && isListening && !isRecording && !isProcessingRef.current && !isSpeaking) {
             try {
               recognitionRef.current.start();
               console.log('✅ [onend] Recognition restarted');
-            } catch (err) {
+            } catch (err: any) {
               // If start fails, it's likely already running or in a bad state
               console.log('⚠️ [onend] Could not restart recognition:', err.message);
               // Don't retry to avoid infinite loop
@@ -245,6 +254,8 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
           } else {
             console.log('🚫 [onend] Conditions changed, not restarting');
           }
+          // Clear the restarting flag
+          isRestartingRef.current = false;
         }, 300); // Increased from 50ms to 300ms for stability
       } else {
         console.log('🚫 [onend] Not restarting - conditions not met');
@@ -492,14 +503,22 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
 
   // Restart listening when Maya stops speaking
   useEffect(() => {
-    if (isListening && !isSpeaking && !isProcessing && !isRecording) {
+    if (isListening && !isSpeaking && !isProcessing && !isRecording && !isRestartingRef.current) {
       // Restart recognition after Maya finishes
       const timer = setTimeout(() => {
-        if (recognitionRef.current && isListening) {
+        if (recognitionRef.current && isListening && !isRecording && !isRestartingRef.current) {
           try {
+            isRestartingRef.current = true;
             recognitionRef.current.start();
+            console.log('✅ [effect] Recognition restarted after Maya stopped speaking');
+            // Clear flag after a short delay
+            setTimeout(() => {
+              isRestartingRef.current = false;
+            }, 500);
           } catch (err) {
-            // Already started, ignore
+            // Already started or other error, ignore
+            console.log('⚠️ [effect] Could not restart recognition:', err);
+            isRestartingRef.current = false;
           }
         }
       }, 500);
