@@ -812,7 +812,7 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
       // Extract symbolic patterns from journal history
       const symbols = this.extractSymbols(journalEntries);
       const archetypes = this.extractArchetypes(journalEntries);
-      const dominantElement = this.detectDominantElement(journalEntries);
+      let dominantElement = this.detectDominantElement(journalEntries);
 
       // Build context as LIVING NARRATIVE not data extraction
       // Use conversation style preference (walking/classic/adaptive)

@@ -226,20 +226,28 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         recognitionTimeoutRef.current = null;
       }
 
-      // CRITICAL: In continuous=false mode, auto-restart immediately to simulate continuous
-      // Don't process here - the silence timer already handled it
+      // CRITICAL: Prevent infinite restart loop
+      // Only restart if we're actively listening and not processing/speaking
+      // Added debounce to prevent rapid restarts
       if (isListening && !isProcessingRef.current && !isSpeaking) {
-        console.log('🔄 [onend] Auto-restarting recognition...');
+        console.log('🔄 [onend] Will restart recognition after delay...');
         setTimeout(() => {
-          if (recognitionRef.current && isListening && !isRecording) {
+          // Double-check conditions before restart to prevent race conditions
+          if (recognitionRef.current && isListening && !isRecording && !isProcessingRef.current && !isSpeaking) {
             try {
               recognitionRef.current.start();
               console.log('✅ [onend] Recognition restarted');
             } catch (err) {
-              console.error('Error restarting recognition:', err);
+              // If start fails, it's likely already running or in a bad state
+              console.log('⚠️ [onend] Could not restart recognition:', err.message);
+              // Don't retry to avoid infinite loop
             }
+          } else {
+            console.log('🚫 [onend] Conditions changed, not restarting');
           }
-        }, 50); // REDUCED from 100ms to 50ms for faster restart
+        }, 300); // Increased from 50ms to 300ms for stability
+      } else {
+        console.log('🚫 [onend] Not restarting - conditions not met');
       }
     };
 
