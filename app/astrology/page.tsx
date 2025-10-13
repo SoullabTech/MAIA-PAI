@@ -313,6 +313,24 @@ export default function AstrologyPage() {
               </p>
             </Link>
           </div>
+
+          {/* Mayan Astrology Link */}
+          <div className="mt-8 text-center">
+            <Link
+              href="/astrology/mayan"
+              className="group inline-flex items-center gap-3 bg-gradient-to-br from-amber-900/30 to-orange-900/30 hover:from-amber-800/40 hover:to-orange-800/40 border border-amber-700/30 hover:border-amber-600/50 rounded-xl p-6 transition-all duration-300"
+            >
+              <div className="text-4xl">☀️</div>
+              <div className="text-left">
+                <h3 className="text-xl font-bold text-soul-text group-hover:text-soul-accent transition-colors">
+                  Mayan Astrology
+                </h3>
+                <p className="text-soul-textSecondary text-sm">
+                  Discover your Galactic Signature in the Tzolk'in Sacred Calendar →
+                </p>
+              </div>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
