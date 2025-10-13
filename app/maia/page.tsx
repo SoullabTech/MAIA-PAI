@@ -177,43 +177,88 @@ export default function MAIAPage() {
           </div>
         </div>
 
-        {/* Dream-Weaver Status Bar */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex-shrink-0 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border-b border-amber-500/20 backdrop-blur-sm"
-        >
-          <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <motion.div
-                animate={{
-                  scale: [1, 1.2, 1],
-                  rotate: [0, 180, 360],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-                className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 opacity-80"
-              />
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-amber-300">MAIA Dream-Weaver Active</span>
-                <span className="text-xs text-amber-200/60">• Midwifing Your Wisdom</span>
+        {/* HUD Status Bar - High-end Game Interface for Serious Work */}
+        <div className="flex-shrink-0 relative bg-black/60 border-b border-amber-600/10 backdrop-blur-xl">
+          {/* Scanning line effect */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-600/5 to-transparent"
+            animate={{
+              x: ["-100%", "100%"],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+
+          <div className="relative max-w-7xl mx-auto px-4 py-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-6">
+                {/* Status Indicator - Like a power core */}
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <div className="absolute inset-0 animate-ping">
+                      <div className="w-2 h-2 bg-amber-600/40 rounded-full"></div>
+                    </div>
+                    <div className="relative w-2 h-2 bg-amber-600 rounded-full"></div>
+                  </div>
+                  <span className="text-[10px] font-mono text-amber-600/80 uppercase tracking-widest">ONLINE</span>
+                </div>
+
+                {/* System Status */}
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-stone-600 uppercase">SYSTEM</span>
+                    <span className="text-[10px] font-mono text-amber-600">DREAMWEAVER_V2</span>
+                  </div>
+
+                  <div className="h-3 w-px bg-stone-800"></div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-stone-600 uppercase">MODE</span>
+                    <span className="text-[10px] font-mono text-amber-600">WISDOM_SYNTHESIS</span>
+                  </div>
+
+                  <div className="h-3 w-px bg-stone-800"></div>
+
+                  {/* Live metrics */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1">
+                      <div className="w-1 h-3 bg-amber-600/60"></div>
+                      <div className="w-1 h-4 bg-amber-600/70"></div>
+                      <div className="w-1 h-2 bg-amber-600/50"></div>
+                      <div className="w-1 h-5 bg-amber-600/80"></div>
+                      <div className="w-1 h-3 bg-amber-600/60"></div>
+                    </div>
+                    <span className="text-[10px] font-mono text-stone-600">NEURAL_ACTIVITY</span>
+                  </div>
+                </div>
               </div>
+
+              {/* Action Button - Like a game menu */}
+              <button
+                onClick={() => setShowDashboard(true)}
+                className="group relative overflow-hidden px-4 py-1.5 bg-black/40 border border-amber-600/20 hover:border-amber-600/40 transition-all"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-600/0 via-amber-600/10 to-amber-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+                <div className="relative flex items-center gap-2">
+                  <div className="flex gap-1">
+                    <div className="w-1 h-1 bg-amber-600/60"></div>
+                    <div className="w-1 h-1 bg-amber-600/60"></div>
+                    <div className="w-1 h-1 bg-amber-600/60"></div>
+                  </div>
+                  <span className="text-[11px] font-mono text-amber-600/80 group-hover:text-amber-600 uppercase tracking-wider">
+                    WISDOM MATRIX
+                  </span>
+                  <svg className="w-3 h-3 text-amber-600/60 group-hover:text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L13.586 11H3a1 1 0 110-2h10.586l-3.293-3.293a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </button>
             </div>
-            <button
-              onClick={() => setShowDashboard(true)}
-              className="text-xs text-amber-300/80 hover:text-amber-300 transition-colors flex items-center gap-1"
-            >
-              <span>View Your Journey</span>
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
           </div>
-        </motion.div>
+        </div>
 
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
@@ -250,7 +295,10 @@ export default function MAIAPage() {
                 >
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-xl font-bold text-white">Your Wisdom Journey</h2>
+                      <div>
+                        <h2 className="text-lg font-mono text-amber-600/80 uppercase tracking-wider">WISDOM MATRIX</h2>
+                        <p className="text-xs font-mono text-stone-600 mt-1">PATTERN ANALYSIS • EMERGENCE TRACKING</p>
+                      </div>
                       <button
                         onClick={() => setShowDashboard(false)}
                         className="p-2 hover:bg-white/5 rounded-lg transition-colors"
