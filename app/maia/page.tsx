@@ -24,24 +24,34 @@ import { motion, AnimatePresence } from 'framer-motion';
 function getInitialUserData() {
   if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
 
+  // Check NEW system first (beta_user from auth system)
   const betaUser = localStorage.getItem('beta_user');
   if (betaUser) {
     try {
       const userData = JSON.parse(betaUser);
       if (userData.onboarded === true && userData.id && userData.username) {
+        // Also sync to old system for compatibility
+        localStorage.setItem('explorerName', userData.username);
+        localStorage.setItem('explorerId', userData.id);
+        console.log('✅ [MAIA] User authenticated as:', userData.username);
         return { id: userData.id, name: userData.username };
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error('❌ [MAIA] Error parsing beta_user:', e);
+    }
   }
 
+  // Check OLD system (for backward compatibility)
   if (localStorage.getItem('betaOnboardingComplete') === 'true') {
     const id = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
     const name = localStorage.getItem('explorerName');
     if (id && name) {
+      console.log('📦 [MAIA] Using legacy user data:', name);
       return { id, name };
     }
   }
 
+  console.log('⚠️ [MAIA] No user data found, using defaults');
   return { id: 'guest', name: 'Explorer' };
 }
 
@@ -104,8 +114,15 @@ export default function MAIAPage() {
 
         const newId = userData.id || 'guest';
         const newName = userData.username || 'Explorer';
+
+        // Sync to old system for compatibility
+        localStorage.setItem('explorerName', newName);
+        localStorage.setItem('explorerId', newId);
+
         if (explorerId !== newId) setExplorerId(newId);
         if (explorerName !== newName) setExplorerName(newName);
+
+        console.log('✅ [MAIA] User session restored:', { name: newName, id: newId });
         return;
       } catch (e) {
         console.error('Error parsing user data:', e);
