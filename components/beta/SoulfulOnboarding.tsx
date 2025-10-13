@@ -96,7 +96,7 @@ export function SoulfulOnboarding({ initialName }: { initialName: string }) {
       console.log('Saved locally only');
     }
 
-    router.push('/maya');
+    router.push('/maia');
   };
 
   const renderStep = () => {

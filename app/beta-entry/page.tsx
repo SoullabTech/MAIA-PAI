@@ -37,14 +37,14 @@ export default function BetaEntry() {
 
           if (user?.beta_onboarded_at) {
             console.log('✅ User already onboarded, redirecting to MAIA');
-            router.replace('/maya');
+            router.replace('/maia');
             return;
           }
         } catch (error) {
           console.log('Could not check Supabase, using localStorage fallback');
           // If Supabase fails but localStorage says onboarded, trust localStorage
           if (localOnboarded && explorerName) {
-            router.replace('/maya');
+            router.replace('/maia');
             return;
           }
         }

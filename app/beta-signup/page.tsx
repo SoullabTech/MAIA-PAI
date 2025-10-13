@@ -19,8 +19,8 @@ export default function BetaSignup() {
         console.log('🔍 [beta-signup] Found new system user:', { username: userData.username, onboarded: userData.onboarded });
 
         if (userData.onboarded === true) {
-          console.log('✅ [beta-signup] Redirecting to /maya');
-          router.replace('/maya');
+          console.log('✅ [beta-signup] Redirecting to /maia');
+          router.replace('/maia');
           return;
         }
       } catch (e) {
@@ -33,8 +33,8 @@ export default function BetaSignup() {
     const betaOnboarded = localStorage.getItem('betaOnboardingComplete') === 'true';
 
     if (explorerId && betaOnboarded) {
-      console.log('🔄 [beta-signup] Found old system user, redirecting to /maya');
-      router.replace('/maya');
+      console.log('🔄 [beta-signup] Found old system user, redirecting to /maia');
+      router.replace('/maia');
     }
   }, [router]);
 

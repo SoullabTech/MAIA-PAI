@@ -136,7 +136,7 @@ export default function DebugAuthPage() {
               <p><span className="text-gray-400">Created:</span> {new Date(currentUser.createdAt).toLocaleString()}</p>
 
               <button
-                onClick={() => router.push('/maya')}
+                onClick={() => router.push('/maia')}
                 className="mt-4 px-4 py-2 bg-green-600 rounded hover:bg-green-700"
               >
                 Go to Maya →

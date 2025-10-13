@@ -195,7 +195,7 @@ export function useUserAuth() {
     } else if (!status.onboarded) {
       router.replace('/beta-entry');
     } else {
-      router.replace('/maya');
+      router.replace('/maia');
     }
   }, [checkAuthStatus, router]);
 

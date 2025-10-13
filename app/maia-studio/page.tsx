@@ -16,7 +16,7 @@ export default function MaiaStudioPage() {
   useEffect(() => {
     // Redirect beta testers to Maya instead of experimental Kairos
     console.log('🚫 MAIA Studio disabled for beta - redirecting to Maya');
-    router.replace('/maya');
+    router.replace('/maia');
   }, [router]);
 
   return (

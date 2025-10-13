@@ -8,7 +8,7 @@ export default function OraclePage() {
 
   useEffect(() => {
     // Redirect to Maya page - the oracle page is deprecated
-    router.replace('/maya');
+    router.replace('/maia');
   }, [router]);
 
   return (

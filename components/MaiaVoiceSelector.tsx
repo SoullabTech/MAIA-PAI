@@ -171,11 +171,11 @@ export function MaiaVoiceSelector() {
 
       <div className="mt-6 text-center">
         <a
-          href="/maya"
+          href="/maia"
           className="inline-block px-6 py-2 bg-amber-500/20 border border-amber-500/30
                    text-amber-400 rounded-lg hover:bg-amber-500/30 transition-all"
         >
-          Back to Maya
+          Back to MAIA
         </a>
       </div>
     </div>

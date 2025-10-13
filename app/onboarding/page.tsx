@@ -20,7 +20,7 @@ export default function OnboardingPage() {
     if (storedUser) {
       const userData = JSON.parse(storedUser);
       if (userData.onboarded) {
-        router.push('/maya');
+        router.push('/maia');
       }
     }
   }, [router]);
@@ -114,7 +114,7 @@ export default function OnboardingPage() {
 
     // Smooth transition to Maya chat after animation
     setTimeout(() => {
-      router.push('/maya');
+      router.push('/maia');
     }, 2500);
   };
 

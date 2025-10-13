@@ -26,7 +26,7 @@ export default function MayaV2Page() {
     // Feature flag check
     if (isClient && !flags.maiaOrchestratorV2) {
       console.log('🚫 [V2] Feature flag disabled, redirecting to production /maya');
-      router.replace('/maya');
+      router.replace('/maia');
       return;
     }
 

@@ -30,7 +30,7 @@ export default function LoginPage() {
   const checkExistingSession = async () => {
     const status = await sessionManager.initSession();
     if (status.authenticated) {
-      router.push('/maya');
+      router.push('/maia');
     }
   };
 
@@ -48,7 +48,7 @@ export default function LoginPage() {
         setMessage({ type: 'success', text: 'Welcome back! 👋' });
 
         setTimeout(() => {
-          router.push('/maya');
+          router.push('/maia');
         }, 1000);
       } else {
         setMessage({

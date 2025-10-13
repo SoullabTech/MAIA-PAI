@@ -10,7 +10,7 @@ export default function MayaTrainingPage() {
     <div className="min-h-screen bg-gradient-to-b from-slate-950 to-slate-900 text-white p-6">
       {/* Back button */}
       <button
-        onClick={() => router.push('/maya')}
+        onClick={() => router.push('/maia')}
         className="flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors mb-8"
       >
         <ArrowLeft className="w-5 h-5" />
@@ -45,7 +45,7 @@ export default function MayaTrainingPage() {
         </div>
 
         <button
-          onClick={() => router.push('/maya')}
+          onClick={() => router.push('/maia')}
           className="mt-8 px-8 py-3 bg-amber-500/20 border border-amber-500/30 rounded-full text-amber-400 hover:bg-amber-500/30 transition-all"
         >
           Return to Maya

@@ -34,7 +34,7 @@ export default function CompleteSignup() {
       // Already have a code - redirect to appropriate next step
       const onboarded = localStorage.getItem('betaOnboardingComplete') === 'true';
       if (onboarded) {
-        router.replace('/maya');
+        router.replace('/maia');
       } else {
         router.replace('/beta-orientation');
       }
@@ -73,7 +73,7 @@ export default function CompleteSignup() {
 
         if (onboarded) {
           // Already onboarded - go to Maya
-          setTimeout(() => router.push('/maya'), 500);
+          setTimeout(() => router.push('/maia'), 500);
         } else {
           // Need to complete onboarding
           setTimeout(() => router.push('/beta-orientation'), 500);

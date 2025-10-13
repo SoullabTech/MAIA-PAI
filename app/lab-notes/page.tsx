@@ -125,7 +125,7 @@ export default function LabNotes() {
             <p className="text-amber-200/50">No conversations yet</p>
             <p className="text-amber-200/30 text-sm mt-2">Start a conversation with Maia to see your lab notes</p>
             <button
-              onClick={() => router.push('/maya')}
+              onClick={() => router.push('/maia')}
               className="mt-6 px-6 py-3 bg-gradient-to-r from-amber-500/80 to-amber-600/80 text-white rounded-lg hover:from-amber-500 hover:to-amber-600 transition-all"
             >
               Begin Conversation

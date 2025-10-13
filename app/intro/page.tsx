@@ -245,7 +245,7 @@ export default function IntroPage() {
                   console.log(`🎬 User data:`, userData);
                   if (userData.onboarded === true) {
                     console.log(`🎬 Navigating to /maya (onboarded user)`);
-                    router.push('/maya');
+                    router.push('/maia');
                   } else {
                     console.log(`🎬 Navigating to /onboarding (not onboarded)`);
                     router.push('/onboarding');
@@ -276,7 +276,7 @@ export default function IntroPage() {
               console.log(`🎬 User data:`, userData);
               if (userData.onboarded === true) {
                 console.log(`🎬 Navigating to /maya (onboarded user)`);
-                router.push('/maya');
+                router.push('/maia');
               } else {
                 console.log(`🎬 Navigating to /onboarding (not onboarded)`);
                 router.push('/onboarding');

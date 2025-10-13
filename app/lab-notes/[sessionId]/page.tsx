@@ -177,7 +177,7 @@ export default function SessionDetail() {
 
         <div className="mt-12 text-center">
           <button
-            onClick={() => router.push('/maya')}
+            onClick={() => router.push('/maia')}
             className="px-6 py-3 bg-gradient-to-r from-amber-500/80 to-amber-600/80 text-white rounded-lg hover:from-amber-500 hover:to-amber-600 transition-all inline-flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4" />

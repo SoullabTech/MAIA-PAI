@@ -420,7 +420,7 @@ export default function MeetingRoomPage() {
 
               <div className="text-center">
                 <button
-                  onClick={() => router.push('/maya')}
+                  onClick={() => router.push('/maia')}
                   className="px-8 py-3 bg-gradient-to-r from-amber-500/80 to-amber-600/80 text-white rounded-lg font-medium hover:from-amber-500 hover:to-amber-600 transition-all shadow-lg shadow-amber-500/20"
                 >
                   Return to MAIA

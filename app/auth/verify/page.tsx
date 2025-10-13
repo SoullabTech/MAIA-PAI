@@ -52,7 +52,7 @@ export default function VerifyMagicLinkPage() {
           setShowTrustPrompt(true);
         } else {
           setTimeout(() => {
-            router.push('/maya');
+            router.push('/maia');
           }, 1500);
         }
       } else {
@@ -70,11 +70,11 @@ export default function VerifyMagicLinkPage() {
     if (session) {
       await deviceTrust.trustDevice(session.userId);
     }
-    router.push('/maya');
+    router.push('/maia');
   };
 
   const handleSkip = () => {
-    router.push('/maya');
+    router.push('/maia');
   };
 
   return (

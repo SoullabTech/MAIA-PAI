@@ -55,7 +55,7 @@ export default function CheckInPage() {
             localStorage.setItem('beta_users', JSON.stringify(users));
           }
 
-          router.push('/maya');
+          router.push('/maia'); // Updated to dreamweaver-enhanced MAIA
           return;
         }
       }
@@ -88,7 +88,7 @@ export default function CheckInPage() {
       console.log('✅ [checkin] Quick check-in successful, redirecting to Maya');
 
       // Go straight to Maya
-      router.push('/maya');
+      router.push('/maia'); // Updated to dreamweaver-enhanced MAIA
     } catch (err: any) {
       console.error('❌ [checkin] Error:', err);
       setError(err.message || 'Check-in failed');

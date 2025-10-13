@@ -154,7 +154,7 @@ export default function MAIAPage() {
               </motion.div>
               <div>
                 <h1 className="text-lg font-bold text-white">SOUL​LAB</h1>
-                <p className="text-xs text-stone-400">with MAIA Dream-Weaver</p>
+                <p className="text-xs text-stone-400">Beta Experience</p>
               </div>
             </div>
 
@@ -176,6 +176,44 @@ export default function MAIAPage() {
             </div>
           </div>
         </div>
+
+        {/* Dream-Weaver Status Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="flex-shrink-0 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border-b border-amber-500/20 backdrop-blur-sm"
+        >
+          <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <motion.div
+                animate={{
+                  scale: [1, 1.2, 1],
+                  rotate: [0, 180, 360],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 opacity-80"
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-amber-300">MAIA Dream-Weaver Active</span>
+                <span className="text-xs text-amber-200/60">• Midwifing Your Wisdom</span>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowDashboard(true)}
+              className="text-xs text-amber-300/80 hover:text-amber-300 transition-colors flex items-center gap-1"
+            >
+              <span>View Your Journey</span>
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </motion.div>
 
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">

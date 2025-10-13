@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, Volume2, MessageCircle, Sparkles } from 'lucide-react';
+import { Mic, MicOff, Volume2, MessageCircle, Sparkles, StopCircle } from 'lucide-react';
 import { useVoiceChat } from '@/hooks/useVoiceChat';
 import { useMayaStream } from '@/hooks/useMayaStream';
 
@@ -179,6 +179,23 @@ export default function MayaVoiceInterface() {
           <div className="border-t border-amber-500/20 p-6 backdrop-blur-sm bg-black/30">
             {/* Voice Visualizer */}
             <div className="flex flex-col items-center space-y-4">
+              {/* Conversation Depth Selector */}
+              <div className="flex gap-2 mb-2">
+                {(['quick', 'normal', 'deep'] as const).map((depth) => (
+                  <button
+                    key={depth}
+                    onClick={() => setConversationDepth(depth)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all capitalize ${
+                      conversationDepth === depth
+                        ? 'bg-amber-500 text-black'
+                        : 'bg-black/40 text-amber-400/70 border border-amber-500/20 hover:border-amber-500/40'
+                    }`}
+                  >
+                    {depth}
+                  </button>
+                ))}
+              </div>
+
               {/* Transcript Display */}
               <AnimatePresence>
                 {(transcript || interimTranscript) && (
@@ -237,9 +254,30 @@ export default function MayaVoiceInterface() {
                 </button>
               </div>
 
+              {/* Manual Stop Button - appears when user is speaking */}
+              <AnimatePresence>
+                {isListening && (transcript || interimTranscript) && !isSpeaking && (
+                  <motion.button
+                    onClick={manualStop}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="px-6 py-3 bg-red-500/80 hover:bg-red-500 text-white rounded-lg font-medium transition-all flex items-center gap-2"
+                  >
+                    <StopCircle className="w-5 h-5" />
+                    Done Speaking
+                  </motion.button>
+                )}
+              </AnimatePresence>
+
               {/* Status */}
               <p className="text-xs text-amber-200/60">
                 {isSpeaking ? 'Maya is speaking' : isListening ? 'Listening...' : 'Click to start'}
+                {isListening && (
+                  <span className="ml-2 opacity-60">
+                    ({conversationDepth === 'quick' ? '3s' : conversationDepth === 'deep' ? '8s' : '6s'} pause)
+                  </span>
+                )}
               </p>
 
               {/* Error Display */}

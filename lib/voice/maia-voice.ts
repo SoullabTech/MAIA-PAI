@@ -548,15 +548,17 @@ export class MaiaVoiceSystem {
         }
       }
 
-      // Fallback to Web Speech API
-      if (this.config.fallbackToWebSpeech) {
-        console.log('🤖 Using Web Speech API as final fallback...');
-        await this.speakWithWebSpeech(text);
-        console.log('✅ Web Speech API succeeded!');
-        return;
+      // DISABLED: Don't fall back to robotic Web Speech API
+      // Users report it's jarring and breaks immersion
+      // Better to fail silently than use robotic voice
+      console.warn('🚫 All premium voice services failed. NOT falling back to robotic Web Speech API.');
+      console.warn('   → OpenAI TTS failed');
+      if (this.config.elevenLabsApiKey) {
+        console.warn('   → ElevenLabs failed');
       }
+      console.warn('   → Skipping Web Speech API to avoid robotic voice');
 
-      throw new Error('No voice services available');
+      throw new Error('Premium voice services unavailable');
     } catch (error) {
       console.error('❌ Maia voice system completely failed:', error);
       this.updateState({

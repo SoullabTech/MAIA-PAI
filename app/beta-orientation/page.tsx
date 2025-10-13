@@ -31,7 +31,7 @@ export default function BetaOrientationPage() {
             .single();
 
           if (user?.beta_onboarded_at) {
-            router.replace('/maya');
+            router.replace('/maia');
             return;
           }
         } catch (error) {
