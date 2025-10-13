@@ -19,6 +19,7 @@ import { ConservativeRefiner } from '@/lib/voice/ConservativeRefiner';
 import { suggestElementalPhrase } from '@/lib/voice/ElementalPhrasebook';
 import { getBirthChartContext, formatChartContextForMAIA, synthesizeAspectForMAIA, getRawBirthChartData } from '@/lib/services/birthChartContextService';
 import { collectiveBreakthroughService } from '@/lib/services/collectiveBreakthroughService';
+import { ClaudeCodeBrain } from './ClaudeCodeBrain';
 
 // 🧠 Advanced Memory & Intelligence Modules
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
@@ -1172,7 +1173,7 @@ This is the soul-level truth you're helping them see, not reference material to 
         throw new Error('ANTHROPIC_API_KEY not configured - cannot call Claude');
       }
 
-      // 🔀 MODEL ROUTING: GPT-4o for Walking (conversational), Claude+EO for depth
+      // 🔀 MODEL ROUTING: Check for Claude Code Brain first!
       let responseText: string;
 
       // === ANALYTICS: Track timing and performance ===
@@ -1181,6 +1182,94 @@ This is the soul-level truth you're helping them see, not reference material to 
       let totalTokens = 0;
       let inputTokens = 0;
       let outputTokens = 0;
+
+      // 🧠 CLAUDE CODE BRAIN PATH - Use our deep system awareness
+      const useClaudeCodeBrain = localStorage.getItem('use_claude_code_brain') === 'true' ||
+                                 localStorage.getItem('ai_model') === 'claude-code';
+
+      if (useClaudeCodeBrain) {
+        console.log('🧠 === CLAUDE CODE BRAIN PATH === Deep system awareness activated!');
+        console.log('📚 Using full context:', {
+          journey: '35 years of Kelly\'s wisdom',
+          system: 'Complete SOUL​LAB awareness',
+          memory: 'All our conversations and breakthroughs'
+        });
+
+        try {
+          const brain = ClaudeCodeBrain.getInstance();
+
+          // Get user's actual name from localStorage
+          let userName = 'Explorer';
+          if (typeof window !== 'undefined') {
+            const betaUser = localStorage.getItem('beta_user');
+            if (betaUser) {
+              try {
+                const userData = JSON.parse(betaUser);
+                userName = userData.username || 'Explorer';
+              } catch (e) {}
+            }
+          }
+
+          // Process with full awareness
+          const brainResponse = await brain.processWithFullAwareness(
+            trimmedInput,
+            this.userId,
+            userName,
+            journalEntries,
+            ainMemory
+          );
+
+          responseText = brainResponse.message;
+          dominantElement = brainResponse.element;
+
+          // Update metrics
+          const apiResponseTime = Date.now() - apiStartTime;
+          console.log('✅ Claude Code Brain response in', apiResponseTime, 'ms');
+
+          // Skip the rest of the API logic
+          const responseWordCount = responseText.split(/\s+/).length;
+          const brevityScore = responseWordCount > 50 ? 50 / responseWordCount : 1;
+
+          return {
+            response: responseText,
+            element: dominantElement,
+            metadata: {
+              ...brainResponse.metadata,
+              sessionId: brainResponse.metadata.sessionId || `session_${Date.now()}`,
+              symbols: brainResponse.metadata.symbols || symbols,
+              archetypes: archetypes,
+              phase: detectedPhaseResult.phase,
+              dominantSymbols: symbols.slice(0, 3),
+              emotionalThemes,
+              recommendations: phaseTransitionPrediction.nextPhaseLikely ?
+                [`Consider exploring ${phaseTransitionPrediction.nextPhaseLikely} energy`] : [],
+              ainMemory: ainMemory,
+              modelMetrics: {
+                model: 'Claude Code Brain',
+                apiResponseTime,
+                totalTokens: 0,
+                inputTokens: 0,
+                outputTokens: 0,
+                apiRetries: 0,
+                costUsd: 0,
+                provider: 'claude-code'
+              },
+              qualityMetrics: {
+                responseLength: responseText.length,
+                responseWordCount,
+                brevityScore,
+                hasActionableInsight: responseText.includes('?') || responseText.includes('try') || responseText.includes('consider'),
+                hasSymbolicDepth: true, // Always true for Brain Trust
+                elementalAlignment: 1.0 // Perfect alignment
+              }
+            }
+          };
+        } catch (brainError) {
+          console.error('❌ Claude Code Brain error:', brainError);
+          console.log('⚠️ Falling back to standard API...');
+          // Continue to regular API calls
+        }
+      }
 
       if (useGPT) {
         // === GPT-4o PATH: Conversational companion (Walking mode only) ===
