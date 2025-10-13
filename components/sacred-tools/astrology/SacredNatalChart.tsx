@@ -37,13 +37,13 @@ const ZODIAC_SIGNS = [
   '♎', '♏', '♐', '♑', '♒', '♓'
 ];
 
-// Element colors matching Sacred Portal aesthetic
+// Element colors matching Dune aesthetic - earthy, desert mysticism
 const ELEMENT_COLORS = {
-  fire: '#ff6b6b',
-  water: '#4dabf7',
-  earth: '#51cf66',
-  air: '#ffd43b',
-  aether: '#e5dbff'
+  fire: '#d97706', // Deep amber/saffron
+  water: '#0891b2', // Desert oasis cyan
+  earth: '#78350f', // Rich desert sand/spice
+  air: '#a16207', // Golden dust
+  aether: '#7c2d12' // Deep mystical rust
 };
 
 export function SacredNatalChart({ 
@@ -77,15 +77,10 @@ export function SacredNatalChart({
       
       // Ready for interaction
       setChartState('ready');
-      
-      // Start coherence pulse
+
+      // Chart is now still - no bouncing animation
       controls.start({
-        scale: [1, 1.02, 1],
-        transition: { 
-          duration: 2, 
-          repeat: Infinity,
-          ease: "easeInOut"
-        }
+        scale: 1
       });
     };
     
@@ -151,10 +146,10 @@ export function SacredNatalChart({
         
         <motion.button
           onClick={generateSacredReading}
-          className="p-2 bg-gradient-to-r from-amber-500 to-pink-500 rounded-lg"
+          className="p-2 bg-amber-900/40 backdrop-blur rounded-lg border border-amber-700/30"
           whileTap={{ scale: 0.95 }}
         >
-          <Sparkles className="w-5 h-5 text-white" />
+          <Sparkles className="w-5 h-5 text-amber-400" />
         </motion.button>
       </div>
 
@@ -182,9 +177,9 @@ export function SacredNatalChart({
         ))}
       </div>
 
-      {/* Main Chart Container */}
+      {/* Main Chart Container - Dune-inspired desert mysticism */}
       <motion.div
-        className="relative aspect-square bg-gradient-to-br from-amber-900/20 to-black rounded-3xl overflow-hidden"
+        className="relative aspect-square bg-gradient-to-br from-amber-950/30 via-stone-900/50 to-black rounded-3xl overflow-hidden border border-amber-900/20"
         animate={controls}
         style={{
           transform: `scale(${zoomLevel})`
@@ -212,12 +207,14 @@ export function SacredNatalChart({
           ))}
         </div>
 
-        {/* Cosmic Mandala SVG */}
+        {/* Cosmic Mandala SVG - TEMPORARILY HIDDEN until chart data is accurate */}
+        {/* TODO: Re-enable when we have actual birth chart calculations */}
         <svg
           ref={svgRef}
           className="absolute inset-0 w-full h-full"
           viewBox="0 0 800 800"
           preserveAspectRatio="xMidYMid meet"
+          style={{ display: 'none' }} // Hidden until chart makes sense
         >
           <defs>
             {/* Gradient definitions */}
@@ -234,15 +231,15 @@ export function SacredNatalChart({
             </linearGradient>
           </defs>
 
-          {/* Aether center halo */}
+          {/* Aether center halo - still, no pulsing */}
           <motion.circle
             cx="400"
             cy="400"
             r="80"
             fill="url(#aetherGlow)"
             initial={{ r: 0 }}
-            animate={chartState === 'ready' ? { r: [80, 90, 80] } : { r: 80 }}
-            transition={{ duration: 3, repeat: Infinity }}
+            animate={{ r: 80 }}
+            transition={{ duration: 1 }}
           />
 
           {/* House divisions */}
@@ -404,6 +401,19 @@ export function SacredNatalChart({
             })}
           </g>
         </svg>
+
+        {/* Placeholder while chart is being refined */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-center max-w-md px-8">
+            <div className="text-amber-400 text-6xl mb-4">✦</div>
+            <h3 className="text-amber-200 text-xl font-light mb-2">
+              Sacred Chart Calibrating
+            </h3>
+            <p className="text-amber-300/60 text-sm">
+              Your natal chart visualization is being refined to accurately reflect the cosmic architecture of your birth moment.
+            </p>
+          </div>
+        </div>
 
         {/* Loading/State Overlay */}
         <AnimatePresence>
