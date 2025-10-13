@@ -200,10 +200,12 @@ export class ElementalOracle2Bridge {
    * Prepare optimized query for your Oracle 2.0
    */
   private prepareOracleQuery(context: Oracle2Context): string {
-    const elementalPriorities = Object.entries(context.elementalNeeds)
-      .filter(([_, need]) => (need || 0) > 0.3)
-      .sort(([_, a], [__, b]) => (b || 0) - (a || 0))
-      .map(([element, _]) => element);
+    const elementalPriorities = context.elementalNeeds
+      ? Object.entries(context.elementalNeeds)
+          .filter(([_, need]) => (need || 0) > 0.3)
+          .sort(([_, a], [__, b]) => (b || 0) - (a || 0))
+          .map(([element, _]) => element)
+      : [];
 
     const query = `
 **Context for Elemental Wisdom Response:**

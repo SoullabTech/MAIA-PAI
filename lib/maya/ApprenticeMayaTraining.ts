@@ -290,7 +290,7 @@ ${calibration.guidance}`;
     // Get unique user IDs using PostgreSQL DISTINCT
     const { data, error } = await this.supabase
       .from('maya_training_corpus')
-      .select('userId');
+      .select('user_id');
 
     if (error) {
       console.error('Error getting unique users:', error);
@@ -298,7 +298,7 @@ ${calibration.guidance}`;
     }
 
     // Count unique userIds manually
-    const uniqueUserIds = new Set(data?.map(row => row.userId) || []);
+    const uniqueUserIds = new Set(data?.map(row => row.user_id) || []);
     return uniqueUserIds.size;
   }
 

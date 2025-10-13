@@ -153,29 +153,29 @@ export class FireAgent {
   private async activateFireElementalPowers(
     cognitiveState: FireProcessingState['cognitiveState']
   ): Promise<FireProcessingState['fireActivation']> {
-    
-    // Calculate visionary power from attention and memory
-    const visionaryPower = Math.min(1.0, 
-      (cognitiveState.attention.focusIntensity + 
-       cognitiveState.memoryIntegration.wisdomEvolution.breakthroughReadiness) / 2
-    );
 
-    // Calculate breakthrough readiness from SOAR planning
-    const breakthroughReadiness = cognitiveState.wisdomPlan.confidence * 
-      cognitiveState.wisdomPlan.actionOrientation;
+    // Calculate visionary power from attention and memory (with null checks)
+    const focusIntensity = cognitiveState?.attention?.focusIntensity ?? 0.5;
+    const breakthroughReady = cognitiveState?.memoryIntegration?.wisdomEvolution?.breakthroughReadiness ?? 0.5;
+    const visionaryPower = Math.min(1.0, (focusIntensity + breakthroughReady) / 2);
 
-    // Calculate courage level from emotional processing
+    // Calculate breakthrough readiness from SOAR planning (with null checks)
+    const confidence = cognitiveState?.wisdomPlan?.confidence ?? 0.5;
+    const actionOrientation = cognitiveState?.wisdomPlan?.actionOrientation ?? 0.5;
+    const breakthroughReadiness = confidence * actionOrientation;
+
+    // Calculate courage level from emotional processing (with null checks)
     const courageLevel = Math.max(
-      cognitiveState.emotionalResonance.emotionalBalance.confidence,
-      cognitiveState.emotionalResonance.emotionalBalance.excitement,
-      cognitiveState.emotionalResonance.emotionalBalance.anticipation
+      cognitiveState?.emotionalResonance?.emotionalBalance?.confidence ?? 0.5,
+      cognitiveState?.emotionalResonance?.emotionalBalance?.excitement ?? 0.5,
+      cognitiveState?.emotionalResonance?.emotionalBalance?.anticipation ?? 0.5
     );
 
-    // Calculate transformation desire from motivational drives
+    // Calculate transformation desire from motivational drives (with null checks)
     const transformationDesire = Math.max(
-      cognitiveState.emotionalResonance.motivationalDrives.growth,
-      cognitiveState.emotionalResonance.motivationalDrives.transcendence,
-      cognitiveState.emotionalResonance.motivationalDrives.achievement
+      cognitiveState?.emotionalResonance?.motivationalDrives?.growth ?? 0.5,
+      cognitiveState?.emotionalResonance?.motivationalDrives?.transcendence ?? 0.5,
+      cognitiveState?.emotionalResonance?.motivationalDrives?.achievement ?? 0.5
     );
 
     return {
