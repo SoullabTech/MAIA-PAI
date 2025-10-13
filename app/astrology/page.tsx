@@ -314,8 +314,33 @@ export default function AstrologyPage() {
             </Link>
           </div>
 
+          {/* Deep Dive Link */}
+          <div className="mt-8">
+            <Link
+              href="/deep-dive"
+              className="group block bg-gradient-to-br from-amber-900/40 to-orange-900/40 hover:from-amber-800/50 hover:to-orange-800/50 border border-amber-700/40 hover:border-amber-600/60 rounded-xl p-8 transition-all duration-300"
+            >
+              <div className="flex items-start gap-4">
+                <div className="text-5xl">📖</div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-soul-text group-hover:text-soul-accent transition-colors mb-2">
+                    The Deep Dive: Elemental Alchemy
+                  </h3>
+                  <p className="text-soul-textSecondary mb-3">
+                    Go beyond your chart into the phenomenological journey through consciousness.
+                    Kelly Beard's book as living curriculum.
+                  </p>
+                  <div className="flex items-center gap-2 text-soul-accentGlow text-sm">
+                    <span>Begin your transformation</span>
+                    <span>→</span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </div>
+
           {/* Mayan Astrology Link */}
-          <div className="mt-8 text-center">
+          <div className="mt-6 text-center">
             <Link
               href="/astrology/mayan"
               className="group inline-flex items-center gap-3 bg-gradient-to-br from-amber-900/30 to-orange-900/30 hover:from-amber-800/40 hover:to-orange-800/40 border border-amber-700/30 hover:border-amber-600/50 rounded-xl p-6 transition-all duration-300"
