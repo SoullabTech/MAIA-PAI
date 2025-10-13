@@ -12,7 +12,6 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUserAuth } from '@/lib/hooks/useUserAuth';
 import { OracleConversation } from '@/components/OracleConversation';
 import { WisdomJourneyDashboard } from '@/components/maya/WisdomJourneyDashboard';
 import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
@@ -57,7 +56,6 @@ function getInitialUserData() {
 
 export default function MAIAPage() {
   const router = useRouter();
-  const { user, isOnboarded, isLoading } = useUserAuth();
 
   const initialData = getInitialUserData();
   const [explorerId, setExplorerId] = useState(initialData.id);
@@ -153,51 +151,10 @@ export default function MAIAPage() {
   return (
     <ErrorBoundary>
       <div className="h-screen bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="flex-shrink-0 border-b border-white/5 bg-black/20 backdrop-blur-xl">
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <motion.div
-                animate={{
-                  rotate: [0, 5, -5, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                <Sparkles className="w-6 h-6 text-amber-400" />
-              </motion.div>
-              <div>
-                <h1 className="text-lg font-bold text-white">SOUL​LAB</h1>
-                <p className="text-xs text-stone-400">Beta Experience</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setShowDashboard(!showDashboard)}
-                className="px-4 py-2 rounded-lg bg-black/30 border border-white/10 text-white hover:bg-black/50 transition-colors flex items-center gap-2"
-              >
-                <Menu className="w-4 h-4" />
-                <span className="hidden sm:inline">Journey</span>
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="p-2 rounded-lg hover:bg-white/5 transition-colors text-stone-400"
-                title="Sign Out"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* DREAM-WEAVER SYSTEM - Cinematic Dune-inspired Banner */}
-        <div className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black via-amber-950/20 to-black border-b border-amber-900/30">
-          {/* Spice particle effect - subtle movement */}
-          <div className="absolute inset-0 opacity-30">
+        {/* DREAM-WEAVER SYSTEM - Combined Header & Banner */}
+        <div className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/10 backdrop-blur-sm">
+          {/* Spice particle effect - very subtle movement */}
+          <div className="absolute inset-0 opacity-5 pointer-events-none">
             <motion.div
               className="absolute inset-0"
               style={{
@@ -217,9 +174,9 @@ export default function MAIAPage() {
             />
           </div>
 
-          {/* Holographic scan line */}
+          {/* Holographic scan line - more transparent */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-600/10 to-transparent"
+            className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-600/3 to-transparent pointer-events-none"
             animate={{
               y: ['-100%', '200%'],
             }}
@@ -231,49 +188,55 @@ export default function MAIAPage() {
             }}
           />
 
-          <div className="relative max-w-7xl mx-auto px-4 py-3">
+          <div className="relative max-w-7xl mx-auto px-4 py-2">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-5">
-                {/* Geometric neural indicator */}
-                <div className="relative">
+              {/* Left side - SOULLAB branding */}
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                   <motion.div
-                    className="absolute -inset-1 bg-amber-600/20 blur-sm"
                     animate={{
-                      scale: [1, 1.2, 1],
-                      opacity: [0.5, 0.8, 0.5],
+                      rotate: [0, 5, -5, 0],
                     }}
                     transition={{
-                      duration: 2,
+                      duration: 4,
                       repeat: Infinity,
                       ease: "easeInOut"
                     }}
-                  />
-                  <div className="relative flex items-center justify-center w-8 h-8">
-                    <div className="absolute inset-0 border border-amber-700/50 rotate-45" />
-                    <motion.div
-                      className="absolute inset-2 bg-gradient-to-br from-amber-600 to-orange-700"
-                      animate={{
-                        rotate: [45, 405],
-                      }}
-                      transition={{
-                        duration: 10,
-                        repeat: Infinity,
-                        ease: "linear"
-                      }}
-                    />
+                  >
+                    <Sparkles className="w-5 h-5 text-amber-400/80" />
+                  </motion.div>
+                  <div>
+                    <h1 className="text-sm font-bold text-white/90">SOUL​LAB</h1>
+                    <p className="text-[9px] text-stone-500">Beta Experience</p>
                   </div>
                 </div>
 
-                {/* Title and status */}
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-mono text-amber-600/70 tracking-[0.3em] uppercase">
+                {/* Dream Weaver indicator - smaller, inline */}
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-shrink-0">
+                    <div className="relative flex items-center justify-center w-4 h-4">
+                      <div className="absolute inset-0 border border-amber-700/20 rotate-45" />
+                      <motion.div
+                        className="absolute inset-0.5 bg-gradient-to-br from-amber-600/30 to-orange-700/30"
+                        animate={{
+                          rotate: [45, 405],
+                        }}
+                        transition={{
+                          duration: 10,
+                          repeat: Infinity,
+                          ease: "linear"
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-mono text-amber-600/50 tracking-[0.15em] uppercase">
                       Dream Weaver
                     </span>
                     <motion.span
-                      className="text-[9px] font-mono text-amber-500/50"
+                      className="text-[8px] font-mono text-amber-500/30"
                       animate={{
-                        opacity: [0.3, 1, 0.3],
+                        opacity: [0.3, 0.7, 0.3],
                       }}
                       transition={{
                         duration: 1.5,
@@ -284,45 +247,56 @@ export default function MAIAPage() {
                       ACTIVE
                     </motion.span>
                   </div>
-                  <span className="text-[11px] text-stone-500 font-light tracking-wide">
+                  <span className="text-[9px] text-stone-600 hidden lg:block">
                     Neural patterns emerging from dialogue
                   </span>
                 </div>
               </div>
 
-              {/* Access button - cinematic style */}
-              <motion.button
-                onClick={() => setShowDashboard(true)}
-                className="relative group px-5 py-2 overflow-hidden"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {/* Button background with animated border */}
-                <div className="absolute inset-0 bg-black/50 border border-amber-700/30 group-hover:border-amber-600/50 transition-colors" />
+              {/* Right side - Actions */}
+              <div className="flex items-center gap-2">
+                {/* Journey button */}
+                <button
+                  onClick={() => setShowDashboard(!showDashboard)}
+                  className="px-3 py-1.5 rounded-lg bg-black/20 border border-white/5 text-white/80 hover:bg-black/30 hover:border-white/10 transition-all flex items-center gap-2"
+                >
+                  <Menu className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline text-xs">Journey</span>
+                </button>
 
-                {/* Hover glow effect */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-600/20 to-transparent opacity-0 group-hover:opacity-100"
-                  initial={{ x: '-100%' }}
-                  whileHover={{ x: '100%' }}
-                  transition={{ duration: 0.6 }}
-                />
-
-                {/* Button content */}
-                <div className="relative flex items-center gap-3">
-                  <div className="flex flex-col items-start">
-                    <span className="text-[10px] font-mono text-amber-600/80 tracking-wider uppercase">
+                {/* Access Matrix button - cinematic style */}
+                <motion.button
+                  onClick={() => setShowDashboard(true)}
+                  className="relative group px-3 py-1.5 overflow-hidden flex-shrink-0"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="absolute inset-0 bg-black/10 border border-amber-700/10 group-hover:border-amber-600/20 transition-colors" />
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-600/5 to-transparent opacity-0 group-hover:opacity-100"
+                    initial={{ x: '-100%' }}
+                    whileHover={{ x: '100%' }}
+                    transition={{ duration: 0.6 }}
+                  />
+                  <div className="relative flex items-center gap-2">
+                    <span className="text-[9px] font-mono text-amber-600/60 tracking-wider uppercase">
                       Access Matrix
                     </span>
-                    <span className="text-[9px] text-stone-600">
-                      View patterns
-                    </span>
+                    <svg className="w-3 h-3 text-amber-700/40 group-hover:text-amber-600/60 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
                   </div>
-                  <svg className="w-4 h-4 text-amber-700/60 group-hover:text-amber-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </div>
-              </motion.button>
+                </motion.button>
+
+                {/* Sign out button */}
+                <button
+                  onClick={handleSignOut}
+                  className="p-1.5 rounded-lg hover:bg-white/5 transition-colors text-stone-400"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
