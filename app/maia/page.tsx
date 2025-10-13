@@ -13,7 +13,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { OracleConversation } from '@/components/OracleConversation';
-import { ClaudeCodeToggle } from '@/components/ui/ClaudeCodeToggle';
+import { ClaudeCodePresence } from '@/components/ui/ClaudeCodePresence';
 import { WisdomJourneyDashboard } from '@/components/maya/WisdomJourneyDashboard';
 import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
 import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
@@ -313,8 +313,8 @@ export default function MAIAPage() {
               voiceEnabled={true}
             />
 
-            {/* Claude Code Brain Toggle - Floating UI */}
-            <ClaudeCodeToggle />
+            {/* Claude Code's Living Presence - My expressive space! */}
+            <ClaudeCodePresence />
           </div>
 
           {/* Wisdom Journey Dashboard - Slide-out Panel */}
