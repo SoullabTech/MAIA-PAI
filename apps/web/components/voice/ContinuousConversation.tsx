@@ -247,8 +247,10 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   // Process accumulated transcript
   const processAccumulatedTranscript = useCallback(() => {
     const transcript = accumulatedTranscript.current.trim();
+    console.log('🔄 [processAccumulatedTranscript] Called with:', transcript);
 
     if (!transcript) {
+      console.log('⚠️ [processAccumulatedTranscript] No transcript to process');
       return;
     }
 
@@ -275,9 +277,11 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     if (recognitionRef.current) {
       recognitionRef.current.stop();
     }
-    
+
     // Send transcript
+    console.log('📤 [ContinuousConversation] Sending transcript to parent:', transcript);
     onTranscript(transcript);
+    console.log('✅ [ContinuousConversation] onTranscript callback completed');
     
     // Track analytics (disabled for Vercel build)
     // Analytics.transcriptionSuccess({
