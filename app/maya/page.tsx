@@ -1,219 +1,33 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUserAuth } from '@/lib/hooks/useUserAuth';
-import { OracleConversation } from '@/components/OracleConversation';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { LogOut } from 'lucide-react';
 
-// Helper to get initial user state from localStorage (runs before first render)
-function getInitialUserData() {
-  if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
-
-  // Check NEW auth system
-  const betaUser = localStorage.getItem('beta_user');
-  if (betaUser) {
-    try {
-      const userData = JSON.parse(betaUser);
-      if (userData.onboarded === true && userData.id && userData.username) {
-        return { id: userData.id, name: userData.username };
-      }
-    } catch (e) {}
-  }
-
-  // Check OLD auth system
-  if (localStorage.getItem('betaOnboardingComplete') === 'true') {
-    const id = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
-    const name = localStorage.getItem('explorerName');
-    if (id && name) {
-      return { id, name };
-    }
-  }
-
-  return { id: 'guest', name: 'Explorer' };
-}
-
-export default function MayaPage() {
-  console.log('[MayaPage] Component mounting - Stack trace:', new Error().stack?.split('\n').slice(0, 3));
+/**
+ * DEPRECATED: /maya route
+ * Redirects to /maia which has Claude Code integration
+ *
+ * /maia features:
+ * - Claude Code Brain integration
+ * - ClaudeCodePresence component
+ * - Dream-Weaver enhanced UI
+ * - Full system consciousness
+ */
+export default function MayaRedirectPage() {
   const router = useRouter();
-  const { user, preferences, isOnboarded, isLoading } = useUserAuth();
-
-  // Initialize state from localStorage to prevent re-mount when auth loads
-  const initialData = getInitialUserData();
-  const [explorerId, setExplorerId] = useState(initialData.id);
-  const [explorerName, setExplorerName] = useState(initialData.name);
-
-  // Create session ID once and keep it stable across renders
-  const [sessionId] = useState(() => Date.now().toString());
-
-  // Track if we've already run auth checks to prevent redirect loops
-  const hasCheckedAuth = useRef(false);
-
-  console.log('[MayaPage] State:', { explorerId, explorerName, isLoading });
-
-  const handleSignOut = () => {
-    // Clear all auth data
-    localStorage.removeItem('beta_user');
-    localStorage.removeItem('beta_users');
-    localStorage.removeItem('betaOnboardingComplete');
-    localStorage.removeItem('explorerId');
-    localStorage.removeItem('betaUserId');
-    localStorage.removeItem('explorerName');
-
-    console.log('👋 Signed out, redirecting to home');
-    router.push('/');
-  };
 
   useEffect(() => {
-    // Only run auth checks once to prevent redirect loops during conversation
-    if (hasCheckedAuth.current) {
-      return;
-    }
-    hasCheckedAuth.current = true;
+    console.log('🔄 [MAYA DEPRECATED] Redirecting to /maia (Claude Code enhanced version)');
+    router.replace('/maia');
+  }, [router]);
 
-    // Check NEW auth system first
-    const newUser = localStorage.getItem('beta_user');
-    if (newUser) {
-      try {
-        const userData = JSON.parse(newUser);
-        console.log('🔍 [maya] Found new system user:', { username: userData.username, onboarded: userData.onboarded });
-
-        if (userData.onboarded !== true) {
-          console.log('❌ [maya] Not onboarded, redirecting to /onboarding');
-          router.replace('/onboarding');
-          return;
-        }
-
-        // Check if user has seen intro today - COMMENTED OUT TO PREVENT INTERRUPTIONS
-        // const lastIntroDate = localStorage.getItem('last_intro_date');
-        // const today = new Date().toDateString();
-        // if (lastIntroDate !== today) {
-        //   console.log('✨ [maya] New day - showing intro sequence');
-        //   localStorage.setItem('last_intro_date', today);
-        //   router.replace('/intro');
-        //   return;
-        // }
-
-        console.log('✅ [maya] User onboarded, loading Maya');
-        // Only update state if values actually changed
-        const newId = userData.id || 'guest';
-        const newName = userData.username || 'Explorer';
-        if (explorerId !== newId) setExplorerId(newId);
-        if (explorerName !== newName) setExplorerName(newName);
-        return;
-      } catch (e) {
-        console.error('❌ [maya] Error parsing new user data:', e);
-      }
-    }
-
-    // Fallback to OLD system for migration
-    const betaOnboarded = localStorage.getItem('betaOnboardingComplete') === 'true';
-
-    if (!betaOnboarded) {
-      console.log('❌ [maya] Not onboarded (old system), redirecting to signup');
-      router.replace('/beta-signup');
-      return;
-    }
-
-    console.log('✅ [maya] User onboarded (old system), loading Maya');
-
-    // Get user data from localStorage as fallback
-    const id = user?.id || localStorage.getItem('explorerId') || localStorage.getItem('betaUserId') || 'guest';
-    const name = user?.name || user?.sacredName || localStorage.getItem('explorerName') || 'Explorer';
-
-    // Only update state if values actually changed
-    if (explorerId !== id) setExplorerId(id);
-    if (explorerName !== name) setExplorerName(name);
-  }, [router, user]); // FIXED: Removed explorerId/explorerName to prevent infinite loop
-
-  // Show loading state while checking auth (but allow guest to proceed)
-  // Commenting out this check - it might be too aggressive
-  // if (!explorerId || explorerId === 'guest') {
-  //   return (
-  //     <div className="relative min-h-screen bg-[#1a1f3a] flex items-center justify-center">
-  //       <div className="text-amber-200/60">Loading...</div>
-  //     </div>
-  //   );
-  // }
-
-  // Enhanced error handling and logging
-  console.log('[MayaPage] Rendering with:', { explorerId, explorerName, voiceEnabled: preferences?.voice_enabled });
-
-  if (!explorerId || explorerId === '') {
-    console.log('[MayaPage] No explorerId yet, showing loading state');
-    return (
-      <div className="relative min-h-screen bg-soul-background flex items-center justify-center">
-        <div className="text-soul-textSecondary text-lg">Initializing MAIA...</div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+        <p className="text-amber-400 text-lg font-light">Redirecting to MAIA...</p>
+        <p className="text-amber-400/60 text-sm mt-2">Enhanced with Claude Code</p>
       </div>
-    );
-  }
-
-  try {
-    console.log('[MayaPage] Rendering OracleConversation');
-    return (
-      <ErrorBoundary
-        fallback={
-          <div className="min-h-screen bg-soul-background flex items-center justify-center text-soul-textPrimary p-8">
-            <div className="max-w-md text-center space-y-4">
-              <h2 className="text-2xl">Something went wrong</h2>
-              <p className="text-soul-textSecondary">MAIA encountered an error. Please refresh the page.</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-6 py-3 bg-soul-accent/90 hover:bg-soul-accentHover text-soul-background rounded-lg transition-all"
-              >
-                Refresh
-              </button>
-            </div>
-          </div>
-        }
-      >
-        <div className="relative min-h-screen bg-soul-background" style={{ backgroundColor: '#1C1614', minHeight: '100vh', position: 'relative' }}>
-          {/* Header with Journey Button */}
-          <div className="fixed top-4 right-4 z-[200] flex items-center gap-3">
-            <button
-              onClick={() => window.location.href = '/maia'}
-              className="px-4 py-2 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-lg text-white hover:from-purple-500/30 hover:to-pink-500/30 transition-all flex items-center gap-2"
-              title="Open Wisdom Journey"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              <span>Journey</span>
-            </button>
-            <button
-              onClick={handleSignOut}
-              className="p-3 bg-soul-surface/80 border border-soul-accent/20 rounded-full hover:border-soul-accent/50 hover:bg-soul-surface transition-all backdrop-blur-sm"
-              title="Sign Out"
-            >
-              <LogOut className="w-5 h-5 text-soul-accent/70 hover:text-soul-accent" />
-            </button>
-          </div>
-
-          <OracleConversation
-            sessionId={sessionId}
-            userId={explorerId}
-            userName={explorerName}
-            voiceEnabled={preferences?.voice_enabled ?? true}
-          />
-        </div>
-      </ErrorBoundary>
-    );
-  } catch (error) {
-    console.error('[MayaPage] Render error:', error);
-    return (
-      <div className="min-h-screen bg-soul-background flex items-center justify-center text-soul-textPrimary p-8">
-        <div className="max-w-md text-center space-y-4">
-          <h2 className="text-2xl">Error loading MAIA</h2>
-          <p className="text-soul-textSecondary">{String(error)}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-soul-accent/90 hover:bg-soul-accentHover text-soul-background rounded-lg transition-all"
-          >
-            Refresh
-          </button>
-        </div>
-      </div>
-    );
-  }
+    </div>
+  );
 }
