@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { useUserAuth } from '@/lib/hooks/useUserAuth';
 import { OracleConversation } from '@/components/OracleConversation';
 import { WisdomJourneyDashboard } from '@/components/maya/WisdomJourneyDashboard';
+import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
 import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LogOut, Sparkles, Menu, X } from 'lucide-react';
@@ -221,6 +222,18 @@ export default function MAIAPage() {
                     </div>
 
                     <WisdomJourneyDashboard userId={explorerId} />
+
+                    {/* Weaving Visualization - Shows the dreamweaver process */}
+                    <div className="mt-6">
+                      <WeavingVisualization
+                        userId={explorerId}
+                        onSelectPrompt={(prompt) => {
+                          // Feed selected prompt to conversation
+                          // TODO: Connect to OracleConversation input
+                          console.log('Selected prompt:', prompt.question);
+                        }}
+                      />
+                    </div>
                   </div>
                 </motion.div>
               </>
