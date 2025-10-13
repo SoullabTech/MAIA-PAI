@@ -246,7 +246,7 @@ export function WeavingVisualization({
 
             {trajectory === 'exploring' && (
               <>
-                <h4 className="text-purple-400 font-semibold mb-2">Exploration Phase (All Elements)</h4>
+                <h4 className="text-stone-400 font-semibold mb-2">Exploration Phase (All Elements)</h4>
                 <p className="text-sm text-stone-300">
                   You're in open exploration, with multiple elements active. No single pathway
                   dominates - you're feeling into different dimensions, discovering what wants
@@ -256,10 +256,10 @@ export function WeavingVisualization({
             )}
           </div>
 
-          <div className="mt-4 p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl">
+          <div className="mt-4 p-4 bg-stone-900/50 border border-stone-800 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
-              <Eye className="w-4 h-4 text-purple-400" />
-              <h4 className="text-sm font-semibold text-purple-400">What's Emerging</h4>
+              <Eye className="w-4 h-4 text-stone-500" />
+              <h4 className="text-sm font-semibold text-stone-400">What's Emerging</h4>
             </div>
             <p className="text-sm text-stone-300">
               Based on your current threads, we sense movement toward
@@ -323,10 +323,10 @@ export function WeavingVisualization({
             );
           })}
 
-          <div className="mt-6 p-4 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-xl">
+          <div className="mt-6 p-4 bg-stone-900/50 border border-stone-800 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
-              <Map className="w-4 h-4 text-indigo-400" />
-              <h4 className="text-sm font-semibold text-indigo-400">About These Prompts</h4>
+              <Map className="w-4 h-4 text-stone-500" />
+              <h4 className="text-sm font-semibold text-stone-400">About These Prompts</h4>
             </div>
             <p className="text-xs text-stone-300">
               These questions emerge from your conversation patterns. Higher readiness means

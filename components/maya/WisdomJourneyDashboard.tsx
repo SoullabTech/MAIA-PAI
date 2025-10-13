@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, TrendingUp, Heart, Zap, Flame, Droplet, Mountain, Wind } from 'lucide-react';
+import { Holoflower } from '@/components/ui/Holoflower';
 
 /**
  * Wisdom Journey Dashboard - Shows beta testers their emerging patterns
@@ -276,12 +277,14 @@ export function WisdomJourneyDashboard({
 
       {/* Empty State - First time */}
       {journeyState.wisdomMomentCount === 0 && (
-        <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-2xl p-8 text-center">
-          <Sparkles className="w-12 h-12 text-indigo-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">
+        <div className="border border-stone-800 rounded-lg p-6 text-center">
+          <div className="mb-4 flex justify-center">
+            <Holoflower size="md" glowIntensity="low" />
+          </div>
+          <h3 className="text-sm font-medium text-stone-300 mb-2">
             Your Wisdom Journey Begins
           </h3>
-          <p className="text-stone-400 max-w-md mx-auto">
+          <p className="text-xs text-stone-500 max-w-md mx-auto">
             As you share your story with MAIA, she'll recognize patterns and wisdom emerging.
             Your moments will be captured here - your teaching voice taking form.
           </p>

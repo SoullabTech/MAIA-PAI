@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Heart, User, Calendar, ArrowRight } from 'lucide-react';
+import { Holoflower } from '@/components/ui/Holoflower';
 
 /**
  * Beta Onboarding Flow - "Share Your Story" Entry Point
@@ -186,18 +187,9 @@ export function BetaOnboarding({ onComplete }: BetaOnboardingProps) {
                 className="space-y-6"
               >
                 <div className="text-center mb-8">
-                  <motion.div
-                    animate={{
-                      scale: [1, 1.05, 1],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  >
-                    <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-                  </motion.div>
+                  <div className="mb-4 flex justify-center">
+                    <Holoflower size="lg" glowIntensity="medium" />
+                  </div>
                   <h2 className="text-3xl font-bold text-white mb-3">
                     One more thing, {name}...
                   </h2>
@@ -217,7 +209,7 @@ export function BetaOnboarding({ onComplete }: BetaOnboardingProps) {
                     onChange={(e) => setIntention(e.target.value)}
                     placeholder="I'm here to explore... / I want to understand... / I'm seeking..."
                     rows={4}
-                    className="w-full bg-black/30 border border-white/10 rounded-xl px-6 py-4 text-white placeholder-stone-500 focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all resize-none"
+                    className="w-full bg-black/30 border border-white/10 rounded-xl px-6 py-4 text-white placeholder-stone-500 focus:outline-none focus:border-amber-700/50 focus:ring-2 focus:ring-amber-700/20 transition-all resize-none"
                   />
                 </div>
 
@@ -230,7 +222,7 @@ export function BetaOnboarding({ onComplete }: BetaOnboardingProps) {
                   </button>
                   <button
                     onClick={handleNext}
-                    className="flex-1 py-4 px-6 rounded-xl font-semibold text-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-lg shadow-purple-500/25 transition-all flex items-center justify-center gap-2"
+                    className="flex-1 py-4 px-6 rounded-xl font-semibold text-lg bg-gradient-to-r from-amber-800 to-amber-700 text-white hover:from-amber-700 hover:to-amber-600 shadow-lg shadow-amber-800/25 transition-all flex items-center justify-center gap-2"
                   >
                     Begin Journey
                     <Sparkles className="w-5 h-5" />
