@@ -177,45 +177,135 @@ export default function MAIAPage() {
           </div>
         </div>
 
-        {/* Utilitarian Status Bar - For the Working Mystic */}
-        <div className="flex-shrink-0 bg-stone-950/80 border-b border-stone-800/50">
-          <div className="max-w-7xl mx-auto px-4 py-2">
+        {/* DREAM-WEAVER SYSTEM - Cinematic Dune-inspired Banner */}
+        <div className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black via-amber-950/20 to-black border-b border-amber-900/30">
+          {/* Spice particle effect - subtle movement */}
+          <div className="absolute inset-0 opacity-30">
+            <motion.div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `radial-gradient(1px 1px at 20% 30%, amber 0%, transparent 50%),
+                                 radial-gradient(1px 1px at 60% 70%, amber 0%, transparent 50%),
+                                 radial-gradient(1px 1px at 80% 10%, amber 0%, transparent 50%)`,
+                backgroundSize: '50px 50px',
+              }}
+              animate={{
+                backgroundPosition: ['0% 0%', '100% 100%'],
+              }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+            />
+          </div>
+
+          {/* Holographic scan line */}
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-600/10 to-transparent"
+            animate={{
+              y: ['-100%', '200%'],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "linear",
+              repeatDelay: 3
+            }}
+          />
+
+          <div className="relative max-w-7xl mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                {/* Simple working indicator */}
-                <div className="flex items-center gap-2">
+              <div className="flex items-center gap-5">
+                {/* Geometric neural indicator */}
+                <div className="relative">
                   <motion.div
+                    className="absolute -inset-1 bg-amber-600/20 blur-sm"
                     animate={{
-                      opacity: [0.4, 1, 0.4],
+                      scale: [1, 1.2, 1],
+                      opacity: [0.5, 0.8, 0.5],
                     }}
                     transition={{
                       duration: 2,
                       repeat: Infinity,
                       ease: "easeInOut"
                     }}
-                    className="w-1.5 h-1.5 bg-amber-700 rounded-full"
                   />
-                  <span className="text-xs text-stone-400">Dream-Weaver Active</span>
+                  <div className="relative flex items-center justify-center w-8 h-8">
+                    <div className="absolute inset-0 border border-amber-700/50 rotate-45" />
+                    <motion.div
+                      className="absolute inset-2 bg-gradient-to-br from-amber-600 to-orange-700"
+                      animate={{
+                        rotate: [45, 405],
+                      }}
+                      transition={{
+                        duration: 10,
+                        repeat: Infinity,
+                        ease: "linear"
+                      }}
+                    />
+                  </div>
                 </div>
 
-                <span className="text-stone-700">•</span>
-
-                {/* Current mode - plain language */}
-                <span className="text-xs text-stone-500">
-                  Weaving patterns from your conversation
-                </span>
+                {/* Title and status */}
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-mono text-amber-600/70 tracking-[0.3em] uppercase">
+                      Dream Weaver
+                    </span>
+                    <motion.span
+                      className="text-[9px] font-mono text-amber-500/50"
+                      animate={{
+                        opacity: [0.3, 1, 0.3],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      ACTIVE
+                    </motion.span>
+                  </div>
+                  <span className="text-[11px] text-stone-500 font-light tracking-wide">
+                    Neural patterns emerging from dialogue
+                  </span>
+                </div>
               </div>
 
-              {/* Simple, clear button */}
-              <button
+              {/* Access button - cinematic style */}
+              <motion.button
                 onClick={() => setShowDashboard(true)}
-                className="group flex items-center gap-2 px-3 py-1 text-xs text-stone-500 hover:text-amber-700 transition-colors"
+                className="relative group px-5 py-2 overflow-hidden"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <span>View your patterns</span>
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+                {/* Button background with animated border */}
+                <div className="absolute inset-0 bg-black/50 border border-amber-700/30 group-hover:border-amber-600/50 transition-colors" />
+
+                {/* Hover glow effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-600/20 to-transparent opacity-0 group-hover:opacity-100"
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: '100%' }}
+                  transition={{ duration: 0.6 }}
+                />
+
+                {/* Button content */}
+                <div className="relative flex items-center gap-3">
+                  <div className="flex flex-col items-start">
+                    <span className="text-[10px] font-mono text-amber-600/80 tracking-wider uppercase">
+                      Access Matrix
+                    </span>
+                    <span className="text-[9px] text-stone-600">
+                      View patterns
+                    </span>
+                  </div>
+                  <svg className="w-4 h-4 text-amber-700/60 group-hover:text-amber-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </div>
+              </motion.button>
             </div>
           </div>
         </div>
