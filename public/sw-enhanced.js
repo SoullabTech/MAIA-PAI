@@ -20,6 +20,7 @@ const PRECACHE_URLS = [
 const CACHE_CONFIG = {
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   maxEntries: 50,
+  maxCacheSizeBytes: 50 * 1024 * 1024, // 50MB limit
   // Strategy per route pattern
   strategies: {
     networkFirst: [
@@ -175,7 +176,7 @@ async function cacheFirst(request) {
   try {
     const response = await fetch(request);
     if (response.ok && request.method === 'GET') {
-      cache.put(request, response.clone());
+      await safeCachePut(cache, request, response.clone());
     }
     return response;
   } catch (error) {
@@ -193,7 +194,8 @@ async function networkFirst(request) {
   try {
     const response = await fetch(request);
     if (response.ok && request.method === 'GET') {
-      cache.put(request, response.clone());
+      // Check quota before caching
+      await safeCachePut(cache, request, response.clone());
     }
     return response;
   } catch (error) {
@@ -212,9 +214,9 @@ async function staleWhileRevalidate(request) {
   const cache = await caches.open(RUNTIME_CACHE);
   const cached = await cache.match(request);
 
-  const fetchPromise = fetch(request).then(response => {
+  const fetchPromise = fetch(request).then(async response => {
     if (response.ok && request.method === 'GET') {
-      cache.put(request, response.clone());
+      await safeCachePut(cache, request, response.clone());
     }
     return response;
   });
@@ -222,12 +224,42 @@ async function staleWhileRevalidate(request) {
   return cached || fetchPromise;
 }
 
+// Safe cache put with quota handling
+async function safeCachePut(cache, request, response) {
+  try {
+    await cache.put(request, response);
+  } catch (error) {
+    if (error.name === 'QuotaExceededError') {
+      console.warn('⚠️ Cache quota exceeded, clearing oldest entries...');
+      await clearOldestCacheEntries(cache);
+      // Retry once after cleanup
+      try {
+        await cache.put(request, response);
+      } catch (retryError) {
+        console.error('❌ Failed to cache after cleanup:', retryError);
+      }
+    }
+  }
+}
+
+// Clear oldest cache entries
+async function clearOldestCacheEntries(cache) {
+  const keys = await cache.keys();
+  const keysToDelete = keys.slice(0, Math.floor(keys.length / 2)); // Delete oldest 50%
+
+  await Promise.all(
+    keysToDelete.map(key => cache.delete(key))
+  );
+
+  console.log(`🗑️ Cleared ${keysToDelete.length} cache entries`);
+}
+
 // Background fetch and cache
 async function fetchAndCache(request, cache) {
   try {
     const response = await fetch(request);
     if (response.ok && request.method === 'GET') {
-      cache.put(request, response.clone());
+      await safeCachePut(cache, request, response.clone());
     }
   } catch (error) {
     // Silent fail for background updates

@@ -13,7 +13,7 @@ import { ConditionalMenuBar } from "@/components/ui/ConditionalMenuBar";
 // import { ToneDebugOverlay } from "@/components/voice/ToneDebugOverlay"; // Disabled for debugging
 import { Toaster } from 'react-hot-toast';
 import "./globals.css";
-import "./globals-mobile.css";
+// import "./globals-mobile.css"; // TEMPORARILY DISABLED: CSS parse error in Next.js dev
 import "@/styles/typography-refresh.css"; // 🎨 Phase 1: Typography refresh
 
 const inter = Inter({ subsets: ["latin"] });
@@ -58,8 +58,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-black text-white`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} bg-black text-white`} suppressHydrationWarning>
         <PWAProvider>
           <AuthProvider>
             <ToastProvider>

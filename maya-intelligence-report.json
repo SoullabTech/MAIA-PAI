@@ -1,0 +1,66 @@
+{
+  "memory": {
+    "ain": {
+      "exists": true,
+      "hasCreateMemory": true,
+      "hasUpdateMemory": true,
+      "hasHistorySummary": true
+    },
+    "soulprint": {
+      "exists": true,
+      "hasSymbolicContext": true,
+      "hasElementalTracking": true,
+      "hasSpiralHistory": true
+    },
+    "semantic": {
+      "exists": true,
+      "hasRAG": true,
+      "hasVectorSearch": false
+    }
+  },
+  "consciousness": {
+    "voice": {
+      "exists": true,
+      "hasLIDA": true,
+      "hasSOAR": true,
+      "hasACTR": true,
+      "hasMicroPsi": true
+    },
+    "unified": {
+      "exists": true,
+      "hasFieldReading": true,
+      "hasAdvisorConsultation": true,
+      "hasAnamnesis": true,
+      "hasElementalWeaving": true,
+      "hasSacredSynthesis": true
+    }
+  },
+  "collective": {
+    "wisdom": {
+      "exists": true,
+      "hasFieldTracking": true,
+      "hasPatternDetection": true,
+      "hasBreakthroughTracking": true
+    },
+    "apprentice": {
+      "exists": true,
+      "hasLearning": true,
+      "hasReciprocity": false
+    }
+  },
+  "integration": {
+    "agent": {
+      "exists": true,
+      "hasSystemPrompt": true,
+      "hasMemoryIntegration": true,
+      "hasElementalOracle": true,
+      "hasIPEngine": true
+    },
+    "knowledge": {
+      "exists": true,
+      "hasFramework": true,
+      "hasFireElement": false,
+      "hasWaterElement": false
+    }
+  }
+}

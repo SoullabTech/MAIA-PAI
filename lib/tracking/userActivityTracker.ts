@@ -63,15 +63,21 @@ export class UserActivityTracker {
     // Try to store in database
     if (this.supabase) {
       try {
-        // Use users table instead of beta_users (correct schema)
-        await this.supabase
-          .from('users')
-          .upsert({
-            id: userId,
-            name,
-            email,
-            last_login: new Date().toISOString(),
-          });
+        // Validate UUID format before database insert
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidRegex.test(userId)) {
+          // Use users table instead of beta_users (correct schema)
+          await this.supabase
+            .from('users')
+            .upsert({
+              id: userId,
+              name,
+              email,
+              last_login: new Date().toISOString(),
+            });
+        } else {
+          console.log(`[userActivityTracker] Skipping DB write for non-UUID user: ${userId}`);
+        }
       } catch (error) {
         console.log('Database write failed, continuing with in-memory storage');
       }
@@ -94,15 +100,19 @@ export class UserActivityTracker {
 
       console.log(`📊 Activity tracked for ${user.name}: ${user.messageCount} messages`);
 
-      // Update database if available
+      // Update database if available (only for valid UUIDs)
       if (this.supabase) {
         try {
-          await this.supabase
-            .from('users')
-            .update({
-              last_login: new Date().toISOString(),
-            })
-            .eq('id', userId);
+          // Validate UUID format before database update
+          const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+          if (uuidRegex.test(userId)) {
+            await this.supabase
+              .from('users')
+              .update({
+                last_login: new Date().toISOString(),
+              })
+              .eq('id', userId);
+          }
         } catch (error) {
           // Silent fail, in-memory is the fallback
         }

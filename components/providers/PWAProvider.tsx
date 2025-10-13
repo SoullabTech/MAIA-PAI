@@ -67,7 +67,12 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
       // Listen for controlling state change
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         console.log('🔄 Controller changed, reloading...');
-        window.location.reload();
+        // Only auto-reload in production to avoid dev mode refresh loops
+        if (process.env.NODE_ENV === 'production') {
+          window.location.reload();
+        } else {
+          console.log('⚠️ Skipping auto-reload in development mode');
+        }
       });
     } else {
       // Fallback: just reload if no waiting worker
