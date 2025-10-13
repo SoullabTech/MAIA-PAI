@@ -357,7 +357,7 @@ export default function PathwayDetailPage() {
               She can help you understand the archetypal journey through these houses.
             </p>
             <Link
-              href="/maya"
+              href="/maia"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white px-8 py-4 rounded-full font-semibold shadow-lg shadow-amber-900/30 hover:shadow-amber-600/30 transition-all duration-300"
             >
               <Sparkles className="w-5 h-5" />

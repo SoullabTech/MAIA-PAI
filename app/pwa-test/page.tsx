@@ -177,7 +177,7 @@ export default function PWATestPage() {
         <div className="mt-8 text-center text-white/70">
           <p className="mb-4">Quick Links for Testing:</p>
           <div className="flex gap-4 justify-center">
-            <a href="/maya" className="underline hover:text-white">Maya Chat</a>
+            <a href="/maia" className="underline hover:text-white">MAIA Chat</a>
             <a href="/holoflower" className="underline hover:text-white">Holoflower</a>
             <a href="/" className="underline hover:text-white">Home</a>
           </div>

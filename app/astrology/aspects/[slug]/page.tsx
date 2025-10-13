@@ -246,7 +246,7 @@ export default function AspectDetailPage() {
         {/* Talk to MAIA CTA */}
         <div className="mt-8 text-center">
           <Link
-            href="/maya"
+            href="/maia"
             className="inline-flex items-center gap-2 bg-gradient-to-r from-soul-accent to-soul-accentGlow text-soul-background px-8 py-4 rounded-full font-semibold hover:shadow-lg hover:shadow-soul-accent/30 transition-all duration-300"
           >
             <Sparkles className="w-5 h-5" />
