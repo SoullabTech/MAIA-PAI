@@ -36,30 +36,30 @@ const ELEMENT_ICONS = {
 };
 
 const ELEMENT_COLORS = {
-  fire: 'from-orange-500/20 to-red-500/20 border-orange-500/40',
-  water: 'from-blue-500/20 to-cyan-500/20 border-blue-500/40',
-  earth: 'from-amber-500/20 to-yellow-500/20 border-amber-500/40',
-  air: 'from-indigo-500/20 to-purple-500/20 border-indigo-500/40'
+  fire: 'bg-stone-900/50 border-stone-700',
+  water: 'bg-stone-900/50 border-stone-700',
+  earth: 'bg-stone-900/50 border-stone-700',
+  air: 'bg-stone-900/50 border-stone-700'
 };
 
 const PHASE_INFO = {
   'seeker': {
     title: 'Seeker',
     description: 'Exploring the maps, discovering your patterns',
-    color: 'text-cyan-400',
-    gradient: 'from-cyan-500/20 to-blue-500/20'
+    color: 'text-stone-400',
+    gradient: 'bg-stone-900/50'
   },
   'discoverer': {
     title: 'Discoverer',
     description: 'Recognizing your wisdom, seeing your gold',
-    color: 'text-amber-400',
-    gradient: 'from-amber-500/20 to-orange-500/20'
+    color: 'text-stone-300',
+    gradient: 'bg-stone-900/50'
   },
   'wisdom-keeper': {
     title: 'Wisdom Keeper',
     description: 'Your journey is teaching, ready to share',
-    color: 'text-purple-400',
-    gradient: 'from-purple-500/20 to-pink-500/20'
+    color: 'text-amber-700',
+    gradient: 'bg-stone-900/50'
   }
 };
 
@@ -156,41 +156,30 @@ export function WisdomJourneyDashboard({
       animate={{ opacity: 1 }}
       className="space-y-6"
     >
-      {/* Phase Card */}
-      <div className={`bg-gradient-to-br ${phaseInfo.gradient} border border-white/10 rounded-2xl p-6`}>
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <Sparkles className={`w-6 h-6 ${phaseInfo.color}`} />
-              <h2 className={`text-2xl font-bold ${phaseInfo.color}`}>
-                {phaseInfo.title}
-              </h2>
-            </div>
-            <p className="text-stone-300">
-              {phaseInfo.description}
-            </p>
-          </div>
+      {/* Phase Card - Utilitarian */}
+      <div className="border border-stone-800 rounded-lg p-4">
+        <div className="mb-3">
+          <h3 className="text-sm font-medium text-stone-300 mb-1">
+            Current Phase: {phaseInfo.title}
+          </h3>
+          <p className="text-xs text-stone-500">
+            {phaseInfo.description}
+          </p>
         </div>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-4 mt-6">
-          <div className="bg-black/20 rounded-lg p-4 border border-white/5">
-            <div className="text-xs text-stone-400 mb-1">Conversations</div>
-            <div className="text-2xl font-bold text-white">
-              {journeyState.wisdomMomentCount}
-            </div>
+        {/* Simple Stats */}
+        <div className="flex gap-6 text-xs">
+          <div>
+            <span className="text-stone-500">Conversations:</span>
+            <span className="text-stone-300 ml-1">{journeyState.wisdomMomentCount}</span>
           </div>
-          <div className="bg-black/20 rounded-lg p-4 border border-white/5">
-            <div className="text-xs text-stone-400 mb-1">Patterns</div>
-            <div className="text-2xl font-bold text-white">
-              {journeyState.emergingPatterns.length}
-            </div>
+          <div>
+            <span className="text-stone-500">Patterns:</span>
+            <span className="text-stone-300 ml-1">{journeyState.emergingPatterns.length}</span>
           </div>
-          <div className="bg-black/20 rounded-lg p-4 border border-white/5">
-            <div className="text-xs text-stone-400 mb-1">Readiness</div>
-            <div className="text-2xl font-bold text-amber-400">
-              {readinessPercent}%
-            </div>
+          <div>
+            <span className="text-stone-500">Readiness:</span>
+            <span className="text-stone-300 ml-1">{readinessPercent}%</span>
           </div>
         </div>
       </div>

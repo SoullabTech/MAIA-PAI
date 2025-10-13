@@ -40,10 +40,10 @@ const ELEMENT_ICONS = {
 };
 
 const ELEMENT_COLORS = {
-  fire: 'from-orange-500 to-red-500',
-  water: 'from-blue-500 to-cyan-500',
-  earth: 'from-amber-500 to-yellow-500',
-  air: 'from-indigo-500 to-purple-500'
+  fire: 'bg-stone-900/50',
+  water: 'bg-stone-900/50',
+  earth: 'bg-stone-900/50',
+  air: 'bg-stone-900/50'
 };
 
 export function WeavingVisualization({
@@ -136,51 +136,33 @@ export function WeavingVisualization({
   };
 
   return (
-    <div className="bg-black/40 border border-white/10 rounded-2xl p-6">
-      {/* Header with View Toggle */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-          >
-            <Circle className="w-6 h-6 text-purple-400" />
-          </motion.div>
-          <h2 className="text-xl font-bold text-white">The Weaving</h2>
-        </div>
+    <div className="border border-stone-800 rounded-lg p-4 mt-4">
+      {/* Simple Header */}
+      <div className="mb-4">
+        <h3 className="text-sm font-medium text-stone-300 mb-1">Active Conversation Threads</h3>
+        <p className="text-xs text-stone-500">What's emerging from your dialogue</p>
+      </div>
 
-        <div className="flex gap-2">
-          <button
-            onClick={() => setSelectedView('threads')}
-            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-              selectedView === 'threads'
-                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/40'
-                : 'text-stone-400 hover:text-white'
-            }`}
-          >
-            Threads
-          </button>
-          <button
-            onClick={() => setSelectedView('trajectory')}
-            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-              selectedView === 'trajectory'
-                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/40'
-                : 'text-stone-400 hover:text-white'
-            }`}
-          >
-            Trajectory
-          </button>
-          <button
-            onClick={() => setSelectedView('prompts')}
-            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
-              selectedView === 'prompts'
-                ? 'bg-purple-500/20 text-purple-400 border border-purple-500/40'
-                : 'text-stone-400 hover:text-white'
-            }`}
-          >
-            Prompts
-          </button>
-        </div>
+      {/* Simple tab navigation */}
+      <div className="flex gap-4 mb-3 text-xs border-b border-stone-800 pb-2">
+        <button
+          onClick={() => setSelectedView('threads')}
+          className={selectedView === 'threads' ? 'text-stone-300' : 'text-stone-600 hover:text-stone-400'}
+        >
+          Threads
+        </button>
+        <button
+          onClick={() => setSelectedView('trajectory')}
+          className={selectedView === 'trajectory' ? 'text-stone-300' : 'text-stone-600 hover:text-stone-400'}
+        >
+          Trajectory
+        </button>
+        <button
+          onClick={() => setSelectedView('prompts')}
+          className={selectedView === 'prompts' ? 'text-stone-300' : 'text-stone-600 hover:text-stone-400'}
+        >
+          Prompts
+        </button>
       </div>
 
       {/* Threads View - What's Being Woven */}
@@ -199,38 +181,25 @@ export function WeavingVisualization({
             const gradient = ELEMENT_COLORS[thread.element];
 
             return (
-              <motion.div
+              <div
                 key={thread.id}
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                className={`relative overflow-hidden rounded-lg bg-gradient-to-r ${gradient} p-4`}
+                className="border-l-2 border-stone-700 pl-3 py-2"
               >
-                <div className="absolute inset-0 bg-black/40" />
-                <div className="relative flex items-start gap-3">
-                  <Icon className="w-5 h-5 text-white mt-0.5" />
+                <div className="flex items-start gap-2">
+                  <Icon className="w-3 h-3 text-stone-500 mt-0.5" />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-white">
+                    <p className="text-xs font-medium text-stone-300">
                       {thread.pattern}
-                    </h4>
-                    <p className="text-sm text-white/80 mt-1">
+                    </p>
+                    <p className="text-xs text-stone-500 mt-0.5">
                       {thread.description}
                     </p>
-                    <div className="mt-2 flex items-center gap-4 text-xs text-white/60">
-                      <span>Strength: {Math.round(thread.strength * 100)}%</span>
-                      <span>Active {Math.round((Date.now() - thread.lastSeen.getTime()) / 60000)} min ago</span>
-                    </div>
+                    <p className="text-xs text-stone-600 mt-1">
+                      Strength: {Math.round(thread.strength * 100)}% • {Math.round((Date.now() - thread.lastSeen.getTime()) / 60000)} min ago
+                    </p>
                   </div>
                 </div>
-
-                {/* Strength bar */}
-                <div className="relative mt-3 h-1 bg-black/30 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${thread.strength * 100}%` }}
-                    className="h-full bg-white/60"
-                  />
-                </div>
-              </motion.div>
+              </div>
             );
           })}
         </motion.div>
