@@ -267,14 +267,19 @@ export async function POST(request: NextRequest) {
 
     // Initialize Personal Oracle Agent
     const agent = new PersonalOracleAgent(userId, {
-      conversationStyle: conversationMode,
-      useVoice: false
+      conversationStyle: conversationMode as 'her' | 'classic' | 'adaptive',
+      voice: {
+        enabled: false,
+        autoSpeak: false,
+        rate: 1.0,
+        pitch: 1.0,
+        volume: 0.8
+      }
     });
 
     // Process through full Oracle framework
     const response = await agent.processInteraction(userInput, {
-      sessionId: `oracle_${Date.now()}`,
-      timestamp: Date.now()
+      // Context can include journal entries, mood, etc but is optional
     });
 
     // Return Oracle wisdom + MAIA's embodied integration

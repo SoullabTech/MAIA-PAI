@@ -1184,8 +1184,11 @@ This is the soul-level truth you're helping them see, not reference material to 
       let outputTokens = 0;
 
       // 🧠 CLAUDE CODE BRAIN PATH - Use our deep system awareness
-      const useClaudeCodeBrain = localStorage.getItem('use_claude_code_brain') === 'true' ||
-                                 localStorage.getItem('ai_model') === 'claude-code';
+      let useClaudeCodeBrain = false;
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        useClaudeCodeBrain = localStorage.getItem('use_claude_code_brain') === 'true' ||
+                             localStorage.getItem('ai_model') === 'claude-code';
+      }
 
       if (useClaudeCodeBrain) {
         console.log('🧠 === CLAUDE CODE BRAIN PATH === Deep system awareness activated!');

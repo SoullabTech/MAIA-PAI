@@ -258,6 +258,9 @@ Remember: You're here to be helpful and supportive. Be real, be present, be Maia
 // Default is walking companion mode for casual, natural conversations
 export const MAYA_NATURAL_PROMPT = MAYA_WALKING_COMPANION_PROMPT;
 
+// Alias for backwards compatibility - HER mode is the walking companion mode
+export const MAYA_HER_MODE_PROMPT = MAYA_WALKING_COMPANION_PROMPT;
+
 /**
  * Get the appropriate prompt based on conversation style preference
  * @param style - 'walking' | 'classic' | 'adaptive'
