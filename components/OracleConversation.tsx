@@ -159,6 +159,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [checkIns, setCheckIns] = useState<Record<string, number>>(initialCheckIns);
   const [activeFacetId, setActiveFacetId] = useState<string | undefined>();
   const [isProcessing, setIsProcessing] = useState(false);
+  const isProcessingRef = useRef(false); // Track processing state without stale closures
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Motion states
@@ -174,9 +175,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [userVoiceState, setUserVoiceState] = useState<VoiceState | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [isResponding, setIsResponding] = useState(false);
+  const isRespondingRef = useRef(false); // Track responding state without stale closures
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isIOSAudioEnabled, setIsIOSAudioEnabled] = useState(false);
   const [needsIOSAudioPermission, setNeedsIOSAudioPermission] = useState(false);
+
+  // Sync refs with state to avoid stale closures in callbacks
+  useEffect(() => {
+    isProcessingRef.current = isProcessing;
+  }, [isProcessing]);
+
+  useEffect(() => {
+    isRespondingRef.current = isResponding;
+  }, [isResponding]);
 
   // Listening mode for different conversation styles
   type ListeningMode = 'normal' | 'patient' | 'session';
@@ -1220,8 +1231,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
 
     // Prevent duplicate processing if already handling a message
-    if (isProcessing || isResponding) {
-      console.log('⚠️ Already processing, ignoring duplicate transcript');
+    // Use refs to check current state (not stale closure values)
+    const currentlyProcessing = isProcessingRef.current || isRespondingRef.current;
+    if (currentlyProcessing) {
+      console.log('⚠️ Already processing, ignoring duplicate transcript', {
+        isProcessingRef: isProcessingRef.current,
+        isRespondingRef: isRespondingRef.current
+      });
       return;
     }
 
