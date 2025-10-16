@@ -6,8 +6,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent';
 import { saveConversationWithAnalytics, detectDeviceType } from '@/lib/services/conversation-analytics-service';
-import { processElementalReflection } from '@/apps/api/backend/src/services/elementalReflectionHook';
-import { getConfigWithEnvOverrides } from '@/config/elemental-reflection.config';
+// TODO: Re-enable when elemental reflection hook is implemented
+// import { processElementalReflection } from '@/apps/api/backend/src/services/elementalReflectionHook';
+// import { getConfigWithEnvOverrides } from '@/config/elemental-reflection.config';
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
@@ -25,13 +26,13 @@ export async function POST(request: NextRequest) {
 
     console.log(`💬 MAIA chat for user ${userId} in ${conversationMode} mode`);
 
-    // ELEMENTAL REFLECTION HOOK - Process incoming message for elemental patterns
-    const elementalConfig = getConfigWithEnvOverrides();
-    const elementalReflection = await processElementalReflection(
-      message,
-      userId,
-      elementalConfig
-    );
+    // TODO: ELEMENTAL REFLECTION HOOK - Process incoming message for elemental patterns
+    // const elementalConfig = getConfigWithEnvOverrides();
+    // const elementalReflection = await processElementalReflection(
+    //   message,
+    //   userId,
+    //   elementalConfig
+    // );
 
     // Initialize Personal Oracle Agent with conversation style
     const agent = new PersonalOracleAgent(userId, {
