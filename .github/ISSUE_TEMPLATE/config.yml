@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Quick Feedback (In-App)
+    url: https://www.soullab.life
+    about: Use the feedback button (top right) for quick questions or comments
+  - name: 📧 Email Support
+    url: mailto:beta@soullab.life
+    about: Email us for complex issues or private feedback (24hr response time)
+  - name: 📖 Beta Handbook
+    url: https://github.com/SoullabTech/MAIA-PAI/blob/main/BETA_HANDBOOK.md
+    about: Complete guide for beta testers with troubleshooting, FAQ, and Field Labs

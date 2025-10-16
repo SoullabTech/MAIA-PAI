@@ -1,0 +1,119 @@
+name: 🐛 Bug Report
+description: Something isn't working as expected
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this bug! Your feedback helps us build something soulful.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Clear description of what went wrong
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should have happened?
+      description: What did you expect to happen instead?
+      placeholder: What was supposed to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: How can we recreate this bug?
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feature-area
+    attributes:
+      label: Which part of Soullab?
+      options:
+        - MAIA Conversation (text)
+        - MAIA Conversation (voice)
+        - Field Protocol (creating records)
+        - Field Protocol (viewing records)
+        - Elemental personalities
+        - Authentication / Sign in
+        - Dashboard / Navigation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Safari
+        - Firefox
+        - Edge
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: Device
+      options:
+        - Desktop (Mac)
+        - Desktop (Windows)
+        - Desktop (Linux)
+        - Mobile (iPhone)
+        - Mobile (Android)
+        - Tablet (iPad)
+        - Tablet (Android)
+    validations:
+      required: true
+
+  - type: input
+    id: when
+    attributes:
+      label: When did this happen?
+      description: Date and approximate time
+      placeholder: "October 21, 2025 at 3pm PT"
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or videos
+      description: If applicable, add screenshots or screen recordings
+      placeholder: Drag and drop images here
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Anything else we should know?
+      placeholder: Any other details that might help us understand what happened
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Beta Tester Acknowledgment
+      description: By submitting this issue, you confirm you're a Soullab beta tester
+      options:
+        - label: I'm a Soullab beta tester
+          required: true

@@ -1,0 +1,126 @@
+name: 🧭 Resonance Lab Report
+description: Report findings from Field Lab experiments
+title: "[Resonance Lab]: "
+labels: ["resonance-lab", "field-research"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Field Lab Series: The Resonance Exchange**
+
+        Document your findings from exploring how resonance moves through systems.
+
+  - type: dropdown
+    id: lab-level
+    attributes:
+      label: Which lab level?
+      options:
+        - "Level 1: Share What Moves You (Signal integrity)"
+        - "Level 2: Pattern Mapping (Emotional translation)"
+        - "Level 3: System Reflection (Perceptual intelligence)"
+        - "General observation"
+    validations:
+      required: true
+
+  - type: textarea
+    id: experiment
+    attributes:
+      label: What did you test?
+      description: Describe the experiment or observation
+      placeholder: |
+        I shared [song/image/reflection/etc.] via [method]...
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you observe?
+      placeholder: The results were...
+    validations:
+      required: true
+
+  - type: textarea
+    id: signal-integrity
+    attributes:
+      label: What stayed true? What got lost?
+      description: How did emotion, context, and intention survive transmission?
+      placeholder: |
+        What carried the feeling:
+        What lost the essence:
+    validations:
+      required: false
+
+  - type: textarea
+    id: maia-response
+    attributes:
+      label: How did MAIA respond?
+      description: If MAIA was involved, how did she perceive/reflect?
+      placeholder: MAIA said/reflected...
+    validations:
+      required: false
+
+  - type: textarea
+    id: felt-sense
+    attributes:
+      label: What was your felt sense?
+      description: Beyond the technical - what did you notice in your body/awareness?
+      placeholder: I noticed...
+    validations:
+      required: false
+
+  - type: textarea
+    id: glitches
+    attributes:
+      label: Technical issues or glitches
+      description: Any bugs, errors, or unexpected behavior?
+      placeholder: |
+        - Voice cut mid-response
+        - Memory mismatch
+        - Element mis-detected
+        - Broken preview link
+    validations:
+      required: false
+
+  - type: dropdown
+    id: medium
+    attributes:
+      label: What medium did you use?
+      multiple: true
+      options:
+        - Text conversation
+        - Voice conversation
+        - Field Record
+        - Image sharing
+        - Link sharing
+        - Cross-platform (describe in notes)
+    validations:
+      required: false
+
+  - type: textarea
+    id: insight
+    attributes:
+      label: What insight emerged?
+      description: What new possibility appeared? What did this teach you?
+      placeholder: I learned that...
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or artifacts
+      description: Share relevant images, links, or examples
+      placeholder: Drag and drop here
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Beta Tester Acknowledgment
+      description: By submitting this report, you confirm you're a Soullab beta tester
+      options:
+        - label: I'm a Soullab beta tester participating in the Field Lab Series
+          required: true

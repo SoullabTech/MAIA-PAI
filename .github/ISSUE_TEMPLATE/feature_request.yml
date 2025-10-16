@@ -1,0 +1,109 @@
+name: 💡 Feature Request
+description: Suggest an idea or improvement
+title: "[Feature]: "
+labels: ["enhancement", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping shape Soullab! Your ideas matter.
+
+  - type: textarea
+    id: feature
+    attributes:
+      label: What feature or improvement would you like?
+      description: Describe what you wish existed
+      placeholder: I wish I could...
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: What pain point or need does this address?
+      placeholder: Right now, I struggle with...
+    validations:
+      required: true
+
+  - type: textarea
+    id: how-it-works
+    attributes:
+      label: How would it work?
+      description: Your vision for how this feature would work
+      placeholder: |
+        I imagine it working like this:
+        1. User does X
+        2. System responds with Y
+        3. Result is Z
+    validations:
+      required: false
+
+  - type: textarea
+    id: why-it-matters
+    attributes:
+      label: Why does this matter?
+      description: How would this make Soullab more soulful or valuable?
+      placeholder: This would help because...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feature-area
+    attributes:
+      label: Which part of Soullab?
+      options:
+        - MAIA Conversations
+        - Field Protocol
+        - Elemental personalities
+        - Privacy / Data control
+        - Community / Sharing
+        - Mobile experience
+        - Voice experience
+        - Pattern recognition / Analytics
+        - Integration with other tools
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: How important is this to you?
+      description: Honest assessment - no judgment!
+      options:
+        - "Critical - I can't use Soullab effectively without this"
+        - "High - I really want this, would significantly improve my experience"
+        - "Medium - Nice to have, would make things better"
+        - "Low - Just an idea, not urgent"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What are you doing instead right now?
+      description: How are you working around the lack of this feature?
+      placeholder: Currently, I...
+    validations:
+      required: false
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Examples or inspiration
+      description: Links to examples, similar features elsewhere, mockups, etc.
+      placeholder: |
+        Here's an example of something similar:
+        [Link or description]
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Beta Tester Acknowledgment
+      description: By submitting this request, you confirm you're a Soullab beta tester
+      options:
+        - label: I'm a Soullab beta tester
+          required: true
