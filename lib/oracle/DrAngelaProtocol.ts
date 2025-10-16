@@ -189,7 +189,7 @@ export class DrAngelaProtocol {
     }
 
     // Follicular phase markers
-    if /(feel|feeling) (good|great|energized|clear)|post.?period|after.*period/i.test(lower)) {
+    if (/(feel|feeling) (good|great|energized|clear)|post.?period|after.*period/i.test(lower)) {
       return {
         phase: 'follicular',
         dayInCycle: 10,
