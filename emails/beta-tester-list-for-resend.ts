@@ -18,6 +18,7 @@ export const betaTesters = [
   { name: 'Virginia', firstName: 'Virginia', email: 'vmiller@bmfcomms.com', code: 'SOULLAB-VIRGINIA' },
   { name: 'Jondi', firstName: 'Jondi', email: 'jondi@eft4results.com', code: 'SOULLAB-JONDI' },
   { name: 'Joseph', firstName: 'Joseph', email: 'crownhouseone@gmail.com', code: 'SOULLAB-JOSEPH' },
+  { name: 'Leah Emmerich', firstName: 'Leah', email: 'LeachEmmerich@gmail.com', code: 'SOULLAB-LEAH' },
 
   // Kelly (already signed up successfully - exclude from re-send)
   // { name: 'Kelly', firstName: 'Kelly', email: 'kelly@soullab.org', code: 'SOULLAB-KELLY' },
