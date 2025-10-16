@@ -73,10 +73,12 @@ export function useMaiaVoice(config: UseMaiaVoiceConfig): UseMaiaVoiceReturn {
         setError(err.message);
       },
       onAudioStart: () => {
+        console.log('🔊 MAIA started speaking');
         setIsSpeaking(true);
         setIsListening(false);
       },
       onAudioEnd: () => {
+        console.log('🎤 MAIA finished speaking - ready to listen');
         setIsSpeaking(false);
         setIsListening(true);
       },

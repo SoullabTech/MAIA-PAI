@@ -120,6 +120,7 @@ export class MaiaRealtimeWebRTC {
   }
 
   private setupAudioHandling(): void {
+    if (typeof window === 'undefined') return; // SSR guard
     if (!this.peerConnection) return;
 
     // Handle incoming audio tracks
@@ -129,10 +130,38 @@ export class MaiaRealtimeWebRTC {
       if (!this.audioElement) {
         this.audioElement = new Audio();
         this.audioElement.autoplay = true;
+
+        // Add event listeners to track actual playback
+        this.audioElement.onplay = () => {
+          console.log('🔊 Audio element started playing');
+          this.config.onAudioStart();
+        };
+
+        this.audioElement.onended = () => {
+          console.log('🔊 Audio element finished playing');
+        };
+
+        this.audioElement.onerror = (e) => {
+          console.error('❌ Audio element error:', e);
+          this.config.onError(new Error('Audio playback failed'));
+        };
       }
 
       this.audioElement.srcObject = event.streams[0];
-      this.config.onAudioStart();
+
+      // Attempt to play (may be blocked by browser autoplay policy)
+      const playPromise = this.audioElement.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('✅ Audio playback started successfully');
+          })
+          .catch((error) => {
+            console.error('❌ Autoplay blocked by browser. User interaction required:', error);
+            // The audio will still be set up, it just won't play until user interacts
+            this.config.onError(new Error('Audio blocked by browser. Click to enable sound.'));
+          });
+      }
     };
 
     // Handle connection state changes
@@ -190,7 +219,7 @@ export class MaiaRealtimeWebRTC {
             type: 'server_vad',
             threshold: 0.5,
             prefix_padding_ms: 300,
-            silence_duration_ms: 500,
+            silence_duration_ms: 3000,  // Increased to 3s to allow natural conversation pauses
           },
         },
       });
@@ -213,10 +242,6 @@ export class MaiaRealtimeWebRTC {
 
     this.dataChannel.onclose = () => {
       console.log('📡 Data channel closed. State:', this.dataChannel?.readyState);
-    };
-
-    this.dataChannel.onstatechange = () => {
-      console.log('📡 Data channel state changed:', this.dataChannel?.readyState);
     };
   }
 
@@ -269,6 +294,10 @@ export class MaiaRealtimeWebRTC {
   }
 
   private async addMicrophoneTrack(): Promise<void> {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      throw new Error('Browser APIs not available');
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -323,6 +352,7 @@ export class MaiaRealtimeWebRTC {
   }
 
   isConnected(): boolean {
+    if (typeof window === 'undefined') return false; // SSR guard
     return this.peerConnection?.connectionState === 'connected';
   }
 
