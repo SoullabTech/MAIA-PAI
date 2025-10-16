@@ -42,13 +42,13 @@ export default function FieldProtocolLanding() {
       {/* Hero */}
       <div className="text-center mb-16">
         <Badge className="mb-4 bg-dune-spice-sand text-dune-deep-sand border-dune-sienna-rock" variant="outline">
-          🏜️ The Desert Teaches Those Who Listen
+          🏜️ Wisdom Emerges from Direct Experience
         </Badge>
         <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-dune-spice-orange to-dune-spice-deep bg-clip-text text-transparent">
-          The Litany Against Ignorance
+          The Field Protocol
         </h1>
         <p className="text-xl text-muted-foreground mb-4 max-w-2xl mx-auto italic">
-          "I must not fear. Fear is the mind-killer..."
+          "The desert teaches patience. Water teaches value. Stillness teaches truth."
         </p>
         <p className="text-lg mb-8 max-w-3xl mx-auto">
           No guru. No dogma. No one telling you what to think or feel.
@@ -58,14 +58,14 @@ export default function FieldProtocolLanding() {
         <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
           The Field Protocol is a heuristic method—you discover your own path by walking it.
           <br />
-          Like the Fremen learning from Arrakis, you learn from <em>your</em> unique desert.
+          Like learning from the terrain itself, you discover wisdom from <em>your</em> unique journey.
         </p>
         <Button
           size="lg"
           onClick={handleGetStarted}
           className="bg-gradient-to-r from-dune-spice-orange to-dune-spice-deep hover:from-dune-spice-glow hover:to-dune-spice-orange text-white font-semibold tracking-wide"
         >
-          ENTER THE DESERT
+          BEGIN THE PRACTICE
         </Button>
       </div>
 
@@ -82,7 +82,7 @@ export default function FieldProtocolLanding() {
               title: 'The Witnessing',
               subtitle: 'Observation',
               desc: 'See without fabrication',
-              quote: 'Bene Gesserit training',
+              quote: 'Clear perception',
               color: 'text-dune-ibad-blue',
               bg: 'bg-dune-ibad-blue/10'
             },
@@ -91,7 +91,7 @@ export default function FieldProtocolLanding() {
               title: 'The Computation',
               subtitle: 'Interpretation',
               desc: 'Understand the pattern',
-              quote: 'Mentat analysis',
+              quote: 'Deep analysis',
               color: 'text-dune-navigator-purple',
               bg: 'bg-dune-navigator-purple/10'
             },
@@ -100,7 +100,7 @@ export default function FieldProtocolLanding() {
               title: 'The Walking',
               subtitle: 'Integration',
               desc: 'Embody the teaching',
-              quote: 'Fremen adaptation',
+              quote: 'Living wisdom',
               color: 'text-dune-atreides-green',
               bg: 'bg-dune-atreides-green/10'
             },
@@ -109,7 +109,7 @@ export default function FieldProtocolLanding() {
               title: 'The Prescience',
               subtitle: 'Reflection',
               desc: 'Know the consequences',
-              quote: 'Guild vision',
+              quote: 'Future sight',
               color: 'text-dune-bene-gesserit-gold',
               bg: 'bg-dune-bene-gesserit-gold/10'
             },
@@ -117,8 +117,8 @@ export default function FieldProtocolLanding() {
               icon: Share2,
               title: 'The Teaching',
               subtitle: 'Transmission',
-              desc: 'Awaken the sleeper',
-              quote: 'Muad\'Dib\'s way',
+              desc: 'Awaken others',
+              quote: 'Shared wisdom',
               color: 'text-dune-spice-orange',
               bg: 'bg-dune-spice-orange/10'
             }
@@ -140,20 +140,20 @@ export default function FieldProtocolLanding() {
 
       {/* Features - Water Rights */}
       <div className="mb-16">
-        <h2 className="text-3xl font-bold text-center mb-4">Your Water, Your Choice</h2>
+        <h2 className="text-3xl font-bold text-center mb-4">Your Wisdom, Your Choice</h2>
         <p className="text-center text-muted-foreground mb-12 italic">
-          "On Arrakis, water is more precious than gold. Here, your consciousness is the water."
+          "Your consciousness is precious. What you discover is yours to protect and share."
         </p>
         <div className="grid md:grid-cols-3 gap-6">
           <Card className="border-dune-fremen-azure/30 hover:border-dune-fremen-azure transition-colors">
             <CardHeader>
               <Lock className="w-8 h-8 mb-2 text-dune-fremen-azure" />
-              <CardTitle>Personal Water</CardTitle>
+              <CardTitle>Personal Practice</CardTitle>
               <p className="text-xs text-muted-foreground italic">(Private by default)</p>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Your experiences are yours. Sacred and protected like water in a stillsuit.
+                Your experiences are yours. Sacred and protected.
                 Share only when you choose to offer the gift.
               </p>
             </CardContent>
@@ -161,26 +161,26 @@ export default function FieldProtocolLanding() {
           <Card className="border-dune-navigator-purple/30 hover:border-dune-navigator-purple transition-colors">
             <CardHeader>
               <TrendingUp className="w-8 h-8 mb-2 text-dune-navigator-purple" />
-              <CardTitle>The Golden Path</CardTitle>
-              <p className="text-xs text-muted-foreground italic">(Pattern recognition)</p>
+              <CardTitle>Pattern Recognition</CardTitle>
+              <p className="text-xs text-muted-foreground italic">(Emergent clarity)</p>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Like Guild Navigators seeing futures, you'll recognize patterns invisible to daily consciousness.
-                The spice shows the way.
+                Over time, you'll recognize patterns invisible to daily consciousness.
+                Wisdom emerges from sustained attention.
               </p>
             </CardContent>
           </Card>
           <Card className="border-dune-atreides-green/30 hover:border-dune-atreides-green transition-colors">
             <CardHeader>
               <Users className="w-8 h-8 mb-2 text-dune-atreides-green" />
-              <CardTitle>Sietch Wisdom</CardTitle>
-              <p className="text-xs text-muted-foreground italic">(Community knowledge)</p>
+              <CardTitle>Community Wisdom</CardTitle>
+              <p className="text-xs text-muted-foreground italic">(Collective learning)</p>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                When ready, share with the tribe. Sietch knowledge strengthens all.
-                Collective wisdom without gurus or hierarchy.
+                When ready, share with the community. Collective knowledge strengthens all.
+                Shared wisdom without gurus or hierarchy.
               </p>
             </CardContent>
           </Card>
@@ -190,14 +190,14 @@ export default function FieldProtocolLanding() {
       {/* CTA */}
       <Card className="bg-gradient-to-r from-dune-spice-sand/20 to-dune-dune-amber/20 border-dune-spice-orange/30">
         <CardContent className="text-center py-12">
-          <h2 className="text-3xl font-bold mb-4 text-dune-deep-sand">The Sleeper Must Awaken</h2>
+          <h2 className="text-3xl font-bold mb-4 text-dune-deep-sand">Awaken to Your Own Wisdom</h2>
           <p className="text-muted-foreground mb-4 max-w-2xl mx-auto italic">
             "The beginning of knowledge is the discovery of something we do not understand." — Frank Herbert
           </p>
           <p className="mb-8 max-w-2xl mx-auto">
-            The desert is waiting. Your consciousness is the spice.
+            Your journey awaits. Your consciousness holds the answers.
             <br />
-            No one can walk your path for you—but the protocol provides the stillsuit.
+            No one can walk your path for you—but the protocol provides the structure.
           </p>
           <Button
             size="lg"
@@ -207,7 +207,7 @@ export default function FieldProtocolLanding() {
             BEGIN THE JOURNEY
           </Button>
           <p className="text-xs text-muted-foreground mt-4 italic">
-            Free. No credit card. Your water belongs to you.
+            Free. No credit card. Your wisdom belongs to you.
           </p>
         </CardContent>
       </Card>
