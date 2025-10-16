@@ -100,6 +100,38 @@ export interface FieldRecord {
     synchronicities?: string[];
   };
 
+  // Direct member engagement
+  engagement?: {
+    reflections?: {
+      memberId: string;
+      memberName?: string;
+      content: string;
+      timestamp: Date;
+      elementalResonance?: Element[];
+      insightAmplification?: string;
+    }[];
+    questions?: {
+      memberId: string;
+      memberName?: string;
+      question: string;
+      timestamp: Date;
+      answered?: boolean;
+      response?: string;
+      responseTimestamp?: Date;
+    }[];
+    resonanceMarkers?: {
+      memberId: string;
+      type: 'resonance' | 'amplification' | 'clarification' | 'integration';
+      timestamp: Date;
+    }[];
+    collectiveThreads?: {
+      threadId: string;
+      title: string;
+      participants: string[];
+      lastActivity: Date;
+    }[];
+  };
+
   // Meta information
   meta: {
     practitionerId: string;

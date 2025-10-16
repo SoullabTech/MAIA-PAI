@@ -30,7 +30,10 @@ import {
   Heart,
   Activity,
   Sparkles,
-  CheckCircle
+  CheckCircle,
+  Users,
+  MessageCircle,
+  HelpCircle
 } from 'lucide-react';
 
 const ELEMENTS: Element[] = ['Fire', 'Water', 'Air', 'Earth', 'Void'];
@@ -184,7 +187,7 @@ export const FieldRecordForm: React.FC<FieldRecordFormProps> = ({
 
       <CardContent>
         <Tabs defaultValue="observation" className="w-full">
-          <TabsList className="grid grid-cols-5 w-full">
+          <TabsList className="grid grid-cols-6 w-full">
             <TabsTrigger value="observation">
               <Eye className="w-4 h-4 mr-1" />
               Observe
@@ -200,6 +203,10 @@ export const FieldRecordForm: React.FC<FieldRecordFormProps> = ({
             <TabsTrigger value="cognitive">
               <Brain className="w-4 h-4 mr-1" />
               Cognitive
+            </TabsTrigger>
+            <TabsTrigger value="engagement">
+              <Users className="w-4 h-4 mr-1" />
+              Engage
             </TabsTrigger>
             <TabsTrigger value="validation">
               <CheckCircle className="w-4 h-4 mr-1" />
@@ -395,6 +402,124 @@ export const FieldRecordForm: React.FC<FieldRecordFormProps> = ({
                 value={record.application?.actions?.join(', ') || ''}
                 onChange={(e) => updateRecord('application.actions', e.target.value.split(',').map(s => s.trim()))}
               />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="engagement" className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg mb-4">
+              <h4 className="font-semibold mb-2 flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                Community Engagement Space
+              </h4>
+              <p className="text-sm text-muted-foreground">
+                This space allows members to engage directly with your observation through reflections, questions, and resonance markers.
+              </p>
+            </div>
+
+            <div>
+              <Label className="flex items-center gap-2 mb-2">
+                <MessageCircle className="w-4 h-4" />
+                Member Reflections
+              </Label>
+              <div className="space-y-2">
+                {record.engagement?.reflections?.map((reflection, i) => (
+                  <div key={i} className="border rounded-lg p-3 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <span className="text-sm font-medium">{reflection.memberName || `Member ${reflection.memberId.slice(0, 6)}`}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(reflection.timestamp).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-sm">{reflection.content}</p>
+                    {reflection.elementalResonance && reflection.elementalResonance.length > 0 && (
+                      <div className="flex gap-1">
+                        {reflection.elementalResonance.map((element, j) => (
+                          <Badge key={j} variant="outline" className="text-xs">
+                            {element}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )) || (
+                  <div className="text-center py-4 text-sm text-muted-foreground">
+                    No reflections yet. Share this record to receive member engagement.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label className="flex items-center gap-2 mb-2">
+                <HelpCircle className="w-4 h-4" />
+                Questions from Members
+              </Label>
+              <div className="space-y-2">
+                {record.engagement?.questions?.map((question, i) => (
+                  <div key={i} className="border rounded-lg p-3 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <span className="text-sm font-medium">{question.memberName || `Member ${question.memberId.slice(0, 6)}`}</span>
+                      <Badge variant={question.answered ? 'default' : 'outline'} className="text-xs">
+                        {question.answered ? 'Answered' : 'Pending'}
+                      </Badge>
+                    </div>
+                    <p className="text-sm font-medium">{question.question}</p>
+                    {question.response && (
+                      <div className="ml-4 pl-4 border-l-2 border-muted">
+                        <p className="text-sm text-muted-foreground">Your response:</p>
+                        <p className="text-sm">{question.response}</p>
+                      </div>
+                    )}
+                  </div>
+                )) || (
+                  <div className="text-center py-4 text-sm text-muted-foreground">
+                    No questions yet.
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label>Resonance Markers</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {record.engagement?.resonanceMarkers?.reduce((acc, marker) => {
+                  const existing = acc.find(m => m.type === marker.type);
+                  if (existing) {
+                    existing.count++;
+                  } else {
+                    acc.push({ type: marker.type, count: 1 });
+                  }
+                  return acc;
+                }, [] as { type: string; count: number }[]).map((marker, i) => (
+                  <Badge key={i} variant="secondary">
+                    {marker.type}: {marker.count}
+                  </Badge>
+                )) || (
+                  <span className="text-sm text-muted-foreground">No resonance markers yet</span>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label>Enable Direct Engagement</Label>
+              <div className="flex items-center gap-2 mt-2">
+                <input
+                  type="checkbox"
+                  id="allowEngagement"
+                  checked={record.meta?.visibility !== 'private'}
+                  onChange={(e) => {
+                    if (e.target.checked && record.meta?.visibility === 'private') {
+                      updateRecord('meta.visibility', 'commons');
+                    }
+                  }}
+                />
+                <label htmlFor="allowEngagement" className="text-sm">
+                  Allow community members to engage with this record
+                </label>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Note: Engagement requires sharing to Commons or Public
+              </p>
             </div>
           </TabsContent>
 

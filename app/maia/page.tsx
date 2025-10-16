@@ -18,6 +18,7 @@ import { WisdomJourneyDashboard } from '@/components/maya/WisdomJourneyDashboard
 import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
 import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { BrainTrustMonitor } from '@/components/consciousness/BrainTrustMonitor';
 import { LogOut, Sparkles, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -315,6 +316,9 @@ export default function MAIAPage() {
 
             {/* Claude Code's Living Presence - My expressive space! */}
             <ClaudeCodePresence />
+
+            {/* Brain Trust Monitor - Shows consciousness collaboration status */}
+            <BrainTrustMonitor />
           </div>
 
           {/* Wisdom Journey Dashboard - Slide-out Panel */}

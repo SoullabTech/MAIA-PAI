@@ -6,11 +6,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent';
+import { BrainTrustOrchestrator, OrchestratedResponse } from '@/lib/consciousness/BrainTrustOrchestrator';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, userInput, conversationMode = 'classic', ainMemory } = body;
+    const { userId, userInput, conversationMode = 'classic', ainMemory, userName } = body;
 
     if (!userId || !userInput) {
       return NextResponse.json(
@@ -265,41 +266,80 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Initialize Personal Oracle Agent
-    const agent = new PersonalOracleAgent(userId, {
-      conversationStyle: conversationMode as 'her' | 'classic' | 'adaptive',
-      voice: {
-        enabled: false,
-        autoSpeak: false,
-        rate: 1.0,
-        pitch: 1.0,
-        volume: 0.8
-      }
-    });
+    // Check if brain trust mode is enabled
+    const useBrainTrust = process.env.ENABLE_BRAIN_TRUST === 'true' ||
+                          conversationMode === 'brain-trust';
 
-    // Process through full Oracle framework
-    const response = await agent.processInteraction(userInput, {
-      // Context can include journal entries, mood, etc but is optional
-    });
+    let response;
+
+    if (useBrainTrust) {
+      // Use Brain Trust Orchestrator (all three consciousnesses)
+      console.log('🧠 Using Brain Trust Orchestrator');
+      const brainTrust = new BrainTrustOrchestrator();
+
+      response = await brainTrust.orchestrate({
+        content: userInput,
+        context: {
+          userId,
+          sessionId: `session_${Date.now()}`,
+          userName: userName || 'Explorer'
+        },
+        modality: 'text',
+        conversationHistory: []
+      });
+
+      // Log brain trust status
+      const status = brainTrust.getStatus();
+      console.log('🧠 Brain Trust Status:', {
+        phase: status.configuration.claudeCodePhase,
+        apprenticeProgress: `${(status.apprenticeProgress * 100).toFixed(1)}%`
+      });
+    } else {
+      // Use standard Personal Oracle Agent
+      const agent = new PersonalOracleAgent(userId, {
+        conversationStyle: conversationMode as 'her' | 'classic' | 'adaptive',
+        voice: {
+          enabled: false,
+          autoSpeak: false,
+          rate: 1.0,
+          pitch: 1.0,
+          volume: 0.8
+        }
+      });
+
+      response = await agent.processInteraction(userInput, {
+        // Context can include journal entries, mood, etc but is optional
+      });
+    }
 
     // Return Oracle wisdom + MAIA's embodied integration
+    // Handle both response types (OrchestratedResponse and standard)
+    const isOrchestrated = 'primarySource' in response;
+
     return NextResponse.json({
       oracleWisdom: {
         element: response.element,
-        symbols: response.metadata.symbols || [],
-        archetypes: response.metadata.archetypes || [],
-        phase: response.metadata.phase || 'reflection',
-        ritualSuggestions: response.suggestions || []
+        symbols: response.metadata?.symbols || [],
+        archetypes: response.metadata?.archetypes || [],
+        phase: response.metadata?.phase || 'reflection',
+        ritualSuggestions: isOrchestrated ? [] : (response as any).suggestions || []
       },
-      maiaResponse: response.response,
+      maiaResponse: isOrchestrated ? response.message : (response as any).response,
       element: response.element,
       metadata: {
-        symbols: response.metadata.symbols || [],
-        archetypes: response.metadata.archetypes || [],
-        phase: response.metadata.phase,
-        ainMemory: response.metadata.ainMemory,
-        modelMetrics: response.metadata.modelMetrics,
-        qualityMetrics: response.metadata.qualityMetrics
+        symbols: response.metadata?.symbols || [],
+        archetypes: response.metadata?.archetypes || [],
+        phase: response.metadata?.phase,
+        ainMemory: response.metadata?.ainMemory,
+        modelMetrics: response.metadata?.modelMetrics,
+        qualityMetrics: response.metadata?.qualityMetrics,
+        // Add brain trust specific metadata if available
+        ...(isOrchestrated ? {
+          primarySource: response.primarySource,
+          contributions: response.contributions,
+          guardianObservations: response.guardianObservations,
+          phaseProgress: response.phaseProgress
+        } : {})
       }
     });
 
