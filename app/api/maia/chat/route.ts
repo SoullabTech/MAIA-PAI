@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent';
 import { saveConversationWithAnalytics, detectDeviceType } from '@/lib/services/conversation-analytics-service';
+import { processElementalReflection } from '@/apps/api/backend/src/services/elementalReflectionHook';
+import { getConfigWithEnvOverrides } from '@/config/elemental-reflection.config';
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
@@ -22,6 +24,14 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`💬 MAIA chat for user ${userId} in ${conversationMode} mode`);
+
+    // ELEMENTAL REFLECTION HOOK - Process incoming message for elemental patterns
+    const elementalConfig = getConfigWithEnvOverrides();
+    const elementalReflection = await processElementalReflection(
+      message,
+      userId,
+      elementalConfig
+    );
 
     // Initialize Personal Oracle Agent with conversation style
     const agent = new PersonalOracleAgent(userId, {
@@ -70,17 +80,25 @@ export async function POST(request: NextRequest) {
       // Don't fail the request if analytics save fails
     }
 
-    // Return MAIA's response
+    // Return MAIA's response with elemental reflection if detected
     return NextResponse.json({
       response: response.response,
       element: response.element,
+      // Include elemental reflection if present
+      elementalReflection: elementalReflection ? {
+        reflection: elementalReflection.reflection,
+        question: elementalReflection.question
+      } : undefined,
       metadata: {
         symbols: response.metadata?.symbols || [],
         archetypes: response.metadata?.archetypes || [],
         phase: response.metadata?.phase,
         conversationMode,
         modelUsed: response.metadata?.modelMetrics?.model,
-        responseTime: Date.now() - startTime
+        responseTime: Date.now() - startTime,
+        // Internal metadata (logged, not shown to user)
+        _elementalPattern: elementalReflection?._internal?.element,
+        _patternConfidence: elementalReflection?._internal?.confidence
       }
     });
 

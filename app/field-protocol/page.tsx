@@ -41,72 +41,146 @@ export default function FieldProtocolLanding() {
     <div className="container mx-auto px-4 py-12 max-w-6xl">
       {/* Hero */}
       <div className="text-center mb-16">
-        <Badge className="mb-4" variant="outline">Beta - Now Accepting Early Users</Badge>
-        <h1 className="text-5xl font-bold mb-4">The Field Protocol</h1>
-        <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-          A structured framework for documenting and understanding your consciousness experiences
+        <Badge className="mb-4 bg-dune-spice-sand text-dune-deep-sand border-dune-sienna-rock" variant="outline">
+          🏜️ The Desert Teaches Those Who Listen
+        </Badge>
+        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-dune-spice-orange to-dune-spice-deep bg-clip-text text-transparent">
+          The Litany Against Ignorance
+        </h1>
+        <p className="text-xl text-muted-foreground mb-4 max-w-2xl mx-auto italic">
+          "I must not fear. Fear is the mind-killer..."
         </p>
-        <Button size="lg" onClick={handleGetStarted}>Start Your First Record</Button>
+        <p className="text-lg mb-8 max-w-3xl mx-auto">
+          No guru. No dogma. No one telling you what to think or feel.
+          <br />
+          Just <strong>you</strong>, your direct experience, and the wisdom that emerges when you truly witness.
+        </p>
+        <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+          The Field Protocol is a heuristic method—you discover your own path by walking it.
+          <br />
+          Like the Fremen learning from Arrakis, you learn from <em>your</em> unique desert.
+        </p>
+        <Button
+          size="lg"
+          onClick={handleGetStarted}
+          className="bg-gradient-to-r from-dune-spice-orange to-dune-spice-deep hover:from-dune-spice-glow hover:to-dune-spice-orange text-white font-semibold tracking-wide"
+        >
+          ENTER THE DESERT
+        </Button>
       </div>
 
-      {/* 5 Stages */}
+      {/* 5 Stages - Dune Style */}
       <div className="mb-16">
-        <h2 className="text-3xl font-bold text-center mb-8">The 5-Stage Process</h2>
+        <h2 className="text-3xl font-bold text-center mb-4">Five Disciplines of the Awakened Mind</h2>
+        <p className="text-center text-muted-foreground mb-8 italic">
+          "The mystery of life isn't a problem to solve, but a reality to experience." — Paul Atreides
+        </p>
         <div className="grid md:grid-cols-5 gap-4">
           {[
-            { icon: Eye, title: '1. Observation', desc: 'Capture what happened', color: 'text-blue-500' },
-            { icon: MessageSquare, title: '2. Interpretation', desc: 'Make meaning', color: 'text-purple-500' },
-            { icon: Heart, title: '3. Integration', desc: 'Embody it', color: 'text-red-500' },
-            { icon: Lightbulb, title: '4. Reflection', desc: 'Extract wisdom', color: 'text-yellow-500' },
-            { icon: Share2, title: '5. Transmission', desc: 'Share insights', color: 'text-green-500' }
-          ].map(({ icon: Icon, title, desc, color }) => (
-            <Card key={title} className="text-center">
+            {
+              icon: Eye,
+              title: 'The Witnessing',
+              subtitle: 'Observation',
+              desc: 'See without fabrication',
+              quote: 'Bene Gesserit training',
+              color: 'text-dune-ibad-blue',
+              bg: 'bg-dune-ibad-blue/10'
+            },
+            {
+              icon: MessageSquare,
+              title: 'The Computation',
+              subtitle: 'Interpretation',
+              desc: 'Understand the pattern',
+              quote: 'Mentat analysis',
+              color: 'text-dune-navigator-purple',
+              bg: 'bg-dune-navigator-purple/10'
+            },
+            {
+              icon: Heart,
+              title: 'The Walking',
+              subtitle: 'Integration',
+              desc: 'Embody the teaching',
+              quote: 'Fremen adaptation',
+              color: 'text-dune-atreides-green',
+              bg: 'bg-dune-atreides-green/10'
+            },
+            {
+              icon: Lightbulb,
+              title: 'The Prescience',
+              subtitle: 'Reflection',
+              desc: 'Know the consequences',
+              quote: 'Guild vision',
+              color: 'text-dune-bene-gesserit-gold',
+              bg: 'bg-dune-bene-gesserit-gold/10'
+            },
+            {
+              icon: Share2,
+              title: 'The Teaching',
+              subtitle: 'Transmission',
+              desc: 'Awaken the sleeper',
+              quote: 'Muad\'Dib\'s way',
+              color: 'text-dune-spice-orange',
+              bg: 'bg-dune-spice-orange/10'
+            }
+          ].map(({ icon: Icon, title, subtitle, desc, quote, color, bg }) => (
+            <Card key={title} className={`text-center border-dune-sienna-rock/30 ${bg} hover:shadow-lg transition-shadow`}>
               <CardHeader>
                 <Icon className={`w-12 h-12 mx-auto mb-2 ${color}`} />
-                <CardTitle className="text-lg">{title}</CardTitle>
+                <CardTitle className="text-base font-bold">{title}</CardTitle>
+                <p className="text-xs text-muted-foreground italic">({subtitle})</p>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">{desc}</p>
+                <p className="text-sm font-semibold mb-1">{desc}</p>
+                <p className="text-xs text-muted-foreground italic">{quote}</p>
               </CardContent>
             </Card>
           ))}
         </div>
       </div>
 
-      {/* Features */}
+      {/* Features - Water Rights */}
       <div className="mb-16">
-        <h2 className="text-3xl font-bold text-center mb-12">What You Get</h2>
+        <h2 className="text-3xl font-bold text-center mb-4">Your Water, Your Choice</h2>
+        <p className="text-center text-muted-foreground mb-12 italic">
+          "On Arrakis, water is more precious than gold. Here, your consciousness is the water."
+        </p>
         <div className="grid md:grid-cols-3 gap-6">
-          <Card>
+          <Card className="border-dune-fremen-azure/30 hover:border-dune-fremen-azure transition-colors">
             <CardHeader>
-              <Lock className="w-8 h-8 mb-2" />
-              <CardTitle>Your Data, Your Control</CardTitle>
+              <Lock className="w-8 h-8 mb-2 text-dune-fremen-azure" />
+              <CardTitle>Personal Water</CardTitle>
+              <p className="text-xs text-muted-foreground italic">(Private by default)</p>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Private by default. Share only what you choose.
+                Your experiences are yours. Sacred and protected like water in a stillsuit.
+                Share only when you choose to offer the gift.
               </p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-dune-navigator-purple/30 hover:border-dune-navigator-purple transition-colors">
             <CardHeader>
-              <TrendingUp className="w-8 h-8 mb-2" />
-              <CardTitle>Pattern Recognition</CardTitle>
+              <TrendingUp className="w-8 h-8 mb-2 text-dune-navigator-purple" />
+              <CardTitle>The Golden Path</CardTitle>
+              <p className="text-xs text-muted-foreground italic">(Pattern recognition)</p>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                See patterns invisible to daily observation.
+                Like Guild Navigators seeing futures, you'll recognize patterns invisible to daily consciousness.
+                The spice shows the way.
               </p>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="border-dune-atreides-green/30 hover:border-dune-atreides-green transition-colors">
             <CardHeader>
-              <Users className="w-8 h-8 mb-2" />
-              <CardTitle>Community Wisdom</CardTitle>
+              <Users className="w-8 h-8 mb-2 text-dune-atreides-green" />
+              <CardTitle>Sietch Wisdom</CardTitle>
+              <p className="text-xs text-muted-foreground italic">(Community knowledge)</p>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">
-                Share and discover collective patterns.
+                When ready, share with the tribe. Sietch knowledge strengthens all.
+                Collective wisdom without gurus or hierarchy.
               </p>
             </CardContent>
           </Card>
@@ -114,13 +188,27 @@ export default function FieldProtocolLanding() {
       </div>
 
       {/* CTA */}
-      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950">
+      <Card className="bg-gradient-to-r from-dune-spice-sand/20 to-dune-dune-amber/20 border-dune-spice-orange/30">
         <CardContent className="text-center py-12">
-          <h2 className="text-3xl font-bold mb-4">Ready to Begin?</h2>
-          <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join early users exploring consciousness through structured documentation
+          <h2 className="text-3xl font-bold mb-4 text-dune-deep-sand">The Sleeper Must Awaken</h2>
+          <p className="text-muted-foreground mb-4 max-w-2xl mx-auto italic">
+            "The beginning of knowledge is the discovery of something we do not understand." — Frank Herbert
           </p>
-          <Button size="lg" onClick={handleGetStarted}>Create Free Account</Button>
+          <p className="mb-8 max-w-2xl mx-auto">
+            The desert is waiting. Your consciousness is the spice.
+            <br />
+            No one can walk your path for you—but the protocol provides the stillsuit.
+          </p>
+          <Button
+            size="lg"
+            onClick={handleGetStarted}
+            className="bg-gradient-to-r from-dune-spice-orange to-dune-spice-deep hover:from-dune-spice-glow hover:to-dune-spice-orange text-white font-semibold tracking-wide shadow-lg"
+          >
+            BEGIN THE JOURNEY
+          </Button>
+          <p className="text-xs text-muted-foreground mt-4 italic">
+            Free. No credit card. Your water belongs to you.
+          </p>
         </CardContent>
       </Card>
     </div>

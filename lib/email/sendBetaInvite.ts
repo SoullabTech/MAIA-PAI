@@ -47,7 +47,7 @@ export async function sendBetaInvite(invite: BetaInvite, template: string = 'bet
 
     const resend = getResendClient();
     const result = await resend.emails.send({
-      from: 'Kelly @ Soullab <kelly@soullab.life>',
+      from: 'Kelly @ Soullab <kelly@soullab.org>',
       to: invite.email,
       subject: config.subject,
       html: personalizedHtml,
@@ -84,7 +84,7 @@ export async function sendBatchInvites(invites: BetaInvite[], template: string =
   // Use Resend's batch API (send all at once, up to 100 per batch)
   try {
     const batchData = invites.map(invite => ({
-      from: 'Kelly @ Soullab <kelly@soullab.life>',
+      from: 'Kelly @ Soullab <kelly@soullab.org>',
       to: invite.email,
       subject: config.subject,
       html: htmlTemplate

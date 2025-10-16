@@ -97,6 +97,36 @@ const config: Config = {
           glow: "#92B27D",      // Earth glow
           shadow: "#628253",    // Earth shadow
         },
+        // 🏜️ DUNE AESTHETIC PALETTE - The Spice Must Flow
+        dune: {
+          // Desert Sand Tones
+          'spice-sand': '#D4A574',     // Primary background, warm desert sand
+          'deep-sand': '#8B6F47',      // Text on light backgrounds
+          'dune-amber': '#E6B887',     // Highlights, accents
+          'sienna-rock': '#A0522D',    // Borders, dividers
+
+          // Spice Orange (The Melange)
+          'spice-orange': '#FF8C42',   // Primary actions, CTAs
+          'spice-glow': '#FFA85C',     // Hover states, active elements
+          'spice-deep': '#CC6F35',     // Pressed states
+
+          // Fremen Blue (Eyes of Ibad)
+          'ibad-blue': '#1E3A5F',      // Deep consciousness states
+          'fremen-azure': '#2E5A8A',   // Water references, integration
+          'spice-blue': '#4A7BA7',     // Links, secondary actions
+
+          // Caladan Water (Memory of Home)
+          'caladan-teal': '#2C7873',   // Success states, completion
+          'water-deep': '#1A4D4A',     // Backgrounds for reflection
+          'ocean-mist': '#5FA8A3',     // Subtle highlights
+
+          // Semantic Colors
+          'bene-gesserit-gold': '#B8860B',  // Wisdom, insights
+          'navigator-purple': '#6A4C93',    // Prescient states, patterns
+          'atreides-green': '#4A7C59',      // Growth, integration
+          'harkonnen-crimson': '#8B0000',   // Warnings, critical states
+          'guild-silver': '#C0C0C0',        // Neutral, inactive
+        },
         air: {
           DEFAULT: '#A8DADC',   // Spiralogic air
           base: "#D4B896",      // Air facet tan

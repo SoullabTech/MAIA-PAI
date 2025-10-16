@@ -9,14 +9,20 @@ export default function HomePage() {
   const [isOnboarded, setIsOnboarded] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Week 2: Force ALL users through Week 2 welcome ritual
+    // Check if user has already completed ANY onboarding (original or Week 2)
     const week2Onboarded = localStorage.getItem("week2_onboarded") === "true";
+    const betaOnboarded = localStorage.getItem("betaOnboardingComplete") === "true";
+    const betaUser = localStorage.getItem("beta_user");
 
     if (week2Onboarded) {
       // Completed Week 2 onboarding - go to check-in
       router.replace('/checkin');
+    } else if (betaOnboarded || betaUser) {
+      // Returning user who completed original onboarding - send to check-in ritual
+      // (They get the beautiful quotes and Maia as Daimon)
+      router.replace('/checkin');
     } else {
-      // Everyone goes through Week 2 welcome
+      // New user - go through Week 2 welcome
       router.replace('/week2-welcome');
     }
   }, [router]);

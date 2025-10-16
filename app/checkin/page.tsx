@@ -10,13 +10,8 @@ export default function CheckInPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Force Week 2 onboarding for all users (including returning)
-  useEffect(() => {
-    const week2Complete = localStorage.getItem('week2_onboarded');
-    if (week2Complete !== 'true') {
-      router.push('/week2-welcome');
-    }
-  }, [router]);
+  // Allow returning users to check in
+  // (Week 2 welcome is only for NEW users now, handled in app/page.tsx)
 
   const handleCheckIn = async (e: React.FormEvent) => {
     e.preventDefault();
