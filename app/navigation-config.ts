@@ -9,6 +9,7 @@ export const navigationConfig = {
     voice: '/maya-voice',
     chat: '/maya',
     journal: '/journal',
+    fieldProtocol: '/field-protocol',
     about: '/about',
     monitor: '/beta/monitor'
   },
@@ -47,6 +48,12 @@ export const navigationConfig = {
       path: '/journal',
       icon: '📖',
       description: 'Sacred journal & reflection'
+    },
+    {
+      label: 'Field Protocol',
+      path: '/field-protocol',
+      icon: '🔮',
+      description: 'Consciousness observation records'
     },
     {
       label: 'About',

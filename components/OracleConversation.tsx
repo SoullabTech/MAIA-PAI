@@ -38,6 +38,8 @@ import { userTracker } from '@/lib/tracking/userActivityTracker';
 import { ModeSwitcher } from './ui/ModeSwitcher';
 import { ConversationStylePreference } from '@/lib/preferences/conversation-style-preference';
 import { detectJournalCommand, detectBreakthroughPotential } from '@/lib/services/conversationEssenceExtractor';
+import { useFieldProtocolIntegration } from '@/hooks/useFieldProtocolIntegration';
+import { BookPlus } from 'lucide-react';
 
 interface OracleConversationProps {
   userId?: string;
@@ -90,6 +92,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 }) => {
   // Maia Voice Integration - Initialize immediately for Voice mode
   const { speak: maiaSpeak, voiceState: maiaVoiceState, isReady: maiaReady } = useMaiaVoice();
+
+  // Field Protocol Integration
+  const {
+    isRecording: isFieldRecording,
+    startRecording: startFieldRecording,
+    completeRecording: completeFieldRecording,
+    processMessage: processFieldMessage,
+    generateFieldRecord
+  } = useFieldProtocolIntegration({
+    practitionerId: userId || sessionId,
+    autoCapture: true,
+    captureThreshold: 5
+  });
 
   // 🌀 Soullab Realtime - DISABLED
   // This was trying to use OpenAI Realtime API in browser (not supported without dangerouslyAllowBrowser)
@@ -786,6 +801,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     setMessages(prev => [...prev, userMessage]);
     onMessageAdded?.(userMessage);
 
+    // Process message for Field Protocol if recording
+    if (isFieldRecording) {
+      processFieldMessage({
+        content: text,
+        timestamp: new Date(),
+        speaker: 'user'
+      });
+    }
+
     // Save user message to long-term memory
     if (oracleAgentId) {
       saveConversationMemory({
@@ -902,6 +926,18 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         // Chat mode - show text immediately
         setMessages(prev => [...prev, oracleMessage]);
         onMessageAdded?.(oracleMessage);
+
+        // Process Oracle message for Field Protocol if recording
+        if (isFieldRecording) {
+          processFieldMessage({
+            content: enhancedResponse.response,
+            timestamp: new Date(),
+            speaker: 'oracle',
+            metadata: {
+              elements: enhancedResponse.elementalInfo?.dominantElements
+            }
+          });
+        }
 
         // Save chat response to long-term memory
         if (oracleAgentId) {
@@ -2609,6 +2645,31 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
           {/* Quick Mode Toggle - Easy mode switching */}
           <QuickModeToggle />
+
+          {/* Field Protocol - Document consciousness explorations */}
+          <button
+            onClick={() => {
+              if (isFieldRecording) {
+                completeFieldRecording().then(() => {
+                  toast.success('Field Record completed');
+                });
+              } else {
+                startFieldRecording();
+                toast.success('Field Recording started');
+              }
+            }}
+            className={`p-3 rounded-full transition-all duration-300 group relative ${
+              isFieldRecording
+                ? 'text-green-400 bg-green-400/20 animate-pulse'
+                : 'text-purple-400/70 hover:text-purple-400 hover:bg-purple-400/10'
+            }`}
+            title={isFieldRecording ? 'Complete Field Recording' : 'Start Field Recording'}
+          >
+            <BookPlus className="w-5 h-5" />
+            {isFieldRecording && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-ping" />
+            )}
+          </button>
 
           {/* Quick Settings - Opens comprehensive MAIA settings - GOLD HIGHLIGHT */}
           <button
