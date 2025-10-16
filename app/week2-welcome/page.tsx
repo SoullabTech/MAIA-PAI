@@ -1,11 +1,12 @@
 'use client';
 
 /**
- * 🌸 Week 2 Beta Welcome Ritual
+ * 🏜️ Dune Welcome Ritual - "The Desert Teaches"
  *
- * One-time onboarding for all Week 2 testers (new + returning)
+ * One-time onboarding for new users
  * Captures: Soullab-[NAME], username, password
- * Delivers: Week 2 opening message
+ * Delivers: Dune philosophy welcome message (first time only)
+ * Returning users: Skip straight to /intro
  */
 
 import { useState, useEffect } from 'react';
@@ -39,11 +40,12 @@ export default function Week2WelcomePage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Check if user has already completed Week 2 onboarding
+  // Check if user has already completed onboarding
   useEffect(() => {
     const week2Complete = localStorage.getItem('week2_onboarded');
     if (week2Complete === 'true') {
-      router.push('/checkin');
+      // Returning user - send straight to intro (skip welcome message)
+      router.push('/intro');
     }
   }, [router]);
 
