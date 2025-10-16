@@ -12,9 +12,10 @@ import { ConditionalMenuBar } from "@/components/ui/ConditionalMenuBar";
 // import VoiceDebugOverlay from "@/components/debug/VoiceDebugOverlay"; // File doesn't exist
 // import { ToneDebugOverlay } from "@/components/voice/ToneDebugOverlay"; // Disabled for debugging
 import { Toaster } from 'react-hot-toast';
-import "./globals.css";
-// import "./globals-mobile.css"; // TEMPORARILY DISABLED: CSS parse error in Next.js dev
-import "@/styles/typography-refresh.css"; // 🎨 Phase 1: Typography refresh
+// import "./globals.css"; // TEMP: Disabled - Next.js CSS loaders broken
+// import "../public/compiled.css"; // TEMP: Disabled - Next.js CSS loaders broken
+// import "./globals-mobile.css"; // TEMP: Disabled - Next.js CSS loaders broken
+// import "@/styles/typography-refresh.css"; // TEMP: Disabled - Next.js CSS loaders broken
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -59,7 +60,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-black text-white`} suppressHydrationWarning>
+      <head>
+        <link rel="stylesheet" href="/compiled.css" />
+      </head>
+      <body className={`${inter.className}`} suppressHydrationWarning>
         <PWAProvider>
           <AuthProvider>
             <ToastProvider>

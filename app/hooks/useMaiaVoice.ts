@@ -14,7 +14,7 @@
  * Feature flag controls rollout.
  */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { MaiaRealtimeWebRTC, MaiaRealtimeConfig } from '@/lib/voice/MaiaRealtimeWebRTC';
 import { useConversationState, VoiceMode } from '@/lib/voice/state/ConversationState';
 import { emit, subscribe } from '@/lib/voice/VoiceBus';
@@ -76,9 +76,7 @@ export function useMaiaVoice(userId?: string): UseMaiaVoiceReturn {
   } = useConversationState();
 
   // Track connection state
-  const [isConnected, setIsConnected] = useCallback(() => {
-    return webrtcRef.current?.isConnected() || false;
-  }, []);
+  const [isConnected, setIsConnected] = useState(false);
 
   // Initialize WebRTC client
   useEffect(() => {
@@ -341,7 +339,7 @@ export function useMaiaVoice(userId?: string): UseMaiaVoiceReturn {
     currentTranscript,
     currentElement,
     error,
-    isConnected: isConnected(),
+    isConnected,
 
     // Actions
     start,

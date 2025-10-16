@@ -351,4 +351,35 @@ export class MaiaRealtimeWebRTC {
       type: 'response.cancel',
     });
   }
+
+  /**
+   * Update system prompt dynamically (for elemental switching)
+   * Allows changing MAIA's personality mid-conversation
+   */
+  updateSystemPrompt(prompt: string): void {
+    this.config.systemPrompt = prompt;
+    this.sendEvent({
+      type: 'session.update',
+      session: {
+        instructions: prompt,
+      },
+    });
+    console.log('📝 System prompt updated');
+  }
+
+  /**
+   * Interrupt current response (alias for cancelResponse for clarity)
+   * Used when user speaks while MAIA is responding
+   */
+  interrupt(): void {
+    this.cancelResponse();
+    console.log('✋ Response interrupted');
+  }
+
+  /**
+   * Get current configuration (for debugging/testing)
+   */
+  getConfig(): Required<MaiaRealtimeConfig> {
+    return { ...this.config };
+  }
 }
