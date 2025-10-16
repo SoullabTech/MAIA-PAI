@@ -162,11 +162,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isIOSAudioEnabled, setIsIOSAudioEnabled] = useState(false);
   const [needsIOSAudioPermission, setNeedsIOSAudioPermission] = useState(false);
+
+  // Listening mode for different conversation styles
+  type ListeningMode = 'normal' | 'patient' | 'session';
+  const [listeningMode, setListeningMode] = useState<ListeningMode>('normal');
   const [streamingText, setStreamingText] = useState<string>('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [isMicrophonePaused, setIsMicrophonePaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false); // Start unmuted in voice mode for immediate use
-  const voiceMicRef = useRef<VoiceActivatedMaiaRef>(null);
+  const voiceMicRef = useRef<ContinuousConversationRef>(null);
   const textInputRef = useRef<HTMLTextAreaElement>(null);
   const [userTranscript, setUserTranscript] = useState('');
   const [maiaResponseText, setMaiaResponseText] = useState('');
@@ -712,10 +716,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       return;
     }
 
-    // IMMEDIATELY mute microphone to prevent Maia from hearing herself
-    if (voiceMicRef.current && voiceMicRef.current.muteImmediately) {
-      voiceMicRef.current.muteImmediately();
-      console.log('🔇 PREEMPTIVE MUTE: Microphone disabled before processing');
+    // IMMEDIATELY stop microphone to prevent Maia from hearing herself
+    if (voiceMicRef.current && voiceMicRef.current.stopListening) {
+      voiceMicRef.current.stopListening();
+      console.log('🔇 PREEMPTIVE STOP: Microphone disabled before processing');
     }
 
     // Prevent multiple processing - comprehensive guard
@@ -1470,6 +1474,88 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             />
           </div>
         </div>
+      )}
+
+      {/* Listening Mode Controls - Voice mode only */}
+      {voiceEnabled && !showChatInterface && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-[30] flex items-center gap-2 bg-black/40 backdrop-blur-md rounded-full px-4 py-2 border border-amber-900/20"
+        >
+          <span className="text-xs text-amber-400/60 mr-2">Mode:</span>
+          <button
+            onClick={() => setListeningMode('normal')}
+            className={`px-3 py-1 rounded-full text-xs transition-all ${
+              listeningMode === 'normal'
+                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                : 'text-stone-400 hover:text-amber-400/80 hover:bg-amber-500/10'
+            }`}
+            title="Dialogue Mode: 3.5 second pause triggers response"
+          >
+            Dialogue
+          </button>
+          <button
+            onClick={() => setListeningMode('patient')}
+            className={`px-3 py-1 rounded-full text-xs transition-all ${
+              listeningMode === 'patient'
+                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                : 'text-stone-400 hover:text-amber-400/80 hover:bg-amber-500/10'
+            }`}
+            title="Patient Mode: 8 second pause triggers response - for gathering thoughts"
+          >
+            Patient
+          </button>
+          <button
+            onClick={() => setListeningMode('session')}
+            className={`px-3 py-1 rounded-full text-xs transition-all ${
+              listeningMode === 'session'
+                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                : 'text-stone-400 hover:text-amber-400/80 hover:bg-amber-500/10'
+            }`}
+            title="Scribe Mode: Maia listens without interrupting until you say you're done"
+          >
+            Scribe
+          </button>
+          {listeningMode === 'session' && (
+            <button
+              onClick={() => {
+                // Manually trigger transcript processing when in session mode
+                if (voiceMicRef.current?.isListening) {
+                  voiceMicRef.current.stopListening();
+                  // The transcript will be sent automatically when stopped
+                  setTimeout(() => {
+                    if (!isProcessing && !isResponding) {
+                      voiceMicRef.current?.startListening();
+                    }
+                  }, 1000);
+                }
+              }}
+              className="ml-2 px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/40 rounded-full text-xs hover:bg-green-500/30 transition-all"
+            >
+              I'm Done Speaking
+            </button>
+          )}
+        </motion.div>
+      )}
+
+      {/* Mode Status Indicator */}
+      {voiceEnabled && !showChatInterface && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[25] text-center"
+        >
+          <div className="text-xs text-amber-400/40">
+            {listeningMode === 'session' ? (
+              <span>🎙️ Scribe Mode Active - Speak freely, I'm just listening...</span>
+            ) : listeningMode === 'patient' ? (
+              <span>🤔 Patient Mode - Taking time for your thoughts...</span>
+            ) : (
+              <span>💬 Dialogue Mode - Natural conversation</span>
+            )}
+          </div>
+        </motion.div>
       )}
 
       {/* Subtle Holoflower - Lower position, not dominating */}
@@ -2564,13 +2650,18 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* Continuous Conversation - Uses browser Web Speech Recognition API (no webm issues) */}
       {voiceEnabled && !showChatInterface && (
-        <div className="hidden">
+        <div className="sr-only">
           <ContinuousConversation
-            ref={voiceMicRef as React.RefObject<ContinuousConversationRef>}
+            ref={voiceMicRef}
             onTranscript={handleVoiceTranscript}
             isProcessing={isResponding}
             isSpeaking={isAudioPlaying}
             autoStart={true}
+            silenceThreshold={
+              listeningMode === 'session' ? 999999 : // Session mode: never auto-send (effectively infinite)
+              listeningMode === 'patient' ? 8000 :    // Patient mode: 8 seconds
+              3500                                      // Normal mode: 3.5 seconds
+            }
           />
         </div>
       )}

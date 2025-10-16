@@ -90,7 +90,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     }
 
     const recognition = new SpeechRecognition();
-    recognition.continuous = false; // EMERGENCY FIX: continuous=true not firing onresult at all
+    recognition.continuous = true; // Enable continuous listening
     recognition.interimResults = true;
     recognition.lang = 'en-US';
     recognition.maxAlternatives = 1;
@@ -174,7 +174,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
           clearTimeout(silenceTimerRef.current);
         }
 
-        // Start new silence timer - REDUCED to 900ms for faster response
+        // Start new silence timer - use the configurable threshold
         silenceTimerRef.current = setTimeout(() => {
           console.log('🔕 Silence detected - processing transcript');
           // CRITICAL FIX: Don't check isRecording - onend fires before this timer
@@ -182,7 +182,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
           if (!isProcessingRef.current && accumulatedTranscript.current.trim()) {
             processAccumulatedTranscript();
           }
-        }, 900); // REDUCED from 2500ms to 900ms
+        }, silenceThreshold); // Use configurable threshold from props
       }
 
       if (interimTranscript) {
