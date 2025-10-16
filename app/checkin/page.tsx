@@ -10,11 +10,11 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 // Each announcement has a unique ID - when you change the announcement, change the ID
 // Users who dismissed a previous announcement will see the new one
 const CURRENT_ANNOUNCEMENT = {
-  id: "elemental-beta-2025-10", // Change this when you post a new announcement
-  title: "New: Elemental Alchemy Integration",
-  message: "This week we're testing a new feature—Maia now recognizes elemental patterns (Fire, Water, Earth, Air, Aether, Shadow) in your language and reflects them back. Your feedback will shape how this evolves.",
-  emoji: "🔥💧🌍",
-  link: null, // Optional: { text: "Learn more", url: "/docs/elemental" }
+  id: "maia-modes-2025-10", // Change this when you post a new announcement
+  title: "New: Customize How MAIA Listens & Responds",
+  message: "Two new mode systems let you personalize your MAIA experience. Voice Listening (Dialogue/Patient/Scribe) controls how long MAIA waits before responding. Conversation Personality (Walking/Classic/Adaptive) shapes her response style. Mix and match to find what serves you best.",
+  emoji: "🎛️💬",
+  link: { text: "See full guide", url: "https://github.com/SoullabTech/MAIA-PAI/blob/main/MAIA_MODES_ANNOUNCEMENT.md" },
   startsOn: "2025-10-21", // YYYY-MM-DD - announcement appears starting this date
   expires: "2025-10-28" // YYYY-MM-DD - announcement auto-hides after this date
 };

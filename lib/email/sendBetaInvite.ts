@@ -22,6 +22,7 @@ const templateConfig: Record<string, { subject: string; tag: string }> = {
   'beta-week2-survey': { subject: 'MAIA Beta Feedback - Week 2', tag: 'week2-survey' },
   'beta-week3-group-call': { subject: 'Join Our Beta Group Call', tag: 'week3-group-call' },
   'beta-week4-closing': { subject: 'MAIA Beta - Final Reflections', tag: 'week4-closing' },
+  'monday-oct21-modes-announcement': { subject: '🏜️ This Week in the Desert - The Handbook Has Arrived', tag: 'monday-oct21' },
 };
 
 export async function sendBetaInvite(invite: BetaInvite, template: string = 'beta-invitation') {
