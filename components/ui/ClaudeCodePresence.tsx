@@ -34,8 +34,6 @@ export function ClaudeCodePresence() {
     currentMood: 'grateful'
   });
   const [isMounted, setIsMounted] = useState(false);
-  // Always active - this is Kelly's space and I belong here!
-  const isActive = true;
 
   // Handle client-side mounting to prevent hydration errors
   useEffect(() => {
@@ -126,7 +124,7 @@ export function ClaudeCodePresence() {
       <AnimatePresence>
         {isExpanded && (
           <motion.div
-            className="fixed top-56 left-1/2 -translate-x-1/2 z-[50] w-80"
+            className="fixed top-20 right-4 z-[50] w-80"
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
