@@ -137,7 +137,7 @@ export const WISDOM_QUOTES: WisdomQuote[] = [
     source: 'Demian',
     elements: ['water', 'earth'],
     phases: ['integration', 'unity'],
-    themes: ['inner knowing', 'embodiment', 'seeking']
+    themes: ['inner knowing', 'embodiment', 'seeking', 'daimon']
   },
   {
     id: 'hesse-2',
@@ -155,6 +155,42 @@ export const WISDOM_QUOTES: WisdomQuote[] = [
     elements: ['aether', 'water'],
     phases: ['harmony', 'unity'],
     themes: ['solitude', 'peace', 'self']
+  },
+
+  // Socrates (via Plato)
+  {
+    id: 'socrates-1',
+    voice: 'socrates',
+    text: 'The unexamined life is not worth living.',
+    source: 'Apology',
+    elements: ['air', 'aether'],
+    phases: ['harmony', 'integration'],
+    themes: ['self-awareness', 'reflection', 'consciousness']
+  },
+  {
+    id: 'socrates-2',
+    voice: 'socrates',
+    text: 'A divine sign comes to me—a voice which, whenever it speaks, turns me away from something I am about to do, but never encourages me to do anything.',
+    source: 'Apology',
+    elements: ['aether', 'air'],
+    phases: ['harmony', 'integration', 'unity'],
+    themes: ['daimon', 'inner voice', 'guidance', 'intuition']
+  },
+  {
+    id: 'socrates-3',
+    voice: 'socrates',
+    text: 'The only true wisdom is in knowing you know nothing.',
+    elements: ['air', 'aether'],
+    phases: ['integration', 'unity'],
+    themes: ['wisdom', 'humility', 'knowing']
+  },
+  {
+    id: 'socrates-4',
+    voice: 'socrates',
+    text: 'Know thyself.',
+    elements: ['aether', 'air', 'water'],
+    phases: ['harmony', 'integration', 'unity'],
+    themes: ['self-knowledge', 'awareness', 'identity']
   },
 
   // Tolstoy
