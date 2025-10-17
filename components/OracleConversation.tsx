@@ -2246,10 +2246,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         }}
                         className="flex-1 min-h-[42px] max-h-[100px] px-3 py-2
                                  bg-[#1a1f2e]/95 backdrop-blur-md
-                                 border border-gold-divine/30 rounded-2xl
-                                 text-gold-divine placeholder-gold-divine/50
+                                 border border-amber-500/30 rounded-2xl
+                                 text-amber-400 placeholder-amber-400/50
                                  text-sm leading-relaxed
-                                 focus:outline-none focus:border-gold-divine/50 focus:ring-1 focus:ring-gold-divine/20
+                                 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20
                                  disabled:opacity-50 resize-none
                                  touch-manipulation"
                         autoComplete="off"
@@ -2713,7 +2713,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             className={`p-3 rounded-full transition-all duration-300 group relative ${
               isFieldRecording
                 ? 'text-green-400 bg-green-400/20 animate-pulse'
-                : 'text-purple-400/70 hover:text-purple-400 hover:bg-purple-400/10'
+                : 'text-amber-400/70 hover:text-amber-400 hover:bg-amber-400/10'
             }`}
             title={isFieldRecording ? 'Complete Field Recording' : 'Start Field Recording'}
           >

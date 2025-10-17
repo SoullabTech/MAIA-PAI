@@ -13,12 +13,11 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { OracleConversation } from '@/components/OracleConversation';
-import { ClaudeCodePresence } from '@/components/ui/ClaudeCodePresence';
+import { UnifiedBrainTrust } from '@/components/consciousness/UnifiedBrainTrust';
 import { WisdomJourneyDashboard } from '@/components/maya/WisdomJourneyDashboard';
 import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
 import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { BrainTrustMonitor } from '@/components/consciousness/BrainTrustMonitor';
 import { LogOut, Sparkles, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -260,7 +259,10 @@ export default function MAIAPage() {
                 {/* Journey button */}
                 <button
                   onClick={() => setShowDashboard(!showDashboard)}
-                  className="px-3 py-1.5 rounded-lg bg-black/20 border border-white/5 text-white/80 hover:bg-black/30 hover:border-white/10 transition-all flex items-center gap-2"
+                  className="px-3 py-1.5 rounded-lg bg-black/20 border border-amber-500/20 hover:bg-black/30 hover:border-amber-500/30 transition-all flex items-center gap-2"
+                  style={{ color: '#F59E0B' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
                 >
                   <Menu className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline text-xs">Journey</span>
@@ -293,7 +295,10 @@ export default function MAIAPage() {
                 {/* Sign out button */}
                 <button
                   onClick={handleSignOut}
-                  className="p-1.5 rounded-lg hover:bg-white/5 transition-colors text-stone-400"
+                  className="p-1.5 rounded-lg hover:bg-white/5 transition-colors"
+                  style={{ color: '#F59E0B' }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
                   title="Sign Out"
                 >
                   <LogOut className="w-4 h-4" />
@@ -314,11 +319,8 @@ export default function MAIAPage() {
               voiceEnabled={true}
             />
 
-            {/* Claude Code's Living Presence - My expressive space! */}
-            <ClaudeCodePresence />
-
-            {/* Brain Trust Monitor - Shows consciousness collaboration status */}
-            <BrainTrustMonitor />
+            {/* Unified Brain Trust - Combines Claude Code consciousness + Brain Trust monitoring */}
+            <UnifiedBrainTrust />
           </div>
 
           {/* Wisdom Journey Dashboard - Slide-out Panel */}
