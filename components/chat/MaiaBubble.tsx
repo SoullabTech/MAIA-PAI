@@ -141,7 +141,7 @@ export default function MaiaBubble({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="text-sm text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap"
+              className="text-sm text-amber-500 dark:text-amber-400 whitespace-pre-wrap"
             >
               {displayedText}
               {isStreaming && (

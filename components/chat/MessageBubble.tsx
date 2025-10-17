@@ -127,7 +127,7 @@ export default function MessageBubble({
         .message-content.maia {
           background: linear-gradient(135deg, rgba(181, 126, 220, 0.1) 0%, rgba(147, 51, 234, 0.05) 100%);
           border: 1px solid rgba(181, 126, 220, 0.2);
-          color: #374151;
+          color: #F59E0B;
           box-shadow: 0 2px 12px rgba(181, 126, 220, 0.08);
         }
         

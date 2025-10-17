@@ -122,9 +122,9 @@ export function ChatMessage({ message, isLatest = false, onPlayAudio }: ChatMess
             }
           }}
           className={`relative p-4 rounded-2xl ${
-            isUser 
-              ? 'bg-blue-500/10 border border-blue-500/20 text-blue-100' 
-              : 'bg-[#1A1F2E]/80 border border-gold-divine/20 text-white'
+            isUser
+              ? 'bg-blue-500/10 border border-blue-500/20 text-blue-100'
+              : 'bg-[#1A1F2E]/80 border border-gold-divine/20 text-amber-400'
           }`}>
           
           {/* Audio Play Button */}
