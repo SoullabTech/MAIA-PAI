@@ -42,7 +42,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-white dark:bg-black text-neutral-900 dark:text-white transition-colors duration-200 overflow-x-hidden`}>
+      <body className={`${inter.className} bg-white dark:bg-black text-neutral-900 dark:text-amber-50 transition-colors duration-200 overflow-x-hidden`}>
         <ThemeProvider>
           <IOSFixInitializer />
           <ToastProvider>

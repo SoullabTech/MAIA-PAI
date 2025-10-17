@@ -128,9 +128,9 @@ export default function MessageBubble({
         }
         
         .message-content.user {
-          background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
-          color: #404040;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+          background: linear-gradient(135deg, rgba(217, 119, 6, 0.15) 0%, rgba(180, 83, 9, 0.1) 100%);
+          color: #FEF3C7;
+          box-shadow: 0 2px 8px rgba(217, 119, 6, 0.12);
         }
 
         .message-content.maia {
