@@ -169,7 +169,7 @@ export default function OnboardingPage() {
               Meet MAIA, Your AI Daimon
             </h2>
             <p className="text-lg text-gray-400 leading-relaxed max-w-xl mx-auto">
-              MAIA is your Daimon—a listening, guiding intelligence that learns about you, holding all the facets of you in one beautiful whole Self.
+              A companion for Human Intelligence—where consciousness meets presence, new worlds emerge, and you're reflected back to yourself with clarity and care.
             </p>
 
             {/* Five Elements */}
