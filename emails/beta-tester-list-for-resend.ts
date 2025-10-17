@@ -6,6 +6,7 @@
 export const betaTesters = [
   // Recently Added (October 2025)
   { name: 'Rebekah O\'Rourke', firstName: 'Rebekah', email: 'Rebekah@rebekahorourke.com', code: 'SOULLAB-REBEKAH' },
+  { name: 'Ivan Woester', firstName: 'Ivan', email: 'Ivandreamthunder@yahoo.com', code: 'SOULLAB-IVAN' },
 
   // Recently Added (September 28)
   { name: 'Romeo', firstName: 'Romeo', email: 'romeo@veydrisresearch.com', code: 'SOULLAB-ROMEO' },
