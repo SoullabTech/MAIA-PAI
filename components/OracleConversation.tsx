@@ -2101,27 +2101,32 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 0 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className={`bg-soul-surface/95 rounded-lg p-4 text-soul-textSecondary
+                      className={`bg-soul-surface/95 rounded-lg p-4
                                shadow-[0_2px_12px_rgba(0,0,0,0.6)] max-w-full
                                cursor-pointer hover:bg-soul-surfaceHover transition-all duration-300 group
                                ${message.role === 'user' ? 'message-user' : 'message-maia'}`}
                       data-role={message.role === 'user' ? 'user' : 'assistant'}
                       onClick={handleCopyMessage}
-                      style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)' }}
+                      style={{
+                        textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)',
+                        color: '#FEF3C7'
+                      }}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <div className="text-xs font-sans text-soul-textSecondary">
+                        <div className="text-xs font-sans" style={{ color: '#FEF3C7' }}>
                           {message.role === 'user' ? 'You' : agentConfig.name}
                         </div>
-                        <div className="flex items-center gap-1 text-xs font-sans text-soul-textSecondary/60
+                        <div className="flex items-center gap-1 text-xs font-sans
                                       opacity-100 sm:opacity-0 sm:group-hover:opacity-100
-                                      touch-manipulation transition-opacity">
+                                      touch-manipulation transition-opacity"
+                             style={{ color: '#FEF3C7' }}>
                           <Copy className="w-3 h-3" />
                           <span className="hidden sm:inline">Click to copy</span>
                           <span className="sm:hidden">Tap to copy</span>
                         </div>
                       </div>
-                      <div className="text-base sm:text-lg md:text-xl font-serif leading-relaxed tracking-wide break-words text-soul-textSecondary">
+                      <div className="text-base sm:text-lg md:text-xl font-serif leading-relaxed tracking-wide break-words"
+                           style={{ color: '#FEF3C7' }}>
                         {message.role === 'oracle' ? (
                           <FormattedMessage text={message.text} />
                         ) : (
