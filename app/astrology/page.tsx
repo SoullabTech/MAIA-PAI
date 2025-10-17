@@ -76,44 +76,17 @@ export default function AstrologyPage() {
   }, []);
 
   useEffect(() => {
-    // Fetch birth chart from API (using your correct placements)
-    async function fetchChart() {
-      try {
-        const response = await fetch('/api/astrology/birth-chart', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            date: '1990-01-01', // Placeholder - will use real data when form is filled
-            time: '12:00',
-            location: { lat: 0, lng: 0, timezone: 'UTC' },
-          }),
-        });
-        const result = await response.json();
-        if (result.success && result.data) {
-          setChartData({
-            sun: result.data.sun,
-            moon: result.data.moon,
-            ascendant: result.data.ascendant,
-            aspects: result.data.aspects,
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching chart:', error);
-        // Fallback to your correct placements
-        setChartData({
-          sun: { sign: 'Sagittarius', degree: 17.2, house: 4 },
-          moon: { sign: 'Scorpio', degree: 23.4, house: 8 },
-          ascendant: { sign: 'Leo', degree: 28.1 },
-          aspects: [
-            { planet1: 'Sun', planet2: 'Jupiter', type: 'conjunction', orb: 1.2 },
-            { planet1: 'Moon', planet2: 'Venus', type: 'conjunction', orb: 0.8 },
-          ],
-        });
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchChart();
+    // Set your correct chart data directly (will wire up API when ephemeris is ready)
+    setChartData({
+      sun: { sign: 'Sagittarius', degree: 17.2, house: 4 },
+      moon: { sign: 'Scorpio', degree: 23.4, house: 8 },
+      ascendant: { sign: 'Leo', degree: 28.1 },
+      aspects: [
+        { planet1: 'Sun', planet2: 'Jupiter', type: 'conjunction', orb: 1.2 },
+        { planet1: 'Moon', planet2: 'Venus', type: 'conjunction', orb: 0.8 },
+      ],
+    });
+    setLoading(false);
   }, []);
 
   // Threshold - The invitation unfolds

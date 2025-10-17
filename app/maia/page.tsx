@@ -261,10 +261,18 @@ export default function MAIAPage() {
                   onClick={() => setShowDashboard(!showDashboard)}
                   className="px-3 py-1.5 rounded-lg bg-black/20 border border-amber-500/20 hover:bg-black/30 hover:border-amber-500/30 transition-all flex items-center gap-2"
                   style={{ color: '#F59E0B' }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#FCD34D';
+                    const icon = e.currentTarget.querySelector('svg');
+                    if (icon) icon.style.color = '#FCD34D';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#F59E0B';
+                    const icon = e.currentTarget.querySelector('svg');
+                    if (icon) icon.style.color = '#F59E0B';
+                  }}
                 >
-                  <Menu className="w-3.5 h-3.5" />
+                  <Menu className="w-3.5 h-3.5" style={{ color: '#F59E0B' }} />
                   <span className="hidden sm:inline text-xs">Journey</span>
                 </button>
 
@@ -286,7 +294,7 @@ export default function MAIAPage() {
                     <span className="text-[9px] font-mono text-amber-600/60 tracking-wider uppercase">
                       Access Matrix
                     </span>
-                    <svg className="w-3 h-3 text-amber-700/40 group-hover:text-amber-600/60 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#B45309' }}>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </div>
@@ -297,11 +305,19 @@ export default function MAIAPage() {
                   onClick={handleSignOut}
                   className="p-1.5 rounded-lg hover:bg-white/5 transition-colors"
                   style={{ color: '#F59E0B' }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#FCD34D';
+                    const icon = e.currentTarget.querySelector('svg');
+                    if (icon) icon.style.color = '#FCD34D';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = '#F59E0B';
+                    const icon = e.currentTarget.querySelector('svg');
+                    if (icon) icon.style.color = '#F59E0B';
+                  }}
                   title="Sign Out"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-4 h-4" style={{ color: '#F59E0B' }} />
                 </button>
               </div>
             </div>

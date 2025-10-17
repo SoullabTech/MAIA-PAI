@@ -124,7 +124,7 @@ export function ChatMessage({ message, isLatest = false, onPlayAudio }: ChatMess
           className={`relative p-4 rounded-2xl ${
             isUser
               ? 'bg-blue-500/10 text-blue-100'
-              : 'bg-[#1A1F2E]/80 text-amber-400'
+              : 'bg-[#1A1F2E]/30 text-amber-400'
           }`}>
           
           {/* Audio Play Button */}
