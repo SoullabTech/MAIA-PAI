@@ -37,7 +37,7 @@ Every planetary position is calculated from **Swiss Ephemeris-level precision**:
 ### 2. **One Coherent Framework (Not Random Blog Posts)**
 
 Generic AI is trained on thousands of contradictory sources:
-- Liz Greene + Linda Goodman + Vedic astrology + horoscope columns = **chaos**
+- Liz Greene's psychological depth + Linda Goodman's pop astrology + Vedic astrology + tabloid horoscopes = **chaos**
 
 **MAIA uses ONE framework:** Spiralogic
 - Developed over 34 years by Kelly Beard
@@ -136,15 +136,17 @@ When you ask ChatGPT "What does Moon in Scorpio mean?", it:
 
 When you ask MAIA about Moon in Scorpio, she:
 
-1. **Calculates** the exact degree from ephemeris
+1. **Calculates** the exact degree from ephemeris (Time Passages precision)
 2. Determines the **house** from local sidereal time and latitude
 3. Maps it to **Spiralogic**: Water-2 phase (deep transformation)
-4. Correlates with **brain region**: Right hemisphere emotional processing
+4. Correlates with **brain region**: Right hemisphere emotional processing (McGilchrist)
 5. Connects to **alchemical stage**: Solutio (dissolution/depth)
 6. References **Jungian archetype**: The Fisher King (wounded healer)
-7. Translates to **everyday language**: "You feel things at soul level"
+7. Applies **Liz Greene's psychological lens**: Shadow work, Plutonian depths, fate vs choice
+8. Integrates **Tarnas's archetypal perspective**: Collective unconscious patterns activated
+9. Translates to **everyday language**: "You feel things at soul level"
 
-**Real math → Coherent framework → Human language**
+**Real math → Coherent framework → Psychological depth → Human language**
 
 ---
 
@@ -153,14 +155,16 @@ When you ask MAIA about Moon in Scorpio, she:
 MAIA's interpretations are grounded in:
 
 ### Developmental Astrology
-- **Rick Tarnas**: *Cosmos and Psyche* - Archetypal cosmology
-- **Steven Forrest**: *The Inner Sky* - Evolutionary astrology
-- **Dane Rudhyar**: *The Astrology of Personality* - Humanistic approach
+- **Liz Greene**: *The Astrology of Fate*, *Saturn: A New Look at an Old Devil* - Psychological astrology integrating Jung with traditional astrology
+- **Rick Tarnas**: *Cosmos and Psyche* - Archetypal cosmology and planetary meaning
+- **Steven Forrest**: *The Inner Sky* - Evolutionary astrology and soul's journey
+- **Dane Rudhyar**: *The Astrology of Personality* - Humanistic approach and holistic cycles
 
 ### Depth Psychology
 - **Carl Jung**: Individuation and archetypal psychology
+- **Liz Greene**: Founded the Centre for Psychological Astrology - synthesizing depth psychology with astrological practice
 - **James Hillman**: Soul-making and imaginal psychology
-- **Marie-Louise von Franz**: Alchemical symbolism
+- **Marie-Louise von Franz**: Alchemical symbolism and Jungian interpretation
 
 ### Neuroscience
 - **Iain McGilchrist**: *The Master and His Emissary* - Divided brain and consciousness
