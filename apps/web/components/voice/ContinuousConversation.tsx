@@ -295,7 +295,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     };
 
     return recognition;
-  }, [isListening, isRecording, isSpeaking, silenceThreshold, onInterimTranscript, onRecordingStateChange]);
+  }, [isListening, isRecording, isSpeaking, adaptiveSilenceThreshold, onInterimTranscript, onRecordingStateChange]);
 
   // Process accumulated transcript
   const processAccumulatedTranscript = useCallback(() => {
