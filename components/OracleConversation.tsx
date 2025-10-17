@@ -2742,7 +2742,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           <button
             onClick={downloadTranscript}
             disabled={messages.length === 0}
-            className="p-3 rounded-full text-soul-accent hover:text-soul-accentGlow hover:bg-soul-accent/10 transition-all duration-300 disabled:opacity-30"
+            className="p-3 rounded-full transition-all duration-300 disabled:opacity-30"
+            style={{ color: '#F59E0B' }}
+            onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.color = '#FCD34D')}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
             title="Download Transcript"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
