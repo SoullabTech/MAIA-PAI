@@ -129,9 +129,9 @@ function calculateHouseCusps(date: Date, lat: number, lng: number): number[] {
     const sidTime = Astronomy.SiderealTime(time);
     const localSiderealTime = sidTime + (lng / 15);
 
-    // Calculate Ascendant (1st house cusp)
-    const sunEcliptic = Astronomy.Ecliptic(Astronomy.SunPosition(time));
-    const obliquity = sunEcliptic.obliquity;
+    // Get obliquity of the ecliptic
+    // Use a simple approximation - professional software would calculate this more precisely
+    const obliquity = 23.4393;
 
     // Simplified Placidus calculation
     // In production, you'd want more precise calculations
@@ -240,12 +240,14 @@ export async function calculateBirthChart(birthData: BirthData): Promise<BirthCh
     // Calculate planetary positions
     const planetLongitudes: Record<string, number> = {};
 
-    // Sun
-    const sunLon = Astronomy.EclipticLongitude(Astronomy.Body.Sun, time);
+    // Sun - use SunPosition which returns ecliptic coordinates
+    const sunPos = Astronomy.SunPosition(time);
+    const sunLon = sunPos.elon;
     planetLongitudes.Sun = sunLon;
 
-    // Moon
-    const moonLon = Astronomy.EclipticLongitude(Astronomy.Body.Moon, time);
+    // Moon - use EclipticGeoMoon which returns geocentric ecliptic coordinates
+    const moonPos = Astronomy.EclipticGeoMoon(time);
+    const moonLon = moonPos.lon;
     planetLongitudes.Moon = moonLon;
 
     // Mercury
