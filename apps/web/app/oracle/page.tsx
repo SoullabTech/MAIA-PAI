@@ -572,42 +572,42 @@ function OraclePageInner() {
               className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Maya's Library"
             >
-              <Library className="w-5 h-5 text-soul-accent hover:text-soul-accentGlow transition-colors" />
+              <Library className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             </button>
             <button
               onClick={() => setShowObsidianVault(true)}
               className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Obsidian Vault"
             >
-              <Database className="w-5 h-5 text-soul-accent hover:text-soul-accentGlow transition-colors" />
+              <Database className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             </button>
             <button
               onClick={() => router.push('/journal')}
               className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Journal"
             >
-              <BookOpen className="w-5 h-5 text-soul-accent hover:text-soul-accentGlow transition-colors" />
+              <BookOpen className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             </button>
             <button
               onClick={() => setShowSettings(true)}
               className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Voice Settings"
             >
-              <Settings className="w-5 h-5 text-soul-accent hover:text-soul-accentGlow transition-colors" />
+              <Settings className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             </button>
             <button
               onClick={() => setShowFeedback(true)}
               className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Give Feedback"
             >
-              <Sparkles className="w-5 h-5 text-soul-accentGlow hover:text-gold-divine transition-colors" />
+              <Sparkles className="w-5 h-5 transition-colors" style={{ color: '#F0C98A' }} />
             </button>
             <button
               onClick={handleSignOut}
               className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Sign Out"
             >
-              <LogOut className="w-5 h-5 text-soul-textTertiary hover:text-soul-accent transition-colors" />
+              <LogOut className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             </button>
           </div>
 
@@ -618,9 +618,9 @@ function OraclePageInner() {
             title="Menu"
           >
             {showMobileMenu ? (
-              <X className="w-5 h-5 text-soul-accent hover:text-soul-accentGlow transition-colors" />
+              <X className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             ) : (
-              <Menu className="w-5 h-5 text-soul-accent hover:text-soul-accentGlow transition-colors" />
+              <Menu className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             )}
           </button>
         </div>
@@ -636,7 +636,7 @@ function OraclePageInner() {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <Library className="w-5 h-5 text-soul-accent" />
+                <Library className="w-5 h-5" style={{ color: '#FEF3C7' }} />
                 <span className="text-soul-textPrimary">Maya's Library</span>
               </button>
               <button
@@ -646,7 +646,7 @@ function OraclePageInner() {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <Database className="w-5 h-5 text-soul-accent" />
+                <Database className="w-5 h-5" style={{ color: '#FEF3C7' }} />
                 <span className="text-soul-textPrimary">Obsidian Vault</span>
               </button>
               <button
@@ -656,7 +656,7 @@ function OraclePageInner() {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <BookOpen className="w-5 h-5 text-soul-accent" />
+                <BookOpen className="w-5 h-5" style={{ color: '#FEF3C7' }} />
                 <span className="text-soul-textPrimary">Journal</span>
               </button>
               <button
@@ -666,7 +666,7 @@ function OraclePageInner() {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <Settings className="w-5 h-5 text-soul-accent" />
+                <Settings className="w-5 h-5" style={{ color: '#FEF3C7' }} />
                 <span className="text-soul-textPrimary">Voice Settings</span>
               </button>
               <button
@@ -676,7 +676,7 @@ function OraclePageInner() {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <Sparkles className="w-5 h-5 text-soul-accentGlow" />
+                <Sparkles className="w-5 h-5" style={{ color: '#F0C98A' }} />
                 <span className="text-soul-textPrimary">Give Feedback</span>
               </button>
               <button
@@ -686,7 +686,7 @@ function OraclePageInner() {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <LogOut className="w-5 h-5 text-soul-textTertiary" />
+                <LogOut className="w-5 h-5" style={{ color: '#FEF3C7' }} />
                 <span className="text-soul-textPrimary">Sign Out</span>
               </button>
             </div>
