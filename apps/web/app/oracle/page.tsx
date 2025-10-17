@@ -545,125 +545,125 @@ function OraclePageInner() {
           <div className="hidden md:flex items-center gap-2">
             <button
               onClick={() => router.push('/oracle/library')}
-              className="p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors"
+              className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Maya's Library"
             >
-              <Library className="w-5 h-5 text-gray-400 hover:text-sacred-gold" />
+              <Library className="w-5 h-5 text-soul-accent hover:text-soul-accentGlow transition-colors" />
             </button>
             <button
               onClick={() => setShowObsidianVault(true)}
-              className="p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors"
+              className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Obsidian Vault"
             >
-              <Database className="w-5 h-5 text-gray-400 hover:text-amber-400" />
+              <Database className="w-5 h-5 text-soul-accent hover:text-soul-accentGlow transition-colors" />
             </button>
             <button
               onClick={() => router.push('/journal')}
-              className="p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors"
+              className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Journal"
             >
-              <BookOpen className="w-5 h-5 text-gray-400" />
+              <BookOpen className="w-5 h-5 text-soul-accent hover:text-soul-accentGlow transition-colors" />
             </button>
             <button
               onClick={() => setShowSettings(true)}
-              className="p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors"
+              className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Voice Settings"
             >
-              <Settings className="w-5 h-5 text-gray-400 hover:text-tesla-blue" />
+              <Settings className="w-5 h-5 text-soul-accent hover:text-soul-accentGlow transition-colors" />
             </button>
             <button
               onClick={() => setShowFeedback(true)}
-              className="p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors"
+              className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Give Feedback"
             >
-              <Sparkles className="w-5 h-5 text-sacred-gold" />
+              <Sparkles className="w-5 h-5 text-soul-accentGlow hover:text-gold-divine transition-colors" />
             </button>
             <button
               onClick={handleSignOut}
-              className="p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors"
+              className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Sign Out"
             >
-              <LogOut className="w-5 h-5 text-gray-400" />
+              <LogOut className="w-5 h-5 text-soul-textTertiary hover:text-soul-accent transition-colors" />
             </button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className="md:hidden p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors flex-shrink-0"
+            className="md:hidden p-3 hover:bg-soul-surface rounded-lg transition-colors flex-shrink-0"
             title="Menu"
           >
             {showMobileMenu ? (
-              <X className="w-5 h-5 text-gray-400" />
+              <X className="w-5 h-5 text-soul-accent hover:text-soul-accentGlow transition-colors" />
             ) : (
-              <Menu className="w-5 h-5 text-gray-400" />
+              <Menu className="w-5 h-5 text-soul-accent hover:text-soul-accentGlow transition-colors" />
             )}
           </button>
         </div>
 
         {/* Mobile Navigation Menu */}
         {showMobileMenu && (
-          <div className="md:hidden border-t border-gray-800 bg-[#0A0D16]/95 backdrop-blur-sm">
+          <div className="md:hidden border-t border-soul-border bg-[#0A0D16]/95 backdrop-blur-sm">
             <div className="px-3 py-2 space-y-1">
               <button
                 onClick={() => {
                   router.push('/oracle/library');
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1A1F2E] rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <Library className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Maya's Library</span>
+                <Library className="w-5 h-5 text-soul-accent" />
+                <span className="text-soul-textPrimary">Maya's Library</span>
               </button>
               <button
                 onClick={() => {
                   setShowObsidianVault(true);
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1A1F2E] rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <Database className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Obsidian Vault</span>
+                <Database className="w-5 h-5 text-soul-accent" />
+                <span className="text-soul-textPrimary">Obsidian Vault</span>
               </button>
               <button
                 onClick={() => {
                   router.push('/journal');
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1A1F2E] rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <BookOpen className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Journal</span>
+                <BookOpen className="w-5 h-5 text-soul-accent" />
+                <span className="text-soul-textPrimary">Journal</span>
               </button>
               <button
                 onClick={() => {
                   setShowSettings(true);
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1A1F2E] rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <Settings className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Voice Settings</span>
+                <Settings className="w-5 h-5 text-soul-accent" />
+                <span className="text-soul-textPrimary">Voice Settings</span>
               </button>
               <button
                 onClick={() => {
                   setShowFeedback(true);
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1A1F2E] rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <Sparkles className="w-5 h-5 text-sacred-gold" />
-                <span className="text-white">Give Feedback</span>
+                <Sparkles className="w-5 h-5 text-soul-accentGlow" />
+                <span className="text-soul-textPrimary">Give Feedback</span>
               </button>
               <button
                 onClick={() => {
                   handleSignOut();
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1A1F2E] rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <LogOut className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Sign Out</span>
+                <LogOut className="w-5 h-5 text-soul-textTertiary" />
+                <span className="text-soul-textPrimary">Sign Out</span>
               </button>
             </div>
           </div>
