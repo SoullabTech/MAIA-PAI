@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { calculateBirthChart } from '@/lib/astrology/ephemerisCalculator';
 
 /**
  * Birth Chart API Route
  *
- * Calculates comprehensive birth chart using the backend astrology service
- * Connects to: apps/api/backend/src/routes/astrology.routes.ts
+ * Calculates comprehensive birth chart using precise ephemeris calculations
+ * Time Passages-level accuracy with Astronomy Engine
  */
 
 export async function POST(request: NextRequest) {
@@ -38,24 +39,66 @@ export async function POST(request: NextRequest) {
     // TODO: Replace with actual auth once implemented
     const userId = 'user_temp'; // Temporary until auth is wired up
 
-    // TODO: For now, return mock chart until backend auth is ready
-    // This allows the Spiralogic wheel to render and be tested
-    console.log('Calculating chart for:', { date, time, location });
+    console.log('Calculating precise birth chart for:', { date, time, location });
 
-    const mockChart = {
-      sun: { sign: 'Sagittarius', degree: 17.2, house: 4 },
-      moon: { sign: 'Scorpio', degree: 23.4, house: 8 },
-      mercury: { sign: 'Sagittarius', degree: 8.1, house: 4 },
-      venus: { sign: 'Scorpio', degree: 19.7, house: 8 },
-      mars: { sign: 'Capricorn', degree: 12.3, house: 5 },
-      jupiter: { sign: 'Sagittarius', degree: 27.9, house: 4 },
-      saturn: { sign: 'Capricorn', degree: 5.4, house: 5 },
-      ascendant: { sign: 'Leo', degree: 28.1 },
-      aspects: [
-        { planet1: 'Sun', planet2: 'Moon', type: 'sextile', orb: 2.5 },
-        { planet1: 'Sun', planet2: 'Jupiter', type: 'conjunction', orb: 1.2 },
-        { planet1: 'Moon', planet2: 'Venus', type: 'conjunction', orb: 0.8 },
-      ],
+    // Calculate real birth chart using ephemeris
+    const chart = await calculateBirthChart({
+      date,
+      time,
+      location: {
+        lat: location.lat,
+        lng: location.lng,
+        timezone: location.timezone || 'UTC',
+      },
+    });
+
+    // Format for frontend (which expects simplified structure)
+    const formattedChart = {
+      sun: {
+        sign: chart.sun.sign,
+        degree: chart.sun.degree,
+        house: chart.sun.house,
+      },
+      moon: {
+        sign: chart.moon.sign,
+        degree: chart.moon.degree,
+        house: chart.moon.house,
+      },
+      mercury: {
+        sign: chart.mercury.sign,
+        degree: chart.mercury.degree,
+        house: chart.mercury.house,
+      },
+      venus: {
+        sign: chart.venus.sign,
+        degree: chart.venus.degree,
+        house: chart.venus.house,
+      },
+      mars: {
+        sign: chart.mars.sign,
+        degree: chart.mars.degree,
+        house: chart.mars.house,
+      },
+      jupiter: {
+        sign: chart.jupiter.sign,
+        degree: chart.jupiter.degree,
+        house: chart.jupiter.house,
+      },
+      saturn: {
+        sign: chart.saturn.sign,
+        degree: chart.saturn.degree,
+        house: chart.saturn.house,
+      },
+      ascendant: {
+        sign: chart.ascendant.sign,
+        degree: chart.ascendant.degree,
+      },
+      aspects: chart.aspects.map(aspect => ({
+        planet1: aspect.planet1,
+        planet2: aspect.planet2,
+        type: aspect.type,
+        orb: aspect.orb,
+      })),
       birthData: { date, time, location },
     };
 
@@ -64,8 +107,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: mockChart,
-      message: 'Using mock chart data - full ephemeris calculation coming soon',
+      data: formattedChart,
+      message: 'Calculated with Time Passages-level precision using Astronomy Engine',
     });
 
     /* TODO: Uncomment when backend auth + ephemeris is ready
