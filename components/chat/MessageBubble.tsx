@@ -129,14 +129,12 @@ export default function MessageBubble({
         
         .message-content.user {
           background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
-          border: 1px solid #d4d4d4;
           color: #404040;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
-        
+
         .message-content.maia {
           background: linear-gradient(135deg, rgba(181, 126, 220, 0.1) 0%, rgba(147, 51, 234, 0.05) 100%);
-          border: 1px solid rgba(181, 126, 220, 0.2);
           color: #F59E0B;
           box-shadow: 0 2px 12px rgba(181, 126, 220, 0.08);
         }

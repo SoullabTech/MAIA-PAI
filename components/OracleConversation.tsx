@@ -2095,7 +2095,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       exit={{ opacity: 0, y: 0 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
                       className={`bg-soul-surface/95 rounded-lg p-4 text-soul-textPrimary
-                               border border-soul-border/40 shadow-[0_2px_12px_rgba(0,0,0,0.6)] max-w-full
+                               shadow-[0_2px_12px_rgba(0,0,0,0.6)] max-w-full
                                cursor-pointer hover:bg-soul-surfaceHover transition-all duration-300 group
                                ${message.role === 'user' ? 'message-user' : 'message-maia'}`}
                       data-role={message.role === 'user' ? 'user' : 'assistant'}
@@ -2215,7 +2215,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               {showChatInterface && (
               <div className="fixed inset-x-0 bottom-16 z-[60]">
                 {/* Text input area - Ultra compact mobile design - Raised above bottom menu bar */}
-                <div className="bg-soul-surface/90 px-2 py-2 border-t border-soul-border/40">
+                <div className="bg-soul-surface/90 px-2 py-2">
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -2246,10 +2246,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         }}
                         className="flex-1 min-h-[42px] max-h-[100px] px-3 py-2
                                  bg-[#1a1f2e]/95 backdrop-blur-md
-                                 border border-amber-500/30 rounded-2xl
+                                 rounded-2xl
                                  text-amber-400 placeholder-amber-400/50
                                  text-sm leading-relaxed
-                                 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20
+                                 focus:outline-none
                                  disabled:opacity-50 resize-none
                                  touch-manipulation"
                         autoComplete="off"
@@ -2330,7 +2330,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               exit={{ opacity: 0, y: -20 }}
               className="fixed bottom-20 sm:bottom-24 left-1/2 transform -translate-x-1/2 z-50"
             >
-              <div className="bg-soul-surface/90 backdrop-blur-md rounded-lg px-4 py-2 border border-soul-border/40">
+              <div className="bg-soul-surface/90 backdrop-blur-md rounded-lg px-4 py-2">
                 <p className="text-soul-textSecondary text-sm">Click the holoflower to activate voice</p>
               </div>
             </motion.div>
@@ -2421,7 +2421,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             display: none;
           }
         `}</style>
-        <div className="flex justify-start items-center gap-4 md:gap-8 py-4 px-4 md:px-8 bg-soul-surface/90 rounded-full border border-soul-accent/20
+        <div className="flex justify-start items-center gap-4 md:gap-8 py-4 px-4 md:px-8 bg-soul-surface/90 rounded-full
                         md:justify-center min-w-max md:min-w-0">
           {/* Voice Toggle - Activate mic when switching to voice mode */}
           <button
