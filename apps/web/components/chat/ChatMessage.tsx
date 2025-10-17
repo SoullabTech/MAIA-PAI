@@ -70,7 +70,7 @@ export function ChatMessage({ message, isLatest = false, onPlayAudio }: ChatMess
       <div className={`flex-1 ${isUser ? 'text-right' : 'text-left'} max-w-[80%]`}>
         {/* Message Header */}
         <div className={`flex items-center gap-2 mb-1 text-xs ${isUser ? 'justify-end' : 'justify-start'}`}>
-          <span className={isUser ? 'text-soul-textTertiary' : 'text-soul-accent'}>
+          <span className={isUser ? 'text-soul-textSecondary' : 'text-soul-textSecondary'}>
             {isUser ? 'You' : 'Maya'}
           </span>
           {message.metadata?.element && !isUser && (
