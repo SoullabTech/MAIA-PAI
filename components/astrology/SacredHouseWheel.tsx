@@ -38,22 +38,22 @@ interface SacredHouseWheelProps {
   className?: string;
 }
 
-// Spiralogic Spiral Order - Clockwise from top
-// Fire (1-3) → Water (4-6) → Earth (7-9) → Air (10-12)
-// Houses maintain their traditional numbers but flow in elemental spiral
+// Spiralogic Spiral Order - Clockwise from 12 o'clock like a clock face
+// Fire quadrant (12:00-3:00) → Water (3:00-6:00) → Earth (6:00-9:00) → Air (9:00-12:00)
+// Each position = 30° segment (one "hour" on clock). Process map for consciousness.
 const spiralogicOrder = [
-  1,   // Fire 1 - Identity/Self
-  5,   // Fire 2 - Creativity/Joy
-  9,   // Fire 3 - Philosophy/Expansion
-  4,   // Water 1 - Home/Roots
-  8,   // Water 2 - Transformation/Intimacy
-  12,  // Water 3 - Spirituality/Dissolution
-  10,  // Earth 1 - Career/Legacy
-  2,   // Earth 2 - Resources/Values
-  6,   // Earth 3 - Service/Health
-  7,   // Air 1 - Relationships/Other
-  11,  // Air 2 - Community/Vision
-  3,   // Air 3 - Communication/Learning
+  1,   // Pos 0 (12-1:00): H1 Aries ♈ Fire-1 | Identity/Self-Awareness/Initiative | Calcinatio begins
+  5,   // Pos 1 (1-2:00): H5 Leo ♌ Fire-2 | Creativity/Joy/Expression | Calcinatio deepens
+  9,   // Pos 2 (2-3:00): H9 Sagittarius ♐ Fire-3 | Philosophy/Expansion/Synthesis | Calcinatio integrates
+  4,   // Pos 3 (3-4:00): H4 Cancer ♋ Water-1 | Home/Roots/Foundation | Solutio begins
+  8,   // Pos 4 (4-5:00): H8 Scorpio ♏ Water-2 | Transformation/Intimacy/Depth | Solutio deepens
+  12,  // Pos 5 (5-6:00): H12 Pisces ♓ Water-3 | Spirituality/Dissolution/Unity | Solutio completes
+  10,  // Pos 6 (6-7:00): H10 Capricorn ♑ Earth-1 | Career/Legacy/Structure | Coagulatio begins
+  2,   // Pos 7 (7-8:00): H2 Taurus ♉ Earth-2 | Resources/Values/Embodiment | Coagulatio deepens
+  6,   // Pos 8 (8-9:00): H6 Virgo ♍ Earth-3 | Service/Health/Refinement | Coagulatio integrates
+  7,   // Pos 9 (9-10:00): H7 Libra ♎ Air-1 | Relationships/Other/Balance | Sublimatio begins
+  11,  // Pos 10 (10-11:00): H11 Aquarius ♒ Air-2 | Community/Vision/Innovation | Sublimatio deepens
+  3,   // Pos 11 (11-12:00): H3 Gemini ♊ Air-3 | Communication/Learning/Connection | Sublimatio returns
 ];
 
 // House-element mapping (Spiralogic system)
