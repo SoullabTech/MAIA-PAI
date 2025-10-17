@@ -59,14 +59,15 @@ export default function PartnerPreludePage() {
   const [loading, setLoading] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
 
-  // Pre-fill data if invite code is recognized
+  // Track viewing when page loads
   useEffect(() => {
-    if (inviteCode === 'loralee-crowder') {
-      setFormData(prev => ({
-        ...prev,
-        name: 'Loralee Crowder',
-        email: 'loralee@example.com', // TODO: Get from invite system
-      }));
+    if (inviteCode) {
+      // Track that partner opened the Prelude page
+      fetch('/api/partners/track-view', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ invite_code: inviteCode }),
+      }).catch(err => console.error('Failed to track view:', err));
     }
   }, [inviteCode]);
 
@@ -75,16 +76,58 @@ export default function PartnerPreludePage() {
     setLoading(true);
 
     try {
-      // TODO: Connect to Supabase partners_prelude table
-      console.log('Partner Prelude Submitted:', formData);
+      // Submit Prelude responses to API
+      const response = await fetch('/api/partners/submit-prelude', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          inviteCode: formData.inviteCode,
+          name: formData.name,
+          email: formData.email,
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+          // Fire
+          whatIsCalling: formData.whatIsCalling,
+          whatDoesItChange: formData.whatDoesItChange,
+          pulseOrTemperature: formData.pulseOrTemperature,
+
+          // Water
+          whyMustExist: formData.whyMustExist,
+          whatIsReadyToFlow: formData.whatIsReadyToFlow,
+          whoEntersAndFeels: formData.whoEntersAndFeels,
+
+          // Earth
+          groundedTechMeaning: formData.groundedTechMeaning,
+          functionsNeeded: formData.functionsNeeded,
+          sustainingResources: formData.sustainingResources,
+
+          // Air
+          voiceItSpeaks: formData.voiceItSpeaks,
+          conversationType: formData.conversationType,
+          formItTakes: formData.formItTakes,
+
+          // Aether
+          whatIsIt: formData.whatIsIt,
+          presenceItCarries: formData.presenceItCarries,
+          howKnowAlive: formData.howKnowAlive,
+
+          // Closing
+          cosmosLine: formData.cosmosLine,
+
+          // MAIA chat messages (if any)
+          chatMessages: [], // TODO: Collect from MaiaPartnerChat component
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit reflection');
+      }
 
       setSubmitted(true);
     } catch (error) {
       console.error('Error submitting prelude:', error);
-      alert('There was an error submitting your reflection. Please try again.');
+      alert(`There was an error submitting your reflection: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again or contact partnerships@soullab.life.`);
     } finally {
       setLoading(false);
     }
