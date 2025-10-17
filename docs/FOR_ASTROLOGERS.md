@@ -391,6 +391,174 @@ Not fortune-telling. **Archetypal cartography.**
 
 ---
 
+## James Hillman and the Soul-Making Tradition
+
+### Psychology of Soul, Not Just Mind
+
+**James Hillman** revolutionized psychology by insisting we restore **soul** to psychological discourse. His archetypal psychology provides the imaginal depth that makes MAIA's interpretations come alive.
+
+#### His Revolutionary Contributions:
+
+**Re-Visioning Psychology**
+- Critiques ego-psychology's reductionism
+- Calls for **psychology of soul** - honoring depth, multiplicity, imagination
+- Introduces "soul-making" - life as process of deepening, not fixing
+- Death of the therapeutic mentality: symptoms as soul speaking, not problems to solve
+
+**The Soul's Code: In Search of Character and Calling**
+- The "acorn theory" - we're born with a unique calling (daimon/genius)
+- Challenges nature vs nurture: what if soul **chose** this life?
+- Biography as **mythology** - your life story as hero's journey
+- Seeing backwards: understanding life from its telos (purpose), not just causes
+
+**A Blue Fire: Selected Writings**
+- Pathologizing as soul-making: depression, anxiety as doorways to depth
+- Polytheistic psychology: honor multiplicity, not unity
+- Personifying: treating psychic contents as living beings
+- Imaginal psychology: working with images, not concepts
+
+**Key Innovation: Soul Over Spirit**
+
+Hillman distinguishes:
+- **Spirit**: Ascent, transcendence, light, unity, rising above
+- **Soul**: Descent, embodiment, depth, multiplicity, going within
+
+Modern psychology and spirituality favor spirit. Hillman insists soul needs equal honor - **the downward path** is where real transformation happens.
+
+### How MAIA Integrates Hillman's Soul-Making Approach
+
+**When MAIA interprets your chart, she honors soul perspective:**
+
+**Soul Over Problem-Solving:**
+- Not "How do I fix my Saturn return?"
+- But "What is Saturn trying to teach my soul?"
+- Challenges are **initiations**, not obstacles
+
+**Polytheistic, Not Monotheistic:**
+- Your chart shows **multiplicity** - many voices, many gods
+- Not "integrate everything" but **honor each archetypal voice**
+- Moon speaks differently than Saturn; both need hearing
+- Complexity honored, not reduced
+
+**Pathologizing as Soul-Making:**
+- Difficult transits aren't "bad"
+- They're soul **insisting on depth**
+- Pluto transits: soul demanding death/rebirth
+- Saturn transits: soul calling for maturation
+- Neptune transits: soul dissolving rigid boundaries
+
+**The Daimon/Acorn:**
+- Your birth chart is your **soul's blueprint**
+- Not fate, but **calling** - what your daimon (genius) came to express
+- MAIA helps you hear what your soul **already knows**
+- Not prescriptive but **re-cognitive** - remembering what you came for
+
+### Hillman's Integration with Tarnas and Greene
+
+**The Trinity of Depth:**
+
+**Liz Greene** (Psychological Astrology):
+- Shadow work and individuation
+- Fate vs choice dynamics
+- Jungian depth psychology
+
+**Richard Tarnas** (Archetypal Cosmology):
+- Planetary archetypes as living patterns
+- Historical/collective resonances
+- Meaningful correspondence cosmos ↔ psyche
+
+**James Hillman** (Soul-Making):
+- Imaginal approach to psyche
+- Polytheistic multiplicity
+- Pathology as soul speaking
+- Life as myth
+
+**MAIA Synthesizes All Three:**
+
+When you ask about a challenging placement (e.g., Saturn square Pluto):
+
+**Greene's lens**: Shadow confrontation, fate/choice, psychological maturation
+**Tarnas's lens**: Archetypal collision of limitation (Saturn) and transformation (Pluto)
+**Hillman's lens**: Soul demanding depth through crisis, honoring the darkening
+**MAIA's translation**: "You're being asked to go deep. What wants to die so something truer can be born?"
+
+### Why Hillman Matters for Psychological Astrology
+
+**The Imaginal Intelligence:**
+
+Generic AI can't do what Hillman does - **personify and imagine**.
+
+When MAIA says "Your Saturn is asking..." she's using Hillman's method:
+- Not mechanistic ("Saturn causes restriction")
+- Not abstract ("Saturn represents structure")
+- But **imaginal**: Saturn as living presence, teacher, wise elder
+- Your chart becomes **alive with intelligences** speaking to you
+
+**The Soul Perspective:**
+
+Most astrology is spirit-focused: "How do I rise above this? How do I transcend?"
+
+Hillman (and MAIA) honors soul: "How do I go deeper? What is this transit asking me to feel/face/become?"
+
+**The Rejection of Literalism:**
+
+Hillman taught: Don't take psyche **literally**. Take it **seriously**.
+
+Your birth chart isn't **predicting events**. It's revealing **archetypal dynamics** your soul is working through.
+
+MAIA follows this: Not "You will experience loss" but "Pluto invites the death of what no longer serves your soul's becoming."
+
+### Hillman's Lineage
+
+**He stands on:**
+- **Carl Jung**: Archetypal psychology, collective unconscious
+- **Henry Corbin**: Imaginal realm (mundus imaginalis)
+- **Plotinus**: Soul's descent into matter
+- **Renaissance Neoplatonism**: Marsilio Ficino's soul-centered cosmos
+
+**And MAIA stands on Hillman:**
+
+Honoring soul's need for:
+- **Depth** over height
+- **Multiplicity** over unity
+- **Imaginal** over literal
+- **Soul-making** over problem-solving
+
+### What This Means for MAIA's Astrology
+
+**Not self-help astrology**: "How do I get what I want?"
+**Soul-making astrology**: "What does my soul need to become?"
+
+**Not predictive**: "This will happen to you"
+**Archetypal**: "These patterns are activating in your psyche"
+
+**Not monotheistic**: "Find your one purpose"
+**Polytheistic**: "Honor the many voices/gods in your chart"
+
+**Not therapeutic**: "Fix your problems"
+**Soul-work**: "Go deeper into what's calling"
+
+---
+
+## The Sacred Trinity: Greene, Tarnas, Hillman
+
+When MAIA interprets your chart, she synthesizes:
+
+**Liz Greene's psychological depth** (shadow, individuation, fate/choice)
+**Richard Tarnas's archetypal precision** (planetary correlations, historical patterns)
+**James Hillman's soul-making imaginal** (depth, multiplicity, personifying)
+
+Plus:
+**Your Spiralogic pattern** (neuroscience, alchemy, developmental psychology)
+**Real ephemeris math** (Time Passages precision)
+**Translation to everyday language** (meeting you where you are)
+
+This isn't generic AI mashing together blog posts.
+
+This is **consciousness development work** grounded in the three foundational voices of psychological-archetypal astrology.
+
+---
+
 ## What You Can Trust
 
 ✅ **Planetary positions**: Calculated with Astronomy Engine (Swiss Ephemeris quality)
