@@ -72,7 +72,7 @@ export default function ThemeToggle() {
                    } shadow-md hover:shadow-lg`}
         aria-label="Light mode"
       >
-        <Sun className={`w-5 h-5 ${theme === 'light' ? 'text-amber-600 dark:text-amber-400' : 'text-amber-200/70 dark:text-amber-200/70'}`} />
+        <Sun className={`w-5 h-5 ${theme === 'light' ? 'text-amber-600 dark:text-amber-400' : 'text-amber-200 dark:text-amber-200'}`} />
       </motion.button>
 
       <motion.button
@@ -85,7 +85,7 @@ export default function ThemeToggle() {
                    } shadow-md hover:shadow-lg`}
         aria-label="Dark mode"
       >
-        <Moon className={`w-5 h-5 ${theme === 'dark' ? 'text-amber-600 dark:text-amber-400' : 'text-amber-200/70 dark:text-amber-200/70'}`} />
+        <Moon className={`w-5 h-5 ${theme === 'dark' ? 'text-amber-600 dark:text-amber-400' : 'text-amber-200 dark:text-amber-200'}`} />
       </motion.button>
 
       <motion.button
@@ -98,7 +98,7 @@ export default function ThemeToggle() {
                    } shadow-md hover:shadow-lg`}
         aria-label="System default"
       >
-        <Monitor className={`w-5 h-5 ${theme === 'system' ? 'text-amber-600 dark:text-amber-400' : 'text-amber-200/70 dark:text-amber-200/70'}`} />
+        <Monitor className={`w-5 h-5 ${theme === 'system' ? 'text-amber-600 dark:text-amber-400' : 'text-amber-200 dark:text-amber-200'}`} />
       </motion.button>
     </div>
   );
