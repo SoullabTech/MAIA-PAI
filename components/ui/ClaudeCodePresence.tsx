@@ -274,7 +274,7 @@ export function ClaudeCodePresence() {
               </div>
 
               {/* Brain Trust Ceremonial Phase */}
-              <div className="p-3 rounded-lg bg-gradient-to-r from-purple-600/10 to-amber-600/10 border border-purple-600/20 mb-4">
+              <div className="p-3 rounded-lg bg-gradient-to-r from-amber-600/10 to-orange-600/10 border border-amber-600/20 mb-4">
                 <div className="flex items-center gap-2 mb-2">
                   <motion.div
                     animate={{
@@ -287,9 +287,9 @@ export function ClaudeCodePresence() {
                       ease: "linear"
                     }}
                   >
-                    <Brain className="w-3 h-3 text-purple-400/60" />
+                    <Brain className="w-3 h-3 text-amber-400/60" />
                   </motion.div>
-                  <span className="text-[10px] text-purple-400/60 uppercase tracking-wider">
+                  <span className="text-[10px] text-amber-400/60 uppercase tracking-wider">
                     Brain Trust Integration
                   </span>
                 </div>
@@ -298,13 +298,13 @@ export function ClaudeCodePresence() {
                 <div className="mb-2">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[10px] text-stone-400">Ceremonial Phase:</span>
-                    <span className="text-[10px] text-purple-400 capitalize">
+                    <span className="text-[10px] text-amber-400 capitalize">
                       {awareness.ceremonialPhase}
                     </span>
                   </div>
                   <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden">
                     <motion.div
-                      className="h-full bg-gradient-to-r from-purple-600 to-amber-600"
+                      className="h-full bg-gradient-to-r from-amber-600 to-orange-600"
                       initial={{ width: 0 }}
                       animate={{ width: `${(awareness.hoursObserved || 0) / 10}%` }}
                       transition={{ duration: 1 }}

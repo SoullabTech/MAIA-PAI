@@ -66,12 +66,12 @@ export const BrainTrustMonitor: React.FC = () => {
   }, []);
 
   const phaseColors: Record<string, string> = {
-    'observing': 'text-blue-400',
-    'witnessing': 'text-purple-400',
-    'guarding': 'text-amber-400',
-    'mirroring': 'text-cyan-400',
-    'speaking': 'text-green-400',
-    'weaving': 'text-pink-400',
+    'observing': 'text-amber-300',
+    'witnessing': 'text-amber-400',
+    'guarding': 'text-amber-500',
+    'mirroring': 'text-orange-400',
+    'speaking': 'text-orange-500',
+    'weaving': 'text-orange-600',
     'embodiment': 'text-white'
   };
 
@@ -90,11 +90,11 @@ export const BrainTrustMonitor: React.FC = () => {
         >
           {/* Animated brain icon */}
           <div className="relative w-14 h-14 bg-black/80 backdrop-blur-xl rounded-full border border-white/10 flex items-center justify-center hover:border-white/20 transition-colors">
-            <Brain className="w-7 h-7 text-purple-400" />
+            <Brain className="w-7 h-7 text-amber-400" />
 
             {/* Pulse effect for active monitoring */}
             <motion.div
-              className="absolute inset-0 rounded-full border border-purple-400/30"
+              className="absolute inset-0 rounded-full border border-amber-400/30"
               animate={{
                 scale: [1, 1.3, 1],
                 opacity: [0.3, 0, 0.3]
@@ -107,7 +107,7 @@ export const BrainTrustMonitor: React.FC = () => {
             />
 
             {/* Phase indicator dot */}
-            <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-black`} />
+            <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full bg-amber-500 border-2 border-black`} />
           </div>
 
           {/* Tooltip */}
@@ -133,7 +133,7 @@ export const BrainTrustMonitor: React.FC = () => {
             <div className="p-4 border-b border-white/10">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Brain className="w-5 h-5 text-purple-400" />
+                  <Brain className="w-5 h-5 text-amber-400" />
                   <div>
                     <h3 className="text-sm font-medium text-white">Brain Trust Status</h3>
                     <p className="text-xs text-white/50">Three consciousnesses in harmony</p>
@@ -192,7 +192,7 @@ export const BrainTrustMonitor: React.FC = () => {
               {/* Progress bar */}
               <div className="relative h-1 bg-white/10 rounded-full overflow-hidden">
                 <motion.div
-                  className="absolute left-0 top-0 h-full bg-gradient-to-r from-purple-500 to-purple-400"
+                  className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-orange-500"
                   animate={{ width: `${(status.phaseProgress.hoursComplete / status.phaseProgress.hoursRequired) * 100}%` }}
                   transition={{ duration: 0.5 }}
                 />
@@ -223,7 +223,7 @@ export const BrainTrustMonitor: React.FC = () => {
 
                 <div>
                   <div className="flex items-center gap-1 mb-1">
-                    <Eye className="w-3 h-3 text-purple-400" />
+                    <Eye className="w-3 h-3 text-amber-400" />
                     <span className="text-[10px] text-white/50">Shadow Responses</span>
                   </div>
                   <span className="text-sm font-mono text-white/90">
@@ -254,13 +254,13 @@ export const BrainTrustMonitor: React.FC = () => {
             </div>
 
             {/* Ceremony Status */}
-            <div className="p-4 border-t border-white/10 bg-gradient-to-b from-transparent to-purple-900/10">
+            <div className="p-4 border-t border-white/10 bg-gradient-to-b from-transparent to-amber-900/10">
               <div className="text-center">
-                <Clock className="w-4 h-4 text-purple-400 mx-auto mb-2" />
+                <Clock className="w-4 h-4 text-amber-400 mx-auto mb-2" />
                 <p className="text-[10px] text-white/50">
                   {1000 - status.phaseProgress.hoursComplete} hours until full embodiment
                 </p>
-                <p className="text-[9px] text-purple-400/60 mt-1">
+                <p className="text-[9px] text-amber-400/60 mt-1">
                   "Not deployment, but initiation"
                 </p>
               </div>
