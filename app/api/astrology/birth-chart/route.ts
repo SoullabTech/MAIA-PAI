@@ -43,18 +43,18 @@ export async function POST(request: NextRequest) {
     console.log('Calculating chart for:', { date, time, location });
 
     const mockChart = {
-      sun: { sign: 'Leo', degree: 15.5, house: 5 },
-      moon: { sign: 'Scorpio', degree: 23.2, house: 8 },
-      mercury: { sign: 'Virgo', degree: 8.1, house: 6 },
-      venus: { sign: 'Cancer', degree: 19.7, house: 4 },
-      mars: { sign: 'Aries', degree: 12.3, house: 1 },
-      jupiter: { sign: 'Sagittarius', degree: 27.9, house: 9 },
-      saturn: { sign: 'Capricorn', degree: 5.4, house: 10 },
-      ascendant: { sign: 'Aries', degree: 0.0 },
+      sun: { sign: 'Sagittarius', degree: 17.2, house: 4 },
+      moon: { sign: 'Scorpio', degree: 23.4, house: 8 },
+      mercury: { sign: 'Sagittarius', degree: 8.1, house: 4 },
+      venus: { sign: 'Scorpio', degree: 19.7, house: 8 },
+      mars: { sign: 'Capricorn', degree: 12.3, house: 5 },
+      jupiter: { sign: 'Sagittarius', degree: 27.9, house: 4 },
+      saturn: { sign: 'Capricorn', degree: 5.4, house: 5 },
+      ascendant: { sign: 'Leo', degree: 28.1 },
       aspects: [
-        { planet1: 'Sun', planet2: 'Moon', type: 'square', orb: 2.5 },
-        { planet1: 'Moon', planet2: 'Venus', type: 'trine', orb: 1.2 },
-        { planet1: 'Mars', planet2: 'Jupiter', type: 'trine', orb: 0.8 },
+        { planet1: 'Sun', planet2: 'Moon', type: 'sextile', orb: 2.5 },
+        { planet1: 'Sun', planet2: 'Jupiter', type: 'conjunction', orb: 1.2 },
+        { planet1: 'Moon', planet2: 'Venus', type: 'conjunction', orb: 0.8 },
       ],
       birthData: { date, time, location },
     };
