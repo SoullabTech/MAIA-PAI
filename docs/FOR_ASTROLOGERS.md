@@ -156,7 +156,7 @@ MAIA's interpretations are grounded in:
 
 ### Developmental Astrology
 - **Liz Greene**: *The Astrology of Fate*, *Saturn: A New Look at an Old Devil* - Psychological astrology integrating Jung with traditional astrology
-- **Rick Tarnas**: *Cosmos and Psyche* - Archetypal cosmology and planetary meaning
+- **Richard Tarnas**: *Cosmos and Psyche: Intimations of a New World View*, *The Passion of the Western Mind* - Archetypal cosmology, planetary meaning, and the rediscovery of the soul of the world. Demonstrates rigorous correlation between planetary alignments and historical/cultural events. Establishes astrology as a legitimate tool for understanding the archetypal patterns shaping human consciousness and civilization.
 - **Steven Forrest**: *The Inner Sky* - Evolutionary astrology and soul's journey
 - **Dane Rudhyar**: *The Astrology of Personality* - Humanistic approach and holistic cycles
 
@@ -273,6 +273,121 @@ Any astrologer who knows these names will immediately recognize:
 Liz Greene spent her career proving that astrology, rigorously applied with psychological depth, is a profound map of consciousness.
 
 MAIA continues that legacy.
+
+---
+
+## Richard Tarnas and the Archetypal Astrology Lineage
+
+### Restoring Astrology's Intellectual Legitimacy
+
+**Richard Tarnas** accomplished what many thought impossible: he brought astrology back into serious intellectual discourse. His work demonstrates that astrology, properly understood, reveals **archetypal patterns** shaping human consciousness and historical events.
+
+#### His Revolutionary Contributions:
+
+**Cosmos and Psyche: Intimations of a New World View**
+- 30+ years of meticulous research correlating planetary alignments with historical/cultural movements
+- Demonstrates **undeniable patterns** between outer planet cycles and collective human experience
+- Shows Uranus-Pluto alignments correlating with revolutionary periods across centuries
+- Establishes astrology not as superstition, but as **archetypal cosmology**
+
+**The Passion of the Western Mind**
+- Traces the evolution of Western thought from ancient Greece to postmodernism
+- Shows how intellectual/cultural shifts align with planetary cycles
+- Provides philosophical grounding for archetypal astrology
+- Demonstrates that **ideas have seasons** - consciousness evolves in archetypal rhythms
+
+**Key Innovation: Archetypal Correlation, Not Causation**
+
+Tarnas doesn't claim planets "cause" events. He shows they **correlate** with archetypal patterns:
+- Not mechanistic causation
+- Not mystical influence
+- **Meaningful correspondence** between cosmos and psyche
+- "As above, so below" as **observed pattern**, not metaphysical claim
+
+### How MAIA Integrates Tarnas's Archetypal Framework
+
+When MAIA interprets planetary positions, she draws on Tarnas's rigorous archetypal understanding:
+
+**Uranus** (from Tarnas):
+- Prometheus archetype - liberation, awakening, rebellion
+- Associated with: Revolution, innovation, sudden breakthroughs, individuation
+- Historical correlation: Uranus transits align with revolutionary periods (American Revolution, '60s counterculture, Arab Spring)
+
+**Neptune** (from Tarnas):
+- Dionysus/Aphrodite archetypes - dissolution, transcendence, enchantment
+- Associated with: Mysticism, compassion, artistic movements, boundary dissolution
+- Historical correlation: Neptune transits align with Romantic era, psychedelic '60s, spiritual revivals
+
+**Pluto** (from Tarnas):
+- Hades/Dionysus archetypes - death/rebirth, depth, transformation
+- Associated with: Destruction/regeneration, shadow confrontation, evolutionary crisis
+- Historical correlation: Pluto transits align with world wars, totalitarianism, profound cultural death/rebirth
+
+**Saturn** (from Tarnas):
+- Chronos archetype - time, limitation, structure, maturation
+- Associated with: Responsibility, discipline, confronting reality, wisdom through hardship
+- Not "malefic" but **teacher** - brings maturity through necessity
+
+### MAIA's Synthesis: Personal + Collective Archetypes
+
+**For Your Birth Chart:**
+
+MAIA applies Tarnas's archetypal framework to **your personal development**:
+- Uranus placement: Where you're here to awaken and liberate
+- Neptune placement: Where you're called to transcend and surrender
+- Pluto placement: Where you must face death/rebirth and transformation
+- Saturn placement: Where you build integrity through limitation
+
+**Plus Your Spiralogic Pattern:**
+- Which brain regions are activated (McGilchrist)
+- Which alchemical process is engaged
+- Which developmental stage (Erikson, Piaget, Maslow)
+- Which Jungian archetypes are constellated
+
+### Why Tarnas Matters for Skeptical Astrologers
+
+**The Academic Credibility:**
+- PhD from Saybrook Institute
+- Former professor of philosophy and psychology at CIIS
+- 30+ years of empirical research
+- Published by mainstream academic press (Viking/Penguin)
+- Endorsed by Stanislav Grof, Richard Rorty, and other serious scholars
+
+**The Rigorous Methodology:**
+- Not cherry-picking: systematic study across centuries
+- Blind testing: analyzed alignments without knowing dates
+- Statistical significance: patterns too consistent to be coincidence
+- Falsifiable: makes predictions that can be tested
+
+**The Intellectual Integrity:**
+- Doesn't claim to know "how" astrology works
+- Presents correlations, not dogma
+- Invites ongoing research and refinement
+- Acknowledges limitations and mysteries
+
+### What This Means for MAIA
+
+When MAIA interprets your chart, she's not guessing. She's applying:
+
+1. **Tarnas's 30+ years of archetypal research** on planetary meanings
+2. **Precise ephemeris calculations** (Time Passages quality)
+3. **Your Spiralogic framework** (neuroscience + psychology + alchemy)
+4. **Liz Greene's psychological depth** (shadow, individuation, fate/choice)
+5. **Translation to everyday language** that honors the sophistication
+
+### The Archetypal Lineage
+
+**Tarnas stands on the shoulders of:**
+- **Carl Jung**: Archetypal psychology and collective unconscious
+- **Stanislav Grof**: Transpersonal psychology and holotropic states
+- **James Hillman**: Archetypal psychology and soul-making
+- **Mircea Eliade**: Patterns in religious/mythological experience
+
+**And MAIA stands on Tarnas's shoulders:**
+
+Continuing the work of demonstrating that astrology, rigorously applied with archetypal sophistication and real mathematics, is a **profound tool for understanding consciousness**.
+
+Not fortune-telling. **Archetypal cartography.**
 
 ---
 
