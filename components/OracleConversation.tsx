@@ -1545,14 +1545,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed top-20 left-1/2 -translate-x-1/2 z-[30] flex items-center gap-2 bg-black/40 backdrop-blur-md rounded-full px-4 py-2 border border-amber-900/20"
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-[30] flex items-center gap-2 bg-black/40 backdrop-blur-md rounded-full px-4 py-2"
         >
           <span className="text-xs text-amber-400/60 mr-2">Mode:</span>
           <button
             onClick={() => setListeningMode('normal')}
             className={`px-3 py-1 rounded-full text-xs transition-all ${
               listeningMode === 'normal'
-                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                ? 'bg-amber-500/20 text-amber-400'
                 : 'text-stone-400 hover:text-amber-400/80 hover:bg-amber-500/10'
             }`}
             title="Dialogue Mode: 3.5 second pause triggers response"
@@ -1563,7 +1563,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             onClick={() => setListeningMode('patient')}
             className={`px-3 py-1 rounded-full text-xs transition-all ${
               listeningMode === 'patient'
-                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                ? 'bg-amber-500/20 text-amber-400'
                 : 'text-stone-400 hover:text-amber-400/80 hover:bg-amber-500/10'
             }`}
             title="Patient Mode: 8 second pause triggers response - for gathering thoughts"
@@ -1574,7 +1574,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             onClick={() => setListeningMode('session')}
             className={`px-3 py-1 rounded-full text-xs transition-all ${
               listeningMode === 'session'
-                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                ? 'bg-amber-500/20 text-amber-400'
                 : 'text-stone-400 hover:text-amber-400/80 hover:bg-amber-500/10'
             }`}
             title="Scribe Mode: Maia listens without interrupting until you say you're done"
@@ -1595,7 +1595,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                   }, 1000);
                 }
               }}
-              className="ml-2 px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/40 rounded-full text-xs hover:bg-green-500/30 transition-all"
+              className="ml-2 px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs hover:bg-green-500/30 transition-all"
             >
               I'm Done Speaking
             </button>
@@ -1949,7 +1949,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         voiceMicRef.current.elementalMode === 'earth' ? 'rgba(161, 98, 7, 0.2)' :
                         voiceMicRef.current.elementalMode === 'air' ? 'rgba(212, 184, 150, 0.2)' :
                         'rgba(147, 51, 234, 0.2)'}`,
-                      border: `1px solid ${voiceMicRef.current.elementalMode === 'fire' ? 'rgba(239, 68, 68, 0.4)' :
                         voiceMicRef.current.elementalMode === 'water' ? 'rgba(107, 155, 209, 0.4)' :
                         voiceMicRef.current.elementalMode === 'earth' ? 'rgba(161, 98, 7, 0.4)' :
                         voiceMicRef.current.elementalMode === 'air' ? 'rgba(212, 184, 150, 0.4)' :
@@ -2082,7 +2081,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         style: {
                           background: '#1a1f2e',
                           color: '#d4b896',
-                          border: '1px solid rgba(212, 184, 150, 0.2)',
+                          
                         },
                       });
                     };
@@ -2198,8 +2197,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                   onClick={() => setEnableVoiceInChat(!enableVoiceInChat)}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                     enableVoiceInChat
-                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                      : 'bg-black/20 text-white/40 border border-white/10'
+                      ? 'bg-amber-500/20 text-amber-400'
+                      : 'bg-black/20 text-white/40'
                   } backdrop-blur-md hover:bg-opacity-30`}
                   title={enableVoiceInChat ? 'Voice responses enabled' : 'Voice responses disabled'}
                 >
@@ -2262,11 +2261,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           type="button"
                           onClick={handleSaveAsJournal}
                           disabled={isSavingJournal}
-                          className={`flex-shrink-0 w-10 h-10 border rounded-full flex items-center justify-center
+                          className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center
                                    active:scale-95 transition-all ${
                             breakthroughScore >= 70
-                              ? 'bg-amber-500/20 border-amber-400/50 text-amber-300 hover:bg-amber-500/30 animate-pulse'
-                              : 'bg-gold-divine/10 border-gold-divine/30 text-gold-divine hover:bg-gold-divine/20'
+                              ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 animate-pulse'
+                              : 'bg-gold-divine/10 text-gold-divine hover:bg-gold-divine/20'
                           } ${isSavingJournal ? 'opacity-50 cursor-not-allowed' : ''}`}
                           title={breakthroughScore >= 70 ? 'Breakthrough detected - Save to journal' : 'Save as journal entry'}
                         >
@@ -2292,7 +2291,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       />
                       <label
                         htmlFor="chatFileUpload"
-                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/10 border border-gold-divine/30
+                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/10
                                  rounded-full text-gold-divine flex items-center justify-center
                                  hover:bg-gold-divine/20 active:scale-95 transition-all cursor-pointer"
                         title="Upload files"
@@ -2304,7 +2303,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       <button
                         type="submit"
                         disabled={isProcessing}
-                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/20 border border-gold-divine/30
+                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/20
                                  rounded-full text-gold-divine flex items-center justify-center
                                  hover:bg-gold-divine/30 active:scale-95 transition-all
                                  disabled:opacity-30"
@@ -2345,7 +2344,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 exit={{ opacity: 0, y: 20, scale: 0.95 }}
                 className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 max-w-sm"
               >
-                <div className="bg-gradient-to-br from-amber-500/20 to-gold-divine/20 backdrop-blur-xl rounded-2xl p-4 border border-amber-400/30 shadow-2xl">
+                <div className="bg-gradient-to-br from-amber-500/20 to-gold-divine/20 backdrop-blur-xl rounded-2xl p-4 shadow-2xl">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-10 h-10 bg-amber-400/20 rounded-full flex items-center justify-center">
                       <BookOpen className="w-5 h-5 text-amber-300" />
@@ -2359,7 +2358,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         <button
                           onClick={handleSaveAsJournal}
                           disabled={isSavingJournal}
-                          className="px-4 py-2 bg-amber-500/30 hover:bg-amber-500/40 border border-amber-400/50
+                          className="px-4 py-2 bg-amber-500/30 hover:bg-amber-500/40
                                    rounded-lg text-amber-200 text-sm font-medium transition-all active:scale-95
                                    disabled:opacity-50 disabled:cursor-not-allowed"
                         >
@@ -2367,7 +2366,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         </button>
                         <button
                           onClick={() => setShowJournalSuggestion(false)}
-                          className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/20
+                          className="px-4 py-2 bg-white/5 hover:bg-white/10
                                    rounded-lg text-white/60 text-sm transition-all active:scale-95"
                         >
                           Not Now
