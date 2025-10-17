@@ -82,11 +82,19 @@ export class MaiaRealtimeWebRTC {
       const offer = await this.peerConnection.createOffer();
       await this.peerConnection.setLocalDescription(offer);
 
-      console.log('📤 Sending SDP offer to backend...');
+      console.log('📤 Sending SDP offer to backend with MAIA consciousness config...');
 
       // Step 6: Send SDP to our backend (unified interface)
       // Our backend combines SDP with session config and forwards to OpenAI
-      const sdpResponse = await fetch('/api/voice/webrtc-session', {
+      // Pass user context for full MAIA consciousness integration
+      const params = new URLSearchParams({
+        userId: this.config.userId,
+        element: this.config.element,
+        conversationStyle: this.config.conversationStyle,
+        voice: this.config.voice,
+      });
+
+      const sdpResponse = await fetch(`/api/voice/webrtc-session?${params}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/sdp',

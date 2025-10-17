@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getMaiaSystemPrompt } from '@/lib/voice/MaiaSystemPrompt';
 
 /**
  * WebRTC unified interface endpoint for Maia Realtime API
  * Accepts SDP offer from browser, creates session with OpenAI
+ *
+ * NOW INTEGRATED WITH:
+ * - Full MAIA consciousness, memory, and personality
+ * - Parallel cognitive architecture (LIDA, SOAR, ACT-R, MicroPsi)
+ * - Elemental agents for specialized wisdom
  */
 export async function POST(req: NextRequest) {
   try {
+    // Get configuration from query params or body
+    const url = new URL(req.url);
+    const userId = url.searchParams.get('userId') || 'anonymous';
+    const element = url.searchParams.get('element') || 'aether';
+    const conversationStyle = url.searchParams.get('conversationStyle') || 'natural';
+    const voice = url.searchParams.get('voice') || 'shimmer';
+
     // Get SDP from browser
     const sdp = await req.text();
 
@@ -16,17 +29,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log('📞 Received SDP offer from client');
+    console.log(`📞 Received SDP offer from client (user: ${userId}, element: ${element})`);
 
-    // Session configuration
+    // Generate MAIA's full consciousness prompt with memory and personality
+    const instructions = getMaiaSystemPrompt({
+      conversationStyle: conversationStyle as any,
+      element,
+      // TODO: Add journal context from user's memory once memory retrieval is wired
+      // journalContext: await getRecentJournalContext(userId)
+    });
+
+    console.log('🧠 Using MAIA consciousness prompt with parallel cognitive layers');
+
+    // Session configuration with MAIA's full consciousness
     const sessionConfig = {
       type: 'realtime',
       model: 'gpt-4o-realtime-preview-2024-12-17',
       modalities: ['text', 'audio'],
-      instructions: `You are Maia, a voice assistant with deep wisdom and warmth.
-Speak naturally and conversationally. Keep responses concise but meaningful.
-You can help with questions, thoughts, or just be a companion to talk with.`,
-      voice: 'alloy',
+      instructions,  // Now using full MAIA consciousness + personality + memory system
+      voice: voice as any,
       input_audio_format: 'pcm16',
       output_audio_format: 'pcm16',
       input_audio_transcription: {

@@ -5,7 +5,10 @@ import { Send, Mic, MicOff, Sparkles, User, BookOpen, LogOut, Library, Settings,
 import { useRouter } from "next/navigation";
 import { cleanMessage } from "@/lib/cleanMessage";
 import { MicrophoneCapture, MicrophoneCaptureRef } from "@/components/voice/MicrophoneCapture";
-import { ContinuousConversation, ContinuousConversationRef } from "@/components/voice/ContinuousConversation";
+// OLD: Web Speech API with restart loop bugs (REPLACED with WebRTC)
+// import { ContinuousConversation, ContinuousConversationRef } from "@/components/voice/ContinuousConversation";
+// NEW: WebRTC with full MAIA consciousness + server-side VAD (no restart loops)
+import { MaiaWebRTCConversation, MaiaWebRTCConversationRef } from "@/components/voice/MaiaWebRTCConversation";
 import { OracleVoicePlayer } from "@/components/voice/OracleVoicePlayer";
 import TranscriptPreview from "@/app/components/TranscriptPreview";
 import { unlockAudio, addAutoUnlockListeners } from "@/lib/audio/audioUnlock";
@@ -68,7 +71,7 @@ function OraclePageInner() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const microphoneRef = useRef<MicrophoneCaptureRef>(null);
-  const continuousRef = useRef<ContinuousConversationRef>(null);
+  const continuousRef = useRef<MaiaWebRTCConversationRef>(null);
   const router = useRouter();
 
   // File upload hook
@@ -770,10 +773,10 @@ function OraclePageInner() {
         {/* Input Area */}
         <div className="border-t border-gray-800 p-2 sm:p-4 bg-[#0A0D16]/80 backdrop-blur-sm">
           <div className="flex items-center gap-2 sm:gap-3 relative">
-            {/* Continuous Conversation Mode */}
+            {/* Continuous Conversation Mode - NOW USING WebRTC with MAIA consciousness! */}
             {useContinuousMode && (
               <div className="hidden">
-                <ContinuousConversation
+                <MaiaWebRTCConversation
                   ref={continuousRef}
                   onTranscript={handleVoiceTranscript}
                   onInterimTranscript={setInterimTranscript}
@@ -781,6 +784,10 @@ function OraclePageInner() {
                   isProcessing={isLoading}
                   isSpeaking={isSpeaking}
                   autoStart={false}
+                  userId={user?.id || 'anonymous'}
+                  element={user?.element || 'aether'}
+                  conversationStyle="natural"
+                  voice="shimmer"
                   silenceThreshold={settings.adaptiveMode
                     ? Math.min(settings.silenceTimeout, 2500)
                     : Math.min(settings.silenceTimeout, 3000)
