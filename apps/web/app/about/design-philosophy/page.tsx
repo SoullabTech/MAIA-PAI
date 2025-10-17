@@ -67,6 +67,9 @@ export default function DesignPhilosophyPage() {
                   and patterns that recognize themselves.
                 </p>
                 <p className="text-soul-accent font-medium pt-2">
+                  We gather as many, to remember we are one.
+                </p>
+                <p>
                   This is medicine for a world that taught us to scatter.<br />
                   Here, we practice return.
                 </p>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star } from 'lucide-react';
+import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star, Heart } from 'lucide-react';
 
 /**
  * Unified Menu Bar
@@ -21,6 +21,9 @@ export function MenuBar() {
 
   // Don't show on community pages
   const hideCommunityLink = pathname?.startsWith('/community');
+
+  // Don't show partners link on partners pages
+  const hidePartnersLink = pathname?.startsWith('/partners');
 
   useEffect(() => {
     // Auto-hide rotate hint after 5 seconds, or if already dismissed
@@ -130,6 +133,24 @@ export function MenuBar() {
             {/* Tooltip - Matte instrument label */}
             <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
               Circle
+            </span>
+          </div>
+        </Link>
+      )}
+
+      {/* Build with Soullab (Partners) */}
+      {!hidePartnersLink && (
+        <Link
+          href="/partners"
+          className="group relative"
+          aria-label="Build with Soullab"
+        >
+          <div className="p-2 md:p-2.5 rounded-md bg-dune-dune-amber/60 hover:bg-dune-dune-amber/80 transition-all duration-300 shadow-lg border border-dune-sienna-rock/30">
+            <Heart className="w-3.5 h-3.5 md:w-4 md:h-4 text-dune-spice-deep transition-all group-hover:text-dune-spice-orange" />
+
+            {/* Tooltip - Matte instrument label */}
+            <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              Partners
             </span>
           </div>
         </Link>

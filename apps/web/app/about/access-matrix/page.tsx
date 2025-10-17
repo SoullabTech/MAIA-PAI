@@ -35,18 +35,40 @@ export default function AccessMatrixPage() {
         </div>
 
         <div className="relative z-10 space-y-12">
-          {/* Opening Quote */}
+          {/* The Spiral Invitation */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center"
+            transition={{ duration: 1.2 }}
+            className="text-center space-y-8"
           >
             <Sparkles className="w-12 h-12 text-soul-accent/50 mx-auto mb-6" />
-            <p className="text-2xl md:text-3xl font-light text-soul-textSecondary italic leading-relaxed">
-              "A living mandala of meaning—<br />
-              a gameboard for the modern seeker."
-            </p>
+
+            {/* Core Spiral Statement */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 2, delay: 0.5 }}
+              className="max-w-3xl mx-auto space-y-4"
+            >
+              <p className="text-lg md:text-xl font-light text-soul-accent leading-loose tracking-wide">
+                In the spiral, all find their place.<br />
+                All bring wonders long forgotten.<br />
+                All are honored.<br />
+                All are needed.<br />
+                All are one.
+              </p>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.5, delay: 1.2 }}
+              className="text-xl md:text-2xl font-light text-soul-textSecondary italic leading-relaxed pt-4"
+            >
+              A living mandala of meaning—<br />
+              a gameboard for the modern seeker.
+            </motion.p>
           </motion.div>
 
           {/* Main Introduction */}
