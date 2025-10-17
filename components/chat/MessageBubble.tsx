@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Flame, Droplets, Mountain, Wind, Sparkles, Edit3 } from 'lucide-react';
 import { Message, ElementalHint } from './types';
@@ -28,19 +28,28 @@ const elementColors = {
   aether: { bg: 'rgba(147, 51, 234, 0.1)', color: '#7C3AED' }
 };
 
-export default function MessageBubble({ 
-  message, 
+export default function MessageBubble({
+  message,
   showBreathingAura = true,
   isLastInGroup = false,
   onJournalTag
 }: MessageBubbleProps) {
   const [isHovered, setIsHovered] = useState(false);
-  
+  const [formattedTime, setFormattedTime] = useState<string>('');
+
   const isMaia = message.sender === 'maia';
   const hasElementalHints = message.elementalHints && message.elementalHints.length > 0;
-  
+
   // Split message into paragraphs for cascade animation
   const paragraphs = message.content.split('\n\n').filter(p => p.trim());
+
+  // Format timestamp on client-side only to avoid hydration mismatch
+  useEffect(() => {
+    setFormattedTime(new Date(message.timestamp).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    }));
+  }, [message.timestamp]);
   
   const renderElementalIndicators = () => {
     if (!hasElementalHints || !message.elementalHints) return null;
@@ -111,8 +120,9 @@ export default function MessageBubble({
           max-width: ${isMaia ? '80%' : '70%'};
           padding: 16px 20px;
           border-radius: 24px;
-          font-family: 'Lato', sans-serif;
+          font-family: 'Spectral', Georgia, serif;
           line-height: 1.6;
+          letter-spacing: 0.015em;
           word-wrap: break-word;
           overflow-wrap: break-word;
         }
@@ -293,12 +303,11 @@ export default function MessageBubble({
           )}
           
           {/* Timestamp */}
-          <div className="timestamp">
-            {new Date(message.timestamp).toLocaleTimeString([], { 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            })}
-          </div>
+          {formattedTime && (
+            <div className="timestamp">
+              {formattedTime}
+            </div>
+          )}
         </div>
       </motion.div>
     </>

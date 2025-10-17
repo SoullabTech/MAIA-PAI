@@ -140,7 +140,7 @@ export function ChatMessage({ message, isLatest = false, onPlayAudio }: ChatMess
 
           {/* Message Text */}
           <div className="prose prose-sm max-w-none">
-            <p className="whitespace-pre-wrap leading-relaxed mb-0">
+            <p className="font-serif whitespace-pre-wrap leading-relaxed tracking-wide mb-0">
               {message.content}
             </p>
           </div>

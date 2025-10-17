@@ -200,6 +200,9 @@ const config: Config = {
       fontFamily: {
         'sacred-primary': ['Inter', 'SF Pro Display', '-apple-system', 'sans-serif'],
         'sacred-accent': ['Crimson Pro', 'Georgia', 'serif'],
+        // Claude-style warm, legible fonts
+        'serif': ['"Spectral"', 'Georgia', 'serif'],
+        'sans': ['"Atkinson Hyperlegible"', 'system-ui', 'sans-serif'],
       },
       letterSpacing: {
         'archive': '0.015em',     // Open tracking - "dust between letters"

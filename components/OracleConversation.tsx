@@ -748,12 +748,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       console.log('🔇 PREEMPTIVE STOP: Microphone disabled before processing');
     }
 
-    // Prevent multiple processing - comprehensive guard
-    if (isProcessing || isResponding || isAudioPlaying) {
+    // Prevent multiple processing - but only check refs for real-time state
+    // Using state here causes race conditions with stale closures
+    if (isProcessingRef.current || isRespondingRef.current) {
       console.log('⚠️ Text message blocked - already processing/responding', {
-        isProcessing,
-        isResponding,
-        isAudioPlaying
+        isProcessing: isProcessingRef.current,
+        isResponding: isRespondingRef.current
       });
       return;
     }
@@ -1047,12 +1047,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           setIsResponding(false);
           setIsAudioPlaying(false);
           setIsMicrophonePaused(false); // 🎤 RESUME MIC AFTER MAIA FINISHES
+          setIsProcessing(false); // Reset processing here instead of outer finally
           console.log('🎤 Microphone unpaused - ready for next input');
 
           // CRITICAL: Resume listening after cooldown to prevent echo
           if (isInVoiceMode && !isMuted && voiceMicRef.current?.startListening) {
             setTimeout(() => {
-              if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
+              if (voiceMicRef.current?.startListening && !isProcessingRef.current && !isRespondingRef.current) {
                 voiceMicRef.current.startListening();
                 console.log('🎤 Microphone resumed after Maia finished speaking');
               }
@@ -1091,12 +1092,23 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       };
       setMessages(prev => [...prev, errorMessage]);
       onMessageAdded?.(errorMessage);
-    } finally {
-      // Always reset processing state for text chat
-      console.log('📝 Text processing complete - resetting states');
+
+      // Reset states on error
       setIsProcessing(false);
       setIsResponding(false);
       setCurrentMotionState('idle');
+    } finally {
+      // Only reset motion state here if not speaking
+      // Processing state is reset in the speech finally block for voice mode
+      if (showChatInterface) {
+        console.log('📝 Text processing complete - resetting states');
+        setIsProcessing(false);
+        setIsResponding(false);
+        setCurrentMotionState('idle');
+      } else {
+        console.log('📝 Text processing complete - voice mode (states reset after speech)');
+        setCurrentMotionState('idle');
+      }
     }
   }, [isProcessing, isAudioPlaying, isResponding, sessionId, userId, onMessageAdded, agentConfig, messages.length, showChatInterface, voiceEnabled, maiaReady, maiaSpeak]);
 
@@ -2091,10 +2103,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)' }}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <div className="text-xs text-amber-400">
+                        <div className="text-xs font-sans text-amber-400">
                           {message.role === 'user' ? 'You' : agentConfig.name}
                         </div>
-                        <div className="flex items-center gap-1 text-xs text-amber-400/60
+                        <div className="flex items-center gap-1 text-xs font-sans text-amber-400/60
                                       opacity-100 sm:opacity-0 sm:group-hover:opacity-100
                                       touch-manipulation transition-opacity">
                           <Copy className="w-3 h-3" />
@@ -2102,7 +2114,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           <span className="sm:hidden">Tap to copy</span>
                         </div>
                       </div>
-                      <div className="text-base sm:text-lg md:text-xl leading-relaxed break-words text-amber-400">
+                      <div className="text-base sm:text-lg md:text-xl font-serif leading-relaxed tracking-wide break-words text-amber-400">
                         {message.role === 'oracle' ? (
                           <FormattedMessage text={message.text} />
                         ) : (
