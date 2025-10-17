@@ -38,13 +38,43 @@ export async function POST(request: NextRequest) {
     // TODO: Replace with actual auth once implemented
     const userId = 'user_temp'; // Temporary until auth is wired up
 
-    // Forward to backend API
+    // TODO: For now, return mock chart until backend auth is ready
+    // This allows the Spiralogic wheel to render and be tested
+    console.log('Calculating chart for:', { date, time, location });
+
+    const mockChart = {
+      sun: { sign: 'Leo', degree: 15.5, house: 5 },
+      moon: { sign: 'Scorpio', degree: 23.2, house: 8 },
+      mercury: { sign: 'Virgo', degree: 8.1, house: 6 },
+      venus: { sign: 'Cancer', degree: 19.7, house: 4 },
+      mars: { sign: 'Aries', degree: 12.3, house: 1 },
+      jupiter: { sign: 'Sagittarius', degree: 27.9, house: 9 },
+      saturn: { sign: 'Capricorn', degree: 5.4, house: 10 },
+      ascendant: { sign: 'Aries', degree: 0.0 },
+      aspects: [
+        { planet1: 'Sun', planet2: 'Moon', type: 'square', orb: 2.5 },
+        { planet1: 'Moon', planet2: 'Venus', type: 'trine', orb: 1.2 },
+        { planet1: 'Mars', planet2: 'Jupiter', type: 'trine', orb: 0.8 },
+      ],
+      birthData: { date, time, location },
+    };
+
+    // Store birth chart in database (Supabase)
+    // TODO: Implement database storage
+
+    return NextResponse.json({
+      success: true,
+      data: mockChart,
+      message: 'Using mock chart data - full ephemeris calculation coming soon',
+    });
+
+    /* TODO: Uncomment when backend auth + ephemeris is ready
     const backendUrl = process.env.BACKEND_API_URL || 'http://localhost:3001';
     const response = await fetch(`${backendUrl}/api/astrology/birth-chart`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        // TODO: Add auth token when implemented
+        'Authorization': `Bearer ${authToken}`,
       },
       body: JSON.stringify({
         userId,
@@ -70,13 +100,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Store birth chart in database (Supabase)
-    // TODO: Implement database storage
-
     return NextResponse.json({
       success: true,
       data: data.data,
     });
+    */
   } catch (error) {
     console.error('Birth chart calculation error:', error);
     return NextResponse.json(
