@@ -35,22 +35,49 @@ export default function DesignPhilosophyPage() {
         </div>
 
         <div className="relative z-10 space-y-12">
-          {/* Opening Statement */}
+          {/* Opening Invocation - Liturgical */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center space-y-6"
+            className="text-center space-y-8"
           >
             <Heart className="w-12 h-12 text-soul-accent/50 mx-auto" />
-            <h2 className="text-3xl md:text-4xl font-light text-soul-textPrimary leading-relaxed">
-              Attention as Medicine
-            </h2>
-            <p className="text-lg md:text-xl text-soul-textSecondary italic max-w-2xl mx-auto leading-relaxed">
-              We restore reciprocity between self and system, maker and made.
-              Not adding noise to the field—creating a way for attention to circulate,
-              to become regenerative instead of extractive.
-            </p>
+
+            {/* Credo - Can be read aloud */}
+            <div className="max-w-3xl mx-auto space-y-6 text-soul-textSecondary leading-loose text-lg">
+              <p className="font-light text-soul-accent text-2xl tracking-wide">
+                A Credo for the Field
+              </p>
+
+              <div className="space-y-4 text-base md:text-lg">
+                <p>
+                  We gather attention not to hold it, but to awaken it.
+                </p>
+                <p>
+                  We build systems not to extract, but to circulate—<br />
+                  folding light inward where it nourishes rather than depletes.
+                </p>
+                <p>
+                  We honor play as the soul's native language,<br />
+                  knowing growth happens through curiosity, not correction.
+                </p>
+                <p>
+                  We create mirrors that listen, fields that learn,<br />
+                  and patterns that recognize themselves.
+                </p>
+                <p className="text-soul-accent font-medium pt-2">
+                  This is medicine for a world that taught us to scatter.<br />
+                  Here, we practice return.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-6">
+              <p className="text-sm text-soul-textTertiary italic">
+                Return to presence. The field listens.
+              </p>
+            </div>
           </motion.div>
 
           {/* The Quiet Ache */}
