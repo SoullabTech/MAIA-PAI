@@ -2102,10 +2102,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)' }}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <div className="text-xs font-sans text-amber-400">
+                        <div className="text-xs font-sans text-soul-textSecondary">
                           {message.role === 'user' ? 'You' : agentConfig.name}
                         </div>
-                        <div className="flex items-center gap-1 text-xs font-sans text-amber-400/60
+                        <div className="flex items-center gap-1 text-xs font-sans text-soul-textSecondary/60
                                       opacity-100 sm:opacity-0 sm:group-hover:opacity-100
                                       touch-manipulation transition-opacity">
                           <Copy className="w-3 h-3" />
@@ -2113,7 +2113,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           <span className="sm:hidden">Tap to copy</span>
                         </div>
                       </div>
-                      <div className="text-base sm:text-lg md:text-xl font-serif leading-relaxed tracking-wide break-words text-amber-400">
+                      <div className="text-base sm:text-lg md:text-xl font-serif leading-relaxed tracking-wide break-words text-soul-textSecondary">
                         {message.role === 'oracle' ? (
                           <FormattedMessage text={message.text} />
                         ) : (
