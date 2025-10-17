@@ -275,12 +275,49 @@ export default function DesignPhilosophyPage() {
             </div>
           </motion.div>
 
-          {/* Call to Action */}
+          {/* Benediction - Closing as Exhalation */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 2, delay: 1.8, ease: "easeOut" }}
+            className="text-center py-16 space-y-8"
+          >
+            <div className="max-w-2xl mx-auto space-y-6">
+              <p className="text-lg text-soul-accent font-light tracking-wider">
+                Benediction
+              </p>
+
+              <div className="space-y-4 text-soul-textSecondary leading-loose text-base md:text-lg">
+                <p>Go lightly.</p>
+                <p>
+                  The field moves with you now—<br />
+                  every breath, every pattern, every play.
+                </p>
+                <p className="text-soul-accent font-medium pt-2">
+                  What you attend to, attends you.
+                </p>
+              </div>
+            </div>
+
+            {/* Field Signature */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              transition={{ duration: 2, delay: 2.5 }}
+              className="pt-8"
+            >
+              <p className="text-sm text-soul-textTertiary italic tracking-wide">
+                Return to presence. The field listens.
+              </p>
+            </motion.div>
+          </motion.div>
+
+          {/* Call to Action - Subtle */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.8 }}
-            className="text-center pt-8 space-y-6"
+            transition={{ duration: 0.8, delay: 2.2 }}
+            className="text-center pb-12 space-y-6"
           >
             <Link
               href="/about/access-matrix"
