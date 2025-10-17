@@ -2439,8 +2439,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             }}
             className={`p-3 rounded-full transition-all duration-300 ${
               !showChatInterface
-                ? 'bg-soul-accent/20 text-soul-accentGlow border border-soul-accent/30'
-                : 'text-soul-accent hover:text-soul-accentGlow hover:bg-soul-accent/10'
+                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                : 'text-amber-500 hover:text-amber-400 hover:bg-amber-500/10'
             }`}
             title="Voice Mode"
           >
@@ -2476,7 +2476,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               className={`p-3 rounded-full transition-all duration-300 ${
                 isMuted
                   ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                  : 'bg-soul-accent/20 text-soul-accentGlow border border-soul-accent/30 hover:bg-[#D4B896]/30'
+                  : 'bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30'
               }`}
               title={isMuted ? "Unmute Microphone" : "Mute Microphone"}
             >
@@ -2511,7 +2511,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
           {/* Heart/Favorites */}
           <button
-            className="p-3 rounded-full text-soul-accent hover:text-soul-accentGlow hover:bg-soul-accent/10 transition-all duration-300"
+            className="p-3 rounded-full text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-300"
             title="Favorites"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2523,7 +2523,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           {/* Profile/User */}
           <button
             onClick={() => window.location.href = '/profile'}
-            className="p-3 rounded-full text-soul-accent hover:text-soul-accentGlow hover:bg-soul-accent/10 transition-all duration-300"
+            className="p-3 rounded-full text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-300"
             title="Your Profile"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2535,7 +2535,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           {/* Birth Chart / Astrology - Holoflower Icon */}
           <button
             onClick={() => window.location.href = '/birth-chart'}
-            className="p-3 rounded-full text-soul-accent hover:text-soul-accentGlow hover:bg-soul-accent/10 transition-all duration-300 group"
+            className="p-3 rounded-full text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-300 group"
             title="Your Cosmic Blueprint"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -2558,7 +2558,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           {/* Lab Notes */}
           <button
             onClick={() => window.location.href = '/lab-notes'}
-            className="p-3 rounded-full text-soul-accent hover:text-soul-accentGlow hover:bg-soul-accent/10 transition-all duration-300"
+            className="p-3 rounded-full text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-300"
             title="Lab Notes"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2570,7 +2570,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           {/* Journal/Book Icon - Open Book Style */}
           <button
             onClick={() => window.location.href = '/journal'}
-            className="p-3 rounded-full text-soul-accent hover:text-soul-accentGlow hover:bg-soul-accent/10 transition-all duration-300 group"
+            className="p-3 rounded-full text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-300 group"
             title="Sacred Journal"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
@@ -2616,8 +2616,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             onClick={() => setShowChatInterface(true)}
             className={`p-3 rounded-full transition-all duration-300 ${
               showChatInterface
-                ? 'bg-soul-accent/20 text-soul-accentGlow border border-soul-accent/30'
-                : 'text-soul-accent hover:text-soul-accentGlow hover:bg-soul-accent/10'
+                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                : 'text-amber-500 hover:text-amber-400 hover:bg-amber-500/10'
             }`}
             title="Chat Mode"
           >
@@ -2631,7 +2631,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           {!showChatInterface && (
             <button
               onClick={() => setShowVoiceText(!showVoiceText)}
-              className="p-3 rounded-full text-soul-accent hover:text-soul-accentGlow hover:bg-soul-accent/10 transition-all duration-300"
+              className="p-3 rounded-full text-amber-500 hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-300"
               title={showVoiceText ? "Hide Text" : "Show Text"}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
