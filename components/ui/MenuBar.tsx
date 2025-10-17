@@ -59,15 +59,15 @@ export function MenuBar() {
       )}
 
       {/* INSTRUMENT PANEL: Ancient-future navigation - Positioned left of sign out button */}
-      <div className="flex fixed right-16 z-40 items-center gap-1.5 md:gap-2" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 0.75rem)' }}>
+      <div className="flex fixed right-16 z-40 items-center gap-1.5 md:gap-2" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 3.5rem)' }}>
       {/* MAIA Training Progress Icon */}
       <Link
         href="/maya/training"
         className="group relative"
         aria-label="MAIA Training Progress"
       >
-        <div className="relative p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-accent/40">
-          <Brain className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent/70 transition-all group-hover:text-soul-accent" />
+        <div className="relative p-2 md:p-2.5 rounded-md bg-soul-surface/90 border border-amber-500/40 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-accent shadow-lg">
+          <Brain className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-400 transition-all group-hover:text-amber-300" />
 
           {/* Progress Ring */}
           <svg className="absolute inset-0 w-full h-full -rotate-90" style={{ filter: 'drop-shadow(0 0 2px rgba(251, 191, 36, 0.3))' }}>
@@ -107,8 +107,8 @@ export function MenuBar() {
         className="group relative"
         aria-label="Astrology Chart"
       >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-amber-500/40">
-          <Star className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500" />
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/90 border border-amber-500/40 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-amber-400 shadow-lg">
+          <Star className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-400 transition-all group-hover:text-amber-300" />
 
           {/* Tooltip - Matte instrument label */}
           <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
@@ -124,8 +124,8 @@ export function MenuBar() {
           className="group relative"
           aria-label="Soul-Building Circle"
         >
-          <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-waterWarm/40">
-            <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-waterWarm/70 transition-all group-hover:text-soul-waterWarm" />
+          <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/90 border border-cyan-500/40 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-cyan-400 shadow-lg">
+            <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-400 transition-all group-hover:text-cyan-300" />
 
             {/* Tooltip - Matte instrument label */}
             <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
@@ -141,8 +141,8 @@ export function MenuBar() {
         className="group relative"
         aria-label="Conversation Mode"
       >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-link/40">
-          <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-link/70 transition-all group-hover:text-soul-link" />
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/90 border border-indigo-500/40 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-indigo-400 shadow-lg">
+          <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4 text-indigo-400 transition-all group-hover:text-indigo-300" />
 
           {/* Tooltip - Matte instrument label */}
           <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
@@ -157,8 +157,8 @@ export function MenuBar() {
         className="group relative"
         aria-label="Settings"
       >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-accent/40">
-          <Settings className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent/70 transition-all group-hover:text-soul-accent group-hover:rotate-45" />
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/90 border border-purple-500/40 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-purple-400 shadow-lg">
+          <Settings className="w-3.5 h-3.5 md:w-4 md:h-4 text-purple-400 transition-all group-hover:text-purple-300 group-hover:rotate-45" />
 
           {/* Tooltip - Matte instrument label */}
           <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
@@ -177,8 +177,8 @@ export function MenuBar() {
         className="group relative"
         aria-label="Report a Problem"
       >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-textTertiary/40">
-          <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-textTertiary/70 transition-all group-hover:text-soul-textTertiary" />
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/90 border border-gray-400/40 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-gray-300 shadow-lg">
+          <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-400 transition-all group-hover:text-gray-300" />
 
           {/* Tooltip - Matte instrument label */}
           <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
