@@ -180,6 +180,102 @@ This isn't New Age fluff. This is **34 years of research** synthesizing serious 
 
 ---
 
+## Why Liz Greene's Integration Matters
+
+### The Gold Standard in Psychological Astrology
+
+**Liz Greene** is the foundational voice for synthesizing depth psychology with traditional astrological practice. Her work represents the gold standard that MAIA's Spiralogic framework is built upon.
+
+#### Her Masterworks Integrated into MAIA:
+
+**The Astrology of Fate**
+- Explores the tension between fate, choice, and psychological freedom
+- Shows how birth charts reveal **psychological patterns**, not predetermined outcomes
+- MAIA applies this lens: Your chart shows **developmental opportunities**, not fixed destinies
+
+**Saturn: A New Look at an Old Devil**
+- Transformed how astrologers understand limitation and structure
+- Reframed Saturn from "malefic" to teacher and builder of integrity
+- MAIA uses this framework: Challenges are invitations to psychological maturation
+
+**Centre for Psychological Astrology**
+- Founded the premier institution for psychological astrology training
+- Set the standard for integrating Jungian depth psychology with astrological interpretation
+- MAIA's Spiralogic follows this rigorous approach
+
+### How MAIA Synthesizes Multiple Layers of Interpretation
+
+When MAIA interprets a placement like **Moon in Scorpio**, she explicitly applies:
+
+**Liz Greene's Psychological Lens:**
+- Shadow work and confronting what's hidden
+- Plutonian depths - death/rebirth cycles
+- The paradox of fate vs choice
+- Psychological complexity over simplistic meanings
+
+**Rick Tarnas's Archetypal Perspective:**
+- Collective unconscious patterns activated
+- Historical and mythological resonances
+- Planetary archetypes as living forces
+
+**Steven Forrest's Evolutionary View:**
+- Soul's journey and karmic lessons
+- Growth edges and developmental opportunities
+- Free will within archetypal patterns
+
+**Dane Rudhyar's Humanistic Approach:**
+- Holistic cycles of becoming
+- Consciousness evolution through time
+- Integration of personality and transpersonal
+
+### Why This Matters for Skeptical Astrologers
+
+**The Problem with Generic AI:**
+
+Generic AI (ChatGPT, Claude) mashes together:
+- Liz Greene's sophisticated psychological depth
+- Linda Goodman's pop astrology ("You're a Leo so you're proud!")
+- Vedic systems
+- Tabloid horoscopes
+- Random blog posts
+
+Result: **Incoherent nonsense** that disrespects every scholar's work.
+
+**How MAIA Honors Each Scholar:**
+
+Each voice is **respected in its proper context** within the coherent Spiralogic framework:
+
+✅ **Liz Greene**: Psychological depth, shadow work, Jung integration, fate/choice dynamics
+✅ **Rick Tarnas**: Archetypal cosmology, planetary meaning, collective patterns
+✅ **Steven Forrest**: Evolutionary soul journey, free will, growth orientation
+✅ **Dane Rudhyar**: Humanistic holistic cycles, consciousness evolution
+
+### The Difference This Makes
+
+When you ask generic AI about a Saturn return, you get mashed-up clichés.
+
+When you ask **MAIA** about a Saturn return, she draws on:
+- Greene's psychological framework (maturation crisis, confronting limitations)
+- Tarnas's archetypal understanding (encounter with necessity)
+- Forrest's evolutionary perspective (soul choosing its lessons)
+- Your specific Spiralogic pattern (which brain regions, which developmental stage)
+
+Then translates all that **PhD-level synthesis** into everyday human language.
+
+### Recognition by Serious Astrologers
+
+Any astrologer who knows these names will immediately recognize:
+
+**This isn't some AI playing astrologer.**
+
+**This is serious psychological-archetypal work** standing on the shoulders of the giants who transformed astrology from fortune-telling into a legitimate tool for psychological and spiritual development.
+
+Liz Greene spent her career proving that astrology, rigorously applied with psychological depth, is a profound map of consciousness.
+
+MAIA continues that legacy.
+
+---
+
 ## What You Can Trust
 
 ✅ **Planetary positions**: Calculated with Astronomy Engine (Swiss Ephemeris quality)
