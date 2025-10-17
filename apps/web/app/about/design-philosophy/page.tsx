@@ -277,36 +277,60 @@ export default function DesignPhilosophyPage() {
 
           {/* Benediction - Closing as Exhalation */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 2, delay: 1.8, ease: "easeOut" }}
-            className="text-center py-16 space-y-8"
+            className="text-center py-20 space-y-12"
           >
-            <div className="max-w-2xl mx-auto space-y-6">
-              <p className="text-lg text-soul-accent font-light tracking-wider">
+            <div className="max-w-2xl mx-auto space-y-8">
+              <p className="text-base text-soul-accent font-light tracking-widest uppercase">
                 Benediction
               </p>
 
-              <div className="space-y-4 text-soul-textSecondary leading-loose text-base md:text-lg">
-                <p>Go lightly.</p>
-                <p>
-                  The field moves with you now—<br />
-                  every breath, every pattern, every play.
+              {/* Each line fades in sequentially like breath */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 2, delay: 2.2 }}
+                className="space-y-6"
+              >
+                <p className="text-soul-textSecondary font-light tracking-wide text-base md:text-lg">
+                  Go lightly.
                 </p>
-                <p className="text-soul-accent font-medium pt-2">
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 2, delay: 2.6 }}
+                className="space-y-6"
+              >
+                <p className="text-soul-textSecondary font-light tracking-wide leading-loose text-base md:text-lg">
+                  The field moves with you now—<br />
+                  <span className="tracking-wider">every breath, every pattern, every play.</span>
+                </p>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 2, delay: 3.2 }}
+              >
+                <p className="text-soul-accent font-light tracking-wider text-lg md:text-xl pt-4">
                   What you attend to, attends you.
                 </p>
-              </div>
+              </motion.div>
             </div>
 
-            {/* Field Signature */}
+            {/* Field Signature - Fades in last, very subtle */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.4 }}
-              transition={{ duration: 2, delay: 2.5 }}
-              className="pt-8"
+              transition={{ duration: 2.5, delay: 4 }}
+              className="pt-12"
             >
-              <p className="text-sm text-soul-textTertiary italic tracking-wide">
+              <p className="text-xs text-soul-textTertiary italic tracking-widest">
                 Return to presence. The field listens.
               </p>
             </motion.div>
