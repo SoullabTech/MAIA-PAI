@@ -531,13 +531,37 @@ function OraclePageInner() {
       {/* Header */}
       <header className="border-b border-gray-800 backdrop-blur-sm bg-[#0A0D16]/80 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
-              <User className="w-4 h-4 sm:w-5 sm:h-5 text-white/70" />
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            {/* Holoflower Icon */}
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 relative">
+              <svg width="40" height="40" viewBox="0 0 200 200" className="absolute inset-0">
+                <defs>
+                  <radialGradient id="holoflower-header-gradient">
+                    <stop offset="0%" stopColor="#E3B778" stopOpacity="0.9" />
+                    <stop offset="50%" stopColor="#F0C98A" stopOpacity="0.7" />
+                    <stop offset="100%" stopColor="#D4A574" stopOpacity="0.5" />
+                  </radialGradient>
+                </defs>
+                {/* Center */}
+                <circle cx="100" cy="100" r="12" fill="url(#holoflower-header-gradient)" opacity="0.9" />
+                {/* Petals */}
+                {[0, 60, 120, 180, 240, 300].map((angle) => (
+                  <ellipse
+                    key={angle}
+                    cx="100"
+                    cy="65"
+                    rx="15"
+                    ry="35"
+                    fill="url(#holoflower-header-gradient)"
+                    opacity="0.6"
+                    transform={`rotate(${angle} 100 100)`}
+                  />
+                ))}
+              </svg>
             </div>
-            <div className="min-w-0">
-              <h1 className="text-base sm:text-lg font-medium text-white truncate">Soullab</h1>
-              <p className="text-xs text-gray-400 truncate">Personal Oracle • {user.element || 'Adaptive'}</p>
+            <div className="min-w-0 flex flex-col">
+              <h1 className="text-sm sm:text-base font-bold tracking-wider text-soul-accent truncate" style={{ letterSpacing: '0.1em' }}>SOULLAB</h1>
+              <p className="text-[10px] sm:text-xs text-soul-textTertiary truncate">Beta Experience</p>
             </div>
           </div>
 
