@@ -38,6 +38,24 @@ interface SacredHouseWheelProps {
   className?: string;
 }
 
+// Spiralogic Spiral Order - Clockwise from top
+// Fire (1-3) → Water (4-6) → Earth (7-9) → Air (10-12)
+// Houses maintain their traditional numbers but flow in elemental spiral
+const spiralogicOrder = [
+  1,   // Fire 1 - Identity/Self
+  5,   // Fire 2 - Creativity/Joy
+  9,   // Fire 3 - Philosophy/Expansion
+  4,   // Water 1 - Home/Roots
+  8,   // Water 2 - Transformation/Intimacy
+  12,  // Water 3 - Spirituality/Dissolution
+  10,  // Earth 1 - Career/Legacy
+  2,   // Earth 2 - Resources/Values
+  6,   // Earth 3 - Service/Health
+  7,   // Air 1 - Relationships/Other
+  11,  // Air 2 - Community/Vision
+  3,   // Air 3 - Communication/Learning
+];
+
 // House-element mapping (Spiralogic system)
 const houseElements = {
   1: 'fire',    // Identity
@@ -104,9 +122,12 @@ export function SacredHouseWheel({
   }, [controls]);
 
   // Calculate position on wheel for a given house (1-12)
+  // Uses Spiralogic spiral order for positioning
   const getHousePosition = (house: number) => {
-    // Houses start at 9 o'clock position (ascendant) and go counter-clockwise
-    const angle = ((house - 1) * 30 - 90) * (Math.PI / 180);
+    // Find position in spiral order
+    const spiralIndex = spiralogicOrder.indexOf(house);
+    // Start at top (12 o'clock) and go clockwise
+    const angle = (spiralIndex * 30 - 90) * (Math.PI / 180);
     const radius = 140;
     return {
       x: 200 + radius * Math.cos(angle),
@@ -115,8 +136,11 @@ export function SacredHouseWheel({
   };
 
   // Calculate planet position (more precise, based on degree within house)
+  // Uses Spiralogic spiral order for positioning
   const getPlanetPosition = (planet: Planet) => {
-    const houseStartAngle = ((planet.house - 1) * 30);
+    // Find house position in spiral order
+    const spiralIndex = spiralogicOrder.indexOf(planet.house);
+    const houseStartAngle = spiralIndex * 30;
     const planetAngle = (houseStartAngle + (planet.degree % 30)) - 90;
     const angle = planetAngle * (Math.PI / 180);
     const radius = 120;
@@ -190,13 +214,13 @@ export function SacredHouseWheel({
           opacity="0.2"
         />
 
-        {/* 12 House segments - slow rotation */}
+        {/* 12 House segments - Spiralogic spiral order, clockwise */}
         <motion.g animate={controls}>
-          {[...Array(12)].map((_, i) => {
-            const house = i + 1;
+          {spiralogicOrder.map((house, i) => {
             const element = houseElements[house as keyof typeof houseElements] as keyof typeof elementalColors;
             const elementColor = elementalColors[element];
             const color = isDayMode ? elementColor.day : elementColor.night;
+            // Position i determines visual placement (0-11), house number stays as label
             const startAngle = (i * 30 - 90) * (Math.PI / 180);
             const endAngle = ((i + 1) * 30 - 90) * (Math.PI / 180);
 
