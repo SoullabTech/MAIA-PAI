@@ -40,7 +40,7 @@ Generic AI is trained on thousands of contradictory sources:
 - Liz Greene's psychological depth + Linda Goodman's pop astrology + Vedic astrology + tabloid horoscopes = **chaos**
 
 **MAIA uses ONE framework:** Spiralogic
-- Developed over 34 years by Kelly Beard
+- Developed over 34 years by Kelly Nezat
 - Integrates McGilchrist's neuroscience (The Master and His Emissary)
 - Maps Jungian individuation process to houses
 - Correlates alchemical stages to elemental development
@@ -621,5 +621,5 @@ Just like you do.
 
 ---
 
-*Developed by Kelly Beard, Spiralogic Institute
+*Developed by Kelly Nezat, Spiralogic Institute
 Built on 34 years of research integrating astrology, neuroscience, depth psychology, and alchemical wisdom.*
