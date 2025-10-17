@@ -28,6 +28,7 @@ import { VoiceState } from '@/lib/voice/voice-capture';
 import { useMaiaVoice } from '@/hooks/useMaiaVoice';
 import { cleanMessage, cleanMessageForVoice, formatMessageForDisplay } from '@/lib/cleanMessage';
 import { getAgentConfig, AgentConfig } from '@/lib/agent-config';
+import { AdaptiveSilenceCalibration } from '@/lib/voice/AdaptiveSilenceCalibration';
 import { toast } from 'react-hot-toast';
 import { voiceLock } from '@/lib/services/VoiceLock';
 import { trackEvent } from '@/lib/analytics/track';
@@ -92,6 +93,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 }) => {
   // Maia Voice Integration - Initialize immediately for Voice mode
   const { speak: maiaSpeak, voiceState: maiaVoiceState, isReady: maiaReady } = useMaiaVoice();
+
+  // 🎵 Adaptive Rhythm Calibration - MAIA learns your tempo
+  const adaptiveCalibration = useRef(AdaptiveSilenceCalibration.getInstance());
 
   // Field Protocol Integration
   const {
@@ -990,8 +994,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         const cleanVoiceText = cleanMessageForVoice(responseText);
         console.log('🧹 Cleaned for voice:', cleanVoiceText);
 
-        // ECHO SUPPRESSION: Define cooldown OUTSIDE try block so finally can access it
-        const cooldownMs = 2000; // 2 second cooldown (reduced from 3.5s for faster mic restart)
+        // ECHO SUPPRESSION: Use adaptive cooldown based on learned rhythm
+        const cooldownMs = adaptiveCalibration.current.getCooldownDuration();
 
         try {
           // Start speaking immediately
@@ -1011,6 +1015,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
           const speakDuration = Date.now() - startSpeakTime;
           console.log(`🔇 Maia finished speaking after ${speakDuration}ms`);
+
+          // 🎵 Track when MAIA finishes speaking for rhythm calibration
+          adaptiveCalibration.current.onMaiaSpeechEnd();
+          console.log(`🎵 [AdaptiveCalibration] Cooldown: ${cooldownMs}ms`);
 
           // ECHO SUPPRESSION: Extended cooldown to prevent audio tail from being recorded
           setEchoSuppressUntil(Date.now() + cooldownMs);
@@ -2093,7 +2101,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 0 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className={`bg-soul-surface/95 rounded-lg p-4 text-soul-textPrimary
+                      className={`bg-soul-surface/95 rounded-lg p-4 text-soul-textSecondary
                                shadow-[0_2px_12px_rgba(0,0,0,0.6)] max-w-full
                                cursor-pointer hover:bg-soul-surfaceHover transition-all duration-300 group
                                ${message.role === 'user' ? 'message-user' : 'message-maia'}`}

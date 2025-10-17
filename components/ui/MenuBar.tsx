@@ -66,8 +66,8 @@ export function MenuBar() {
         className="group relative"
         aria-label="MAIA Training Progress"
       >
-        <div className="relative p-2 md:p-2.5 rounded-md bg-soul-surface/90 hover:bg-soul-surfaceHover transition-all duration-300 shadow-lg">
-          <Brain className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent transition-all group-hover:text-soul-accentGlow" />
+        <div className="relative p-2 md:p-2.5 rounded-md bg-dune-dune-amber/60 hover:bg-dune-dune-amber/80 transition-all duration-300 shadow-lg border border-dune-sienna-rock/30">
+          <Brain className="w-3.5 h-3.5 md:w-4 md:h-4 text-dune-spice-deep transition-all group-hover:text-dune-spice-orange" />
 
           {/* Progress Ring */}
           <svg className="absolute inset-0 w-full h-full -rotate-90" style={{ filter: 'drop-shadow(0 0 2px rgba(251, 191, 36, 0.3))' }}>
@@ -94,7 +94,7 @@ export function MenuBar() {
           </svg>
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Training {Math.round(trainingProgress * 100)}%
           </span>
         </div>
@@ -107,11 +107,11 @@ export function MenuBar() {
         className="group relative"
         aria-label="Astrology Chart"
       >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/90 hover:bg-soul-surfaceHover transition-all duration-300 shadow-lg">
-          <Star className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent transition-all group-hover:text-soul-accentGlow" />
+        <div className="p-2 md:p-2.5 rounded-md bg-dune-dune-amber/60 hover:bg-dune-dune-amber/80 transition-all duration-300 shadow-lg border border-dune-sienna-rock/30">
+          <Star className="w-3.5 h-3.5 md:w-4 md:h-4 text-dune-spice-deep transition-all group-hover:text-dune-spice-orange" />
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Chart
           </span>
         </div>
@@ -124,11 +124,11 @@ export function MenuBar() {
           className="group relative"
           aria-label="Soul-Building Circle"
         >
-          <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/90 hover:bg-soul-surfaceHover transition-all duration-300 shadow-lg">
-            <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent transition-all group-hover:text-soul-accentGlow" />
+          <div className="p-2 md:p-2.5 rounded-md bg-dune-dune-amber/60 hover:bg-dune-dune-amber/80 transition-all duration-300 shadow-lg border border-dune-sienna-rock/30">
+            <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-dune-spice-deep transition-all group-hover:text-dune-spice-orange" />
 
             {/* Tooltip - Matte instrument label */}
-            <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
               Circle
             </span>
           </div>
@@ -141,11 +141,11 @@ export function MenuBar() {
         className="group relative"
         aria-label="Conversation Mode"
       >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/90 hover:bg-soul-surfaceHover transition-all duration-300 shadow-lg">
-          <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent transition-all group-hover:text-soul-accentGlow" />
+        <div className="p-2 md:p-2.5 rounded-md bg-dune-dune-amber/60 hover:bg-dune-dune-amber/80 transition-all duration-300 shadow-lg border border-dune-sienna-rock/30">
+          <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4 text-dune-spice-deep transition-all group-hover:text-dune-spice-orange" />
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Mode
           </span>
         </div>
@@ -157,11 +157,11 @@ export function MenuBar() {
         className="group relative"
         aria-label="Settings"
       >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/90 hover:bg-soul-surfaceHover transition-all duration-300 shadow-lg">
-          <Settings className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent transition-all group-hover:text-soul-accentGlow group-hover:rotate-45" />
+        <div className="p-2 md:p-2.5 rounded-md bg-dune-dune-amber/60 hover:bg-dune-dune-amber/80 transition-all duration-300 shadow-lg border border-dune-sienna-rock/30">
+          <Settings className="w-3.5 h-3.5 md:w-4 md:h-4 text-dune-spice-deep transition-all group-hover:text-dune-spice-orange group-hover:rotate-45" />
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Settings
           </span>
         </div>
@@ -177,11 +177,11 @@ export function MenuBar() {
         className="group relative"
         aria-label="Report a Problem"
       >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/90 hover:bg-soul-surfaceHover transition-all duration-300 shadow-lg">
-          <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent transition-all group-hover:text-soul-accentGlow" />
+        <div className="p-2 md:p-2.5 rounded-md bg-dune-dune-amber/60 hover:bg-dune-dune-amber/80 transition-all duration-300 shadow-lg border border-dune-sienna-rock/30">
+          <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-dune-spice-deep transition-all group-hover:text-dune-spice-orange" />
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Feedback
           </span>
         </div>
