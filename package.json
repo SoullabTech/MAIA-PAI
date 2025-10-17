@@ -178,7 +178,7 @@
     "react-sparklines": "^1.7.0",
     "react-spring": "^9.7.3",
     "react-use-measure": "^2.1.7",
-    "react-window": "^1.8.10",
+    "react-window": "^2.2.1",
     "recharts": "^2.15.4",
     "resend": "^6.1.0",
     "simple-peer": "^9.11.1",
