@@ -41,6 +41,8 @@ NOTES.md
 # Node/Next.js
 node_modules/
 .pnpm-store/
+pnpm-lock.yaml
+pnpm-workspace.yaml
 .next/
 out/
 dist/
