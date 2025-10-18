@@ -31,6 +31,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { getSpiralogicHouseData } from '@/lib/astrology/spiralogicHouseMapping';
 import { getZodiacArchetype } from '@/lib/astrology/archetypeLibrary';
+import { getPlanetaryArchetype } from '@/lib/astrology/spiralogicMapping';
+import { AlchemicalSymbol } from './AlchemicalSymbols';
 
 interface Planet {
   name: string;
@@ -145,7 +147,9 @@ export function SacredHouseWheel({
   className = '',
 }: SacredHouseWheelProps) {
   const [hoveredHouse, setHoveredHouse] = useState<number | null>(null);
+  const [hoveredPlanet, setHoveredPlanet] = useState<Planet | null>(null);
   const [revealedAspects, setRevealedAspects] = useState(false);
+  const [showSacredGeometry, setShowSacredGeometry] = useState(true); // Fremen alchemist mode
 
   // Wheel is fixed - no rotation (consciousness states are stable)
 
@@ -283,62 +287,322 @@ export function SacredHouseWheel({
           opacity="0.4"
         />
 
-        {/* FIELD DYNAMICS 2: Spiral Pulse from Aether Center */}
-        {/* Logarithmic breathing spiral - expands/contracts every 12-15s */}
+        {/* FIELD DYNAMICS 2: Spiral Swirling from Aether Center */}
+        {/* Golden ratio logarithmic spiral emanating from center */}
         <motion.path
-          d="M 200,200
-             Q 210,195 220,200
-             Q 225,210 220,220
-             Q 210,225 200,220
-             Q 190,210 195,200
-             Q 200,190 210,195"
+          d={(() => {
+            // Generate logarithmic spiral path (golden ratio)
+            const points: string[] = [];
+            const a = 1; // Starting radius
+            const b = 0.306; // Growth rate (golden ratio spiral)
+            const center = { x: 200, y: 200 };
+
+            for (let theta = 0; theta < 6 * Math.PI; theta += 0.15) {
+              const r = a * Math.exp(b * theta);
+              const x = center.x + r * Math.cos(theta);
+              const y = center.y + r * Math.sin(theta);
+              points.push(theta === 0 ? `M ${x},${y}` : `L ${x},${y}`);
+            }
+
+            return points.join(' ');
+          })()}
           fill="none"
           stroke={isDayMode ? '#9B8FAA' : '#8B5CF6'}
-          strokeWidth="1"
-          opacity="0.2"
-          initial={{ scale: 0.5, opacity: 0 }}
+          strokeWidth="1.5"
+          opacity="0.3"
+          strokeLinecap="round"
+          initial={{ pathLength: 0, opacity: 0 }}
           animate={{
-            scale: [0.5, 2.5, 0.5],
-            opacity: [0, 0.3, 0]
+            pathLength: [0, 1, 0],
+            opacity: [0, 0.4, 0]
           }}
           transition={{
-            duration: 13,
+            duration: 15,
             repeat: Infinity,
             ease: 'easeInOut',
           }}
-          style={{ transformOrigin: '200px 200px' }}
         />
 
-        {/* Clockwise movement arrows - showing elemental process flow */}
-        {[...Array(12)].map((_, i) => {
-          // Position arrow between houses (at the dividing line)
-          const angle = (i * 30 - 90) * (Math.PI / 180);
-          const radius = 185; // Outside the outer circle
-          const arrowX = 200 + radius * Math.cos(angle);
-          const arrowY = 200 + radius * Math.sin(angle);
+        {/* Secondary counter-rotating spiral */}
+        <motion.path
+          d={(() => {
+            const points: string[] = [];
+            const a = 1;
+            const b = 0.306;
+            const center = { x: 200, y: 200 };
 
-          // Arrow rotation to point clockwise (tangent to circle)
-          const arrowRotation = i * 30; // Degrees
+            for (let theta = 0; theta < 6 * Math.PI; theta += 0.15) {
+              const r = a * Math.exp(b * theta);
+              // Negative theta for counter-rotation
+              const x = center.x + r * Math.cos(-theta);
+              const y = center.y + r * Math.sin(-theta);
+              points.push(theta === 0 ? `M ${x},${y}` : `L ${x},${y}`);
+            }
 
-          return (
-            <g key={`arrow-${i}`}>
-              {/* Curved arrow pointing clockwise */}
-              <text
-                x={arrowX}
-                y={arrowY}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fontSize="16"
-                opacity="0.4"
-                fill={isDayMode ? '#78716c' : '#d6d3d1'}
-                transform={`rotate(${arrowRotation}, ${arrowX}, ${arrowY})`}
-                style={{ userSelect: 'none' }}
-              >
-                ➤
-              </text>
+            return points.join(' ');
+          })()}
+          fill="none"
+          stroke={isDayMode ? '#C85450' : '#F5A362'}
+          strokeWidth="1"
+          opacity="0.2"
+          strokeLinecap="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{
+            pathLength: [0, 1, 0],
+            opacity: [0, 0.3, 0]
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 2,
+          }}
+        />
+
+        {/* SACRED GEOMETRY LAYER - Fremen Alchemist's Cosmology */}
+        {showSacredGeometry && (
+          <g opacity="0.25">
+            {/* DODECAHEDRON - The Soul's Geometry (5th element, Aether) */}
+            {/* 2D projection of dodecahedron embracing the holoflower */}
+            <g>
+              {/* Outer pentagon */}
+              <motion.polygon
+                points={[...Array(5)].map((_, i) => {
+                  const angle = (i * 72 - 90) * (Math.PI / 180);
+                  const x = 200 + 45 * Math.cos(angle);
+                  const y = 200 + 45 * Math.sin(angle);
+                  return `${x},${y}`;
+                }).join(' ')}
+                fill="none"
+                stroke="#D4AF37"
+                strokeWidth="1.5"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 0.5 }}
+                transition={{ duration: 2, ease: 'easeOut' }}
+                style={{ transformOrigin: '200px 200px' }}
+              />
+
+              {/* Inner pentagon (rotated) */}
+              <motion.polygon
+                points={[...Array(5)].map((_, i) => {
+                  const angle = (i * 72 - 90 + 36) * (Math.PI / 180); // 36° rotation
+                  const x = 200 + 30 * Math.cos(angle);
+                  const y = 200 + 30 * Math.sin(angle);
+                  return `${x},${y}`;
+                }).join(' ')}
+                fill="none"
+                stroke="#D4AF37"
+                strokeWidth="1.2"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 0.4 }}
+                transition={{ duration: 2, delay: 0.2, ease: 'easeOut' }}
+                style={{ transformOrigin: '200px 200px' }}
+              />
+
+              {/* Connecting lines showing 3D depth */}
+              {[...Array(5)].map((_, i) => {
+                const angle1 = (i * 72 - 90) * (Math.PI / 180);
+                const angle2 = (i * 72 - 90 + 36) * (Math.PI / 180);
+                const x1 = 200 + 45 * Math.cos(angle1);
+                const y1 = 200 + 45 * Math.sin(angle1);
+                const x2 = 200 + 30 * Math.cos(angle2);
+                const y2 = 200 + 30 * Math.sin(angle2);
+                return (
+                  <motion.line
+                    key={`dodeca-${i}`}
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke="#D4AF37"
+                    strokeWidth="0.8"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 0.3 }}
+                    transition={{ duration: 1.5, delay: 0.4 + i * 0.1 }}
+                  />
+                );
+              })}
+
+              {/* Center star (pentagram showing quintessence) */}
+              <motion.path
+                d={(() => {
+                  const points = [...Array(5)].map((_, i) => {
+                    const angle = (i * 144 - 90) * (Math.PI / 180); // 144° for pentagram
+                    const x = 200 + 20 * Math.cos(angle);
+                    const y = 200 + 20 * Math.sin(angle);
+                    return `${x},${y}`;
+                  });
+                  return `M ${points[0]} L ${points[1]} L ${points[2]} L ${points[3]} L ${points[4]} Z`;
+                })()}
+                fill="none"
+                stroke="#D4AF37"
+                strokeWidth="1"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{
+                  scale: [0, 1.1, 1],
+                  opacity: [0, 0.6, 0.45]
+                }}
+                transition={{ duration: 2, delay: 0.8 }}
+                style={{ transformOrigin: '200px 200px' }}
+              />
             </g>
-          );
-        })}
+
+            {/* Seed of Life - 7 circles at center (source pattern) */}
+            <circle cx="200" cy="200" r="15" fill="none" stroke="#D4AF37" strokeWidth="0.5" />
+            {[...Array(6)].map((_, i) => {
+              const angle = (i * 60) * (Math.PI / 180);
+              const x = 200 + 15 * Math.cos(angle);
+              const y = 200 + 15 * Math.sin(angle);
+              return (
+                <circle key={`seed-${i}`} cx={x} cy={y} r="15" fill="none" stroke="#D4AF37" strokeWidth="0.5" />
+              );
+            })}
+
+            {/* Nested Polygons - Harmonic Divisions */}
+            {/* Dodecagon (12) - outer */}
+            <motion.polygon
+              points={[...Array(12)].map((_, i) => {
+                const angle = (i * 30 - 90) * (Math.PI / 180);
+                const x = 200 + 155 * Math.cos(angle);
+                const y = 200 + 155 * Math.sin(angle);
+                return `${x},${y}`;
+              }).join(' ')}
+              fill="none"
+              stroke="#D4AF37"
+              strokeWidth="1"
+              strokeDasharray="4,4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.3 }}
+              transition={{ duration: 2 }}
+            />
+
+            {/* Hexagon (6) - mid */}
+            <motion.polygon
+              points={[...Array(6)].map((_, i) => {
+                const angle = (i * 60 - 90) * (Math.PI / 180);
+                const x = 200 + 130 * Math.cos(angle);
+                const y = 200 + 130 * Math.sin(angle);
+                return `${x},${y}`;
+              }).join(' ')}
+              fill="none"
+              stroke="#D4AF37"
+              strokeWidth="1"
+              strokeDasharray="3,3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.25 }}
+              transition={{ duration: 2, delay: 0.3 }}
+            />
+
+            {/* Square (4) - inner */}
+            <motion.polygon
+              points={[...Array(4)].map((_, i) => {
+                const angle = (i * 90 - 45) * (Math.PI / 180);
+                const x = 200 + 90 * Math.cos(angle);
+                const y = 200 + 90 * Math.sin(angle);
+                return `${x},${y}`;
+              }).join(' ')}
+              fill="none"
+              stroke="#D4AF37"
+              strokeWidth="1"
+              strokeDasharray="2,2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.2 }}
+              transition={{ duration: 2, delay: 0.6 }}
+            />
+
+            {/* Upward Triangle (3) - core */}
+            <motion.polygon
+              points="200,140 230,180 170,180"
+              fill="none"
+              stroke="#D4AF37"
+              strokeWidth="1.5"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.35 }}
+              transition={{ duration: 2, delay: 0.9 }}
+            />
+
+            {/* Metatron's Cube - Connecting all 12 house centers */}
+            {spiralogicOrder.map((house1, i) => {
+              const pos1 = getHousePosition(house1);
+              return spiralogicOrder.slice(i + 1).map((house2, j) => {
+                const pos2 = getHousePosition(house2);
+                return (
+                  <line
+                    key={`metatron-${house1}-${house2}`}
+                    x1={pos1.x}
+                    y1={pos1.y}
+                    x2={pos2.x}
+                    y2={pos2.y}
+                    stroke="#D4AF37"
+                    strokeWidth="0.3"
+                    opacity="0.15"
+                  />
+                );
+              });
+            })}
+
+            {/* Elemental Trigrams - Perfect triangles connecting same-element houses */}
+            {/* Fire Triangle (Houses 1, 5, 9) */}
+            <motion.polygon
+              points={[1, 5, 9].map(h => {
+                const pos = getHousePosition(h);
+                return `${pos.x},${pos.y}`;
+              }).join(' ')}
+              fill="none"
+              stroke={elementalColors.fire.night}
+              strokeWidth="1.5"
+              strokeDasharray="5,5"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.4 }}
+              transition={{ duration: 3, delay: 1 }}
+            />
+
+            {/* Water Triangle (Houses 4, 8, 12) */}
+            <motion.polygon
+              points={[4, 8, 12].map(h => {
+                const pos = getHousePosition(h);
+                return `${pos.x},${pos.y}`;
+              }).join(' ')}
+              fill="none"
+              stroke={elementalColors.water.night}
+              strokeWidth="1.5"
+              strokeDasharray="5,5"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.4 }}
+              transition={{ duration: 3, delay: 1.3 }}
+            />
+
+            {/* Earth Triangle (Houses 10, 2, 6) */}
+            <motion.polygon
+              points={[10, 2, 6].map(h => {
+                const pos = getHousePosition(h);
+                return `${pos.x},${pos.y}`;
+              }).join(' ')}
+              fill="none"
+              stroke={elementalColors.earth.night}
+              strokeWidth="1.5"
+              strokeDasharray="5,5"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.4 }}
+              transition={{ duration: 3, delay: 1.6 }}
+            />
+
+            {/* Air Triangle (Houses 7, 11, 3) */}
+            <motion.polygon
+              points={[7, 11, 3].map(h => {
+                const pos = getHousePosition(h);
+                return `${pos.x},${pos.y}`;
+              }).join(' ')}
+              fill="none"
+              stroke={elementalColors.air.night}
+              strokeWidth="1.5"
+              strokeDasharray="5,5"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.4 }}
+              transition={{ duration: 3, delay: 1.9 }}
+            />
+          </g>
+        )}
 
         {/* 12 House segments - Spiralogic spiral order, clockwise */}
         <g>
@@ -393,19 +657,23 @@ export function SacredHouseWheel({
                   }}
                 />
 
-                {/* Element symbol at outer radius */}
-                <text
-                  x={200 + 170 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
-                  y={200 + 170 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fontSize="24"
+                {/* Alchemical elemental symbol at inner radius */}
+                <foreignObject
+                  x={200 + 85 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180)) - 12}
+                  y={200 + 85 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180)) - 12}
+                  width="24"
+                  height="24"
                   className="pointer-events-none"
                 >
-                  {houseStates[house as keyof typeof houseStates].symbol}
-                </text>
+                  <AlchemicalSymbol
+                    element={element}
+                    size={24}
+                    color={color}
+                    opacity={hoveredHouse === house ? 1.0 : 0.6}
+                  />
+                </foreignObject>
 
-                {/* Consciousness phase/state below symbol */}
+                {/* Consciousness phase/state */}
                 <text
                   x={200 + 170 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
                   y={200 + 170 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180)) + 16}
@@ -589,30 +857,38 @@ export function SacredHouseWheel({
           const pos = getPlanetPosition(planet);
           const element = houseElements[planet.house as keyof typeof houseElements] as keyof typeof elementalColors;
           const color = elementalColors[element][isDayMode ? 'day' : 'night'];
+          const isHovered = hoveredPlanet?.name === planet.name;
 
           return (
-            <g key={planet.name}>
+            <g
+              key={planet.name}
+              onMouseEnter={() => setHoveredPlanet(planet)}
+              onMouseLeave={() => setHoveredPlanet(null)}
+              className="cursor-pointer"
+            >
               {/* Planet glow */}
               <motion.circle
                 cx={pos.x}
                 cy={pos.y}
-                r="8"
+                r={isHovered ? 12 : 8}
                 fill={color}
-                fillOpacity="0.3"
+                fillOpacity={isHovered ? 0.5 : 0.3}
                 initial={{ scale: 0.8 }}
-                animate={{ scale: [0.8, 1, 0.8] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                animate={{ scale: isHovered ? [1, 1.2, 1] : [0.8, 1, 0.8] }}
+                transition={{ duration: isHovered ? 1 : 3, repeat: Infinity, ease: 'easeInOut' }}
+                style={{
+                  filter: isHovered ? `drop-shadow(0 0 8px ${color})` : 'none',
+                }}
               />
               {/* Planet point */}
               <circle
                 cx={pos.x}
                 cy={pos.y}
-                r="3"
+                r={isHovered ? 4 : 3}
                 fill={color}
-                className="cursor-pointer"
+                stroke={isHovered ? '#ffffff' : 'none'}
+                strokeWidth={isHovered ? 1 : 0}
               />
-              {/* Planet name on hover */}
-              <title>{planet.name} in {planet.sign} (House {planet.house})</title>
             </g>
           );
         })}
@@ -676,7 +952,7 @@ export function SacredHouseWheel({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute inset-x-0 top-full mt-6 mx-auto max-w-2xl"
+            className="absolute inset-x-0 top-full mt-6 mx-auto max-w-2xl z-50"
             style={{ pointerEvents: 'none' }}
           >
             <div
@@ -830,6 +1106,192 @@ export function SacredHouseWheel({
                           {element === 'water' && 'Heart → Healing → Holiness'}
                           {element === 'earth' && 'Mission → Means → Medicine'}
                           {element === 'air' && 'Connection → Community → Consciousness'}
+                        </span>
+                      </p>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Planetary Insight Overlay - Shows planet/sign/archetype/aspects */}
+        {hoveredPlanet !== null && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="absolute inset-x-0 top-full mt-6 mx-auto max-w-2xl z-50"
+            style={{ pointerEvents: 'none' }}
+          >
+            <div
+              className={`backdrop-blur-xl rounded-2xl border shadow-2xl overflow-hidden ${
+                isDayMode
+                  ? 'bg-white/80 border-stone-200/60'
+                  : 'bg-black/60 border-stone-700/40'
+              }`}
+              style={{
+                boxShadow: isDayMode
+                  ? '0 20px 60px rgba(0,0,0,0.1), 0 0 1px rgba(0,0,0,0.1)'
+                  : '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(139, 92, 246, 0.15)',
+              }}
+            >
+              {(() => {
+                const element = houseElements[hoveredPlanet.house as keyof typeof houseElements] as keyof typeof elementalColors;
+                const elementColor = elementalColors[element];
+                const color = isDayMode ? elementColor.day : elementColor.night;
+                const spiralogicData = getSpiralogicHouseData(hoveredPlanet.house);
+                const planetArchetype = getPlanetaryArchetype(hoveredPlanet.name);
+                const zodiacArchetype = getZodiacArchetype(hoveredPlanet.sign);
+                const planetAspects = aspects.filter(
+                  a => a.planet1 === hoveredPlanet.name || a.planet2 === hoveredPlanet.name
+                );
+
+                return (
+                  <>
+                    {/* Header with gradient */}
+                    <div
+                      className="px-6 py-4 border-b"
+                      style={{
+                        background: `linear-gradient(135deg, ${color}15, ${color}05)`,
+                        borderColor: isDayMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)',
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
+                            style={{
+                              background: `linear-gradient(135deg, ${color}30, ${color}10)`,
+                              boxShadow: `0 0 20px ${elementColor.glow}`,
+                            }}
+                          >
+                            {hoveredPlanet.name === 'Sun' && '☉'}
+                            {hoveredPlanet.name === 'Moon' && '☽'}
+                            {hoveredPlanet.name === 'Mercury' && '☿'}
+                            {hoveredPlanet.name === 'Venus' && '♀'}
+                            {hoveredPlanet.name === 'Mars' && '♂'}
+                            {hoveredPlanet.name === 'Jupiter' && '♃'}
+                            {hoveredPlanet.name === 'Saturn' && '♄'}
+                            {hoveredPlanet.name === 'Uranus' && '♅'}
+                            {hoveredPlanet.name === 'Neptune' && '♆'}
+                            {hoveredPlanet.name === 'Pluto' && '♇'}
+                            {hoveredPlanet.name === 'Chiron' && '⚷'}
+                            {(hoveredPlanet.name === 'North Node' || hoveredPlanet.name === 'South Node') && '☊'}
+                          </div>
+                          <div>
+                            <h3 className={`text-lg font-semibold ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                              {hoveredPlanet.name} in {hoveredPlanet.sign}
+                            </h3>
+                            <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                              {hoveredPlanet.degree.toFixed(1)}° · House {hoveredPlanet.house}
+                            </p>
+                          </div>
+                        </div>
+                        <div className={`text-xs uppercase tracking-wider font-medium ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                          {element.toUpperCase()}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Content Grid */}
+                    <div className="p-6 grid grid-cols-2 gap-6">
+                      {/* Left Column - Planetary Archetype */}
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                            Planetary Archetype
+                          </h4>
+                          <p className={`text-sm font-medium mb-2 ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                            {planetArchetype?.archetype || 'The Guide'}
+                          </p>
+                          <p className={`text-xs leading-relaxed ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                            {planetArchetype?.description || 'Inner wisdom and guidance'}
+                          </p>
+                        </div>
+
+                        <div>
+                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                            Sign Expression
+                          </h4>
+                          <p className={`text-xs leading-relaxed ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                            {zodiacArchetype?.description || `${hoveredPlanet.name} expresses through ${hoveredPlanet.sign} energy`}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Right Column - House Placement & Aspects */}
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                            House Activation
+                          </h4>
+                          <p className={`text-sm font-medium mb-1 ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                            {spiralogicData?.label}
+                          </p>
+                          <p className={`text-xs leading-relaxed ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                            {spiralogicData?.lesson}
+                          </p>
+                        </div>
+
+                        {planetAspects.length > 0 && (
+                          <div>
+                            <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                              Aspects ({planetAspects.length})
+                            </h4>
+                            <div className="space-y-1">
+                              {planetAspects.slice(0, 3).map((aspect, idx) => {
+                                const otherPlanet = aspect.planet1 === hoveredPlanet.name ? aspect.planet2 : aspect.planet1;
+                                return (
+                                  <div
+                                    key={idx}
+                                    className={`px-2 py-1 rounded text-xs ${isDayMode ? 'bg-stone-100/60' : 'bg-stone-800/40'}`}
+                                  >
+                                    <span className={isDayMode ? 'text-stone-900' : 'text-stone-100'}>
+                                      {aspect.type}
+                                    </span>
+                                    {' '}
+                                    <span className={isDayMode ? 'text-stone-600' : 'text-stone-400'}>
+                                      with {otherPlanet} ({aspect.orb.toFixed(1)}°)
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                              {planetAspects.length > 3 && (
+                                <p className={`text-xs italic ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                                  +{planetAspects.length - 3} more aspects
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {planetAspects.length === 0 && (
+                          <div>
+                            <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                              Aspects
+                            </h4>
+                            <p className={`text-xs italic ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                              No major aspects detected
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Footer - Elemental Integration */}
+                    <div
+                      className={`px-6 py-3 border-t text-center ${isDayMode ? 'bg-stone-50/50' : 'bg-stone-900/30'}`}
+                      style={{
+                        borderColor: isDayMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)',
+                      }}
+                    >
+                      <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                        <span className="opacity-60">Current Transits:</span>{' '}
+                        <span className="font-medium italic">
+                          Live transit data coming soon
                         </span>
                       </p>
                     </div>
