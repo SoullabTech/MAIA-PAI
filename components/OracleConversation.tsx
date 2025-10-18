@@ -2090,7 +2090,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                }}>
             <AnimatePresence>
               {messages.length > 0 && (
-                <div className="space-y-3 pb-6">
+                <div className="space-y-3 pb-32 md:pb-40">
                 {/* Show all messages with proper scrolling */}
                 {messages
                   .map((message, index) => {

@@ -5,6 +5,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global icon visibility fix - ensures all icons are visible */
+@import url('./icon-fix.css');
+
+/* Sacred holoflower animations */
+@import url('../styles/sacred-animations.css');
+
 /* Custom animations for onboarding and voice interface */
 @layer utilities {
   @keyframes spin-slow {

@@ -24,6 +24,7 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         "sacred-gradient": "linear-gradient(135deg, #B69A78 0%, #7A9A65 50%, #6B9BD1 100%)",
         "sacred-radial": "radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%)",
+        "arrakis-gradient": "radial-gradient(circle at 50% 70%, #1C130C 0%, #0A0907 100%)",
       },
       colors: {
         // 🜃 ANCIENT-FUTURE PALETTE - Technology as temple instrument
@@ -97,6 +98,33 @@ const config: Config = {
           glow: "#92B27D",      // Earth glow
           shadow: "#628253",    // Earth shadow
         },
+        // 🌌 ARRAKIS PALETTE - Day & Night desert intelligence
+        arrakis: {
+          // Night mode - Soul under starlight
+          night: {
+            horizon: '#0A0907',      // Infinite backdrop, still air
+            shadow: '#1C130C',       // Warm near-ground tone
+            stone: '#9B6B3C',        // Sandstone memory, rim light
+            ember: '#D88A2D',        // Accent, living light of motion
+            starlight: '#E7E2CF',    // Sparse highlights, glyph inlay
+            ash: '#72695E',          // Muted neutral for secondary text
+            panel: 'rgba(12,9,7,0.9)',  // Tooltip/card panels
+          },
+          // Day mode - Dawn on ancient stone
+          day: {
+            horizon: '#E8DCC8',      // Soft morning sky
+            shadow: '#D4C4B0',       // Warm sand light
+            stone: '#9B6B3C',        // Sandstone (consistent)
+            ember: '#C67A28',        // Deeper ember for contrast
+            text: '#3D2E1F',         // Deep warm brown for body text
+            ash: '#6B5E52',          // Cooled ash (darker for visibility)
+            panel: 'rgba(228,220,200,0.85)',  // Translucent panels
+          },
+          // Shared
+          stone: '#9B6B3C',          // Sandstone memory (both modes)
+          ember: '#D88A2D',          // Living light (both modes)
+        },
+
         // 🏜️ DUNE AESTHETIC PALETTE - The Spice Must Flow
         dune: {
           // Desert Sand Tones
@@ -196,6 +224,8 @@ const config: Config = {
         'sacred-deep': '0 10px 40px rgba(10, 14, 39, 0.3)',
         'sacred-gold': '0 0 30px rgba(255, 215, 0, 0.2)',
         'sacred-inner': 'inset 0 2px 10px rgba(255, 215, 0, 0.05)',
+        'etch-light': '0 1px 0 #000, 0 0 6px rgba(216,138,45,0.4)',
+        'ember-glow': '0 0 10px 2px rgba(216,138,45,0.5)',
       },
       fontFamily: {
         'sacred-primary': ['Inter', 'SF Pro Display', '-apple-system', 'sans-serif'],
@@ -219,6 +249,10 @@ const config: Config = {
         "consciousness-ripple": "consciousness-ripple 2s infinite",
         "golden-spin": "golden-spin 6.18s linear infinite",
         "float-sacred": "float-sacred 4.236s ease-in-out infinite",
+        // Arrakis at Night animations
+        "shimmer": "shimmer 8s ease-in-out infinite",
+        "pulseember": "pulseember 5s ease-in-out infinite",
+        "dust": "dust 30s linear infinite",
       },
       keyframes: {
         emergence: {
@@ -252,6 +286,18 @@ const config: Config = {
         'float-sacred': {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-10px)' },
+        },
+        shimmer: {
+          '0%,100%': { opacity: '0.4' },
+          '50%': { opacity: '0.6' },
+        },
+        pulseember: {
+          '0%,100%': { transform: 'scale(1)', opacity: '0.9' },
+          '50%': { transform: 'scale(1.02)', opacity: '1' },
+        },
+        dust: {
+          '0%': { transform: 'translateY(0)' },
+          '100%': { transform: 'translateY(-5%)' },
         },
       },
     },

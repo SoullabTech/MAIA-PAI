@@ -14,52 +14,68 @@
  */
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { Sparkles, Flame, Droplet, Sprout, Wind, Sparkle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ElementalBalanceDisplay } from '@/components/astrology/ElementalBalanceDisplay';
 import { SacredHouseWheel } from '@/components/astrology/SacredHouseWheel';
 import { getZodiacArchetype } from '@/lib/astrology/archetypeLibrary';
+import { getSpiralogicPlanetDescription } from '@/lib/astrology/spiralogicHouseMapping';
+import { BirthDataForm } from '@/components/astrology/BirthDataForm';
+import { MiniHoloflower } from '@/components/holoflower/MiniHoloflower';
 
 interface BirthChartData {
   sun: { sign: string; degree: number; house: number };
   moon: { sign: string; degree: number; house: number };
+  mercury?: { sign: string; degree: number; house: number };
+  venus?: { sign: string; degree: number; house: number };
+  mars?: { sign: string; degree: number; house: number };
+  jupiter?: { sign: string; degree: number; house: number };
+  saturn?: { sign: string; degree: number; house: number };
+  uranus?: { sign: string; degree: number; house: number };
+  neptune?: { sign: string; degree: number; house: number };
+  pluto?: { sign: string; degree: number; house: number };
+  chiron?: { sign: string; degree: number; house: number };
+  northNode?: { sign: string; degree: number; house: number };
+  southNode?: { sign: string; degree: number; house: number };
   ascendant: { sign: string; degree: number };
+  midheaven?: { sign: string; degree: number };
+  houses?: number[]; // Array of 12 house cusp degrees
   aspects: Array<{
     planet1: string;
     planet2: string;
-    type: string;
+    type: 'conjunction' | 'sextile' | 'square' | 'trine' | 'opposition';
     orb: number;
   }>;
 }
 
-// Elemental color configuration (from your design system)
+// Arrakis night color palette - desert mysticism after the twin moons rise
 const elementalColors = {
   fire: {
     day: { primary: '#C85450', accent: '#F5A362', glow: 'rgba(200, 84, 80, 0.2)' },
-    night: { primary: '#F5A362', accent: '#C85450', glow: 'rgba(245, 163, 98, 0.3)' },
+    night: { primary: '#D97706', accent: '#F59E0B', glow: 'rgba(217, 119, 6, 0.4)' }, // spice-orange flames
   },
   water: {
     day: { primary: '#6B9BD1', accent: '#8BADD6', glow: 'rgba(107, 155, 209, 0.2)' },
-    night: { primary: '#8BADD6', accent: '#3D5A80', glow: 'rgba(139, 173, 214, 0.3)' },
+    night: { primary: '#3B82F6', accent: '#60A5FA', glow: 'rgba(59, 130, 246, 0.4)' }, // Fremen spice-blue eyes
   },
   earth: {
     day: { primary: '#7A9A65', accent: '#A8C69F', glow: 'rgba(122, 154, 101, 0.2)' },
-    night: { primary: '#A8C69F', accent: '#5F7A4F', glow: 'rgba(168, 198, 159, 0.3)' },
+    night: { primary: '#92400E', accent: '#B45309', glow: 'rgba(146, 64, 14, 0.3)' }, // deep desert sand
   },
   air: {
     day: { primary: '#D4B896', accent: '#E8D4BF', glow: 'rgba(212, 184, 150, 0.2)' },
-    night: { primary: '#E8D4BF', accent: '#B8997A', glow: 'rgba(232, 212, 191, 0.3)' },
+    night: { primary: '#A16207', accent: '#CA8A04', glow: 'rgba(161, 98, 7, 0.3)' }, // wind-blown spice dust
   },
   aether: {
     day: { primary: '#9B8FAA', accent: '#B5A8C1', glow: 'rgba(155, 143, 170, 0.2)' },
-    night: { primary: '#B5A8C1', accent: '#7D6E8F', glow: 'rgba(181, 168, 193, 0.3)' },
+    night: { primary: '#6366F1', accent: '#818CF8', glow: 'rgba(99, 102, 241, 0.3)' }, // Bene Gesserit prescience
   },
 };
 
 export default function AstrologyPage() {
   const [chartData, setChartData] = useState<BirthChartData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [birthData, setBirthData] = useState<any>(null); // Store for recalculation
   const [elementalBalance, setElementalBalance] = useState({
     fire: 0.28,
     water: 0.38,
@@ -67,25 +83,95 @@ export default function AstrologyPage() {
     air: 0.16,
   });
 
-  // Circadian rhythm - living color that breathes with time
-  const [isDayMode, setIsDayMode] = useState(true);
+  // Arrakis aesthetic - always desert night (the twin moons never set)
+  const [isDayMode, setIsDayMode] = useState(false);
 
   useEffect(() => {
-    const hour = new Date().getHours();
-    setIsDayMode(hour >= 6 && hour < 20); // Day mode 6am-8pm
+    // Force night mode for Arrakis aesthetic
+    setIsDayMode(false);
+
+    // Load saved birth data from localStorage on mount
+    const savedBirthData = localStorage.getItem('birthChartData');
+    if (savedBirthData) {
+      try {
+        const parsedData = JSON.parse(savedBirthData);
+        // Ensure house system is set (default to Porphyry if not present)
+        if (!parsedData.houseSystem) {
+          parsedData.houseSystem = 'porphyry';
+          // Save updated data back to localStorage
+          localStorage.setItem('birthChartData', JSON.stringify(parsedData));
+          console.log('Updated localStorage with Porphyry house system');
+        }
+        calculateChart(parsedData);
+      } catch (error) {
+        console.error('Failed to load saved birth data:', error);
+        setLoading(false);
+      }
+    } else {
+      setLoading(false);
+    }
   }, []);
 
+
+  // Fetch chart from API using real ephemeris calculations
+  const calculateChart = async (data: any) => {
+    setLoading(true);
+    setBirthData(data);
+
+    // Save birth data to localStorage for future visits
+    localStorage.setItem('birthChartData', JSON.stringify(data));
+
+    try {
+      const response = await fetch('/api/astrology/birth-chart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...data, houseSystem: 'porphyry' }),
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        setChartData({
+          sun: result.data.sun,
+          moon: result.data.moon,
+          mercury: result.data.mercury,
+          venus: result.data.venus,
+          mars: result.data.mars,
+          jupiter: result.data.jupiter,
+          saturn: result.data.saturn,
+          uranus: result.data.uranus,
+          neptune: result.data.neptune,
+          pluto: result.data.pluto,
+          chiron: result.data.chiron,
+          northNode: result.data.northNode,
+          southNode: result.data.southNode,
+          ascendant: result.data.ascendant,
+          midheaven: result.data.midheaven,
+          houses: result.data.houses,
+          aspects: result.data.aspects,
+        });
+
+        // Calculate elemental balance from chart
+        // TODO: Make this more sophisticated
+        setElementalBalance({
+          fire: 0.25,
+          water: 0.30,
+          earth: 0.20,
+          air: 0.25,
+        });
+      } else {
+        console.error('Chart calculation failed:', result.error);
+        alert('Failed to calculate birth chart. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error calculating chart:', error);
+      alert('Error calculating birth chart. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // Set your correct chart data directly (will wire up API when ephemeris is ready)
-    setChartData({
-      sun: { sign: 'Sagittarius', degree: 17.2, house: 4 },
-      moon: { sign: 'Scorpio', degree: 23.4, house: 8 },
-      ascendant: { sign: 'Leo', degree: 28.1 },
-      aspects: [
-        { planet1: 'Sun', planet2: 'Jupiter', type: 'conjunction', orb: 1.2 },
-        { planet1: 'Moon', planet2: 'Venus', type: 'conjunction', orb: 0.8 },
-      ],
-    });
     setLoading(false);
   }, []);
 
@@ -121,100 +207,172 @@ export default function AstrologyPage() {
     );
   }
 
-  // Gentle invitation to begin
+  // Birth data form - invitation to calculate chart
   if (!chartData) {
     return (
-      <div className={`min-h-screen flex items-center justify-center relative overflow-hidden transition-colors duration-[3000ms]
-        ${isDayMode
-          ? 'bg-gradient-to-b from-stone-50 via-amber-50/20 to-stone-100'
-          : 'bg-gradient-to-b from-[#0a0a0f] via-[#1a1a2e] to-[#16213e]'
-        }`}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="text-center relative z-10 max-w-md px-6"
-        >
-          <motion.div
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="mb-6"
-          >
-            <Sparkles
-              className={`w-16 h-16 mx-auto ${isDayMode ? 'text-amber-600' : 'text-amber-400'}`}
-              style={{ filter: `drop-shadow(0 0 16px ${elementalColors.aether[isDayMode ? 'day' : 'night'].glow})` }}
-            />
-          </motion.div>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className={`${isDayMode ? 'text-stone-700' : 'text-stone-300'} mb-6 font-serif text-lg leading-relaxed`}
-          >
-            Your blueprint awaits.
-            <br />
-            The field knows your breath.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            <Link
-              href="/settings"
-              className={`inline-block px-6 py-3 rounded-full transition-all duration-500
-                ${isDayMode
-                  ? 'bg-amber-100/50 text-amber-900 hover:bg-amber-200/60 border border-amber-200/40'
-                  : 'bg-indigo-900/30 text-amber-400 hover:bg-indigo-800/40 border border-amber-500/20'
-                } font-serif text-sm tracking-wide`}
-              style={{
-                boxShadow: `0 0 20px ${elementalColors.fire[isDayMode ? 'day' : 'night'].glow}`,
+      <div className="min-h-screen relative overflow-hidden transition-all duration-1000"
+        style={{
+          background: isDayMode
+            ? 'radial-gradient(circle at 50% 30%, #E8DCC8 0%, #D4C4B0 100%)'
+            : 'radial-gradient(circle at 50% 70%, #1C130C 0%, #0A0907 100%)'
+        }}>
+
+        {/* Subtle constellation field */}
+        <div className="absolute inset-0 opacity-20">
+          {[...Array(60)].map((_, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.2, 0.6, 0.2] }}
+              transition={{
+                duration: 3 + Math.random() * 4,
+                repeat: Infinity,
+                delay: Math.random() * 3,
               }}
-            >
-              Step into the field
-            </Link>
-          </motion.div>
-        </motion.div>
+              className="absolute rounded-full"
+              style={{
+                backgroundColor: '#E7E2CF', // Starlight white
+                width: Math.random() > 0.7 ? '2px' : '1px',
+                height: Math.random() > 0.7 ? '2px' : '1px',
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 py-12 min-h-screen flex items-center">
+          <div className="w-full">
+            <BirthDataForm
+              onSubmit={calculateChart}
+              loading={loading}
+              isDayMode={isDayMode}
+            />
+          </div>
+        </div>
       </div>
     );
   }
 
+  // Helper function to get all planets in a specific house
+  const getPlanetsInHouse = (houseNumber: number) => {
+    if (!chartData) return [];
+
+    const planetsInHouse: Array<{ name: string; sign: string; degree: number }> = [];
+
+    // Check all planets
+    if (chartData.sun.house === houseNumber) planetsInHouse.push({ name: 'Sun', ...chartData.sun });
+    if (chartData.moon.house === houseNumber) planetsInHouse.push({ name: 'Moon', ...chartData.moon });
+    if (chartData.mercury?.house === houseNumber) planetsInHouse.push({ name: 'Mercury', ...chartData.mercury });
+    if (chartData.venus?.house === houseNumber) planetsInHouse.push({ name: 'Venus', ...chartData.venus });
+    if (chartData.mars?.house === houseNumber) planetsInHouse.push({ name: 'Mars', ...chartData.mars });
+    if (chartData.jupiter?.house === houseNumber) planetsInHouse.push({ name: 'Jupiter', ...chartData.jupiter });
+    if (chartData.saturn?.house === houseNumber) planetsInHouse.push({ name: 'Saturn', ...chartData.saturn });
+    if (chartData.uranus?.house === houseNumber) planetsInHouse.push({ name: 'Uranus', ...chartData.uranus });
+    if (chartData.neptune?.house === houseNumber) planetsInHouse.push({ name: 'Neptune', ...chartData.neptune });
+    if (chartData.pluto?.house === houseNumber) planetsInHouse.push({ name: 'Pluto', ...chartData.pluto });
+    if (chartData.chiron?.house === houseNumber) planetsInHouse.push({ name: 'Chiron', ...chartData.chiron });
+    if (chartData.northNode?.house === houseNumber) planetsInHouse.push({ name: 'North Node', ...chartData.northNode });
+    if (chartData.southNode?.house === houseNumber) planetsInHouse.push({ name: 'South Node', ...chartData.southNode });
+
+    return planetsInHouse;
+  };
+
   // The living map - main blueprint interface
   return (
-    <div className={`min-h-screen relative overflow-hidden transition-colors duration-[3000ms]
-      ${isDayMode
-        ? 'bg-gradient-to-b from-stone-50 via-amber-50/20 to-stone-100'
-        : 'bg-gradient-to-b from-[#0a0a0f] via-[#1a1a2e] to-[#16213e]'
-      }`}>
+    <div className="min-h-screen relative overflow-hidden transition-all duration-1000"
+      style={{
+        background: isDayMode
+          ? 'radial-gradient(circle at 50% 30%, #E8DCC8 0%, #D4C4B0 100%)'
+          : 'radial-gradient(circle at 50% 70%, #1C130C 0%, #0A0907 100%)'
+      }}>
 
-      {/* Subtle constellation field - alive but not ornate */}
-      <div className="absolute inset-0 opacity-20">
-        {[...Array(60)].map((_, i) => (
+      {/* Arrakis Night Sky - Proper twinkling stars */}
+      <div className="absolute inset-0">
+        {/* Distant stars - subtle shimmer */}
+        {[...Array(200)].map((_, i) => {
+          const size = Math.random();
+          const twinkleSpeed = 2 + Math.random() * 3;
+          return (
+            <motion.div
+              key={`star-${i}`}
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: [0.1, size > 0.8 ? 0.9 : 0.5, 0.1],
+              }}
+              transition={{
+                duration: twinkleSpeed,
+                repeat: Infinity,
+                delay: Math.random() * 3,
+                ease: "easeInOut"
+              }}
+              className={`absolute rounded-full ${isDayMode ? 'bg-amber-400/40' : 'bg-orange-200/90'}`}
+              style={{
+                width: size > 0.9 ? '3px' : size > 0.7 ? '2px' : '1px',
+                height: size > 0.9 ? '3px' : size > 0.7 ? '2px' : '1px',
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                boxShadow: size > 0.8 ? `0 0 ${size * 8}px rgba(249, 115, 22, ${isDayMode ? 0.3 : 0.7})` : 'none',
+              }}
+            />
+          );
+        })}
+
+        {/* Bright navigational stars - like Arrakis */}
+        {[...Array(12)].map((_, i) => (
           <motion.div
-            key={i}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0.2, 0.6, 0.2] }}
-            transition={{
-              duration: 3 + Math.random() * 4,
-              repeat: Infinity,
-              delay: Math.random() * 3,
+            key={`bright-${i}`}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{
+              opacity: [0.4, 1, 0.4],
+              scale: [0.8, 1.2, 0.8],
             }}
-            className={`absolute rounded-full ${isDayMode ? 'bg-amber-400' : 'bg-amber-300'}`}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2,
+              ease: "easeInOut"
+            }}
+            className={`absolute rounded-full ${isDayMode ? 'bg-amber-500' : 'bg-orange-400'}`}
             style={{
-              width: Math.random() > 0.7 ? '2px' : '1px',
-              height: Math.random() > 0.7 ? '2px' : '1px',
+              width: '4px',
+              height: '4px',
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
+              boxShadow: `0 0 20px rgba(249, 115, 22, ${isDayMode ? 0.4 : 0.9}), 0 0 40px rgba(217, 119, 6, ${isDayMode ? 0.2 : 0.5})`,
             }}
           />
         ))}
+
+        {/* Subtle nebula clouds */}
+        {!isDayMode && (
+          <>
+            <motion.div
+              animate={{
+                opacity: [0.03, 0.08, 0.03],
+                scale: [1, 1.15, 1],
+              }}
+              transition={{ duration: 20, repeat: Infinity }}
+              className="absolute top-0 right-1/4 w-[600px] h-[600px] rounded-full blur-3xl"
+              style={{ background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1), transparent)' }}
+            />
+            <motion.div
+              animate={{
+                opacity: [0.02, 0.06, 0.02],
+                scale: [1, 1.2, 1],
+              }}
+              transition={{ duration: 25, repeat: Infinity, delay: 5 }}
+              className="absolute bottom-1/4 left-1/4 w-[700px] h-[700px] rounded-full blur-3xl"
+              style={{ background: 'radial-gradient(circle, rgba(59, 130, 246, 0.08), transparent)' }}
+            />
+          </>
+        )}
       </div>
 
       {/* Ambient elemental glows - soft presence */}
       <motion.div
         animate={{
-          opacity: [0.1, 0.2, 0.1],
+          opacity: [0.08, 0.15, 0.08],
           scale: [1, 1.1, 1],
         }}
         transition={{ duration: 8, repeat: Infinity }}
@@ -223,7 +381,7 @@ export default function AstrologyPage() {
       />
       <motion.div
         animate={{
-          opacity: [0.1, 0.15, 0.1],
+          opacity: [0.08, 0.12, 0.08],
           scale: [1, 1.2, 1],
         }}
         transition={{ duration: 10, repeat: Infinity, delay: 2 }}
@@ -234,26 +392,113 @@ export default function AstrologyPage() {
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-        {/* Threshold - Simple welcome */}
+        {/* Header - Spiralogic Evolutionary Report */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="text-center mb-16"
+          className="text-center mb-12"
         >
-          <h1 className={`text-3xl md:text-4xl font-serif mb-3 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
-            Your Cosmic Blueprint
+          <h1 className="text-3xl md:text-5xl font-serif mb-4 tracking-wide transition-colors duration-500"
+            style={{ color: isDayMode ? '#C67A28' : '#D88A2D' }}>
+            Alchemical Journey
           </h1>
-          <p className={`text-sm ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic`}>
-            The spiral of consciousness, woven through stars
-          </p>
+          <div className="text-sm font-serif space-y-1 transition-colors duration-500"
+            style={{ color: isDayMode ? '#3D2E1F' : '#E7E2CF' }}>
+            <p className="italic">Your soul's navigation through the waters of life</p>
+            <p className="text-xs mt-4 opacity-70">Birth Pattern: {chartData.sun.sign} Sun · {chartData.moon.sign} Moon · {chartData.ascendant.sign} Rising</p>
+
+            {/* Porphyry House System Note */}
+            <div className="mt-4 text-xs italic opacity-60">
+              <span className="opacity-40">Using Porphyry houses — the breathing middle path</span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Introduction */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.8 }}
+          className="rounded-2xl p-8 mb-10 backdrop-blur-md transition-all duration-500"
+          style={{
+            backgroundColor: 'rgba(12, 9, 7, 0.9)',
+            border: '1px solid #9B6B3C',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          }}
+        >
+          <h2 className="text-2xl font-serif mb-4" style={{ color: '#D88A2D' }}>
+            Reading the Pattern
+          </h2>
+          <div className="text-sm space-y-3 leading-relaxed" style={{ color: '#E7E2CF' }}>
+            <p>
+              This map transposes celestial positions into the <strong>12-Facet Process</strong>,
+              tracking planetary forces through Fire (vision), Water (emotion), Earth (form), and Air (mind).
+            </p>
+            <p>
+              Your <strong>birth pattern</strong> establishes the foundation.
+              <strong> Current transits</strong> reveal activation cycles.
+              <strong> Elemental balance</strong> shows where energy flows and where it stagnates.
+            </p>
+            <p className={`italic ${isDayMode ? 'text-stone-500' : 'text-stone-300'}`}>
+              Each phase follows the ancient rhythm: <strong>Vector</strong> (initiation),
+              <strong> Circle</strong> (sustenance), <strong>Spiral</strong> (transformation).
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Current Evolutionary Phase */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="rounded-2xl p-8 mb-10 backdrop-blur-md transition-all duration-500"
+          style={{
+            backgroundColor: 'rgba(12, 9, 7, 0.9)',
+            border: '1px solid #9B6B3C',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+          }}
+        >
+          <h2 className="text-2xl font-serif mb-6" style={{ color: '#D88A2D' }}>
+            Where Are You in Your Spiralogic Evolution?
+          </h2>
+          <div className="space-y-4 text-sm" style={{ color: '#E7E2CF' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {chartData.saturn && (
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'rgba(155, 107, 60, 0.2)' }}>
+                  <h3 className="font-semibold mb-2 flex items-center gap-2" style={{ color: '#E7E2CF' }}>
+                    <span>♄</span> Saturn in House {chartData.saturn.house}
+                  </h3>
+                  <p className="text-xs leading-relaxed">
+                    Karmic restructuring in discipline, responsibility, and emotional resilience.
+                  </p>
+                </div>
+              )}
+              {chartData.jupiter && (
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'rgba(155, 107, 60, 0.2)' }}>
+                  <h3 className="font-semibold mb-2 flex items-center gap-2" style={{ color: '#E7E2CF' }}>
+                    <span>♃</span> Jupiter in House {chartData.jupiter.house}
+                  </h3>
+                  <p className="text-xs leading-relaxed">
+                    Expansion and growth opportunities activating new possibilities.
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className={`mt-6 p-5 rounded-lg ${isDayMode ? 'bg-amber-50/80 border border-amber-200' : 'bg-amber-900/20 border border-amber-700/30'}`}>
+              <p className="font-serif italic">
+                <strong>Major Life Lesson Right Now:</strong> Integration of {chartData.sun.sign} solar consciousness
+                with {chartData.moon.sign} emotional depths through {chartData.ascendant.sign} self-expression.
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         {/* Elemental Balance - The living signature */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
+          transition={{ delay: 0.4, duration: 0.8 }}
           className={`rounded-2xl p-8 mb-12 backdrop-blur-md transition-all duration-500
             ${isDayMode
               ? 'bg-white/40 border border-stone-200/40'
@@ -263,14 +508,247 @@ export default function AstrologyPage() {
             boxShadow: `0 8px 32px ${isDayMode ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.3)'}`,
           }}
         >
+          <h2 className={`text-2xl font-serif mb-6 text-center ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+            Elemental Balancing & Current Energy Dynamics
+          </h2>
           <ElementalBalanceDisplay balance={elementalBalance} />
+          <div className={`mt-6 text-xs text-center ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+            <p>Dominant Element: <strong>{Object.entries(elementalBalance).reduce((a, b) => a[1] > b[1] ? a : b)[0].toUpperCase()}</strong> ·
+            Integration practices available through personalized guidance</p>
+          </div>
+        </motion.div>
+
+        {/* Spiralogic Elemental Mapping */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+          className={`rounded-2xl p-8 mb-12 backdrop-blur-md transition-all duration-500
+            ${isDayMode
+              ? 'bg-white/40 border border-stone-200/40'
+              : 'bg-black/20 border border-stone-700/20'
+            }`}
+          style={{
+            boxShadow: `0 8px 32px ${isDayMode ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.3)'}`,
+          }}
+        >
+          <h2 className={`text-3xl font-serif mb-8 text-center ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+            Spiralogic Elemental Mapping
+          </h2>
+
+          {/* FIRE: Vision, Activation, and Willpower */}
+          <div className="mb-10">
+            <div className="flex items-center gap-3 mb-6">
+              <Flame className={`w-6 h-6`} style={{ color: elementalColors.fire[isDayMode ? 'day' : 'night'].primary }} />
+              <h3 className={`text-2xl font-serif ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                FIRE: Vision, Activation, and Willpower
+              </h3>
+            </div>
+            <div className="space-y-4 ml-9">
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-red-50/60' : 'bg-red-900/20'}`}>
+                <h4 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Fire 1 – Self-Awareness (Vector: Intelligence) · 1st House
+                </h4>
+                <p className={`text-sm mb-2 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                  <strong>{chartData.ascendant.sign} Rising</strong> at {chartData.ascendant.degree.toFixed(1)}°
+                </p>
+                {getPlanetsInHouse(1).map((planet, idx) => (
+                  <p key={idx} className={`text-sm mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    <strong>{planet.name} in {planet.sign}</strong> at {planet.degree.toFixed(1)}°
+                  </p>
+                ))}
+                <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+                  Lesson: Self-awareness and how you initiate action.
+                </p>
+              </div>
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-red-50/60' : 'bg-red-900/20'}`}>
+                <h4 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Fire 2 – Expression in the World (Circle: Intention) · 5th House
+                </h4>
+                {getPlanetsInHouse(5).map((planet, idx) => (
+                  <p key={idx} className={`text-sm mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    <strong>{planet.name} in {planet.sign}</strong> at {planet.degree.toFixed(1)}°
+                  </p>
+                ))}
+                <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+                  Lesson: Passion, artistry, and personal joy.
+                </p>
+              </div>
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-red-50/60' : 'bg-red-900/20'}`}>
+                <h4 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Fire 3 – Transcendent Will (Spiral: Goal) · 9th House
+                </h4>
+                {getPlanetsInHouse(9).map((planet, idx) => (
+                  <p key={idx} className={`text-sm mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    <strong>{planet.name} in {planet.sign}</strong> at {planet.degree.toFixed(1)}°
+                  </p>
+                ))}
+                <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+                  Lesson: Expanding wisdom and visionary leadership.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* WATER: Emotional Depth, Healing, and Flow */}
+          <div className="mb-10">
+            <div className="flex items-center gap-3 mb-6">
+              <Droplet className={`w-6 h-6`} style={{ color: elementalColors.water[isDayMode ? 'day' : 'night'].primary }} />
+              <h3 className={`text-2xl font-serif ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                WATER: Emotional Depth, Healing, and Flow
+              </h3>
+            </div>
+            <div className="space-y-4 ml-9">
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-blue-50/60' : 'bg-blue-900/20'}`}>
+                <h4 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Water 1 – Emotional Intelligence (Vector: Intelligence) · 4th House
+                </h4>
+                {getPlanetsInHouse(4).map((planet, idx) => (
+                  <p key={idx} className={`text-sm mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    <strong>{planet.name} in {planet.sign}</strong> at {planet.degree.toFixed(1)}°
+                  </p>
+                ))}
+                <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+                  Lesson: Deep-rooted emotional cycles and inner foundation.
+                </p>
+              </div>
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-blue-50/60' : 'bg-blue-900/20'}`}>
+                <h4 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Water 2 – Death and Rebirth (Circle: Intention) · 8th House
+                </h4>
+                {getPlanetsInHouse(8).map((planet, idx) => (
+                  <p key={idx} className={`text-sm mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    <strong>{planet.name} in {planet.sign}</strong> at {planet.degree.toFixed(1)}°
+                  </p>
+                ))}
+                <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+                  Lesson: Personal power, shared resources, and shadow work.
+                </p>
+              </div>
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-blue-50/60' : 'bg-blue-900/20'}`}>
+                <h4 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Water 3 – Soul Depth (Spiral: Goal) · 12th House
+                </h4>
+                {getPlanetsInHouse(12).map((planet, idx) => (
+                  <p key={idx} className={`text-sm mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    <strong>{planet.name} in {planet.sign}</strong> at {planet.degree.toFixed(1)}°
+                  </p>
+                ))}
+                <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+                  Lesson: Past-life wisdom and spiritual healing.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* EARTH: Stability, Manifestation, and Purpose */}
+          <div className="mb-10">
+            <div className="flex items-center gap-3 mb-6">
+              <Sprout className={`w-6 h-6`} style={{ color: elementalColors.earth[isDayMode ? 'day' : 'night'].primary }} />
+              <h3 className={`text-2xl font-serif ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                EARTH: Stability, Manifestation, and Purpose
+              </h3>
+            </div>
+            <div className="space-y-4 ml-9">
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-green-50/60' : 'bg-green-900/20'}`}>
+                <h4 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Earth 1 – Purpose and Mission (Vector: Intelligence) · 10th House
+                </h4>
+                {getPlanetsInHouse(10).map((planet, idx) => (
+                  <p key={idx} className={`text-sm mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    <strong>{planet.name} in {planet.sign}</strong> at {planet.degree.toFixed(1)}°
+                  </p>
+                ))}
+                <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+                  Lesson: Public identity, long-term goals, and leadership.
+                </p>
+              </div>
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-green-50/60' : 'bg-green-900/20'}`}>
+                <h4 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Earth 2 – Resources and Plans (Circle: Intention) · 2nd House
+                </h4>
+                {getPlanetsInHouse(2).map((planet, idx) => (
+                  <p key={idx} className={`text-sm mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    <strong>{planet.name} in {planet.sign}</strong> at {planet.degree.toFixed(1)}°
+                  </p>
+                ))}
+                <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+                  Lesson: Financial security, values, and stability.
+                </p>
+              </div>
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-green-50/60' : 'bg-green-900/20'}`}>
+                <h4 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Earth 3 – Endurance and Cycles (Spiral: Goal) · 6th House
+                </h4>
+                {getPlanetsInHouse(6).map((planet, idx) => (
+                  <p key={idx} className={`text-sm mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    <strong>{planet.name} in {planet.sign}</strong> at {planet.degree.toFixed(1)}°
+                  </p>
+                ))}
+                <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+                  Lesson: Building sustainable habits and resilience.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* AIR: Thought, Communication, and Connection */}
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-6">
+              <Wind className={`w-6 h-6`} style={{ color: elementalColors.air[isDayMode ? 'day' : 'night'].primary }} />
+              <h3 className={`text-2xl font-serif ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                AIR: Thought, Communication, and Connection
+              </h3>
+            </div>
+            <div className="space-y-4 ml-9">
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-amber-50/60' : 'bg-amber-900/20'}`}>
+                <h4 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Air 1 – Clarity and Focus (Vector: Intelligence) · 7th House
+                </h4>
+                {getPlanetsInHouse(7).map((planet, idx) => (
+                  <p key={idx} className={`text-sm mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    <strong>{planet.name} in {planet.sign}</strong> at {planet.degree.toFixed(1)}°
+                  </p>
+                ))}
+                <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+                  Lesson: How partnerships shape self-growth.
+                </p>
+              </div>
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-amber-50/60' : 'bg-amber-900/20'}`}>
+                <h4 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Air 2 – Relationships and Dynamics (Circle: Intention) · 11th House
+                </h4>
+                {getPlanetsInHouse(11).map((planet, idx) => (
+                  <p key={idx} className={`text-sm mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    <strong>{planet.name} in {planet.sign}</strong> at {planet.degree.toFixed(1)}°
+                  </p>
+                ))}
+                <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+                  Lesson: Your role in the greater human tapestry.
+                </p>
+              </div>
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-amber-50/60' : 'bg-amber-900/20'}`}>
+                <h4 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Air 3 – Elevated Systems (Spiral: Goal) · 3rd House
+                </h4>
+                {getPlanetsInHouse(3).map((planet, idx) => (
+                  <p key={idx} className={`text-sm mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    <strong>{planet.name} in {planet.sign}</strong> at {planet.degree.toFixed(1)}°
+                  </p>
+                ))}
+                <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+                  Lesson: Mastering intellect, perception, and self-expression.
+                </p>
+              </div>
+            </div>
+          </div>
         </motion.div>
 
         {/* Sacred House Wheel - The mandala of becoming */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.5, duration: 1 }}
+          transition={{ delay: 0.6, duration: 1 }}
           className={`rounded-2xl p-8 mb-12 backdrop-blur-md transition-all duration-500
             ${isDayMode
               ? 'bg-white/40 border border-stone-200/40'
@@ -284,19 +762,162 @@ export default function AstrologyPage() {
             <h2 className={`text-xl font-serif mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
               The Twelve Pathways
             </h2>
-            <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic`}>
-              Hover to reveal sacred geometry
+            <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic mb-3`}>
+              Houses arranged in Spiralogic spiral order · Hover to reveal aspect patterns
             </p>
+            {/* Spiralogic Process Legend */}
+            <div className={`space-y-2 ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+              <div className="flex items-center justify-center gap-6 text-xs">
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-mono">→</span>
+                  <span>Vector (Cardinal) · Initiating</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-mono">○</span>
+                  <span>Circle (Fixed) · Sustaining</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-mono">∿</span>
+                  <span>Spiral (Mutable) · Transforming</span>
+                </div>
+              </div>
+              <div className={`text-xs italic text-center`}>
+                Each element flows: Vector → Circle → Spiral (Cardinal → Fixed → Mutable)
+              </div>
+            </div>
           </div>
-          <SacredHouseWheel
-            planets={[
+          {/* Sacred House Wheel with Static Holoflower Background */}
+          <div className="relative w-full max-w-3xl mx-auto pb-96">
+            {/* Container for wheel - fixed height to prevent bounce */}
+            <div className="relative flex items-center justify-center">
+              {/* Static Holoflower - Background spiral with Arrakis branding - sized to fit inside ring */}
+              <div
+                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                style={{
+                  opacity: 0.35,
+                  transform: 'translate(0, -2px)' // Fine-tune vertical alignment
+                }}
+              >
+                <MiniHoloflower
+                  size={240}
+                  isDayMode={false}
+                />
+              </div>
+
+              {/* Sacred House Wheel on top */}
+              <div className="relative z-10 w-full">
+                <SacredHouseWheel
+              planets={[
               { name: 'Sun', sign: chartData.sun.sign, house: chartData.sun.house, degree: chartData.sun.degree },
               { name: 'Moon', sign: chartData.moon.sign, house: chartData.moon.house, degree: chartData.moon.degree },
+              ...(chartData.mercury ? [{ name: 'Mercury', sign: chartData.mercury.sign, house: chartData.mercury.house, degree: chartData.mercury.degree }] : []),
+              ...(chartData.venus ? [{ name: 'Venus', sign: chartData.venus.sign, house: chartData.venus.house, degree: chartData.venus.degree }] : []),
+              ...(chartData.mars ? [{ name: 'Mars', sign: chartData.mars.sign, house: chartData.mars.house, degree: chartData.mars.degree }] : []),
+              ...(chartData.jupiter ? [{ name: 'Jupiter', sign: chartData.jupiter.sign, house: chartData.jupiter.house, degree: chartData.jupiter.degree }] : []),
+              ...(chartData.saturn ? [{ name: 'Saturn', sign: chartData.saturn.sign, house: chartData.saturn.house, degree: chartData.saturn.degree }] : []),
+              ...(chartData.uranus ? [{ name: 'Uranus', sign: chartData.uranus.sign, house: chartData.uranus.house, degree: chartData.uranus.degree }] : []),
+              ...(chartData.neptune ? [{ name: 'Neptune', sign: chartData.neptune.sign, house: chartData.neptune.house, degree: chartData.neptune.degree }] : []),
+              ...(chartData.pluto ? [{ name: 'Pluto', sign: chartData.pluto.sign, house: chartData.pluto.house, degree: chartData.pluto.degree }] : []),
+              ...(chartData.chiron ? [{ name: 'Chiron', sign: chartData.chiron.sign, house: chartData.chiron.house, degree: chartData.chiron.degree }] : []),
+              ...(chartData.northNode ? [{ name: 'North Node', sign: chartData.northNode.sign, house: chartData.northNode.house, degree: chartData.northNode.degree }] : []),
+              ...(chartData.southNode ? [{ name: 'South Node', sign: chartData.southNode.sign, house: chartData.southNode.house, degree: chartData.southNode.degree }] : []),
             ]}
-            aspects={chartData.aspects}
-            isDayMode={isDayMode}
-            showAspects={true}
-          />
+                houseCusps={chartData.houses}
+                aspects={chartData.aspects}
+                isDayMode={isDayMode}
+                showAspects={true}
+              />
+            </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* How to Engage MAIA Through Your Chart */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className={`mb-12 p-8 rounded-xl backdrop-blur-md ${
+            isDayMode
+              ? 'bg-gradient-to-br from-amber-50/80 to-orange-50/80 border border-amber-200/50'
+              : 'bg-gradient-to-br from-amber-950/20 to-orange-950/20 border border-amber-500/20'
+          }`}
+        >
+          <div className="flex items-center gap-3 mb-6">
+            <Sparkles className={`w-6 h-6 ${isDayMode ? 'text-amber-600' : 'text-amber-400'}`} />
+            <h3 className={`text-2xl font-serif ${isDayMode ? 'text-amber-900' : 'text-amber-200'}`}>
+              Working With Your Chart
+            </h3>
+          </div>
+
+          <div className={`space-y-6 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+            <p className="text-lg leading-relaxed">
+              This chart is not a fortune—it's a <strong>conversation map</strong>. Each planet is an archetype waiting to speak. Each house is an arena where soul-work unfolds.
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-white/60' : 'bg-black/30'}`}>
+                <h4 className={`font-semibold mb-3 ${isDayMode ? 'text-amber-900' : 'text-amber-300'}`}>
+                  🎭 Enter the Archetypal Theater
+                </h4>
+                <p className="text-sm leading-relaxed mb-3">
+                  Hover over any house on the wheel. When you see planets inside, click <strong>"✨ Enter Imaginal Realm"</strong> to open a dialogue with those archetypes.
+                </p>
+                <p className="text-xs italic opacity-75">
+                  Example: "Mars in Leo, what do you want me to know about my creative courage right now?"
+                </p>
+              </div>
+
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-white/60' : 'bg-black/30'}`}>
+                <h4 className={`font-semibold mb-3 ${isDayMode ? 'text-amber-900' : 'text-amber-300'}`}>
+                  🌊 Follow the Elemental Flow
+                </h4>
+                <p className="text-sm leading-relaxed mb-3">
+                  Notice which element dominates your chart (Fire/Water/Earth/Air). Ask MAIA: <strong>"What does my Water dominance need from me?"</strong>
+                </p>
+                <p className="text-xs italic opacity-75">
+                  Each element offers a different portal into your consciousness.
+                </p>
+              </div>
+
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-white/60' : 'bg-black/30'}`}>
+                <h4 className={`font-semibold mb-3 ${isDayMode ? 'text-amber-900' : 'text-amber-300'}`}>
+                  🔄 Track the Process Phases
+                </h4>
+                <p className="text-sm leading-relaxed mb-3">
+                  Each element moves through <strong>Vector → Circle → Spiral</strong>. See where your planets cluster. Ask: <strong>"How do I move from Circle to Spiral in my Earth houses?"</strong>
+                </p>
+                <p className="text-xs italic opacity-75">
+                  The Spiralogic framework maps consciousness development, not personality.
+                </p>
+              </div>
+
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-white/60' : 'bg-black/30'}`}>
+                <h4 className={`font-semibold mb-3 ${isDayMode ? 'text-amber-900' : 'text-amber-300'}`}>
+                  ⚡ Work With Tensions
+                </h4>
+                <p className="text-sm leading-relaxed mb-3">
+                  Squares and oppositions (the red/purple lines) show creative friction. Don't avoid them. Ask: <strong>"Moon square Saturn—what does this tension want to teach me?"</strong>
+                </p>
+                <p className="text-xs italic opacity-75">
+                  Sacred geometry reveals where growth happens through resistance.
+                </p>
+              </div>
+            </div>
+
+            <div className={`mt-6 p-5 rounded-lg border ${
+              isDayMode
+                ? 'bg-gradient-to-r from-amber-100/80 to-orange-100/80 border-amber-300'
+                : 'bg-gradient-to-r from-amber-900/30 to-orange-900/30 border-amber-500/30'
+            }`}>
+              <p className={`text-sm font-medium mb-2 ${isDayMode ? 'text-amber-900' : 'text-amber-300'}`}>
+                💡 Pro Tip: Start with houses that have multiple planets
+              </p>
+              <p className="text-sm leading-relaxed">
+                Stelliums (3+ planets in one house) create intense archetypal theaters. These are your power zones—where multiple voices converge. Engage them in dialogue to understand the complexity.
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         {/* The Big Three - Core trinity */}
@@ -341,7 +962,7 @@ export default function AstrologyPage() {
               {chartData.sun.degree.toFixed(1)}° · House {chartData.sun.house}
             </p>
             <p className={`text-xs italic ${isDayMode ? 'text-stone-700' : 'text-stone-300'} font-serif`}>
-              {getZodiacArchetype(chartData.sun.sign.toLowerCase())?.archetypes.mythological?.[0] || 'The Seeker'}
+              {getSpiralogicPlanetDescription(chartData.sun.house)}
             </p>
           </motion.div>
 
@@ -385,7 +1006,7 @@ export default function AstrologyPage() {
               {chartData.moon.degree.toFixed(1)}° · House {chartData.moon.house}
             </p>
             <p className={`text-xs italic ${isDayMode ? 'text-stone-700' : 'text-stone-300'} font-serif`}>
-              {getZodiacArchetype(chartData.moon.sign.toLowerCase())?.archetypes.mythological?.[0] || 'The Mystic'}
+              {getSpiralogicPlanetDescription(chartData.moon.house)}
             </p>
           </motion.div>
 
@@ -426,13 +1047,203 @@ export default function AstrologyPage() {
               {chartData.ascendant.sign}
             </p>
             <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mb-3`}>
-              {chartData.ascendant.degree.toFixed(1)}°
+              {chartData.ascendant.degree.toFixed(1)}° · House 1
             </p>
             <p className={`text-xs italic ${isDayMode ? 'text-stone-700' : 'text-stone-300'} font-serif`}>
-              {getZodiacArchetype(chartData.ascendant.sign.toLowerCase())?.archetypes.mythological?.[0] || 'The Bridge'}
+              {getSpiralogicPlanetDescription(1)}
             </p>
           </motion.div>
         </div>
+
+        {/* All Planetary Placements */}
+        {(chartData.mercury || chartData.venus || chartData.mars || chartData.jupiter || chartData.saturn) && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+            className={`rounded-2xl p-8 mb-12 backdrop-blur-md transition-all duration-500
+              ${isDayMode
+                ? 'bg-white/40 border border-stone-200/40'
+                : 'bg-black/20 border border-stone-700/20'
+              }`}
+            style={{
+              boxShadow: `0 8px 32px ${isDayMode ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.3)'}`,
+            }}
+          >
+            <h2 className={`text-xl font-serif mb-6 text-center ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+              Planetary Placements
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {chartData.mercury && (
+                <div className={`p-4 rounded-lg ${isDayMode ? 'bg-white/50' : 'bg-black/30'}`}>
+                  <p className={`text-sm font-medium mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    ☿ Mercury · Mind
+                  </p>
+                  <p className={`text-lg font-serif ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                    {chartData.mercury.sign}
+                  </p>
+                  <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mb-2`}>
+                    {chartData.mercury.degree.toFixed(1)}° · House {chartData.mercury.house}
+                  </p>
+                  <p className={`text-xs italic ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    {getSpiralogicPlanetDescription(chartData.mercury.house)}
+                  </p>
+                </div>
+              )}
+              {chartData.venus && (
+                <div className={`p-4 rounded-lg ${isDayMode ? 'bg-white/50' : 'bg-black/30'}`}>
+                  <p className={`text-sm font-medium mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    ♀ Venus · Love
+                  </p>
+                  <p className={`text-lg font-serif ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                    {chartData.venus.sign}
+                  </p>
+                  <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mb-2`}>
+                    {chartData.venus.degree.toFixed(1)}° · House {chartData.venus.house}
+                  </p>
+                  <p className={`text-xs italic ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    {getSpiralogicPlanetDescription(chartData.venus.house)}
+                  </p>
+                </div>
+              )}
+              {chartData.mars && (
+                <div className={`p-4 rounded-lg ${isDayMode ? 'bg-white/50' : 'bg-black/30'}`}>
+                  <p className={`text-sm font-medium mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    ♂ Mars · Action
+                  </p>
+                  <p className={`text-lg font-serif ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                    {chartData.mars.sign}
+                  </p>
+                  <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mb-2`}>
+                    {chartData.mars.degree.toFixed(1)}° · House {chartData.mars.house}
+                  </p>
+                  <p className={`text-xs italic ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    {getSpiralogicPlanetDescription(chartData.mars.house)}
+                  </p>
+                </div>
+              )}
+              {chartData.jupiter && (
+                <div className={`p-4 rounded-lg ${isDayMode ? 'bg-white/50' : 'bg-black/30'}`}>
+                  <p className={`text-sm font-medium mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    ♃ Jupiter · Expansion
+                  </p>
+                  <p className={`text-lg font-serif ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                    {chartData.jupiter.sign}
+                  </p>
+                  <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mb-2`}>
+                    {chartData.jupiter.degree.toFixed(1)}° · House {chartData.jupiter.house}
+                  </p>
+                  <p className={`text-xs italic ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    {getSpiralogicPlanetDescription(chartData.jupiter.house)}
+                  </p>
+                </div>
+              )}
+              {chartData.saturn && (
+                <div className={`p-4 rounded-lg ${isDayMode ? 'bg-white/50' : 'bg-black/30'}`}>
+                  <p className={`text-sm font-medium mb-1 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    ♄ Saturn · Structure
+                  </p>
+                  <p className={`text-lg font-serif ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                    {chartData.saturn.sign}
+                  </p>
+                  <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mb-2`}>
+                    {chartData.saturn.degree.toFixed(1)}° · House {chartData.saturn.house}
+                  </p>
+                  <p className={`text-xs italic ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    {getSpiralogicPlanetDescription(chartData.saturn.house)}
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Practical Integration & Next Steps */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.9, duration: 0.8 }}
+          className={`rounded-2xl p-8 mb-12 backdrop-blur-md transition-all duration-500
+            ${isDayMode
+              ? 'bg-white/40 border border-stone-200/40'
+              : 'bg-black/20 border border-stone-700/20'
+            }`}
+          style={{
+            boxShadow: `0 8px 32px ${isDayMode ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.3)'}`,
+          }}
+        >
+          <h2 className={`text-2xl font-serif mb-6 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+            Practical Rituals & Integration Practices
+          </h2>
+          <div className={`space-y-4 text-sm ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+            <div className={`p-5 rounded-lg ${isDayMode ? 'bg-blue-50/60' : 'bg-blue-900/20'}`}>
+              <h3 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                Moon in {chartData.moon.sign} → Emotional Intelligence Practice
+              </h3>
+              <p className="text-xs leading-relaxed">
+                Journal on your deepest emotional patterns. What recurring feelings guide your soul's journey?
+              </p>
+            </div>
+            {chartData.saturn && (
+              <div className={`p-5 rounded-lg ${isDayMode ? 'bg-green-50/60' : 'bg-green-900/20'}`}>
+                <h3 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                  Saturn in House {chartData.saturn.house} → Discipline Integration
+                </h3>
+                <p className="text-xs leading-relaxed">
+                  Dedicate structured time to mastering the lessons of limitation and responsibility in this life area.
+                </p>
+              </div>
+            )}
+            <div className={`p-5 rounded-lg ${isDayMode ? 'bg-amber-50/60' : 'bg-amber-900/20'}`}>
+              <h3 className={`font-semibold mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+                {chartData.ascendant.sign} Rising → Authentic Self-Expression
+              </h3>
+              <p className="text-xs leading-relaxed">
+                Practice showing up as your true self in daily interactions. How does your soul want to be seen?
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Final Thoughts - Embracing the Cosmic Dance */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.0 }}
+          className={`rounded-2xl p-10 mb-12 backdrop-blur-md transition-all duration-500 text-center
+            ${isDayMode
+              ? 'bg-gradient-to-br from-amber-50/80 to-purple-50/80 border border-amber-200/40'
+              : 'bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-purple-700/20'
+            }`}
+          style={{
+            boxShadow: `0 8px 32px ${isDayMode ? 'rgba(217, 119, 6, 0.15)' : 'rgba(139, 92, 246, 0.2)'}`,
+          }}
+        >
+          <h2 className={`text-3xl font-serif mb-6 ${isDayMode ? 'text-stone-800' : 'text-stone-100'}`}>
+            Embracing the Cosmic Dance
+          </h2>
+          <div className={`text-sm ${isDayMode ? 'text-stone-700' : 'text-stone-300'} space-y-4 max-w-2xl mx-auto leading-relaxed`}>
+            <p className="font-serif italic text-base">
+              This is a moment to embrace your unique path, trust your evolution, and step into your power with clarity and wisdom.
+            </p>
+            <div className="pt-6 space-y-2">
+              <p className="font-semibold">Next Steps:</p>
+              <ul className={`text-xs space-y-2 ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                <li>• Engage with the recommended practices and journal reflections</li>
+                <li>• Track shifting planetary influences over the coming months</li>
+                <li>• Consider personalized guidance through MAIA for deeper integration</li>
+              </ul>
+            </div>
+          </div>
+          <div className={`mt-8 pt-6 border-t ${isDayMode ? 'border-amber-200' : 'border-purple-700/30'}`}>
+            <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic`}>
+              Calculated with Time Passages-level precision using real ephemeris data
+            </p>
+            <p className={`text-xs mt-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'} font-serif`}>
+              Spiralogic Institute · Integrating Astrology, Neuroscience & Depth Psychology
+            </p>
+          </div>
+        </motion.div>
 
         {/* Benediction - The return */}
         <motion.div

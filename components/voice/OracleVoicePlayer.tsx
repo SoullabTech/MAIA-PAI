@@ -4,19 +4,33 @@ import { useEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 
 interface OracleVoicePlayerProps {
-  text: string;
+  text?: string;
+  audioUrl?: string;
   autoPlay?: boolean;
+  compact?: boolean;
+  muted?: boolean;
   onPlayStateChange?: (isPlaying: boolean) => void;
 }
 
 export default function OracleVoicePlayer({
   text,
+  audioUrl,
   autoPlay = false,
+  compact = false,
+  muted = false,
   onPlayStateChange
 }: OracleVoicePlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(muted);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Update muted state when prop changes
+  useEffect(() => {
+    setIsMuted(muted);
+    if (audioRef.current) {
+      audioRef.current.muted = muted;
+    }
+  }, [muted]);
 
   useEffect(() => {
     if (autoPlay && text) {

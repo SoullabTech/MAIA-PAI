@@ -68,7 +68,7 @@ export const AudioControlSettings: React.FC<AudioControlSettingsProps> = ({
         {audioEnabled ? (
           <Volume2 className="w-5 h-5 text-amber-300" />
         ) : (
-          <VolumeX className="w-5 h-5 text-gray-400" />
+          <VolumeX className="w-5 h-5" style={{ color: '#F59E0B' }} />
         )}
       </motion.button>
 
@@ -156,7 +156,7 @@ export const AudioSettingsPanel: React.FC<{
             onClick={onClose}
             className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
           >
-            <Settings className="w-5 h-5 text-gray-400" />
+            <Settings className="w-5 h-5" style={{ color: '#F59E0B' }} />
           </button>
         </div>
 

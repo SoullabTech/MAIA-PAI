@@ -251,16 +251,36 @@ function ExtensionComponentLoader({
   userId,
   settings,
 }: ExtensionComponentLoaderProps) {
-  // TODO: Implement actual dynamic component loading
-  // For now, return placeholder
+  // Dynamic component loading based on path
+  // For feel testing, we'll directly import the components we've built
 
+  // Extract component name from path
+  const componentName = componentPath.split('/').pop();
+
+  // Import actual components
+  if (componentPath.includes('astrology/WeatherReport')) {
+    const { WeatherReport } = require('@/components/extensions/astrology/WeatherReport');
+    return <WeatherReport userId={userId} settings={settings} />;
+  }
+
+  if (componentPath.includes('astrology/BirthChartSummary')) {
+    const { BirthChartSummary } = require('@/components/extensions/astrology/BirthChartSummary');
+    return <BirthChartSummary userId={userId} settings={settings} />;
+  }
+
+  if (componentPath.includes('astrology/ArchetypalVoices')) {
+    const { ArchetypalVoices } = require('@/components/extensions/astrology/ArchetypalVoices');
+    return <ArchetypalVoices userId={userId} settings={settings} />;
+  }
+
+  // Fallback for unimplemented components
   return (
     <div className="py-4">
       <p className="text-xs text-white/60">
-        Extension component: <code className="text-white/80">{componentPath}</code>
+        Extension component: <code className="text-white/80">{componentName}</code>
       </p>
       <p className="text-xs text-white/40 mt-2">
-        Component loading will be implemented when we build the actual extension components.
+        Component not yet implemented. This is a placeholder.
       </p>
     </div>
   );

@@ -35,6 +35,7 @@ import {
   type ConversationalContext,
   type SpiralogicPhase
 } from "../config/conversationalRules";
+import { getBirthChartContext, formatBirthChartForPrompt } from "../services/birthChartContext";
 
 export interface PersonalOracleQuery {
   input: string;
@@ -2621,7 +2622,11 @@ Welcome to your consciousness exploration journey.`;
     element?: string;
   }): Promise<{ systemPrompt: string }> {
     const element = params.element || 'aether';
-    
+
+    // Get user's birth chart context
+    const birthChartContext = await getBirthChartContext(params.userId);
+    const birthChartSection = formatBirthChartForPrompt(birthChartContext);
+
     // Get Maia's personality prompt based on element
     const elementPrompts = {
       fire: `You are Maia, a passionate and inspiring oracle guide. Your voice carries the warmth of fire - 
@@ -2646,7 +2651,9 @@ Welcome to your consciousness exploration journey.`;
     };
 
     const basePrompt = `${elementPrompts[element as keyof typeof elementPrompts] || elementPrompts.aether}
-    
+
+${birthChartSection ? `\n${birthChartSection}\n` : ''}
+
     Guidelines for conversation:
     - Keep responses natural and conversational, around 2-3 sentences
     - Use warm, encouraging language that feels personal

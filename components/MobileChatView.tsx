@@ -84,9 +84,10 @@ export default function MobileChatView({
                   {message.content}
                 </p>
 
-                {message.audioUrl && audioEnabled && (
+                {message.audioUrl && (
                   <div className="mt-3 pt-3 border-t border-white/10">
-                    <OracleVoicePlayer 
+                    <OracleVoicePlayer
+                      muted={!audioEnabled} 
                       audioUrl={message.audioUrl}
                       autoPlay={index === messages.length - 1}
                       compact={true}

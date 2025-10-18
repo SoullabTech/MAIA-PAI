@@ -89,10 +89,45 @@ export async function POST(request: NextRequest) {
         degree: chart.saturn.degree,
         house: chart.saturn.house,
       },
+      uranus: {
+        sign: chart.uranus.sign,
+        degree: chart.uranus.degree,
+        house: chart.uranus.house,
+      },
+      neptune: {
+        sign: chart.neptune.sign,
+        degree: chart.neptune.degree,
+        house: chart.neptune.house,
+      },
+      pluto: {
+        sign: chart.pluto.sign,
+        degree: chart.pluto.degree,
+        house: chart.pluto.house,
+      },
+      chiron: {
+        sign: chart.chiron.sign,
+        degree: chart.chiron.degree,
+        house: chart.chiron.house,
+      },
+      northNode: {
+        sign: chart.northNode.sign,
+        degree: chart.northNode.degree,
+        house: chart.northNode.house,
+      },
+      southNode: {
+        sign: chart.southNode.sign,
+        degree: chart.southNode.degree,
+        house: chart.southNode.house,
+      },
       ascendant: {
         sign: chart.ascendant.sign,
         degree: chart.ascendant.degree,
       },
+      midheaven: {
+        sign: chart.midheaven.sign,
+        degree: chart.midheaven.degree,
+      },
+      houses: chart.houses, // Array of 12 house cusp degrees
       aspects: chart.aspects.map(aspect => ({
         planet1: aspect.planet1,
         planet2: aspect.planet2,

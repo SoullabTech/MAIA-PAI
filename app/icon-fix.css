@@ -1,0 +1,26 @@
+/* Global icon visibility fix */
+/* Ensures all Lucide icons are visible with proper stroke color */
+svg[class*="lucide"] {
+  stroke: currentColor;
+}
+
+/* Specific fix for bottom navigation/control icons */
+[class*="bottom"] svg, 
+.fixed.bottom-0 svg,
+button svg {
+  stroke: currentColor !important;
+}
+
+/* Ensure icons inherit text color from parent */
+button:not([class*="text-"]) svg {
+  color: inherit;
+  stroke: white;
+}
+
+/* Dark background button icons should be light */
+.bg-black button svg,
+.bg-stone-900 button svg,
+[class*="bg-neutral-9"] button svg {
+  stroke: white !important;
+  color: white !important;
+}

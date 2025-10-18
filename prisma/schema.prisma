@@ -36,6 +36,7 @@ model User {
   reflections   InternalReflection[]
   sessions      Session[]
   quotes        QuoteShared[]
+  birthChart    BirthChart?
 
   @@index([username])
   @@index([lastActiveAt])
@@ -308,6 +309,58 @@ model SymbolResonance {
   @@index([userId])
   @@index([motif])
   @@index([score])
+}
+
+// ============================================================================
+// BIRTH CHART & ASTROLOGY
+// ============================================================================
+
+model BirthChart {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+
+  // Birth data
+  birthDate     String   // YYYY-MM-DD
+  birthTime     String   // HH:MM in 24-hour format
+  locationName  String   // Display name (e.g., "Baton Rouge, Louisiana")
+  latitude      Float
+  longitude     Float
+  timezone      String   // IANA timezone (e.g., "America/Chicago")
+
+  // Calculated chart data (JSON for flexibility)
+  // Structure: { sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune, pluto }
+  // Each planet: { sign, degree, house, retrograde }
+  planets       Json
+
+  // Ascendant & Midheaven
+  // Structure: { sign, degree }
+  ascendant     Json
+  midheaven     Json
+
+  // House cusps (12 cusp positions in degrees)
+  houseCusps    Float[]
+
+  // Aspects
+  // Structure: Array of { planet1, planet2, type, orb, exact }
+  aspects       Json
+
+  // Elemental balance calculated from chart
+  // Structure: { Fire, Water, Earth, Air, totals }
+  elementalBalance Json?
+
+  // Spiralogic mapping
+  // Which Spiralogic Focus States are emphasized by natal chart
+  spiralogicEmphasis Json?
+
+  // Timestamps
+  calculatedAt  DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([birthDate])
 }
 
 // ============================================================================
