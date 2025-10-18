@@ -415,6 +415,94 @@ export default function AstrologyPage() {
           </div>
         </motion.div>
 
+        {/* Sacred House Wheel - The mandala of becoming - HERO POSITION! */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 1 }}
+          className={`rounded-2xl p-8 mb-12 backdrop-blur-md transition-all duration-500
+            ${isDayMode
+              ? 'bg-white/40 border border-stone-200/40'
+              : 'bg-black/20 border border-stone-700/20'
+            }`}
+          style={{
+            boxShadow: `0 8px 32px ${isDayMode ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.3)'}`,
+          }}
+        >
+          <div className="text-center mb-6">
+            <h2 className={`text-xl font-serif mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+              Consciousness Field Map
+            </h2>
+            <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic mb-3`}>
+              Soul-centric field instrument · Hover to reveal neural pathways and archetypal insights · Click houses to learn alchemy
+            </p>
+            {/* Spiralogic Process Legend */}
+            <div className={`space-y-2 ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+              <div className="flex items-center justify-center gap-6 text-xs">
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-mono">→</span>
+                  <span>Vector (Cardinal) · Initiating</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-mono">○</span>
+                  <span>Circle (Fixed) · Sustaining</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-mono">∿</span>
+                  <span>Spiral (Mutable) · Transforming</span>
+                </div>
+              </div>
+              <div className={`text-xs italic text-center`}>
+                Each element flows: Vector → Circle → Spiral (Cardinal → Fixed → Mutable)
+              </div>
+            </div>
+          </div>
+          {/* Sacred House Wheel with Static Holoflower Background */}
+          <div className="relative w-full max-w-3xl mx-auto pb-96">
+            {/* Container for wheel - fixed height to prevent bounce */}
+            <div className="relative flex items-center justify-center">
+              {/* Static Holoflower - Background spiral with Arrakis branding - sized to fit inside ring */}
+              <div
+                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                style={{
+                  opacity: 0.35,
+                  transform: 'translate(0, -2px)' // Fine-tune vertical alignment
+                }}
+              >
+                <MiniHoloflower
+                  size={240}
+                  isDayMode={false}
+                />
+              </div>
+
+              {/* Sacred House Wheel on top */}
+              <div className="relative z-10 w-full">
+                <SacredHouseWheel
+              planets={[
+              { name: 'Sun', sign: chartData.sun.sign, house: chartData.sun.house, degree: chartData.sun.degree },
+              { name: 'Moon', sign: chartData.moon.sign, house: chartData.moon.house, degree: chartData.moon.degree },
+              ...(chartData.mercury ? [{ name: 'Mercury', sign: chartData.mercury.sign, house: chartData.mercury.house, degree: chartData.mercury.degree }] : []),
+              ...(chartData.venus ? [{ name: 'Venus', sign: chartData.venus.sign, house: chartData.venus.house, degree: chartData.venus.degree }] : []),
+              ...(chartData.mars ? [{ name: 'Mars', sign: chartData.mars.sign, house: chartData.mars.house, degree: chartData.mars.degree }] : []),
+              ...(chartData.jupiter ? [{ name: 'Jupiter', sign: chartData.jupiter.sign, house: chartData.jupiter.house, degree: chartData.jupiter.degree }] : []),
+              ...(chartData.saturn ? [{ name: 'Saturn', sign: chartData.saturn.sign, house: chartData.saturn.house, degree: chartData.saturn.degree }] : []),
+              ...(chartData.uranus ? [{ name: 'Uranus', sign: chartData.uranus.sign, house: chartData.uranus.house, degree: chartData.uranus.degree }] : []),
+              ...(chartData.neptune ? [{ name: 'Neptune', sign: chartData.neptune.sign, house: chartData.neptune.house, degree: chartData.neptune.degree }] : []),
+              ...(chartData.pluto ? [{ name: 'Pluto', sign: chartData.pluto.sign, house: chartData.pluto.house, degree: chartData.pluto.degree }] : []),
+              ...(chartData.chiron ? [{ name: 'Chiron', sign: chartData.chiron.sign, house: chartData.chiron.house, degree: chartData.chiron.degree }] : []),
+              ...(chartData.northNode ? [{ name: 'North Node', sign: chartData.northNode.sign, house: chartData.northNode.house, degree: chartData.northNode.degree }] : []),
+              ...(chartData.southNode ? [{ name: 'South Node', sign: chartData.southNode.sign, house: chartData.southNode.house, degree: chartData.southNode.degree }] : []),
+            ]}
+                houseCusps={chartData.houses}
+                aspects={chartData.aspects}
+                isDayMode={isDayMode}
+                showAspects={true}
+              />
+            </div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Introduction */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -740,94 +828,6 @@ export default function AstrologyPage() {
                   Lesson: Mastering intellect, perception, and self-expression.
                 </p>
               </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Sacred House Wheel - The mandala of becoming */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6, duration: 1 }}
-          className={`rounded-2xl p-8 mb-12 backdrop-blur-md transition-all duration-500
-            ${isDayMode
-              ? 'bg-white/40 border border-stone-200/40'
-              : 'bg-black/20 border border-stone-700/20'
-            }`}
-          style={{
-            boxShadow: `0 8px 32px ${isDayMode ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.3)'}`,
-          }}
-        >
-          <div className="text-center mb-6">
-            <h2 className={`text-xl font-serif mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
-              Consciousness Field Map
-            </h2>
-            <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic mb-3`}>
-              Soul-centric field instrument · Hover to reveal neural pathways and archetypal insights
-            </p>
-            {/* Spiralogic Process Legend */}
-            <div className={`space-y-2 ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
-              <div className="flex items-center justify-center gap-6 text-xs">
-                <div className="flex items-center gap-1">
-                  <span className="text-sm font-mono">→</span>
-                  <span>Vector (Cardinal) · Initiating</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-sm font-mono">○</span>
-                  <span>Circle (Fixed) · Sustaining</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-sm font-mono">∿</span>
-                  <span>Spiral (Mutable) · Transforming</span>
-                </div>
-              </div>
-              <div className={`text-xs italic text-center`}>
-                Each element flows: Vector → Circle → Spiral (Cardinal → Fixed → Mutable)
-              </div>
-            </div>
-          </div>
-          {/* Sacred House Wheel with Static Holoflower Background */}
-          <div className="relative w-full max-w-3xl mx-auto pb-96">
-            {/* Container for wheel - fixed height to prevent bounce */}
-            <div className="relative flex items-center justify-center">
-              {/* Static Holoflower - Background spiral with Arrakis branding - sized to fit inside ring */}
-              <div
-                className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                style={{
-                  opacity: 0.35,
-                  transform: 'translate(0, -2px)' // Fine-tune vertical alignment
-                }}
-              >
-                <MiniHoloflower
-                  size={240}
-                  isDayMode={false}
-                />
-              </div>
-
-              {/* Sacred House Wheel on top */}
-              <div className="relative z-10 w-full">
-                <SacredHouseWheel
-              planets={[
-              { name: 'Sun', sign: chartData.sun.sign, house: chartData.sun.house, degree: chartData.sun.degree },
-              { name: 'Moon', sign: chartData.moon.sign, house: chartData.moon.house, degree: chartData.moon.degree },
-              ...(chartData.mercury ? [{ name: 'Mercury', sign: chartData.mercury.sign, house: chartData.mercury.house, degree: chartData.mercury.degree }] : []),
-              ...(chartData.venus ? [{ name: 'Venus', sign: chartData.venus.sign, house: chartData.venus.house, degree: chartData.venus.degree }] : []),
-              ...(chartData.mars ? [{ name: 'Mars', sign: chartData.mars.sign, house: chartData.mars.house, degree: chartData.mars.degree }] : []),
-              ...(chartData.jupiter ? [{ name: 'Jupiter', sign: chartData.jupiter.sign, house: chartData.jupiter.house, degree: chartData.jupiter.degree }] : []),
-              ...(chartData.saturn ? [{ name: 'Saturn', sign: chartData.saturn.sign, house: chartData.saturn.house, degree: chartData.saturn.degree }] : []),
-              ...(chartData.uranus ? [{ name: 'Uranus', sign: chartData.uranus.sign, house: chartData.uranus.house, degree: chartData.uranus.degree }] : []),
-              ...(chartData.neptune ? [{ name: 'Neptune', sign: chartData.neptune.sign, house: chartData.neptune.house, degree: chartData.neptune.degree }] : []),
-              ...(chartData.pluto ? [{ name: 'Pluto', sign: chartData.pluto.sign, house: chartData.pluto.house, degree: chartData.pluto.degree }] : []),
-              ...(chartData.chiron ? [{ name: 'Chiron', sign: chartData.chiron.sign, house: chartData.chiron.house, degree: chartData.chiron.degree }] : []),
-              ...(chartData.northNode ? [{ name: 'North Node', sign: chartData.northNode.sign, house: chartData.northNode.house, degree: chartData.northNode.degree }] : []),
-              ...(chartData.southNode ? [{ name: 'South Node', sign: chartData.southNode.sign, house: chartData.southNode.house, degree: chartData.southNode.degree }] : []),
-            ]}
-                houseCusps={chartData.houses}
-                aspects={chartData.aspects}
-                isDayMode={isDayMode}
-                showAspects={true}
-              />
-            </div>
             </div>
           </div>
         </motion.div>

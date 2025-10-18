@@ -35,16 +35,10 @@ export function AlchemicalSymbol({
       // Simple upward triangle △ (RIGHT HEMISPHERE - no line)
       return (
         <svg width={size} height={size} viewBox="0 0 100 100">
-          <defs>
-            <linearGradient id={`fireGradient-${uniqueId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#C8A572" />
-              <stop offset="100%" stopColor="#B8860B" />
-            </linearGradient>
-          </defs>
           <path
             d="M 50 15 L 85 85 L 15 85 Z"
             fill="none"
-            stroke={`url(#fireGradient-${uniqueId})`}
+            stroke={color}
             strokeWidth={strokeWidth}
             strokeLinejoin="miter"
             opacity={opacity}
@@ -56,16 +50,10 @@ export function AlchemicalSymbol({
       // Simple downward triangle ▽ (RIGHT HEMISPHERE - no line)
       return (
         <svg width={size} height={size} viewBox="0 0 100 100">
-          <defs>
-            <linearGradient id={`waterGradient-${uniqueId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#C8A572" />
-              <stop offset="100%" stopColor="#B8860B" />
-            </linearGradient>
-          </defs>
           <path
             d="M 50 85 L 15 15 L 85 15 Z"
             fill="none"
-            stroke={`url(#waterGradient-${uniqueId})`}
+            stroke={color}
             strokeWidth={strokeWidth}
             strokeLinejoin="miter"
             opacity={opacity}
@@ -77,17 +65,11 @@ export function AlchemicalSymbol({
       // Downward triangle with horizontal line ▽— (LEFT HEMISPHERE - with line)
       return (
         <svg width={size} height={size} viewBox="0 0 100 100">
-          <defs>
-            <linearGradient id={`earthGradient-${uniqueId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#C8A572" />
-              <stop offset="100%" stopColor="#B8860B" />
-            </linearGradient>
-          </defs>
           {/* Inverted triangle */}
           <path
             d="M 50 85 L 15 15 L 85 15 Z"
             fill="none"
-            stroke={`url(#earthGradient-${uniqueId})`}
+            stroke={color}
             strokeWidth={strokeWidth}
             strokeLinejoin="miter"
             opacity={opacity}
@@ -98,7 +80,7 @@ export function AlchemicalSymbol({
             y1="50"
             x2="75"
             y2="50"
-            stroke={`url(#earthGradient-${uniqueId})`}
+            stroke={color}
             strokeWidth={strokeWidth}
             opacity={opacity}
           />
@@ -109,17 +91,11 @@ export function AlchemicalSymbol({
       // Upward triangle with horizontal line △— (LEFT HEMISPHERE - with line)
       return (
         <svg width={size} height={size} viewBox="0 0 100 100">
-          <defs>
-            <linearGradient id={`airGradient-${uniqueId}`} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#C8A572" />
-              <stop offset="100%" stopColor="#B8860B" />
-            </linearGradient>
-          </defs>
           {/* Upward triangle */}
           <path
             d="M 50 15 L 85 85 L 15 85 Z"
             fill="none"
-            stroke={`url(#airGradient-${uniqueId})`}
+            stroke={color}
             strokeWidth={strokeWidth}
             strokeLinejoin="miter"
             opacity={opacity}
@@ -130,7 +106,7 @@ export function AlchemicalSymbol({
             y1="50"
             x2="75"
             y2="50"
-            stroke={`url(#airGradient-${uniqueId})`}
+            stroke={color}
             strokeWidth={strokeWidth}
             opacity={opacity}
           />

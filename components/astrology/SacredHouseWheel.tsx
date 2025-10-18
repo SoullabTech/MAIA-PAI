@@ -1169,8 +1169,8 @@ export function SacredHouseWheel({
                   <AlchemicalSymbol
                     element={element}
                     size={24}
-                    color={color}
-                    opacity={hoveredHouse === house ? 1.0 : 0.6}
+                    color="#D4AF37"
+                    opacity={hoveredHouse === house ? 1.0 : 0.7}
                   />
                 </foreignObject>
 
