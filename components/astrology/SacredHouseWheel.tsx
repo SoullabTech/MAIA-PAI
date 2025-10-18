@@ -212,11 +212,11 @@ export function SacredHouseWheel({
   };
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative ${className}`} style={{ minHeight: '400px' }}>
       <svg
         width="400"
         height="400"
-        viewBox="0 0 400 400"
+        viewBox="-80 -80 560 560"
         className="w-full h-full"
         onMouseEnter={() => setRevealedAspects(true)}
         onMouseLeave={() => setRevealedAspects(false)}
@@ -941,7 +941,7 @@ export function SacredHouseWheel({
               transition={{ duration: 3, delay: 1.3 }}
             />
 
-            {/* Earth Triangle (Houses 10, 2, 6) */}
+            {/* Earth Triangle (Houses 10, 2, 6) - LEFT HEMISPHERE WITH LINE */}
             <motion.polygon
               points={[10, 2, 6].map(h => {
                 const pos = getHousePosition(h);
@@ -955,8 +955,28 @@ export function SacredHouseWheel({
               animate={{ pathLength: 1, opacity: 0.4 }}
               transition={{ duration: 3, delay: 1.6 }}
             />
+            {/* Horizontal line through Earth triangle (left hemisphere marker) */}
+            <motion.line
+              x1={(() => {
+                const pos2 = getHousePosition(2);
+                const pos6 = getHousePosition(6);
+                return (pos2.x + pos6.x) / 2;
+              })()}
+              y1={(() => {
+                const pos2 = getHousePosition(2);
+                const pos6 = getHousePosition(6);
+                return (pos2.y + pos6.y) / 2;
+              })()}
+              x2={getHousePosition(10).x}
+              y2={getHousePosition(10).y}
+              stroke={elementalColors.earth.night}
+              strokeWidth="1.5"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.4 }}
+              transition={{ duration: 2, delay: 2 }}
+            />
 
-            {/* Air Triangle (Houses 7, 11, 3) */}
+            {/* Air Triangle (Houses 7, 11, 3) - LEFT HEMISPHERE WITH LINE */}
             <motion.polygon
               points={[7, 11, 3].map(h => {
                 const pos = getHousePosition(h);
@@ -969,6 +989,26 @@ export function SacredHouseWheel({
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 0.4 }}
               transition={{ duration: 3, delay: 1.9 }}
+            />
+            {/* Horizontal line through Air triangle (left hemisphere marker) */}
+            <motion.line
+              x1={(() => {
+                const pos7 = getHousePosition(7);
+                const pos11 = getHousePosition(11);
+                return (pos7.x + pos11.x) / 2;
+              })()}
+              y1={(() => {
+                const pos7 = getHousePosition(7);
+                const pos11 = getHousePosition(11);
+                return (pos7.y + pos11.y) / 2;
+              })()}
+              x2={getHousePosition(3).x}
+              y2={getHousePosition(3).y}
+              stroke={elementalColors.air.night}
+              strokeWidth="1.5"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 0.4 }}
+              transition={{ duration: 2, delay: 2.3 }}
             />
           </g>
         )}
@@ -1235,6 +1275,14 @@ export function SacredHouseWheel({
               onMouseLeave={() => setHoveredPlanet(null)}
               className="cursor-pointer"
             >
+              {/* Invisible larger hover target */}
+              <circle
+                cx={pos.x}
+                cy={pos.y}
+                r={16}
+                fill="transparent"
+                className="cursor-pointer"
+              />
               {/* Planet glow */}
               <motion.circle
                 cx={pos.x}
@@ -1248,6 +1296,7 @@ export function SacredHouseWheel({
                 style={{
                   filter: isHovered ? `drop-shadow(0 0 8px ${color})` : 'none',
                 }}
+                className="pointer-events-none"
               />
               {/* Planet point */}
               <circle
@@ -1257,6 +1306,7 @@ export function SacredHouseWheel({
                 fill={color}
                 stroke={isHovered ? '#ffffff' : 'none'}
                 strokeWidth={isHovered ? 1 : 0}
+                className="pointer-events-none"
               />
             </g>
           );
@@ -1317,18 +1367,18 @@ export function SacredHouseWheel({
       <AnimatePresence>
         {hoveredHouse !== null && (
           <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute inset-x-0 bottom-full mb-6 mx-auto max-w-2xl z-50"
-            style={{ pointerEvents: 'none' }}
+            className="absolute left-1/2 top-1/2 mx-auto max-w-2xl z-50"
+            style={{ pointerEvents: 'none', transform: 'translate(-50%, -50%)' }}
           >
             <div
               className={`backdrop-blur-xl rounded-2xl border shadow-2xl overflow-hidden ${
                 isDayMode
-                  ? 'bg-white/80 border-stone-200/60'
-                  : 'bg-black/60 border-stone-700/40'
+                  ? 'bg-white/95 border-stone-200/60'
+                  : 'bg-black/85 border-stone-700/60'
               }`}
               style={{
                 boxShadow: isDayMode
@@ -1366,10 +1416,10 @@ export function SacredHouseWheel({
                             {houseState.symbol}
                           </div>
                           <div>
-                            <h3 className={`text-lg font-semibold ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                            <h3 className={`text-lg font-semibold ${isDayMode ? 'text-stone-900' : 'text-stone-200'}`}>
                               House {hoveredHouse} · {houseState.phase}
                             </h3>
-                            <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                            <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-300'}`}>
                               {element.toUpperCase()} · {spiralogicData?.phaseLabel}
                             </p>
                           </div>
@@ -1385,7 +1435,7 @@ export function SacredHouseWheel({
                       {/* Left Column - Spiralogic Framework */}
                       <div className="space-y-4">
                         <div>
-                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
                             Spiralogic Process
                           </h4>
                           <div className="space-y-2">
@@ -1408,7 +1458,7 @@ export function SacredHouseWheel({
                         </div>
 
                         <div>
-                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
                             Consciousness State
                           </h4>
                           <p className={`text-sm leading-relaxed ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
@@ -1420,7 +1470,7 @@ export function SacredHouseWheel({
                       {/* Right Column - Planets & Activation */}
                       <div className="space-y-4">
                         <div>
-                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
                             Neural Activation
                           </h4>
                           {planetsInHouse.length > 0 ? (
@@ -1440,7 +1490,7 @@ export function SacredHouseWheel({
                               ))}
                             </div>
                           ) : (
-                            <p className={`text-sm italic ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                            <p className={`text-sm italic ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
                               No planets currently activating this pathway
                             </p>
                           )}
@@ -1448,7 +1498,7 @@ export function SacredHouseWheel({
 
                         {planetsInHouse.length > 0 && (
                           <div>
-                            <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                            <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
                               Integration Pathway
                             </h4>
                             <p className={`text-xs leading-relaxed ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
@@ -1488,18 +1538,18 @@ export function SacredHouseWheel({
         {/* Planetary Insight Overlay - Shows planet/sign/archetype/aspects */}
         {hoveredPlanet !== null && (
           <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute inset-x-0 bottom-full mb-6 mx-auto max-w-2xl z-50"
-            style={{ pointerEvents: 'none' }}
+            className="absolute left-1/2 top-1/2 mx-auto max-w-2xl z-50"
+            style={{ pointerEvents: 'none', transform: 'translate(-50%, -50%)' }}
           >
             <div
               className={`backdrop-blur-xl rounded-2xl border shadow-2xl overflow-hidden ${
                 isDayMode
-                  ? 'bg-white/80 border-stone-200/60'
-                  : 'bg-black/60 border-stone-700/40'
+                  ? 'bg-white/95 border-stone-200/60'
+                  : 'bg-black/85 border-stone-700/60'
               }`}
               style={{
                 boxShadow: isDayMode
@@ -1551,10 +1601,10 @@ export function SacredHouseWheel({
                             {(hoveredPlanet.name === 'North Node' || hoveredPlanet.name === 'South Node') && '☊'}
                           </div>
                           <div>
-                            <h3 className={`text-lg font-semibold ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                            <h3 className={`text-lg font-semibold ${isDayMode ? 'text-stone-900' : 'text-stone-200'}`}>
                               {hoveredPlanet.name} in {hoveredPlanet.sign}
                             </h3>
-                            <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                            <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-300'}`}>
                               {hoveredPlanet.degree.toFixed(1)}° · House {hoveredPlanet.house}
                             </p>
                           </div>
@@ -1570,7 +1620,7 @@ export function SacredHouseWheel({
                       {/* Left Column - Planetary Archetype */}
                       <div className="space-y-4">
                         <div>
-                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
                             Planetary Archetype
                           </h4>
                           <p className={`text-sm font-medium mb-2 ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
@@ -1582,7 +1632,7 @@ export function SacredHouseWheel({
                         </div>
 
                         <div>
-                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
                             Sign Expression
                           </h4>
                           <p className={`text-xs leading-relaxed ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
@@ -1594,7 +1644,7 @@ export function SacredHouseWheel({
                       {/* Right Column - House Placement & Aspects */}
                       <div className="space-y-4">
                         <div>
-                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
                             House Activation
                           </h4>
                           <p className={`text-sm font-medium mb-1 ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
@@ -1607,7 +1657,7 @@ export function SacredHouseWheel({
 
                         {planetAspects.length > 0 && (
                           <div>
-                            <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                            <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
                               Aspects ({planetAspects.length})
                             </h4>
                             <div className="space-y-1">
@@ -1639,10 +1689,10 @@ export function SacredHouseWheel({
 
                         {planetAspects.length === 0 && (
                           <div>
-                            <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                            <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
                               Aspects
                             </h4>
-                            <p className={`text-xs italic ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                            <p className={`text-xs italic ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
                               No major aspects detected
                             </p>
                           </div>
