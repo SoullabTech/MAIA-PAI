@@ -66,9 +66,9 @@ export const AudioControlSettings: React.FC<AudioControlSettingsProps> = ({
         aria-label={audioEnabled ? 'Mute Maya voice' : 'Enable Maya voice'}
       >
         {audioEnabled ? (
-          <Volume2 className="w-5 h-5 text-amber-300" />
+          <Volume2 className="w-5 h-5 text-amber-400" />
         ) : (
-          <VolumeX className="w-5 h-5" style={{ color: '#F59E0B' }} />
+          <VolumeX className="w-5 h-5 text-amber-400" />
         )}
       </motion.button>
 
@@ -156,7 +156,7 @@ export const AudioSettingsPanel: React.FC<{
             onClick={onClose}
             className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
           >
-            <Settings className="w-5 h-5" style={{ color: '#F59E0B' }} />
+            <Settings className="w-5 h-5 text-amber-400" />
           </button>
         </div>
 

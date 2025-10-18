@@ -2463,13 +2463,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 }
               }, 300); // Slightly longer delay to ensure state updates
             }}
-            className="p-3 rounded-full transition-all duration-300"
-            style={{
-              color: '#F59E0B',
-              backgroundColor: !showChatInterface ? 'rgba(245, 158, 11, 0.2)' : 'transparent'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
+            className={`p-3 rounded-full transition-all duration-300 ${
+              !showChatInterface
+                ? 'text-amber-400 bg-amber-400/20 hover:text-amber-300'
+                : 'text-amber-400 hover:text-amber-300'
+            }`}
             title="Voice Mode"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
