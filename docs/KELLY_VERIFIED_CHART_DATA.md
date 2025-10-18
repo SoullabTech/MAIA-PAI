@@ -163,28 +163,34 @@
 
 **Fire 1 – Self-Awareness (Vector: Intelligence) · 1st House**
 - Ascendant: 29°25' Leo
-- Uranus in Virgo 24°14'
-- Pluto in Virgo 20°36'
+- Uranus in Virgo 24°14' - The Awakener
+- Pluto in Virgo 20°36' - The Alchemist
+- **Lesson:** Revolutionary self-awareness through radical transformation. You are designed to disrupt and purify simultaneously.
 
 **Fire 2 – Self-Expression (Circle: Intention) · 5th House**
-- Venus in Sagittarius 25°18'
+- Venus in Sagittarius 25°18' - T-Square focal planet
+- **Lesson:** Creative joy and artistic expression as release valve. You need to create beauty and celebrate truth to stay aligned.
 
 **Fire 3 – Transcendent Self (Spiral: Goal) · 9th House**
-- North Node in Taurus 15°59'R
+- North Node in Taurus 15°59'R - Soul's destiny
+- **Lesson:** Ground mystical wisdom into tangible, teachable frameworks. Your life purpose is making the invisible practical.
 
 ---
 
 ### 💧 WATER - Emotional, Psychic Intelligence
 
 **Water 1 – Emotional Intelligence (Vector: Intelligence) · 4th House**
-- Sun in Sagittarius 17°39'
-- Mercury in Scorpio 28°05' (conjunct IC)
+- Sun in Sagittarius 17°39' - Core Self, Ruler of Rising
+- Mercury in Scorpio 28°05' (conjunct IC) - The Messenger
+- **Lesson:** Your inner world is more important than outer achievement. Deep emotional foundation through philosophical quest and intense introspection.
 
 **Water 2 – Inner Transformation (Circle: Intention) · 8th House**
-- (No planets - but strong Scorpio influence)
+- (No planets - but strong Scorpio energy through Moon, Mercury, Neptune, South Node)
+- **Lesson:** Shadow work, death/rebirth cycles. Though unoccupied, transformation is central to your life through the Scorpio stellium.
 
 **Water 3 – Soul Depth (Spiral: Goal) · 12th House**
-- Jupiter in Leo 3°54'R
+- Jupiter in Leo 3°54'R - Leading planet of chart pattern
+- **Lesson:** Hidden mystical faith guides everything. You work behind the scenes spiritually, accessing wisdom through private retreat and interior practice.
 
 ---
 
@@ -193,28 +199,34 @@
 **Earth 1 – Purpose & Mission (Vector: Intelligence) · 10th House**
 - MC in Taurus 26°51'
 - (No planets)
+- **Lesson:** Build lasting structures in the world. Your public mission is creating something tangible, stable, and enduring.
 
 **Earth 2 – Resources & Plans (Circle: Intention) · 2nd House**
-- Mars in Libra 3°16'
+- Mars in Libra 3°16' - The Warrior
+- **Lesson:** Assert values through balanced, diplomatic action. Resources come through partnership and aesthetic refinement.
 
 **Earth 3 – Well-Formed Plan (Spiral: Goal) · 6th House**
 - (No planets)
+- **Lesson:** Daily ritual and sustainable practices. An area to develop - grounding the vision into consistent, health-supporting routines.
 
 ---
 
 ### 🌬 AIR - Mental, Relational, Communicative Intelligence
 
 **Air 1 – Interpersonal Relationships (Vector: Intelligence) · 7th House**
-- **Saturn in Pisces 23°05'** - FUNNEL FOCAL POINT
-- **Chiron in Pisces 21°42'**
+- **Saturn in Pisces 23°05'** - FUNNEL FOCAL POINT - The Karmic Teacher
+- **Chiron in Pisces 21°42'** - The Wounded Healer
+- **Lesson:** THIS IS YOUR PRIMARY LIFE WORK. All energies funnel through intimate relationship. Mastery comes through learning to give yourself completely without losing yourself. Your wound around boundaries and spiritual merging becomes your greatest medicine.
 
 **Air 2 – Collective Dynamics (Circle: Intention) · 11th House**
 - (No planets)
+- **Lesson:** Community building, social networks. An area you're developing - moving from one-to-one depth toward collective impact.
 
 **Air 3 – Elevated Communication (Spiral: Goal) · 3rd House**
-- **Moon in Scorpio 22°32'** (conjunct IC)
-- **Neptune in Scorpio 22°50'** (conjunct IC)
-- **South Node in Scorpio 15°59'**
+- **Moon in Scorpio 22°32'** (conjunct IC) - Emotional Body
+- **Neptune in Scorpio 22°50'** (conjunct IC) - The Mystic
+- **South Node in Scorpio 15°59'** - Past-Life Mastery
+- **Lesson:** MYSTICAL MESSAGING IS YOUR SOUL GIFT. Moon-Neptune conjunction = you are a psychic translator. Your challenge is bringing hidden, deep knowing into elevated, clear communication that serves consciousness evolution. This is past-life mastery - you've done this for lifetimes. Now: make the mystical teachable.
 
 ---
 
@@ -244,17 +256,27 @@
 
 ## Strongest Facets (Planetary Emphasis)
 
-1. **Air 3 (3rd House)** - Moon, Neptune, South Node in Scorpio
-   - Mystical messaging, psychic communication, depth perception
+1. **Air 3 (3rd House)** - Moon, Neptune, South Node in Scorpio ⭐⭐⭐
+   - **PSYCHIC TRANSLATOR** - Your strongest natural gift
+   - Mystical messaging, channeling invisible wisdom, making the unseen visible
+   - Past-life mastery in depth perception and occult communication
+   - Challenge: Trusting your knowing is valid, not "just you"
 
-2. **Fire 1 (1st House)** - Uranus, Pluto in Virgo
-   - Revolutionary self-awareness, transformative identity
+2. **Air 1 (7th House)** - Saturn, Chiron in Pisces ⭐⭐⭐
+   - **FUNNEL FOCAL POINT** - Your primary life work
+   - ALL chart energies channel through intimate relationship
+   - Learning sacred partnership, boundaries in spiritual merging
+   - Wound around "losing self in other" becomes medicine for collective
 
-3. **Air 1 (7th House)** - Saturn, Chiron in Pisces
-   - Relational mastery, spiritual partnerships
+3. **Fire 1 (1st House)** - Uranus, Pluto in Virgo ⭐⭐
+   - **REVOLUTIONARY IDENTITY** - Disruptive presence
+   - Awakener energy, radical transformation, purification through precision
+   - You can't do "normal" - designed to challenge assumptions
 
-4. **Water 1 (4th House)** - Sun, Mercury in Scorpio/Sagittarius
-   - Emotional intelligence foundation
+4. **Water 1 (4th House)** - Sun, Mercury in Sagittarius/Scorpio ⭐⭐
+   - **EMOTIONAL FOUNDATION** - Inner world primary
+   - Deep introspection, philosophical quest, intensity at the root
+   - Private spiritual practice more important than public achievement
 
 ---
 
