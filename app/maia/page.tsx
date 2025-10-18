@@ -133,11 +133,15 @@ export default function MAIAPage() {
     };
 
     checkSupabaseAuth().then(isSupabaseAuth => {
-      if (isSupabaseAuth) return; // Already authenticated
+      if (isSupabaseAuth) {
+        // User is authenticated via Supabase - no onboarding needed
+        setNeedsOnboarding(false);
+        return;
+      }
 
       // Fall back to localStorage beta system
       const newUser = localStorage.getItem('beta_user');
-    if (newUser) {
+      if (newUser) {
       try {
         const userData = JSON.parse(newUser);
         if (userData.onboarded !== true) {
