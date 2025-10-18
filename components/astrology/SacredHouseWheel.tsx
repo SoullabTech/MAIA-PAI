@@ -3,18 +3,22 @@
 /**
  * Sacred House Wheel - The 12 Houses as Living Mandala
  *
- * Slow rotation, not spin. Each house glows with its ruling element.
- * Aspect patterns appear as sacred geometry on hover - discovered, not displayed.
+ * Now with integrated neuroscience-consciousness mapping.
+ * Each house is a phase of consciousness, a neuronal node in the cortical map.
+ *
+ * Myth meeting neurobiology - cognitive cartography.
  *
  * Philosophy:
  * - The wheel breathes (30-second rotation)
- * - Houses pulse with elemental light
+ * - Houses pulse with elemental light as neural activation
  * - Planets appear as constellation points
  * - Aspects draw themselves on hover (sacred geometry revealed)
+ * - Center point = Aether = Neural hub integration
  */
 
 import { motion, useAnimation } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { getSpiralogicPhase, SPIRALOGIC_SPIRAL_ORDER } from '@/lib/astrology/neuroscienceMapping';
 
 interface Planet {
   name: string;
@@ -106,17 +110,16 @@ export function SacredHouseWheel({
   className = '',
 }: SacredHouseWheelProps) {
   const [hoveredHouse, setHoveredHouse] = useState<number | null>(null);
+  const [hoveredPlanet, setHoveredPlanet] = useState<Planet | null>(null);
   const [revealedAspects, setRevealedAspects] = useState(false);
   const controls = useAnimation();
 
-  // Slow eternal rotation (30 seconds per full cycle)
+  // Static wheel - archetypal positions are sacred and fixed
   useEffect(() => {
     controls.start({
-      rotate: 360,
+      rotate: 0,
       transition: {
-        duration: 30,
-        repeat: Infinity,
-        ease: 'linear',
+        duration: 0,
       },
     });
   }, [controls]);
@@ -135,15 +138,26 @@ export function SacredHouseWheel({
     };
   };
 
-  // Calculate planet position (more precise, based on degree within house)
-  // Uses Spiralogic spiral order for positioning
+  // Calculate planet position by HOUSE NUMBER on the Spiralogic wheel
+  // This is a PROCESS map - planets appear where their house sits in the spiral
+  // NOT by zodiac sign position
   const getPlanetPosition = (planet: Planet) => {
-    // Find house position in spiral order
+    // Find where this HOUSE NUMBER appears in the Spiralogic spiral
     const spiralIndex = spiralogicOrder.indexOf(planet.house);
-    const houseStartAngle = spiralIndex * 30;
-    const planetAngle = (houseStartAngle + (planet.degree % 30)) - 90;
+    if (spiralIndex === -1) {
+      console.warn(`House ${planet.house} not found in spiral order`);
+      return { x: 200, y: 200 }; // Center if unknown
+    }
+
+    // Each position occupies 30° on the wheel (like hours on a clock)
+    const positionStartAngle = spiralIndex * 30;
+
+    // Position planet within the 30° segment based on its degree within sign
+    const degreeWithinSign = planet.degree % 30;
+    const planetAngle = positionStartAngle + degreeWithinSign - 90; // -90 to start at 12 o'clock
+
     const angle = planetAngle * (Math.PI / 180);
-    const radius = 120;
+    const radius = 165; // Just outside the house ring
     return {
       x: 200 + radius * Math.cos(angle),
       y: 200 + radius * Math.sin(angle),
@@ -183,13 +197,30 @@ export function SacredHouseWheel({
         onMouseEnter={() => setRevealedAspects(true)}
         onMouseLeave={() => setRevealedAspects(false)}
       >
-        {/* Central point - the self */}
+        {/* Central point - AETHER - The still center, non-dual awareness */}
+        {/* Slow breathing pulse - 12s cycle (brain's resting rhythm) */}
+        <motion.circle
+          cx="200"
+          cy="200"
+          r="8"
+          fill="white"
+          initial={{ opacity: 0.6 }}
+          animate={{ opacity: [0.6, 1, 0.6] }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          style={{
+            filter: 'drop-shadow(0 0 12px rgba(255, 255, 255, 0.5))'
+          }}
+        />
         <circle
           cx="200"
           cy="200"
-          r="4"
-          fill={isDayMode ? '#78716c' : '#d6d3d1'}
-          opacity="0.6"
+          r="3"
+          fill={isDayMode ? '#fef3c7' : '#fef3c7'}
+          opacity="0.9"
         />
 
         {/* Outer wheel circle */}
@@ -224,6 +255,9 @@ export function SacredHouseWheel({
             const startAngle = (i * 30 - 90) * (Math.PI / 180);
             const endAngle = ((i + 1) * 30 - 90) * (Math.PI / 180);
 
+            // Find planets in this house
+            const planetsInHouse = planets.filter(p => p.house === house);
+
             // Arc path for house segment
             const innerRadius = 100;
             const outerRadius = 160;
@@ -249,8 +283,8 @@ export function SacredHouseWheel({
 
             return (
               <g key={house}>
-                {/* House segment */}
-                <path
+                {/* House segment - breathing with elemental rhythm */}
+                <motion.path
                   d={pathData}
                   fill={color}
                   fillOpacity={hoveredHouse === house ? 0.3 : 0.1}
@@ -259,28 +293,83 @@ export function SacredHouseWheel({
                   strokeOpacity={hoveredHouse === house ? 0.6 : 0.2}
                   onMouseEnter={() => setHoveredHouse(house)}
                   onMouseLeave={() => setHoveredHouse(null)}
-                  className="cursor-pointer transition-all duration-500"
+                  className="cursor-pointer"
                   style={{
                     filter: hoveredHouse === house
                       ? `drop-shadow(0 0 8px ${elementColor.glow})`
                       : 'none',
                   }}
+                  // Subtle breathing - different timing per element
+                  animate={{
+                    fillOpacity: hoveredHouse === house
+                      ? [0.3, 0.4, 0.3]
+                      : [0.1, 0.15, 0.1],
+                  }}
+                  transition={{
+                    duration: element === 'fire' ? 6 : element === 'water' ? 8 : element === 'earth' ? 10 : 7,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: i * 0.5, // Stagger the breathing
+                  }}
                 />
 
-                {/* House number */}
+                {/* House number - clearly visible coordinate */}
                 <text
                   x={200 + 130 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
                   y={200 + 130 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fill={color}
-                  fillOpacity={hoveredHouse === house ? 0.9 : 0.5}
-                  fontSize="12"
+                  fillOpacity={hoveredHouse === house ? 0.9 : 0.6}
+                  fontSize="14"
+                  fontWeight="400"
                   fontFamily="serif"
                   className="transition-all duration-500 pointer-events-none"
                 >
                   {house}
                 </text>
+
+                {/* Elemental phase label - subtle arc along inner rim */}
+                <text
+                  x={200 + 120 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
+                  y={200 + 120 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill={color}
+                  fillOpacity={hoveredHouse === house ? 0.8 : 0.4}
+                  fontSize="8"
+                  fontWeight="300"
+                  fontFamily="serif"
+                  className="transition-all duration-500 pointer-events-none"
+                  style={{
+                    letterSpacing: '0.05em'
+                  }}
+                >
+                  {getSpiralogicPhase(house).label}
+                </text>
+
+                {/* Planets in this house - show as text labels */}
+                {planetsInHouse.length > 0 && (
+                  <text
+                    x={200 + 115 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
+                    y={200 + 115 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill={color}
+                    fillOpacity={0.8}
+                    fontSize="9"
+                    fontFamily="serif"
+                    className="pointer-events-none"
+                  >
+                    {planetsInHouse.map(p => {
+                      // Abbreviate planet names
+                      const abbrev = p.name === 'North Node' ? 'NN' :
+                                    p.name === 'South Node' ? 'SN' :
+                                    p.name.substring(0, 2);
+                      return abbrev;
+                    }).join(' ')}
+                  </text>
+                )}
 
                 {/* Elemental glow pulse */}
                 {hoveredHouse === house && (
@@ -321,28 +410,35 @@ export function SacredHouseWheel({
           const color = elementalColors[element][isDayMode ? 'day' : 'night'];
 
           return (
-            <g key={planet.name}>
-              {/* Planet glow */}
-              <motion.circle
-                cx={pos.x}
-                cy={pos.y}
-                r="8"
-                fill={color}
-                fillOpacity="0.3"
-                initial={{ scale: 0.8 }}
-                animate={{ scale: [0.8, 1, 0.8] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-              />
-              {/* Planet point */}
+            <g
+              key={planet.name}
+              onMouseEnter={() => setHoveredPlanet(planet)}
+              onMouseLeave={() => setHoveredPlanet(null)}
+              className="cursor-pointer"
+            >
+              {/* Planet glow - FIXED SIZE to prevent vibration */}
               <circle
                 cx={pos.x}
                 cy={pos.y}
-                r="3"
+                r="10"
                 fill={color}
-                className="cursor-pointer"
+                fillOpacity={hoveredPlanet?.name === planet.name ? "0.6" : "0.3"}
+                className="transition-opacity duration-300"
+                style={{
+                  filter: hoveredPlanet?.name === planet.name
+                    ? `drop-shadow(0 0 8px ${color})`
+                    : 'none'
+                }}
               />
-              {/* Planet name on hover */}
-              <title>{planet.name} in {planet.sign} (House {planet.house})</title>
+              {/* Planet core - FIXED SIZE */}
+              <circle
+                cx={pos.x}
+                cy={pos.y}
+                r="4"
+                fill={color}
+                fillOpacity={hoveredPlanet?.name === planet.name ? "1" : "0.8"}
+                className="transition-opacity duration-300"
+              />
             </g>
           );
         })}
@@ -371,6 +467,103 @@ export function SacredHouseWheel({
           strokeDasharray="4,4"
         />
       </svg>
+
+      {/* House Overlay - Mythic Phase Description */}
+      {/* Slow reveal - Lynch principle: "When you slow down things are more beautiful" */}
+      {hoveredHouse !== null && (() => {
+        const phase = getSpiralogicPhase(hoveredHouse);
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }} // Slow, generous timing
+            className={`mt-4 p-5 rounded-lg ${
+              isDayMode
+                ? 'bg-stone-100/90 border border-stone-300'
+                : 'bg-stone-900/90 border border-stone-700/50'
+            }`}
+            style={{
+              backdropFilter: 'blur(8px)',
+              boxShadow: isDayMode ? '0 4px 20px rgba(0,0,0,0.08)' : '0 4px 20px rgba(0,0,0,0.4)'
+            }}
+          >
+            {/* Title arrives first */}
+            <motion.h3
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className={`text-lg font-serif mb-3 ${isDayMode ? 'text-stone-900' : 'text-orange-200'}`}
+            >
+              {phase.label} {phase.emoji} · {phase.spiralogicTheme}
+            </motion.h3>
+
+            {/* Mythic line arrives second - the breath after */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className={`text-sm font-serif italic mb-3 leading-relaxed ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}
+            >
+              {phase.mythicLine}
+            </motion.p>
+
+            {/* Description arrives third - the insight */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.7, delay: 0.5 }}
+              className={`text-sm leading-relaxed ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}
+            >
+              {phase.description}
+            </motion.p>
+
+            {/* Invitation arrives last - gently */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.7 }}
+              className={`text-xs mt-3 italic ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}
+            >
+              {phase.invitation}
+            </motion.p>
+          </motion.div>
+        );
+      })()}
+
+      {/* Planet Overlay - Archetypal Description */}
+      {hoveredPlanet && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`mt-4 p-4 rounded-lg ${
+            isDayMode
+              ? 'bg-stone-100 border border-stone-300'
+              : 'bg-stone-900 border border-stone-700'
+          }`}
+        >
+          <h3 className={`text-lg font-serif mb-2 ${isDayMode ? 'text-stone-900' : 'text-orange-200'}`}>
+            {hoveredPlanet.name} in {hoveredPlanet.sign}
+          </h3>
+          <p className={`text-sm font-serif italic mb-2 ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+            House {hoveredPlanet.house} · {hoveredPlanet.degree.toFixed(1)}°
+          </p>
+          <p className={`text-sm ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+            {hoveredPlanet.name === 'Sun' && 'Your conscious identity, life force, and creative essence. Where you shine and express your unique being.'}
+            {hoveredPlanet.name === 'Moon' && 'Your emotional nature, inner world, and instinctive responses. How you nurture and need to be nurtured.'}
+            {hoveredPlanet.name === 'Mercury' && 'Your mind, communication style, and how you process information. The messenger between worlds.'}
+            {hoveredPlanet.name === 'Venus' && 'Your values, aesthetic sense, and capacity for relationship. What you love and how you attract.'}
+            {hoveredPlanet.name === 'Mars' && 'Your drive, desire, and assertive force. How you take action and pursue what you want.'}
+            {hoveredPlanet.name === 'Jupiter' && 'Your quest for meaning, expansion, and wisdom. Where you find faith and abundance.'}
+            {hoveredPlanet.name === 'Saturn' && 'Your discipline, structure, and life lessons. Where you build mastery through time and commitment.'}
+            {hoveredPlanet.name === 'Uranus' && 'Your revolutionary spirit, intuition, and unique genius. Where you break free and innovate.'}
+            {hoveredPlanet.name === 'Neptune' && 'Your imagination, dreams, and connection to the infinite. Where boundaries dissolve into unity.'}
+            {hoveredPlanet.name === 'Pluto' && 'Your power to transform, regenerate, and touch the depths. Where you undergo soul-level metamorphosis.'}
+            {hoveredPlanet.name === 'Chiron' && 'The wounded healer. Your deepest wound that becomes your greatest gift to others.'}
+            {hoveredPlanet.name === 'North Node' && 'Your evolutionary direction. The soul\'s calling toward growth and future potential.'}
+            {hoveredPlanet.name === 'South Node' && 'Your karmic past. Gifts and patterns carried from previous experiences.'}
+          </p>
+        </motion.div>
+      )}
 
       {/* Legend - appears on aspect reveal */}
       {revealedAspects && aspects.length > 0 && (
