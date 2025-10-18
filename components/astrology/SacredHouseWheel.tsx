@@ -550,6 +550,187 @@ export function SacredHouseWheel({
         {/* SACRED GEOMETRY LAYER - Fremen Alchemist's Cosmology */}
         {showSacredGeometry && (
           <g opacity="0.25">
+            {/* TORUS FUNNEL - Consciousness Vortex (Elemental Alchemy book cover inspired) */}
+            <g>
+              {/* Top funnel (golden/fire - descending) */}
+              <defs>
+                <radialGradient id="topFunnelGradient" cx="50%" cy="50%">
+                  <stop offset="0%" stopColor="#F5A362" stopOpacity="0.4" />
+                  <stop offset="50%" stopColor="#D4AF37" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="#C8A572" stopOpacity="0.1" />
+                </radialGradient>
+                <radialGradient id="bottomFunnelGradient" cx="50%" cy="50%">
+                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.4" />
+                  <stop offset="50%" stopColor="#6B9BD1" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="#8BADD6" stopOpacity="0.1" />
+                </radialGradient>
+              </defs>
+
+              {/* Radial grid lines emanating from center - top funnel */}
+              {[...Array(24)].map((_, i) => {
+                const angle = (i * 15) * (Math.PI / 180);
+                const innerRadius = 0;
+                const outerRadius = 70;
+                const x1 = 200 + innerRadius * Math.cos(angle);
+                const y1 = 200 + innerRadius * Math.sin(angle);
+                const x2 = 200 + outerRadius * Math.cos(angle);
+                const y2 = 200 + outerRadius * Math.sin(angle);
+
+                return (
+                  <motion.line
+                    key={`radial-top-${i}`}
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke="#F5A362"
+                    strokeWidth="0.3"
+                    strokeOpacity="0.2"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{
+                      pathLength: [0, 1, 0],
+                      opacity: [0, 0.3, 0]
+                    }}
+                    transition={{
+                      duration: 8,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: i * 0.1,
+                    }}
+                  />
+                );
+              })}
+
+              {/* Radial grid lines emanating from center - bottom funnel */}
+              {[...Array(24)].map((_, i) => {
+                const angle = (i * 15) * (Math.PI / 180);
+                const innerRadius = 0;
+                const outerRadius = 70;
+                const x1 = 200 + innerRadius * Math.cos(angle);
+                const y1 = 200 + innerRadius * Math.sin(angle);
+                const x2 = 200 + outerRadius * Math.cos(angle);
+                const y2 = 200 + outerRadius * Math.sin(angle);
+
+                return (
+                  <motion.line
+                    key={`radial-bottom-${i}`}
+                    x1={x1}
+                    y1={y1}
+                    x2={x2}
+                    y2={y2}
+                    stroke="#8B5CF6"
+                    strokeWidth="0.3"
+                    strokeOpacity="0.15"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{
+                      pathLength: [0, 1, 0],
+                      opacity: [0, 0.25, 0]
+                    }}
+                    transition={{
+                      duration: 10,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: i * 0.12,
+                    }}
+                  />
+                );
+              })}
+
+              {/* Concentric circles showing torus rings */}
+              {[15, 25, 35, 50, 65].map((radius, i) => (
+                <motion.circle
+                  key={`torus-ring-${i}`}
+                  cx="200"
+                  cy="200"
+                  r={radius}
+                  fill="none"
+                  stroke={i < 3 ? "#F5A362" : "#8B5CF6"}
+                  strokeWidth="0.5"
+                  strokeOpacity="0.15"
+                  strokeDasharray="2,3"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{
+                    scale: [0.9, 1.1, 0.9],
+                    opacity: [0.1, 0.2, 0.1]
+                  }}
+                  transition={{
+                    duration: 6 + i,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                    delay: i * 0.5,
+                  }}
+                  style={{ transformOrigin: '200px 200px' }}
+                />
+              ))}
+
+              {/* Top funnel ellipse (perspective view) */}
+              <motion.ellipse
+                cx="200"
+                cy="200"
+                rx="70"
+                ry="25"
+                fill="url(#topFunnelGradient)"
+                stroke="#F5A362"
+                strokeWidth="0.8"
+                strokeOpacity="0.3"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{
+                  scale: [0.8, 1.05, 0.8],
+                  opacity: [0.2, 0.4, 0.2]
+                }}
+                transition={{
+                  duration: 7,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                style={{ transformOrigin: '200px 200px' }}
+              />
+
+              {/* Bottom funnel ellipse (perspective view) */}
+              <motion.ellipse
+                cx="200"
+                cy="200"
+                rx="70"
+                ry="25"
+                fill="url(#bottomFunnelGradient)"
+                stroke="#8B5CF6"
+                strokeWidth="0.8"
+                strokeOpacity="0.25"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{
+                  scale: [0.8, 1.08, 0.8],
+                  opacity: [0.15, 0.35, 0.15]
+                }}
+                transition={{
+                  duration: 9,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: 1,
+                }}
+                style={{ transformOrigin: '200px 200px' }}
+              />
+
+              {/* Center portal (the throat of the torus) */}
+              <motion.circle
+                cx="200"
+                cy="200"
+                r="8"
+                fill="none"
+                stroke="#D4AF37"
+                strokeWidth="1.5"
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{
+                  scale: [1, 1.3, 1],
+                  opacity: [0.6, 0.9, 0.6]
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
+            </g>
+
             {/* DODECAHEDRON - The Soul's Geometry (5th element, Aether) */}
             {/* 2D projection of dodecahedron embracing the holoflower */}
             <g>
