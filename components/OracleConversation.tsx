@@ -2501,13 +2501,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                   }, 100);
                 }
               }}
-              className="p-3 rounded-full transition-all duration-300"
-              style={{
-                color: isMuted ? '#F87171' : '#F59E0B',
-                backgroundColor: isMuted ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = isMuted ? '#FCA5A5' : '#FCD34D'}
-              onMouseLeave={(e) => e.currentTarget.style.color = isMuted ? '#F87171' : '#F59E0B'}
+              className={`p-3 rounded-full transition-all duration-300 border-0 ${
+                isMuted
+                  ? 'text-red-400 bg-red-400/20 hover:text-red-300'
+                  : 'text-amber-400 bg-neutral-800/90 hover:bg-neutral-700/90 hover:text-amber-300'
+              }`}
               title={isMuted ? "Unmute Microphone" : "Mute Microphone"}
             >
               {isMuted ? (
@@ -2542,13 +2540,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           {/* Chat Toggle */}
           <button
             onClick={() => setShowChatInterface(true)}
-            className="p-3 rounded-full transition-all duration-300"
-            style={{
-              color: '#F59E0B',
-              backgroundColor: showChatInterface ? 'rgba(245, 158, 11, 0.2)' : 'transparent'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
+            className={`p-3 rounded-full transition-all duration-300 text-amber-400 hover:text-amber-300 border-0 ${
+              showChatInterface ? 'bg-amber-400/20' : 'bg-neutral-800/90 hover:bg-neutral-700/90'
+            }`}
             title="Chat Mode"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2559,10 +2553,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
           {/* Heart/Favorites */}
           <button
-            className="p-3 rounded-full transition-all duration-300"
-            style={{ color: '#F59E0B' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
+            className="p-3 rounded-full transition-all duration-300 text-amber-400 hover:text-amber-300 bg-neutral-800/90 hover:bg-neutral-700/90 border-0"
             title="Favorites"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2574,10 +2565,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           {/* Profile/User */}
           <button
             onClick={() => window.location.href = '/profile'}
-            className="p-3 rounded-full transition-all duration-300"
-            style={{ color: '#F59E0B' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
+            className="p-3 rounded-full transition-all duration-300 text-amber-400 hover:text-amber-300 bg-neutral-800/90 hover:bg-neutral-700/90 border-0"
             title="Your Profile"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2589,10 +2577,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           {/* Birth Chart / Astrology - Holoflower Icon */}
           <button
             onClick={() => window.location.href = '/birth-chart'}
-            className="p-3 rounded-full transition-all duration-300 group"
-            style={{ color: '#F59E0B' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
+            className="p-3 rounded-full transition-all duration-300 group text-amber-400 hover:text-amber-300 bg-neutral-800/90 hover:bg-neutral-700/90 border-0"
             title="Your Cosmic Blueprint"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -2615,10 +2600,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           {/* Lab Notes */}
           <button
             onClick={() => window.location.href = '/lab-notes'}
-            className="p-3 rounded-full transition-all duration-300"
-            style={{ color: '#F59E0B' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
+            className="p-3 rounded-full transition-all duration-300 text-amber-400 hover:text-amber-300 bg-neutral-800/90 hover:bg-neutral-700/90 border-0"
             title="Lab Notes"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2630,10 +2612,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           {/* Journal/Book Icon - Open Book Style */}
           <button
             onClick={() => window.location.href = '/journal'}
-            className="p-3 rounded-full transition-all duration-300 group"
-            style={{ color: '#F59E0B' }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
+            className="p-3 rounded-full transition-all duration-300 group text-amber-400 hover:text-amber-300 bg-neutral-800/90 hover:bg-neutral-700/90 border-0"
             title="Sacred Journal"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
@@ -2679,10 +2658,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           {!showChatInterface && (
             <button
               onClick={() => setShowVoiceText(!showVoiceText)}
-              className="p-3 rounded-full transition-all duration-300"
-              style={{ color: '#F59E0B' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
+              className="p-3 rounded-full transition-all duration-300 text-amber-400 hover:text-amber-300 bg-neutral-800/90 hover:bg-neutral-700/90 border-0"
               title={showVoiceText ? "Hide Text" : "Show Text"}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2769,10 +2745,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           <button
             onClick={downloadTranscript}
             disabled={messages.length === 0}
-            className="p-3 rounded-full transition-all duration-300 disabled:opacity-30"
-            style={{ color: '#F59E0B' }}
-            onMouseEnter={(e) => !e.currentTarget.disabled && (e.currentTarget.style.color = '#FCD34D')}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
+            className="p-3 rounded-full transition-all duration-300 disabled:opacity-30 text-amber-400 hover:text-amber-300 bg-neutral-800/90 hover:bg-neutral-700/90 border-0"
             title="Download Transcript"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
