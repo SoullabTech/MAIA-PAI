@@ -90,6 +90,94 @@ const houseElements = {
   12: 'water',  // Transcendence
 };
 
+// Alchemical Education: Deep dive into each house's alchemical process
+const alchemicalEducation = {
+  1: {
+    operation: 'Calcinatio (Fire 1)',
+    process: 'Vector: Intelligence → Experience',
+    description: 'The alchemical fire of self-awareness. Burning away false identities to reveal your essential nature. The first spark of consciousness recognizing itself.',
+    practices: ['Mirror work: "Who am I beyond my stories?"', 'Physical movement to embody presence', 'Courage practices: facing fear directly'],
+    keywords: ['Identity', 'Initiation', 'Raw Experience', 'Self-Awareness'],
+  },
+  5: {
+    operation: 'Calcinatio (Fire 2)',
+    process: 'Circle: Intention → Expression',
+    description: 'Sustained creative fire. The joy of making something from nothing. Your unique gifts burning bright in sustained expression.',
+    practices: ['Daily creative practice (art, music, writing)', 'Play without purpose', 'Sharing your authentic joy'],
+    keywords: ['Creativity', 'Joy', 'Self-Expression', 'Artistry'],
+  },
+  9: {
+    operation: 'Calcinatio (Fire 3)',
+    process: 'Spiral: Goal → Expansion',
+    description: 'Philosophical fire reaching toward ultimate meaning. The quest for truth beyond cultural conditioning. Visionary wisdom burning through limitation.',
+    practices: ['Study wisdom traditions', 'Travel (physical or mental)', 'Teaching what you know'],
+    keywords: ['Philosophy', 'Meaning', 'Vision', 'Higher Learning'],
+  },
+  4: {
+    operation: 'Solutio (Water 1)',
+    process: 'Vector: Intelligence → Heart',
+    description: 'Dissolution into emotional roots. The waters of home and family washing through your foundation. Feeling the ancestral currents.',
+    practices: ['Ancestral healing work', 'Create sacred space at home', 'Emotional archaeology'],
+    keywords: ['Home', 'Roots', 'Foundation', 'Emotional Safety'],
+  },
+  8: {
+    operation: 'Solutio (Water 2)',
+    process: 'Circle: Intention → Healing',
+    description: 'Deep transformation through dissolution. Death and rebirth cycles. Shadow integration. Merging boundaries in intimacy and shared resources.',
+    practices: ['Shadow work journaling', 'Tantric practices', 'Energy healing', 'Facing death consciously'],
+    keywords: ['Transformation', 'Death/Rebirth', 'Shadow', 'Intimacy', 'Power'],
+  },
+  12: {
+    operation: 'Solutio (Water 3)',
+    process: 'Spiral: Goal → Holiness',
+    description: 'Total dissolution into oneness. Spiritual surrender. The mystic waters where ego boundaries disappear into universal consciousness.',
+    practices: ['Meditation retreats', 'Solitude practices', 'Dream work', 'Compassionate service'],
+    keywords: ['Transcendence', 'Spirituality', 'Dissolution', 'Unity'],
+  },
+  10: {
+    operation: 'Coagulatio (Earth 1)',
+    process: 'Vector: Intelligence → Mission',
+    description: 'Crystallizing purpose into public form. Your mission made manifest. Building legacy through disciplined structure.',
+    practices: ['Define your life\'s work', 'Build sustainable systems', 'Lead with integrity'],
+    keywords: ['Career', 'Mission', 'Legacy', 'Public Identity'],
+  },
+  2: {
+    operation: 'Coagulatio (Earth 2)',
+    process: 'Circle: Intention → Means',
+    description: 'Grounding resources and values. What you build, keep, and value. Material stability through sustained effort.',
+    practices: ['Financial planning', 'Define your values', 'Cultivate gratitude'],
+    keywords: ['Resources', 'Values', 'Stability', 'Self-Worth'],
+  },
+  6: {
+    operation: 'Coagulatio (Earth 3)',
+    process: 'Spiral: Goal → Medicine',
+    description: 'Refining daily practice into healing. Service through perfected craft. Your medicine made through disciplined devotion.',
+    practices: ['Daily ritual/routine', 'Health optimization', 'Skillful service'],
+    keywords: ['Service', 'Health', 'Daily Practice', 'Refinement'],
+  },
+  7: {
+    operation: 'Sublimatio (Air 1)',
+    process: 'Vector: Intelligence → Connection',
+    description: 'Rising through relationship. The other as mirror. Elevating consciousness through partnership and encounter.',
+    practices: ['Conscious relationship', 'Mirror work with partners', 'Seek balance'],
+    keywords: ['Partnership', 'Balance', 'Projection', 'The Other'],
+  },
+  11: {
+    operation: 'Sublimatio (Air 2)',
+    process: 'Circle: Intention → Community',
+    description: 'Collective elevation. Your role in the greater web. Future visions made real through group consciousness.',
+    practices: ['Join intentional community', 'Network with vision', 'Future planning'],
+    keywords: ['Community', 'Friendship', 'Collective', 'Future Vision'],
+  },
+  3: {
+    operation: 'Sublimatio (Air 3)',
+    process: 'Spiral: Goal → Consciousness',
+    description: 'Pure thought ascending. Communication perfected. Mind recognizing its own patterns and transcending them.',
+    practices: ['Write daily', 'Study systems thinking', 'Teach what you learn'],
+    keywords: ['Communication', 'Learning', 'Mind', 'Connection'],
+  },
+} as const;
+
 // Neuroscience Integration: Brain-Consciousness-Element Mapping
 const houseStates = {
   // FIRE - Right Prefrontal Cortex (Vision & Projection)
@@ -148,6 +236,7 @@ export function SacredHouseWheel({
 }: SacredHouseWheelProps) {
   const [hoveredHouse, setHoveredHouse] = useState<number | null>(null);
   const [hoveredPlanet, setHoveredPlanet] = useState<Planet | null>(null);
+  const [clickedHouse, setClickedHouse] = useState<number | null>(null);
   const [revealedAspects, setRevealedAspects] = useState(false);
   const [showSacredGeometry, setShowSacredGeometry] = useState(true); // Fremen alchemist mode
 
@@ -970,9 +1059,10 @@ export function SacredHouseWheel({
               x2={getHousePosition(10).x}
               y2={getHousePosition(10).y}
               stroke={elementalColors.earth.night}
-              strokeWidth="1.5"
+              strokeWidth="2"
+              strokeDasharray=""
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.4 }}
+              animate={{ pathLength: 1, opacity: 0.6 }}
               transition={{ duration: 2, delay: 2 }}
             />
 
@@ -1005,9 +1095,10 @@ export function SacredHouseWheel({
               x2={getHousePosition(3).x}
               y2={getHousePosition(3).y}
               stroke={elementalColors.air.night}
-              strokeWidth="1.5"
+              strokeWidth="2"
+              strokeDasharray=""
               initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ pathLength: 1, opacity: 0.4 }}
+              animate={{ pathLength: 1, opacity: 0.6 }}
               transition={{ duration: 2, delay: 2.3 }}
             />
           </g>
@@ -1058,6 +1149,7 @@ export function SacredHouseWheel({
                   strokeOpacity={hoveredHouse === house ? 0.9 : 0.5}
                   onMouseEnter={() => setHoveredHouse(house)}
                   onMouseLeave={() => setHoveredHouse(null)}
+                  onClick={() => setClickedHouse(clickedHouse === house ? null : house)}
                   className="cursor-pointer transition-all duration-500"
                   style={{
                     filter: hoveredHouse === house
@@ -1718,6 +1810,162 @@ export function SacredHouseWheel({
                 );
               })()}
             </div>
+          </motion.div>
+        )}
+
+        {/* Alchemical Education Popup - Click to learn about the house's alchemical process */}
+        {clickedHouse !== null && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            style={{ pointerEvents: 'auto' }}
+            onClick={() => setClickedHouse(null)}
+          >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+            {/* Educational Modal */}
+            <motion.div
+              initial={{ y: 20 }}
+              animate={{ y: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className={`relative max-w-2xl w-full rounded-3xl shadow-2xl overflow-hidden ${
+                isDayMode
+                  ? 'bg-white/95 border border-stone-200'
+                  : 'bg-black/90 border border-stone-700/50'
+              }`}
+              style={{
+                boxShadow: isDayMode
+                  ? '0 25px 80px rgba(0,0,0,0.15)'
+                  : '0 25px 80px rgba(0,0,0,0.7), 0 0 60px rgba(139, 92, 246, 0.2)',
+              }}
+            >
+              {(() => {
+                const element = houseElements[clickedHouse as keyof typeof houseElements] as keyof typeof elementalColors;
+                const elementColor = elementalColors[element];
+                const color = isDayMode ? elementColor.day : elementColor.night;
+                const education = alchemicalEducation[clickedHouse as keyof typeof alchemicalEducation];
+                const houseState = houseStates[clickedHouse as keyof typeof houseStates];
+
+                return (
+                  <>
+                    {/* Header */}
+                    <div
+                      className="p-8"
+                      style={{
+                        background: `linear-gradient(135deg, ${color}15, ${color}05)`,
+                        borderBottom: `1px solid ${isDayMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.1)'}`,
+                      }}
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <div
+                            className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl"
+                            style={{
+                              background: `linear-gradient(135deg, ${color}30, ${color}10)`,
+                              boxShadow: `0 0 30px ${elementColor.glow}`,
+                            }}
+                          >
+                            {houseState.symbol}
+                          </div>
+                          <div>
+                            <h2 className={`text-2xl font-serif font-semibold ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                              House {clickedHouse} · {houseState.phase}
+                            </h2>
+                            <p className={`text-sm ${isDayMode ? 'text-stone-600' : 'text-stone-300'} mt-1`}>
+                              {education.operation}
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setClickedHouse(null)}
+                          className={`text-2xl w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                            isDayMode
+                              ? 'hover:bg-stone-100 text-stone-600'
+                              : 'hover:bg-stone-800/50 text-stone-400'
+                          }`}
+                        >
+                          ×
+                        </button>
+                      </div>
+
+                      <div className={`text-sm font-medium ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                        {education.process}
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-8 space-y-6">
+                      {/* Alchemical Description */}
+                      <div>
+                        <h3 className={`text-xs uppercase tracking-wider font-semibold mb-3 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                          The Alchemical Process
+                        </h3>
+                        <p className={`text-base leading-relaxed ${isDayMode ? 'text-stone-700' : 'text-stone-200'}`}>
+                          {education.description}
+                        </p>
+                      </div>
+
+                      {/* Keywords */}
+                      <div>
+                        <h3 className={`text-xs uppercase tracking-wider font-semibold mb-3 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                          Keywords
+                        </h3>
+                        <div className="flex flex-wrap gap-2">
+                          {education.keywords.map((keyword, idx) => (
+                            <span
+                              key={idx}
+                              className={`px-3 py-1.5 rounded-full text-xs font-medium ${
+                                isDayMode
+                                  ? 'bg-stone-100 text-stone-700'
+                                  : 'bg-stone-800/60 text-stone-200'
+                              }`}
+                              style={{
+                                boxShadow: `0 0 10px ${elementColor.glow}`,
+                              }}
+                            >
+                              {keyword}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Practices */}
+                      <div>
+                        <h3 className={`text-xs uppercase tracking-wider font-semibold mb-3 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                          Integration Practices
+                        </h3>
+                        <ul className={`space-y-2 ${isDayMode ? 'text-stone-700' : 'text-stone-200'}`}>
+                          {education.practices.map((practice, idx) => (
+                            <li key={idx} className="flex items-start gap-2">
+                              <span style={{ color }}>•</span>
+                              <span className="text-sm">{practice}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div
+                      className={`px-8 py-4 text-center ${
+                        isDayMode ? 'bg-stone-50/50' : 'bg-stone-900/30'
+                      }`}
+                      style={{
+                        borderTop: `1px solid ${isDayMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)'}`,
+                      }}
+                    >
+                      <p className={`text-xs italic ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                        Click outside to close · Click any house to explore its alchemical process
+                      </p>
+                    </div>
+                  </>
+                );
+              })()}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
