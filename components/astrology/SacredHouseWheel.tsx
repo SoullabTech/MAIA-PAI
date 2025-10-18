@@ -863,8 +863,8 @@ export function SacredHouseWheel({
 
                 {/* Consciousness phase/state */}
                 <text
-                  x={200 + 170 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
-                  y={200 + 170 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180)) + 16}
+                  x={200 + 185 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
+                  y={200 + 185 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fill={color}
