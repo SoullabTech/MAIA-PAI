@@ -359,6 +359,194 @@ export function SacredHouseWheel({
           }}
         />
 
+        {/* SPIRAL COLLECTION - Multiple Sacred Spirals */}
+
+        {/* Fibonacci Spiral (Natural Growth Pattern) */}
+        <motion.path
+          d={(() => {
+            const points: string[] = [];
+            const center = { x: 200, y: 200 };
+            const fib = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89];
+            let currentAngle = 0;
+
+            for (let i = 0; i < fib.length; i++) {
+              const radius = fib[i] * 1.2;
+              const startAngle = currentAngle * (Math.PI / 180);
+              const endAngle = (currentAngle + 90) * (Math.PI / 180);
+
+              // Draw quarter circle arc
+              const startX = center.x + radius * Math.cos(startAngle);
+              const startY = center.y + radius * Math.sin(startAngle);
+              const endX = center.x + radius * Math.cos(endAngle);
+              const endY = center.y + radius * Math.sin(endAngle);
+
+              if (i === 0) {
+                points.push(`M ${startX},${startY}`);
+              }
+              points.push(`A ${radius},${radius} 0 0 1 ${endX},${endY}`);
+
+              currentAngle += 90;
+            }
+
+            return points.join(' ');
+          })()}
+          fill="none"
+          stroke={isDayMode ? '#7A9A65' : '#A8C69F'}
+          strokeWidth="1.2"
+          opacity="0.15"
+          strokeLinecap="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{
+            pathLength: [0, 1, 0],
+            opacity: [0, 0.25, 0]
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 4,
+          }}
+        />
+
+        {/* Archimedean Spiral (Uniform Expansion) */}
+        <motion.path
+          d={(() => {
+            const points: string[] = [];
+            const center = { x: 200, y: 200 };
+            const a = 0.5; // Starting distance from center
+            const b = 3; // Growth rate per revolution
+
+            for (let theta = 0; theta < 8 * Math.PI; theta += 0.12) {
+              const r = a + b * theta;
+              const x = center.x + r * Math.cos(theta);
+              const y = center.y + r * Math.sin(theta);
+              points.push(theta === 0 ? `M ${x},${y}` : `L ${x},${y}`);
+            }
+
+            return points.join(' ');
+          })()}
+          fill="none"
+          stroke={isDayMode ? '#6B9BD1' : '#8BADD6'}
+          strokeWidth="0.8"
+          opacity="0.12"
+          strokeLinecap="round"
+          strokeDasharray="3,3"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{
+            pathLength: [0, 1, 0],
+            opacity: [0, 0.2, 0]
+          }}
+          transition={{
+            duration: 22,
+            repeat: Infinity,
+            ease: 'linear',
+            delay: 6,
+          }}
+        />
+
+        {/* Hyperbolic Spiral (Infinite Approach - inward) */}
+        <motion.path
+          d={(() => {
+            const points: string[] = [];
+            const center = { x: 200, y: 200 };
+            const a = 50; // Starting radius
+
+            for (let theta = 0.5; theta < 10 * Math.PI; theta += 0.15) {
+              const r = a / theta; // Inverse relationship
+              const x = center.x + r * Math.cos(theta);
+              const y = center.y + r * Math.sin(theta);
+              points.push(theta === 0.5 ? `M ${x},${y}` : `L ${x},${y}`);
+            }
+
+            return points.join(' ');
+          })()}
+          fill="none"
+          stroke={isDayMode ? '#D4B896' : '#E8D4BF'}
+          strokeWidth="0.6"
+          opacity="0.1"
+          strokeLinecap="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{
+            pathLength: [0, 1, 0],
+            opacity: [0, 0.18, 0]
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 8,
+          }}
+        />
+
+        {/* Fermat's Spiral (Parabolic - sunflower pattern foundation) */}
+        <motion.path
+          d={(() => {
+            const points: string[] = [];
+            const center = { x: 200, y: 200 };
+            const a = 8; // Growth constant
+
+            for (let theta = 0; theta < 6 * Math.PI; theta += 0.1) {
+              const r = a * Math.sqrt(theta);
+              const x = center.x + r * Math.cos(theta);
+              const y = center.y + r * Math.sin(theta);
+              points.push(theta === 0 ? `M ${x},${y}` : `L ${x},${y}`);
+            }
+
+            return points.join(' ');
+          })()}
+          fill="none"
+          stroke="#D4AF37"
+          strokeWidth="0.7"
+          opacity="0.08"
+          strokeLinecap="round"
+          strokeDasharray="2,4"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{
+            pathLength: [0, 1, 0],
+            opacity: [0, 0.15, 0]
+          }}
+          transition={{
+            duration: 28,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 10,
+          }}
+        />
+
+        {/* Lituus Spiral (1/sqrt - rapid inward approach) */}
+        <motion.path
+          d={(() => {
+            const points: string[] = [];
+            const center = { x: 200, y: 200 };
+            const a = 80; // Scaling constant
+
+            for (let theta = 0.5; theta < 8 * Math.PI; theta += 0.12) {
+              const r = a / Math.sqrt(theta);
+              const x = center.x + r * Math.cos(theta);
+              const y = center.y + r * Math.sin(theta);
+              points.push(theta === 0.5 ? `M ${x},${y}` : `L ${x},${y}`);
+            }
+
+            return points.join(' ');
+          })()}
+          fill="none"
+          stroke={isDayMode ? '#9B8FAA' : '#C8A8E0'}
+          strokeWidth="0.5"
+          opacity="0.1"
+          strokeLinecap="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{
+            pathLength: [0, 1, 0],
+            opacity: [0, 0.16, 0]
+          }}
+          transition={{
+            duration: 24,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 12,
+          }}
+        />
+
         {/* SACRED GEOMETRY LAYER - Fremen Alchemist's Cosmology */}
         {showSacredGeometry && (
           <g opacity="0.25">
@@ -948,11 +1136,11 @@ export function SacredHouseWheel({
       <AnimatePresence>
         {hoveredHouse !== null && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.98 }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute inset-x-0 top-full mt-6 mx-auto max-w-2xl z-50"
+            className="absolute inset-x-0 bottom-full mb-6 mx-auto max-w-2xl z-50"
             style={{ pointerEvents: 'none' }}
           >
             <div
@@ -1119,11 +1307,11 @@ export function SacredHouseWheel({
         {/* Planetary Insight Overlay - Shows planet/sign/archetype/aspects */}
         {hoveredPlanet !== null && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.98 }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute inset-x-0 top-full mt-6 mx-auto max-w-2xl z-50"
+            className="absolute inset-x-0 bottom-full mb-6 mx-auto max-w-2xl z-50"
             style={{ pointerEvents: 'none' }}
           >
             <div
