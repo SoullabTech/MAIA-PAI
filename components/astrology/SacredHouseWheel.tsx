@@ -1,20 +1,30 @@
 'use client';
 
 /**
- * Sacred House Wheel - The 12 Houses as Living Mandala
+ * Sacred House Wheel - Neuroscience Integration
  *
- * Slow rotation, not spin. Each house glows with its ruling element.
- * Aspect patterns appear as sacred geometry on hover - discovered, not displayed.
+ * Maps the 12 Houses to brain regions and consciousness states.
+ * Fixed wheel (no rotation) showing stable consciousness processes.
+ *
+ * Neuroscience Mapping:
+ * 🔥 FIRE (Right PFC) - Vision & Projection: Experience → Expression → Expansion
+ * 💧 WATER (Right Hemisphere) - Deep Introspection: Heart → Healing → Holiness
+ * 🌍 EARTH (Left Hemisphere) - Grounded Creativity: Mission → Means → Medicine
+ * 💨 AIR (Left PFC) - Communication: Connection → Community → Consciousness
+ * ✨ AETHER (Center) - Transcendent non-duality
  *
  * Philosophy:
- * - The wheel breathes (30-second rotation)
- * - Houses pulse with elemental light
- * - Planets appear as constellation points
- * - Aspects draw themselves on hover (sacred geometry revealed)
+ * - Element symbols at outer radius show consciousness type
+ * - Phase names show the developmental state
+ * - House numbers at lower radius for reference
+ * - Planets appear as constellation points (neural activation)
+ * - Aspects reveal inter-hemispheric dynamics
  */
 
-import { motion, useAnimation } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { getSpiralogicHouseData } from '@/lib/astrology/spiralogicHouseMapping';
+import { getZodiacArchetype } from '@/lib/astrology/archetypeLibrary';
 
 interface Planet {
   name: string;
@@ -72,6 +82,29 @@ const houseElements = {
   12: 'water',  // Transcendence
 };
 
+// Neuroscience Integration: Brain-Consciousness-Element Mapping
+const houseStates = {
+  // FIRE - Right Prefrontal Cortex (Vision & Projection)
+  1: { symbol: '🔥', phase: 'Experience', brain: 'Right PFC' },      // Aries - Identity
+  5: { symbol: '🔥', phase: 'Expression', brain: 'Right PFC' },      // Leo - Creativity
+  9: { symbol: '🔥', phase: 'Expansion', brain: 'Right PFC' },       // Sagittarius - Philosophy
+
+  // WATER - Right Hemisphere (Deep Introspection)
+  4: { symbol: '💧', phase: 'Heart', brain: 'Right Hemisphere' },    // Cancer - Home
+  8: { symbol: '💧', phase: 'Healing', brain: 'Right Hemisphere' },  // Scorpio - Transformation
+  12: { symbol: '💧', phase: 'Holiness', brain: 'Right Hemisphere' }, // Pisces - Transcendence
+
+  // EARTH - Left Hemisphere (Grounded Creativity)
+  10: { symbol: '🌍', phase: 'Mission', brain: 'Left Hemisphere' },  // Capricorn - Career
+  2: { symbol: '🌍', phase: 'Means', brain: 'Left Hemisphere' },     // Taurus - Resources
+  6: { symbol: '🌍', phase: 'Medicine', brain: 'Left Hemisphere' },  // Virgo - Service
+
+  // AIR - Left Prefrontal Cortex (Communication)
+  7: { symbol: '💨', phase: 'Connection', brain: 'Left PFC' },       // Libra - Partnership
+  11: { symbol: '💨', phase: 'Community', brain: 'Left PFC' },       // Aquarius - Vision
+  3: { symbol: '💨', phase: 'Consciousness', brain: 'Left PFC' },    // Gemini - Communication
+};
+
 // Elemental colors
 const elementalColors = {
   fire: { day: '#C85450', night: '#F5A362', glow: 'rgba(200, 84, 80, 0.4)' },
@@ -107,19 +140,8 @@ export function SacredHouseWheel({
 }: SacredHouseWheelProps) {
   const [hoveredHouse, setHoveredHouse] = useState<number | null>(null);
   const [revealedAspects, setRevealedAspects] = useState(false);
-  const controls = useAnimation();
 
-  // Slow eternal rotation (30 seconds per full cycle)
-  useEffect(() => {
-    controls.start({
-      rotate: 360,
-      transition: {
-        duration: 30,
-        repeat: Infinity,
-        ease: 'linear',
-      },
-    });
-  }, [controls]);
+  // Wheel is fixed - no rotation (consciousness states are stable)
 
   // Calculate position on wheel for a given house (1-12)
   // Uses Spiralogic spiral order for positioning
@@ -183,14 +205,20 @@ export function SacredHouseWheel({
         onMouseEnter={() => setRevealedAspects(true)}
         onMouseLeave={() => setRevealedAspects(false)}
       >
-        {/* Central point - the self */}
-        <circle
-          cx="200"
-          cy="200"
-          r="4"
-          fill={isDayMode ? '#78716c' : '#d6d3d1'}
-          opacity="0.6"
-        />
+        {/* Central point - AETHER (Transcendent Self) */}
+        <g>
+          <text
+            x="200"
+            y="200"
+            textAnchor="middle"
+            dominantBaseline="central"
+            fontSize="20"
+            opacity="0.8"
+            style={{ userSelect: 'none' }}
+          >
+            ✨
+          </text>
+        </g>
 
         {/* Outer wheel circle */}
         <circle
@@ -214,8 +242,39 @@ export function SacredHouseWheel({
           opacity="0.2"
         />
 
+        {/* Clockwise movement arrows - showing elemental process flow */}
+        {[...Array(12)].map((_, i) => {
+          // Position arrow between houses (at the dividing line)
+          const angle = (i * 30 - 90) * (Math.PI / 180);
+          const radius = 185; // Outside the outer circle
+          const arrowX = 200 + radius * Math.cos(angle);
+          const arrowY = 200 + radius * Math.sin(angle);
+
+          // Arrow rotation to point clockwise (tangent to circle)
+          const arrowRotation = i * 30; // Degrees
+
+          return (
+            <g key={`arrow-${i}`}>
+              {/* Curved arrow pointing clockwise */}
+              <text
+                x={arrowX}
+                y={arrowY}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fontSize="16"
+                opacity="0.4"
+                fill={isDayMode ? '#78716c' : '#d6d3d1'}
+                transform={`rotate(${arrowRotation}, ${arrowX}, ${arrowY})`}
+                style={{ userSelect: 'none' }}
+              >
+                ➤
+              </text>
+            </g>
+          );
+        })}
+
         {/* 12 House segments - Spiralogic spiral order, clockwise */}
-        <motion.g animate={controls}>
+        <g>
           {spiralogicOrder.map((house, i) => {
             const element = houseElements[house as keyof typeof houseElements] as keyof typeof elementalColors;
             const elementColor = elementalColors[element];
@@ -267,16 +326,44 @@ export function SacredHouseWheel({
                   }}
                 />
 
-                {/* House number */}
+                {/* Element symbol at outer radius */}
                 <text
-                  x={200 + 130 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
-                  y={200 + 130 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
+                  x={200 + 170 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
+                  y={200 + 170 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontSize="24"
+                  className="pointer-events-none"
+                >
+                  {houseStates[house as keyof typeof houseStates].symbol}
+                </text>
+
+                {/* Consciousness phase/state below symbol */}
+                <text
+                  x={200 + 170 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
+                  y={200 + 170 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180)) + 16}
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fill={color}
-                  fillOpacity={hoveredHouse === house ? 1.0 : 0.75}
-                  fontSize="14"
-                  fontWeight="500"
+                  fillOpacity={hoveredHouse === house ? 1.0 : 0.8}
+                  fontSize="9"
+                  fontWeight="600"
+                  fontFamily="system-ui"
+                  className="transition-all duration-500 pointer-events-none uppercase tracking-wide"
+                >
+                  {houseStates[house as keyof typeof houseStates].phase}
+                </text>
+
+                {/* House number at lower radius (smaller) */}
+                <text
+                  x={200 + 110 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
+                  y={200 + 110 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fill={color}
+                  fillOpacity={hoveredHouse === house ? 0.9 : 0.6}
+                  fontSize="10"
+                  fontWeight="400"
                   fontFamily="serif"
                   className="transition-all duration-500 pointer-events-none"
                 >
@@ -299,7 +386,7 @@ export function SacredHouseWheel({
               </g>
             );
           })}
-        </motion.g>
+        </g>
 
         {/* Aspect lines - sacred geometry revealed on hover */}
         {revealedAspects && aspects.length > 0 && (
@@ -398,6 +485,179 @@ export function SacredHouseWheel({
           </div>
         </motion.div>
       )}
+
+      {/* House Insight Overlay - Elegant futuristic minimal design */}
+      <AnimatePresence>
+        {hoveredHouse !== null && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="absolute inset-x-0 top-full mt-6 mx-auto max-w-2xl"
+            style={{ pointerEvents: 'none' }}
+          >
+            <div
+              className={`backdrop-blur-xl rounded-2xl border shadow-2xl overflow-hidden ${
+                isDayMode
+                  ? 'bg-white/80 border-stone-200/60'
+                  : 'bg-black/60 border-stone-700/40'
+              }`}
+              style={{
+                boxShadow: isDayMode
+                  ? '0 20px 60px rgba(0,0,0,0.1), 0 0 1px rgba(0,0,0,0.1)'
+                  : '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(139, 92, 246, 0.15)',
+              }}
+            >
+              {(() => {
+                const element = houseElements[hoveredHouse as keyof typeof houseElements] as keyof typeof elementalColors;
+                const elementColor = elementalColors[element];
+                const color = isDayMode ? elementColor.day : elementColor.night;
+                const spiralogicData = getSpiralogicHouseData(hoveredHouse);
+                const planetsInHouse = planets.filter(p => p.house === hoveredHouse);
+                const houseState = houseStates[hoveredHouse as keyof typeof houseStates];
+
+                return (
+                  <>
+                    {/* Header with gradient */}
+                    <div
+                      className="px-6 py-4 border-b"
+                      style={{
+                        background: `linear-gradient(135deg, ${color}15, ${color}05)`,
+                        borderColor: isDayMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)',
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
+                            style={{
+                              background: `linear-gradient(135deg, ${color}30, ${color}10)`,
+                              boxShadow: `0 0 20px ${elementColor.glow}`,
+                            }}
+                          >
+                            {houseState.symbol}
+                          </div>
+                          <div>
+                            <h3 className={`text-lg font-semibold ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                              House {hoveredHouse} · {houseState.phase}
+                            </h3>
+                            <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                              {element.toUpperCase()} · {spiralogicData?.phaseLabel}
+                            </p>
+                          </div>
+                        </div>
+                        <div className={`text-xs uppercase tracking-wider font-medium ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                          {houseState.brain}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Content Grid */}
+                    <div className="p-6 grid grid-cols-2 gap-6">
+                      {/* Left Column - Spiralogic Framework */}
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                            Spiralogic Process
+                          </h4>
+                          <div className="space-y-2">
+                            <div className={`flex items-center gap-2 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                              <span className="text-xs opacity-60">Element</span>
+                              <div className="flex-1 border-b border-dotted opacity-20"></div>
+                              <span className="text-sm font-medium" style={{ color }}>{element.toUpperCase()}</span>
+                            </div>
+                            <div className={`flex items-center gap-2 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                              <span className="text-xs opacity-60">Phase</span>
+                              <div className="flex-1 border-b border-dotted opacity-20"></div>
+                              <span className="text-sm font-medium">{spiralogicData?.phase.toUpperCase()}</span>
+                            </div>
+                            <div className={`flex items-center gap-2 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                              <span className="text-xs opacity-60">Facet</span>
+                              <div className="flex-1 border-b border-dotted opacity-20"></div>
+                              <span className="text-sm font-medium">{spiralogicData?.facet}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                            Consciousness State
+                          </h4>
+                          <p className={`text-sm leading-relaxed ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                            {spiralogicData?.lesson}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Right Column - Planets & Activation */}
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                            Neural Activation
+                          </h4>
+                          {planetsInHouse.length > 0 ? (
+                            <div className="space-y-2">
+                              {planetsInHouse.map((planet, idx) => (
+                                <div
+                                  key={idx}
+                                  className={`px-3 py-2 rounded-lg ${isDayMode ? 'bg-stone-100/60' : 'bg-stone-800/40'}`}
+                                >
+                                  <div className={`text-sm font-medium ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                                    {planet.name} in {planet.sign}
+                                  </div>
+                                  <div className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                                    {planet.degree.toFixed(1)}°
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className={`text-sm italic ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                              No planets currently activating this pathway
+                            </p>
+                          )}
+                        </div>
+
+                        {planetsInHouse.length > 0 && (
+                          <div>
+                            <h4 className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isDayMode ? 'text-stone-500' : 'text-stone-500'}`}>
+                              Integration Pathway
+                            </h4>
+                            <p className={`text-xs leading-relaxed ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                              {planetsInHouse.length === 1
+                                ? `Single planetary activation - focused development through ${planetsInHouse[0].name} energy`
+                                : `Stellium activation - ${planetsInHouse.length} archetypal forces converging in complex dialog`}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Footer - Process Flow Indicator */}
+                    <div
+                      className={`px-6 py-3 border-t text-center ${isDayMode ? 'bg-stone-50/50' : 'bg-stone-900/30'}`}
+                      style={{
+                        borderColor: isDayMode ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)',
+                      }}
+                    >
+                      <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                        <span className="opacity-60">Elemental Flow:</span>{' '}
+                        <span className="font-medium">
+                          {element === 'fire' && 'Experience → Expression → Expansion'}
+                          {element === 'water' && 'Heart → Healing → Holiness'}
+                          {element === 'earth' && 'Mission → Means → Medicine'}
+                          {element === 'air' && 'Connection → Community → Consciousness'}
+                        </span>
+                      </p>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
