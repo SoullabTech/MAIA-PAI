@@ -41,6 +41,7 @@ import { ConversationStylePreference } from '@/lib/preferences/conversation-styl
 import { detectJournalCommand, detectBreakthroughPotential } from '@/lib/services/conversationEssenceExtractor';
 import { useFieldProtocolIntegration } from '@/hooks/useFieldProtocolIntegration';
 import { BookPlus } from 'lucide-react';
+import { supabase } from '@/lib/auth/supabase-client';
 
 interface OracleConversationProps {
   userId?: string;
@@ -669,6 +670,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     setIsSavingJournal(true);
 
     try {
+      // Get authenticated session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError || !session) {
+        console.error('❌ [Journal] Failed to get auth session:', sessionError);
+        toast.error('Please sign in again to save journal entries');
+        return;
+      }
+
       // Convert messages to the format expected by the extractor
       const conversationMessages = messages.map(msg => ({
         role: msg.role === 'oracle' ? 'assistant' as const : 'user' as const,
@@ -679,12 +689,16 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       console.log('📤 [Journal] Sending request to /api/journal/save-conversation', {
         messageCount: conversationMessages.length,
         userId,
-        sessionId
+        sessionId,
+        hasAuthToken: !!session.access_token
       });
 
       const response = await fetch('/api/journal/save-conversation', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
         body: JSON.stringify({
           messages: conversationMessages,
           userId,
@@ -2059,12 +2073,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         }`}
              style={{
                height: showChatInterface
-                 ? 'calc(100vh - 220px)'
+                 ? 'calc(100vh - 280px)'
                  : 'calc(100vh - 240px)',
                maxHeight: showChatInterface
-                 ? 'calc(100vh - 220px)'
+                 ? 'calc(100vh - 280px)'
                  : 'calc(100vh - 240px)',
-               bottom: showChatInterface ? '200px' : '120px',
+               bottom: showChatInterface ? '140px' : '120px',
                overflow: 'hidden'
              }}>
           <div className="h-full overflow-y-scroll overflow-x-hidden pr-2 mobile-scroll"
@@ -2076,7 +2090,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                }}>
             <AnimatePresence>
               {messages.length > 0 && (
-                <div className="space-y-3 pb-32 md:pb-24">
+                <div className="space-y-3 pb-6">
                 {/* Show all messages with proper scrolling */}
                 {messages
                   .map((message, index) => {
@@ -2525,6 +2539,24 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             </button>
           )}
 
+          {/* Chat Toggle */}
+          <button
+            onClick={() => setShowChatInterface(true)}
+            className="p-3 rounded-full transition-all duration-300"
+            style={{
+              color: '#F59E0B',
+              backgroundColor: showChatInterface ? 'rgba(245, 158, 11, 0.2)' : 'transparent'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
+            onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
+            title="Chat Mode"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </button>
+
           {/* Heart/Favorites */}
           <button
             className="p-3 rounded-full transition-all duration-300"
@@ -2642,23 +2674,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             </svg>
           </button>
 
-          {/* Chat Toggle */}
-          <button
-            onClick={() => setShowChatInterface(true)}
-            className="p-3 rounded-full transition-all duration-300"
-            style={{
-              color: '#F59E0B',
-              backgroundColor: showChatInterface ? 'rgba(245, 158, 11, 0.2)' : 'transparent'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.color = '#FCD34D'}
-            onMouseLeave={(e) => e.currentTarget.style.color = '#F59E0B'}
-            title="Chat Mode"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-          </button>
 
           {/* Text Display Toggle - Only visible in Voice mode */}
           {!showChatInterface && (
