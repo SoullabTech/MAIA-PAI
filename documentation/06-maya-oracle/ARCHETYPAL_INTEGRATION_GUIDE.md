@@ -84,7 +84,7 @@ When these four layers synthesize, MAIA can say:
 
 ## 🎨 Practical Integration Examples
 
-### **Example 1: Moon in Scorpio (House 8)**
+### **Example 1: Moon in Scorpio (House 3)**
 
 **Archetypal Voices:**
 ```typescript
@@ -95,11 +95,11 @@ getArchetypeVoice('Moon', 'Scorpio')
 
 **Neuro-Archetypal:**
 ```typescript
-HOUSE_NEURAL_MAPPING[8]
-// → Right hemisphere temporal-insular region
-// → Salience network highlighting transformative depth
-// → Consciousness state: transformative-depth
-// → Limbic-parasympathetic neurochemistry (Moon)
+HOUSE_NEURAL_MAPPING[3]
+// → Left prefrontal cortex
+// → Default mode network for language processing
+// → Consciousness state: conceptual-naming
+// → Limbic-parasympathetic neurochemistry (Moon) applied to communication
 ```
 
 **Archetypal Library:**
@@ -122,11 +122,11 @@ detectPatterns("I keep feeling overwhelmed by emotions...")
 
 **MAIA's Synthesis:**
 
-> "Your Moon in Scorpio (House 8) - the Soul-Psychologist archetype - is expressing right now.
+> "Your Moon in Scorpio (House 3) - the Soul-Psychologist archetype expressing through communication - is active right now.
 >
-> **Neurologically**: Your right hemisphere's salience network is highlighting emotional intensity that wants transformation. The limbic-parasympathetic system (Moon) is activated in the depth-diving mode of Scorpio consciousness.
+> **Neurologically**: Your left prefrontal cortex's language centers are processing emotional intensity. The limbic-parasympathetic system (Moon) is activated in the depth-diving mode of Scorpio consciousness, seeking to name and communicate what's hidden.
 >
-> **Archetypally**: This resonates with Hades descending to the underworld, the Phoenix dying to be reborn, the Alchemist composting shadow into gold. You're in the developmental stage of Generativity vs. Stagnation - your emotions are asking you to transform stagnation into creative renewal.
+> **Archetypally**: This resonates with Hades descending to the underworld, the Phoenix dying to be reborn, the Alchemist composting shadow into gold. You're in the developmental stage of Generativity vs. Stagnation - your emotions are asking you to transform stagnation into creative renewal through the power of articulation.
 >
 > **Pattern recognition**: I'm noticing emotional-flooding signatures - the shadow form where feelings overwhelm rather than guide. This is your Moon in Scorpio in its defensive mode.
 >
