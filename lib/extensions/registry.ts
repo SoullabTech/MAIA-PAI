@@ -90,7 +90,7 @@ export const EXTENSION_REGISTRY: Record<string, Extension> = {
       },
     ],
 
-    loader: () => import('./astrology'),
+    loader: async () => ({}), // TODO: implement extension
 
     settings: {
       schema: {
@@ -143,7 +143,7 @@ export const EXTENSION_REGISTRY: Record<string, Extension> = {
       },
     ],
 
-    loader: () => import('./iching'),
+    loader: async () => ({}), // TODO: implement extension
 
     settings: {
       schema: {
@@ -196,7 +196,7 @@ export const EXTENSION_REGISTRY: Record<string, Extension> = {
       },
     ],
 
-    loader: () => import('./tarot'),
+    loader: async () => ({}), // TODO: implement extension
 
     settings: {
       schema: {
@@ -256,7 +256,7 @@ export const EXTENSION_REGISTRY: Record<string, Extension> = {
       },
     ],
 
-    loader: () => import('./dreamwork'),
+    loader: async () => ({}), // TODO: implement extension
 
     settings: {
       schema: {
@@ -308,7 +308,7 @@ export const EXTENSION_REGISTRY: Record<string, Extension> = {
       },
     ],
 
-    loader: () => import('./somatic'),
+    loader: async () => ({}), // TODO: implement extension
 
     settings: {
       schema: {
@@ -360,7 +360,7 @@ export const EXTENSION_REGISTRY: Record<string, Extension> = {
       },
     ],
 
-    loader: () => import('./mythology'),
+    loader: async () => ({}), // TODO: implement extension
 
     settings: {
       schema: {
