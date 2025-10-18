@@ -253,10 +253,10 @@ export function SacredHouseWheel({
                 <path
                   d={pathData}
                   fill={color}
-                  fillOpacity={hoveredHouse === house ? 0.3 : 0.1}
+                  fillOpacity={hoveredHouse === house ? 0.6 : 0.35}
                   stroke={color}
-                  strokeWidth="1"
-                  strokeOpacity={hoveredHouse === house ? 0.6 : 0.2}
+                  strokeWidth="2"
+                  strokeOpacity={hoveredHouse === house ? 0.9 : 0.5}
                   onMouseEnter={() => setHoveredHouse(house)}
                   onMouseLeave={() => setHoveredHouse(null)}
                   className="cursor-pointer transition-all duration-500"
@@ -274,8 +274,9 @@ export function SacredHouseWheel({
                   textAnchor="middle"
                   dominantBaseline="middle"
                   fill={color}
-                  fillOpacity={hoveredHouse === house ? 0.9 : 0.5}
-                  fontSize="12"
+                  fillOpacity={hoveredHouse === house ? 1.0 : 0.75}
+                  fontSize="14"
+                  fontWeight="500"
                   fontFamily="serif"
                   className="transition-all duration-500 pointer-events-none"
                 >
