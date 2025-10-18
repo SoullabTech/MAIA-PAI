@@ -20,6 +20,7 @@ import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { LogOut, Sparkles, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '@/lib/auth/supabase-client';
 
 function getInitialUserData() {
   if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
@@ -67,7 +68,11 @@ export default function MAIAPage() {
 
   const hasCheckedAuth = useRef(false);
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    // Sign out from Supabase
+    await supabase.auth.signOut();
+
+    // Clear localStorage
     localStorage.removeItem('beta_user');
     localStorage.removeItem('beta_users');
     localStorage.removeItem('betaOnboardingComplete');
@@ -102,7 +107,36 @@ export default function MAIAPage() {
     if (hasCheckedAuth.current) return;
     hasCheckedAuth.current = true;
 
-    const newUser = localStorage.getItem('beta_user');
+    // Check Supabase session FIRST
+    const checkSupabaseAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          // Get user profile from database
+          const { data: profile } = await supabase
+            .from('users')
+            .select('name, email')
+            .eq('id', session.user.id)
+            .single();
+
+          const userName = profile?.name || session.user.email?.split('@')[0] || 'Explorer';
+          console.log('✅ [MAIA] Supabase user authenticated:', userName);
+
+          setExplorerId(session.user.id);
+          setExplorerName(userName);
+          return true; // Authenticated via Supabase
+        }
+      } catch (error) {
+        console.error('⚠️ [MAIA] Supabase auth check failed:', error);
+      }
+      return false;
+    };
+
+    checkSupabaseAuth().then(isSupabaseAuth => {
+      if (isSupabaseAuth) return; // Already authenticated
+
+      // Fall back to localStorage beta system
+      const newUser = localStorage.getItem('beta_user');
     if (newUser) {
       try {
         const userData = JSON.parse(newUser);
@@ -140,9 +174,10 @@ export default function MAIAPage() {
     if (oldId && oldName) {
       if (explorerId !== oldId) setExplorerId(oldId);
       if (explorerName !== oldName) setExplorerName(oldName);
-    } else {
-      setNeedsOnboarding(true);
-    }
+      } else {
+        setNeedsOnboarding(true);
+      }
+    });
   }, [explorerId, explorerName]);
 
   if (needsOnboarding) {
