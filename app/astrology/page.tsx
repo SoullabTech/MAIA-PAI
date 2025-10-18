@@ -760,10 +760,10 @@ export default function AstrologyPage() {
         >
           <div className="text-center mb-6">
             <h2 className={`text-xl font-serif mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
-              The Twelve Pathways
+              Consciousness Field Map
             </h2>
             <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic mb-3`}>
-              Houses arranged in Spiralogic spiral order · Hover to reveal aspect patterns
+              Soul-centric field instrument · Hover to reveal neural pathways and archetypal insights
             </p>
             {/* Spiralogic Process Legend */}
             <div className={`space-y-2 ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>

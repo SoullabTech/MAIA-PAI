@@ -1,24 +1,30 @@
 'use client';
 
 /**
- * Sacred House Wheel - Neuroscience Integration
+ * Sacred House Wheel - Soul-Centric Field Instrument
  *
- * Maps the 12 Houses to brain regions and consciousness states.
- * Fixed wheel (no rotation) showing stable consciousness processes.
+ * A living cross-section of consciousness in motion.
+ * Houses are FIXED stations (not spinning gears) - stable consciousness states.
+ * Motion = field currents, not mechanical rotation.
  *
- * Neuroscience Mapping:
+ * Soul-Centric Design Principles:
+ * - Nothing orbits the center; all movement passes THROUGH it
+ * - Rotation = mechanistic time | Flow = living process | Stillness = witness consciousness
+ * - The wheel doesn't move FOR you; it thinks WITH you
+ *
+ * Neuroscience Integration:
  * 🔥 FIRE (Right PFC) - Vision & Projection: Experience → Expression → Expansion
  * 💧 WATER (Right Hemisphere) - Deep Introspection: Heart → Healing → Holiness
  * 🌍 EARTH (Left Hemisphere) - Grounded Creativity: Mission → Means → Medicine
  * 💨 AIR (Left PFC) - Communication: Connection → Community → Consciousness
- * ✨ AETHER (Center) - Transcendent non-duality
+ * ✨ AETHER (Center) - The Unmoved Witness (absolute stillness)
  *
- * Philosophy:
- * - Element symbols at outer radius show consciousness type
- * - Phase names show the developmental state
- * - House numbers at lower radius for reference
- * - Planets appear as constellation points (neural activation)
- * - Aspects reveal inter-hemispheric dynamics
+ * Field Dynamics:
+ * - Outer rim: Subtle elemental current (Fire→Water→Earth→Air gradient sweep)
+ * - Inner field: Slow logarithmic spiral pulse (12-15s breathing cycle)
+ * - House resonance: Element-specific tempos on hover
+ * - Aspects: Field currents converging through Aether center (not around it)
+ * - All motion: Easing like breath (sine-in-out), meditative, seamless loops
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -172,25 +178,31 @@ export function SacredHouseWheel({
     };
   };
 
-  // Draw aspect line between two planets
+  // FIELD DYNAMICS 4: Draw aspect as field current through Aether center
+  // All currents converge on the unmoved witness (nothing orbits, everything passes through)
   const drawAspectLine = (planet1: Planet, planet2: Planet, aspect: Aspect) => {
     const pos1 = getPlanetPosition(planet1);
     const pos2 = getPlanetPosition(planet2);
+    const center = { x: 200, y: 200 }; // Aether node
+
+    // Create Bezier path through center
+    const controlX = center.x + (Math.random() - 0.5) * 10; // Slight variation
+    const controlY = center.y + (Math.random() - 0.5) * 10;
+
+    const pathData = `M ${pos1.x},${pos1.y} Q ${controlX},${controlY} ${center.x},${center.y} T ${pos2.x},${pos2.y}`;
 
     return (
-      <motion.line
+      <motion.path
         key={`${planet1.name}-${planet2.name}`}
-        x1={pos1.x}
-        y1={pos1.y}
-        x2={pos2.x}
-        y2={pos2.y}
+        d={pathData}
+        fill="none"
         stroke={aspectColors[aspect.type]}
         strokeWidth={aspect.orb < 2 ? 2 : 1}
-        strokeOpacity={aspect.orb < 2 ? 0.8 : 0.5}
+        strokeOpacity={aspect.orb < 2 ? 0.6 : 0.3}
         strokeDasharray={aspect.type === 'square' ? '4,4' : aspect.type === 'opposition' ? '8,4' : '0'}
         initial={{ pathLength: 0, opacity: 0 }}
         animate={{ pathLength: 1, opacity: 1 }}
-        transition={{ duration: 1, ease: 'easeOut' }}
+        transition={{ duration: 1.5, ease: 'easeInOut' }}
       />
     );
   };
@@ -240,6 +252,61 @@ export function SacredHouseWheel({
           stroke={isDayMode ? '#e7e5e4' : '#292524'}
           strokeWidth="1"
           opacity="0.2"
+        />
+
+        {/* FIELD DYNAMICS 1: Outer Rim Elemental Current */}
+        {/* Subtle aurora-like gradient sweep showing Fire→Water→Earth→Air flow */}
+        <defs>
+          <linearGradient id="elementalCurrent" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={elementalColors.fire.night} stopOpacity="0.15" />
+            <stop offset="25%" stopColor={elementalColors.water.night} stopOpacity="0.15" />
+            <stop offset="50%" stopColor={elementalColors.earth.night} stopOpacity="0.15" />
+            <stop offset="75%" stopColor={elementalColors.air.night} stopOpacity="0.15" />
+            <stop offset="100%" stopColor={elementalColors.fire.night} stopOpacity="0.15" />
+          </linearGradient>
+        </defs>
+        <motion.circle
+          cx="200"
+          cy="200"
+          r="160"
+          fill="none"
+          stroke="url(#elementalCurrent)"
+          strokeWidth="3"
+          strokeDasharray="10 5"
+          initial={{ strokeDashoffset: 0 }}
+          animate={{ strokeDashoffset: -1000 }}
+          transition={{
+            duration: 60,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+          opacity="0.4"
+        />
+
+        {/* FIELD DYNAMICS 2: Spiral Pulse from Aether Center */}
+        {/* Logarithmic breathing spiral - expands/contracts every 12-15s */}
+        <motion.path
+          d="M 200,200
+             Q 210,195 220,200
+             Q 225,210 220,220
+             Q 210,225 200,220
+             Q 190,210 195,200
+             Q 200,190 210,195"
+          fill="none"
+          stroke={isDayMode ? '#9B8FAA' : '#8B5CF6'}
+          strokeWidth="1"
+          opacity="0.2"
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{
+            scale: [0.5, 2.5, 0.5],
+            opacity: [0, 0.3, 0]
+          }}
+          transition={{
+            duration: 13,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+          style={{ transformOrigin: '200px 200px' }}
         />
 
         {/* Clockwise movement arrows - showing elemental process flow */}
@@ -370,18 +437,133 @@ export function SacredHouseWheel({
                   {house}
                 </text>
 
-                {/* Elemental glow pulse */}
+                {/* FIELD DYNAMICS 3: House Resonance Cues (Element-Specific Tempos) */}
                 {hoveredHouse === house && (
-                  <motion.circle
-                    cx={200 + 130 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
-                    cy={200 + 130 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
-                    r="20"
-                    fill={color}
-                    fillOpacity="0.1"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1.2, opacity: 0 }}
-                    transition={{ duration: 1, repeat: Infinity }}
-                  />
+                  <>
+                    {/* Fire: Fast flicker (kinetic) */}
+                    {element === 'fire' && (
+                      <motion.circle
+                        cx={200 + 130 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
+                        cy={200 + 130 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
+                        r="25"
+                        fill={color}
+                        fillOpacity="0.15"
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{
+                          scale: [0.8, 1.3, 0.8],
+                          opacity: [0, 0.3, 0]
+                        }}
+                        transition={{
+                          duration: 0.6,
+                          repeat: Infinity,
+                          ease: 'easeInOut'
+                        }}
+                      />
+                    )}
+
+                    {/* Water: Slow undulation (wave) */}
+                    {element === 'water' && (
+                      <>
+                        <motion.circle
+                          cx={200 + 130 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
+                          cy={200 + 130 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
+                          r="25"
+                          fill={color}
+                          fillOpacity="0.08"
+                          initial={{ scale: 0.9, opacity: 0 }}
+                          animate={{
+                            scale: [0.9, 1.5, 0.9],
+                            opacity: [0, 0.25, 0]
+                          }}
+                          transition={{
+                            duration: 2.5,
+                            repeat: Infinity,
+                            ease: 'easeInOut'
+                          }}
+                        />
+                        <motion.circle
+                          cx={200 + 130 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
+                          cy={200 + 130 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
+                          r="20"
+                          fill={color}
+                          fillOpacity="0.1"
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{
+                            scale: [0.8, 1.3, 0.8],
+                            opacity: [0, 0.2, 0]
+                          }}
+                          transition={{
+                            duration: 2.5,
+                            repeat: Infinity,
+                            ease: 'easeInOut',
+                            delay: 0.8
+                          }}
+                        />
+                      </>
+                    )}
+
+                    {/* Earth: Grounded glow (steady) */}
+                    {element === 'earth' && (
+                      <motion.circle
+                        cx={200 + 130 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
+                        cy={200 + 130 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
+                        r="22"
+                        fill={color}
+                        fillOpacity="0.12"
+                        initial={{ scale: 1, opacity: 0.1 }}
+                        animate={{
+                          scale: [1, 1.1, 1],
+                          opacity: [0.1, 0.25, 0.1]
+                        }}
+                        transition={{
+                          duration: 3,
+                          repeat: Infinity,
+                          ease: 'easeInOut'
+                        }}
+                      />
+                    )}
+
+                    {/* Air: Interference pattern (oscillation) */}
+                    {element === 'air' && (
+                      <>
+                        <motion.circle
+                          cx={200 + 130 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
+                          cy={200 + 130 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
+                          r="20"
+                          fill={color}
+                          fillOpacity="0.1"
+                          initial={{ scale: 0.9, opacity: 0 }}
+                          animate={{
+                            scale: [0.9, 1.2, 0.9],
+                            opacity: [0, 0.2, 0]
+                          }}
+                          transition={{
+                            duration: 1.2,
+                            repeat: Infinity,
+                            ease: 'easeInOut'
+                          }}
+                        />
+                        <motion.circle
+                          cx={200 + 130 * Math.cos((i * 30 + 15 - 90) * (Math.PI / 180))}
+                          cy={200 + 130 * Math.sin((i * 30 + 15 - 90) * (Math.PI / 180))}
+                          r="25"
+                          fill={color}
+                          fillOpacity="0.08"
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{
+                            scale: [0.8, 1.3, 0.8],
+                            opacity: [0, 0.15, 0]
+                          }}
+                          transition={{
+                            duration: 1.2,
+                            repeat: Infinity,
+                            ease: 'easeInOut',
+                            delay: 0.6
+                          }}
+                        />
+                      </>
+                    )}
+                  </>
                 )}
               </g>
             );
