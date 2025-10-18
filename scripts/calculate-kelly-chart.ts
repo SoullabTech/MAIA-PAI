@@ -14,88 +14,121 @@ import { createClient } from '@supabase/supabase-js';
 // Load environment variables from .env.local
 config({ path: resolve(process.cwd(), '.env.local') });
 
-// Swiss Ephemeris calculation (simplified - using astronomical positions for Dec 9, 1966, 10:29 PM)
-// These are astronomical calculations for the exact date/time/location
+// VERIFIED DATA FROM TIME PASSAGES (Porphyry House System)
+// Birth: December 9, 1966, 10:29 PM CST, Baton Rouge, LA
+// Source: Time Passages Professional Natal Report
 const KELLY_BIRTH_CHART = {
   // Core Luminaries
   sun: {
     sign: 'Sagittarius',
-    degree: 17.23,
+    degree: 17.661, // 17° Sag 39' 40"
     house: 4,
-    element: 'fire'
+    element: 'fire',
+    description: 'Ruler of Rising Sign (Leo Asc)'
   },
   moon: {
-    sign: 'Pisces',
-    degree: 23.45,
-    house: 7,
-    element: 'water'
+    sign: 'Scorpio',
+    degree: 22.547, // 22° Sco 32' 51"
+    house: 3, // CORRECTED: Time Passages says "Moon in the Third House"
+    element: 'water',
+    description: 'Angular planet - conjunct Nadir (IC)'
   },
   ascendant: {
     sign: 'Leo',
-    degree: 28.12,
+    degree: 29.417, // 29° Leo 25'
     element: 'fire'
+  },
+  midheaven: {
+    sign: 'Taurus',
+    degree: 26.85, // 26° Tau 51'
+    element: 'earth'
   },
 
   // Personal Planets
   mercury: {
-    sign: 'Sagittarius',
-    degree: 9.34,
-    house: 4,
-    element: 'fire'
+    sign: 'Scorpio',
+    degree: 28.083, // 28° Sco 05'
+    house: 4, // "Mercury in the Fourth House" + "conjunct Nadir"
+    element: 'water',
+    description: 'Angular planet - conjunct Nadir (IC)'
   },
   venus: {
-    sign: 'Capricorn',
-    degree: 2.56,
+    sign: 'Sagittarius',
+    degree: 25.3, // 25° Sag 18'
     house: 5,
-    element: 'earth'
+    element: 'fire',
+    description: 'T-Square focal planet'
   },
   mars: {
     sign: 'Libra',
-    degree: 19.87,
+    degree: 3.267, // 3° Lib 16'
     house: 2,
     element: 'air'
   },
 
   // Social Planets
   jupiter: {
-    sign: 'Cancer',
-    degree: 26.43,
-    house: 11,
-    element: 'water'
+    sign: 'Leo',
+    degree: 3.9, // 3° Leo 54' R
+    house: 12,
+    element: 'fire',
+    retrograde: true,
+    description: 'Leading planet of planetary pattern'
   },
   saturn: {
     sign: 'Pisces',
-    degree: 23.12,
+    degree: 23.083, // 23° Pis 05'
     house: 7,
-    element: 'water'
+    element: 'water',
+    description: 'Focal planet of Funnel/Bucket pattern'
   },
 
   // Outer Planets
   uranus: {
     sign: 'Virgo',
-    degree: 23.67,
+    degree: 24.233, // 24° Vir 14'
     house: 1,
     element: 'earth'
   },
   neptune: {
     sign: 'Scorpio',
-    degree: 22.89,
+    degree: 22.833, // 22° Sco 50'
     house: 3,
-    element: 'water'
+    element: 'water',
+    description: 'Angular planet - conjunct Nadir (IC)'
   },
   pluto: {
     sign: 'Virgo',
-    degree: 20.45,
+    degree: 20.6, // 20° Vir 36'
     house: 1,
     element: 'earth'
+  },
+  chiron: {
+    sign: 'Pisces',
+    degree: 21.7, // 21° Pis 42' (corrected from 17°)
+    house: 7,
+    element: 'water'
+  },
+  northNode: {
+    sign: 'Taurus',
+    degree: 15.983, // 15° Tau 59' R
+    house: 9,
+    element: 'earth',
+    retrograde: true
+  },
+  southNode: {
+    sign: 'Scorpio',
+    degree: 15.983, // 15° Sco 59'
+    house: 3,
+    element: 'water'
   },
 
   // Elemental Balance
   elementalBalance: {
-    fire: 30,    // Sun, Mercury, Ascendant
-    water: 35,   // Moon, Jupiter, Saturn, Neptune
-    earth: 25,   // Venus, Uranus, Pluto
-    air: 10      // Mars
+    fire: 6,     // Sun (Sag), Venus (Sag), Jupiter (Leo), Ascendant (Leo) - 4 fire, but weighted: Sun=3, Venus=2, Jupiter=1.5, Asc=2 = ~8.5, normalized to 6
+    water: 6,    // Moon (Sco), Mercury (Sco), Saturn (Pis), Neptune (Sco), Chiron (Pis) - 5 water planets
+    earth: 3,    // Uranus (Vir), Pluto (Vir), North Node (Tau) - 3 earth
+    air: 1       // Mars (Lib) - 1 air
   },
 
   // Major Aspects (the ones that matter for archetypal synthesis)
