@@ -27,6 +27,8 @@ export function AlchemicalSymbol({
 }: AlchemicalSymbolProps) {
   const halfSize = size / 2;
   const strokeWidth = size / 12;
+  // Unique ID for each instance to avoid gradient conflicts
+  const uniqueId = `${element}-${Math.random().toString(36).substr(2, 9)}`;
 
   switch (element) {
     case 'fire':
@@ -34,7 +36,7 @@ export function AlchemicalSymbol({
       return (
         <svg width={size} height={size} viewBox="0 0 100 100">
           <defs>
-            <linearGradient id="fireGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id={`fireGradient-${uniqueId}`} x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#C8A572" />
               <stop offset="100%" stopColor="#B8860B" />
             </linearGradient>
@@ -42,7 +44,7 @@ export function AlchemicalSymbol({
           <path
             d="M 50 15 L 85 85 L 15 85 Z"
             fill="none"
-            stroke="url(#fireGradient)"
+            stroke={`url(#fireGradient-${uniqueId})`}
             strokeWidth={strokeWidth}
             strokeLinejoin="miter"
             opacity={opacity}
@@ -55,7 +57,7 @@ export function AlchemicalSymbol({
       return (
         <svg width={size} height={size} viewBox="0 0 100 100">
           <defs>
-            <linearGradient id="waterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id={`waterGradient-${uniqueId}`} x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#C8A572" />
               <stop offset="100%" stopColor="#B8860B" />
             </linearGradient>
@@ -63,7 +65,7 @@ export function AlchemicalSymbol({
           <path
             d="M 50 85 L 15 15 L 85 15 Z"
             fill="none"
-            stroke="url(#waterGradient)"
+            stroke={`url(#waterGradient-${uniqueId})`}
             strokeWidth={strokeWidth}
             strokeLinejoin="miter"
             opacity={opacity}
@@ -76,7 +78,7 @@ export function AlchemicalSymbol({
       return (
         <svg width={size} height={size} viewBox="0 0 100 100">
           <defs>
-            <linearGradient id="earthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id={`earthGradient-${uniqueId}`} x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#C8A572" />
               <stop offset="100%" stopColor="#B8860B" />
             </linearGradient>
@@ -85,7 +87,7 @@ export function AlchemicalSymbol({
           <path
             d="M 50 85 L 15 15 L 85 15 Z"
             fill="none"
-            stroke="url(#earthGradient)"
+            stroke={`url(#earthGradient-${uniqueId})`}
             strokeWidth={strokeWidth}
             strokeLinejoin="miter"
             opacity={opacity}
@@ -96,7 +98,7 @@ export function AlchemicalSymbol({
             y1="50"
             x2="75"
             y2="50"
-            stroke="url(#earthGradient)"
+            stroke={`url(#earthGradient-${uniqueId})`}
             strokeWidth={strokeWidth}
             opacity={opacity}
           />
@@ -108,7 +110,7 @@ export function AlchemicalSymbol({
       return (
         <svg width={size} height={size} viewBox="0 0 100 100">
           <defs>
-            <linearGradient id="airGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id={`airGradient-${uniqueId}`} x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#C8A572" />
               <stop offset="100%" stopColor="#B8860B" />
             </linearGradient>
@@ -117,7 +119,7 @@ export function AlchemicalSymbol({
           <path
             d="M 50 15 L 85 85 L 15 85 Z"
             fill="none"
-            stroke="url(#airGradient)"
+            stroke={`url(#airGradient-${uniqueId})`}
             strokeWidth={strokeWidth}
             strokeLinejoin="miter"
             opacity={opacity}
@@ -128,7 +130,7 @@ export function AlchemicalSymbol({
             y1="50"
             x2="75"
             y2="50"
-            stroke="url(#airGradient)"
+            stroke={`url(#airGradient-${uniqueId})`}
             strokeWidth={strokeWidth}
             opacity={opacity}
           />
