@@ -316,10 +316,10 @@ export function SacredHouseWheel({
   };
 
   return (
-    <div className={`relative ${className}`} style={{ minHeight: '800px' }}>
+    <div className={`relative ${className}`} style={{ minHeight: '600px' }}>
       <svg
-        width="800"
-        height="800"
+        width="600"
+        height="600"
         viewBox="-80 -80 560 560"
         className="w-full h-full"
         onMouseEnter={() => setRevealedAspects(true)}
