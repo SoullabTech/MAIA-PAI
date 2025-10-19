@@ -48,6 +48,7 @@ const VALID_INVITE_CODES = [
   'SOULLAB-MARC',
   'SOULLAB-KELLY',
   'SOULLAB-JUDE',  // Jude Epstein - Beta Tester
+  'SOULLAB-MATT',  // Matthew O'Connor - Beta Tester
 
   // Founder access
   'SOULLAB'
