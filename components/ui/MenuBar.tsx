@@ -23,17 +23,45 @@ export function MenuBar() {
   const [showRotateHint, setShowRotateHint] = useState(true);
 
   const handleSignOut = async () => {
+    // Preserve user profile data (birthday, name, intention) before clearing session
+    const betaUser = localStorage.getItem('beta_user');
+    let preservedData: { birthDate?: string; username?: string; intention?: string } | null = null;
+
+    if (betaUser) {
+      try {
+        const userData = JSON.parse(betaUser);
+        preservedData = {
+          birthDate: userData.birthDate,
+          username: userData.username,
+          intention: userData.intention
+        };
+      } catch (e) {
+        console.error('Error parsing user data for preservation:', e);
+      }
+    }
+
     // Sign out from Supabase
     await supabase.auth.signOut();
 
-    // Clear localStorage
+    // Clear session data only (NOT profile data like birthday)
     localStorage.removeItem('beta_user');
     localStorage.removeItem('explorerId');
     localStorage.removeItem('explorerName');
     localStorage.removeItem('soullab-session');
+    localStorage.removeItem('betaOnboardingComplete');
 
-    // Redirect to maia
-    router.push('/maia');
+    // Restore preserved profile data but mark as logged out
+    if (preservedData) {
+      const profileData = {
+        ...preservedData,
+        onboarded: true, // Keep onboarded status so they go to intro, not onboarding
+        loggedOut: true
+      };
+      localStorage.setItem('beta_user', JSON.stringify(profileData));
+    }
+
+    // Redirect to auth page where they can easily log back in
+    router.push('/auth');
   };
 
   // Don't show on community pages
@@ -79,7 +107,7 @@ export function MenuBar() {
       )}
 
       {/* INSTRUMENT PANEL: Ancient-future navigation */}
-      <div className="flex fixed right-16 z-40 items-center gap-1.5 md:gap-2" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 3.5rem)' }}>
+      <div className="flex fixed right-32 md:right-24 z-40 items-center gap-1.5 md:gap-2" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 3.5rem)' }}>
 
       {/* MAIA Conversation - Holoflower Seed of Life */}
       <Link
@@ -89,7 +117,7 @@ export function MenuBar() {
       >
         <div className="relative p-2 md:p-2.5 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30 flex items-center justify-center">
           <div className="w-7 h-7 md:w-8 md:h-8">
-            <MiniHoloflower size={32} color="#FDB713" />
+            <MiniHoloflower size={32} />
           </div>
 
           {/* Tooltip - Matte instrument label */}
@@ -244,15 +272,15 @@ export function MenuBar() {
         </div>
       </button>
 
-      {/* Sign Out - Holoflower with logout overlay (LAST ICON) */}
+      {/* Sign Out - Holoflower with logout overlay (LAST ICON - RIGHT) */}
       <button
         onClick={handleSignOut}
         className="group relative"
         aria-label="Sign Out - Return to Checkin"
       >
-        <div className="relative p-2 md:p-3 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30 flex items-center justify-center">
+        <div className="relative p-2 md:p-2.5 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30 flex items-center justify-center">
           <div className="w-9 h-9 md:w-10 md:h-10 opacity-60 group-hover:opacity-100 transition-opacity">
-            <MiniHoloflower size={40} color="#FDB713" />
+            <MiniHoloflower size={40} />
           </div>
           {/* Small logout icon overlay */}
           <div className="absolute inset-0 flex items-center justify-center">

@@ -3,9 +3,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Paperclip, X, Copy, BookOpen } from 'lucide-react';
-// import { SimplifiedOrganicVoice, VoiceActivatedMaiaRef } from './ui/SimplifiedOrganicVoice'; // REPLACED with Whisper
-// import { WhisperVoiceRecognition } from './ui/WhisperVoiceRecognition'; // REPLACED with ContinuousConversation (uses browser Web Speech API)
-import { ContinuousConversation, ContinuousConversationRef } from '../apps/web/components/voice/ContinuousConversation';
+// Hybrid Voice Recognition - automatically selects best method for browser (Whisper for mobile, Web Speech for desktop)
+import { HybridVoiceRecognition, HybridVoiceRef } from './voice/HybridVoiceRecognition';
 import { SacredHoloflower } from './sacred/SacredHoloflower';
 import { EnhancedVoiceMicButton } from './ui/EnhancedVoiceMicButton';
 import AdaptiveVoiceMicButton from './ui/AdaptiveVoiceMicButton';
@@ -201,7 +200,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [isStreaming, setIsStreaming] = useState(false);
   const [isMicrophonePaused, setIsMicrophonePaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false); // Start unmuted in voice mode for immediate use
-  const voiceMicRef = useRef<ContinuousConversationRef>(null);
+  const voiceMicRef = useRef<HybridVoiceRef>(null);
   const textInputRef = useRef<HTMLTextAreaElement>(null);
   const [userTranscript, setUserTranscript] = useState('');
   const [maiaResponseText, setMaiaResponseText] = useState('');
@@ -2090,7 +2089,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                }}>
             <AnimatePresence>
               {messages.length > 0 && (
-                <div className="space-y-3 pb-48 md:pb-40">
+                <div className="space-y-3 pb-64 md:pb-48">
                 {/* Show all messages with proper scrolling */}
                 {messages
                   .map((message, index) => {
@@ -2762,12 +2761,21 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {/* Soulprint Metrics Widget - DISABLED: Causing 400 errors when userId not authenticated */}
       {/* {userId && <SoulprintMetricsWidget userId={userId} />} */}
 
-      {/* Continuous Conversation - Uses browser Web Speech Recognition API (no webm issues) */}
+      {/* Hybrid Voice Recognition - Automatically selects best method (Whisper for mobile, Web Speech for desktop) */}
       {voiceEnabled && !showChatInterface && (
         <div className="sr-only">
-          <ContinuousConversation
+          <HybridVoiceRecognition
             ref={voiceMicRef}
+            enabled={voiceEnabled && !showChatInterface}
+            isMuted={isMuted}
+            isMayaSpeaking={isAudioPlaying}
             onTranscript={handleVoiceTranscript}
+            conversationDepth={
+              listeningMode === 'session' ? 'deep' :    // Session mode: longer pauses
+              listeningMode === 'patient' ? 'deep' :    // Patient mode: longer pauses
+              'normal'                                    // Normal mode: standard pauses
+            }
+            // ContinuousConversation props (for desktop)
             isProcessing={isResponding}
             isSpeaking={isAudioPlaying}
             autoStart={true}

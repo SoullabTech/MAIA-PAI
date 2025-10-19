@@ -32,12 +32,33 @@ export function supportsWebSpeechAPI(): boolean {
   );
 }
 
+/**
+ * Determine if we should use Whisper (MediaRecorder) instead of Web Speech API
+ * Returns true if browser doesn't reliably support Web Speech API
+ */
+export function shouldUseWhisper(): boolean {
+  if (typeof window === 'undefined') return true;
+
+  // iOS Chrome - Web Speech API completely broken
+  if (isIOSChrome()) return true;
+
+  // iOS Safari - Web Speech API unreliable, prefer Whisper
+  if (isIOSSafari()) return true;
+
+  // No Web Speech API support at all
+  if (!supportsWebSpeechAPI()) return true;
+
+  // Desktop browsers - Web Speech API works well
+  return false;
+}
+
 export function getBrowserInfo() {
   if (typeof window === 'undefined') {
     return {
       isIOSChrome: false,
       isIOSSafari: false,
       supportsWebSpeech: false,
+      shouldUseWhisper: true,
       userAgent: ''
     };
   }
@@ -46,6 +67,7 @@ export function getBrowserInfo() {
     isIOSChrome: isIOSChrome(),
     isIOSSafari: isIOSSafari(),
     supportsWebSpeech: supportsWebSpeechAPI(),
+    shouldUseWhisper: shouldUseWhisper(),
     userAgent: window.navigator.userAgent
   };
 }
