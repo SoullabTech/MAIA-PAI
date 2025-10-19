@@ -565,9 +565,9 @@ export default function AstrologyPage() {
             </div>
           </div>
           {/* Sacred House Wheel with 3D Animated Torus (Apple/Tree of Life) */}
-          <div className="relative w-full max-w-4xl mx-auto px-4">
+          <div className="relative w-full max-w-5xl mx-auto px-2">
             {/* 3D Torus Field - Animated breathing torus - responsive sizing */}
-            <div className="flex items-center justify-center w-full aspect-square max-h-[85vh]">
+            <div className="flex items-center justify-center w-full aspect-square max-h-[90vh]">
               <ConsciousnessFieldWithTorus
                 size={700}
                 showLabels={false}
