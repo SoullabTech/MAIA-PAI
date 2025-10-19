@@ -289,6 +289,23 @@ export default function CheckInPage() {
         transition={{ duration: 1 }}
         className="relative z-10 max-w-md w-full"
       >
+        {/* Soullab Wordmark */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="text-center mb-6"
+        >
+          <h2 className="text-2xl font-serif tracking-widest" style={{
+            color: '#D4AF37',
+            textShadow: '0 0 12px rgba(212, 175, 55, 0.4), 0 2px 4px rgba(107, 68, 35, 0.3)',
+            fontWeight: 300,
+            letterSpacing: '0.15em',
+          }}>
+            SOULLAB
+          </h2>
+        </motion.div>
+
         {/* Holoflower portal */}
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
@@ -385,13 +402,21 @@ export default function CheckInPage() {
           transition={{ duration: 0.6, delay: 0.6 }}
           className="text-center mb-8"
         >
-          <h1 className="text-3xl font-serif tracking-wide mb-2" style={{
+          <h1 className="text-3xl font-serif tracking-wide mb-3" style={{
             color: '#6B4423',
             textShadow: '0 2px 6px rgba(107, 68, 35, 0.2)',
             fontWeight: 500,
           }}>
             Welcome Back
           </h1>
+          <p className="text-xs font-serif tracking-wider mb-4" style={{
+            color: '#D4AF37',
+            textShadow: '0 0 8px rgba(212, 175, 55, 0.3)',
+            letterSpacing: '0.1em',
+            fontWeight: 300,
+          }}>
+            YOUR DOCUMENTARY CONTINUES
+          </p>
           <p className="text-sm font-serif leading-relaxed" style={{
             color: '#5A4A3A',
           }}>
@@ -509,13 +534,21 @@ export default function CheckInPage() {
           </div>
 
           {/* Help text */}
-          <div className="text-center pt-4 border-t border-amber-500/10">
-            <p className="text-amber-200/30 text-xs leading-relaxed">
-              <strong className="text-amber-200/40">Tip:</strong> If you haven't been here in a while and your username doesn't work,
+          <div className="text-center pt-4" style={{
+            borderTop: '1px solid rgba(201, 168, 106, 0.2)',
+          }}>
+            <p className="text-xs font-serif leading-relaxed" style={{
+              color: '#8B7355',
+              opacity: 0.8,
+            }}>
+              <strong style={{ color: '#6B5A4A' }}>Tip:</strong> If you haven't been here in a while and your username doesn't work,
               <br />
               <button
                 onClick={() => router.push('/week2-welcome')}
-                className="text-amber-400/60 hover:text-amber-400/80 underline underline-offset-2"
+                className="font-serif underline underline-offset-2 transition-colors"
+                style={{
+                  color: '#D4AF37',
+                }}
               >
                 it's easy to create a fresh account
               </button>
@@ -524,15 +557,33 @@ export default function CheckInPage() {
           </div>
         </motion.div>
 
-        {/* Footer note */}
+        {/* Footer - Birthed by Soullab */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.3 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 2, delay: 1.5 }}
-          className="mt-12 text-center"
+          className="mt-16 text-center"
         >
-          <p className="text-amber-200/20 text-xs font-light">
-            Beta Testing · Your work here matters
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="h-px w-8" style={{
+              background: 'linear-gradient(to right, transparent, #D4AF37, transparent)',
+            }} />
+            <p className="text-xs font-serif tracking-wider" style={{
+              color: '#D4AF37',
+              textShadow: '0 0 6px rgba(212, 175, 55, 0.2)',
+              letterSpacing: '0.12em',
+            }}>
+              BIRTHED BY SOULLAB
+            </p>
+            <div className="h-px w-8" style={{
+              background: 'linear-gradient(to right, transparent, #D4AF37, transparent)',
+            }} />
+          </div>
+          <p className="text-xs font-serif italic" style={{
+            color: '#8B7355',
+            opacity: 0.7,
+          }}>
+            Technology that honors the work
           </p>
         </motion.div>
       </motion.div>
