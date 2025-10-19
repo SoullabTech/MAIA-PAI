@@ -329,7 +329,7 @@ export function SacredHouseWheel({
           transform: 'translate(-50%, -50%)',
           width: '400px',
           height: '400px',
-          opacity: 0.35,
+          opacity: 0.2,
           pointerEvents: 'none',
           mixBlendMode: 'lighten',
           zIndex: 5
