@@ -87,13 +87,13 @@ export function MenuBar() {
         className="group relative"
         aria-label="Sign Out - Return to Checkin"
       >
-        <div className="relative p-2 md:p-2.5 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30 flex items-center justify-center">
-          <div className="w-7 h-7 md:w-8 md:h-8 opacity-60 group-hover:opacity-100 transition-opacity">
-            <MiniHoloflower size={32} color="#FDB713" />
+        <div className="relative p-2 md:p-3 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30 flex items-center justify-center">
+          <div className="w-9 h-9 md:w-10 md:h-10 opacity-60 group-hover:opacity-100 transition-opacity">
+            <MiniHoloflower size={40} color="#FDB713" />
           </div>
           {/* Small logout icon overlay */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <LogOut className="w-3 h-3 text-amber-400/70 group-hover:text-amber-300 transition-colors" />
+            <LogOut className="w-3.5 h-3.5 text-amber-400/70 group-hover:text-amber-300 transition-colors" />
           </div>
 
           {/* Tooltip - Matte instrument label */}
