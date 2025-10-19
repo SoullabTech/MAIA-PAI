@@ -141,45 +141,112 @@ export default function StoryPage() {
 
   return (
     <div className="min-h-screen text-stone-900" style={{
-      background: 'linear-gradient(to bottom, #A8B5A0 0%, #C9B899 25%, #D9C7AD 50%, #B8935C 75%, #8B6F47 100%)',
+      background: 'linear-gradient(to bottom, #2C3640 0%, #3E4A54 15%, #5A4A3A 35%, #8B6F47 55%, #B8935C 70%, #D4AF37 85%, #FFB84D 100%)',
     }}>
-      {/* Dune atmospheric haze - floating sand particles */}
+      {/* Sandworm Oracle atmosphere - night to blazing horizon */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Atmospheric glow layers */}
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse at 50% 20%, rgba(201, 184, 153, 0.3), transparent 70%)',
-        }} />
-        <div className="absolute inset-0" style={{
-          background: 'radial-gradient(ellipse at 50% 80%, rgba(139, 111, 71, 0.2), transparent 60%)',
+        {/* Film grain texture overlay */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{
+          backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 400 400\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' /%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' /%3E%3C/svg%3E")',
+          backgroundRepeat: 'repeat',
         }} />
 
-        {/* Floating sand particles */}
-        {[...Array(80)].map((_, i) => (
+        {/* Atmospheric depth layers - night sky to desert */}
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse at 50% 5%, rgba(44, 54, 64, 0.4), transparent 50%)',
+        }} />
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse at 50% 85%, rgba(255, 184, 77, 0.3), transparent 70%)',
+        }} />
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(circle at 50% 100%, rgba(212, 175, 55, 0.2), transparent 60%)',
+        }} />
+
+        {/* Stars in night sky (top 30% only) */}
+        {[...Array(120)].map((_, i) => {
+          const top = Math.random() * 30; // Only top 30% for night sky
+          return (
+            <motion.div
+              key={`star-${i}`}
+              className="absolute rounded-full"
+              style={{
+                background: '#E8DCC4',
+                width: Math.random() > 0.8 ? '2px' : '1px',
+                height: Math.random() > 0.8 ? '2px' : '1px',
+                left: `${Math.random() * 100}%`,
+                top: `${top}%`,
+                filter: 'blur(0.5px)',
+                boxShadow: '0 0 2px rgba(232, 220, 196, 0.5)',
+              }}
+              animate={{
+                opacity: [0.3, 0.8, 0.3],
+              }}
+              transition={{
+                duration: 2 + Math.random() * 3,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+                ease: 'easeInOut',
+              }}
+            />
+          );
+        })}
+
+        {/* Sandworm silhouette - watching from the deep desert */}
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[40%] overflow-hidden">
           <motion.div
-            key={i}
-            className="absolute rounded-full"
+            className="absolute"
             style={{
-              background: Math.random() > 0.6 ? '#C9A86A' : '#B8935C',
-              width: Math.random() > 0.7 ? '3px' : '2px',
-              height: Math.random() > 0.7 ? '3px' : '2px',
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              filter: 'blur(1px)',
-              opacity: 0.3,
+              bottom: '-10%',
+              left: '30%',
+              width: '500px',
+              height: '300px',
+              background: 'radial-gradient(ellipse at center, rgba(107, 68, 35, 0.15), transparent 70%)',
+              borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
+              transform: 'rotate(-5deg)',
+              filter: 'blur(8px)',
             }}
             animate={{
-              y: [0, -30, 0],
-              x: [0, Math.random() * 20 - 10, 0],
-              opacity: [0.2, 0.4, 0.2],
+              y: [0, -10, 0],
+              opacity: [0.1, 0.2, 0.1],
             }}
             transition={{
-              duration: 8 + Math.random() * 6,
+              duration: 12,
               repeat: Infinity,
-              delay: Math.random() * 4,
               ease: 'easeInOut',
             }}
           />
-        ))}
+        </div>
+
+        {/* Floating sand particles (bottom 60% - desert zone) */}
+        {[...Array(80)].map((_, i) => {
+          const top = 40 + Math.random() * 60; // Bottom 60% only
+          return (
+            <motion.div
+              key={`sand-${i}`}
+              className="absolute rounded-full"
+              style={{
+                background: Math.random() > 0.6 ? '#D4AF37' : '#FFB84D',
+                width: Math.random() > 0.7 ? '3px' : '2px',
+                height: Math.random() > 0.7 ? '3px' : '2px',
+                left: `${Math.random() * 100}%`,
+                top: `${top}%`,
+                filter: 'blur(1px)',
+                opacity: 0.3,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                x: [0, Math.random() * 20 - 10, 0],
+                opacity: [0.2, 0.4, 0.2],
+              }}
+              transition={{
+                duration: 8 + Math.random() * 6,
+                repeat: Infinity,
+                delay: Math.random() * 4,
+                ease: 'easeInOut',
+              }}
+            />
+          );
+        })}
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -322,13 +389,24 @@ export default function StoryPage() {
                   {mockStory.activeThreads.map((thread) => (
                     <div
                       key={thread.id}
-                      className="p-3 rounded-lg bg-stone-800/40 border border-stone-700/40"
+                      className="p-3 rounded-lg border"
+                      style={{
+                        background: 'rgba(59, 130, 246, 0.08)',
+                        borderColor: 'rgba(59, 130, 246, 0.25)',
+                        boxShadow: '0 0 12px rgba(59, 130, 246, 0.15)',
+                      }}
                     >
                       <div className="flex items-center gap-2 mb-1">
-                        <Sparkles className="w-3 h-3 text-purple-400" />
-                        <span className="text-sm font-medium text-purple-200">{thread.name}</span>
+                        <Sparkles className="w-3 h-3" style={{
+                          color: '#3B82F6',
+                          filter: 'drop-shadow(0 0 4px rgba(59, 130, 246, 0.6))',
+                        }} />
+                        <span className="text-sm font-medium" style={{
+                          color: '#1E40AF',
+                          textShadow: '0 0 8px rgba(59, 130, 246, 0.3)',
+                        }}>{thread.name}</span>
                       </div>
-                      <p className="text-xs text-stone-400">{thread.description}</p>
+                      <p className="text-xs" style={{ color: '#5A4A3A' }}>{thread.description}</p>
                     </div>
                   ))}
                 </div>
@@ -376,7 +454,7 @@ export default function StoryPage() {
                   </button>
                 </div>
 
-                {/* Chapter Text */}
+                {/* Chapter Text - Sacred Inscription */}
                 <div className="mb-8">
                   <div className="space-y-6">
                     {selectedChapter.currentDraft.split('\n\n').map((paragraph, idx) => (
@@ -384,12 +462,15 @@ export default function StoryPage() {
                         key={idx}
                         className="font-serif text-lg"
                         style={{
-                          color: '#3E2723',
+                          color: '#2C1810',
                           lineHeight: '1.9',
                           whiteSpace: 'normal',
                           wordWrap: 'break-word',
                           display: 'block',
                           maxWidth: 'none',
+                          textShadow: '0 1px 2px rgba(212, 175, 55, 0.15)',
+                          letterSpacing: '0.01em',
+                          fontWeight: 400,
                         }}
                       >
                         {paragraph}
