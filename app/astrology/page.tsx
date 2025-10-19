@@ -565,16 +565,16 @@ export default function AstrologyPage() {
             </div>
           </div>
           {/* Sacred House Wheel with 3D Animated Torus (Apple/Tree of Life) */}
-          <div className="relative w-full max-w-6xl mx-auto pb-24">
+          <div className="relative w-full max-w-7xl mx-auto pb-24">
             {/* 3D Torus Field - Animated breathing torus */}
             <div className="flex items-center justify-center">
               <ConsciousnessFieldWithTorus
-                size={1100}
+                size={1400}
                 showLabels={false}
                 animate={true}
               >
-                {/* Sacred House Wheel - MUCH BIGGER for easy navigation */}
-                <div className="relative w-full h-full flex items-center justify-center scale-[2.5]">
+                {/* Sacred House Wheel - REALLY BIG - fills the screen */}
+                <div className="relative w-full h-full flex items-center justify-center scale-[3.2]">
                     <SacredHouseWheel
                       planets={[
                         { name: 'Sun', sign: chartData.sun.sign, house: chartData.sun.house, degree: chartData.sun.degree },
