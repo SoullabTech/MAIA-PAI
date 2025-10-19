@@ -90,6 +90,26 @@ export default function PartnersPage() {
 
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Beta Badge - Building with First Dreamers */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          className="flex justify-center mb-6"
+        >
+          <div className="backdrop-blur-xl bg-gradient-to-r from-amber-500/20 to-purple-500/20 border border-amber-300/50 rounded-full px-6 py-2 shadow-xl"
+            style={{ boxShadow: '0 0 30px rgba(251, 191, 36, 0.3)' }}
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span className="text-amber-200 text-sm font-semibold tracking-wide">
+                BETA · Building with First Dreamers
+              </span>
+              <Sparkles className="w-4 h-4 text-amber-300" />
+            </div>
+          </div>
+        </motion.div>
+
         {/* Header with Holoflower Logo */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -141,8 +161,28 @@ export default function PartnersPage() {
             className="inline-block px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full text-white font-bold text-lg shadow-2xl transition-all transform hover:scale-105"
             style={{ boxShadow: '0 0 30px rgba(168, 85, 247, 0.6)' }}
           >
-            Begin Your Journey
+            Request Beta Access
           </Link>
+
+          {/* Beta Invite System */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="mt-8 backdrop-blur-md bg-white/5 border border-amber-300/20 rounded-xl p-6 max-w-2xl mx-auto"
+          >
+            <div className="flex items-start gap-3">
+              <Heart className="w-6 h-6 text-amber-300 flex-shrink-0 mt-1" />
+              <div className="text-left">
+                <p className="text-purple-100 text-sm leading-relaxed">
+                  <span className="text-amber-200 font-semibold">First Dreamers</span> receive{' '}
+                  <span className="text-white font-bold">10 sacred invite codes</span> to pass ceremoniously to their people.
+                  <br />
+                  <span className="text-purple-200 italic">Build the world with us. Invite-only. Reverent. Alive.</span>
+                </p>
+              </div>
+            </div>
+          </motion.div>
         </motion.div>
 
         {/* What It Is */}
@@ -275,7 +315,11 @@ export default function PartnersPage() {
           <p className="text-center text-purple-200 mb-10 text-lg">Choose your level of partnership</p>
           <div className="grid md:grid-cols-2 gap-6">
             {/* Seed */}
-            <div className="backdrop-blur-xl bg-gradient-to-br from-green-500/15 to-emerald-500/15 border border-emerald-300/40 rounded-2xl p-8 shadow-xl">
+            <div className="backdrop-blur-xl bg-gradient-to-br from-green-500/15 to-emerald-500/15 border border-emerald-300/40 rounded-2xl p-8 shadow-xl relative overflow-hidden">
+              {/* Coming Soon Badge */}
+              <div className="absolute top-4 right-4 backdrop-blur-md bg-amber-500/20 border border-amber-300/40 rounded-full px-3 py-1">
+                <span className="text-amber-200 text-xs font-semibold tracking-wide">COMING SOON</span>
+              </div>
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-4xl">🌱</span>
                 <h3 className="text-2xl font-bold text-white">Seed</h3>
@@ -304,7 +348,11 @@ export default function PartnersPage() {
             </div>
 
             {/* Grow */}
-            <div className="backdrop-blur-xl bg-gradient-to-br from-blue-500/15 to-cyan-500/15 border border-cyan-300/40 rounded-2xl p-8 shadow-xl">
+            <div className="backdrop-blur-xl bg-gradient-to-br from-blue-500/15 to-cyan-500/15 border border-cyan-300/40 rounded-2xl p-8 shadow-xl relative overflow-hidden">
+              {/* Coming Soon Badge */}
+              <div className="absolute top-4 right-4 backdrop-blur-md bg-amber-500/20 border border-amber-300/40 rounded-full px-3 py-1">
+                <span className="text-amber-200 text-xs font-semibold tracking-wide">COMING SOON</span>
+              </div>
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-4xl">🌿</span>
                 <h3 className="text-2xl font-bold text-white">Grow</h3>
@@ -333,7 +381,11 @@ export default function PartnersPage() {
             </div>
 
             {/* Thrive */}
-            <div className="backdrop-blur-xl bg-gradient-to-br from-orange-500/15 to-red-500/15 border border-orange-300/40 rounded-2xl p-8 shadow-xl">
+            <div className="backdrop-blur-xl bg-gradient-to-br from-orange-500/15 to-red-500/15 border border-orange-300/40 rounded-2xl p-8 shadow-xl relative overflow-hidden">
+              {/* Coming Soon Badge */}
+              <div className="absolute top-4 right-4 backdrop-blur-md bg-amber-500/20 border border-amber-300/40 rounded-full px-3 py-1">
+                <span className="text-amber-200 text-xs font-semibold tracking-wide">COMING SOON</span>
+              </div>
               <div className="flex items-center gap-3 mb-4">
                 <span className="text-4xl">🔥</span>
                 <h3 className="text-2xl font-bold text-white">Thrive</h3>
@@ -364,6 +416,10 @@ export default function PartnersPage() {
             {/* Emanate */}
             <div className="backdrop-blur-xl bg-gradient-to-br from-purple-500/15 to-pink-500/15 border border-pink-300/40 rounded-2xl p-8 shadow-xl relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 to-pink-400/10" />
+              {/* Coming Soon Badge */}
+              <div className="absolute top-4 right-4 backdrop-blur-md bg-amber-500/20 border border-amber-300/40 rounded-full px-3 py-1 z-20">
+                <span className="text-amber-200 text-xs font-semibold tracking-wide">COMING SOON</span>
+              </div>
               <div className="relative z-10">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-4xl">✨</span>
@@ -397,16 +453,17 @@ export default function PartnersPage() {
 
         {/* CTA Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-16">
-          <Link
-            href="/partners/showcase"
-            className="backdrop-blur-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-purple-300/40 rounded-2xl p-8 hover:scale-105 transition-all group shadow-xl"
-          >
-            <Users className="w-12 h-12 text-purple-300 mb-4 group-hover:scale-110 transition-transform" />
+          <div className="backdrop-blur-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-purple-300/40 rounded-2xl p-8 shadow-xl relative overflow-hidden opacity-60 cursor-not-allowed">
+            {/* Coming Soon Badge */}
+            <div className="absolute top-4 right-4 backdrop-blur-md bg-amber-500/20 border border-amber-300/40 rounded-full px-3 py-1">
+              <span className="text-amber-200 text-xs font-semibold tracking-wide">COMING SOON</span>
+            </div>
+            <Users className="w-12 h-12 text-purple-300 mb-4" />
             <h3 className="text-2xl font-bold text-white mb-3">Partner Showcase</h3>
             <p className="text-purple-100">
               See sacred tech in action
             </p>
-          </Link>
+          </div>
 
           <Link
             href="/partners/onboarding"
@@ -423,16 +480,17 @@ export default function PartnersPage() {
             </div>
           </Link>
 
-          <Link
-            href="/partners/covenant"
-            className="backdrop-blur-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-300/40 rounded-2xl p-8 hover:scale-105 transition-all group shadow-xl"
-          >
-            <Code className="w-12 h-12 text-pink-300 mb-4 group-hover:scale-110 transition-transform" />
+          <div className="backdrop-blur-xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-300/40 rounded-2xl p-8 shadow-xl relative overflow-hidden opacity-60 cursor-not-allowed">
+            {/* Coming Soon Badge */}
+            <div className="absolute top-4 right-4 backdrop-blur-md bg-amber-500/20 border border-amber-300/40 rounded-full px-3 py-1">
+              <span className="text-amber-200 text-xs font-semibold tracking-wide">COMING SOON</span>
+            </div>
+            <Code className="w-12 h-12 text-pink-300 mb-4" />
             <h3 className="text-2xl font-bold text-white mb-3">Field Partner Covenant</h3>
             <p className="text-pink-100">
               Our shared commitments
             </p>
-          </Link>
+          </div>
         </div>
 
         {/* Footer Note */}
