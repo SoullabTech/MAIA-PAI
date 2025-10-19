@@ -35,6 +35,7 @@ import { getPlanetaryArchetype } from '@/lib/astrology/spiralogicMapping';
 import { AlchemicalSymbol } from './AlchemicalSymbols';
 import { Mission, MissionLayerSettings } from '@/lib/story/types';
 import { MissionDot, MissionPopup } from './MissionDot';
+import { SacredHoloflower } from '@/components/sacred/SacredHoloflower';
 
 interface Planet {
   name: string;
@@ -326,20 +327,26 @@ export function SacredHouseWheel({
         onMouseEnter={() => setRevealedAspects(true)}
         onMouseLeave={() => setRevealedAspects(false)}
       >
-        {/* Central point - AETHER (Transcendent Self) */}
-        <g>
-          <text
-            x="200"
-            y="200"
-            textAnchor="middle"
-            dominantBaseline="central"
-            fontSize="20"
-            opacity="0.8"
-            style={{ userSelect: 'none' }}
-          >
-            ✨
-          </text>
-        </g>
+        {/* Central holoflower overlay - Sacred geometry in the center */}
+        <foreignObject x="50" y="50" width="300" height="300">
+          <div style={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: 0.4,
+            pointerEvents: 'none'
+          }}>
+            <SacredHoloflower
+              size={300}
+              showLabels={false}
+              interactive={false}
+              motionState="idle"
+              dimmed={true}
+            />
+          </div>
+        </foreignObject>
 
         {/* Outer wheel circle */}
         <circle
