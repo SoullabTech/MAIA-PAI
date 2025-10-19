@@ -653,7 +653,7 @@ export function SacredHouseWheel({
 
         {/* SACRED GEOMETRY LAYER - Fremen Alchemist's Cosmology */}
         {showSacredGeometry && (
-          <g opacity="0.25">
+          <g opacity="0.7">
             {/* TORUS FUNNEL - Consciousness Vortex (Elemental Alchemy book cover inspired) */}
             <g>
               {/* Top funnel (golden/fire - descending) - ENHANCED for book cover glow */}
@@ -670,9 +670,9 @@ export function SacredHouseWheel({
                 </radialGradient>
                 {/* Outer glow for cosmic dragonfly effect */}
                 <radialGradient id="torusGlowGradient" cx="50%" cy="50%">
-                  <stop offset="0%" stopColor="#D4AF37" stopOpacity="0" />
-                  <stop offset="40%" stopColor="#F5A362" stopOpacity="0.15" />
-                  <stop offset="70%" stopColor="#8B5CF6" stopOpacity="0.1" />
+                  <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.1" />
+                  <stop offset="40%" stopColor="#F5A362" stopOpacity="0.4" />
+                  <stop offset="70%" stopColor="#8B5CF6" stopOpacity="0.3" />
                   <stop offset="100%" stopColor="#6B9BD1" stopOpacity="0" />
                 </radialGradient>
               </defs>
@@ -714,12 +714,12 @@ export function SacredHouseWheel({
                     x2={x2}
                     y2={y2}
                     stroke="#F5A362"
-                    strokeWidth="0.5"
-                    strokeOpacity="0.35"
+                    strokeWidth="1"
+                    strokeOpacity="0.6"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={{
                       pathLength: [0, 1, 0],
-                      opacity: [0, 0.5, 0]
+                      opacity: [0, 0.8, 0]
                     }}
                     transition={{
                       duration: 8,
@@ -749,12 +749,12 @@ export function SacredHouseWheel({
                     x2={x2}
                     y2={y2}
                     stroke="#8B5CF6"
-                    strokeWidth="0.5"
-                    strokeOpacity="0.3"
+                    strokeWidth="1"
+                    strokeOpacity="0.6"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={{
                       pathLength: [0, 1, 0],
-                      opacity: [0, 0.45, 0]
+                      opacity: [0, 0.8, 0]
                     }}
                     transition={{
                       duration: 10,
