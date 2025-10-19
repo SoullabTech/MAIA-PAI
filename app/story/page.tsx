@@ -328,12 +328,19 @@ export default function StoryPage() {
                 </div>
 
                 {/* Chapter Text */}
-                <div className="mb-8">
-                  <div className="text-stone-200 leading-relaxed font-serif text-lg space-y-4">
+                <div className="mb-8 max-w-3xl">
+                  <div className="space-y-6">
                     {selectedChapter.currentDraft.split('\n\n').map((paragraph, idx) => (
-                      <p key={idx} className="text-stone-200" style={{
-                        lineHeight: '1.8',
-                      }}>
+                      <p
+                        key={idx}
+                        className="text-stone-200 font-serif text-lg"
+                        style={{
+                          lineHeight: '1.8',
+                          whiteSpace: 'normal',
+                          wordWrap: 'break-word',
+                          display: 'block',
+                        }}
+                      >
                         {paragraph}
                       </p>
                     ))}
