@@ -237,12 +237,12 @@ export function MissionPopup({ mission, onClose }: MissionPopupProps) {
         {/* Header */}
         <div className="p-6 border-b border-stone-700/40">
           <div className="flex items-start justify-between gap-4 mb-2">
-            <h3 className="text-xl font-serif text-stone-100">{mission.title}</h3>
+            <h3 className="text-xl font-serif" style={{ color: '#F5F5F4' }}>{mission.title}</h3>
             <span className={`px-3 py-1 rounded-full border text-xs ${statusColors[mission.status]}`}>
               {statusLabels[mission.status]}
             </span>
           </div>
-          <p className="text-sm text-stone-400">{mission.description}</p>
+          <p className="text-sm" style={{ color: '#A8A29E' }}>{mission.description}</p>
         </div>
 
         {/* Progress (if active) */}
