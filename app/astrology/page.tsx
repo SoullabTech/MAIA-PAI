@@ -573,8 +573,8 @@ export default function AstrologyPage() {
                 showLabels={false}
                 animate={true}
               >
-                {/* Sacred House Wheel - REALLY BIG - fills the screen */}
-                <div className="relative w-full h-full flex items-center justify-center scale-[3.2]">
+                {/* Sacred House Wheel - MASSIVE - truly fills the screen */}
+                <div className="relative w-full h-full flex items-center justify-center scale-[5.0]">
                     <SacredHouseWheel
                       planets={[
                         { name: 'Sun', sign: chartData.sun.sign, house: chartData.sun.house, degree: chartData.sun.degree },

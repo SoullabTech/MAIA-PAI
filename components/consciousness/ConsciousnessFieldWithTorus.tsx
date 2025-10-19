@@ -196,8 +196,8 @@ export default function ConsciousnessFieldWithTorus({
           left: '50%',
           transform: 'translate(-50%, -50%)',
           zIndex: 10,
-          width: '85%',
-          height: '85%',
+          width: '95%',
+          height: '95%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center'
