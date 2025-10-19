@@ -23,7 +23,7 @@ import { getSpiralogicPlanetDescription } from '@/lib/astrology/spiralogicHouseM
 import { BirthDataForm } from '@/components/astrology/BirthDataForm';
 import { MiniHoloflower } from '@/components/holoflower/MiniHoloflower';
 import { Mission } from '@/lib/story/types';
-import TorusBackgroundMap from '@/components/consciousness/TorusBackgroundMap';
+import ConsciousnessFieldWithTorus from '@/components/consciousness/ConsciousnessFieldWithTorus';
 
 interface BirthChartData {
   sun: { sign: string; degree: number; house: number };
@@ -564,34 +564,17 @@ export default function AstrologyPage() {
               </div>
             </div>
           </div>
-          {/* Sacred House Wheel with Torus Background (Apple/Tree of Life) */}
-          <div className="relative w-full max-w-3xl mx-auto pb-96">
-            {/* Torus Background Map - The Apple Core / Tree of Life structure */}
+          {/* Sacred House Wheel with 3D Animated Torus (Apple/Tree of Life) */}
+          <div className="relative w-full max-w-5xl mx-auto pb-24">
+            {/* 3D Torus Field - Animated breathing torus */}
             <div className="flex items-center justify-center">
-              <TorusBackgroundMap
-                size={800}
-                showLabels={true}
-                torusOpacity={isDayMode ? 0.45 : 0.65}
-                amberTint={isDayMode ? "#D4A574" : "#7C9FD4"}
-                isDarkMode={!isDayMode}
+              <ConsciousnessFieldWithTorus
+                size={900}
+                showLabels={false}
+                animate={true}
               >
-                <div className="relative w-full h-full flex items-center justify-center">
-                  {/* Optional: Holoflower overlay for extra depth */}
-                  <div
-                    className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                    style={{
-                      opacity: 0.25,
-                      transform: 'scale(0.6)'
-                    }}
-                  >
-                    <MiniHoloflower
-                      size={240}
-                      isDayMode={false}
-                    />
-                  </div>
-
-                  {/* Sacred House Wheel - centered in torus heart */}
-                  <div className="relative z-10">
+                {/* Sacred House Wheel - Large and Prominent, fills most of the field */}
+                <div className="relative w-full h-full flex items-center justify-center scale-[1.8]">
                     <SacredHouseWheel
                       planets={[
                         { name: 'Sun', sign: chartData.sun.sign, house: chartData.sun.house, degree: chartData.sun.degree },
@@ -613,9 +596,8 @@ export default function AstrologyPage() {
                       showAspects={true}
                       missions={KELLY_MISSIONS}
                     />
-                  </div>
                 </div>
-              </TorusBackgroundMap>
+              </ConsciousnessFieldWithTorus>
             </div>
           </div>
         </motion.div>

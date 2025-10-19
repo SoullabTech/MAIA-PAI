@@ -92,7 +92,7 @@ function AnimatedTorusField({ animate = true }: { animate?: boolean }) {
           size={0.02}
           color="#C1A880"
           transparent
-          opacity={0.35}
+          opacity={0.20}
           blending={THREE.AdditiveBlending}
         />
       </points>
@@ -103,7 +103,7 @@ function AnimatedTorusField({ animate = true }: { animate?: boolean }) {
         <meshBasicMaterial
           color="#988C7C"
           transparent
-          opacity={0.25}
+          opacity={0.15}
           wireframe={false}
         />
       </mesh>
@@ -114,7 +114,7 @@ function AnimatedTorusField({ animate = true }: { animate?: boolean }) {
         <meshBasicMaterial
           color="#A89D8E"
           transparent
-          opacity={0.4}
+          opacity={0.25}
         />
       </mesh>
 
@@ -124,20 +124,11 @@ function AnimatedTorusField({ animate = true }: { animate?: boolean }) {
         <meshBasicMaterial
           color="#C9B896"
           transparent
-          opacity={0.55}
+          opacity={0.35}
         />
       </mesh>
 
-      {/* Central sphere - placeholder for consciousness map */}
-      <mesh>
-        <sphereGeometry args={[1.5, 32, 32]} />
-        <meshBasicMaterial
-          color="#E8DFD0"
-          transparent
-          opacity={0.3}
-          wireframe={true}
-        />
-      </mesh>
+      {/* Central sphere removed - actual consciousness map will be here */}
     </group>
   );
 }
