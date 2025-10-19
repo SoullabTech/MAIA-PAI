@@ -319,6 +319,28 @@ export function SacredHouseWheel({
 
   return (
     <div className={`relative ${className}`} style={{ minHeight: '1280px' }}>
+      {/* Central holoflower overlay - Sacred geometry in the center - absolute positioned for reliable rendering */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '350px',
+        height: '350px',
+        opacity: 0.4,
+        pointerEvents: 'none',
+        mixBlendMode: 'lighten',
+        zIndex: 5
+      }}>
+        <SacredHoloflower
+          size={350}
+          showLabels={false}
+          interactive={false}
+          motionState="idle"
+          dimmed={false}
+        />
+      </div>
+
       <svg
         width="1280"
         height="1280"
@@ -327,28 +349,6 @@ export function SacredHouseWheel({
         onMouseEnter={() => setRevealedAspects(true)}
         onMouseLeave={() => setRevealedAspects(false)}
       >
-        {/* Central holoflower overlay - Sacred geometry in the center */}
-        <foreignObject x="50" y="50" width="300" height="300">
-          <div style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            opacity: 0.35,
-            pointerEvents: 'none',
-            mixBlendMode: 'lighten'
-          }}>
-            <SacredHoloflower
-              size={300}
-              showLabels={false}
-              interactive={false}
-              motionState="idle"
-              dimmed={false}
-            />
-          </div>
-        </foreignObject>
-
         {/* Outer wheel circle */}
         <circle
           cx="200"
