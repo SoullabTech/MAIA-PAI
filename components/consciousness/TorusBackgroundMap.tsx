@@ -9,6 +9,7 @@ interface TorusBackgroundMapProps {
   showLabels?: boolean;
   amberTint?: string; // Hex color for amber tint overlay
   torusOpacity?: number; // Opacity of the torus background (0-1)
+  isDarkMode?: boolean; // Whether to use dark/twilight styling
 }
 
 /**
@@ -28,7 +29,8 @@ export default function TorusBackgroundMap({
   size = 800,
   showLabels = true,
   amberTint = '#D4A574',
-  torusOpacity = 0.35
+  torusOpacity = 0.35,
+  isDarkMode = false
 }: TorusBackgroundMapProps) {
   return (
     <div
@@ -37,9 +39,13 @@ export default function TorusBackgroundMap({
         width: size,
         height: size,
         overflow: 'hidden',
-        background: '#F5F0E8',
+        background: isDarkMode
+          ? 'radial-gradient(circle at center, rgba(30, 58, 95, 0.3) 0%, rgba(15, 23, 41, 0.5) 100%)'
+          : '#F5F0E8',
         borderRadius: '8px',
-        boxShadow: '0 8px 32px rgba(139, 125, 107, 0.15)'
+        boxShadow: isDarkMode
+          ? '0 8px 32px rgba(59, 130, 246, 0.15), 0 0 60px rgba(139, 92, 246, 0.1)'
+          : '0 8px 32px rgba(139, 125, 107, 0.15)'
       }}
     >
       {/* Sacred Geometry Torus Background - Full Bleed */}
@@ -85,7 +91,9 @@ export default function TorusBackgroundMap({
           position: 'absolute',
           inset: '20%',
           zIndex: 2,
-          background: 'radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%)',
+          background: isDarkMode
+            ? 'radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.08) 40%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%)',
           borderRadius: '50%',
           pointerEvents: 'none'
         }}
@@ -127,12 +135,14 @@ export default function TorusBackgroundMap({
               top: 24,
               left: '50%',
               transform: 'translateX(-50%)',
-              color: '#8B7D6B',
+              color: isDarkMode ? '#A5B4CB' : '#8B7D6B',
               fontSize: '13px',
               fontFamily: 'serif',
               fontStyle: 'italic',
-              opacity: 0.7,
-              textShadow: '0 2px 8px rgba(255,255,255,0.8)',
+              opacity: isDarkMode ? 0.9 : 0.7,
+              textShadow: isDarkMode
+                ? '0 2px 8px rgba(59, 130, 246, 0.4), 0 0 20px rgba(139, 92, 246, 0.3)'
+                : '0 2px 8px rgba(255,255,255,0.8)',
               letterSpacing: '0.5px'
             }}
           >
@@ -146,13 +156,15 @@ export default function TorusBackgroundMap({
               bottom: 24,
               left: '50%',
               transform: 'translateX(-50%)',
-              color: '#8B7D6B',
+              color: isDarkMode ? '#8B9BB8' : '#8B7D6B',
               fontSize: '10px',
               fontFamily: 'serif',
               fontStyle: 'italic',
-              opacity: 0.6,
+              opacity: isDarkMode ? 0.8 : 0.6,
               textAlign: 'center',
-              textShadow: '0 1px 4px rgba(255,255,255,0.8)'
+              textShadow: isDarkMode
+                ? '0 1px 4px rgba(59, 130, 246, 0.3)'
+                : '0 1px 4px rgba(255,255,255,0.8)'
             }}
           >
             "As above, so below" — The map sits at the heart of the torus

@@ -303,7 +303,7 @@ export default function AstrologyPage() {
         style={{
           background: isDayMode
             ? 'radial-gradient(circle at 50% 30%, #E8DCC8 0%, #D4C4B0 100%)'
-            : 'radial-gradient(circle at 50% 70%, #1C130C 0%, #0A0907 100%)'
+            : 'radial-gradient(ellipse at top, #1e3a5f 0%, #1a2947 20%, #15203a 40%, #0f1729 60%, #0a0f1e 80%, #050911 100%)'
         }}>
 
         {/* Subtle constellation field */}
@@ -373,10 +373,28 @@ export default function AstrologyPage() {
       style={{
         background: isDayMode
           ? 'radial-gradient(circle at 50% 30%, #E8DCC8 0%, #D4C4B0 100%)'
-          : 'radial-gradient(circle at 50% 70%, #1C130C 0%, #0A0907 100%)'
+          : 'radial-gradient(ellipse at top, #1e3a5f 0%, #1a2947 20%, #15203a 40%, #0f1729 60%, #0a0f1e 80%, #050911 100%)'
       }}>
 
-      {/* Arrakis Night Sky - Proper twinkling stars */}
+      {/* Twilight horizon - hint of sunlight just past dusk */}
+      {!isDayMode && (
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 h-64 pointer-events-none"
+          style={{
+            background: 'linear-gradient(to top, rgba(255, 147, 79, 0.08) 0%, rgba(255, 120, 50, 0.05) 30%, transparent 100%)',
+          }}
+          animate={{
+            opacity: [0.6, 0.8, 0.6],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
+      )}
+
+      {/* Twilight Sky - Twinkling stars */}
       <div className="absolute inset-0">
         {/* Distant stars - subtle shimmer */}
         {[...Array(200)].map((_, i) => {
@@ -553,8 +571,9 @@ export default function AstrologyPage() {
               <TorusBackgroundMap
                 size={800}
                 showLabels={true}
-                torusOpacity={0.45}
-                amberTint={isDayMode ? "#D4A574" : "#C9B896"}
+                torusOpacity={isDayMode ? 0.45 : 0.65}
+                amberTint={isDayMode ? "#D4A574" : "#7C9FD4"}
+                isDarkMode={!isDayMode}
               >
                 <div className="relative w-full h-full flex items-center justify-center">
                   {/* Optional: Holoflower overlay for extra depth */}
