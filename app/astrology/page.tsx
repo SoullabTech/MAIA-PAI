@@ -644,15 +644,15 @@ export default function AstrologyPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-2xl">{statusIcons[mission.status]}</span>
                       <div>
-                        <h3 className={`font-serif text-lg ${isDayMode ? 'text-stone-800' : 'text-stone-100'}`}>
+                        <h3 className="font-serif text-lg text-white">
                           {mission.title}
                         </h3>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                          <span className="text-xs text-stone-300">
                             House {mission.house}
                           </span>
                           <span className="text-xs text-stone-500">•</span>
-                          <span className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                          <span className="text-xs text-stone-300">
                             {statusLabels[mission.status]}
                           </span>
                         </div>
@@ -661,7 +661,7 @@ export default function AstrologyPage() {
                   </div>
 
                   {/* Description */}
-                  <p className={`text-sm mb-4 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                  <p className="text-sm mb-4 text-stone-200">
                     {mission.description}
                   </p>
 
@@ -690,10 +690,7 @@ export default function AstrologyPage() {
                         <div className={`w-1.5 h-1.5 rounded-full ${
                           milestone.completed ? 'bg-green-500' : 'bg-stone-600'
                         }`} />
-                        <span className={milestone.completed
-                          ? (isDayMode ? 'text-stone-600' : 'text-stone-400')
-                          : (isDayMode ? 'text-stone-500' : 'text-stone-500')
-                        }>
+                        <span className={milestone.completed ? 'text-stone-300' : 'text-stone-400'}>
                           {milestone.title}
                         </span>
                       </div>
@@ -706,10 +703,10 @@ export default function AstrologyPage() {
                       <div className="flex items-start gap-2">
                         <Sparkles className="w-3 h-3 text-purple-400 mt-0.5" />
                         <div>
-                          <div className={`text-xs font-medium ${isDayMode ? 'text-purple-700' : 'text-purple-300'}`}>
+                          <div className="text-xs font-medium text-purple-300">
                             {mission.transitContext.activatingPlanet}
                           </div>
-                          <div className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mt-0.5`}>
+                          <div className="text-xs text-stone-300 mt-0.5">
                             {mission.transitContext.transitDescription}
                           </div>
                         </div>
