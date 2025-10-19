@@ -89,10 +89,10 @@ function AnimatedTorusField({ animate = true }: { animate?: boolean }) {
           />
         </bufferGeometry>
         <pointsMaterial
-          size={0.02}
+          size={0.025}
           color="#C1A880"
           transparent
-          opacity={0.05}
+          opacity={0.25}
           blending={THREE.AdditiveBlending}
         />
       </points>
