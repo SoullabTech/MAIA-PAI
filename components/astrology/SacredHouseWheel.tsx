@@ -35,7 +35,6 @@ import { getPlanetaryArchetype } from '@/lib/astrology/spiralogicMapping';
 import { AlchemicalSymbol } from './AlchemicalSymbols';
 import { Mission, MissionLayerSettings } from '@/lib/story/types';
 import { MissionDot, MissionPopup } from './MissionDot';
-import { SacredHoloflower } from '@/components/sacred/SacredHoloflower';
 
 interface Planet {
   name: string;
@@ -319,27 +318,23 @@ export function SacredHouseWheel({
 
   return (
     <div className={`relative ${className}`} style={{ minHeight: '1280px' }}>
-      {/* Central holoflower overlay - Sacred geometry in the center - absolute positioned for reliable rendering */}
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        width: '350px',
-        height: '350px',
-        opacity: 0.4,
-        pointerEvents: 'none',
-        mixBlendMode: 'lighten',
-        zIndex: 5
-      }}>
-        <SacredHoloflower
-          size={350}
-          showLabels={false}
-          interactive={false}
-          motionState="idle"
-          dimmed={false}
-        />
-      </div>
+      {/* Central holoflower overlay - Multicolor elemental sacred geometry */}
+      <img
+        src="/elementalHoloflower.svg"
+        alt="Elemental Holoflower"
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '400px',
+          height: '400px',
+          opacity: 0.35,
+          pointerEvents: 'none',
+          mixBlendMode: 'lighten',
+          zIndex: 5
+        }}
+      />
 
       <svg
         width="1280"
