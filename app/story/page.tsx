@@ -328,7 +328,7 @@ export default function StoryPage() {
                 </div>
 
                 {/* Chapter Text */}
-                <div className="mb-8 max-w-3xl">
+                <div className="mb-8">
                   <div className="space-y-6">
                     {selectedChapter.currentDraft.split('\n\n').map((paragraph, idx) => (
                       <p
@@ -339,6 +339,7 @@ export default function StoryPage() {
                           whiteSpace: 'normal',
                           wordWrap: 'break-word',
                           display: 'block',
+                          maxWidth: 'none',
                         }}
                       >
                         {paragraph}
