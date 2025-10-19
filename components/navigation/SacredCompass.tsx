@@ -89,39 +89,31 @@ export function SacredCompass({
 
   return (
     <div
-      className={`fixed bottom-6 right-6 z-50 ${className}`}
+      className={`fixed bottom-8 right-8 z-50 ${className}`}
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
     >
-      <motion.div
-        animate={{
-          scale: isExpanded ? 1.2 : 1,
-        }}
-        transition={{ duration: 0.2 }}
-        className="relative"
-      >
-        {/* Compass Container */}
-        <div className="relative w-20 h-20">
+      <div className="relative">
+        {/* Compass Container - Fixed size, no scaling */}
+        <div className="relative w-24 h-24">
           {/* Center Circle - MAIA Presence */}
-          <motion.button
+          <button
             onClick={() => onNavigate('center')}
             className={`
               absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
-              w-8 h-8 rounded-full
+              w-10 h-10 rounded-full
               flex items-center justify-center
-              transition-all duration-300
+              transition-all duration-200
               ${
                 isActive('center')
-                  ? 'bg-white text-black scale-110 shadow-lg'
-                  : 'bg-black border border-white/30 text-white/70 hover:border-white/60'
+                  ? 'bg-white text-black shadow-lg'
+                  : 'bg-black border-2 border-white/40 text-white/80 hover:border-white/70'
               }
             `}
-            whileHover={{ scale: 1.15 }}
-            whileTap={{ scale: 0.95 }}
             aria-label="Return to center - MAIA conversation"
           >
-            <span className="text-xs font-serif">◉</span>
-          </motion.button>
+            <span className="text-sm font-serif">◉</span>
+          </button>
 
           {/* UP - Depths/Subconscious */}
           <DirectionButton
@@ -176,21 +168,22 @@ export function SacredCompass({
         <AnimatePresence>
           {isExpanded && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full
-                         bg-black/90 border border-white/20 rounded-lg px-3 py-2
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="absolute -top-3 left-1/2 -translate-x-1/2 -translate-y-full
+                         bg-black/95 border border-white/20 rounded-lg px-4 py-2
                          text-xs text-white/70 whitespace-nowrap pointer-events-none"
             >
               <div className="text-center font-serif">
-                <div className="text-white/90">Sacred Compass</div>
-                <div className="text-[10px] mt-1">Arrow keys to navigate</div>
+                <div className="text-white/90 font-medium">Sacred Compass</div>
+                <div className="text-[10px] mt-1 text-white/50">Arrow keys to navigate</div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -238,44 +231,25 @@ function DirectionButton({
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
     >
-      <motion.button
+      <button
         onClick={onClick}
         disabled={!hasContent}
         className={`
-          w-6 h-6 rounded-full
+          w-8 h-8 rounded-full
           flex items-center justify-center
-          transition-all duration-300
+          transition-all duration-200
           ${
             isActive
-              ? `${colorClass} bg-current/20 scale-110 shadow-lg`
+              ? `${colorClass} bg-current/20 shadow-lg border-2 border-current`
               : hasContent
-              ? `${colorClass} bg-black border border-current/30 hover:border-current/60`
-              : 'bg-black border border-white/10 text-white/20 cursor-not-allowed'
+              ? `${colorClass} bg-black border-2 border-current/40 hover:border-current/70 hover:bg-current/10`
+              : 'bg-black border-2 border-white/10 text-white/20 cursor-not-allowed'
           }
         `}
-        whileHover={hasContent ? { scale: 1.15 } : {}}
-        whileTap={hasContent ? { scale: 0.95 } : {}}
-        animate={
-          isSuggested
-            ? {
-                opacity: [0.5, 1, 0.5],
-                scale: [1, 1.1, 1],
-              }
-            : {}
-        }
-        transition={
-          isSuggested
-            ? {
-                duration: 2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }
-            : {}
-        }
         aria-label={`Navigate ${direction} to ${metadata.title}`}
       >
-        <span className="text-sm font-serif">{getIcon()}</span>
-      </motion.button>
+        <span className="text-base font-serif">{getIcon()}</span>
+      </button>
 
       {/* Tooltip */}
       <AnimatePresence>
