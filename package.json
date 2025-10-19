@@ -124,6 +124,8 @@
     "@deepgram/sdk": "^4.11.2",
     "@huggingface/inference": "^2.8.0",
     "@prisma/client": "^6.17.0",
+    "@react-three/fiber": "^8.15.12",
+    "@types/three": "^0.160.0",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
@@ -190,6 +192,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.160.0",
     "typescript": "5.3.3",
     "uuid": "^9.0.1",
     "zustand": "^4.5.7"
