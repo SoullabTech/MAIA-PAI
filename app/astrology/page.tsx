@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Sparkles, Flame, Droplet, Sprout, Wind, Sparkle, Target, TrendingUp } from 'lucide-react';
+import { Sparkles, Flame, Droplet, Sprout, Wind, Sparkle, Target, TrendingUp, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ElementalBalanceDisplay } from '@/components/astrology/ElementalBalanceDisplay';
 import { SacredHouseWheel } from '@/components/astrology/SacredHouseWheel';
@@ -724,6 +724,218 @@ export default function AstrologyPage() {
               Each mission pulses on the map in its house location •{' '}
               Click the pulsing dots above to see details
             </p>
+          </div>
+        </motion.div>
+
+        {/* Sacred Scribe - Living Mythology Co-Authored with MAIA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.8 }}
+          className="mb-12"
+        >
+          <div className="text-center mb-8">
+            <h2 className={`text-2xl font-serif mb-2 ${isDayMode ? 'text-stone-800' : 'text-amber-300'}`}>
+              Your Living Story
+            </h2>
+            <p className={`text-sm ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+              MAIA witnesses your journey and weaves your mythology across time
+            </p>
+          </div>
+
+          <div className={`rounded-xl p-8 backdrop-blur-md border ${
+            isDayMode
+              ? 'bg-gradient-to-br from-purple-50/80 to-blue-50/80 border-purple-200/40'
+              : 'bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-purple-700/30'
+          }`}>
+            {/* Current Chapter Spotlight */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    isDayMode ? 'bg-purple-200/50' : 'bg-purple-500/20'
+                  }`}>
+                    <BookOpen className={`w-5 h-5 ${isDayMode ? 'text-purple-700' : 'text-purple-400'}`} />
+                  </div>
+                  <div>
+                    <h3 className={`text-lg font-serif ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                      Chapter 0: Genesis
+                    </h3>
+                    <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                      Co-authored with MAIA • Approved
+                    </p>
+                  </div>
+                </div>
+                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  isDayMode
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-green-900/30 text-green-400'
+                }`}>
+                  ✓ Approved
+                </div>
+              </div>
+
+              {/* Genesis excerpt */}
+              <div className={`p-6 rounded-lg ${
+                isDayMode ? 'bg-stone-50/50' : 'bg-stone-900/20'
+              } border ${isDayMode ? 'border-stone-200/40' : 'border-stone-700/20'}`}>
+                <p className={`font-serif text-sm leading-relaxed ${
+                  isDayMode ? 'text-stone-700' : 'text-stone-300'
+                } mb-4`}>
+                  Your soul architecture reveals itself in the configuration of cosmos at your first breath.
+                </p>
+                <p className={`font-serif text-sm leading-relaxed ${
+                  isDayMode ? 'text-stone-700' : 'text-stone-300'
+                } mb-4`}>
+                  Not fate. Not prediction. But invitation - a field of archetypal potential waiting to be lived,
+                  played, embodied through the music only you can make.
+                </p>
+                <p className={`font-serif text-sm leading-relaxed ${
+                  isDayMode ? 'text-stone-700' : 'text-stone-300'
+                }`}>
+                  The cosmos arranged itself in a <strong>Funnel pattern</strong> - nine planets flowing toward a single point of focus.
+                  This is the signature of someone who channels universal energy through a specific calling.
+                  Everything flows toward your focal planet - <strong>Saturn in House 10</strong> - your life's work lives there.
+                </p>
+              </div>
+            </div>
+
+            {/* Stats & Activity */}
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className={`p-4 rounded-lg text-center ${
+                isDayMode ? 'bg-blue-50/50' : 'bg-blue-900/10'
+              }`}>
+                <div className={`text-2xl font-bold ${isDayMode ? 'text-blue-700' : 'text-blue-400'}`}>
+                  1
+                </div>
+                <div className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mt-1`}>
+                  Chapters
+                </div>
+              </div>
+              <div className={`p-4 rounded-lg text-center ${
+                isDayMode ? 'bg-green-50/50' : 'bg-green-900/10'
+              }`}>
+                <div className={`text-2xl font-bold ${isDayMode ? 'text-green-700' : 'text-green-400'}`}>
+                  1
+                </div>
+                <div className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mt-1`}>
+                  Approved
+                </div>
+              </div>
+              <div className={`p-4 rounded-lg text-center ${
+                isDayMode ? 'bg-purple-50/50' : 'bg-purple-900/10'
+              }`}>
+                <div className={`text-2xl font-bold ${isDayMode ? 'text-purple-700' : 'text-purple-400'}`}>
+                  2
+                </div>
+                <div className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mt-1`}>
+                  Active Threads
+                </div>
+              </div>
+            </div>
+
+            {/* Active Threads */}
+            <div className="mb-6">
+              <h4 className={`text-sm font-semibold mb-3 ${
+                isDayMode ? 'text-stone-800' : 'text-stone-200'
+              }`}>
+                Patterns MAIA Is Tracking
+              </h4>
+              <div className="space-y-2">
+                <div className={`p-3 rounded-lg flex items-start gap-3 ${
+                  isDayMode ? 'bg-amber-50/50' : 'bg-amber-900/10'
+                } border ${isDayMode ? 'border-amber-200/30' : 'border-amber-700/20'}`}>
+                  <Sparkles className={`w-4 h-4 mt-0.5 ${isDayMode ? 'text-amber-600' : 'text-amber-400'}`} />
+                  <div className="flex-1">
+                    <div className={`text-sm font-medium ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                      Saturn Focal Point Work
+                    </div>
+                    <div className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mt-0.5`}>
+                      Crystallizing life's work through consciousness technology
+                    </div>
+                  </div>
+                  <div className={`px-2 py-0.5 rounded-full text-xs ${
+                    isDayMode ? 'bg-green-100 text-green-700' : 'bg-green-900/30 text-green-400'
+                  }`}>
+                    Active
+                  </div>
+                </div>
+
+                <div className={`p-3 rounded-lg flex items-start gap-3 ${
+                  isDayMode ? 'bg-blue-50/50' : 'bg-blue-900/10'
+                } border ${isDayMode ? 'border-blue-200/30' : 'border-blue-700/20'}`}>
+                  <Sparkles className={`w-4 h-4 mt-0.5 ${isDayMode ? 'text-blue-600' : 'text-blue-400'}`} />
+                  <div className="flex-1">
+                    <div className={`text-sm font-medium ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                      The Air Path: Pattern to Purpose
+                    </div>
+                    <div className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mt-0.5`}>
+                      Weaving connection, community, and collective consciousness
+                    </div>
+                  </div>
+                  <div className={`px-2 py-0.5 rounded-full text-xs ${
+                    isDayMode ? 'bg-blue-100 text-blue-700' : 'bg-blue-900/30 text-blue-400'
+                  }`}>
+                    Emerging
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Journey Timeline Preview */}
+            <div className="mb-6">
+              <h4 className={`text-sm font-semibold mb-3 ${
+                isDayMode ? 'text-stone-800' : 'text-stone-200'
+              }`}>
+                Recent Journey Events
+              </h4>
+              <div className="space-y-2">
+                <div className="flex items-start gap-3">
+                  <div className={`w-2 h-2 rounded-full mt-1.5 ${
+                    isDayMode ? 'bg-purple-500' : 'bg-purple-400'
+                  }`} />
+                  <div className="flex-1">
+                    <div className={`text-sm ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                      Story Begins: Genesis Chapter Created
+                    </div>
+                    <div className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                      {new Date().toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className={`w-2 h-2 rounded-full mt-1.5 ${
+                    isDayMode ? 'bg-green-500' : 'bg-green-400'
+                  }`} />
+                  <div className="flex-1">
+                    <div className={`text-sm ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                      Mission Identified: Build MAIA Platform
+                    </div>
+                    <div className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                      June 2024
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Call to Action */}
+            <div className="text-center pt-4 border-t border-stone-700/20">
+              <a
+                href="/story"
+                className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-sm transition-all ${
+                  isDayMode
+                    ? 'bg-purple-600 text-white hover:bg-purple-700'
+                    : 'bg-purple-500/20 text-purple-300 border border-purple-500/40 hover:bg-purple-500/30'
+                }`}
+              >
+                <BookOpen className="w-4 h-4" />
+                Open Sacred Scribe
+              </a>
+              <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-500'} mt-3 italic`}>
+                Co-author your living mythology with MAIA
+              </p>
+            </div>
           </div>
         </motion.div>
 

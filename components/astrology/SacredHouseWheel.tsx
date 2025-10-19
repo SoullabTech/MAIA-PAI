@@ -1539,17 +1539,38 @@ export function SacredHouseWheel({
         </motion.div>
       )}
 
-      {/* House Insight Overlay - Elegant futuristic minimal design */}
+      {/* House Insight Overlay - Smart quadrant positioning */}
       <AnimatePresence>
-        {hoveredHouse !== null && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute left-1/2 top-1/2 mx-auto max-w-2xl z-50"
-            style={{ pointerEvents: 'none', transform: 'translate(-50%, -50%)' }}
-          >
+        {hoveredHouse !== null && (() => {
+          // Calculate smart positioning based on quadrant to avoid covering dots
+          const housePos = getHousePosition(hoveredHouse);
+          const centerX = 200;
+          const centerY = 200;
+
+          // Determine which quadrant the hovered house is in
+          const isRight = housePos.x > centerX;
+          const isBottom = housePos.y > centerY;
+
+          // Position popup in opposite quadrant
+          const transformX = isRight ? '-100%' : '0%';
+          const transformY = isBottom ? '-100%' : '0%';
+          const leftPos = isRight ? '20%' : '80%';
+          const topPos = isBottom ? '20%' : '80%';
+
+          return (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="absolute mx-auto max-w-2xl z-50"
+              style={{
+                pointerEvents: 'none',
+                left: leftPos,
+                top: topPos,
+                transform: `translate(${transformX}, ${transformY})`
+              }}
+            >
             <div
               className={`backdrop-blur-xl rounded-2xl border shadow-2xl overflow-hidden ${
                 isDayMode
@@ -1709,7 +1730,8 @@ export function SacredHouseWheel({
               })()}
             </div>
           </motion.div>
-        )}
+          );
+        })()}
 
         {/* Planetary Insight Overlay - Shows planet/sign/archetype/aspects */}
         {hoveredPlanet !== null && (
