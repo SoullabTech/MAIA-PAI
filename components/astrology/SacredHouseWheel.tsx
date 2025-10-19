@@ -1203,9 +1203,30 @@ export function SacredHouseWheel({
               Z
             `;
 
+            // Wider hover zone path - extends further into the house for easier interaction
+            const hoverInnerRadius = 60;
+            const hoverOuterRadius = 160;
+            const hx1 = 200 + hoverInnerRadius * Math.cos(startAngle);
+            const hy1 = 200 + hoverInnerRadius * Math.sin(startAngle);
+            const hx2 = 200 + hoverOuterRadius * Math.cos(startAngle);
+            const hy2 = 200 + hoverOuterRadius * Math.sin(startAngle);
+            const hx3 = 200 + hoverOuterRadius * Math.cos(endAngle);
+            const hy3 = 200 + hoverOuterRadius * Math.sin(endAngle);
+            const hx4 = 200 + hoverInnerRadius * Math.cos(endAngle);
+            const hy4 = 200 + hoverInnerRadius * Math.sin(endAngle);
+
+            const hoverPathData = `
+              M ${hx1} ${hy1}
+              L ${hx2} ${hy2}
+              A ${hoverOuterRadius} ${hoverOuterRadius} 0 ${largeArcFlag} 1 ${hx3} ${hy3}
+              L ${hx4} ${hy4}
+              A ${hoverInnerRadius} ${hoverInnerRadius} 0 ${largeArcFlag} 0 ${hx1} ${hy1}
+              Z
+            `;
+
             return (
               <g key={house}>
-                {/* House segment */}
+                {/* House segment - visual only */}
                 <path
                   d={pathData}
                   fill={color}
@@ -1213,15 +1234,22 @@ export function SacredHouseWheel({
                   stroke={color}
                   strokeWidth="2"
                   strokeOpacity={hoveredHouse === house ? 0.9 : 0.5}
-                  onMouseEnter={() => setHoveredHouse(house)}
-                  onMouseLeave={() => setHoveredHouse(null)}
-                  onClick={() => setClickedHouse(clickedHouse === house ? null : house)}
-                  className="cursor-pointer transition-all duration-500"
+                  className="pointer-events-none transition-all duration-500"
                   style={{
                     filter: hoveredHouse === house
                       ? `drop-shadow(0 0 8px ${elementColor.glow})`
                       : 'none',
                   }}
+                />
+
+                {/* Wider invisible hover zone - extends further into house for easier interaction */}
+                <path
+                  d={hoverPathData}
+                  fill="transparent"
+                  onMouseEnter={() => setHoveredHouse(house)}
+                  onMouseLeave={() => setHoveredHouse(null)}
+                  onClick={() => setClickedHouse(clickedHouse === house ? null : house)}
+                  className="cursor-pointer"
                 />
 
                 {/* Alchemical elemental symbol at inner radius */}
