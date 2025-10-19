@@ -78,32 +78,30 @@ export function MenuBar() {
         </div>
       )}
 
-      {/* SIGN OUT: Holoflower signout on left side */}
-      <div className="fixed left-4 z-40" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 3.5rem)' }}>
-        <button
-          onClick={handleSignOut}
-          className="group relative"
-          aria-label="Sign Out - Return to Checkin"
-        >
-          <div className="relative p-2 md:p-2.5 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30 flex items-center justify-center">
-            <div className="w-7 h-7 md:w-8 md:h-8 opacity-60 group-hover:opacity-100 transition-opacity">
-              <MiniHoloflower size={32} color="#FDB713" />
-            </div>
-            {/* Small logout icon overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <LogOut className="w-3 h-3 text-amber-400/70 group-hover:text-amber-300 transition-colors" />
-            </div>
-
-            {/* Tooltip - Matte instrument label */}
-            <span className="absolute -bottom-8 left-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-              Sign Out
-            </span>
-          </div>
-        </button>
-      </div>
-
-      {/* INSTRUMENT PANEL: Ancient-future navigation - Positioned left of sign out button */}
+      {/* INSTRUMENT PANEL: Ancient-future navigation */}
       <div className="flex fixed right-16 z-40 items-center gap-1.5 md:gap-2" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 3.5rem)' }}>
+
+      {/* Sign Out - Holoflower with logout overlay (FIRST ICON) */}
+      <button
+        onClick={handleSignOut}
+        className="group relative"
+        aria-label="Sign Out - Return to Checkin"
+      >
+        <div className="relative p-2 md:p-2.5 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30 flex items-center justify-center">
+          <div className="w-7 h-7 md:w-8 md:h-8 opacity-60 group-hover:opacity-100 transition-opacity">
+            <MiniHoloflower size={32} color="#FDB713" />
+          </div>
+          {/* Small logout icon overlay */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <LogOut className="w-3 h-3 text-amber-400/70 group-hover:text-amber-300 transition-colors" />
+          </div>
+
+          {/* Tooltip - Matte instrument label */}
+          <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Sign Out
+          </span>
+        </div>
+      </button>
 
       {/* MAIA Conversation - Holoflower Seed of Life */}
       <Link
