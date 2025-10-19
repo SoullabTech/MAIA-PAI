@@ -140,26 +140,30 @@ export default function StoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0a0a0f] via-[#1a1a2e] to-[#16213e] text-stone-100">
-      {/* Arrakis star field */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(100)].map((_, i) => (
+    <div className="min-h-screen bg-black text-stone-100">
+      {/* Cosmic dragonfly star field - amber spice dust */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {[...Array(150)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute rounded-full bg-orange-200/60"
+            className="absolute rounded-full"
             style={{
-              width: Math.random() > 0.7 ? '2px' : '1px',
-              height: Math.random() > 0.7 ? '2px' : '1px',
+              background: Math.random() > 0.5 ? '#F5A362' : '#D4AF37',
+              width: Math.random() > 0.8 ? '2px' : '1px',
+              height: Math.random() > 0.8 ? '2px' : '1px',
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
+              filter: 'blur(0.5px)',
             }}
             animate={{
-              opacity: [0.2, 0.8, 0.2],
+              opacity: [0.1, 0.6, 0.1],
+              scale: [1, 1.2, 1],
             }}
             transition={{
-              duration: 2 + Math.random() * 3,
+              duration: 3 + Math.random() * 4,
               repeat: Infinity,
-              delay: Math.random() * 2,
+              delay: Math.random() * 3,
+              ease: 'easeInOut',
             }}
           />
         ))}
@@ -173,15 +177,29 @@ export default function StoryPage() {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <BookOpen className="w-10 h-10 text-amber-400" />
-            <h1 className="text-4xl md:text-5xl font-serif text-amber-400">
+            <motion.div
+              animate={{
+                scale: [1, 1.1, 1],
+                rotate: [0, 5, 0, -5, 0],
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
+            >
+              <BookOpen className="w-10 h-10 text-amber-400" style={{ filter: 'drop-shadow(0 0 8px rgba(245, 163, 98, 0.6))' }} />
+            </motion.div>
+            <h1 className="text-4xl md:text-5xl font-serif text-amber-400" style={{
+              textShadow: '0 0 20px rgba(245, 163, 98, 0.4), 0 0 40px rgba(212, 175, 55, 0.2)',
+            }}>
               {mockStory.title}
             </h1>
           </div>
-          <p className="text-stone-400 font-serif italic mb-2">
+          <p className="text-stone-300 font-serif italic mb-2">
             Co-authored with MAIA, your Sacred Scribe
           </p>
-          <p className="text-stone-500 text-sm italic max-w-xl mx-auto">
+          <p className="text-stone-400 text-sm italic max-w-xl mx-auto leading-relaxed">
             She listens with archetypal ears. Asks questions informed by the cosmos.
             Weaves your story across time. You lived it. She saw it. Together you author it.
           </p>
@@ -220,8 +238,12 @@ export default function StoryPage() {
               animate={{ opacity: 1, x: 0 }}
               className="col-span-12 lg:col-span-3"
             >
-              <div className="bg-black/40 backdrop-blur-md border border-stone-700/40 rounded-2xl p-6">
-                <h3 className="text-lg font-serif mb-4 text-amber-300">Chapters</h3>
+              <div className="bg-stone-900/30 backdrop-blur-xl border border-amber-900/20 rounded-2xl p-6 shadow-2xl" style={{
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(245, 163, 98, 0.1)',
+              }}>
+                <h3 className="text-lg font-serif mb-4 text-amber-300" style={{
+                  textShadow: '0 0 10px rgba(245, 163, 98, 0.3)',
+                }}>Chapters</h3>
                 <div className="space-y-2">
                   {mockStory.chapters.map((chapter) => (
                     <button
@@ -250,8 +272,12 @@ export default function StoryPage() {
               </div>
 
               {/* Active Threads */}
-              <div className="mt-6 bg-black/40 backdrop-blur-md border border-stone-700/40 rounded-2xl p-6">
-                <h3 className="text-lg font-serif mb-4 text-amber-300">Unfolding Threads</h3>
+              <div className="mt-6 bg-stone-900/30 backdrop-blur-xl border border-purple-900/20 rounded-2xl p-6 shadow-2xl" style={{
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(139, 92, 246, 0.1)',
+              }}>
+                <h3 className="text-lg font-serif mb-4 text-purple-300" style={{
+                  textShadow: '0 0 10px rgba(139, 92, 246, 0.3)',
+                }}>Unfolding Threads</h3>
                 <div className="space-y-3">
                   {mockStory.activeThreads.map((thread) => (
                     <div
@@ -275,11 +301,15 @@ export default function StoryPage() {
               animate={{ opacity: 1, y: 0 }}
               className="col-span-12 lg:col-span-9"
             >
-              <div className="bg-black/40 backdrop-blur-md border border-stone-700/40 rounded-2xl p-8 md:p-12">
+              <div className="bg-stone-900/30 backdrop-blur-xl border border-amber-900/20 rounded-2xl p-8 md:p-12 shadow-2xl" style={{
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(245, 163, 98, 0.1)',
+              }}>
                 {/* Chapter Header */}
                 <div className="flex items-start justify-between mb-8">
                   <div>
-                    <h2 className="text-3xl font-serif text-amber-300 mb-2">
+                    <h2 className="text-3xl font-serif text-amber-300 mb-2" style={{
+                      textShadow: '0 0 15px rgba(245, 163, 98, 0.4)',
+                    }}>
                       {selectedChapter.title}
                     </h2>
                     <div className="flex items-center gap-4 text-sm text-stone-400">
