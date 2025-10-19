@@ -150,6 +150,17 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
 
     } catch (error) {
       console.error('❌ Whisper transcription error:', error);
+
+      // Show user-friendly error notification
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (errorMessage.includes('timeout') || errorMessage.includes('network')) {
+        console.error('🌐 Network issue - mobile connection may be slow. Try again.');
+      } else if (errorMessage.includes('OPENAI_API_KEY')) {
+        console.error('🔑 API key missing - transcription unavailable');
+      }
+
+      // Don't break the voice flow - just log the error
+      // User can try speaking again
     } finally {
       isProcessingRef.current = false;
     }

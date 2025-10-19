@@ -547,22 +547,22 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // Enable audio on user interaction - Enhanced for iOS
   const enableAudio = useCallback(async () => {
-    console.log('🔊 Enabling audio context on user interaction');
+    console.log('🔊 [Audio Init] Enabling audio context on user interaction');
 
     try {
       // Create or resume AudioContext
       if (!audioContextRef.current && typeof window !== 'undefined') {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-        console.log('📱 AudioContext created:', audioContextRef.current.state);
+        console.log('📱 [Audio Init] AudioContext created:', audioContextRef.current.state);
       }
 
       // Resume if suspended (critical for iOS)
       if (audioContextRef.current) {
         if (audioContextRef.current.state === 'suspended') {
           await audioContextRef.current.resume();
-          console.log('🎵 Audio context resumed, state:', audioContextRef.current.state);
+          console.log('✅ [Audio Init] Audio context resumed, state:', audioContextRef.current.state);
         } else {
-          console.log('🎵 Audio context already running, state:', audioContextRef.current.state);
+          console.log('✅ [Audio Init] Audio context already running, state:', audioContextRef.current.state);
         }
       }
 
