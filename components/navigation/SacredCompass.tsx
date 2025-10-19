@@ -77,13 +77,13 @@ export function SacredCompass({
   const getDirectionColor = (direction: DirectionalPanel): string => {
     switch (direction) {
       case 'right':
-        return 'text-blue-400'; // Analytical - cool blue
+        return 'text-blue-300'; // Analytical - cool blue (lighter)
       case 'left':
-        return 'text-purple-400'; // Imaginal - mystical purple
+        return 'text-purple-300'; // Imaginal - mystical purple (lighter)
       case 'up':
-        return 'text-red-400'; // Depths - primal red
+        return 'text-red-300'; // Depths - primal red (lighter)
       case 'down':
-        return 'text-amber-400'; // Transcendent - golden light
+        return 'text-amber-300'; // Transcendent - golden light (lighter)
     }
   };
 
@@ -107,12 +107,12 @@ export function SacredCompass({
               ${
                 isActive('center')
                   ? 'bg-white text-black shadow-lg'
-                  : 'bg-black border-2 border-white/40 text-white/80 hover:border-white/70'
+                  : 'bg-black border-2 border-white/60 text-white hover:border-white hover:bg-white/5'
               }
             `}
             aria-label="Return to center - MAIA conversation"
           >
-            <span className="text-sm font-serif">◉</span>
+            <span className="text-base font-bold">◉</span>
           </button>
 
           {/* UP - Depths/Subconscious */}
@@ -240,15 +240,15 @@ function DirectionButton({
           transition-all duration-200
           ${
             isActive
-              ? `${colorClass} bg-current/20 shadow-lg border-2 border-current`
+              ? `${colorClass} bg-current/20 shadow-lg border-2 border-current shadow-current/50`
               : hasContent
-              ? `${colorClass} bg-black border-2 border-current/40 hover:border-current/70 hover:bg-current/10`
+              ? `${colorClass} bg-black border-2 border-current/50 hover:border-current hover:bg-current/15 hover:shadow-md hover:shadow-current/30`
               : 'bg-black border-2 border-white/10 text-white/20 cursor-not-allowed'
           }
         `}
         aria-label={`Navigate ${direction} to ${metadata.title}`}
       >
-        <span className="text-base font-serif">{getIcon()}</span>
+        <span className="text-lg font-bold">{getIcon()}</span>
       </button>
 
       {/* Tooltip */}
