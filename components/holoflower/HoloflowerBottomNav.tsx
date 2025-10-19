@@ -88,11 +88,11 @@ export function HoloflowerBottomNav() {
               <motion.div
                 className="relative"
                 animate={{
-                  color: isActive ? item.color : '#FCD34D',
+                  color: isActive ? item.color : '#F6AD55',
                   scale: isActive ? 1.1 : 1,
                 }}
                 transition={{ duration: 0.2 }}
-                style={{ color: isActive ? item.color : '#FCD34D' }}
+                style={{ color: isActive ? item.color : '#F6AD55' }}
               >
                 {item.icon}
 
@@ -119,11 +119,11 @@ export function HoloflowerBottomNav() {
               {/* Label */}
               <motion.span
                 animate={{
-                  color: isActive ? item.color : '#FCD34D',
-                  opacity: isActive ? 1 : 0.9,
+                  color: isActive ? item.color : '#F6AD55',
+                  opacity: 1,
                 }}
-                className="text-[11px] font-light mt-0.5"
-                style={{ color: isActive ? item.color : '#FCD34D' }}
+                className="text-[11px] font-medium mt-0.5"
+                style={{ color: isActive ? item.color : '#F6AD55' }}
               >
                 {item.label}
               </motion.span>

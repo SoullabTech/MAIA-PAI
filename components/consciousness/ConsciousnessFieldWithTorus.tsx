@@ -90,41 +90,41 @@ function AnimatedTorusField({ animate = true }: { animate?: boolean }) {
         </bufferGeometry>
         <pointsMaterial
           size={0.02}
-          color="#FFD700"
+          color="#C1A880"
           transparent
-          opacity={0.4}
+          opacity={0.35}
           blending={THREE.AdditiveBlending}
         />
       </points>
 
-      {/* Outer torus (Universe) */}
+      {/* Outer torus (Universe) - cool sepia */}
       <mesh ref={outerTorusRef} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[4, 0.15, 16, 100]} />
         <meshBasicMaterial
-          color="#4169E1"
+          color="#988C7C"
           transparent
-          opacity={0.2}
+          opacity={0.25}
           wireframe={false}
         />
       </mesh>
 
-      {/* Middle torus (Tree/Collective) */}
+      {/* Middle torus (Tree/Collective) - mid sepia */}
       <mesh ref={middleTorusRef} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[3, 0.2, 16, 100]} />
         <meshBasicMaterial
-          color="#FFA500"
+          color="#A89D8E"
           transparent
-          opacity={0.35}
+          opacity={0.4}
         />
       </mesh>
 
-      {/* Inner torus (Apple/Personal) */}
+      {/* Inner torus (Apple/Personal) - warm sepia */}
       <mesh ref={innerTorusRef} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[2, 0.25, 16, 100]} />
         <meshBasicMaterial
-          color="#FFD700"
+          color="#C9B896"
           transparent
-          opacity={0.5}
+          opacity={0.55}
         />
       </mesh>
 
@@ -132,7 +132,7 @@ function AnimatedTorusField({ animate = true }: { animate?: boolean }) {
       <mesh>
         <sphereGeometry args={[1.5, 32, 32]} />
         <meshBasicMaterial
-          color="#321450"
+          color="#E8DFD0"
           transparent
           opacity={0.3}
           wireframe={true}
@@ -169,10 +169,12 @@ export default function ConsciousnessFieldWithTorus({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'rgba(10,10,26,0.9)'
+          background: 'rgba(245,240,232,0.95)'
         }}
       >
-        <div className="text-sacred-gold">Loading consciousness field...</div>
+        <div style={{ color: '#8B7D6B', fontFamily: 'serif', fontStyle: 'italic' }}>
+          Loading consciousness field...
+        </div>
       </div>
     );
   }
@@ -230,11 +232,12 @@ export default function ConsciousnessFieldWithTorus({
               top: 20,
               left: '50%',
               transform: 'translateX(-50%)',
-              color: '#4169E1',
+              color: '#8B7D6B',
               fontSize: '12px',
+              fontFamily: 'serif',
               fontStyle: 'italic',
-              opacity: 0.7,
-              textShadow: '0 0 10px rgba(65,105,225,0.5)'
+              opacity: 0.65,
+              textShadow: '0 0 8px rgba(139,125,107,0.3)'
             }}
           >
             Universe (Cosmic Torus)
@@ -247,13 +250,14 @@ export default function ConsciousnessFieldWithTorus({
               top: '50%',
               left: 20,
               transform: 'translateY(-50%)',
-              color: '#FFA500',
+              color: '#9B8A76',
               fontSize: '11px',
+              fontFamily: 'serif',
               fontStyle: 'italic',
-              opacity: 0.7,
+              opacity: 0.65,
               writingMode: 'vertical-rl',
               textOrientation: 'mixed',
-              textShadow: '0 0 10px rgba(255,165,0,0.5)'
+              textShadow: '0 0 8px rgba(155,138,118,0.3)'
             }}
           >
             Collective (Tree)
@@ -266,11 +270,12 @@ export default function ConsciousnessFieldWithTorus({
               top: '25%',
               left: '50%',
               transform: 'translateX(-50%)',
-              color: '#FFD700',
+              color: '#A89D8E',
               fontSize: '10px',
+              fontFamily: 'serif',
               fontStyle: 'italic',
-              opacity: 0.7,
-              textShadow: '0 0 10px rgba(255,215,0,0.5)'
+              opacity: 0.65,
+              textShadow: '0 0 8px rgba(168,157,142,0.3)'
             }}
           >
             Personal (Apple)
@@ -282,9 +287,10 @@ export default function ConsciousnessFieldWithTorus({
               position: 'absolute',
               bottom: 20,
               left: 20,
-              color: '#87CEEB',
+              color: '#8B7D6B',
               fontSize: '9px',
-              fontFamily: 'monospace',
+              fontFamily: 'serif',
+              fontStyle: 'italic',
               opacity: 0.5,
               maxWidth: 200
             }}
@@ -310,8 +316,10 @@ export default function ConsciousnessFieldWithTorus({
             position: 'absolute',
             top: '20%',
             left: '15%',
-            color: '#FFD700',
+            color: '#C1A880',
             fontSize: '10px',
+            fontFamily: 'serif',
+            fontStyle: 'italic',
             opacity: 0.6
           }}
         >
@@ -324,8 +332,10 @@ export default function ConsciousnessFieldWithTorus({
             position: 'absolute',
             bottom: '20%',
             right: '15%',
-            color: '#4169E1',
+            color: '#A89D8E',
             fontSize: '10px',
+            fontFamily: 'serif',
+            fontStyle: 'italic',
             opacity: 0.6
           }}
         >
@@ -350,7 +360,7 @@ export function ConsciousnessFieldFallback({
         position: 'relative',
         width: size,
         height: size,
-        background: 'radial-gradient(circle, rgba(50,20,80,0.8), rgba(10,10,26,0.9))',
+        background: 'radial-gradient(circle, rgba(232,223,208,0.95), rgba(245,240,232,0.98))',
         borderRadius: '50%',
         overflow: 'hidden'
       }}
@@ -372,8 +382,8 @@ export function ConsciousnessFieldFallback({
             width: '90%',
             height: '90%',
             borderRadius: '50%',
-            border: '2px solid rgba(65,105,225,0.2)',
-            boxShadow: '0 0 20px rgba(65,105,225,0.3)'
+            border: '2px solid rgba(152,140,124,0.25)',
+            boxShadow: '0 0 20px rgba(152,140,124,0.2)'
           }}
         />
 
@@ -384,8 +394,8 @@ export function ConsciousnessFieldFallback({
             width: '70%',
             height: '70%',
             borderRadius: '50%',
-            border: '3px solid rgba(255,165,0,0.35)',
-            boxShadow: '0 0 20px rgba(255,165,0,0.4)'
+            border: '3px solid rgba(168,157,142,0.4)',
+            boxShadow: '0 0 20px rgba(168,157,142,0.35)'
           }}
         />
 
@@ -396,8 +406,8 @@ export function ConsciousnessFieldFallback({
             width: '50%',
             height: '50%',
             borderRadius: '50%',
-            border: '4px solid rgba(255,215,0,0.5)',
-            boxShadow: '0 0 20px rgba(255,215,0,0.6)'
+            border: '4px solid rgba(201,184,150,0.55)',
+            boxShadow: '0 0 20px rgba(201,184,150,0.5)'
           }}
         />
       </div>
@@ -429,9 +439,11 @@ export function ConsciousnessFieldFallback({
               top: 20,
               left: '50%',
               transform: 'translateX(-50%)',
-              color: '#4169E1',
+              color: '#8B7D6B',
               fontSize: '12px',
-              opacity: 0.7
+              fontFamily: 'serif',
+              fontStyle: 'italic',
+              opacity: 0.65
             }}
           >
             Universe
@@ -441,8 +453,10 @@ export function ConsciousnessFieldFallback({
               position: 'absolute',
               bottom: 20,
               left: 20,
-              color: '#87CEEB',
+              color: '#8B7D6B',
               fontSize: '9px',
+              fontFamily: 'serif',
+              fontStyle: 'italic',
               opacity: 0.5
             }}
           >

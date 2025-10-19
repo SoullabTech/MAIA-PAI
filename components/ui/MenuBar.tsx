@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star, Heart, Home, LogOut } from 'lucide-react';
+import { MessageCircle, Users, Brain, MessageSquare, Settings, Star, Heart, LogOut } from 'lucide-react';
 import { MiniHoloflower } from '@/components/holoflower/MiniHoloflower';
 import { supabase } from '@/lib/auth/supabase-client';
 
@@ -32,8 +32,8 @@ export function MenuBar() {
     localStorage.removeItem('explorerName');
     localStorage.removeItem('soullab-session');
 
-    // Redirect to checkin
-    router.push('/checkin');
+    // Redirect to maia
+    router.push('/maia');
   };
 
   // Don't show on community pages
