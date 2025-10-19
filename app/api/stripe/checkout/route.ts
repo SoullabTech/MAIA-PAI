@@ -1,9 +1,16 @@
 import Stripe from 'stripe';
 import { NextRequest, NextResponse } from 'next/server';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-11-20.acacia',
-});
+// Lazy initialization to avoid build-time errors when env vars aren't set
+function getStripeClient() {
+  const apiKey = process.env.STRIPE_SECRET_KEY;
+  if (!apiKey) {
+    throw new Error('STRIPE_SECRET_KEY environment variable is not set');
+  }
+  return new Stripe(apiKey, {
+    apiVersion: '2024-11-20.acacia',
+  });
+}
 
 /**
  * Stripe Checkout Session Creator
@@ -41,6 +48,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create Stripe checkout session
+    const stripe = getStripeClient();
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       customer_email: userEmail,
