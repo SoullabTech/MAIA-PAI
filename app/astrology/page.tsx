@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Sparkles, Flame, Droplet, Sprout, Wind, Sparkle } from 'lucide-react';
+import { Sparkles, Flame, Droplet, Sprout, Wind, Sparkle, Target, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ElementalBalanceDisplay } from '@/components/astrology/ElementalBalanceDisplay';
 import { SacredHouseWheel } from '@/components/astrology/SacredHouseWheel';
@@ -22,6 +22,7 @@ import { getZodiacArchetype } from '@/lib/astrology/archetypeLibrary';
 import { getSpiralogicPlanetDescription } from '@/lib/astrology/spiralogicHouseMapping';
 import { BirthDataForm } from '@/components/astrology/BirthDataForm';
 import { MiniHoloflower } from '@/components/holoflower/MiniHoloflower';
+import { Mission } from '@/lib/story/types';
 
 interface BirthChartData {
   sun: { sign: string; degree: number; house: number };
@@ -71,6 +72,93 @@ const elementalColors = {
     night: { primary: '#6366F1', accent: '#818CF8', glow: 'rgba(99, 102, 241, 0.3)' }, // Bene Gesserit prescience
   },
 };
+
+// Kelly's Real Missions - Demo/Test Case for Mission Tracking
+const KELLY_MISSIONS: Mission[] = [
+  {
+    id: 'mission-1',
+    userId: 'kelly',
+    title: 'Build MAIA Platform',
+    description: 'Create consciousness co-authorship platform where everyone becomes their own mythographer',
+    status: 'active',
+    house: 10, // Career/Legacy/Public work
+    relatedPlanets: ['Saturn'], // Saturn focal point
+    progress: 75,
+    milestones: [
+      { id: 'm1', title: 'Sacred Scribe system architecture', completed: true },
+      { id: 'm2', title: 'Mission tracking with pulsing dots', completed: true },
+      { id: 'm3', title: 'Database integration', completed: false },
+      { id: 'm4', title: 'Launch to first cohort', completed: false },
+    ],
+    identifiedDate: new Date('2024-06-01'),
+    startedDate: new Date('2024-07-15'),
+    transitContext: {
+      activatingPlanet: 'Saturn in Pisces',
+      transitDescription: 'Saturn focal point crystallizing life\'s work through consciousness technology',
+    },
+    createdAt: new Date('2024-06-01'),
+    lastUpdated: new Date(),
+  },
+  {
+    id: 'mission-2',
+    userId: 'kelly',
+    title: 'Spiralogic Teaching Curriculum',
+    description: 'Develop comprehensive teaching system for Spiralogic archetypal framework',
+    status: 'active',
+    house: 9, // Teaching/Philosophy/Expansion
+    relatedPlanets: ['Sun', 'Venus'], // Sun in 9th area, Venus teaching
+    progress: 45,
+    milestones: [
+      { id: 'm1', title: 'Core framework documented', completed: true },
+      { id: 'm2', title: 'Alchemical house system complete', completed: true },
+      { id: 'm3', title: 'First cohort curriculum', completed: false },
+      { id: 'm4', title: 'Certification program', completed: false },
+    ],
+    identifiedDate: new Date('2024-03-15'),
+    startedDate: new Date('2024-04-01'),
+    createdAt: new Date('2024-03-15'),
+    lastUpdated: new Date(),
+  },
+  {
+    id: 'mission-3',
+    userId: 'kelly',
+    title: 'Collective Vision Crystallization',
+    description: 'Building community of practitioners who see the pattern and serve as sacred scribes',
+    status: 'emerging',
+    house: 11, // Community/Collective/Future vision
+    relatedPlanets: ['Uranus'], // Innovation, collective consciousness
+    progress: 20,
+    milestones: [
+      { id: 'm1', title: 'Vision articulated', completed: true },
+      { id: 'm2', title: 'First practitioners gathering', completed: false },
+      { id: 'm3', title: 'Training protocols', completed: false },
+    ],
+    identifiedDate: new Date('2024-09-01'),
+    createdAt: new Date('2024-09-01'),
+    lastUpdated: new Date(),
+  },
+  {
+    id: 'mission-4',
+    userId: 'kelly',
+    title: 'Sacred Geometry Integration',
+    description: 'Bringing pre-literate symbolic transmission into the consciousness field',
+    status: 'completed',
+    house: 12, // Spirituality/Dissolution/Transcendence
+    relatedPlanets: ['Jupiter', 'Neptune'], // Expansion + Mysticism
+    progress: 100,
+    milestones: [
+      { id: 'm1', title: 'Metatron\'s Cube', completed: true, completedDate: new Date('2024-10-01') },
+      { id: 'm2', title: '7 Sacred Spirals', completed: true, completedDate: new Date('2024-10-05') },
+      { id: 'm3', title: 'Torus vortex', completed: true, completedDate: new Date('2024-10-10') },
+      { id: 'm4', title: 'Alchemical symbols', completed: true, completedDate: new Date('2024-10-15') },
+    ],
+    identifiedDate: new Date('2024-09-15'),
+    startedDate: new Date('2024-09-20'),
+    completedDate: new Date('2024-10-15'),
+    createdAt: new Date('2024-09-15'),
+    lastUpdated: new Date('2024-10-15'),
+  },
+];
 
 export default function AstrologyPage() {
   const [chartData, setChartData] = useState<BirthChartData | null>(null);
@@ -497,9 +585,148 @@ export default function AstrologyPage() {
                 aspects={chartData.aspects}
                 isDayMode={isDayMode}
                 showAspects={true}
+                missions={KELLY_MISSIONS}
               />
             </div>
             </div>
+          </div>
+        </motion.div>
+
+        {/* Your Active Missions - Manifestations in Progress */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="mb-12"
+        >
+          <div className="text-center mb-8">
+            <h2 className={`text-2xl font-serif mb-2 ${isDayMode ? 'text-stone-800' : 'text-amber-300'}`}>
+              Your Active Missions
+            </h2>
+            <p className={`text-sm ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
+              Creative manifestations pulsing on your consciousness field map
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {KELLY_MISSIONS.map((mission) => {
+              const statusColors = {
+                emerging: 'border-blue-500/40 bg-blue-500/10',
+                active: 'border-green-500/40 bg-green-500/10',
+                completed: 'border-amber-500/40 bg-amber-500/10',
+                urgent: 'border-red-500/40 bg-red-500/10',
+              };
+
+              const statusLabels = {
+                emerging: 'Emerging',
+                active: 'In Progress',
+                completed: 'Manifested',
+                urgent: 'Urgent',
+              };
+
+              const statusIcons = {
+                emerging: '🔵',
+                active: '🟢',
+                completed: '🟡',
+                urgent: '🔴',
+              };
+
+              return (
+                <motion.div
+                  key={mission.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 }}
+                  className={`rounded-xl p-6 border backdrop-blur-md ${statusColors[mission.status]}`}
+                >
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">{statusIcons[mission.status]}</span>
+                      <div>
+                        <h3 className={`font-serif text-lg ${isDayMode ? 'text-stone-800' : 'text-stone-100'}`}>
+                          {mission.title}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                            House {mission.house}
+                          </span>
+                          <span className="text-xs text-stone-500">•</span>
+                          <span className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
+                            {statusLabels[mission.status]}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className={`text-sm mb-4 ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                    {mission.description}
+                  </p>
+
+                  {/* Progress bar (if active) */}
+                  {mission.status === 'active' && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between text-xs text-stone-400 mb-1">
+                        <span>Progress</span>
+                        <span>{mission.progress}%</span>
+                      </div>
+                      <div className="h-2 bg-stone-800/40 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${mission.progress}%` }}
+                          transition={{ duration: 1, delay: 0.5 }}
+                          className="h-full bg-green-500"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Milestones */}
+                  <div className="space-y-1">
+                    {mission.milestones.slice(0, 3).map((milestone) => (
+                      <div key={milestone.id} className="flex items-center gap-2 text-xs">
+                        <div className={`w-1.5 h-1.5 rounded-full ${
+                          milestone.completed ? 'bg-green-500' : 'bg-stone-600'
+                        }`} />
+                        <span className={milestone.completed
+                          ? (isDayMode ? 'text-stone-600' : 'text-stone-400')
+                          : (isDayMode ? 'text-stone-500' : 'text-stone-500')
+                        }>
+                          {milestone.title}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Transit context (if present) */}
+                  {mission.transitContext && (
+                    <div className="mt-4 pt-4 border-t border-stone-700/20">
+                      <div className="flex items-start gap-2">
+                        <Sparkles className="w-3 h-3 text-purple-400 mt-0.5" />
+                        <div>
+                          <div className={`text-xs font-medium ${isDayMode ? 'text-purple-700' : 'text-purple-300'}`}>
+                            {mission.transitContext.activatingPlanet}
+                          </div>
+                          <div className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} mt-0.5`}>
+                            {mission.transitContext.transitDescription}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Legend */}
+          <div className={`mt-6 text-center text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-500'}`}>
+            <p className="italic">
+              Each mission pulses on the map in its house location •{' '}
+              Click the pulsing dots above to see details
+            </p>
           </div>
         </motion.div>
 
