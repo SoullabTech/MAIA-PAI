@@ -217,14 +217,70 @@ export default function CheckInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1a1f3a] flex items-center justify-center px-4">
-      {/* Sacred Geometry - Subtle presence */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.02]">
-        <svg viewBox="0 0 1000 1000" className="w-full h-full">
-          <circle cx="500" cy="500" r="400" fill="none" stroke="#F6AD55" strokeWidth="0.5" strokeDasharray="4 4" />
-          <circle cx="500" cy="500" r="300" fill="none" stroke="#F6AD55" strokeWidth="0.5" strokeDasharray="2 6" />
-          <circle cx="500" cy="500" r="200" fill="none" stroke="#F6AD55" strokeWidth="0.5" />
-        </svg>
+    <div className="min-h-screen text-stone-900 flex items-center justify-center px-4" style={{
+      background: 'linear-gradient(to bottom, #2C3640 0%, #3E4A54 15%, #5A4A3A 35%, #8B6F47 55%, #B8935C 70%, #D4AF37 85%, #FFB84D 100%)',
+    }}>
+      {/* Film grain texture overlay */}
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03]" style={{
+        backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 400 400\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' /%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noise)\' /%3E%3C/svg%3E")',
+        backgroundRepeat: 'repeat',
+      }} />
+
+      {/* Stars in night sky (top 30%) */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {[...Array(80)].map((_, i) => {
+          const top = Math.random() * 30;
+          return (
+            <motion.div
+              key={`star-${i}`}
+              className="absolute rounded-full"
+              style={{
+                background: '#E8DCC4',
+                width: Math.random() > 0.8 ? '2px' : '1px',
+                height: Math.random() > 0.8 ? '2px' : '1px',
+                left: `${Math.random() * 100}%`,
+                top: `${top}%`,
+                filter: 'blur(0.5px)',
+                boxShadow: '0 0 2px rgba(232, 220, 196, 0.5)',
+              }}
+              animate={{ opacity: [0.3, 0.8, 0.3] }}
+              transition={{ duration: 2 + Math.random() * 3, repeat: Infinity }}
+            />
+          );
+        })}
+      </div>
+
+      {/* Golden sand particles (bottom 60%) */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {[...Array(50)].map((_, i) => {
+          const top = 40 + Math.random() * 60;
+          return (
+            <motion.div
+              key={`sand-${i}`}
+              className="absolute rounded-full"
+              style={{
+                background: '#D4AF37',
+                width: Math.random() > 0.7 ? '3px' : '2px',
+                height: Math.random() > 0.7 ? '3px' : '2px',
+                left: `${Math.random() * 100}%`,
+                top: `${top}%`,
+                filter: 'blur(1px)',
+                opacity: 0.3,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                x: [0, Math.random() * 20 - 10, 0],
+                opacity: [0.2, 0.4, 0.2],
+              }}
+              transition={{
+                duration: 8 + Math.random() * 6,
+                repeat: Infinity,
+                delay: Math.random() * 4,
+                ease: 'easeInOut',
+              }}
+            />
+          );
+        })}
       </div>
 
       <motion.div
@@ -251,10 +307,17 @@ export default function CheckInPage() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="mb-8"
           >
-            <div className="bg-gradient-to-r from-amber-500/10 to-amber-600/10 border border-amber-500/30 rounded-xl p-5 backdrop-blur-sm relative">
+            <div className="rounded-xl p-5 backdrop-blur-md relative" style={{
+              background: 'rgba(255, 248, 240, 0.8)',
+              border: '1px solid #C9A86A',
+              boxShadow: '0 4px 20px rgba(107, 68, 35, 0.15)',
+            }}>
               <button
                 onClick={handleDismissAnnouncement}
-                className="absolute top-3 right-3 text-amber-200/40 hover:text-amber-200/70 transition-colors text-xs"
+                className="absolute top-3 right-3 transition-colors text-xs"
+                style={{
+                  color: '#8B7355',
+                }}
               >
                 ✕
               </button>
@@ -266,16 +329,24 @@ export default function CheckInPage() {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-amber-50 font-medium text-sm mb-1.5">
+                  <h3 className="font-serif font-medium text-sm mb-1.5" style={{
+                    color: '#6B4423',
+                  }}>
                     {CURRENT_ANNOUNCEMENT.title}
                   </h3>
-                  <p className="text-amber-200/70 text-xs leading-relaxed">
+                  <p className="font-serif text-xs leading-relaxed" style={{
+                    color: '#5A4A3A',
+                  }}>
                     {CURRENT_ANNOUNCEMENT.message}
                   </p>
                   {CURRENT_ANNOUNCEMENT.link && (
                     <a
                       href={CURRENT_ANNOUNCEMENT.link.url}
-                      className="inline-block mt-2 text-amber-400/80 hover:text-amber-400 text-xs font-medium transition-colors"
+                      className="inline-block mt-2 text-xs font-serif font-medium transition-colors"
+                      style={{
+                        color: '#D4AF37',
+                        textShadow: '0 0 6px rgba(212, 175, 55, 0.2)',
+                      }}
                     >
                       {CURRENT_ANNOUNCEMENT.link.text} →
                     </a>
@@ -293,10 +364,16 @@ export default function CheckInPage() {
           transition={{ duration: 0.8, delay: shouldShowAnnouncement() ? 0.5 : 0.4 }}
           className="mb-12 text-center"
         >
-          <p className="text-lg font-light text-amber-50/90 mb-3 leading-relaxed italic">
+          <p className="text-lg font-serif leading-relaxed italic mb-3" style={{
+            color: '#2C1810',
+            textShadow: '0 1px 2px rgba(212, 175, 55, 0.15)',
+          }}>
             "{quote.text}"
           </p>
-          <p className="text-sm text-amber-200/50 font-light">
+          <p className="text-sm font-serif" style={{
+            color: '#6B5A4A',
+            textShadow: '0 1px 1px rgba(107, 90, 74, 0.1)',
+          }}>
             {quote.author}
           </p>
         </motion.div>
@@ -308,10 +385,16 @@ export default function CheckInPage() {
           transition={{ duration: 0.6, delay: 0.6 }}
           className="text-center mb-8"
         >
-          <h1 className="text-3xl font-extralight text-amber-50 tracking-wide mb-2">
+          <h1 className="text-3xl font-serif tracking-wide mb-2" style={{
+            color: '#6B4423',
+            textShadow: '0 2px 6px rgba(107, 68, 35, 0.2)',
+            fontWeight: 500,
+          }}>
             Welcome Back
           </h1>
-          <p className="text-amber-200/60 text-sm leading-relaxed">
+          <p className="text-sm font-serif leading-relaxed" style={{
+            color: '#5A4A3A',
+          }}>
             Enter your username to continue your journey
           </p>
         </motion.div>
@@ -332,10 +415,18 @@ export default function CheckInPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Your username"
-              className="w-full px-5 py-4 bg-black/30 border border-amber-500/20 rounded-lg text-amber-50 placeholder-amber-200/30 focus:outline-none focus:border-amber-500/40 transition-colors backdrop-blur-sm text-center"
+              className="w-full px-5 py-4 rounded-lg backdrop-blur-md text-center focus:outline-none transition-colors font-serif"
+              style={{
+                background: 'rgba(255, 248, 240, 0.85)',
+                border: '1px solid #C9A86A',
+                color: '#2C1810',
+                boxShadow: '0 4px 20px rgba(107, 68, 35, 0.15), 0 8px 40px rgba(139, 111, 71, 0.1)',
+              }}
               autoFocus
             />
-            <p className="text-amber-200/40 text-xs mt-2 text-center">
+            <p className="text-xs mt-2 text-center font-serif" style={{
+              color: '#6B5A4A',
+            }}>
               Just your username - quick and easy
             </p>
           </div>
@@ -353,11 +444,18 @@ export default function CheckInPage() {
           <button
             type="submit"
             disabled={loading || !username.trim()}
-            className={`w-full py-4 rounded-full font-medium transition-all flex items-center justify-center gap-2 ${
-              username.trim() && !loading
-                ? 'bg-gradient-to-r from-amber-500/80 to-amber-600/80 text-white hover:from-amber-500 hover:to-amber-600 hover:shadow-lg hover:shadow-amber-500/20'
-                : 'bg-amber-500/20 text-amber-200/40 cursor-not-allowed'
-            }`}
+            className="w-full py-4 rounded-lg font-serif font-medium transition-all flex items-center justify-center gap-2"
+            style={username.trim() && !loading ? {
+              background: 'rgba(184, 147, 92, 0.9)',
+              border: '1px solid rgba(139, 111, 71, 0.6)',
+              color: '#FFF8F0',
+              boxShadow: '0 4px 20px rgba(107, 68, 35, 0.25)',
+            } : {
+              background: 'rgba(184, 147, 92, 0.3)',
+              border: '1px solid rgba(139, 111, 71, 0.3)',
+              color: '#8B7355',
+              cursor: 'not-allowed',
+            }}
           >
             {loading ? (
               <>
@@ -384,9 +482,15 @@ export default function CheckInPage() {
           <div className="text-center">
             <button
               onClick={() => router.push('/week2-welcome')}
-              className="text-amber-400/80 hover:text-amber-400 transition-colors text-sm font-light inline-flex items-center gap-2"
+              className="transition-colors text-sm font-serif inline-flex items-center gap-2"
+              style={{
+                color: '#D4AF37',
+                textShadow: '0 0 8px rgba(212, 175, 55, 0.3)',
+              }}
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-4 h-4" style={{
+                filter: 'drop-shadow(0 0 4px rgba(212, 175, 55, 0.6))',
+              }} />
               <span>New here? Create your portal</span>
             </button>
           </div>
@@ -395,7 +499,10 @@ export default function CheckInPage() {
           <div className="text-center">
             <button
               onClick={() => router.push('/auth')}
-              className="text-amber-200/50 hover:text-amber-200/70 transition-colors text-xs font-light"
+              className="transition-colors text-xs font-serif"
+              style={{
+                color: '#8B7355',
+              }}
             >
               Need password sign-in instead?
             </button>
