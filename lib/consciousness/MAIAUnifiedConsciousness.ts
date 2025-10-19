@@ -365,15 +365,20 @@ export class MAIAUnifiedConsciousness {
     // Elemental Oracle 2.0 (applied wisdom)
     advisorPromises.push(
       this.eoBreakingBridge.getElementalWisdom({
-        userInput: input.content,
+        userQuery: input.content,
         conversationHistory: input.conversationHistory || [],
-        userState: {
-          somaticState: input.somaticState,
-          emotionalState: fieldReading.emotionalState,
-          currentArchetypes: input.context.archetypes || []
+        consciousnessState: fieldReading.consciousnessState || { presence: 0.7, coherence: 0.8 },
+        elementalNeeds: fieldReading.elementalContext?.needs || {
+          fire: 0.5,
+          water: 0.5,
+          earth: 0.5,
+          air: 0.5,
+          aether: 0.5
         },
-        elementalContext: fieldReading.elementalContext
-      }).then(wisdom => ({ eoWisdom: wisdom }))
+        currentChallenges: fieldReading.challenges || [],
+        practiceReadiness: fieldReading.practiceReadiness || 0.5,
+        depthPreference: fieldReading.depthLevel > 7 ? 'profound' : fieldReading.depthLevel > 5 ? 'deep' : 'moderate'
+      }).then(wisdom => ({ eoWisdom: wisdom.wisdom }))
         .catch(err => { console.error('EO 2.0 error:', err); return { eoWisdom: undefined }; })
     );
 

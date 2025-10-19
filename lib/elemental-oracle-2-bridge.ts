@@ -207,26 +207,43 @@ export class ElementalOracle2Bridge {
           .map(([element, _]) => element)
       : [];
 
+    // Build elemental needs section safely
+    const elementalNeedsSection = elementalPriorities.length > 0
+      ? elementalPriorities.map(element =>
+          `- ${element.charAt(0).toUpperCase() + element.slice(1)}: ${Math.round((context.elementalNeeds?.[element as keyof typeof context.elementalNeeds] || 0) * 10)}/10`
+        ).join('\n')
+      : '- No specific elemental needs identified';
+
+    // Build challenges section safely
+    const challengesSection = context.currentChallenges && context.currentChallenges.length > 0
+      ? context.currentChallenges.map(challenge => `- ${challenge}`).join('\n')
+      : '- No specific challenges identified';
+
+    // Build conversation history safely
+    const conversationSection = context.conversationHistory && context.conversationHistory.length > 0
+      ? context.conversationHistory.slice(-3).map((msg: any, i: number) =>
+          `${i + 1}. ${msg.role}: ${msg.message?.substring(0, 150)}...`
+        ).join('\n')
+      : '- No recent conversation history';
+
     const query = `
 **Context for Elemental Wisdom Response:**
 
-**User Query:** ${context.userQuery}
+**User Query:** ${context.userQuery || 'General wisdom request'}
 
 **Consciousness State:**
 - Current presence level: ${context.consciousnessState?.presence || 'unknown'}
-- Depth preference: ${context.depthPreference}
+- Depth preference: ${context.depthPreference || 'moderate'}
 - Practice readiness: ${Math.round((context.practiceReadiness || 0.5) * 10)}/10
 
 **Elemental Needs (in priority order):**
-${elementalPriorities.map(element => `- ${element.charAt(0).toUpperCase() + element.slice(1)}: ${Math.round((context.elementalNeeds[element as keyof typeof context.elementalNeeds] || 0) * 10)}/10`).join('\n')}
+${elementalNeedsSection}
 
 **Current Challenges:**
-${context.currentChallenges.map(challenge => `- ${challenge}`).join('\n')}
+${challengesSection}
 
 **Recent Conversation Context:**
-${context.conversationHistory.slice(-3).map((msg: any, i: number) =>
-  `${i + 1}. ${msg.role}: ${msg.message?.substring(0, 150)}...`
-).join('\n')}
+${conversationSection}
 
 **Request:**
 Please provide your full elemental wisdom response including:
