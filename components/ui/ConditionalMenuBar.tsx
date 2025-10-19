@@ -1,7 +1,9 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { MenuBar } from './MenuBar';
+import { MiniHoloflower } from '@/components/holoflower/MiniHoloflower';
+import { supabase } from '@/lib/auth/supabase-client';
 
 /**
  * Conditionally renders MenuBar based on current route
@@ -9,6 +11,50 @@ import { MenuBar } from './MenuBar';
  */
 export function ConditionalMenuBar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    // Preserve user profile data (birthday, name, intention, birthData) before clearing session
+    const betaUser = localStorage.getItem('beta_user');
+    let preservedData: { birthDate?: string; username?: string; intention?: string; birthData?: any } | null = null;
+
+    if (betaUser) {
+      try {
+        const userData = JSON.parse(betaUser);
+        preservedData = {
+          birthDate: userData.birthDate,
+          username: userData.username,
+          intention: userData.intention,
+          birthData: userData.birthData // Preserve astrology chart data
+        };
+      } catch (e) {
+        console.error('Error parsing user data for preservation:', e);
+      }
+    }
+
+    // Sign out from Supabase
+    await supabase.auth.signOut();
+
+    // Clear session data only (NOT profile data like birthday)
+    localStorage.removeItem('beta_user');
+    localStorage.removeItem('explorerId');
+    localStorage.removeItem('explorerName');
+    localStorage.removeItem('soullab-session');
+    localStorage.removeItem('betaOnboardingComplete');
+
+    // Restore preserved profile data but mark as logged out
+    if (preservedData) {
+      const profileData = {
+        ...preservedData,
+        onboarded: true, // Keep onboarded status so they go to intro, not onboarding
+        loggedOut: true
+      };
+      localStorage.setItem('beta_user', JSON.stringify(profileData));
+    }
+
+    // Redirect to auth page where they can easily log back in
+    router.push('/auth');
+  };
 
   // ONLY show MenuBar on /maia page
   // All other pages get a clean, immersive experience with just Home + Logout
@@ -55,11 +101,7 @@ export function ConditionalMenuBar() {
       >
         <div className="relative p-2 md:p-2.5 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30 flex items-center justify-center">
           <div className="w-8 h-8 md:w-9 md:h-9">
-            <svg viewBox="0 0 100 100" className="w-full h-full">
-              <circle cx="50" cy="50" r="45" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="1" opacity="0.6" />
-              <circle cx="50" cy="50" r="30" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="1" opacity="0.4" />
-              <circle cx="50" cy="50" r="15" fill="rgb(251, 191, 36)" opacity="0.3" />
-            </svg>
+            <MiniHoloflower size={36} />
           </div>
           <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Home
@@ -69,13 +111,7 @@ export function ConditionalMenuBar() {
 
       {/* Logout Button */}
       <button
-        onClick={async () => {
-          const { supabase } = await import('@/lib/auth/supabase-client');
-          await supabase.auth.signOut();
-          localStorage.removeItem('beta_user');
-          localStorage.removeItem('soullab-session');
-          window.location.href = '/auth';
-        }}
+        onClick={handleSignOut}
         className="group relative"
         aria-label="Sign Out"
       >

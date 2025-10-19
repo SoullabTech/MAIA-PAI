@@ -170,11 +170,34 @@ export function MissionDot({ mission, x, y, size = 8, onClick }: MissionDotProps
 
 /**
  * Mission Dot Popup - Shows mission details on hover/click
+ * Intelligently positions in the opposite quadrant from the mission's house
  */
 interface MissionPopupProps {
   mission: Mission;
   onClose?: () => void;
 }
+
+// Map houses to elements/quadrants and their opposites
+const getOppositeQuadrantPosition = (house: number) => {
+  // FIRE houses (1, 5, 9) - Right/Top-Right → Position in EARTH (Left/Bottom-Left)
+  if ([1, 5, 9].includes(house)) {
+    return { horizontal: '25%', vertical: '65%' }; // Bottom-left
+  }
+  // WATER houses (4, 8, 12) - Bottom-Right → Position in AIR (Top-Left)
+  if ([4, 8, 12].includes(house)) {
+    return { horizontal: '25%', vertical: '25%' }; // Top-left
+  }
+  // EARTH houses (2, 6, 10) - Bottom-Left → Position in FIRE (Top-Right)
+  if ([2, 6, 10].includes(house)) {
+    return { horizontal: '75%', vertical: '25%' }; // Top-right
+  }
+  // AIR houses (3, 7, 11) - Left/Top-Left → Position in WATER (Bottom-Right)
+  if ([3, 7, 11].includes(house)) {
+    return { horizontal: '75%', vertical: '65%' }; // Bottom-right
+  }
+  // Default center
+  return { horizontal: '50%', vertical: '50%' };
+};
 
 export function MissionPopup({ mission, onClose }: MissionPopupProps) {
   const statusLabels = {
@@ -191,13 +214,21 @@ export function MissionPopup({ mission, onClose }: MissionPopupProps) {
     urgent: 'bg-red-500/20 border-red-500/40 text-red-200',
   };
 
+  const position = getOppositeQuadrantPosition(mission.house);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-md z-50"
-      style={{ pointerEvents: 'none' }}
+      onClick={onClose}
+      className="absolute max-w-md z-50 cursor-pointer"
+      style={{
+        left: position.horizontal,
+        top: position.vertical,
+        transform: 'translate(-50%, -50%)',
+        pointerEvents: 'auto'
+      }}
     >
       <div
         className="bg-black/90 backdrop-blur-xl rounded-2xl border border-stone-700/60 shadow-2xl overflow-hidden"
