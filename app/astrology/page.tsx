@@ -545,14 +545,14 @@ export default function AstrologyPage() {
       />
 
       {/* Content */}
-      <div className="relative z-10 w-full mx-auto px-0 sm:px-4 md:px-6 lg:px-8 pt-2 md:pt-12 pb-20">
+      <div className="relative z-10 w-full mx-auto px-0 sm:px-2 md:px-4 pt-1 md:pt-8 pb-12">
 
         {/* Header - Spiralogic Evolutionary Report - HIDE ON MOBILE */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="text-center mb-12 hidden md:block"
+          className="text-center mb-6 hidden md:block"
         >
           <h1 className="text-3xl md:text-5xl font-serif mb-4 tracking-wide transition-colors duration-500"
             style={{ color: isDayMode ? '#C67A28' : '#D88A2D' }}>
@@ -575,7 +575,7 @@ export default function AstrologyPage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 1 }}
-          className={`rounded-none md:rounded-2xl p-1 sm:p-6 md:p-8 mb-4 backdrop-blur-md transition-all duration-500
+          className={`rounded-none md:rounded-2xl p-0 sm:p-4 md:p-6 mb-2 sm:mb-4 backdrop-blur-md transition-all duration-500
             ${isDayMode
               ? 'bg-white/40 border border-stone-200/40'
               : 'bg-black/20 border border-stone-700/20'
@@ -584,11 +584,11 @@ export default function AstrologyPage() {
             boxShadow: `0 8px 32px ${isDayMode ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.3)'}`,
           }}
         >
-          <div className="text-center mb-2 sm:mb-4">
+          <div className="text-center mb-1 sm:mb-3 hidden sm:block">
             <h2 className={`text-lg sm:text-xl font-serif mb-1 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
               Consciousness Field Map
             </h2>
-            <p className={`text-[10px] sm:text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic mb-2 hidden sm:block`}>
+            <p className={`text-[10px] sm:text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic mb-2`}>
               Soul-centric field instrument · Hover to reveal neural pathways and archetypal insights
             </p>
             {/* Spiralogic Process Legend - Hide on mobile to save space */}
@@ -611,10 +611,10 @@ export default function AstrologyPage() {
           </div>
           {/* Sacred House Wheel with 3D Animated Torus (Apple/Tree of Life) */}
           <div className="relative w-full mx-auto px-0">
-            {/* 3D Torus Field - Animated breathing torus - LARGE on mobile */}
+            {/* 3D Torus Field - Animated breathing torus - MAXIMUM SIZE on mobile */}
             <div className="flex items-center justify-center w-full" style={{ aspectRatio: '1/1' }}>
               <ConsciousnessFieldWithTorus
-                size={1100}
+                size={1300}
                 showLabels={false}
                 animate={true}
               >
