@@ -1506,7 +1506,7 @@ export function SacredHouseWheel({
               mission={mission}
               x={housePos.x}
               y={housePos.y}
-              size={8}
+              size={3}
               onClick={() => setClickedMission(mission)}
             />
           );

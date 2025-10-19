@@ -55,16 +55,16 @@ export function MissionDot({ mission, x, y, size = 8, onClick }: MissionDotProps
       className="cursor-pointer"
       style={{ pointerEvents: 'all' }}
     >
-      {/* Outer pulsing ring */}
+      {/* Outer pulsing ring - more subtle to match planet nodes */}
       <motion.circle
         cx={x}
         cy={y}
-        r={size * 2.5}
+        r={size * 3}
         fill={colors.ring}
-        opacity={0.2}
+        opacity={0.15}
         animate={{
           r: [size * 2.5, size * 3.5, size * 2.5],
-          opacity: [0.2, 0.4, 0.2],
+          opacity: [0.15, 0.3, 0.15],
         }}
         transition={{
           duration: mission.status === 'urgent' ? 1.5 : 3,
@@ -77,11 +77,11 @@ export function MissionDot({ mission, x, y, size = 8, onClick }: MissionDotProps
       <motion.circle
         cx={x}
         cy={y}
-        r={size * 1.5}
+        r={size * 2}
         fill={colors.glow}
-        opacity={0.6}
+        opacity={0.4}
         animate={{
-          opacity: [0.6, 0.9, 0.6],
+          opacity: [0.4, 0.7, 0.4],
         }}
         transition={{
           duration: mission.status === 'urgent' ? 1 : 2,
@@ -97,7 +97,7 @@ export function MissionDot({ mission, x, y, size = 8, onClick }: MissionDotProps
         r={size}
         fill={colors.core}
         animate={{
-          scale: [1, 1.1, 1],
+          scale: [1, 1.2, 1],
         }}
         transition={{
           duration: mission.status === 'urgent' ? 0.8 : 2,
