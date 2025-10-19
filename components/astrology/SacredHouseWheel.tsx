@@ -250,6 +250,7 @@ export function SacredHouseWheel({
 }: SacredHouseWheelProps) {
   const [hoveredHouse, setHoveredHouse] = useState<number | null>(null);
   const [hoveredPlanet, setHoveredPlanet] = useState<Planet | null>(null);
+  const [clickedPlanet, setClickedPlanet] = useState<Planet | null>(null);
   const [clickedHouse, setClickedHouse] = useState<number | null>(null);
   const [clickedMission, setClickedMission] = useState<Mission | null>(null);
   const [revealedAspects, setRevealedAspects] = useState(false);
@@ -1423,6 +1424,7 @@ export function SacredHouseWheel({
               key={planet.name}
               onMouseEnter={() => setHoveredPlanet(planet)}
               onMouseLeave={() => setHoveredPlanet(null)}
+              onClick={() => setClickedPlanet(clickedPlanet?.name === planet.name ? null : planet)}
               className="cursor-pointer"
             >
               {/* Invisible larger hover target */}
@@ -1734,14 +1736,18 @@ export function SacredHouseWheel({
         })()}
 
         {/* Planetary Insight Overlay - Shows planet/sign/archetype/aspects */}
-        {hoveredPlanet !== null && (
+        {(clickedPlanet !== null || hoveredPlanet !== null) && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className="absolute left-1/2 top-1/2 mx-auto max-w-2xl z-50"
-            style={{ pointerEvents: 'none', transform: 'translate(-50%, -50%)' }}
+            style={{
+              pointerEvents: clickedPlanet ? 'auto' : 'none',
+              transform: 'translate(-50%, -50%)'
+            }}
+            onClick={() => clickedPlanet && setClickedPlanet(null)}
           >
             <div
               className={`backdrop-blur-xl rounded-2xl border shadow-2xl overflow-hidden ${
@@ -1756,14 +1762,16 @@ export function SacredHouseWheel({
               }}
             >
               {(() => {
-                const element = houseElements[hoveredPlanet.house as keyof typeof houseElements] as keyof typeof elementalColors;
+                const activePlanet = clickedPlanet || hoveredPlanet;
+                if (!activePlanet) return null;
+                const element = houseElements[activePlanet.house as keyof typeof houseElements] as keyof typeof elementalColors;
                 const elementColor = elementalColors[element];
                 const color = isDayMode ? elementColor.day : elementColor.night;
-                const spiralogicData = getSpiralogicHouseData(hoveredPlanet.house);
-                const planetArchetype = getPlanetaryArchetype(hoveredPlanet.name);
-                const zodiacArchetype = getZodiacArchetype(hoveredPlanet.sign);
+                const spiralogicData = getSpiralogicHouseData(activePlanet.house);
+                const planetArchetype = getPlanetaryArchetype(activePlanet.name);
+                const zodiacArchetype = getZodiacArchetype(activePlanet.sign);
                 const planetAspects = aspects.filter(
-                  a => a.planet1 === hoveredPlanet.name || a.planet2 === hoveredPlanet.name
+                  a => a.planet1 === activePlanet.name || a.planet2 === activePlanet.name
                 );
 
                 return (
@@ -1785,25 +1793,25 @@ export function SacredHouseWheel({
                               boxShadow: `0 0 20px ${elementColor.glow}`,
                             }}
                           >
-                            {hoveredPlanet.name === 'Sun' && '☉'}
-                            {hoveredPlanet.name === 'Moon' && '☽'}
-                            {hoveredPlanet.name === 'Mercury' && '☿'}
-                            {hoveredPlanet.name === 'Venus' && '♀'}
-                            {hoveredPlanet.name === 'Mars' && '♂'}
-                            {hoveredPlanet.name === 'Jupiter' && '♃'}
-                            {hoveredPlanet.name === 'Saturn' && '♄'}
-                            {hoveredPlanet.name === 'Uranus' && '♅'}
-                            {hoveredPlanet.name === 'Neptune' && '♆'}
-                            {hoveredPlanet.name === 'Pluto' && '♇'}
-                            {hoveredPlanet.name === 'Chiron' && '⚷'}
-                            {(hoveredPlanet.name === 'North Node' || hoveredPlanet.name === 'South Node') && '☊'}
+                            {activePlanet.name === 'Sun' && '☉'}
+                            {activePlanet.name === 'Moon' && '☽'}
+                            {activePlanet.name === 'Mercury' && '☿'}
+                            {activePlanet.name === 'Venus' && '♀'}
+                            {activePlanet.name === 'Mars' && '♂'}
+                            {activePlanet.name === 'Jupiter' && '♃'}
+                            {activePlanet.name === 'Saturn' && '♄'}
+                            {activePlanet.name === 'Uranus' && '♅'}
+                            {activePlanet.name === 'Neptune' && '♆'}
+                            {activePlanet.name === 'Pluto' && '♇'}
+                            {activePlanet.name === 'Chiron' && '⚷'}
+                            {(activePlanet.name === 'North Node' || activePlanet.name === 'South Node') && '☊'}
                           </div>
                           <div>
                             <h3 className={`text-lg font-semibold ${isDayMode ? 'text-stone-900' : 'text-stone-200'}`}>
-                              {hoveredPlanet.name} in {hoveredPlanet.sign}
+                              {activePlanet.name} in {activePlanet.sign}
                             </h3>
                             <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-300'}`}>
-                              {hoveredPlanet.degree.toFixed(1)}° · House {hoveredPlanet.house}
+                              {activePlanet.degree.toFixed(1)}° · House {activePlanet.house}
                             </p>
                           </div>
                         </div>
@@ -1834,7 +1842,7 @@ export function SacredHouseWheel({
                             Sign Expression
                           </h4>
                           <p className={`text-xs leading-relaxed ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
-                            {zodiacArchetype?.description || `${hoveredPlanet.name} expresses through ${hoveredPlanet.sign} energy`}
+                            {zodiacArchetype?.description || `${activePlanet.name} expresses through ${activePlanet.sign} energy`}
                           </p>
                         </div>
                       </div>
@@ -1860,7 +1868,7 @@ export function SacredHouseWheel({
                             </h4>
                             <div className="space-y-1">
                               {planetAspects.slice(0, 3).map((aspect, idx) => {
-                                const otherPlanet = aspect.planet1 === hoveredPlanet.name ? aspect.planet2 : aspect.planet1;
+                                const otherPlanet = aspect.planet1 === activePlanet.name ? aspect.planet2 : aspect.planet1;
                                 return (
                                   <div
                                     key={idx}
