@@ -174,3 +174,92 @@ export interface StoryWeavingContext {
   intent: 'genesis' | 'new-chapter' | 'revision' | 'thread-update';
   memberPrompt?: string; // If member requested specific focus
 }
+
+// ============================================================================
+// MISSION TRACKING - Pulsing Dots on Consciousness Field Map
+// ============================================================================
+
+/**
+ * Mission Status Colors
+ * - emerging: Blue pulse (vision not yet crystallized)
+ * - active: Green pulse (mission in progress)
+ * - completed: Gold pulse (manifested/achieved)
+ * - urgent: Red pulse (Saturn transit or time-sensitive calling)
+ */
+export type MissionStatus = 'emerging' | 'active' | 'completed' | 'urgent';
+
+/**
+ * A creative manifestation throughout the evolutionary process
+ *
+ * Appears as pulsing dot on Consciousness Field Map in the relevant house.
+ * When completed, can become a chapter in the living mythology.
+ */
+export interface Mission {
+  id: string;
+  userId: string;
+
+  // Mission details
+  title: string; // "Build MAIA Platform", "Write Book", "Launch Course"
+  description: string;
+  status: MissionStatus;
+
+  // Chart placement - WHERE in your soul architecture
+  house: number; // Which house (1-12)
+  relatedPlanets?: string[]; // Which planets are involved
+  relatedSign?: string; // If relevant
+
+  // Timeline
+  identifiedDate: Date; // When you recognized this calling
+  startedDate?: Date; // When you began working on it
+  completedDate?: Date; // When you manifested it
+  targetDate?: Date; // If time-sensitive
+
+  // Progress tracking
+  progress: number; // 0-100
+  milestones: Milestone[];
+
+  // Integration with story
+  relatedChapterId?: string; // If this became a chapter
+  relatedThreadIds?: string[]; // Which threads this touches
+  relatedSessionIds?: string[]; // Sessions where this was discussed
+
+  // Chart context
+  transitContext?: {
+    activatingPlanet?: string; // e.g., "Saturn in 10th"
+    transitDescription?: string;
+  };
+
+  createdAt: Date;
+  lastUpdated: Date;
+}
+
+/**
+ * A milestone within a mission
+ */
+export interface Milestone {
+  id: string;
+  title: string;
+  completed: boolean;
+  completedDate?: Date;
+  notes?: string;
+}
+
+/**
+ * Mission Layer Settings - Controls what appears on Field Map
+ */
+export interface MissionLayerSettings {
+  showEmerging: boolean; // Show blue pulses
+  showActive: boolean; // Show green pulses
+  showCompleted: boolean; // Show gold pulses
+  showUrgent: boolean; // Show red pulses
+  showArchetypal: boolean; // Show birth chart layer
+  showTransits: boolean; // Show current transit layer
+}
+
+/**
+ * Extended Soul Story with Mission Tracking
+ */
+export interface SoulStoryWithMissions extends SoulStory {
+  missions: Mission[];
+  missionLayerSettings: MissionLayerSettings;
+}

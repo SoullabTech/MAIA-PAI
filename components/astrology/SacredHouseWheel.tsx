@@ -33,6 +33,8 @@ import { getSpiralogicHouseData } from '@/lib/astrology/spiralogicHouseMapping';
 import { getZodiacArchetype } from '@/lib/astrology/archetypeLibrary';
 import { getPlanetaryArchetype } from '@/lib/astrology/spiralogicMapping';
 import { AlchemicalSymbol } from './AlchemicalSymbols';
+import { Mission, MissionLayerSettings } from '@/lib/story/types';
+import { MissionDot, MissionPopup } from './MissionDot';
 
 interface Planet {
   name: string;
@@ -54,6 +56,9 @@ interface SacredHouseWheelProps {
   isDayMode?: boolean;
   showAspects?: boolean;
   className?: string;
+  // MISSION TRACKING - Pulsing dots for creative manifestations
+  missions?: Mission[];
+  missionLayerSettings?: MissionLayerSettings;
 }
 
 // Spiralogic Spiral Order - Clockwise from top
@@ -233,10 +238,20 @@ export function SacredHouseWheel({
   isDayMode = true,
   showAspects = false,
   className = '',
+  missions = [],
+  missionLayerSettings = {
+    showEmerging: true,
+    showActive: true,
+    showCompleted: true,
+    showUrgent: true,
+    showArchetypal: true,
+    showTransits: false,
+  },
 }: SacredHouseWheelProps) {
   const [hoveredHouse, setHoveredHouse] = useState<number | null>(null);
   const [hoveredPlanet, setHoveredPlanet] = useState<Planet | null>(null);
   const [clickedHouse, setClickedHouse] = useState<number | null>(null);
+  const [clickedMission, setClickedMission] = useState<Mission | null>(null);
   const [revealedAspects, setRevealedAspects] = useState(false);
   const [showSacredGeometry, setShowSacredGeometry] = useState(true); // Fremen alchemist mode
 
@@ -1427,6 +1442,32 @@ export function SacredHouseWheel({
           strokeOpacity="0.3"
           strokeDasharray="4,4"
         />
+
+        {/* MISSION DOTS LAYER - Pulsing indicators for creative manifestations */}
+        {missions.length > 0 && missions.map((mission) => {
+          // Filter by mission layer settings
+          const shouldShow =
+            (mission.status === 'emerging' && missionLayerSettings.showEmerging) ||
+            (mission.status === 'active' && missionLayerSettings.showActive) ||
+            (mission.status === 'completed' && missionLayerSettings.showCompleted) ||
+            (mission.status === 'urgent' && missionLayerSettings.showUrgent);
+
+          if (!shouldShow) return null;
+
+          // Calculate position for this mission's house
+          const housePos = getHousePosition(mission.house);
+
+          return (
+            <MissionDot
+              key={mission.id}
+              mission={mission}
+              x={housePos.x}
+              y={housePos.y}
+              size={8}
+              onClick={() => setClickedMission(mission)}
+            />
+          );
+        })}
       </svg>
 
       {/* Legend - appears on aspect reveal */}
@@ -1967,6 +2008,16 @@ export function SacredHouseWheel({
               })()}
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Mission Popup - Shows mission details */}
+      <AnimatePresence>
+        {clickedMission && (
+          <MissionPopup
+            mission={clickedMission}
+            onClose={() => setClickedMission(null)}
+          />
         )}
       </AnimatePresence>
     </div>
