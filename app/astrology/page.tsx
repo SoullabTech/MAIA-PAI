@@ -620,6 +620,24 @@ export default function AstrologyPage() {
               >
                 {/* Sacred House Wheel - Now actually BIG at the SVG level */}
                 <div className="relative w-full h-full flex items-center justify-center">
+                    {/* Central Holoflower - Seed of Life at center */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+                      <div className="w-24 h-24 md:w-32 md:h-32 opacity-30">
+                        <svg viewBox="0 0 100 100" className="w-full h-full">
+                          {/* Seed of Life pattern - 7 circles */}
+                          <circle cx="50" cy="50" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.8" />
+                          <circle cx="50" cy="35" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.6" />
+                          <circle cx="63" cy="42.5" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.6" />
+                          <circle cx="63" cy="57.5" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.6" />
+                          <circle cx="50" cy="65" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.6" />
+                          <circle cx="37" cy="57.5" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.6" />
+                          <circle cx="37" cy="42.5" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.6" />
+                          {/* Center glow */}
+                          <circle cx="50" cy="50" r="8" fill="rgb(251, 191, 36)" opacity="0.2" />
+                          <circle cx="50" cy="50" r="4" fill="rgb(251, 191, 36)" opacity="0.4" />
+                        </svg>
+                      </div>
+                    </div>
                     <SacredHouseWheel
                       planets={[
                         { name: 'Sun', sign: chartData.sun.sign, house: chartData.sun.house, degree: chartData.sun.degree },
