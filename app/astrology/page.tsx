@@ -179,24 +179,51 @@ export default function AstrologyPage() {
     // Force night mode for Arrakis aesthetic
     setIsDayMode(false);
 
-    // Load saved birth data from localStorage on mount
-    const savedBirthData = localStorage.getItem('birthChartData');
-    if (savedBirthData) {
-      try {
-        const parsedData = JSON.parse(savedBirthData);
-        // Ensure house system is set (default to Porphyry if not present)
-        if (!parsedData.houseSystem) {
-          parsedData.houseSystem = 'porphyry';
-          // Save updated data back to localStorage
-          localStorage.setItem('birthChartData', JSON.stringify(parsedData));
-          console.log('Updated localStorage with Porphyry house system');
+    // Load saved birth data - check user profile FIRST (more persistent)
+    let birthDataToLoad = null;
+
+    // Priority 1: Check user profile
+    try {
+      const betaUser = localStorage.getItem('beta_user');
+      if (betaUser) {
+        const userData = JSON.parse(betaUser);
+        if (userData.birthData) {
+          birthDataToLoad = userData.birthData;
+          console.log('✅ Loaded birth data from user profile');
         }
-        calculateChart(parsedData);
+      }
+    } catch (error) {
+      console.error('Error loading from user profile:', error);
+    }
+
+    // Priority 2: Fallback to birthChartData if no profile data
+    if (!birthDataToLoad) {
+      const savedBirthData = localStorage.getItem('birthChartData');
+      if (savedBirthData) {
+        try {
+          birthDataToLoad = JSON.parse(savedBirthData);
+          console.log('✅ Loaded birth data from localStorage');
+        } catch (error) {
+          console.error('Error parsing birthChartData:', error);
+        }
+      }
+    }
+
+    // If we have data from either source, calculate the chart
+    if (birthDataToLoad) {
+      try {
+        // Ensure house system is set (default to Porphyry if not present)
+        if (!birthDataToLoad.houseSystem) {
+          birthDataToLoad.houseSystem = 'porphyry';
+          console.log('Using default Porphyry house system');
+        }
+        calculateChart(birthDataToLoad);
       } catch (error) {
-        console.error('Failed to load saved birth data:', error);
+        console.error('Failed to calculate chart:', error);
         setLoading(false);
       }
     } else {
+      console.log('ℹ️ No saved birth data found - showing input form');
       setLoading(false);
     }
   }, []);
@@ -209,6 +236,27 @@ export default function AstrologyPage() {
 
     // Save birth data to localStorage for future visits
     localStorage.setItem('birthChartData', JSON.stringify(data));
+
+    // ALSO save to user profile for persistent storage across devices
+    try {
+      const betaUser = localStorage.getItem('beta_user');
+      if (betaUser) {
+        const userData = JSON.parse(betaUser);
+        userData.birthData = {
+          date: data.date,
+          time: data.time,
+          location: data.location,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          timezone: data.timezone,
+          houseSystem: data.houseSystem || 'porphyry'
+        };
+        localStorage.setItem('beta_user', JSON.stringify(userData));
+        console.log('✅ Saved birth data to user profile');
+      }
+    } catch (error) {
+      console.error('Failed to save birth data to user profile:', error);
+    }
 
     try {
       const response = await fetch('/api/astrology/birth-chart', {
@@ -497,14 +545,14 @@ export default function AstrologyPage() {
       />
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="relative z-10 w-full mx-auto px-0 sm:px-4 md:px-6 lg:px-8 pt-2 md:pt-12 pb-20">
 
-        {/* Header - Spiralogic Evolutionary Report */}
+        {/* Header - Spiralogic Evolutionary Report - HIDE ON MOBILE */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
-          className="text-center mb-12"
+          className="text-center mb-12 hidden md:block"
         >
           <h1 className="text-3xl md:text-5xl font-serif mb-4 tracking-wide transition-colors duration-500"
             style={{ color: isDayMode ? '#C67A28' : '#D88A2D' }}>
@@ -527,7 +575,7 @@ export default function AstrologyPage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 1 }}
-          className={`rounded-2xl p-8 mb-12 backdrop-blur-md transition-all duration-500
+          className={`rounded-none md:rounded-2xl p-1 sm:p-6 md:p-8 mb-4 backdrop-blur-md transition-all duration-500
             ${isDayMode
               ? 'bg-white/40 border border-stone-200/40'
               : 'bg-black/20 border border-stone-700/20'
@@ -536,38 +584,35 @@ export default function AstrologyPage() {
             boxShadow: `0 8px 32px ${isDayMode ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.3)'}`,
           }}
         >
-          <div className="text-center mb-6">
-            <h2 className={`text-xl font-serif mb-2 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
+          <div className="text-center mb-2 sm:mb-4">
+            <h2 className={`text-lg sm:text-xl font-serif mb-1 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
               Consciousness Field Map
             </h2>
-            <p className={`text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic mb-3`}>
-              Soul-centric field instrument · Hover to reveal neural pathways and archetypal insights · Click houses to learn alchemy
+            <p className={`text-[10px] sm:text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic mb-2 hidden sm:block`}>
+              Soul-centric field instrument · Hover to reveal neural pathways and archetypal insights
             </p>
-            {/* Spiralogic Process Legend */}
-            <div className={`space-y-2 ${isDayMode ? 'text-stone-600' : 'text-stone-400'}`}>
-              <div className="flex items-center justify-center gap-6 text-xs">
+            {/* Spiralogic Process Legend - Hide on mobile to save space */}
+            <div className={`space-y-1 ${isDayMode ? 'text-stone-600' : 'text-stone-400'} hidden sm:block`}>
+              <div className="flex items-center justify-center gap-4 text-[10px]">
                 <div className="flex items-center gap-1">
-                  <span className="text-sm font-mono">→</span>
-                  <span>Vector (Cardinal) · Initiating</span>
+                  <span className="text-xs font-mono">→</span>
+                  <span>Vector (Cardinal)</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-sm font-mono">○</span>
-                  <span>Circle (Fixed) · Sustaining</span>
+                  <span className="text-xs font-mono">○</span>
+                  <span>Circle (Fixed)</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-sm font-mono">∿</span>
-                  <span>Spiral (Mutable) · Transforming</span>
+                  <span className="text-xs font-mono">∿</span>
+                  <span>Spiral (Mutable)</span>
                 </div>
-              </div>
-              <div className={`text-xs italic text-center`}>
-                Each element flows: Vector → Circle → Spiral (Cardinal → Fixed → Mutable)
               </div>
             </div>
           </div>
           {/* Sacred House Wheel with 3D Animated Torus (Apple/Tree of Life) */}
-          <div className="relative w-full max-w-7xl mx-auto px-1">
-            {/* 3D Torus Field - Animated breathing torus - responsive sizing */}
-            <div className="flex items-center justify-center w-full aspect-square max-h-[65vh]">
+          <div className="relative w-full mx-auto px-0">
+            {/* 3D Torus Field - Animated breathing torus - LARGE on mobile */}
+            <div className="flex items-center justify-center w-full" style={{ aspectRatio: '1/1' }}>
               <ConsciousnessFieldWithTorus
                 size={1100}
                 showLabels={false}
@@ -602,12 +647,12 @@ export default function AstrologyPage() {
           </div>
         </motion.div>
 
-        {/* Your Active Missions - Manifestations in Progress */}
+        {/* Your Active Missions - Manifestations in Progress - HIDE ON MOBILE */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.8 }}
-          className="mb-12"
+          className="mb-12 hidden md:block"
         >
           <div className="text-center mb-8">
             <h2 className={`text-2xl font-serif mb-2 ${isDayMode ? 'text-stone-800' : 'text-amber-300'}`}>
@@ -1651,12 +1696,12 @@ export default function AstrologyPage() {
           </div>
         </motion.div>
 
-        {/* Final Thoughts - Embracing the Cosmic Dance */}
+        {/* Final Thoughts - Embracing the Cosmic Dance - HIDE ON MOBILE */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.0 }}
-          className={`rounded-2xl p-10 mb-12 backdrop-blur-md transition-all duration-500 text-center
+          className={`rounded-2xl p-10 mb-12 backdrop-blur-md transition-all duration-500 text-center hidden md:block
             ${isDayMode
               ? 'bg-gradient-to-br from-amber-50/80 to-purple-50/80 border border-amber-200/40'
               : 'bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-purple-700/20'

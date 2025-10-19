@@ -71,9 +71,9 @@ export default function MAIAPage() {
   const hasCheckedAuth = useRef(false);
 
   const handleSignOut = async () => {
-    // Preserve user profile data (birthday, name, intention) before clearing session
+    // Preserve user profile data (birthday, name, intention, birthData) before clearing session
     const betaUser = localStorage.getItem('beta_user');
-    let preservedData: { birthDate?: string; username?: string; intention?: string } | null = null;
+    let preservedData: { birthDate?: string; username?: string; intention?: string; birthData?: any } | null = null;
 
     if (betaUser) {
       try {
@@ -81,7 +81,8 @@ export default function MAIAPage() {
         preservedData = {
           birthDate: userData.birthDate,
           username: userData.username,
-          intention: userData.intention
+          intention: userData.intention,
+          birthData: userData.birthData // Preserve astrology chart data
         };
       } catch (e) {
         console.error('Error parsing user data for preservation:', e);

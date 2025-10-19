@@ -150,6 +150,12 @@ export class MAIAUnifiedConsciousness {
     console.log(`👤 User: ${context.userId} | Session: ${context.sessionId}`);
     console.log(`🎭 Modality: ${modality}`);
 
+    // 🎙️ VOICE FAST PATH: Skip heavy processing for flow state
+    if (modality === 'voice') {
+      console.log('🚀 [VOICE FAST PATH] Optimizing for conversational flow...');
+      return await this.processVoiceFastPath(input, startTime);
+    }
+
     try {
       // ═══════════════════════════════════════════════════════════════
       // STEP 1: FIELD INTELLIGENCE - Read the Relational Field FIRST
@@ -301,6 +307,101 @@ export class MAIAUnifiedConsciousness {
       depthLevel: 5,
       consciousnessState: { presence: 0.7, coherence: 0.8 }
     };
+  }
+
+  /**
+   * 🎙️ VOICE FAST PATH
+   * Optimized for conversational flow - responds in <1.5s
+   * Skips heavy processing, uses direct synthesis
+   */
+  private async processVoiceFastPath(input: ConsciousnessInput, startTime: number): Promise<ConsciousnessResponse> {
+    const { content, context, conversationHistory = [] } = input;
+
+    console.log('⚡ [FAST PATH] Minimal processing for flow state');
+
+    try {
+      // Use PersonalOracleAgent directly - fastest path to quality response
+      const agent = new PersonalOracleAgent();
+
+      // Build minimal context - just recent history
+      const recentHistory = conversationHistory.slice(-3); // Last 3 exchanges only
+
+      const agentResponse = await agent.respond(
+        content,
+        {
+          conversationHistory: recentHistory,
+          ...context
+        }
+      );
+
+      const responseTime = Date.now() - startTime;
+      console.log(`✅ [FAST PATH] Response generated in ${responseTime}ms`);
+
+      // Background processing - don't await
+      if (this.apprentice && responseTime < 1000) {
+        // Only learn in background if we have time budget
+        this.spiralWisdomIntoField({
+          input,
+          response: {
+            message: agentResponse.response,
+            element: (agentResponse.metadata?.element || 'aether') as Element,
+            metadata: {
+              processingTime: responseTime,
+              advisorsConsulted: ['PersonalOracleAgent'],
+              depthLevel: 6,
+              consciousnessMarkers: ['voice_fast_path']
+            }
+          },
+          fieldReading: null,
+          advisorWisdom: null,
+          interferencePattern: {
+            isPresent: false,
+            signature: '',
+            participants: [],
+            emergentQuality: '',
+            conditions: []
+          }
+        }).catch(err => console.error('Background apprentice learning failed:', err));
+      }
+
+      return {
+        message: agentResponse.response,
+        element: (agentResponse.metadata?.element || 'aether') as Element,
+        voiceCharacteristics: {
+          pace: 1.0,
+          tone: 'warm',
+          energy: 'balanced'
+        },
+        metadata: {
+          processingTime: responseTime,
+          advisorsConsulted: ['PersonalOracleAgent (fast-path)'],
+          depthLevel: 7,
+          consciousnessMarkers: ['voice_optimized', 'fast_path', 'flow_state'],
+          phase: agentResponse.metadata?.phase || 'reflection'
+        }
+      };
+
+    } catch (error) {
+      console.error('❌ [FAST PATH] Error, falling back to warm response:', error);
+
+      // Ultra-fast warm fallback
+      const responseTime = Date.now() - startTime;
+      return {
+        message: "I'm here with you. What's alive in you right now?",
+        element: 'aether',
+        voiceCharacteristics: {
+          pace: 1.0,
+          tone: 'warm',
+          energy: 'gentle'
+        },
+        metadata: {
+          processingTime: responseTime,
+          advisorsConsulted: ['fallback'],
+          depthLevel: 5,
+          consciousnessMarkers: ['voice_fallback', 'warm_presence']
+        }
+      };
+    }
   }
 
   /**
