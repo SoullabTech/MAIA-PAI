@@ -324,12 +324,12 @@ export default function StoryPage() {
 
         {/* Narrative View */}
         {view === 'narrative' && (
-          <div className="grid grid-cols-12 gap-8">
-            {/* Chapter List */}
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Chapter List - Sidebar */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="col-span-12 lg:col-span-3"
+              className="w-full lg:w-72 flex-shrink-0"
             >
               <div className="backdrop-blur-md border rounded-2xl p-6 shadow-lg" style={{
                 background: 'rgba(255, 248, 240, 0.8)',
@@ -417,7 +417,7 @@ export default function StoryPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="col-span-12 lg:col-span-9"
+              className="col-span-12"
             >
               <div className="backdrop-blur-md border rounded-2xl p-8 md:p-12 shadow-xl" style={{
                 background: 'rgba(255, 248, 240, 0.85)',
