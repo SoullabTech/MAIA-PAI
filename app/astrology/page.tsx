@@ -549,11 +549,11 @@ export default function AstrologyPage() {
           <div className="relative w-full max-w-3xl mx-auto pb-96">
             {/* Container for wheel - fixed height to prevent bounce */}
             <div className="relative flex items-center justify-center">
-              {/* Static Holoflower - Background spiral with Arrakis branding - sized to fit inside ring */}
+              {/* Static Holoflower - The Dragonfly comes through prominently */}
               <div
                 className="absolute inset-0 flex items-center justify-center pointer-events-none"
                 style={{
-                  opacity: 0.35,
+                  opacity: 0.65, // Increased from 0.35 - dragonfly prominence
                   transform: 'translate(0, -2px)' // Fine-tune vertical alignment
                 }}
               >

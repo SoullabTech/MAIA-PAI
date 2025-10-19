@@ -366,11 +366,11 @@ export function SacredHouseWheel({
         {/* Subtle aurora-like gradient sweep showing Fire→Water→Earth→Air flow */}
         <defs>
           <linearGradient id="elementalCurrent" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={elementalColors.fire.night} stopOpacity="0.15" />
-            <stop offset="25%" stopColor={elementalColors.water.night} stopOpacity="0.15" />
-            <stop offset="50%" stopColor={elementalColors.earth.night} stopOpacity="0.15" />
-            <stop offset="75%" stopColor={elementalColors.air.night} stopOpacity="0.15" />
-            <stop offset="100%" stopColor={elementalColors.fire.night} stopOpacity="0.15" />
+            <stop offset="0%" stopColor={elementalColors.fire.night} stopOpacity="0.08" />
+            <stop offset="25%" stopColor={elementalColors.water.night} stopOpacity="0.08" />
+            <stop offset="50%" stopColor={elementalColors.earth.night} stopOpacity="0.08" />
+            <stop offset="75%" stopColor={elementalColors.air.night} stopOpacity="0.08" />
+            <stop offset="100%" stopColor={elementalColors.fire.night} stopOpacity="0.08" />
           </linearGradient>
         </defs>
         <motion.circle
@@ -379,7 +379,7 @@ export function SacredHouseWheel({
           r="160"
           fill="none"
           stroke="url(#elementalCurrent)"
-          strokeWidth="3"
+          strokeWidth="2"
           strokeDasharray="10 5"
           initial={{ strokeDashoffset: 0 }}
           animate={{ strokeDashoffset: -1000 }}
@@ -388,7 +388,7 @@ export function SacredHouseWheel({
             repeat: Infinity,
             ease: 'linear',
           }}
-          opacity="0.4"
+          opacity="0.25"
         />
 
         {/* FIELD DYNAMICS 2: Spiral Swirling from Aether Center */}
@@ -412,13 +412,13 @@ export function SacredHouseWheel({
           })()}
           fill="none"
           stroke={isDayMode ? '#9B8FAA' : '#8B5CF6'}
-          strokeWidth="1.5"
-          opacity="0.3"
+          strokeWidth="0.8"
+          opacity="0.15"
           strokeLinecap="round"
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{
             pathLength: [0, 1, 0],
-            opacity: [0, 0.4, 0]
+            opacity: [0, 0.2, 0]
           }}
           transition={{
             duration: 15,
