@@ -620,21 +620,41 @@ export default function AstrologyPage() {
               >
                 {/* Sacred House Wheel - Now actually BIG at the SVG level */}
                 <div className="relative w-full h-full flex items-center justify-center">
-                    {/* Central Holoflower - Seed of Life at center */}
+                    {/* Central Holoflower - Fibonacci spiral pattern */}
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-                      <div className="w-24 h-24 md:w-32 md:h-32 opacity-30">
-                        <svg viewBox="0 0 100 100" className="w-full h-full">
-                          {/* Seed of Life pattern - 7 circles */}
-                          <circle cx="50" cy="50" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.8" />
-                          <circle cx="50" cy="35" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.6" />
-                          <circle cx="63" cy="42.5" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.6" />
-                          <circle cx="63" cy="57.5" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.6" />
-                          <circle cx="50" cy="65" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.6" />
-                          <circle cx="37" cy="57.5" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.6" />
-                          <circle cx="37" cy="42.5" r="15" fill="none" stroke="rgb(251, 191, 36)" strokeWidth="0.5" opacity="0.6" />
+                      <div className="w-20 h-20 md:w-28 md:h-28 opacity-15">
+                        <svg viewBox="0 0 200 200" className="w-full h-full">
+                          {/* Fibonacci spiral of dots - matching your reference */}
+                          {(() => {
+                            const dots = [];
+                            const center = 100;
+                            const totalDots = 120;
+                            const goldenAngle = 137.5 * (Math.PI / 180);
+
+                            for (let i = 0; i < totalDots; i++) {
+                              const angle = i * goldenAngle;
+                              const radius = 2.5 * Math.sqrt(i);
+                              const x = center + radius * Math.cos(angle);
+                              const y = center + radius * Math.sin(angle);
+                              const size = Math.max(0.3, 1 - (i / totalDots) * 0.5);
+                              const opacity = Math.max(0.2, 1 - (i / totalDots) * 0.6);
+
+                              dots.push(
+                                <circle
+                                  key={i}
+                                  cx={x}
+                                  cy={y}
+                                  r={size}
+                                  fill="rgb(251, 191, 36)"
+                                  opacity={opacity}
+                                />
+                              );
+                            }
+                            return dots;
+                          })()}
                           {/* Center glow */}
-                          <circle cx="50" cy="50" r="8" fill="rgb(251, 191, 36)" opacity="0.2" />
-                          <circle cx="50" cy="50" r="4" fill="rgb(251, 191, 36)" opacity="0.4" />
+                          <circle cx="100" cy="100" r="3" fill="rgb(251, 191, 36)" opacity="0.6" />
+                          <circle cx="100" cy="100" r="6" fill="rgb(251, 191, 36)" opacity="0.3" />
                         </svg>
                       </div>
                     </div>
