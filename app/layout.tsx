@@ -9,6 +9,7 @@ import { BetaBanner } from "@/components/ui/BetaBanner";
 import { FeedbackWidget } from "@/components/ui/FeedbackWidget";
 import { PWAInstallPrompt } from "@/components/ui/PWAInstallPrompt";
 import { ConditionalMenuBar } from "@/components/ui/ConditionalMenuBar";
+import { SessionGuard } from "@/components/auth/SessionGuard";
 // import VoiceDebugOverlay from "@/components/debug/VoiceDebugOverlay"; // File doesn't exist
 // import { ToneDebugOverlay } from "@/components/voice/ToneDebugOverlay"; // Disabled for debugging
 import { Toaster } from 'react-hot-toast';
@@ -66,23 +67,26 @@ export default function RootLayout({
       <body className={`${inter.className}`} suppressHydrationWarning>
         <PWAProvider>
           <AuthProvider>
-            <ToastProvider>
-              {/* 🎙️ MAIA Ambient Presence - Voice-first layer */}
-              <MaiaPresenceProvider>
-                <Toaster position="top-center" />
-                <BetaBanner />
-                {children}
-                <ConditionalMenuBar />
-                {/* <PWAInstallPrompt /> - Disabled: was causing black overlay */}
-                <FeedbackWidget />
+            {/* 🔐 Session Guard - Restores sessions on page load */}
+            <SessionGuard>
+              <ToastProvider>
+                {/* 🎙️ MAIA Ambient Presence - Voice-first layer */}
+                <MaiaPresenceProvider>
+                  <Toaster position="top-center" />
+                  <BetaBanner />
+                  {children}
+                  <ConditionalMenuBar />
+                  {/* <PWAInstallPrompt /> - Disabled: was causing black overlay */}
+                  <FeedbackWidget />
 
-                {/* 🎙️ Ambient Voice Indicator - Shows when voice active */}
-                <AmbientVoiceIndicator />
+                  {/* 🎙️ Ambient Voice Indicator - Shows when voice active */}
+                  <AmbientVoiceIndicator />
 
-                {/* <VoiceDebugOverlay /> - File doesn't exist */}
-                {/* {process.env.NODE_ENV === 'development' && <ToneDebugOverlay />} */}
-              </MaiaPresenceProvider>
-            </ToastProvider>
+                  {/* <VoiceDebugOverlay /> - File doesn't exist */}
+                  {/* {process.env.NODE_ENV === 'development' && <ToneDebugOverlay />} */}
+                </MaiaPresenceProvider>
+              </ToastProvider>
+            </SessionGuard>
           </AuthProvider>
         </PWAProvider>
       </body>

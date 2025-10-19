@@ -4,42 +4,35 @@ import { useState } from 'react';
 import SacredGeometryBackground, { SacredGeometryPresets } from '@/components/consciousness/SacredGeometryBackground';
 import { ConsciousnessMapPlaceholder } from '@/components/consciousness/TorusBackgroundMap';
 
-// All available sacred geometry images
+// All available sacred geometry images - HIGH QUALITY SVGs & PNGs
 const sacredGeometryImages = [
-  // Torus designs
-  { path: '/sacred-geometry/iStock-1008544140-0.png', name: 'Torus Field (Main)', category: 'Torus' },
-  { path: '/sacred-geometry/iStock-1008544140-1.png', name: 'Torus Field (Alt)', category: 'Torus' },
+  // Main Torus (Clean SVG)
+  { path: '/consciousness-torus.svg', name: 'Consciousness Torus Field', category: 'Torus & Vortex' },
 
-  // Golden Ratio
-  { path: '/sacred-geometry/GoldenRatio005-0.png', name: 'Golden Ratio Spiral 1', category: 'Golden Ratio' },
-  { path: '/sacred-geometry/GoldenRatio005-1.png', name: 'Golden Ratio Spiral 2', category: 'Golden Ratio' },
-  { path: '/sacred-geometry/GoldenRatio007-0.png', name: 'Golden Ratio Grid 1', category: 'Golden Ratio' },
-  { path: '/sacred-geometry/GoldenRatio007-1.png', name: 'Golden Ratio Grid 2', category: 'Golden Ratio' },
+  // Holoflower Sacred Geometry (SVGs)
+  { path: '/holoflower-sacred.svg', name: 'Sacred Holoflower', category: 'Holoflower' },
+  { path: '/holoflower-spectrum.svg', name: 'Holoflower Spectrum', category: 'Holoflower' },
+  { path: '/holoflower.svg', name: 'Elemental Holoflower', category: 'Holoflower' },
+  { path: '/holoflower-interactive.svg', name: 'Interactive Holoflower', category: 'Holoflower' },
 
-  // Sacred Patterns
-  { path: '/sacred-geometry/iStock-1168629991.png', name: 'Flower of Life', category: 'Patterns' },
-  { path: '/sacred-geometry/iStock-1794921394.png', name: 'Merkaba Star', category: 'Patterns' },
-  { path: '/sacred-geometry/iStock-2180076224.png', name: 'Sacred Mandala 1', category: 'Patterns' },
-  { path: '/sacred-geometry/iStock-2189155739.png', name: 'Sacred Mandala 2', category: 'Patterns' },
-  { path: '/sacred-geometry/iStock-2214567221.png', name: 'Sacred Mandala 3', category: 'Patterns' },
-  { path: '/sacred-geometry/iStock-627211452.png', name: 'Cosmic Grid', category: 'Patterns' },
+  // Sacred Mirror
+  { path: '/favicon-sacred-mirror.svg', name: 'Sacred Mirror Portal', category: 'Portals' },
 
-  // Complex geometries
-  { path: '/sacred-geometry/iStock-1695148210-0.png', name: 'Complex Field 1', category: 'Complex' },
-  { path: '/sacred-geometry/iStock-1707848734-0.png', name: 'Complex Field 2', category: 'Complex' },
-  { path: '/sacred-geometry/iStock-2148842959-0.png', name: 'Complex Field 3', category: 'Complex' },
+  // Rachel White Art Collection (High-Quality PNGs - Black)
+  { path: '/sacred-geometry/black/rachel white art 01.png', name: 'Sacred Portal 1 (Dark)', category: 'Rachel White - Dark' },
+  { path: '/sacred-geometry/black/rachel white art 02.png', name: 'Sacred Portal 2 (Dark)', category: 'Rachel White - Dark' },
+  { path: '/sacred-geometry/black/rachel white art 03.png', name: 'Sacred Portal 3 (Dark)', category: 'Rachel White - Dark' },
+  { path: '/sacred-geometry/black/rachel white art 04.png', name: 'Sacred Portal 4 (Dark)', category: 'Rachel White - Dark' },
+  { path: '/sacred-geometry/black/rachel white art 05.png', name: 'Sacred Portal 5 (Dark)', category: 'Rachel White - Dark' },
+  { path: '/sacred-geometry/black/rachel white art 06.png', name: 'Sacred Portal 6 (Dark)', category: 'Rachel White - Dark' },
 
-  // Rachel White (Black)
-  { path: '/sacred-geometry/black/rachel white art 01.png', name: 'Portal 1 (Dark)', category: 'Rachel White - Black' },
-  { path: '/sacred-geometry/black/rachel white art 02.png', name: 'Portal 2 (Dark)', category: 'Rachel White - Black' },
-  { path: '/sacred-geometry/black/rachel white art 03.png', name: 'Portal 3 (Dark)', category: 'Rachel White - Black' },
-  { path: '/sacred-geometry/black/rachel white art 04.png', name: 'Portal 4 (Dark)', category: 'Rachel White - Black' },
-
-  // Rachel White (White)
-  { path: '/sacred-geometry/white/rachel white art 01.png', name: 'Portal 1 (Light)', category: 'Rachel White - White' },
-  { path: '/sacred-geometry/white/rachel white art 02.png', name: 'Portal 2 (Light)', category: 'Rachel White - White' },
-  { path: '/sacred-geometry/white/rachel white art 03.png', name: 'Portal 3 (Light)', category: 'Rachel White - White' },
-  { path: '/sacred-geometry/white/rachel white art 04.png', name: 'Portal 4 (Light)', category: 'Rachel White - White' },
+  // Rachel White Art Collection (High-Quality PNGs - Light)
+  { path: '/sacred-geometry/white/rachel white art 01.png', name: 'Sacred Portal 1 (Light)', category: 'Rachel White - Light' },
+  { path: '/sacred-geometry/white/rachel white art 02.png', name: 'Sacred Portal 2 (Light)', category: 'Rachel White - Light' },
+  { path: '/sacred-geometry/white/rachel white art 03.png', name: 'Sacred Portal 3 (Light)', category: 'Rachel White - Light' },
+  { path: '/sacred-geometry/white/rachel white art 04.png', name: 'Sacred Portal 4 (Light)', category: 'Rachel White - Light' },
+  { path: '/sacred-geometry/white/rachel white art 05.png', name: 'Sacred Portal 5 (Light)', category: 'Rachel White - Light' },
+  { path: '/sacred-geometry/white/rachel white art 06.png', name: 'Sacred Portal 6 (Light)', category: 'Rachel White - Light' },
 ];
 
 export default function SacredGeometryGallery() {

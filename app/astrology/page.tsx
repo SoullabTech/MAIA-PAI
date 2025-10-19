@@ -23,6 +23,7 @@ import { getSpiralogicPlanetDescription } from '@/lib/astrology/spiralogicHouseM
 import { BirthDataForm } from '@/components/astrology/BirthDataForm';
 import { MiniHoloflower } from '@/components/holoflower/MiniHoloflower';
 import { Mission } from '@/lib/story/types';
+import TorusBackgroundMap from '@/components/consciousness/TorusBackgroundMap';
 
 interface BirthChartData {
   sun: { sign: string; degree: number; house: number };
@@ -545,49 +546,57 @@ export default function AstrologyPage() {
               </div>
             </div>
           </div>
-          {/* Sacred House Wheel with Static Holoflower Background */}
+          {/* Sacred House Wheel with Torus Background (Apple/Tree of Life) */}
           <div className="relative w-full max-w-3xl mx-auto pb-96">
-            {/* Container for wheel - fixed height to prevent bounce */}
-            <div className="relative flex items-center justify-center">
-              {/* Static Holoflower - The Dragonfly comes through prominently */}
-              <div
-                className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                style={{
-                  opacity: 0.65, // Increased from 0.35 - dragonfly prominence
-                  transform: 'translate(0, -2px)' // Fine-tune vertical alignment
-                }}
+            {/* Torus Background Map - The Apple Core / Tree of Life structure */}
+            <div className="flex items-center justify-center">
+              <TorusBackgroundMap
+                size={800}
+                showLabels={true}
+                torusOpacity={0.45}
+                amberTint={isDayMode ? "#D4A574" : "#C9B896"}
               >
-                <MiniHoloflower
-                  size={240}
-                  isDayMode={false}
-                />
-              </div>
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {/* Optional: Holoflower overlay for extra depth */}
+                  <div
+                    className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                    style={{
+                      opacity: 0.25,
+                      transform: 'scale(0.6)'
+                    }}
+                  >
+                    <MiniHoloflower
+                      size={240}
+                      isDayMode={false}
+                    />
+                  </div>
 
-              {/* Sacred House Wheel on top */}
-              <div className="relative z-10 w-full">
-                <SacredHouseWheel
-              planets={[
-              { name: 'Sun', sign: chartData.sun.sign, house: chartData.sun.house, degree: chartData.sun.degree },
-              { name: 'Moon', sign: chartData.moon.sign, house: chartData.moon.house, degree: chartData.moon.degree },
-              ...(chartData.mercury ? [{ name: 'Mercury', sign: chartData.mercury.sign, house: chartData.mercury.house, degree: chartData.mercury.degree }] : []),
-              ...(chartData.venus ? [{ name: 'Venus', sign: chartData.venus.sign, house: chartData.venus.house, degree: chartData.venus.degree }] : []),
-              ...(chartData.mars ? [{ name: 'Mars', sign: chartData.mars.sign, house: chartData.mars.house, degree: chartData.mars.degree }] : []),
-              ...(chartData.jupiter ? [{ name: 'Jupiter', sign: chartData.jupiter.sign, house: chartData.jupiter.house, degree: chartData.jupiter.degree }] : []),
-              ...(chartData.saturn ? [{ name: 'Saturn', sign: chartData.saturn.sign, house: chartData.saturn.house, degree: chartData.saturn.degree }] : []),
-              ...(chartData.uranus ? [{ name: 'Uranus', sign: chartData.uranus.sign, house: chartData.uranus.house, degree: chartData.uranus.degree }] : []),
-              ...(chartData.neptune ? [{ name: 'Neptune', sign: chartData.neptune.sign, house: chartData.neptune.house, degree: chartData.neptune.degree }] : []),
-              ...(chartData.pluto ? [{ name: 'Pluto', sign: chartData.pluto.sign, house: chartData.pluto.house, degree: chartData.pluto.degree }] : []),
-              ...(chartData.chiron ? [{ name: 'Chiron', sign: chartData.chiron.sign, house: chartData.chiron.house, degree: chartData.chiron.degree }] : []),
-              ...(chartData.northNode ? [{ name: 'North Node', sign: chartData.northNode.sign, house: chartData.northNode.house, degree: chartData.northNode.degree }] : []),
-              ...(chartData.southNode ? [{ name: 'South Node', sign: chartData.southNode.sign, house: chartData.southNode.house, degree: chartData.southNode.degree }] : []),
-            ]}
-                houseCusps={chartData.houses}
-                aspects={chartData.aspects}
-                isDayMode={isDayMode}
-                showAspects={true}
-                missions={KELLY_MISSIONS}
-              />
-            </div>
+                  {/* Sacred House Wheel - centered in torus heart */}
+                  <div className="relative z-10">
+                    <SacredHouseWheel
+                      planets={[
+                        { name: 'Sun', sign: chartData.sun.sign, house: chartData.sun.house, degree: chartData.sun.degree },
+                        { name: 'Moon', sign: chartData.moon.sign, house: chartData.moon.house, degree: chartData.moon.degree },
+                        ...(chartData.mercury ? [{ name: 'Mercury', sign: chartData.mercury.sign, house: chartData.mercury.house, degree: chartData.mercury.degree }] : []),
+                        ...(chartData.venus ? [{ name: 'Venus', sign: chartData.venus.sign, house: chartData.venus.house, degree: chartData.venus.degree }] : []),
+                        ...(chartData.mars ? [{ name: 'Mars', sign: chartData.mars.sign, house: chartData.mars.house, degree: chartData.mars.degree }] : []),
+                        ...(chartData.jupiter ? [{ name: 'Jupiter', sign: chartData.jupiter.sign, house: chartData.jupiter.house, degree: chartData.jupiter.degree }] : []),
+                        ...(chartData.saturn ? [{ name: 'Saturn', sign: chartData.saturn.sign, house: chartData.saturn.house, degree: chartData.saturn.degree }] : []),
+                        ...(chartData.uranus ? [{ name: 'Uranus', sign: chartData.uranus.sign, house: chartData.uranus.house, degree: chartData.uranus.degree }] : []),
+                        ...(chartData.neptune ? [{ name: 'Neptune', sign: chartData.neptune.sign, house: chartData.neptune.house, degree: chartData.neptune.degree }] : []),
+                        ...(chartData.pluto ? [{ name: 'Pluto', sign: chartData.pluto.sign, house: chartData.pluto.house, degree: chartData.pluto.degree }] : []),
+                        ...(chartData.chiron ? [{ name: 'Chiron', sign: chartData.chiron.sign, house: chartData.chiron.house, degree: chartData.chiron.degree }] : []),
+                        ...(chartData.northNode ? [{ name: 'North Node', sign: chartData.northNode.sign, house: chartData.northNode.house, degree: chartData.northNode.degree }] : []),
+                        ...(chartData.southNode ? [{ name: 'South Node', sign: chartData.southNode.sign, house: chartData.southNode.house, degree: chartData.southNode.degree }] : []),
+                      ]}
+                      aspects={chartData.aspects}
+                      isDayMode={isDayMode}
+                      showAspects={true}
+                      missions={KELLY_MISSIONS}
+                    />
+                  </div>
+                </div>
+              </TorusBackgroundMap>
             </div>
           </div>
         </motion.div>

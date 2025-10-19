@@ -51,11 +51,11 @@ export default function TorusBackgroundMap({
         }}
       >
         <Image
-          src="/sacred-geometry/iStock-1008544140-0.png"
+          src="/consciousness-torus.svg"
           alt="Sacred Torus Geometry"
           fill
           style={{
-            objectFit: 'cover',
+            objectFit: 'contain',
             objectPosition: 'center',
             opacity: torusOpacity
           }}
