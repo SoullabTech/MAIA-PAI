@@ -335,9 +335,9 @@ export function SacredHouseWheel({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            opacity: 0.25,
+            opacity: 0.35,
             pointerEvents: 'none',
-            mixBlendMode: 'screen'
+            mixBlendMode: 'lighten'
           }}>
             <SacredHoloflower
               size={300}
