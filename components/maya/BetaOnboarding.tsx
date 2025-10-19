@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Heart, User, Calendar, ArrowRight } from 'lucide-react';
 import { Holoflower } from '@/components/ui/Holoflower';
@@ -27,6 +27,32 @@ export function BetaOnboarding({ onComplete }: BetaOnboardingProps) {
   const [name, setName] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [intention, setIntention] = useState('');
+
+  // Load preserved profile data if available (from previous logout)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const betaUser = localStorage.getItem('beta_user');
+    if (betaUser) {
+      try {
+        const userData = JSON.parse(betaUser);
+        if (userData.username) {
+          setName(userData.username);
+          console.log('✅ Pre-filled name from preserved data:', userData.username);
+        }
+        if (userData.birthDate) {
+          setBirthDate(userData.birthDate);
+          console.log('✅ Pre-filled birthday from preserved data');
+        }
+        if (userData.intention) {
+          setIntention(userData.intention);
+          console.log('✅ Pre-filled intention from preserved data');
+        }
+      } catch (e) {
+        console.error('Error loading preserved data:', e);
+      }
+    }
+  }, []);
 
   const handleNext = () => {
     if (step === 0 && !name.trim()) return;

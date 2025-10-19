@@ -69,16 +69,47 @@ export default function MAIAPage() {
   const hasCheckedAuth = useRef(false);
 
   const handleSignOut = async () => {
+    // Preserve user profile data (birthday, name, intention) before clearing session
+    const betaUser = localStorage.getItem('beta_user');
+    let preservedData: { birthDate?: string; username?: string; intention?: string } | null = null;
+
+    if (betaUser) {
+      try {
+        const userData = JSON.parse(betaUser);
+        preservedData = {
+          birthDate: userData.birthDate,
+          username: userData.username,
+          intention: userData.intention
+        };
+      } catch (e) {
+        console.error('Error parsing user data for preservation:', e);
+      }
+    }
+
     // Sign out from Supabase
     await supabase.auth.signOut();
 
-    // Clear localStorage
-    localStorage.removeItem('beta_user');
+    // Clear session data only (NOT profile data like birthday)
     localStorage.removeItem('beta_users');
     localStorage.removeItem('betaOnboardingComplete');
     localStorage.removeItem('explorerId');
     localStorage.removeItem('betaUserId');
     localStorage.removeItem('explorerName');
+
+    // Restore preserved profile data but mark as logged out
+    if (preservedData) {
+      const profileData = {
+        ...preservedData,
+        onboarded: false, // User needs to sign back in
+        loggedOut: true
+      };
+      localStorage.setItem('beta_user', JSON.stringify(profileData));
+      console.log('✅ User profile data preserved after logout:', {
+        hasBirthDate: !!preservedData.birthDate,
+        hasUsername: !!preservedData.username
+      });
+    }
+
     router.push('/');
   };
 
