@@ -2023,10 +2023,10 @@ export function SacredHouseWheel({
                             {houseState.symbol}
                           </div>
                           <div>
-                            <h2 className={`text-2xl font-serif font-semibold ${isDayMode ? 'text-stone-900' : 'text-stone-100'}`}>
+                            <h2 className={`text-2xl font-serif font-semibold ${isDayMode ? 'text-stone-900' : 'text-amber-100'}`}>
                               House {clickedHouse} · {houseState.phase}
                             </h2>
-                            <p className={`text-sm ${isDayMode ? 'text-stone-600' : 'text-stone-300'} mt-1`}>
+                            <p className={`text-sm ${isDayMode ? 'text-stone-600' : 'text-amber-200'} mt-1`}>
                               {education.operation}
                             </p>
                           </div>
@@ -2043,7 +2043,7 @@ export function SacredHouseWheel({
                         </button>
                       </div>
 
-                      <div className={`text-sm font-medium ${isDayMode ? 'text-stone-700' : 'text-stone-300'}`}>
+                      <div className={`text-sm font-medium ${isDayMode ? 'text-stone-700' : 'text-amber-200'}`}>
                         {education.process}
                       </div>
                     </div>
@@ -2052,17 +2052,17 @@ export function SacredHouseWheel({
                     <div className="p-8 space-y-6">
                       {/* Alchemical Description */}
                       <div>
-                        <h3 className={`text-xs uppercase tracking-wider font-semibold mb-3 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                        <h3 className={`text-xs uppercase tracking-wider font-semibold mb-3 ${isDayMode ? 'text-stone-500' : 'text-amber-400/80'}`}>
                           The Alchemical Process
                         </h3>
-                        <p className={`text-base leading-relaxed ${isDayMode ? 'text-stone-700' : 'text-stone-200'}`}>
+                        <p className={`text-base leading-relaxed ${isDayMode ? 'text-stone-700' : 'text-amber-50'}`}>
                           {education.description}
                         </p>
                       </div>
 
                       {/* Keywords */}
                       <div>
-                        <h3 className={`text-xs uppercase tracking-wider font-semibold mb-3 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                        <h3 className={`text-xs uppercase tracking-wider font-semibold mb-3 ${isDayMode ? 'text-stone-500' : 'text-amber-400/80'}`}>
                           Keywords
                         </h3>
                         <div className="flex flex-wrap gap-2">
@@ -2072,7 +2072,7 @@ export function SacredHouseWheel({
                               className={`px-3 py-1.5 rounded-full text-xs font-medium ${
                                 isDayMode
                                   ? 'bg-stone-100 text-stone-700'
-                                  : 'bg-stone-800/60 text-stone-200'
+                                  : 'bg-stone-800/60 text-amber-100'
                               }`}
                               style={{
                                 boxShadow: `0 0 10px ${elementColor.glow}`,
@@ -2086,10 +2086,10 @@ export function SacredHouseWheel({
 
                       {/* Practices */}
                       <div>
-                        <h3 className={`text-xs uppercase tracking-wider font-semibold mb-3 ${isDayMode ? 'text-stone-500' : 'text-stone-400'}`}>
+                        <h3 className={`text-xs uppercase tracking-wider font-semibold mb-3 ${isDayMode ? 'text-stone-500' : 'text-amber-400/80'}`}>
                           Integration Practices
                         </h3>
-                        <ul className={`space-y-2 ${isDayMode ? 'text-stone-700' : 'text-stone-200'}`}>
+                        <ul className={`space-y-2 ${isDayMode ? 'text-stone-700' : 'text-amber-50'}`}>
                           {education.practices.map((practice, idx) => (
                             <li key={idx} className="flex items-start gap-2">
                               <span style={{ color }}>•</span>
