@@ -140,29 +140,42 @@ export default function StoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-stone-100">
-      {/* Cosmic dragonfly star field - amber spice dust */}
+    <div className="min-h-screen text-stone-900" style={{
+      background: 'linear-gradient(to bottom, #A8B5A0 0%, #C9B899 25%, #D9C7AD 50%, #B8935C 75%, #8B6F47 100%)',
+    }}>
+      {/* Dune atmospheric haze - floating sand particles */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {[...Array(150)].map((_, i) => (
+        {/* Atmospheric glow layers */}
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse at 50% 20%, rgba(201, 184, 153, 0.3), transparent 70%)',
+        }} />
+        <div className="absolute inset-0" style={{
+          background: 'radial-gradient(ellipse at 50% 80%, rgba(139, 111, 71, 0.2), transparent 60%)',
+        }} />
+
+        {/* Floating sand particles */}
+        {[...Array(80)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute rounded-full"
             style={{
-              background: Math.random() > 0.5 ? '#F5A362' : '#D4AF37',
-              width: Math.random() > 0.8 ? '2px' : '1px',
-              height: Math.random() > 0.8 ? '2px' : '1px',
+              background: Math.random() > 0.6 ? '#C9A86A' : '#B8935C',
+              width: Math.random() > 0.7 ? '3px' : '2px',
+              height: Math.random() > 0.7 ? '3px' : '2px',
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              filter: 'blur(0.5px)',
+              filter: 'blur(1px)',
+              opacity: 0.3,
             }}
             animate={{
-              opacity: [0.1, 0.6, 0.1],
-              scale: [1, 1.2, 1],
+              y: [0, -30, 0],
+              x: [0, Math.random() * 20 - 10, 0],
+              opacity: [0.2, 0.4, 0.2],
             }}
             transition={{
-              duration: 3 + Math.random() * 4,
+              duration: 8 + Math.random() * 6,
               repeat: Infinity,
-              delay: Math.random() * 3,
+              delay: Math.random() * 4,
               ease: 'easeInOut',
             }}
           />
@@ -179,49 +192,62 @@ export default function StoryPage() {
           <div className="flex items-center justify-center gap-3 mb-4">
             <motion.div
               animate={{
-                scale: [1, 1.1, 1],
-                rotate: [0, 5, 0, -5, 0],
+                scale: [1, 1.05, 1],
+                rotate: [0, 3, 0, -3, 0],
               }}
               transition={{
-                duration: 6,
+                duration: 8,
                 repeat: Infinity,
                 ease: 'easeInOut',
               }}
             >
-              <BookOpen className="w-10 h-10 text-amber-400" style={{ filter: 'drop-shadow(0 0 8px rgba(245, 163, 98, 0.6))' }} />
+              <BookOpen className="w-10 h-10" style={{
+                color: '#8B6F47',
+                filter: 'drop-shadow(0 2px 4px rgba(107, 68, 35, 0.3))',
+              }} />
             </motion.div>
-            <h1 className="text-4xl md:text-5xl font-serif text-amber-400" style={{
-              textShadow: '0 0 20px rgba(245, 163, 98, 0.4), 0 0 40px rgba(212, 175, 55, 0.2)',
+            <h1 className="text-4xl md:text-5xl font-serif" style={{
+              color: '#6B4423',
+              textShadow: '0 2px 8px rgba(107, 68, 35, 0.2)',
+              fontWeight: 500,
             }}>
               {mockStory.title}
             </h1>
           </div>
-          <p className="text-stone-300 font-serif italic mb-2">
+          <p className="font-serif italic mb-2" style={{ color: '#5A4A3A' }}>
             Co-authored with MAIA, your Sacred Scribe
           </p>
-          <p className="text-stone-400 text-sm italic max-w-xl mx-auto leading-relaxed">
+          <p className="text-sm italic max-w-xl mx-auto leading-relaxed" style={{ color: '#6B5A4A' }}>
             She listens with archetypal ears. Asks questions informed by the cosmos.
             Weaves your story across time. You lived it. She saw it. Together you author it.
           </p>
           <div className="mt-6 flex items-center justify-center gap-4 text-sm">
             <button
               onClick={() => setView('narrative')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                view === 'narrative'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                  : 'text-stone-400 hover:text-stone-200'
-              }`}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all"
+              style={view === 'narrative' ? {
+                background: 'rgba(184, 147, 92, 0.3)',
+                border: '1px solid rgba(139, 111, 71, 0.4)',
+                color: '#6B4423',
+              } : {
+                color: '#8B7355',
+                background: 'rgba(255, 248, 240, 0.3)',
+              }}
             >
               <BookOpen className="w-4 h-4" />
               Narrative View
             </button>
             <button
               onClick={() => setView('timeline')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                view === 'timeline'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                  : 'text-stone-400 hover:text-stone-200'
-              }`}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all"
+              style={view === 'timeline' ? {
+                background: 'rgba(184, 147, 92, 0.3)',
+                border: '1px solid rgba(139, 111, 71, 0.4)',
+                color: '#6B4423',
+              } : {
+                color: '#8B7355',
+                background: 'rgba(255, 248, 240, 0.3)',
+              }}
             >
               <History className="w-4 h-4" />
               Timeline View
@@ -238,22 +264,29 @@ export default function StoryPage() {
               animate={{ opacity: 1, x: 0 }}
               className="col-span-12 lg:col-span-3"
             >
-              <div className="bg-stone-900/30 backdrop-blur-xl border border-amber-900/20 rounded-2xl p-6 shadow-2xl" style={{
-                boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(245, 163, 98, 0.1)',
+              <div className="backdrop-blur-md border rounded-2xl p-6 shadow-lg" style={{
+                background: 'rgba(255, 248, 240, 0.8)',
+                borderColor: '#C9A86A',
+                boxShadow: '0 4px 20px rgba(107, 68, 35, 0.15), 0 8px 40px rgba(139, 111, 71, 0.1)',
               }}>
-                <h3 className="text-lg font-serif mb-4 text-amber-300" style={{
-                  textShadow: '0 0 10px rgba(245, 163, 98, 0.3)',
+                <h3 className="text-lg font-serif mb-4" style={{
+                  color: '#6B4423',
+                  textShadow: '0 1px 2px rgba(107, 68, 35, 0.2)',
                 }}>Chapters</h3>
                 <div className="space-y-2">
                   {mockStory.chapters.map((chapter) => (
                     <button
                       key={chapter.id}
                       onClick={() => setSelectedChapter(chapter)}
-                      className={`w-full text-left px-4 py-3 rounded-lg transition-all ${
-                        selectedChapter.id === chapter.id
-                          ? 'bg-amber-500/20 border border-amber-500/40 text-amber-200'
-                          : 'text-stone-300 hover:bg-stone-800/40'
-                      }`}
+                      className="w-full text-left px-4 py-3 rounded-lg transition-all"
+                      style={selectedChapter.id === chapter.id ? {
+                        background: 'rgba(184, 147, 92, 0.25)',
+                        border: '1px solid rgba(139, 111, 71, 0.5)',
+                        color: '#6B4423',
+                      } : {
+                        color: '#8B7355',
+                        background: 'rgba(201, 168, 106, 0.1)',
+                      }}
                     >
                       <div className="flex items-center justify-between">
                         <span className="font-serif">{chapter.title}</span>
@@ -265,18 +298,25 @@ export default function StoryPage() {
                   ))}
                 </div>
 
-                <button className="w-full mt-4 px-4 py-3 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-200 hover:bg-purple-500/30 transition-all flex items-center justify-center gap-2">
+                <button className="w-full mt-4 px-4 py-3 rounded-lg transition-all flex items-center justify-center gap-2" style={{
+                  background: 'rgba(168, 181, 160, 0.2)',
+                  border: '1px solid rgba(168, 181, 160, 0.4)',
+                  color: '#5A4A3A',
+                }}>
                   <Plus className="w-4 h-4" />
                   New Chapter
                 </button>
               </div>
 
               {/* Active Threads */}
-              <div className="mt-6 bg-stone-900/30 backdrop-blur-xl border border-purple-900/20 rounded-2xl p-6 shadow-2xl" style={{
-                boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(139, 92, 246, 0.1)',
+              <div className="mt-6 backdrop-blur-md border rounded-2xl p-6 shadow-lg" style={{
+                background: 'rgba(255, 248, 240, 0.8)',
+                borderColor: '#A8B5A0',
+                boxShadow: '0 4px 20px rgba(107, 68, 35, 0.15), 0 8px 40px rgba(168, 181, 160, 0.1)',
               }}>
-                <h3 className="text-lg font-serif mb-4 text-purple-300" style={{
-                  textShadow: '0 0 10px rgba(139, 92, 246, 0.3)',
+                <h3 className="text-lg font-serif mb-4" style={{
+                  color: '#5A4A3A',
+                  textShadow: '0 1px 2px rgba(90, 74, 58, 0.2)',
                 }}>Unfolding Threads</h3>
                 <div className="space-y-3">
                   {mockStory.activeThreads.map((thread) => (
@@ -301,18 +341,22 @@ export default function StoryPage() {
               animate={{ opacity: 1, y: 0 }}
               className="col-span-12 lg:col-span-9"
             >
-              <div className="bg-stone-900/30 backdrop-blur-xl border border-amber-900/20 rounded-2xl p-8 md:p-12 shadow-2xl" style={{
-                boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(245, 163, 98, 0.1)',
+              <div className="backdrop-blur-md border rounded-2xl p-8 md:p-12 shadow-xl" style={{
+                background: 'rgba(255, 248, 240, 0.85)',
+                borderColor: '#C9A86A',
+                boxShadow: '0 6px 30px rgba(107, 68, 35, 0.2), 0 12px 50px rgba(139, 111, 71, 0.15)',
               }}>
                 {/* Chapter Header */}
                 <div className="flex items-start justify-between mb-8">
                   <div>
-                    <h2 className="text-3xl font-serif text-amber-300 mb-2" style={{
-                      textShadow: '0 0 15px rgba(245, 163, 98, 0.4)',
+                    <h2 className="text-3xl font-serif mb-2" style={{
+                      color: '#6B4423',
+                      textShadow: '0 2px 6px rgba(107, 68, 35, 0.2)',
+                      fontWeight: 500,
                     }}>
                       {selectedChapter.title}
                     </h2>
-                    <div className="flex items-center gap-4 text-sm text-stone-400">
+                    <div className="flex items-center gap-4 text-sm" style={{ color: '#8B7355' }}>
                       <span>Chapter {selectedChapter.chapterNumber}</span>
                       <span>•</span>
                       <span className="capitalize">{selectedChapter.status}</span>
@@ -320,7 +364,12 @@ export default function StoryPage() {
                   </div>
                   <button
                     onClick={() => setIsEditMode(!isEditMode)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-200 hover:bg-amber-500/30 transition-all"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all"
+                    style={{
+                      background: 'rgba(184, 147, 92, 0.2)',
+                      border: '1px solid rgba(139, 111, 71, 0.4)',
+                      color: '#6B4423',
+                    }}
                   >
                     <Edit3 className="w-4 h-4" />
                     {isEditMode ? 'Reading Mode' : 'Edit Mode'}
@@ -333,9 +382,10 @@ export default function StoryPage() {
                     {selectedChapter.currentDraft.split('\n\n').map((paragraph, idx) => (
                       <p
                         key={idx}
-                        className="text-stone-200 font-serif text-lg"
+                        className="font-serif text-lg"
                         style={{
-                          lineHeight: '1.8',
+                          color: '#3E2723',
+                          lineHeight: '1.9',
                           whiteSpace: 'normal',
                           wordWrap: 'break-word',
                           display: 'block',
