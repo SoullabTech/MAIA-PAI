@@ -165,7 +165,7 @@ export default function CheckInPage() {
             localStorage.setItem('beta_users', JSON.stringify(users));
           }
 
-          router.push('/intro'); // Go through beautiful intro ritual
+          router.push('/welcome-back'); // Go through beautiful return ritual
           return;
         }
       }
@@ -204,10 +204,10 @@ export default function CheckInPage() {
       const { password: _, ...userData } = userWithPassword;
       localStorage.setItem('beta_user', JSON.stringify(userData));
 
-      console.log('✅ [checkin] Quick check-in successful, redirecting to intro');
+      console.log('✅ [checkin] Quick check-in successful, redirecting to welcome-back');
 
-      // Go through beautiful intro ritual
-      router.push('/intro');
+      // Go through beautiful return ritual
+      router.push('/welcome-back');
     } catch (err: any) {
       console.error('❌ [checkin] Error:', err);
       setError(err.message || 'Check-in failed');
