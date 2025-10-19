@@ -1203,9 +1203,10 @@ export function SacredHouseWheel({
               Z
             `;
 
-            // Wider hover zone path - extends further into the house for easier interaction
+            // Wider hover zone path - extends as far as possible toward starfield edges
+            // Stops before covering outer labels like "EXPERIENCE", "EXPANSION", etc.
             const hoverInnerRadius = 60;
-            const hoverOuterRadius = 160;
+            const hoverOuterRadius = 235; // Extended from 160 to nearly reach frame edges
             const hx1 = 200 + hoverInnerRadius * Math.cos(startAngle);
             const hy1 = 200 + hoverInnerRadius * Math.sin(startAngle);
             const hx2 = 200 + hoverOuterRadius * Math.cos(startAngle);
