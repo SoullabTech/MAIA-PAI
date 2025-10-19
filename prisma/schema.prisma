@@ -389,3 +389,33 @@ model ConversationAnalytics {
   @@unique([userId, date])
   @@index([userId, date])
 }
+
+// ============================================================================
+// BETA TESTERS & COMMUNITY
+// ============================================================================
+
+model BetaTester {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+
+  // Status
+  status        String   @default("invited") // invited, active, completed
+  invitedAt     DateTime @default(now())
+  activatedAt   DateTime?
+
+  // Access
+  inviteCode    String?  @unique
+  accessLevel   String   @default("standard") // standard, extended, partner
+
+  // Feedback
+  notes         String?  // Internal notes about their testing focus
+  feedbackCount Int      @default(0)
+
+  // Relations
+  userId        String?  @unique // Connected user account when they sign up
+
+  @@index([email])
+  @@index([status])
+  @@index([invitedAt])
+}
