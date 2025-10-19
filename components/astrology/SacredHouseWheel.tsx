@@ -335,15 +335,16 @@ export function SacredHouseWheel({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            opacity: 0.4,
-            pointerEvents: 'none'
+            opacity: 0.25,
+            pointerEvents: 'none',
+            mixBlendMode: 'screen'
           }}>
             <SacredHoloflower
               size={300}
               showLabels={false}
               interactive={false}
               motionState="idle"
-              dimmed={true}
+              dimmed={false}
             />
           </div>
         </foreignObject>
