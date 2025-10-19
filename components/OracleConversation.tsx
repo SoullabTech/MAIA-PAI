@@ -1566,7 +1566,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed top-20 left-1/2 -translate-x-1/2 z-[30] flex items-center gap-2 bg-black/40 backdrop-blur-md rounded-full px-4 py-2"
+          className="fixed top-20 left-4 z-[30] flex items-center gap-2 bg-black/40 backdrop-blur-md rounded-full px-4 py-2"
         >
           <span className="text-xs text-amber-400/60 mr-2">Mode:</span>
           <button
