@@ -2436,7 +2436,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* Redesigned Bottom Icon Bar - Sacred Style - Always visible - Scrollable on mobile */}
       <div className="fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 pb-safe mb-2 overflow-x-auto overflow-y-hidden
-                      md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 md:ml-12 md:overflow-x-visible"
+                      md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 md:ml-24 md:overflow-x-visible"
            style={{
              WebkitOverflowScrolling: 'touch',
              scrollbarWidth: 'none',
