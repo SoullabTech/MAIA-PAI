@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star, Heart } from 'lucide-react';
+import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star, Heart, Home } from 'lucide-react';
+import { MiniHoloflower } from '@/components/holoflower/MiniHoloflower';
 
 /**
  * Unified Menu Bar
@@ -63,6 +64,25 @@ export function MenuBar() {
 
       {/* INSTRUMENT PANEL: Ancient-future navigation - Positioned left of sign out button */}
       <div className="flex fixed right-16 z-40 items-center gap-1.5 md:gap-2" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 3.5rem)' }}>
+
+      {/* Home - Holoflower Seed of Life */}
+      <Link
+        href="/"
+        className="group relative"
+        aria-label="Home - Return to Center"
+      >
+        <div className="relative p-2 md:p-2.5 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30 flex items-center justify-center">
+          <div className="w-3.5 h-3.5 md:w-4 md:h-4">
+            <MiniHoloflower size={16} color="#FDB713" />
+          </div>
+
+          {/* Tooltip - Matte instrument label */}
+          <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Home
+          </span>
+        </div>
+      </Link>
+
       {/* MAIA Training Progress Icon */}
       <Link
         href="/maya/training"
