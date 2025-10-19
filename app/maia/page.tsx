@@ -18,9 +18,10 @@ import { WisdomJourneyDashboard } from '@/components/maya/WisdomJourneyDashboard
 import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
 import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { LogOut, Sparkles, Menu, X } from 'lucide-react';
+import { LogOut, Sparkles, Menu, X, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/auth/supabase-client';
+import { isIOSChrome } from '@/lib/utils/browserDetection';
 
 function getInitialUserData() {
   if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
@@ -65,6 +66,7 @@ export default function MAIAPage() {
   const [sessionId] = useState(() => Date.now().toString());
   const [showDashboard, setShowDashboard] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [showIOSChromeWarning, setShowIOSChromeWarning] = useState(false);
 
   const hasCheckedAuth = useRef(false);
 
@@ -137,6 +139,12 @@ export default function MAIAPage() {
   useEffect(() => {
     if (hasCheckedAuth.current) return;
     hasCheckedAuth.current = true;
+
+    // Detect iOS Chrome (voice won't work)
+    if (isIOSChrome()) {
+      setShowIOSChromeWarning(true);
+      console.warn('⚠️ [MAIA] iOS Chrome detected - voice input not supported. Recommend using Safari.');
+    }
 
     // Check Supabase session FIRST
     const checkSupabaseAuth = async () => {
@@ -222,6 +230,38 @@ export default function MAIAPage() {
   return (
     <ErrorBoundary>
       <div className="h-screen bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 flex flex-col overflow-hidden">
+        {/* iOS Chrome Warning Banner */}
+        <AnimatePresence>
+          {showIOSChromeWarning && (
+            <motion.div
+              initial={{ y: -100, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -100, opacity: 0 }}
+              className="relative z-50 bg-amber-500/10 border-b border-amber-500/30 backdrop-blur-sm"
+            >
+              <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3 flex-1">
+                  <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-sm text-amber-200 font-medium">
+                      Voice input doesn't work in Chrome on iPhone
+                    </p>
+                    <p className="text-xs text-amber-300/80 mt-0.5">
+                      Please use Safari for voice conversations with MAIA, or use text chat
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowIOSChromeWarning(false)}
+                  className="p-1.5 hover:bg-amber-500/20 rounded-lg transition-colors flex-shrink-0"
+                >
+                  <X className="w-4 h-4 text-amber-400" />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* DREAM-WEAVER SYSTEM - Combined Header & Banner */}
         <div className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/10 backdrop-blur-sm">
           {/* Spice particle effect - very subtle movement */}
