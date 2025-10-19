@@ -656,19 +656,45 @@ export function SacredHouseWheel({
           <g opacity="0.25">
             {/* TORUS FUNNEL - Consciousness Vortex (Elemental Alchemy book cover inspired) */}
             <g>
-              {/* Top funnel (golden/fire - descending) */}
+              {/* Top funnel (golden/fire - descending) - ENHANCED for book cover glow */}
               <defs>
                 <radialGradient id="topFunnelGradient" cx="50%" cy="50%">
-                  <stop offset="0%" stopColor="#F5A362" stopOpacity="0.4" />
-                  <stop offset="50%" stopColor="#D4AF37" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#C8A572" stopOpacity="0.1" />
+                  <stop offset="0%" stopColor="#F5A362" stopOpacity="0.6" />
+                  <stop offset="50%" stopColor="#D4AF37" stopOpacity="0.4" />
+                  <stop offset="100%" stopColor="#C8A572" stopOpacity="0.2" />
                 </radialGradient>
                 <radialGradient id="bottomFunnelGradient" cx="50%" cy="50%">
-                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.4" />
-                  <stop offset="50%" stopColor="#6B9BD1" stopOpacity="0.25" />
-                  <stop offset="100%" stopColor="#8BADD6" stopOpacity="0.1" />
+                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.6" />
+                  <stop offset="50%" stopColor="#6B9BD1" stopOpacity="0.4" />
+                  <stop offset="100%" stopColor="#8BADD6" stopOpacity="0.2" />
+                </radialGradient>
+                {/* Outer glow for cosmic dragonfly effect */}
+                <radialGradient id="torusGlowGradient" cx="50%" cy="50%">
+                  <stop offset="0%" stopColor="#D4AF37" stopOpacity="0" />
+                  <stop offset="40%" stopColor="#F5A362" stopOpacity="0.15" />
+                  <stop offset="70%" stopColor="#8B5CF6" stopOpacity="0.1" />
+                  <stop offset="100%" stopColor="#6B9BD1" stopOpacity="0" />
                 </radialGradient>
               </defs>
+
+              {/* Outer luminous glow - cosmic dragonfly aura */}
+              <motion.circle
+                cx="200"
+                cy="200"
+                r="160"
+                fill="url(#torusGlowGradient)"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{
+                  scale: [0.9, 1.1, 0.9],
+                  opacity: [0.3, 0.6, 0.3]
+                }}
+                transition={{
+                  duration: 12,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                style={{ transformOrigin: '200px 200px' }}
+              />
 
               {/* Radial grid lines emanating from center - top funnel */}
               {[...Array(24)].map((_, i) => {
@@ -688,12 +714,12 @@ export function SacredHouseWheel({
                     x2={x2}
                     y2={y2}
                     stroke="#F5A362"
-                    strokeWidth="0.3"
-                    strokeOpacity="0.2"
+                    strokeWidth="0.5"
+                    strokeOpacity="0.35"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={{
                       pathLength: [0, 1, 0],
-                      opacity: [0, 0.3, 0]
+                      opacity: [0, 0.5, 0]
                     }}
                     transition={{
                       duration: 8,
@@ -723,12 +749,12 @@ export function SacredHouseWheel({
                     x2={x2}
                     y2={y2}
                     stroke="#8B5CF6"
-                    strokeWidth="0.3"
-                    strokeOpacity="0.15"
+                    strokeWidth="0.5"
+                    strokeOpacity="0.3"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={{
                       pathLength: [0, 1, 0],
-                      opacity: [0, 0.25, 0]
+                      opacity: [0, 0.45, 0]
                     }}
                     transition={{
                       duration: 10,
@@ -740,7 +766,7 @@ export function SacredHouseWheel({
                 );
               })}
 
-              {/* Concentric circles showing torus rings */}
+              {/* Concentric circles showing torus rings - ENHANCED */}
               {[15, 25, 35, 50, 65].map((radius, i) => (
                 <motion.circle
                   key={`torus-ring-${i}`}
@@ -749,13 +775,13 @@ export function SacredHouseWheel({
                   r={radius}
                   fill="none"
                   stroke={i < 3 ? "#F5A362" : "#8B5CF6"}
-                  strokeWidth="0.5"
-                  strokeOpacity="0.15"
+                  strokeWidth="0.8"
+                  strokeOpacity="0.3"
                   strokeDasharray="2,3"
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{
                     scale: [0.9, 1.1, 0.9],
-                    opacity: [0.1, 0.2, 0.1]
+                    opacity: [0.2, 0.4, 0.2]
                   }}
                   transition={{
                     duration: 6 + i,
@@ -767,7 +793,7 @@ export function SacredHouseWheel({
                 />
               ))}
 
-              {/* Top funnel ellipse (perspective view) */}
+              {/* Top funnel ellipse (perspective view) - ENHANCED glow */}
               <motion.ellipse
                 cx="200"
                 cy="200"
@@ -775,22 +801,22 @@ export function SacredHouseWheel({
                 ry="25"
                 fill="url(#topFunnelGradient)"
                 stroke="#F5A362"
-                strokeWidth="0.8"
-                strokeOpacity="0.3"
+                strokeWidth="1.2"
+                strokeOpacity="0.5"
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{
                   scale: [0.8, 1.05, 0.8],
-                  opacity: [0.2, 0.4, 0.2]
+                  opacity: [0.4, 0.7, 0.4]
                 }}
                 transition={{
                   duration: 7,
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
-                style={{ transformOrigin: '200px 200px' }}
+                style={{ transformOrigin: '200px 200px', filter: 'blur(1px)' }}
               />
 
-              {/* Bottom funnel ellipse (perspective view) */}
+              {/* Bottom funnel ellipse (perspective view) - ENHANCED glow */}
               <motion.ellipse
                 cx="200"
                 cy="200"
@@ -798,12 +824,12 @@ export function SacredHouseWheel({
                 ry="25"
                 fill="url(#bottomFunnelGradient)"
                 stroke="#8B5CF6"
-                strokeWidth="0.8"
-                strokeOpacity="0.25"
+                strokeWidth="1.2"
+                strokeOpacity="0.45"
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{
                   scale: [0.8, 1.08, 0.8],
-                  opacity: [0.15, 0.35, 0.15]
+                  opacity: [0.35, 0.65, 0.35]
                 }}
                 transition={{
                   duration: 9,
@@ -811,24 +837,41 @@ export function SacredHouseWheel({
                   ease: 'easeInOut',
                   delay: 1,
                 }}
-                style={{ transformOrigin: '200px 200px' }}
+                style={{ transformOrigin: '200px 200px', filter: 'blur(1px)' }}
               />
 
-              {/* Center portal (the throat of the torus) */}
+              {/* Center portal (the throat of the torus) - ENHANCED golden glow */}
               <motion.circle
                 cx="200"
                 cy="200"
-                r="8"
-                fill="none"
+                r="12"
+                fill="#D4AF37"
+                fillOpacity="0.2"
                 stroke="#D4AF37"
-                strokeWidth="1.5"
+                strokeWidth="2"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{
-                  scale: [1, 1.3, 1],
-                  opacity: [0.6, 0.9, 0.6]
+                  scale: [1, 1.4, 1],
+                  opacity: [0.7, 1, 0.7]
                 }}
                 transition={{
                   duration: 5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                style={{ filter: 'blur(0.5px)' }}
+              />
+              {/* Inner bright core */}
+              <motion.circle
+                cx="200"
+                cy="200"
+                r="4"
+                fill="#D4AF37"
+                animate={{
+                  opacity: [0.8, 1, 0.8]
+                }}
+                transition={{
+                  duration: 3,
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
