@@ -1643,9 +1643,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </motion.div>
       )}
 
-      {/* Subtle Holoflower - Lower position, not dominating */}
+      {/* Subtle Holoflower - Upper position (top 1/8th of screen) */}
       <motion.div
-        className="fixed top-32 md:top-28 lg:top-24 left-1/2 -translate-x-1/2 z-[25] cursor-pointer opacity-60 hover:opacity-80 transition-opacity"
+        className="fixed top-16 md:top-12 lg:top-10 left-1/2 -translate-x-1/2 z-[25] cursor-pointer opacity-60 hover:opacity-80 transition-opacity"
         onClick={async (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -2063,21 +2063,21 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         />
       )}
 
-      {/* Message flow - Star Wars crawl: text flows from beneath holoflower */}
+      {/* Message flow - Star Wars crawl: text flows from beneath holoflower, stays above bottom 1/8th */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
-        <div className={`fixed top-60 sm:top-64 md:top-60 lg:top-56 z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
+        <div className={`fixed top-36 sm:top-32 md:top-28 z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
           showChatInterface
             ? 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[600px] lg:w-[680px] xl:w-[720px] opacity-100'
             : 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[520px] lg:w-[560px] opacity-70'
         }`}
              style={{
                height: showChatInterface
-                 ? 'calc(100vh - 280px)'
-                 : 'calc(100vh - 240px)',
+                 ? 'calc(100vh - 320px)'
+                 : 'calc(100vh - 280px)',
                maxHeight: showChatInterface
-                 ? 'calc(100vh - 280px)'
-                 : 'calc(100vh - 240px)',
-               bottom: showChatInterface ? '140px' : '120px',
+                 ? 'calc(100vh - 320px)'
+                 : 'calc(100vh - 280px)',
+               bottom: showChatInterface ? '160px' : '140px',
                overflow: 'hidden'
              }}>
           <div className="h-full overflow-y-scroll overflow-x-hidden pr-2 mobile-scroll"
