@@ -12,66 +12,80 @@ async function addKaraToBeta() {
   console.log('🌸 Adding Kara Lynn Pylant to beta testers...');
 
   const email = 'karapylant@outlook.com';
-  const betaAccessCode = 'MAIA-BETA-KARA-' + Date.now();
+  const explorerName = 'Kara Lynn Pylant';
+  const invitationCode = 'SOULLAB-KARA';
 
   try {
-    // Check if user already exists
-    const { data: existingUser, error: checkError } = await supabase
-      .from('users')
+    // Check if explorer already exists
+    const { data: existingExplorer, error: checkError } = await supabase
+      .from('explorers')
       .select('*')
       .eq('email', email)
-      .single();
+      .maybeSingle();
 
-    if (existingUser && !checkError) {
-      console.log('✅ User already exists in the system!');
-      console.log('User ID:', existingUser.id);
-      console.log('Email:', existingUser.email);
-      console.log('Existing Beta Code:', existingUser.beta_access_code);
-
-      // Update beta access code if needed
-      if (!existingUser.beta_access_code) {
-        const { data: updatedUser, error: updateError } = await supabase
-          .from('users')
-          .update({
-            beta_access_code: betaAccessCode,
-            sacred_name: existingUser.sacred_name || 'Kara',
-            user_intention: existingUser.user_intention || 'Beta tester',
-            updated_at: new Date().toISOString()
-          })
-          .eq('email', email)
-          .select();
-
-        if (updateError) {
-          console.error('❌ Error updating user:', updateError);
-        } else {
-          console.log('✅ Updated user with beta access code:', betaAccessCode);
-        }
-      }
+    if (existingExplorer) {
+      console.log('✅ Explorer already exists in the system!');
+      console.log('Explorer ID:', existingExplorer.explorer_id);
+      console.log('Explorer Name:', existingExplorer.explorer_name);
+      console.log('Email:', existingExplorer.email);
+      console.log('Invitation Code:', existingExplorer.invitation_code);
+      console.log('Status:', existingExplorer.status);
     } else {
-      // Create new user with beta access
+      // Create new explorer
       const { data, error } = await supabase
-        .from('users')
+        .from('explorers')
         .insert({
+          explorer_name: explorerName,
           email,
-          sacred_name: 'Kara',
-          beta_access_code: betaAccessCode,
-          user_intention: 'Beta tester',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          invitation_code: invitationCode,
+          agreement_accepted: false,
+          signup_date: new Date().toISOString(),
+          status: 'active',
+          week_number: 1,
+          arc_level: 1,
+          session_count: 0
         })
         .select();
 
       if (error) {
-        console.error('❌ Error adding user:', error);
+        console.error('❌ Error adding explorer:', error);
         throw error;
       }
 
       console.log('✅ Kara Lynn Pylant added to beta testers!');
-      console.log('User ID:', data[0].id);
-      console.log('Beta Access Code:', betaAccessCode);
-      console.log('📧 Send Kara this invite link:');
-      console.log(`https://soullab.life/welcome?code=${betaAccessCode}`);
+      console.log('Explorer ID:', data[0].explorer_id);
+      console.log('Explorer Name:', data[0].explorer_name);
+      console.log('Invitation Code:', invitationCode);
+      console.log('📧 Kara can now sign up with passcode: SOULLAB-KARA');
     }
+
+    // Also add to beta_users table for email tracking
+    const { data: existingBetaUser } = await supabase
+      .from('beta_users')
+      .select('*')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (!existingBetaUser) {
+      const { data: betaUser, error: betaError } = await supabase
+        .from('beta_users')
+        .insert({
+          email,
+          timezone: 'America/New_York', // Default, can be updated
+          privacy_mode: 'sanctuary',
+          created_at: new Date().toISOString(),
+          consent_date: new Date().toISOString(),
+          evolution_level: 1.0,
+          session_count: 0
+        })
+        .select();
+
+      if (!betaError) {
+        console.log('✅ Also added to beta_users table');
+        console.log('Beta User ID:', betaUser[0].id);
+      }
+    }
+
   } catch (error) {
     console.error('❌ Error:', error);
     process.exit(1);
