@@ -92,39 +92,39 @@ function AnimatedTorusField({ animate = true }: { animate?: boolean }) {
           size={0.02}
           color="#C1A880"
           transparent
-          opacity={0.20}
+          opacity={0.10}
           blending={THREE.AdditiveBlending}
         />
       </points>
 
-      {/* Outer torus (Universe) - cool sepia */}
+      {/* Outer torus (Universe) - cool sepia - VERY LIGHT */}
       <mesh ref={outerTorusRef} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[4, 0.15, 16, 100]} />
         <meshBasicMaterial
           color="#988C7C"
           transparent
-          opacity={0.15}
+          opacity={0.08}
           wireframe={false}
         />
       </mesh>
 
-      {/* Middle torus (Tree/Collective) - mid sepia */}
+      {/* Middle torus (Tree/Collective) - mid sepia - VERY LIGHT */}
       <mesh ref={middleTorusRef} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[3, 0.2, 16, 100]} />
         <meshBasicMaterial
           color="#A89D8E"
           transparent
-          opacity={0.25}
+          opacity={0.12}
         />
       </mesh>
 
-      {/* Inner torus (Apple/Personal) - warm sepia */}
+      {/* Inner torus (Apple/Personal) - warm sepia - VERY LIGHT */}
       <mesh ref={innerTorusRef} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[2, 0.25, 16, 100]} />
         <meshBasicMaterial
           color="#C9B896"
           transparent
-          opacity={0.35}
+          opacity={0.15}
         />
       </mesh>
 
