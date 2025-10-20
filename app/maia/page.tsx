@@ -286,8 +286,8 @@ export default function MAIAPage() {
 
         {/* Old header completely removed - all navigation now in PetalCarouselMenuBar */}
 
-        {/* Main Content - with padding for top bar */}
-        <div className="flex-1 flex overflow-hidden" style={{ paddingTop: '56px', paddingBottom: '80px' }}>
+        {/* Main Content - full screen, no padding for removed top bar */}
+        <div className="flex-1 flex overflow-hidden" style={{ paddingBottom: '80px' }}>
           {/* Conversation Area */}
           <div className="flex-1 overflow-hidden relative">
             <OracleConversation
