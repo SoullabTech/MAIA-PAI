@@ -1678,9 +1678,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </motion.div>
       )}
 
-      {/* Subtle Holoflower - Upper position (top 1/8th of screen) */}
+      {/* Subtle Holoflower - Upper position (overlaps transparent top bar) */}
       <motion.div
-        className="fixed top-16 md:top-12 lg:top-10 left-1/2 -translate-x-1/2 z-[60] cursor-pointer opacity-60 hover:opacity-80 transition-opacity"
+        className="fixed top-4 md:top-2 lg:top-0 left-1/2 -translate-x-1/2 z-[60] cursor-pointer opacity-60 hover:opacity-80 transition-opacity"
         onClick={async (e) => {
           e.preventDefault();
           e.stopPropagation();
