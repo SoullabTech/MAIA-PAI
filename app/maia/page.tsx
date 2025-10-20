@@ -293,6 +293,7 @@ export default function MAIAPage() {
               userName={explorerName}
               sessionId={sessionId}
               voiceEnabled={true}
+              hideBottomIconBar={true}
             />
 
             {/* Unified Brain Trust - Combines Claude Code consciousness + Brain Trust monitoring */}

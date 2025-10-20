@@ -49,6 +49,7 @@ interface OracleConversationProps {
   initialCheckIns?: Record<string, number>;
   showAnalytics?: boolean;
   voiceEnabled?: boolean;
+  hideBottomIconBar?: boolean; // Hide bottom icon bar when using external navigation (e.g., PetalCarouselMenuBar)
   onMessageAdded?: (message: ConversationMessage) => void;
   onSessionEnd?: (reason?: string) => void;
 }
@@ -88,6 +89,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   initialCheckIns = {},
   showAnalytics = false,
   voiceEnabled = true,
+  hideBottomIconBar = false,
   onMessageAdded,
   onSessionEnd
 }) => {
@@ -2434,6 +2436,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       )}
 
       {/* Redesigned Bottom Icon Bar - Sacred Style - Always visible - Scrollable on mobile */}
+      {!hideBottomIconBar && (
       <div className="fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 pb-safe mb-2 overflow-x-auto overflow-y-hidden
                       md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 md:ml-24 md:overflow-x-visible"
            style={{
@@ -2752,6 +2755,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           </button>
         </div>
       </div>
+      )}
 
       {/* Floating Quick Settings Button */}
       {/* QuickSettingsButton removed - now in bottom nav bar */}

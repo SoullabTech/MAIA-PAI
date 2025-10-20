@@ -61,7 +61,7 @@ export function PetalCarouselMenuBar() {
       localStorage.setItem('beta_user', JSON.stringify(profileData));
     }
 
-    router.push('/auth');
+    router.push('/maia');
   };
 
   const hideCommunityLink = pathname?.startsWith('/community');

@@ -184,6 +184,26 @@
       "name": "Kara",
       "email": "karapylant@outlook.com",
       "passcode": "SOULLAB-KARA"
+    },
+    {
+      "name": "Christian",
+      "email": "cl@spiraldynamik.com",
+      "passcode": "SOULLAB-CHRISTIAN"
+    },
+    {
+      "name": "Claudia",
+      "email": "claudia.bayuelo@studiolabs.com",
+      "passcode": "SOULLAB-CLAUDIA"
+    },
+    {
+      "name": "Stephanie",
+      "email": "stephanie@schoss.com",
+      "passcode": "SOULLAB-STEPHANIE"
+    },
+    {
+      "name": "Nicole",
+      "email": "nicolecasbarro@gmail.com",
+      "passcode": "SOULLAB-NICOLE"
     }
   ]
 }
