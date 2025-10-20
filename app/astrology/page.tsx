@@ -558,7 +558,7 @@ export default function AstrologyPage() {
       />
 
       {/* Content */}
-      <div className="relative z-10 w-full mx-auto px-0 sm:px-2 md:px-4 pt-1 md:pt-8 pb-12">
+      <div className="relative z-10 w-full mx-auto px-0 sm:px-2 md:px-4 pt-1 md:pt-8 pb-32">
 
         {/* Header - Spiralogic Evolutionary Report - HIDE ON MOBILE */}
         <motion.div
