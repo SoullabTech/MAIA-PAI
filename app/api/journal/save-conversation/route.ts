@@ -9,32 +9,37 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   try {
-    // Get auth token from header
+    const { messages, userId, conversationId, sessionId } = await req.json();
+
+    // Get auth token from header (optional for beta users)
     const authHeader = req.headers.get('authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
-      console.error('❌ [API] Missing or invalid Authorization header');
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+    let authenticatedUserId: string | null = null;
+
+    // Try Supabase authentication first
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+      if (user) {
+        authenticatedUserId = user.id;
+        console.log('✅ [API] Supabase user authenticated:', authenticatedUserId);
+      } else {
+        console.warn('⚠️ [API] Invalid Supabase token:', authError?.message);
+      }
     }
 
-    const token = authHeader.substring(7);
-
-    // Verify the session and get authenticated user
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user) {
-      console.error('❌ [API] Invalid auth token:', authError);
-      return NextResponse.json(
-        { error: 'Invalid or expired session' },
-        { status: 401 }
-      );
+    // Fall back to userId from request body for beta users
+    if (!authenticatedUserId) {
+      if (!userId) {
+        console.error('❌ [API] No authentication and no userId provided');
+        return NextResponse.json(
+          { error: 'Authentication or userId required' },
+          { status: 401 }
+        );
+      }
+      authenticatedUserId = userId;
+      console.log('📦 [API] Using beta localStorage userId:', authenticatedUserId);
     }
-
-    const authenticatedUserId = user.id;
-
-    const { messages, conversationId, sessionId } = await req.json();
 
     console.log('📝 [API] save-conversation called', {
       messageCount: messages?.length,
@@ -63,46 +68,85 @@ export async function POST(req: NextRequest) {
       hasInsight: !!essence.coreInsight
     });
 
-    // Store in the journal_entries table
-    // Schema uses: user_id (not oracle_agent_id)
-    console.log('💾 [API] Saving to Supabase journal_entries...');
+    // Check if user ID is a valid UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const isUUID = uuidRegex.test(authenticatedUserId);
 
-    const { data, error } = await supabase
-      .from('journal_entries')
-      .insert({
-        user_id: authenticatedUserId,  // ✅ Using authenticated user ID from token
-        title: essence.title || 'Conversation Reflection',
-        content: essence.synthesizedEntry,
-        entry_type: 'reflection',
-        elemental_focus: determineElement(essence.elementalSignature),
-        ritual_practice: 'conversation',
-        is_private: true
-      })
-      .select()
-      .single();
+    // For UUID users, check if they exist in the database
+    let isSupabaseUser = false;
+    if (isUUID) {
+      const { data: userExists } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', authenticatedUserId)
+        .single();
 
-    if (error) {
-      console.error('❌ [journal.save] insert failed', {
-        code: error.code,
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        userId,
-        hasContent: !!essence.synthesizedEntry,
-      });
-      return NextResponse.json(
-        { ok: false, error: error.message, details: error.details },
-        { status: 400 }
-      );
+      isSupabaseUser = !!userExists;
+      console.log(`🔍 [API] UUID user ${authenticatedUserId} exists in DB:`, isSupabaseUser);
     }
 
-    console.log('✅ [journal.save] Entry saved successfully:', data.id);
-    return NextResponse.json({
-      ok: true,
-      success: true,
-      entry: data,
-      essence
-    });
+    if (isSupabaseUser) {
+      // Store in the journal_entries table for authenticated Supabase users
+      console.log('💾 [API] Saving to Supabase journal_entries...');
+
+      const { data, error } = await supabase
+        .from('journal_entries')
+        .insert({
+          user_id: authenticatedUserId,
+          title: essence.title || 'Conversation Reflection',
+          content: essence.synthesizedEntry,
+          entry_type: 'reflection',
+          elemental_focus: determineElement(essence.elementalSignature),
+          ritual_practice: 'conversation',
+          is_private: true
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('❌ [journal.save] insert failed', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          authenticatedUserId,
+          hasContent: !!essence.synthesizedEntry,
+        });
+        return NextResponse.json(
+          { ok: false, error: error.message, details: error.details },
+          { status: 400 }
+        );
+      }
+
+      console.log('✅ [journal.save] Entry saved successfully:', data.id);
+      return NextResponse.json({
+        ok: true,
+        success: true,
+        entry: data,
+        essence,
+        storageType: 'supabase'
+      });
+    } else {
+      // Return essence for client-side localStorage storage (beta users)
+      console.log('📦 [API] Returning essence for localStorage storage (beta user)');
+      return NextResponse.json({
+        ok: true,
+        success: true,
+        essence,
+        storageType: 'localStorage',
+        entry: {
+          id: `local_${Date.now()}`,
+          user_id: authenticatedUserId,
+          title: essence.title || 'Conversation Reflection',
+          content: essence.synthesizedEntry,
+          entry_type: 'reflection',
+          elemental_focus: determineElement(essence.elementalSignature),
+          ritual_practice: 'conversation',
+          is_private: true,
+          created_at: new Date().toISOString()
+        }
+      });
+    }
   } catch (error: any) {
     console.error('Error in save-conversation endpoint:', error);
     return NextResponse.json(

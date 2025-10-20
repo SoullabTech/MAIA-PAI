@@ -682,14 +682,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     setIsSavingJournal(true);
 
     try {
-      // Get authenticated session
+      // Try to get authenticated session (optional for beta users)
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-      if (sessionError || !session) {
-        console.error('❌ [Journal] Failed to get auth session:', sessionError);
-        toast.error('Please sign in again to save journal entries');
-        return;
-      }
 
       // Convert messages to the format expected by the extractor
       const conversationMessages = messages.map(msg => ({
@@ -702,15 +696,22 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         messageCount: conversationMessages.length,
         userId,
         sessionId,
-        hasAuthToken: !!session.access_token
+        hasAuthToken: !!session?.access_token,
+        authMethod: session ? 'supabase' : 'beta_localStorage'
       });
+
+      // Build headers - include auth token only if available
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json'
+      };
+
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
 
       const response = await fetch('/api/journal/save-conversation', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
+        headers,
         body: JSON.stringify({
           messages: conversationMessages,
           userId,
@@ -730,10 +731,27 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       const data = await response.json();
       console.log('✅ [Journal] Successfully saved:', data);
 
+      // Handle localStorage storage for beta users
+      if (data.storageType === 'localStorage') {
+        console.log('💾 [Journal] Storing in localStorage for beta user');
+        try {
+          const journalEntries = JSON.parse(localStorage.getItem('journal_entries') || '[]');
+          journalEntries.unshift(data.entry); // Add to beginning
+          localStorage.setItem('journal_entries', JSON.stringify(journalEntries));
+          console.log('✅ [Journal] Saved to localStorage:', data.entry.id);
+        } catch (storageError) {
+          console.error('❌ [Journal] localStorage save failed:', storageError);
+        }
+      }
+
       toast.success(
         <div>
           <div className="font-semibold">{data.essence?.title || 'Journal Entry Saved'}</div>
-          <div className="text-sm text-white/70">Saved to your journal</div>
+          <div className="text-sm text-white/70">
+            {data.storageType === 'localStorage'
+              ? 'Saved locally to your device'
+              : 'Saved to your journal'}
+          </div>
         </div>,
         { duration: 4000 }
       );
@@ -745,7 +763,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         userId,
         sessionId,
         messageCount: messages.length,
-        title: data.essence.title
+        title: data.essence.title,
+        storageType: data.storageType
       });
     } catch (error: any) {
       console.error('❌ [Journal] Error saving journal entry:', error);
