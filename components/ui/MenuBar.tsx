@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { MessageCircle, Users, Brain, MessageSquare, Settings, Star, Heart, LogOut, ChevronUp, ChevronDown } from 'lucide-react';
 import { MiniHoloflower } from '@/components/holoflower/MiniHoloflower';
 import { supabase } from '@/lib/auth/supabase-client';
@@ -14,11 +14,11 @@ import { supabase } from '@/lib/auth/supabase-client';
  * Bottom collapsible panel: Everything else
  */
 export function MenuBar() {
-  const pathname = usePathname();
   const router = useRouter();
+  const pathname = usePathname();
+  const [isBottomMenuOpen, setIsBottomMenuOpen] = useState(false);
   const [trainingProgress] = useState(0); // TODO: Connect to actual training data
   const [showRotateHint, setShowRotateHint] = useState(true);
-  const [isBottomMenuOpen, setIsBottomMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     // Preserve user profile data (birthday, name, intention, birthData) before clearing session
@@ -59,8 +59,8 @@ export function MenuBar() {
       localStorage.setItem('beta_user', JSON.stringify(profileData));
     }
 
-    // Redirect to auth page where they can easily log back in
-    router.push('/auth');
+    // Redirect to maia
+    router.push('/maia');
   };
 
   // Don't show on community pages
@@ -101,7 +101,7 @@ export function MenuBar() {
             <div className="w-8 h-8 md:w-9 md:h-9">
               <MiniHoloflower size={36} />
             </div>
-            <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-amber-600 text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
               Home
             </span>
           </div>
@@ -115,7 +115,7 @@ export function MenuBar() {
         >
           <div className="relative p-2 md:p-2.5 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30 flex items-center justify-center">
             <LogOut className="w-4 h-4 md:w-5 md:h-5 text-amber-400 group-hover:text-amber-300 transition-colors" />
-            <span className="absolute -bottom-8 right-0 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-amber-600 text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
               Sign Out
             </span>
           </div>
@@ -155,7 +155,7 @@ export function MenuBar() {
                     className="transition-all duration-500"
                   />
                 </svg>
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-amber-600 text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                   Training
                 </span>
               </div>
@@ -170,7 +170,7 @@ export function MenuBar() {
             >
               <div className="p-2.5 md:p-3 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30">
                 <Star className="w-5 h-5 md:w-6 md:h-6 text-amber-400 transition-all group-hover:text-amber-300" />
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-amber-600 text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                   Chart
                 </span>
               </div>
@@ -186,7 +186,7 @@ export function MenuBar() {
               >
                 <div className="p-2.5 md:p-3 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30">
                   <Users className="w-5 h-5 md:w-6 md:h-6 text-amber-400 transition-all group-hover:text-amber-300" />
-                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-amber-600 text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                     Circle
                   </span>
                 </div>
@@ -203,7 +203,7 @@ export function MenuBar() {
               >
                 <div className="p-2.5 md:p-3 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30">
                   <Heart className="w-5 h-5 md:w-6 md:h-6 text-amber-400 transition-all group-hover:text-amber-300" />
-                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-amber-600 text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                     Partners
                   </span>
                 </div>
@@ -219,7 +219,7 @@ export function MenuBar() {
             >
               <div className="p-2.5 md:p-3 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30">
                 <Settings className="w-5 h-5 md:w-6 md:h-6 text-amber-400 transition-all group-hover:rotate-45 group-hover:text-amber-300" />
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-amber-600 text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                   Settings
                 </span>
               </div>
@@ -237,7 +237,7 @@ export function MenuBar() {
             >
               <div className="p-2.5 md:p-3 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30">
                 <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-amber-400 transition-all group-hover:text-amber-300" />
-                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-dune-deep-sand text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-dune-spice-sand/95 text-amber-600 text-[10px] tracking-archive px-2 py-1 rounded border border-dune-sienna-rock/40 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
                   Feedback
                 </span>
               </div>

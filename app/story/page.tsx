@@ -18,7 +18,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Edit3, History, Sparkles, Plus, CheckCircle, MessageCircle } from 'lucide-react';
+import { BookOpen, Edit3, History, Sparkles, Plus, CheckCircle, MessageCircle, HelpCircle } from 'lucide-react';
 import { StoryAPI } from '@/lib/story/storyAPI';
 
 // Mock data for development - will connect to real data
@@ -77,6 +77,9 @@ export default function StoryPage() {
   const [memberNote, setMemberNote] = useState('');
   const [isRevising, setIsRevising] = useState(false);
   const [isApproving, setIsApproving] = useState(false);
+
+  // Guided tour state
+  const [showGuidedTour, setShowGuidedTour] = useState(false);
 
   // Handler functions for co-authorship
   const handleAddNote = async () => {
@@ -288,6 +291,21 @@ export default function StoryPage() {
             She listens with archetypal ears. Asks questions informed by the cosmos.
             Weaves your story across time. You lived it. She saw it. Together you author it.
           </p>
+
+          {/* Help Icon - Guided Tour */}
+          <button
+            onClick={() => setShowGuidedTour(true)}
+            className="mt-4 mx-auto flex items-center gap-2 px-4 py-2 rounded-lg transition-all hover:scale-105"
+            style={{
+              background: 'rgba(212, 175, 55, 0.2)',
+              border: '1px solid rgba(212, 175, 55, 0.4)',
+              color: '#6B4423',
+            }}
+          >
+            <HelpCircle className="w-4 h-4" />
+            <span className="text-sm font-serif">How does this work?</span>
+          </button>
+
           <div className="mt-6 flex items-center justify-center gap-4 text-sm">
             <button
               onClick={() => setView('narrative')}
@@ -603,6 +621,216 @@ export default function StoryPage() {
           </motion.div>
         )}
       </div>
+
+      {/* Guided Tour Modal */}
+      <AnimatePresence>
+        {showGuidedTour && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{
+              background: 'rgba(0, 0, 0, 0.85)',
+              backdropFilter: 'blur(8px)',
+            }}
+            onClick={() => setShowGuidedTour(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="max-w-2xl w-full rounded-2xl border p-8 max-h-[90vh] overflow-y-auto"
+              style={{
+                background: 'linear-gradient(135deg, rgba(255, 248, 240, 0.98) 0%, rgba(245, 235, 220, 0.98) 100%)',
+                borderColor: 'rgba(139, 111, 71, 0.3)',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.15)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="text-center mb-6">
+                <BookOpen className="w-12 h-12 mx-auto mb-4" style={{ color: '#8B6F47' }} />
+                <h2 className="text-3xl font-serif mb-2" style={{ color: '#6B4423' }}>
+                  Sacred Scribe
+                </h2>
+                <p className="text-sm italic" style={{ color: '#8B7355' }}>
+                  Co-authoring your living mythology with MAIA
+                </p>
+              </div>
+
+              {/* Scrollable Content */}
+              <div className="space-y-6 text-left">
+                {/* What is this? */}
+                <div>
+                  <h3 className="text-lg font-serif font-semibold mb-2" style={{ color: '#6B4423' }}>
+                    📖 What is Sacred Scribe?
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: '#5A4A3A' }}>
+                    This is your <strong>living mythology</strong> - an evolving narrative that grows as you grow.
+                    Not a static reading, but a co-authored story where MAIA (your Sacred Scribe) helps you
+                    weave your experiences into a coherent, archetypal journey.
+                  </p>
+                </div>
+
+                {/* The Process */}
+                <div>
+                  <h3 className="text-lg font-serif font-semibold mb-3" style={{ color: '#6B4423' }}>
+                    ✨ How it Works
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'rgba(184, 147, 92, 0.2)', color: '#6B4423' }}>
+                        1
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm" style={{ color: '#6B4423' }}>MAIA Listens</p>
+                        <p className="text-xs" style={{ color: '#8B7355' }}>
+                          In your conversations, MAIA tracks patterns, themes, and threads across time
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'rgba(184, 147, 92, 0.2)', color: '#6B4423' }}>
+                        2
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm" style={{ color: '#6B4423' }}>MAIA Drafts</p>
+                        <p className="text-xs" style={{ color: '#8B7355' }}>
+                          She synthesizes your journey into poetic chapters, informed by archetypal wisdom
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'rgba(184, 147, 92, 0.2)', color: '#6B4423' }}>
+                        3
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm" style={{ color: '#6B4423' }}>You Refine</p>
+                        <p className="text-xs" style={{ color: '#8B7355' }}>
+                          Add notes, request revisions, approve chapters - you're the final author
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: 'rgba(184, 147, 92, 0.2)', color: '#6B4423' }}>
+                        4
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm" style={{ color: '#6B4423' }}>Story Evolves</p>
+                        <p className="text-xs" style={{ color: '#8B7355' }}>
+                          Your mythology grows chapter by chapter, documenting your transformation
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Chapters */}
+                <div>
+                  <h3 className="text-lg font-serif font-semibold mb-2" style={{ color: '#6B4423' }}>
+                    📚 Chapters
+                  </h3>
+                  <p className="text-sm leading-relaxed mb-2" style={{ color: '#5A4A3A' }}>
+                    Your story unfolds in chapters. Click any chapter to read, add notes, or request revisions.
+                  </p>
+                  <ul className="text-xs space-y-1 ml-4" style={{ color: '#8B7355' }}>
+                    <li>• <strong style={{ color: '#6B4423' }}>Genesis:</strong> Generated from your birth chart (auto-approved)</li>
+                    <li>• <strong style={{ color: '#6B4423' }}>Future Chapters:</strong> Co-written based on your MAIA conversations</li>
+                  </ul>
+                </div>
+
+                {/* Unfolding Threads */}
+                <div>
+                  <h3 className="text-lg font-serif font-semibold mb-2" style={{ color: '#6B4423' }}>
+                    🧵 Unfolding Threads
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: '#5A4A3A' }}>
+                    These are <strong>patterns MAIA tracks across time</strong>. When she notices recurring themes
+                    in your conversations (like "finding your voice" or "healing relationship wounds"),
+                    she creates a thread. These threads become the fabric of your story.
+                  </p>
+                </div>
+
+                {/* Views */}
+                <div>
+                  <h3 className="text-lg font-serif font-semibold mb-2" style={{ color: '#6B4423' }}>
+                    👁️ Two Views
+                  </h3>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="font-semibold text-sm" style={{ color: '#6B4423' }}>
+                        📖 Narrative View (Current)
+                      </p>
+                      <p className="text-xs" style={{ color: '#8B7355' }}>
+                        Read your chapters, add feedback, approve revisions - the co-authorship space
+                      </p>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm" style={{ color: '#6B4423' }}>
+                        📅 Timeline View
+                      </p>
+                      <p className="text-xs" style={{ color: '#8B7355' }}>
+                        See your journey chronologically - when chapters were created, major events, pattern emergence
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Edit Mode */}
+                <div>
+                  <h3 className="text-lg font-serif font-semibold mb-2" style={{ color: '#6B4423' }}>
+                    ✏️ Edit Mode
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: '#5A4A3A' }}>
+                    Click "Edit Mode" to add your feedback. MAIA will incorporate your notes into the next revision.
+                    You can request multiple revisions until the chapter resonates perfectly.
+                  </p>
+                </div>
+
+                {/* Next Steps */}
+                <div className="pt-4 border-t" style={{ borderColor: 'rgba(139, 111, 71, 0.2)' }}>
+                  <h3 className="text-lg font-serif font-semibold mb-2" style={{ color: '#6B4423' }}>
+                    🎯 Ready to Begin?
+                  </h3>
+                  <p className="text-sm leading-relaxed mb-4" style={{ color: '#5A4A3A' }}>
+                    Start by having conversations with MAIA. She'll listen, track patterns, and draft your next chapter
+                    when she senses enough material has emerged.
+                  </p>
+                  <a
+                    href="/maia"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-serif tracking-wide transition-all"
+                    style={{
+                      background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                      color: 'white',
+                      boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                    }}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Continue with MAIA</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setShowGuidedTour(false)}
+                className="mt-6 w-full px-6 py-3 rounded-lg text-sm font-serif tracking-wide transition-all"
+                style={{
+                  background: 'rgba(139, 111, 71, 0.1)',
+                  border: '1px solid rgba(139, 111, 71, 0.3)',
+                  color: '#6B4423',
+                }}
+              >
+                Got it, thanks!
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

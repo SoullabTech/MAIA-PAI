@@ -208,10 +208,10 @@ const houseStates = {
 
 // Elemental colors
 const elementalColors = {
-  fire: { day: '#C85450', night: '#F5A362', glow: 'rgba(200, 84, 80, 0.4)' },
-  water: { day: '#6B9BD1', night: '#8BADD6', glow: 'rgba(107, 155, 209, 0.4)' },
-  earth: { day: '#7A9A65', night: '#A8C69F', glow: 'rgba(122, 154, 101, 0.4)' },
-  air: { day: '#D4B896', night: '#E8D4BF', glow: 'rgba(212, 184, 150, 0.4)' },
+  fire: { day: '#C85450', night: '#F5A362', glow: 'rgba(200, 84, 80, 0.4)' },      // Red/Orange
+  water: { day: '#6B9BD1', night: '#8BADD6', glow: 'rgba(107, 155, 209, 0.4)' },   // Blue
+  earth: { day: '#7A9A65', night: '#A8C69F', glow: 'rgba(122, 154, 101, 0.4)' },   // Green
+  air: { day: '#E4C247', night: '#F5D565', glow: 'rgba(228, 194, 71, 0.4)' },      // Yellow
 };
 
 // Aspect geometry (angles in degrees)

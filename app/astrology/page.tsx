@@ -175,6 +175,12 @@ export default function AstrologyPage() {
   // Arrakis aesthetic - always desert night (the twin moons never set)
   const [isDayMode, setIsDayMode] = useState(false);
 
+  // Demo/Tutorial mode - toggle between user's chart and Kelly's example chart
+  const [showExampleChart, setShowExampleChart] = useState(false);
+
+  // Welcome modal for first-time users
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+
   useEffect(() => {
     // Force night mode for Arrakis aesthetic
     setIsDayMode(false);
@@ -296,6 +302,13 @@ export default function AstrologyPage() {
           earth: 0.20,
           air: 0.25,
         });
+
+        // Check if this is first time seeing their chart
+        const hasSeenWelcome = localStorage.getItem('hasSeenChartWelcome');
+        if (!hasSeenWelcome) {
+          setShowWelcomeModal(true);
+          localStorage.setItem('hasSeenChartWelcome', 'true');
+        }
       } else {
         console.error('Chart calculation failed:', result.error);
         alert('Failed to calculate birth chart. Please try again.');
@@ -575,7 +588,7 @@ export default function AstrologyPage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 1 }}
-          className={`rounded-none md:rounded-2xl p-0 sm:p-4 md:p-6 mb-2 sm:mb-4 backdrop-blur-md transition-all duration-500
+          className={`rounded-none md:rounded-2xl p-0 pb-0 sm:p-4 md:p-6 mb-2 sm:mb-4 backdrop-blur-md transition-all duration-500
             ${isDayMode
               ? 'bg-white/40 border border-stone-200/40'
               : 'bg-black/20 border border-stone-700/20'
@@ -584,13 +597,43 @@ export default function AstrologyPage() {
             boxShadow: `0 8px 32px ${isDayMode ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.3)'}`,
           }}
         >
-          <div className="text-center mb-1 sm:mb-3 hidden sm:block">
+          <div className="text-center mb-1 sm:mb-2 hidden sm:block">
             <h2 className={`text-lg sm:text-xl font-serif mb-1 ${isDayMode ? 'text-stone-800' : 'text-stone-200'}`}>
               Consciousness Field Map
             </h2>
-            <p className={`text-[10px] sm:text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic mb-2`}>
+            <p className={`text-[10px] sm:text-xs ${isDayMode ? 'text-stone-600' : 'text-stone-400'} font-serif italic mb-1`}>
               Soul-centric field instrument · Hover to reveal neural pathways and archetypal insights
             </p>
+
+            {/* Toggle and CTA buttons */}
+            <div className="flex items-center justify-center gap-3 mb-2">
+              {/* View Example Chart Toggle */}
+              <button
+                onClick={() => setShowExampleChart(!showExampleChart)}
+                className={`px-4 py-2 rounded-lg text-xs font-serif tracking-wide transition-all ${
+                  showExampleChart
+                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-stone-900'
+                    : 'bg-stone-800/40 text-stone-300 border border-stone-700/50'
+                }`}
+              >
+                {showExampleChart ? '👁️ Viewing Example (Kelly\'s Chart)' : '✨ View Example Chart'}
+              </button>
+
+              {/* Start Your Missions CTA */}
+              {!showExampleChart && (
+                <button
+                  onClick={() => window.location.href = '/maia'}
+                  className="px-4 py-2 rounded-lg text-xs font-serif tracking-wide transition-all"
+                  style={{
+                    background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                    color: 'white',
+                    boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
+                  }}
+                >
+                  🎯 Start Your Missions with MAIA
+                </button>
+              )}
+            </div>
             {/* Spiralogic Process Legend - Hide on mobile to save space */}
             <div className={`space-y-1 ${isDayMode ? 'text-stone-600' : 'text-stone-400'} hidden sm:block`}>
               <div className="flex items-center justify-center gap-4 text-[10px]">
@@ -610,11 +653,11 @@ export default function AstrologyPage() {
             </div>
           </div>
           {/* Sacred House Wheel with 3D Animated Torus (Apple/Tree of Life) */}
-          <div className="relative w-full mx-auto px-0">
-            {/* 3D Torus Field - Animated breathing torus - MAXIMUM SIZE on mobile */}
-            <div className="flex items-center justify-center w-full" style={{ aspectRatio: '1/1' }}>
+          <div className="relative w-full mx-auto px-0 pb-0">
+            {/* 3D Torus Field - Animated breathing torus - RESPONSIVE SIZE */}
+            <div className="flex items-center justify-center w-full pb-0" style={{ aspectRatio: '1/1' }}>
               <ConsciousnessFieldWithTorus
-                size={1300}
+                size={typeof window !== 'undefined' && window.innerWidth < 640 ? 600 : 1300}
                 showLabels={false}
                 animate={true}
               >
@@ -677,7 +720,7 @@ export default function AstrologyPage() {
                       aspects={chartData.aspects}
                       isDayMode={isDayMode}
                       showAspects={true}
-                      missions={KELLY_MISSIONS}
+                      missions={showExampleChart ? KELLY_MISSIONS : []}  // Show Kelly's missions in example mode
                     />
                 </div>
               </ConsciousnessFieldWithTorus>
@@ -1799,6 +1842,78 @@ export default function AstrologyPage() {
           </motion.p>
         </motion.div>
       </div>
+
+      {/* Welcome Modal - First-time chart viewers */}
+      {showWelcomeModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{
+            background: 'rgba(0, 0, 0, 0.85)',
+            backdropFilter: 'blur(8px)',
+          }}
+          onClick={() => setShowWelcomeModal(false)}
+        >
+          <motion.div
+            initial={{ scale: 0.9, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            className="max-w-lg w-full rounded-2xl border border-amber-500/30 p-8 text-center"
+            style={{
+              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(251, 191, 36, 0.15)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Holoflower icon */}
+            <div className="mb-6 flex justify-center">
+              <MiniHoloflower size={80} />
+            </div>
+
+            <h2 className="text-2xl font-serif mb-4 text-amber-300">
+              🎉 Your Consciousness Field Map is Ready!
+            </h2>
+
+            <p className="text-stone-300 mb-6 leading-relaxed">
+              This is your personal consciousness field - a living map of archetypal energies woven through your birth chart.
+            </p>
+
+            <p className="text-stone-400 text-sm mb-8 leading-relaxed">
+              Want a guided tour using Kelly's chart as an example? You'll see how mission dots work, how to read planetary nodes, and what the sacred geometry means.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => {
+                  setShowWelcomeModal(false);
+                  setShowExampleChart(true);
+                }}
+                className="px-6 py-3 rounded-lg font-serif tracking-wide transition-all"
+                style={{
+                  background: 'linear-gradient(135deg, #D4AF37 0%, #FFB84D 100%)',
+                  color: '#2C1810',
+                  boxShadow: '0 4px 20px rgba(212, 175, 55, 0.4)',
+                }}
+              >
+                Yes, show me how it works
+              </button>
+
+              <button
+                onClick={() => setShowWelcomeModal(false)}
+                className="px-6 py-3 rounded-lg font-serif tracking-wide transition-all backdrop-blur-md"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(212, 175, 55, 0.4)',
+                  color: '#E8D4BF',
+                }}
+              >
+                Explore on my own
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }

@@ -18,7 +18,8 @@ import { WisdomJourneyDashboard } from '@/components/maya/WisdomJourneyDashboard
 import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
 import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { LogOut, Sparkles, Menu, X, AlertCircle } from 'lucide-react';
+import { PetalCarouselMenuBar } from '@/components/ui/PetalCarouselMenuBar';
+import { X, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/auth/supabase-client';
 import { isIOSChrome } from '@/lib/utils/browserDetection';
@@ -228,9 +229,26 @@ export default function MAIAPage() {
     return <BetaOnboarding onComplete={handleOnboardingComplete} />;
   }
 
+  // Listen for Journey and Access Matrix events from PetalCarouselMenuBar
+  useEffect(() => {
+    const handleOpenJourney = () => setShowDashboard(true);
+    const handleOpenMatrix = () => setShowDashboard(true);
+
+    window.addEventListener('openJourneyDashboard', handleOpenJourney);
+    window.addEventListener('openAccessMatrix', handleOpenMatrix);
+
+    return () => {
+      window.removeEventListener('openJourneyDashboard', handleOpenJourney);
+      window.removeEventListener('openAccessMatrix', handleOpenMatrix);
+    };
+  }, []);
+
   return (
     <ErrorBoundary>
       <div className="h-screen bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 flex flex-col overflow-hidden">
+        {/* New Petal Carousel Menu Bar - Clean & Minimal Top, Carousel Bottom */}
+        <PetalCarouselMenuBar />
+
         {/* iOS Chrome Warning Banner */}
         <AnimatePresence>
           {showIOSChromeWarning && (
@@ -238,7 +256,8 @@ export default function MAIAPage() {
               initial={{ y: -100, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -100, opacity: 0 }}
-              className="relative z-50 bg-amber-500/10 border-b border-amber-500/30 backdrop-blur-sm"
+              className="relative z-40 bg-amber-500/10 border-b border-amber-500/30 backdrop-blur-sm"
+              style={{ marginTop: '56px' }} // Below the new top bar
             >
               <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3 flex-1">
@@ -263,158 +282,10 @@ export default function MAIAPage() {
           )}
         </AnimatePresence>
 
-        {/* DREAM-WEAVER SYSTEM - Combined Header & Banner */}
-        <div className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/10 backdrop-blur-sm">
-          {/* Spice particle effect - very subtle movement */}
-          <div className="absolute inset-0 opacity-5 pointer-events-none">
-            <motion.div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `radial-gradient(1px 1px at 20% 30%, amber 0%, transparent 50%),
-                                 radial-gradient(1px 1px at 60% 70%, amber 0%, transparent 50%),
-                                 radial-gradient(1px 1px at 80% 10%, amber 0%, transparent 50%)`,
-                backgroundSize: '50px 50px',
-              }}
-              animate={{
-                backgroundPosition: ['0% 0%', '100% 100%'],
-              }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-            />
-          </div>
+        {/* Old header completely removed - all navigation now in PetalCarouselMenuBar */}
 
-          {/* Holographic scan line - more transparent */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-600/3 to-transparent pointer-events-none"
-            animate={{
-              y: ['-100%', '200%'],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "linear",
-              repeatDelay: 3
-            }}
-          />
-
-          <div className="relative max-w-7xl mx-auto px-4 py-2">
-            <div className="flex items-center justify-between">
-              {/* Left side - SOULLAB branding */}
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <motion.div
-                    animate={{
-                      rotate: [0, 5, -5, 0],
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  >
-                    <Sparkles className="w-5 h-5 text-amber-400/80" />
-                  </motion.div>
-                  <div>
-                    <h1 className="text-sm font-bold text-white/90">SOUL​LAB</h1>
-                    <p className="text-[9px] text-stone-500">Beta Experience</p>
-                  </div>
-                </div>
-
-                {/* Dream Weaver indicator - smaller, inline */}
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-shrink-0">
-                    <div className="relative flex items-center justify-center w-4 h-4">
-                      <div className="absolute inset-0 border border-amber-700/20 rotate-45" />
-                      <motion.div
-                        className="absolute inset-0.5 bg-gradient-to-br from-amber-600/30 to-orange-700/30"
-                        animate={{
-                          rotate: [45, 405],
-                        }}
-                        transition={{
-                          duration: 10,
-                          repeat: Infinity,
-                          ease: "linear"
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-mono text-amber-600/50 tracking-[0.15em] uppercase">
-                      Dream Weaver
-                    </span>
-                    <motion.span
-                      className="text-[8px] font-mono text-amber-500/30"
-                      animate={{
-                        opacity: [0.3, 0.7, 0.3],
-                      }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    >
-                      ACTIVE
-                    </motion.span>
-                  </div>
-                  <span className="text-[9px] text-stone-600 hidden lg:block">
-                    Neural patterns emerging from dialogue
-                  </span>
-                </div>
-              </div>
-
-              {/* Right side - Actions */}
-              <div className="flex items-center gap-2">
-                {/* Journey button */}
-                <button
-                  onClick={() => setShowDashboard(!showDashboard)}
-                  className="px-3 py-1.5 rounded-lg bg-black/20 border border-amber-500/20 hover:bg-black/30 hover:border-amber-500/30 transition-all flex items-center gap-2 text-amber-400 hover:text-amber-300"
-                >
-                  <Menu className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline text-xs">Journey</span>
-                </button>
-
-                {/* Access Matrix button - cinematic style */}
-                <motion.button
-                  onClick={() => setShowDashboard(true)}
-                  className="relative group px-3 py-1.5 overflow-hidden flex-shrink-0"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="absolute inset-0 bg-black/10 border border-amber-700/10 group-hover:border-amber-600/20 transition-colors" />
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-600/5 to-transparent opacity-0 group-hover:opacity-100"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: '100%' }}
-                    transition={{ duration: 0.6 }}
-                  />
-                  <div className="relative flex items-center gap-2">
-                    <span className="text-[9px] font-mono text-amber-400/80 tracking-wider uppercase">
-                      Access Matrix
-                    </span>
-                    <svg className="w-3 h-3 transition-colors text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </div>
-                </motion.button>
-
-                {/* Sign out button */}
-                <button
-                  onClick={handleSignOut}
-                  className="p-1.5 rounded-lg hover:bg-white/5 transition-colors text-amber-400 hover:text-amber-300"
-                  title="Sign Out"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <div className="flex-1 flex overflow-hidden">
+        {/* Main Content - with padding for top bar */}
+        <div className="flex-1 flex overflow-hidden" style={{ paddingTop: '56px', paddingBottom: '80px' }}>
           {/* Conversation Area */}
           <div className="flex-1 overflow-hidden relative">
             <OracleConversation
