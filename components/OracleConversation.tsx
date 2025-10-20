@@ -731,9 +731,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       const data = await response.json();
       console.log('✅ [Journal] Successfully saved:', data);
 
-      // Handle localStorage storage for beta users
-      if (data.storageType === 'localStorage') {
-        console.log('💾 [Journal] Storing in localStorage for beta user');
+      // Handle localStorage storage for beta users OR as backup for Supabase users
+      if (data.storageType === 'localStorage' || data.localStorageBackup) {
+        console.log('💾 [Journal] Storing in localStorage',
+          data.storageType === 'localStorage' ? '(primary)' : '(backup)');
         try {
           const journalEntries = JSON.parse(localStorage.getItem('journal_entries') || '[]');
           journalEntries.unshift(data.entry); // Add to beginning
@@ -750,6 +751,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           <div className="text-sm text-white/70">
             {data.storageType === 'localStorage'
               ? 'Saved locally to your device'
+              : data.localStorageBackup
+              ? 'Saved to database + local backup'
               : 'Saved to your journal'}
           </div>
         </div>,

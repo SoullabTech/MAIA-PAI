@@ -119,12 +119,15 @@ export async function POST(req: NextRequest) {
       }
 
       console.log('✅ [journal.save] Entry saved successfully:', data.id);
+
+      // Also return the entry for client-side localStorage backup
       return NextResponse.json({
         ok: true,
         success: true,
         entry: data,
         essence,
-        storageType: 'supabase'
+        storageType: 'supabase',
+        localStorageBackup: true // Signal to client to also save locally
       });
     } else {
       // Return essence for client-side localStorage storage (beta users)
