@@ -281,35 +281,7 @@ export function PetalCarouselMenuBar() {
 
   return (
     <>
-      {/* TOP BAR: Minimal - Only MAIA Home + Logout */}
-      <div
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-4 bg-neutral-900/10 backdrop-blur-sm border-b border-amber-500/10"
-        style={{ paddingTop: 'calc(max(1.25rem, env(safe-area-inset-top)))' }}
-      >
-        {/* MAIA Home */}
-        <Link
-          href="/maia"
-          className="group relative flex items-center gap-2"
-          aria-label="MAIA - Home"
-        >
-          <div className="w-8 h-8">
-            <MiniHoloflower size={32} />
-          </div>
-          <div>
-            <h1 className="text-sm font-bold text-white/90">MAIA</h1>
-            <p className="text-[9px] text-amber-400/70">Oracle Guide</p>
-          </div>
-        </Link>
-
-        {/* Logout */}
-        <button
-          onClick={handleSignOut}
-          className="group relative p-2 rounded-md bg-neutral-800/90 hover:bg-neutral-700/90 transition-all duration-300 shadow-lg border border-amber-500/30"
-          aria-label="Sign Out"
-        >
-          <LogOut className="w-4 h-4 text-amber-400 group-hover:text-amber-300 transition-colors" />
-        </button>
-      </div>
+      {/* Top bar removed - full immersion with gesture-based navigation only */}
 
       {/* BOTTOM PETAL CAROUSEL MENU */}
       <div className="fixed bottom-0 left-0 right-0 z-40" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
