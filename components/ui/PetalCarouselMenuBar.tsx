@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   MessageCircle, Users, Brain, Settings, Star, Heart, LogOut,
-  ChevronUp, ChevronDown, Menu, ArrowRight, Sparkles, Eye, Zap, Mic
+  Menu, ArrowRight, Sparkles, Eye, Zap, Mic
 } from 'lucide-react';
 import { MiniHoloflower } from '@/components/holoflower/MiniHoloflower';
 import { supabase } from '@/lib/auth/supabase-client';
@@ -410,37 +410,6 @@ export function PetalCarouselMenuBar() {
             })}
           </div>
         </div>
-
-        {/* Toggle Button - Always visible */}
-        <button
-          onClick={() => {
-            const newState = !isBottomMenuOpen;
-            setIsBottomMenuOpen(newState);
-
-            // Clear auto-hide timer when manually toggling
-            if (hideTimeoutRef.current) {
-              clearTimeout(hideTimeoutRef.current);
-            }
-
-            // If manually opened, set a new auto-hide timer
-            if (newState) {
-              hideTimeoutRef.current = setTimeout(() => {
-                setIsBottomMenuOpen(false);
-              }, 5000); // 5 seconds when manually opened (longer than auto-show)
-            }
-          }}
-          className="w-full bg-neutral-900/95 backdrop-blur-md border-t border-amber-500/30 py-2 flex flex-col items-center justify-center hover:bg-neutral-800/95 transition-all duration-300"
-          aria-label={isBottomMenuOpen ? "Close menu" : "Open menu"}
-        >
-          {!isBottomMenuOpen && (
-            <span className="text-[10px] text-amber-400/60 mb-1 tracking-wider">TAP FOR MENU</span>
-          )}
-          {isBottomMenuOpen ? (
-            <ChevronDown className="w-6 h-6 text-amber-400" />
-          ) : (
-            <ChevronUp className="w-6 h-6 text-amber-400 animate-pulse" />
-          )}
-        </button>
       </div>
     </>
   );
