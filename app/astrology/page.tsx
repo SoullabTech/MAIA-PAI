@@ -667,34 +667,28 @@ export default function AstrologyPage() {
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                       <div className="w-20 h-20 md:w-28 md:h-28 opacity-15">
                         <svg viewBox="0 0 200 200" className="w-full h-full">
-                          {/* Fibonacci spiral of dots - matching your reference */}
-                          {(() => {
-                            const dots = [];
+                          {/* Fibonacci spiral of dots - pre-calculated */}
+                          {Array.from({ length: 120 }).map((_, i) => {
                             const center = 100;
-                            const totalDots = 120;
                             const goldenAngle = 137.5 * (Math.PI / 180);
+                            const angle = i * goldenAngle;
+                            const radius = 2.5 * Math.sqrt(i);
+                            const x = center + radius * Math.cos(angle);
+                            const y = center + radius * Math.sin(angle);
+                            const size = Math.max(0.3, 1 - (i / 120) * 0.5);
+                            const opacity = Math.max(0.2, 1 - (i / 120) * 0.6);
 
-                            for (let i = 0; i < totalDots; i++) {
-                              const angle = i * goldenAngle;
-                              const radius = 2.5 * Math.sqrt(i);
-                              const x = center + radius * Math.cos(angle);
-                              const y = center + radius * Math.sin(angle);
-                              const size = Math.max(0.3, 1 - (i / totalDots) * 0.5);
-                              const opacity = Math.max(0.2, 1 - (i / totalDots) * 0.6);
-
-                              dots.push(
-                                <circle
-                                  key={i}
-                                  cx={x}
-                                  cy={y}
-                                  r={size}
-                                  fill="rgb(251, 191, 36)"
-                                  opacity={opacity}
-                                />
-                              );
-                            }
-                            return dots;
-                          })()}
+                            return (
+                              <circle
+                                key={i}
+                                cx={x}
+                                cy={y}
+                                r={size}
+                                fill="rgb(251, 191, 36)"
+                                opacity={opacity}
+                              />
+                            );
+                          })}
                           {/* Center glow */}
                           <circle cx="100" cy="100" r="3" fill="rgb(251, 191, 36)" opacity="0.6" />
                           <circle cx="100" cy="100" r="6" fill="rgb(251, 191, 36)" opacity="0.3" />
@@ -720,7 +714,7 @@ export default function AstrologyPage() {
                       aspects={chartData.aspects}
                       isDayMode={isDayMode}
                       showAspects={true}
-                      missions={showExampleChart ? KELLY_MISSIONS : []}  // Show Kelly's missions in example mode
+                      missions={KELLY_MISSIONS}  // Always show missions with progress rings
                     />
                 </div>
               </ConsciousnessFieldWithTorus>
