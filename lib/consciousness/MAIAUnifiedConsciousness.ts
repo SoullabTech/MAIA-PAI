@@ -321,18 +321,12 @@ export class MAIAUnifiedConsciousness {
 
     try {
       // Use PersonalOracleAgent directly - fastest path to quality response
-      const agent = new PersonalOracleAgent();
+      // PersonalOracleAgent will automatically fetch conversation history from DB
+      const agent = new PersonalOracleAgent(context.userId, {
+        conversationStyle: context.preferences?.conversationStyle || 'classic'
+      });
 
-      // Build minimal context - just recent history
-      const recentHistory = conversationHistory.slice(-3); // Last 3 exchanges only
-
-      const agentResponse = await agent.respond(
-        content,
-        {
-          conversationHistory: recentHistory,
-          ...context
-        }
-      );
+      const agentResponse = await agent.processInteraction(content);
 
       const responseTime = Date.now() - startTime;
       console.log(`✅ [FAST PATH] Response generated in ${responseTime}ms`);
