@@ -325,7 +325,13 @@ export function PetalCarouselMenuBar() {
                   <Link
                     key={index}
                     href={item.href}
-                    onClick={() => setIsBottomMenuOpen(false)}
+                    onClick={() => {
+                      // Only close menu for navigation away from /maia page
+                      // Keep open for mode toggles (type: 'mode')
+                      if (item.type !== 'mode') {
+                        setIsBottomMenuOpen(false);
+                      }
+                    }}
                     className="flex-shrink-0"
                   >
                     {PetalContent}
