@@ -400,6 +400,17 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Listen for voice/chat toggle from carousel menu
+  useEffect(() => {
+    const handleToggleVoiceChat = () => {
+      setShowChatInterface(prev => !prev);
+      console.log('🔄 Voice/Chat mode toggled from carousel');
+    };
+
+    window.addEventListener('toggleVoiceChat', handleToggleVoiceChat);
+    return () => window.removeEventListener('toggleVoiceChat', handleToggleVoiceChat);
+  }, []);
+
   // Initialize voice when in voice mode - DISABLED: Causing cascading connection errors without API keys
   // useEffect(() => {
   //   if (isMounted && !showChatInterface && voiceEnabled && !isMuted) {

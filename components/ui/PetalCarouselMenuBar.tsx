@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   MessageCircle, Users, Brain, Settings, Star, Heart, LogOut,
-  ChevronUp, ChevronDown, Menu, ArrowRight, Sparkles, Eye, Zap
+  ChevronUp, ChevronDown, Menu, ArrowRight, Sparkles, Eye, Zap, Mic
 } from 'lucide-react';
 import { MiniHoloflower } from '@/components/holoflower/MiniHoloflower';
 import { supabase } from '@/lib/auth/supabase-client';
@@ -69,6 +69,20 @@ export function PetalCarouselMenuBar() {
 
   // Petal items - all navigation in one scrollable carousel
   const petalItems = [
+    // Voice/Chat Toggle - First item
+    {
+      type: 'toggle' as const,
+      icon: Mic,
+      label: 'Voice/Chat',
+      subtitle: 'Toggle input mode',
+      onClick: () => {
+        const event = new CustomEvent('toggleVoiceChat');
+        window.dispatchEvent(event);
+        // Keep menu open for toggles
+      },
+      color: 'amber'
+    },
+
     // Mode toggles
     {
       type: 'mode' as const,
@@ -226,98 +240,66 @@ export function PetalCarouselMenuBar() {
             isBottomMenuOpen ? 'translate-y-0' : 'translate-y-full'
           }`}
         >
-          {/* Horizontal Scrolling Petal Carousel */}
+          {/* Compact Icon Carousel - Horizontal scrolling */}
           <div
             ref={scrollContainerRef}
-            className="flex items-center gap-3 px-4 py-4 overflow-x-auto scrollbar-thin scrollbar-thumb-amber-500/30 scrollbar-track-transparent"
+            className="flex items-center gap-2 px-3 py-2 overflow-x-auto scrollbar-hide"
             style={{
-              scrollSnapType: 'x mandatory',
-              WebkitOverflowScrolling: 'touch'
+              scrollSnapType: 'x proximity',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none'
             }}
           >
             {petalItems.map((item, index) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
 
-              // Special styling for Access Matrix
-              if (item.special) {
-                return (
-                  <motion.button
-                    key={index}
-                    onClick={item.onClick}
-                    className="relative group flex-shrink-0 scroll-snap-align-start"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    style={{ scrollSnapAlign: 'start' }}
-                  >
-                    <div className="relative px-4 py-3 rounded-lg overflow-hidden min-w-[140px]">
-                      <div className="absolute inset-0 bg-gradient-to-br from-amber-900/30 to-orange-900/20 border border-amber-700/20" />
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-600/10 to-transparent opacity-0 group-hover:opacity-100"
-                        initial={{ x: '-100%' }}
-                        whileHover={{ x: '100%' }}
-                        transition={{ duration: 0.6 }}
-                      />
-                      <div className="relative flex flex-col items-center gap-1 text-center">
-                        <Icon className="w-5 h-5 text-amber-400" />
-                        <div className="text-[10px] font-mono text-amber-400/90 tracking-wider uppercase">
-                          {item.label}
-                        </div>
-                        <div className="text-[8px] text-amber-600/60">
-                          {item.subtitle}
-                        </div>
-                      </div>
-                    </div>
-                  </motion.button>
-                );
-              }
-
-              // Regular petal items
-              const PetalContent = (
-                <div className={`
-                  relative group flex-shrink-0 scroll-snap-align-start
-                  px-4 py-3 rounded-lg min-w-[120px]
-                  transition-all duration-300
-                  ${isActive
-                    ? 'bg-amber-500/20 border border-amber-500/40 shadow-lg shadow-amber-500/20'
-                    : 'bg-neutral-800/60 border border-amber-500/20 hover:bg-neutral-700/80 hover:border-amber-500/30'
-                  }
-                `}
-                  style={{ scrollSnapAlign: 'start' }}
+              // Compact icon button for all items
+              const IconButton = (
+                <motion.div
+                  className={`
+                    relative flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14
+                    rounded-full flex items-center justify-center
+                    transition-all duration-300 cursor-pointer
+                    ${isActive
+                      ? 'bg-amber-500/30 border-2 border-amber-400/60 shadow-lg shadow-amber-500/30'
+                      : 'bg-neutral-800/70 border border-amber-500/20 hover:bg-amber-500/20 hover:border-amber-400/40'
+                    }
+                    ${item.special ? 'ring-2 ring-amber-600/30 ring-offset-2 ring-offset-neutral-900' : ''}
+                  `}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  title={item.label}
                 >
-                  <div className="flex flex-col items-center gap-1.5 text-center">
-                    <div className="relative">
-                      <Icon className={`w-5 h-5 transition-colors ${
-                        isActive ? 'text-amber-300' : 'text-amber-400/80 group-hover:text-amber-300'
-                      }`} />
-                      {item.showProgress && (
-                        <svg className="absolute -inset-1.5 -rotate-90">
-                          <circle cx="50%" cy="50%" r="14" fill="none" stroke="rgba(251, 191, 36, 0.2)" strokeWidth="2" />
-                          <circle
-                            cx="50%"
-                            cy="50%"
-                            r="14"
-                            fill="none"
-                            stroke="rgb(251, 191, 36)"
-                            strokeWidth="2"
-                            strokeDasharray={`${2 * Math.PI * 14}`}
-                            strokeDashoffset={`${2 * Math.PI * 14 * (1 - trainingProgress)}`}
-                            strokeLinecap="round"
-                            className="transition-all duration-500"
-                          />
-                        </svg>
-                      )}
-                    </div>
-                    <div className={`text-xs font-medium ${
-                      isActive ? 'text-amber-100' : 'text-amber-200/90'
-                    }`}>
-                      {item.label}
-                    </div>
-                    <div className="text-[9px] text-amber-400/50">
-                      {item.subtitle}
-                    </div>
-                  </div>
-                </div>
+                  <Icon className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors ${
+                    isActive ? 'text-amber-300' : 'text-amber-400/80'
+                  }`} />
+                  {item.showProgress && trainingProgress > 0 && (
+                    <svg className="absolute inset-0 -rotate-90">
+                      <circle
+                        cx="50%"
+                        cy="50%"
+                        r="45%"
+                        fill="none"
+                        stroke="rgba(251, 191, 36, 0.3)"
+                        strokeWidth="2"
+                      />
+                      <circle
+                        cx="50%"
+                        cy="50%"
+                        r="45%"
+                        fill="none"
+                        stroke="rgb(251, 191, 36)"
+                        strokeWidth="2"
+                        strokeDasharray={`${2 * Math.PI * 20}`}
+                        strokeDashoffset={`${2 * Math.PI * 20 * (1 - trainingProgress / 100)}`}
+                        strokeLinecap="round"
+                        className="transition-all duration-500"
+                      />
+                    </svg>
+                  )}
+                </motion.div>
               );
 
               if (item.href) {
@@ -332,9 +314,8 @@ export function PetalCarouselMenuBar() {
                         setIsBottomMenuOpen(false);
                       }
                     }}
-                    className="flex-shrink-0"
                   >
-                    {PetalContent}
+                    {IconButton}
                   </Link>
                 );
               }
@@ -343,30 +324,11 @@ export function PetalCarouselMenuBar() {
                 <button
                   key={index}
                   onClick={item.onClick}
-                  className="flex-shrink-0"
                 >
-                  {PetalContent}
+                  {IconButton}
                 </button>
               );
             })}
-          </div>
-
-          {/* Scroll hint indicator */}
-          <div className="flex items-center justify-center py-2 border-t border-amber-500/10">
-            <motion.div
-              className="flex items-center gap-2 text-[9px] text-amber-400/40"
-              animate={{
-                x: [0, 5, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <span>Swipe to explore petals</span>
-              <ArrowRight className="w-3 h-3" />
-            </motion.div>
           </div>
         </div>
 
