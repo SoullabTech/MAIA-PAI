@@ -23,8 +23,10 @@ export function PetalCarouselMenuBar() {
   const pathname = usePathname();
   const router = useRouter();
   const [trainingProgress] = useState(0);
-  const [isBottomMenuOpen, setIsBottomMenuOpen] = useState(true); // Open by default so navigation is visible
+  const [isBottomMenuOpen, setIsBottomMenuOpen] = useState(false); // Start hidden (Apple-style)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTouchY = useRef<number>(0);
 
   const handleSignOut = async () => {
     const betaUser = localStorage.getItem('beta_user');
@@ -66,6 +68,83 @@ export function PetalCarouselMenuBar() {
 
   const hideCommunityLink = pathname?.startsWith('/community');
   const hidePartnersLink = pathname?.startsWith('/partners');
+
+  // Auto-hide functionality - Apple-style behavior
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    const showCarousel = () => {
+      setIsBottomMenuOpen(true);
+      // Auto-hide after 3 seconds of inactivity
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+      hideTimeoutRef.current = setTimeout(() => {
+        setIsBottomMenuOpen(false);
+      }, 3000);
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          // Show on scroll up or when near bottom
+          const windowHeight = window.innerHeight;
+          const documentHeight = document.documentElement.scrollHeight;
+          const distanceFromBottom = documentHeight - (currentScrollY + windowHeight);
+
+          if (currentScrollY < lastScrollY || distanceFromBottom < 200) {
+            showCarousel();
+          }
+
+          lastScrollY = currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      lastTouchY.current = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const currentY = e.touches[0].clientY;
+      const windowHeight = window.innerHeight;
+
+      // Show if touch is in bottom 20% of screen or swiping up from bottom
+      if (currentY > windowHeight * 0.8 || (lastTouchY.current > currentY && currentY > windowHeight * 0.7)) {
+        showCarousel();
+      }
+
+      lastTouchY.current = currentY;
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const windowHeight = window.innerHeight;
+      // Show when mouse enters bottom 15% of screen
+      if (e.clientY > windowHeight * 0.85) {
+        showCarousel();
+      }
+    };
+
+    // Add event listeners
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (hideTimeoutRef.current) {
+        clearTimeout(hideTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Petal items - all navigation in one scrollable carousel
   const petalItems = [
@@ -334,8 +413,23 @@ export function PetalCarouselMenuBar() {
 
         {/* Toggle Button - Always visible */}
         <button
-          onClick={() => setIsBottomMenuOpen(!isBottomMenuOpen)}
-          className="w-full bg-neutral-900/95 backdrop-blur-md border-t border-amber-500/30 py-3 flex flex-col items-center justify-center hover:bg-neutral-800/95 transition-all duration-300"
+          onClick={() => {
+            const newState = !isBottomMenuOpen;
+            setIsBottomMenuOpen(newState);
+
+            // Clear auto-hide timer when manually toggling
+            if (hideTimeoutRef.current) {
+              clearTimeout(hideTimeoutRef.current);
+            }
+
+            // If manually opened, set a new auto-hide timer
+            if (newState) {
+              hideTimeoutRef.current = setTimeout(() => {
+                setIsBottomMenuOpen(false);
+              }, 5000); // 5 seconds when manually opened (longer than auto-show)
+            }
+          }}
+          className="w-full bg-neutral-900/95 backdrop-blur-md border-t border-amber-500/30 py-2 flex flex-col items-center justify-center hover:bg-neutral-800/95 transition-all duration-300"
           aria-label={isBottomMenuOpen ? "Close menu" : "Open menu"}
         >
           {!isBottomMenuOpen && (
