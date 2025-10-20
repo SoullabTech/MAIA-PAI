@@ -17,6 +17,7 @@ export function MenuBar() {
   const router = useRouter();
   const pathname = usePathname();
   const [trainingProgress] = useState(0); // TODO: Connect to actual training data
+  const [showRotateHint, setShowRotateHint] = useState(true); // Mobile rotate hint state
 
   const handleSignOut = async () => {
     // Preserve user profile data (birthday, name, intention, birthData) before clearing session
