@@ -23,7 +23,7 @@ export function PetalCarouselMenuBar() {
   const pathname = usePathname();
   const router = useRouter();
   const [trainingProgress] = useState(0);
-  const [isBottomMenuOpen, setIsBottomMenuOpen] = useState(false);
+  const [isBottomMenuOpen, setIsBottomMenuOpen] = useState(true); // Open by default so navigation is visible
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const handleSignOut = async () => {
