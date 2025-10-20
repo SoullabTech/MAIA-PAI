@@ -18,7 +18,6 @@ import { WisdomJourneyDashboard } from '@/components/maya/WisdomJourneyDashboard
 import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
 import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { PetalCarouselMenuBar } from '@/components/ui/PetalCarouselMenuBar';
 import { X, AlertCircle, HelpCircle, MessageCircle, Sparkles, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/auth/supabase-client';
@@ -250,8 +249,7 @@ export default function MAIAPage() {
   return (
     <ErrorBoundary>
       <div className="h-screen bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 flex flex-col overflow-hidden">
-        {/* New Petal Carousel Menu Bar - Clean & Minimal Top, Carousel Bottom */}
-        <PetalCarouselMenuBar />
+        {/* PetalCarouselMenuBar now rendered by ConditionalMenuBar in layout.tsx */}
 
         {/* iOS Chrome Warning Banner */}
         <AnimatePresence>

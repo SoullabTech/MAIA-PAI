@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
-import { MenuBar } from './MenuBar';
+import { PetalCarouselMenuBar } from './PetalCarouselMenuBar';
 import { MiniHoloflower } from '@/components/holoflower/MiniHoloflower';
 import { supabase } from '@/lib/auth/supabase-client';
 
@@ -87,7 +87,7 @@ export function ConditionalMenuBar() {
   const shouldShowFullMenu = showFullMenuOnPages.some(page => pathname?.startsWith(page));
 
   if (shouldShowFullMenu) {
-    return <MenuBar />;
+    return <PetalCarouselMenuBar />;
   }
 
   // For all other pages: Show minimal Home + Logout only
