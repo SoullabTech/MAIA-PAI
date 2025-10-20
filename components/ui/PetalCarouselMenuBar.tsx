@@ -190,8 +190,8 @@ export function PetalCarouselMenuBar() {
     <>
       {/* TOP BAR: Minimal - Only MAIA Home + Logout */}
       <div
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-neutral-900/95 backdrop-blur-md border-b border-amber-500/30"
-        style={{ paddingTop: 'calc(max(0.75rem, env(safe-area-inset-top)))' }}
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-4 bg-neutral-900/60 backdrop-blur-md border-b border-amber-500/20"
+        style={{ paddingTop: 'calc(max(1.25rem, env(safe-area-inset-top)))' }}
       >
         {/* MAIA Home */}
         <Link
@@ -204,7 +204,7 @@ export function PetalCarouselMenuBar() {
           </div>
           <div>
             <h1 className="text-sm font-bold text-white/90">MAIA</h1>
-            <p className="text-[9px] text-amber-500/60">Oracle Guide</p>
+            <p className="text-[9px] text-amber-400/70">Oracle Guide</p>
           </div>
         </Link>
 
