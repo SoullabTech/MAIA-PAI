@@ -3,7 +3,7 @@
  * Creates fluid, enchanting dialogue with proper pacing and rhythm
  */
 
-import { InterviewIntelligence, ConversationSignal } from './InterviewIntelligence';
+import { SacredMirrorIntelligence, ConversationSignal } from './InterviewIntelligence';
 import { DepthStateTracker, DepthMetrics } from './DepthStateTracker';
 
 export interface FlowState {
@@ -22,14 +22,14 @@ export interface ResponseStrategy {
 }
 
 export class ConversationalFlowEngine {
-  private interviewIntel: InterviewIntelligence;
+  private interviewIntel: SacredMirrorIntelligence;
   private depthTracker: DepthStateTracker;
   private turnCount: number = 0;
   private lastStrategy: ResponseStrategy | null = null;
   private silenceCount: number = 0;
 
   constructor() {
-    this.interviewIntel = new InterviewIntelligence();
+    this.interviewIntel = new SacredMirrorIntelligence();
     this.depthTracker = new DepthStateTracker();
   }
 
@@ -239,7 +239,7 @@ export class ConversationalFlowEngine {
     // Build response based on strategy
     switch (strategy.style) {
       case 'questioning': {
-        const intervention = this.interviewIntel.selectIntervention(
+        const intervention = this.interviewIntel.selectWitnessing(
           signal,
           depth.currentDepth,
           userInput

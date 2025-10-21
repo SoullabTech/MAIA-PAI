@@ -240,11 +240,18 @@ export default function IntroPage() {
               onClick={() => {
                 console.log(`🎬 Continue button clicked`);
                 const storedUser = localStorage.getItem('beta_user');
-                if (storedUser) {
+                const week2Onboarded = localStorage.getItem('week2_onboarded') === 'true';
+                console.log(`🎬 Week 2 onboarded:`, week2Onboarded);
+
+                // If week2_onboarded is set, go straight to MAIA
+                if (week2Onboarded) {
+                  console.log(`🎬 Navigating to /maia (week 2 onboarded)`);
+                  router.push('/maia');
+                } else if (storedUser) {
                   const userData = JSON.parse(storedUser);
                   console.log(`🎬 User data:`, userData);
                   if (userData.onboarded === true) {
-                    console.log(`🎬 Navigating to /maya (onboarded user)`);
+                    console.log(`🎬 Navigating to /maia (onboarded user)`);
                     router.push('/maia');
                   } else {
                     console.log(`🎬 Navigating to /onboarding (not onboarded)`);
@@ -271,11 +278,17 @@ export default function IntroPage() {
           onClick={() => {
             console.log(`🎬 Skip button clicked`);
             const storedUser = localStorage.getItem('beta_user');
-            if (storedUser) {
+            const week2Onboarded = localStorage.getItem('week2_onboarded') === 'true';
+
+            // If week2_onboarded is set, go straight to MAIA
+            if (week2Onboarded) {
+              console.log(`🎬 Navigating to /maia (week 2 onboarded)`);
+              router.push('/maia');
+            } else if (storedUser) {
               const userData = JSON.parse(storedUser);
               console.log(`🎬 User data:`, userData);
               if (userData.onboarded === true) {
-                console.log(`🎬 Navigating to /maya (onboarded user)`);
+                console.log(`🎬 Navigating to /maia (onboarded user)`);
                 router.push('/maia');
               } else {
                 console.log(`🎬 Navigating to /onboarding (not onboarded)`);

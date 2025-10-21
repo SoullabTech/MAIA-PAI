@@ -74,7 +74,16 @@ export function SoulfulOnboarding({ initialName }: { initialName: string }) {
     localStorage.setItem('onboardingData', JSON.stringify(data));
     localStorage.setItem('betaOnboardingComplete', 'true');
 
-    console.log('✅ localStorage set BEFORE API call:', { explorerId, explorerName, betaOnboardingComplete: 'true' });
+    // CRITICAL: Also set the beta_user object with onboarded: true flag
+    const betaUserData = {
+      id: explorerId,
+      username: explorerName,
+      onboarded: true,
+      createdAt: new Date().toISOString()
+    };
+    localStorage.setItem('beta_user', JSON.stringify(betaUserData));
+
+    console.log('✅ localStorage set BEFORE API call:', { explorerId, explorerName, betaOnboardingComplete: 'true', onboarded: true });
 
     try {
       const response = await fetch('/api/beta/onboarding', {
@@ -89,7 +98,18 @@ export function SoulfulOnboarding({ initialName }: { initialName: string }) {
           sessionStorage.setItem('betaUserId', result.userId);
           sessionStorage.setItem('explorerId', result.userId);
           localStorage.setItem('betaUserId', result.userId);
-          console.log('✅ User ID saved:', result.userId);
+          localStorage.setItem('explorerId', result.userId);
+
+          // Update the beta_user object with the new ID from server
+          const betaUserData = {
+            id: result.userId,
+            username: explorerName,
+            onboarded: true,
+            createdAt: new Date().toISOString()
+          };
+          localStorage.setItem('beta_user', JSON.stringify(betaUserData));
+
+          console.log('✅ User ID saved and beta_user updated:', result.userId);
         }
       }
     } catch (error) {

@@ -96,8 +96,11 @@ export const MobileFirstInterface: React.FC<MobileFirstInterfaceProps> = ({
         <div className="safe-area-top px-4 py-3">
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-medium text-white">Maya</h1>
-            <button className="p-2 rounded-lg hover:bg-gray-800">
-              <Settings className="w-5 h-5 text-gray-400" />
+            <button
+              className="p-2 rounded-lg hover:bg-gray-800"
+              aria-label="Settings"
+            >
+              <Settings className="w-5 h-5 text-amber-400" />
             </button>
           </div>
         </div>
@@ -150,7 +153,7 @@ export const MobileFirstInterface: React.FC<MobileFirstInterfaceProps> = ({
               className="p-3 rounded-full hover:bg-gray-800 transition-colors"
               aria-label="Attach file"
             >
-              <Paperclip className="w-5 h-5 text-gray-400" />
+              <Paperclip className="w-5 h-5 text-amber-400" />
             </button>
 
             {/* Text Input */}
@@ -176,11 +179,11 @@ export const MobileFirstInterface: React.FC<MobileFirstInterfaceProps> = ({
                 className={`absolute right-2 bottom-2 p-2 rounded-full transition-colors
                   ${isVoiceActive
                     ? 'bg-yellow-500 text-white'
-                    : 'hover:bg-gray-700 text-gray-400'
+                    : 'hover:bg-gray-700'
                   }`}
                 aria-label="Voice input"
               >
-                <Mic className="w-4 h-4" />
+                <Mic className={`w-4 h-4 ${isVoiceActive ? 'text-white' : 'text-amber-400'}`} />
               </button>
             </div>
 

@@ -1,0 +1,12 @@
+{
+  "livePreview": true,
+  "spellcheck": true,
+  "showLineNumber": false,
+  "alwaysUpdateLinks": true,
+  "attachmentFolderPath": "Assets",
+  "promptDelete": true,
+  "foldHeading": true,
+  "foldIndent": true,
+  "showFrontmatter": false,
+  "vimMode": false
+}

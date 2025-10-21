@@ -518,15 +518,128 @@ export class IntellectualPropertyEngine {
 
   // Database and storage methods (stubs - would implement based on your database)
   private async loadExistingKnowledgeBase(): Promise<void> {
-    // Load from database
+    // Load from Supabase file_chunks table (ingested files)
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        console.warn('[IPEngine] Supabase not configured - knowledge base will be empty');
+        return;
+      }
+
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
+
+      // Load all file chunks (your book content, teachings, etc.)
+      const { data: chunks, error } = await supabase
+        .from('file_chunks')
+        .select('*')
+        .limit(1000); // Load first 1000 chunks
+
+      if (error) {
+        console.error('[IPEngine] Error loading file chunks:', error);
+        return;
+      }
+
+      if (!chunks || chunks.length === 0) {
+        console.warn('[IPEngine] No file chunks found in database. Upload your book/teachings via the file upload interface.');
+        return;
+      }
+
+      // Convert chunks to IPKnowledgeBase format
+      for (const chunk of chunks) {
+        const knowledge: IPKnowledgeBase = {
+          id: chunk.id,
+          title: chunk.metadata?.filename || `Chunk ${chunk.chunk_index}`,
+          content: chunk.content,
+          category: this.categorizeContent(chunk.content),
+          embedding: chunk.embedding || [],
+          metadata: {
+            chapter: chunk.metadata?.chapter,
+            section: chunk.metadata?.section,
+            keywords: this.extractKeywords(chunk.content),
+            concepts: this.extractConcepts(chunk.content),
+            archetypes: [],
+            elements: this.detectElements(chunk.content),
+            consciousnessLevel: 0.7,
+            relevantQuestions: []
+          },
+          relationships: []
+        };
+
+        this.knowledgeBase.set(knowledge.id, knowledge);
+      }
+
+      console.log(`[IPEngine] Loaded ${chunks.length} knowledge chunks from database`);
+    } catch (error) {
+      console.error('[IPEngine] Failed to load knowledge base:', error);
+    }
+  }
+
+  private categorizeContent(content: string): IPKnowledgeBase['category'] {
+    const lowerContent = content.toLowerCase();
+
+    if (lowerContent.includes('practice') || lowerContent.includes('exercise') || lowerContent.includes('ritual')) {
+      return 'sacred_practice';
+    }
+    if (lowerContent.includes('fire') || lowerContent.includes('water') || lowerContent.includes('earth') || lowerContent.includes('air') || lowerContent.includes('aether')) {
+      return 'elemental_wisdom';
+    }
+    if (lowerContent.includes('consciousness') || lowerContent.includes('awareness') || lowerContent.includes('presence')) {
+      return 'consciousness_principle';
+    }
+    if (lowerContent.includes('chapter')) {
+      return 'book_chapter';
+    }
+
+    return 'core_teaching';
+  }
+
+  private extractConcepts(content: string): string[] {
+    // Extract key concepts
+    const concepts: string[] = [];
+    const conceptPatterns = [
+      /the ([A-Z][a-z]+ [A-Z][a-z]+)/g, // "The Shadow Work"
+      /concept of ([a-z ]+)/gi,
+      /principle of ([a-z ]+)/gi
+    ];
+
+    conceptPatterns.forEach(pattern => {
+      const matches = content.matchAll(pattern);
+      for (const match of matches) {
+        if (match[1]) concepts.push(match[1].toLowerCase());
+      }
+    });
+
+    return [...new Set(concepts)].slice(0, 10); // Top 10 unique concepts
   }
 
   private buildConceptGraph(): void {
     // Build relationship graph between concepts
+    this.knowledgeBase.forEach((content, id) => {
+      content.metadata.concepts.forEach(concept => {
+        if (!this.conceptGraph.has(concept)) {
+          this.conceptGraph.set(concept, []);
+        }
+        this.conceptGraph.get(concept)!.push(id);
+      });
+    });
+
+    console.log(`[IPEngine] Built concept graph with ${this.conceptGraph.size} concepts`);
   }
 
   private updateConceptGraph(content: IPKnowledgeBase): void {
     // Update concept relationships
+    content.metadata.concepts.forEach(concept => {
+      if (!this.conceptGraph.has(concept)) {
+        this.conceptGraph.set(concept, []);
+      }
+      if (!this.conceptGraph.get(concept)!.includes(content.id)) {
+        this.conceptGraph.get(concept)!.push(content.id);
+      }
+    });
   }
 
   private buildChapterRelationships(chapterIds: string[]): Promise<void> {
@@ -557,16 +670,56 @@ export class IntellectualPropertyEngine {
     return [];
   }
 
-  private extractKeywords(insights: string[]): string[] {
-    return [];
+  private extractKeywords(content: string): string[] {
+    // Simple keyword extraction - could be enhanced with NLP
+    const keywords: string[] = [];
+    const keywordPatterns = [
+      /\b(fire|water|earth|air|aether)\b/gi,
+      /\b(shadow|light|integration|transformation)\b/gi,
+      /\b(spiralogic|elemental alchemy|god between)\b/gi,
+      /\b(consciousness|awareness|presence)\b/gi
+    ];
+
+    keywordPatterns.forEach(pattern => {
+      const matches = content.match(pattern);
+      if (matches) {
+        keywords.push(...matches.map(m => m.toLowerCase()));
+      }
+    });
+
+    return [...new Set(keywords)]; // Remove duplicates
   }
 
   private detectArchetypes(conversation: any[]): string[] {
     return [];
   }
 
-  private detectElements(conversation: any[]): ('fire' | 'water' | 'earth' | 'air' | 'aether')[] {
-    return [];
+  private detectElements(content: string | any[]): ('fire' | 'water' | 'earth' | 'air' | 'aether')[] {
+    // Handle both string content and conversation array
+    const textContent = typeof content === 'string'
+      ? content
+      : content.map((msg: any) => msg.content || '').join(' ');
+
+    const elements: ('fire' | 'water' | 'earth' | 'air' | 'aether')[] = [];
+    const lowerContent = textContent.toLowerCase();
+
+    if (lowerContent.includes('fire') || lowerContent.includes('passion') || lowerContent.includes('vision')) {
+      elements.push('fire');
+    }
+    if (lowerContent.includes('water') || lowerContent.includes('emotion') || lowerContent.includes('flow')) {
+      elements.push('water');
+    }
+    if (lowerContent.includes('earth') || lowerContent.includes('grounding') || lowerContent.includes('embodiment')) {
+      elements.push('earth');
+    }
+    if (lowerContent.includes('air') || lowerContent.includes('thought') || lowerContent.includes('clarity')) {
+      elements.push('air');
+    }
+    if (lowerContent.includes('aether') || lowerContent.includes('spirit') || lowerContent.includes('transcendence')) {
+      elements.push('aether');
+    }
+
+    return elements;
   }
 
   private generateRelevantQuestions(insights: string[]): string[] {

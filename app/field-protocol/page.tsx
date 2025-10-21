@@ -117,7 +117,7 @@ export default function FieldProtocolLanding() {
               icon: Share2,
               title: 'Transmission',
               subtitle: 'Stage 5',
-              desc: 'What's worth sharing?',
+              desc: "What's worth sharing?",
               quote: 'Teaching',
               color: 'text-orange-600',
               bg: 'bg-orange-50'

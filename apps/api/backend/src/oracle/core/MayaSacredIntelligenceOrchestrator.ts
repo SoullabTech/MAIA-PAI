@@ -9,7 +9,7 @@
  * which approach to take based on user needs, expressions, and patterns
  */
 
-import { sacredOracleConstellation } from '../../../../../lib/sacred-oracle-constellation';
+// import { sacredOracleConstellation } from '../../../../../lib/sacred-oracle-constellation'; // TODO: Re-enable when module exists
 import { MayaConsciousnessOrchestrator } from './MayaConsciousnessOrchestrator';
 import { ConsciousnessExplorationEngine } from '../intelligence/ConsciousnessExplorationEngine';
 import { DepthStateTracker } from '../intelligence/DepthStateTracker';
@@ -61,7 +61,7 @@ export interface PatternRecognition {
  * The Sacred Intelligence Web
  */
 export class MayaSacredIntelligenceOrchestrator {
-  private sacredOracle: typeof sacredOracleConstellation;
+  // private sacredOracle: typeof sacredOracleConstellation; // TODO: Re-enable when module exists
   private consciousness: MayaConsciousnessOrchestrator;
   private exploration: ConsciousnessExplorationEngine;
   private depthTracker: DepthStateTracker;
@@ -76,7 +76,7 @@ export class MayaSacredIntelligenceOrchestrator {
   private interconnectivityMatrix: Map<string, Map<string, number>>;
 
   constructor() {
-    this.sacredOracle = sacredOracleConstellation;
+    // this.sacredOracle = sacredOracleConstellation; // TODO: Re-enable when module exists
     this.consciousness = new MayaConsciousnessOrchestrator();
     this.exploration = new ConsciousnessExplorationEngine();
     this.depthTracker = new DepthStateTracker();

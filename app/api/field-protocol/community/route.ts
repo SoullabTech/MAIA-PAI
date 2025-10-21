@@ -12,6 +12,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { fieldRecordsService } from '@/lib/field-protocol/FieldRecordsService';
 
+// Force dynamic rendering - this route cannot be statically generated
+export const dynamic = 'force-dynamic';
+
 // Initialize Supabase client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

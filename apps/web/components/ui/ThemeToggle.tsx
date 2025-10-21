@@ -66,39 +66,48 @@ export default function ThemeToggle() {
         whileTap={{ scale: 0.9 }}
         onClick={() => handleThemeChange('light')}
         className={`p-2 rounded-full border transition-all duration-200
-                   ${theme === 'light' 
-                     ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' 
-                     : 'border-gray-400 dark:border-gray-600 bg-white dark:bg-neutral-900'
+                   ${theme === 'light'
+                     ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/30'
+                     : 'border-amber-700/30 dark:border-amber-500/30 bg-amber-900/10 dark:bg-amber-900/10'
                    } shadow-md hover:shadow-lg`}
         aria-label="Light mode"
       >
-        <Sun className={`w-5 h-5 ${theme === 'light' ? 'text-yellow-600' : 'text-gray-500'}`} />
+        <Sun
+          className="w-5 h-5"
+          style={{ color: theme === 'light' ? '#D97706' : '#FEF3C7' }}
+        />
       </motion.button>
 
       <motion.button
         whileTap={{ scale: 0.9 }}
         onClick={() => handleThemeChange('dark')}
         className={`p-2 rounded-full border transition-all duration-200
-                   ${theme === 'dark' 
-                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-                     : 'border-gray-400 dark:border-gray-600 bg-white dark:bg-neutral-900'
+                   ${theme === 'dark'
+                     ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/30'
+                     : 'border-amber-700/30 dark:border-amber-500/30 bg-amber-900/10 dark:bg-amber-900/10'
                    } shadow-md hover:shadow-lg`}
         aria-label="Dark mode"
       >
-        <Moon className={`w-5 h-5 ${theme === 'dark' ? 'text-blue-600' : 'text-gray-500'}`} />
+        <Moon
+          className="w-5 h-5"
+          style={{ color: theme === 'dark' ? '#D97706' : '#FEF3C7' }}
+        />
       </motion.button>
 
       <motion.button
         whileTap={{ scale: 0.9 }}
         onClick={() => handleThemeChange('system')}
         className={`p-2 rounded-full border transition-all duration-200
-                   ${theme === 'system' 
-                     ? 'border-stone-500 bg-stone-50 dark:bg-stone-900/20' 
-                     : 'border-gray-400 dark:border-gray-600 bg-white dark:bg-neutral-900'
+                   ${theme === 'system'
+                     ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/30'
+                     : 'border-amber-700/30 dark:border-amber-500/30 bg-amber-900/10 dark:bg-amber-900/10'
                    } shadow-md hover:shadow-lg`}
         aria-label="System default"
       >
-        <Monitor className={`w-5 h-5 ${theme === 'system' ? 'text-stone-600' : 'text-gray-500'}`} />
+        <Monitor
+          className="w-5 h-5"
+          style={{ color: theme === 'system' ? '#D97706' : '#FEF3C7' }}
+        />
       </motion.button>
     </div>
   );

@@ -7,6 +7,9 @@
 import { SimpleConversationMemory } from './SimpleConversationMemory';
 import { ActiveListeningCore } from './ActiveListeningCore';
 import { neurodivergentValidation } from './NeurodivergentValidation';
+import { GenderAwareContext, GenderContextSignals } from './GenderAwareContext';
+import { GenderAwareResponseRefinement } from './GenderAwareResponseRefinement';
+import { DrAngelaProtocol, CyclePhase, CycleAwareContext } from './DrAngelaProtocol';
 
 export interface ConversationContext {
   turnCount: number;
@@ -23,6 +26,12 @@ export interface ConversationContext {
   ageRange: '14-16' | '17-19' | '20-24' | 'unknown';
   economicContext: 'struggling' | 'stable' | 'privileged' | 'unknown';
   identityMarkers: string[];
+
+  // Gender-aware context (optional - system works without it)
+  genderContext?: GenderContextSignals;
+
+  // Cycle-aware context (optional - Dr. Angela's Protocol)
+  cycleContext?: CycleAwareContext;
 }
 
 export interface IntelligenceResponse {
@@ -33,11 +42,22 @@ export interface IntelligenceResponse {
   reason: string;
   memoryUsed: boolean;
   contextAdjustments: string[];
+
+  // Gender-aware metadata (optional)
+  genderAdaptationsApplied?: string[];
 }
 
 export class ConversationIntelligenceEngine {
   private memory = new SimpleConversationMemory();
   private activeListening = new ActiveListeningCore();
+
+  // Gender-aware modules (OPT-IN: disabled by default, user chooses to enable)
+  private genderContext = new GenderAwareContext(false);
+  private genderRefinement = new GenderAwareResponseRefinement(false);
+
+  // Dr. Angela's Protocol - Cycle-aware conversation support (OPT-IN)
+  private drAngelaProtocol = new DrAngelaProtocol();
+
   private context: ConversationContext = {
     turnCount: 0,
     emotionalIntensity: 0,
@@ -55,7 +75,7 @@ export class ConversationIntelligenceEngine {
     identityMarkers: []
   };
 
-  generateResponse(userInput: string): IntelligenceResponse {
+  generateResponse(userInput: string, userProfile?: { gender?: string }): IntelligenceResponse {
     this.context.turnCount++;
 
     // Step 1: Update memory with this input
@@ -65,6 +85,47 @@ export class ConversationIntelligenceEngine {
     // Step 2: Priority checks (frustration, validation)
     const priorityResponse = this.checkPriorityInterventions(userInput);
     if (priorityResponse) return priorityResponse;
+
+    // Step 2.5: Detect gender patterns (additive, non-blocking)
+    try {
+      const genderSignals = this.genderContext.detectPatterns(
+        userProfile,
+        this.memory.getRecentInputs?.() || [],
+        userInput
+      );
+
+      if (genderSignals) {
+        this.context.genderContext = genderSignals;
+        console.log(`[ConversationEngine] Gender context detected (confidence: ${genderSignals.confidence.toFixed(2)})`);
+      }
+    } catch (err) {
+      console.warn('[ConversationEngine] Gender context detection failed, continuing without it:', err);
+    }
+
+    // Step 2.6: Detect cycle phase (Dr. Angela's Protocol - additive, non-blocking)
+    try {
+      // Only attempt if user has opted into cycle tracking
+      const lastPeriodDate = (userProfile as any)?.lastPeriodDate;
+      const cycleLength = (userProfile as any)?.cycleLength || 28;
+      const cycleTrackingEnabled = (userProfile as any)?.cycleTrackingEnabled;
+
+      if (cycleTrackingEnabled || lastPeriodDate) {
+        const cyclePhase = this.drAngelaProtocol.detectCyclePhase(lastPeriodDate, cycleLength, userInput);
+
+        if (cyclePhase.confidence > 0.5) {
+          const cycleContext = this.drAngelaProtocol.getCycleContext(cyclePhase, {
+            perimenopause: (userProfile as any)?.perimenopause,
+            pcos: (userProfile as any)?.pcos,
+            irregularCycles: (userProfile as any)?.irregularCycles
+          });
+
+          this.context.cycleContext = cycleContext;
+          console.log(`[ConversationEngine] Cycle context detected: ${cyclePhase.phase} (day ${cyclePhase.dayInCycle}, confidence: ${cyclePhase.confidence.toFixed(2)})`);
+        }
+      }
+    } catch (err) {
+      console.warn('[ConversationEngine] Cycle context detection failed, continuing without it:', err);
+    }
 
     // Step 3: Run contextual listening analysis
     const analysis = this.activeListening.listen(userInput);
@@ -79,7 +140,65 @@ export class ConversationIntelligenceEngine {
     const memoryResponse = this.memory.generateContextAwareResponse(userInput, selectedTechnique);
 
     // Step 7: Weave responses together
-    const finalResponse = this.weaveResponses(baseResponse, memoryResponse);
+    let finalResponse = this.weaveResponses(baseResponse, memoryResponse);
+
+    // Step 7.5: Refine response with gender awareness (additive, non-blocking)
+    let genderAdaptations: string[] = [];
+
+    try {
+      if (this.context.genderContext) {
+        const adaptations = this.genderContext.suggestAdaptations(
+          this.context.genderContext,
+          selectedTechnique.technique?.type || 'unknown'
+        );
+
+        const conversationPhase = this.context.turnCount < 3 ? 'early'
+          : this.context.turnCount > 10 ? 'late' : 'mid';
+
+        const refinementResult = this.genderRefinement.refine(
+          finalResponse,
+          this.context.genderContext,
+          adaptations,
+          conversationPhase
+        );
+
+        if (refinementResult.modificationsApplied.length > 0) {
+          finalResponse = refinementResult.refinedResponse;
+          genderAdaptations = refinementResult.modificationsApplied;
+          console.log(`[ConversationEngine] Gender refinements applied: ${genderAdaptations.join(', ')}`);
+        }
+      }
+    } catch (err) {
+      console.warn('[ConversationEngine] Gender-aware refinement failed, using original response:', err);
+    }
+
+    // Step 7.6: Integrate cycle-aware responses (Dr. Angela's Protocol - additive, non-blocking)
+    try {
+      if (this.context.cycleContext) {
+        const cycleResponse = this.drAngelaProtocol.generateCycleAwareResponse(userInput, this.context.cycleContext);
+
+        if (cycleResponse) {
+          // Integrate the three-layer response into the conversation
+          // Layer 1 (Medical) + Layer 2 (Clinical) + Layer 3 (Spiritual if present) + Support
+          let cycleEnhancedResponse = finalResponse;
+
+          // Add cycle-aware context to response
+          cycleEnhancedResponse += `\n\n${cycleResponse.medical}`;
+          cycleEnhancedResponse += `\n\n${cycleResponse.clinical}`;
+
+          if (cycleResponse.spiritual) {
+            cycleEnhancedResponse += `\n\n${cycleResponse.spiritual}`;
+          }
+
+          cycleEnhancedResponse += `\n\n${cycleResponse.support}`;
+
+          finalResponse = cycleEnhancedResponse;
+          console.log(`[ConversationEngine] Cycle-aware response integrated (phase: ${this.context.cycleContext.cyclePhase.phase})`);
+        }
+      }
+    } catch (err) {
+      console.warn('[ConversationEngine] Cycle-aware integration failed, using original response:', err);
+    }
 
     // Step 8: Record for future context
     this.memory.recordQuestion(finalResponse);
@@ -91,8 +210,19 @@ export class ConversationIntelligenceEngine {
       element: selectedTechnique.technique?.element || 'water',
       reason: `[${selectedTechnique.technique?.type}-contextual]`,
       memoryUsed: !!memoryResponse,
-      contextAdjustments: this.getContextAdjustments()
+      contextAdjustments: this.getContextAdjustments(),
+      genderAdaptationsApplied: genderAdaptations.length > 0 ? genderAdaptations : undefined
     };
+  }
+
+  /**
+   * Enable/disable gender-aware features
+   * Can be called at runtime based on user preference (opt-in)
+   */
+  enableGenderAwareness(enabled: boolean) {
+    this.genderContext = new GenderAwareContext(enabled);
+    this.genderRefinement = new GenderAwareResponseRefinement(enabled);
+    console.log(`[ConversationEngine] Gender awareness ${enabled ? 'enabled' : 'disabled'}`);
   }
 
   private updateContext(input: string): void {

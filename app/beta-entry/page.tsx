@@ -94,7 +94,12 @@ export default function BetaEntry() {
 
         // Proceed to elemental orientation
         setTimeout(() => {
-          router.push('/beta-orientation');
+          // Store inviter info for ceremonial welcome (if available in future)
+          // For now just store that they came through invite
+          sessionStorage.setItem('inviterName', 'A First Dreamer');
+          sessionStorage.setItem('inviterMessage', 'You were chosen. Welcome to the field.');
+
+          router.push('/invite-welcome'); // Sacred invitation ceremony
         }, 500);
       } else {
         setError('Invalid access code. Please check your invitation email.');

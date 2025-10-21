@@ -25,8 +25,12 @@ interface WhisperVoiceProps {
 
 export interface VoiceActivatedMaiaRef {
   isListening: boolean;
+  isRecording: boolean; // Add for compatibility
   audioLevel: number;
   manualStop: () => void; // Allow parent to trigger manual stop
+  startListening: () => Promise<void>; // Add for compatibility with ContinuousConversation
+  stopListening: () => void; // Add for compatibility with ContinuousConversation
+  toggleListening: () => void; // Add for compatibility with ContinuousConversation
 }
 
 export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, WhisperVoiceProps>(({
@@ -40,6 +44,7 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
 }, ref) => {
 
   const [isListening, setIsListening] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const [transcript, setTranscript] = useState('');
 
@@ -63,13 +68,6 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
       onManualStop?.(); // Notify parent component
     }
   }, [onManualStop]);
-
-  // Expose ref interface for parent component
-  useImperativeHandle(ref, () => ({
-    isListening,
-    audioLevel,
-    manualStop
-  }), [isListening, audioLevel, manualStop]);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -152,6 +150,17 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
 
     } catch (error) {
       console.error('❌ Whisper transcription error:', error);
+
+      // Show user-friendly error notification
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      if (errorMessage.includes('timeout') || errorMessage.includes('network')) {
+        console.error('🌐 Network issue - mobile connection may be slow. Try again.');
+      } else if (errorMessage.includes('OPENAI_API_KEY')) {
+        console.error('🔑 API key missing - transcription unavailable');
+      }
+
+      // Don't break the voice flow - just log the error
+      // User can try speaking again
     } finally {
       isProcessingRef.current = false;
     }
@@ -417,6 +426,28 @@ export const WhisperVoiceRecognition = forwardRef<VoiceActivatedMaiaRef, Whisper
     setIsListening(false);
     setTranscript('');
   }, []);
+
+  /**
+   * Wrapper methods for ContinuousConversation compatibility
+   */
+  const toggleListening = useCallback(() => {
+    if (isListening) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  }, [isListening, startRecording, stopRecording]);
+
+  // Expose ref interface for parent component (compatible with ContinuousConversation)
+  useImperativeHandle(ref, () => ({
+    isListening,
+    isRecording: isListening, // Same value for now
+    audioLevel,
+    manualStop,
+    startListening: startRecording,
+    stopListening: stopRecording,
+    toggleListening
+  }), [isListening, audioLevel, manualStop, startRecording, stopRecording, toggleListening]);
 
   /**
    * Effect: Start/stop based on enabled/muted

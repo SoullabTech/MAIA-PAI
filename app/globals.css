@@ -1,6 +1,15 @@
+/* Import Claude-style fonts for warm, legible dialogue */
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Spectral:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global icon visibility fix - ensures all icons are visible */
+@import url('./icon-fix.css');
+
+/* Sacred holoflower animations */
+@import url('../styles/sacred-animations.css');
 
 /* Custom animations for onboarding and voice interface */
 @layer utilities {

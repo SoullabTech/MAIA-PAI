@@ -6,6 +6,9 @@
 import { NextResponse } from 'next/server';
 import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent';
 
+// Force dynamic rendering - this is a diagnostic endpoint
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const diagnostics: any = {
     timestamp: new Date().toISOString(),

@@ -97,7 +97,8 @@ async function transcribeWithOpenAI(audioFile: File): Promise<any> {
     headers: {
       'Authorization': `Bearer ${OPENAI_API_KEY}`
     },
-    body: formData
+    body: formData,
+    signal: AbortSignal.timeout(30000) // 30s timeout for mobile networks
   });
 
   if (!response.ok) {

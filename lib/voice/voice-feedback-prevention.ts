@@ -216,7 +216,19 @@ export function playAudioWithFeedbackPrevention(audio: HTMLAudioElement): Promis
     // Dispatch event before playing
     window.dispatchEvent(new Event('maya-voice-start'));
 
-    audio.play().catch(reject);
+    // Enhanced error logging for iOS/iPhone Chrome debugging
+    audio.play().catch((error) => {
+      console.error('❌ Audio playback failed:', {
+        errorName: error?.name,
+        errorMessage: error?.message,
+        audioSrc: audio.src?.substring(0, 50) + '...',
+        audioReadyState: audio.readyState,
+        audioNetworkState: audio.networkState,
+        audioError: audio.error,
+        userAgent: navigator.userAgent
+      });
+      reject(error);
+    });
   });
 }
 

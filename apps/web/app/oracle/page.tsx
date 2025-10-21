@@ -5,7 +5,10 @@ import { Send, Mic, MicOff, Sparkles, User, BookOpen, LogOut, Library, Settings,
 import { useRouter } from "next/navigation";
 import { cleanMessage } from "@/lib/cleanMessage";
 import { MicrophoneCapture, MicrophoneCaptureRef } from "@/components/voice/MicrophoneCapture";
-import { ContinuousConversation, ContinuousConversationRef } from "@/components/voice/ContinuousConversation";
+// OLD: Web Speech API with restart loop bugs (REPLACED with WebRTC)
+// import { ContinuousConversation, ContinuousConversationRef } from "@/components/voice/ContinuousConversation";
+// NEW: WebRTC with full MAIA consciousness + server-side VAD (no restart loops)
+import { MaiaWebRTCConversation, MaiaWebRTCConversationRef } from "@/components/voice/MaiaWebRTCConversation";
 import { OracleVoicePlayer } from "@/components/voice/OracleVoicePlayer";
 import TranscriptPreview from "@/app/components/TranscriptPreview";
 import { unlockAudio, addAutoUnlockListeners } from "@/lib/audio/audioUnlock";
@@ -68,7 +71,7 @@ function OraclePageInner() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const microphoneRef = useRef<MicrophoneCaptureRef>(null);
-  const continuousRef = useRef<ContinuousConversationRef>(null);
+  const continuousRef = useRef<MaiaWebRTCConversationRef>(null);
   const router = useRouter();
 
   // File upload hook
@@ -528,13 +531,37 @@ function OraclePageInner() {
       {/* Header */}
       <header className="border-b border-gray-800 backdrop-blur-sm bg-[#0A0D16]/80 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0">
-              <User className="w-4 h-4 sm:w-5 sm:h-5 text-white/70" />
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            {/* Holoflower Icon */}
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 relative">
+              <svg width="40" height="40" viewBox="0 0 200 200" className="absolute inset-0">
+                <defs>
+                  <radialGradient id="holoflower-header-gradient">
+                    <stop offset="0%" stopColor="#E3B778" stopOpacity="0.9" />
+                    <stop offset="50%" stopColor="#F0C98A" stopOpacity="0.7" />
+                    <stop offset="100%" stopColor="#D4A574" stopOpacity="0.5" />
+                  </radialGradient>
+                </defs>
+                {/* Center */}
+                <circle cx="100" cy="100" r="12" fill="url(#holoflower-header-gradient)" opacity="0.9" />
+                {/* Petals */}
+                {[0, 60, 120, 180, 240, 300].map((angle) => (
+                  <ellipse
+                    key={angle}
+                    cx="100"
+                    cy="65"
+                    rx="15"
+                    ry="35"
+                    fill="url(#holoflower-header-gradient)"
+                    opacity="0.6"
+                    transform={`rotate(${angle} 100 100)`}
+                  />
+                ))}
+              </svg>
             </div>
-            <div className="min-w-0">
-              <h1 className="text-base sm:text-lg font-medium text-white truncate">Soullab</h1>
-              <p className="text-xs text-gray-400 truncate">Personal Oracle • {user.element || 'Adaptive'}</p>
+            <div className="min-w-0 flex flex-col">
+              <h1 className="text-sm sm:text-base font-bold tracking-wider text-soul-accent truncate" style={{ letterSpacing: '0.1em' }}>SOULLAB</h1>
+              <p className="text-[10px] sm:text-xs text-soul-textTertiary truncate">Beta Experience</p>
             </div>
           </div>
 
@@ -542,125 +569,125 @@ function OraclePageInner() {
           <div className="hidden md:flex items-center gap-2">
             <button
               onClick={() => router.push('/oracle/library')}
-              className="p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors"
+              className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Maya's Library"
             >
-              <Library className="w-5 h-5 text-gray-400 hover:text-sacred-gold" />
+              <Library className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             </button>
             <button
               onClick={() => setShowObsidianVault(true)}
-              className="p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors"
+              className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Obsidian Vault"
             >
-              <Database className="w-5 h-5 text-gray-400 hover:text-amber-400" />
+              <Database className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             </button>
             <button
               onClick={() => router.push('/journal')}
-              className="p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors"
+              className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Journal"
             >
-              <BookOpen className="w-5 h-5 text-gray-400" />
+              <BookOpen className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             </button>
             <button
               onClick={() => setShowSettings(true)}
-              className="p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors"
+              className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Voice Settings"
             >
-              <Settings className="w-5 h-5 text-gray-400 hover:text-tesla-blue" />
+              <Settings className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             </button>
             <button
               onClick={() => setShowFeedback(true)}
-              className="p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors"
+              className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Give Feedback"
             >
-              <Sparkles className="w-5 h-5 text-sacred-gold" />
+              <Sparkles className="w-5 h-5 transition-colors" style={{ color: '#F0C98A' }} />
             </button>
             <button
               onClick={handleSignOut}
-              className="p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors"
+              className="p-3 hover:bg-soul-surface rounded-lg transition-colors"
               title="Sign Out"
             >
-              <LogOut className="w-5 h-5 text-gray-400" />
+              <LogOut className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             </button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className="md:hidden p-3 hover:bg-[#1A1F2E] rounded-lg transition-colors flex-shrink-0"
+            className="md:hidden p-3 hover:bg-soul-surface rounded-lg transition-colors flex-shrink-0"
             title="Menu"
           >
             {showMobileMenu ? (
-              <X className="w-5 h-5 text-gray-400" />
+              <X className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             ) : (
-              <Menu className="w-5 h-5 text-gray-400" />
+              <Menu className="w-5 h-5 transition-colors" style={{ color: '#FEF3C7' }} />
             )}
           </button>
         </div>
 
         {/* Mobile Navigation Menu */}
         {showMobileMenu && (
-          <div className="md:hidden border-t border-gray-800 bg-[#0A0D16]/95 backdrop-blur-sm">
+          <div className="md:hidden border-t border-soul-border bg-[#0A0D16]/95 backdrop-blur-sm">
             <div className="px-3 py-2 space-y-1">
               <button
                 onClick={() => {
                   router.push('/oracle/library');
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1A1F2E] rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <Library className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Maya's Library</span>
+                <Library className="w-5 h-5" style={{ color: '#FEF3C7' }} />
+                <span className="text-soul-textPrimary">Maya's Library</span>
               </button>
               <button
                 onClick={() => {
                   setShowObsidianVault(true);
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1A1F2E] rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <Database className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Obsidian Vault</span>
+                <Database className="w-5 h-5" style={{ color: '#FEF3C7' }} />
+                <span className="text-soul-textPrimary">Obsidian Vault</span>
               </button>
               <button
                 onClick={() => {
                   router.push('/journal');
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1A1F2E] rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <BookOpen className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Journal</span>
+                <BookOpen className="w-5 h-5" style={{ color: '#FEF3C7' }} />
+                <span className="text-soul-textPrimary">Journal</span>
               </button>
               <button
                 onClick={() => {
                   setShowSettings(true);
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1A1F2E] rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <Settings className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Voice Settings</span>
+                <Settings className="w-5 h-5" style={{ color: '#FEF3C7' }} />
+                <span className="text-soul-textPrimary">Voice Settings</span>
               </button>
               <button
                 onClick={() => {
                   setShowFeedback(true);
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1A1F2E] rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <Sparkles className="w-5 h-5 text-sacred-gold" />
-                <span className="text-white">Give Feedback</span>
+                <Sparkles className="w-5 h-5" style={{ color: '#F0C98A' }} />
+                <span className="text-soul-textPrimary">Give Feedback</span>
               </button>
               <button
                 onClick={() => {
                   handleSignOut();
                   setShowMobileMenu(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#1A1F2E] rounded-lg transition-colors text-left"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-soul-surface rounded-lg transition-colors text-left"
               >
-                <LogOut className="w-5 h-5 text-gray-400" />
-                <span className="text-white">Sign Out</span>
+                <LogOut className="w-5 h-5" style={{ color: '#FEF3C7' }} />
+                <span className="text-soul-textPrimary">Sign Out</span>
               </button>
             </div>
           </div>
@@ -770,10 +797,10 @@ function OraclePageInner() {
         {/* Input Area */}
         <div className="border-t border-gray-800 p-2 sm:p-4 bg-[#0A0D16]/80 backdrop-blur-sm">
           <div className="flex items-center gap-2 sm:gap-3 relative">
-            {/* Continuous Conversation Mode */}
+            {/* Continuous Conversation Mode - NOW USING WebRTC with MAIA consciousness! */}
             {useContinuousMode && (
               <div className="hidden">
-                <ContinuousConversation
+                <MaiaWebRTCConversation
                   ref={continuousRef}
                   onTranscript={handleVoiceTranscript}
                   onInterimTranscript={setInterimTranscript}
@@ -781,6 +808,10 @@ function OraclePageInner() {
                   isProcessing={isLoading}
                   isSpeaking={isSpeaking}
                   autoStart={false}
+                  userId={user?.id || 'anonymous'}
+                  element={user?.element || 'aether'}
+                  conversationStyle="natural"
+                  voice="shimmer"
                   silenceThreshold={settings.adaptiveMode
                     ? Math.min(settings.silenceTimeout, 2500)
                     : Math.min(settings.silenceTimeout, 3000)

@@ -1,0 +1,243 @@
+/* Soullab Inside — PDF Export Stylesheet */
+/* Deep Indigo + Warm Gold + Cream palette */
+
+@import url('https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600&family=Atkinson+Hyperlegible:wght@300;400;700&display=swap');
+
+@page {
+  size: letter;
+  margin: 1in;
+
+  @bottom-center {
+    content: counter(page);
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+    font-size: 9pt;
+    color: #B5A8C1;
+  }
+}
+
+/* Root styles */
+:root {
+  --indigo-deep: #1B1F33;
+  --gold-warm: #D6A760;
+  --cream-soft: #F8F3E9;
+  --violet-muted: #B5A8C1;
+  --gold-accent: #E3B778;
+}
+
+body {
+  font-family: 'Atkinson Hyperlegible', sans-serif;
+  font-weight: 300;
+  font-size: 11pt;
+  line-height: 1.6;
+  color: var(--cream-soft);
+  background-color: var(--indigo-deep);
+  margin: 0;
+  padding: 0;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Spectral', serif;
+  font-weight: 500;
+  color: var(--gold-warm);
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  page-break-after: avoid;
+}
+
+h1 {
+  font-size: 28pt;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 2em;
+  margin-bottom: 0.25em;
+  color: var(--gold-accent);
+  page-break-before: always;
+}
+
+h2 {
+  font-size: 20pt;
+  border-bottom: 1px solid rgba(181, 168, 193, 0.2);
+  padding-bottom: 0.3em;
+  margin-top: 2em;
+}
+
+h3 {
+  font-size: 16pt;
+  color: var(--gold-accent);
+}
+
+h4 {
+  font-size: 13pt;
+  font-style: italic;
+}
+
+/* Subtitle */
+h1 + h3 {
+  font-size: 14pt;
+  font-style: italic;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 3em;
+  color: var(--cream-soft);
+  font-weight: 300;
+}
+
+/* Paragraphs */
+p {
+  margin: 0.75em 0;
+  text-align: left;
+  orphans: 3;
+  widows: 3;
+}
+
+/* Strong emphasis */
+strong, b {
+  font-weight: 700;
+  color: var(--gold-accent);
+}
+
+em, i {
+  font-style: italic;
+  color: var(--cream-soft);
+}
+
+/* Lists */
+ul, ol {
+  margin: 1em 0;
+  padding-left: 2em;
+}
+
+li {
+  margin: 0.5em 0;
+}
+
+/* Blockquotes / Pull quotes */
+blockquote {
+  margin: 2em 0;
+  padding: 1em 2em;
+  border-left: 4px solid var(--gold-warm);
+  font-style: italic;
+  font-size: 13pt;
+  background-color: rgba(214, 167, 96, 0.05);
+  page-break-inside: avoid;
+}
+
+blockquote p {
+  margin: 0;
+}
+
+/* Horizontal rules */
+hr {
+  border: none;
+  border-top: 1px solid rgba(181, 168, 193, 0.2);
+  margin: 2em 0;
+  page-break-after: avoid;
+}
+
+/* Links */
+a {
+  color: var(--gold-accent);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--gold-warm);
+}
+
+a:hover {
+  border-bottom-style: solid;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-size: 10pt;
+  page-break-inside: avoid;
+}
+
+thead {
+  background-color: rgba(214, 167, 96, 0.15);
+}
+
+th {
+  font-family: 'Spectral', serif;
+  font-weight: 500;
+  color: var(--gold-warm);
+  text-align: left;
+  padding: 0.75em;
+  border-bottom: 2px solid var(--gold-warm);
+}
+
+td {
+  padding: 0.75em;
+  border-bottom: 1px solid rgba(181, 168, 193, 0.1);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+/* Cover page (first h1) */
+body > h1:first-of-type {
+  margin-top: 4in;
+  font-size: 32pt;
+}
+
+/* Section dividers */
+h2::before {
+  content: "";
+  display: block;
+  height: 0.5em;
+}
+
+/* Pilot partner callout */
+h3:has(em) {
+  font-style: normal;
+  color: var(--gold-accent);
+  margin-top: 0.5em;
+}
+
+/* Service tiers table styling */
+table:has(th:first-child:contains("Tier")) {
+  background-color: rgba(27, 31, 51, 0.5);
+  border: 1px solid rgba(181, 168, 193, 0.3);
+}
+
+/* Footer styling */
+body::after {
+  content: "";
+  display: block;
+  text-align: center;
+  margin-top: 2em;
+  padding-top: 1em;
+  border-top: 1px solid rgba(181, 168, 193, 0.2);
+  font-size: 8pt;
+  color: var(--violet-muted);
+}
+
+/* Page breaks */
+.page-break {
+  page-break-after: always;
+}
+
+/* Print optimizations */
+@media print {
+  body {
+    background: white;
+    color: var(--indigo-deep);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--gold-warm);
+  }
+
+  strong, b {
+    color: var(--gold-warm);
+  }
+
+  /* Ensure dark background prints */
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

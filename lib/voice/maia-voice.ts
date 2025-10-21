@@ -431,6 +431,17 @@ export class MaiaVoiceSystem {
         audio.preload = 'auto';
         audio.volume = this.config.naturalSettings.volume;
 
+        // CRITICAL iOS/iPhone Chrome FIX: Set playsinline attributes for mobile compatibility
+        audio.setAttribute('playsinline', '');
+        audio.setAttribute('webkit-playsinline', ''); // For older iOS versions
+        audio.muted = false; // Explicitly ensure audio is not muted
+
+        console.log('🎵 Audio element configured for iOS:', {
+          playsinline: audio.getAttribute('playsinline'),
+          volume: audio.volume,
+          muted: audio.muted
+        });
+
         // iOS PWA: Resume AudioContext if suspended
         if (this.audioContext) {
           try {

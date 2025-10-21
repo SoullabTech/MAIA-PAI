@@ -25,7 +25,8 @@ export async function POST(request: NextRequest) {
       'SPIRALOGIC-SEED',
       'EARLY-EXPLORER',
       'APPRENTICE-ACCESS',
-      'TEST-ACCESS'
+      'TEST-ACCESS',
+      'Soullab-Jude'  // Jude Epstein - Beta Tester
     ];
 
     if (!invitationCode || !VALID_CODES.includes(invitationCode)) {

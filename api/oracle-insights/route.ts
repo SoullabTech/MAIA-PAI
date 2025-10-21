@@ -5,15 +5,24 @@ import OraclePipeline from '@/services/oracle-pipeline';
 // import { ElementalContentService } from '@/services/ElementalContentService'; // Service not implemented
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize services
-const pipeline = new OraclePipeline(process.env.ANTHROPIC_API_KEY!);
-// const elementalService = new ElementalContentService(); // Service not implemented
+// Lazy initialization to avoid build-time errors when env vars aren't set
+function getOraclePipeline() {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    throw new Error('ANTHROPIC_API_KEY environment variable is not set');
+  }
+  return new OraclePipeline(apiKey);
+}
 
-// Supabase for persistence
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
-);
+// Lazy Supabase client initialization
+function getSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key) {
+    throw new Error('Supabase environment variables are not set');
+  }
+  return createClient(url, key);
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,6 +45,7 @@ export async function POST(req: NextRequest) {
     switch (mode) {
       case 'cascade': {
         // Full 5-stage oracle pipeline
+        const pipeline = getOraclePipeline();
         const result = await pipeline.runPipeline(query, {
           debug,
           userId,
@@ -118,6 +128,7 @@ export async function GET(req: NextRequest) {
 
   try {
     // Load user's temporal buffer from DB
+    const supabase = getSupabaseClient();
     const { data: sessions } = await supabase
       .from('oracle_sessions')
       .select('*')
@@ -151,6 +162,7 @@ async function persistOracleSession(data: {
   stages?: any[];
   elements?: Record<string, string>;
 }) {
+  const supabase = getSupabaseClient();
   const { error } = await supabase
     .from('oracle_sessions')
     .insert({

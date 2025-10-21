@@ -41,7 +41,7 @@ const createNavItems = (onSettingsClick: () => void): NavItem[] => [
     id: 'settings',
     label: 'Settings',
     icon: <Settings className="w-4 h-4 sm:w-5 sm:h-5" />,
-    color: '#FFD700',
+    color: '#F59E0B',
     action: onSettingsClick,
   },
 ];
@@ -100,19 +100,21 @@ export function BottomNavigation() {
 
                 <motion.div
                   animate={{
-                    color: isActive ? item.color : '#ffffff60',
+                    color: isActive ? item.color : '#F6AD55',
                     scale: isActive ? 1.1 : 1,
                   }}
                   transition={{ duration: 0.2 }}
+                  style={{ color: isActive ? item.color : '#F6AD55' }}
                 >
                   {item.icon}
                 </motion.div>
 
                 <motion.span
                   animate={{
-                    color: isActive ? item.color : '#ffffff60',
+                    color: isActive ? item.color : '#F6AD55',
                   }}
-                  className="text-[10px] sm:text-xs font-light"
+                  className="text-[10px] sm:text-xs font-medium"
+                  style={{ color: isActive ? item.color : '#F6AD55' }}
                 >
                   {item.label}
                 </motion.span>

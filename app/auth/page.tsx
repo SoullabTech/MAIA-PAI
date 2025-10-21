@@ -55,7 +55,7 @@ export default function AuthPage() {
         localStorage.setItem('beta_user', JSON.stringify(newUser));
 
         console.log('✅ New user created:', { username, id: newUser.id });
-        router.push('/intro');
+        router.push('/beta-onboarding'); // New users go to onboarding, not intro
       } else {
         // Sign in
         if (!users[username] || users[username].password !== password) {

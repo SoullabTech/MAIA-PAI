@@ -122,16 +122,16 @@ export function ChatMessage({ message, isLatest = false, onPlayAudio }: ChatMess
             }
           }}
           className={`relative p-4 rounded-2xl ${
-            isUser 
-              ? 'bg-blue-500/10 border border-blue-500/20 text-blue-100' 
-              : 'bg-[#1A1F2E]/80 border border-gold-divine/20 text-white'
+            isUser
+              ? 'bg-blue-500/10 text-blue-100'
+              : 'bg-[#1A1F2E]/30 text-amber-400'
           }`}>
           
           {/* Audio Play Button */}
           {hasAudio && (
             <button
               onClick={() => onPlayAudio?.(message.audioUrl!)}
-              className="absolute -top-2 -right-2 w-6 h-6 bg-gold-divine/20 hover:bg-gold-divine/30 border border-gold-divine/40 rounded-full flex items-center justify-center transition-colors"
+              className="absolute -top-2 -right-2 w-6 h-6 bg-gold-divine/20 hover:bg-gold-divine/30 rounded-full flex items-center justify-center transition-colors"
               title="Play Maya&apos;s voice"
             >
               <div className="w-0 h-0 border-l-[6px] border-l-gold-divine border-y-[3px] border-y-transparent ml-0.5" />
@@ -140,7 +140,7 @@ export function ChatMessage({ message, isLatest = false, onPlayAudio }: ChatMess
 
           {/* Message Text */}
           <div className="prose prose-sm max-w-none">
-            <p className="whitespace-pre-wrap leading-relaxed mb-0">
+            <p className="font-serif whitespace-pre-wrap leading-relaxed tracking-wide mb-0">
               {message.content}
             </p>
           </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Heart, User, Calendar, ArrowRight } from 'lucide-react';
 import { Holoflower } from '@/components/ui/Holoflower';
@@ -27,6 +27,32 @@ export function BetaOnboarding({ onComplete }: BetaOnboardingProps) {
   const [name, setName] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [intention, setIntention] = useState('');
+
+  // Load preserved profile data if available (from previous logout)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const betaUser = localStorage.getItem('beta_user');
+    if (betaUser) {
+      try {
+        const userData = JSON.parse(betaUser);
+        if (userData.username) {
+          setName(userData.username);
+          console.log('✅ Pre-filled name from preserved data:', userData.username);
+        }
+        if (userData.birthDate) {
+          setBirthDate(userData.birthDate);
+          console.log('✅ Pre-filled birthday from preserved data');
+        }
+        if (userData.intention) {
+          setIntention(userData.intention);
+          console.log('✅ Pre-filled intention from preserved data');
+        }
+      } catch (e) {
+        console.error('Error loading preserved data:', e);
+      }
+    }
+  }, []);
 
   const handleNext = () => {
     if (step === 0 && !name.trim()) return;
@@ -72,17 +98,52 @@ export function BetaOnboarding({ onComplete }: BetaOnboardingProps) {
                 <div className="text-center mb-8">
                   <motion.div
                     animate={{
-                      scale: [1, 1.1, 1],
-                      rotate: [0, 5, -5, 0]
+                      scale: [1, 1.05, 1],
+                      rotate: [0, 360]
                     }}
                     transition={{
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "easeInOut"
+                      scale: {
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      },
+                      rotate: {
+                        duration: 20,
+                        repeat: Infinity,
+                        ease: "linear"
+                      }
                     }}
                     className="inline-block mb-4"
                   >
-                    <Sparkles className="w-16 h-16 text-amber-400" />
+                    <svg className="w-16 h-16 text-amber-400" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      {/* Outer circle (zodiac wheel) */}
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                      {/* Inner holoflower petals */}
+                      <path d="M12 4 L12 8" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* North */}
+                      <path d="M17.66 6.34 L15.18 8.82" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* NE */}
+                      <path d="M20 12 L16 12" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* East */}
+                      <path d="M17.66 17.66 L15.18 15.18" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* SE */}
+                      <path d="M12 20 L12 16" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* South */}
+                      <path d="M6.34 17.66 L8.82 15.18" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* SW */}
+                      <path d="M4 12 L8 12" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* West */}
+                      <path d="M6.34 6.34 L8.82 8.82" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* NW */}
+                      {/* Center point with pulse */}
+                      <motion.circle
+                        cx="12"
+                        cy="12"
+                        r="1.5"
+                        fill="currentColor"
+                        animate={{
+                          opacity: [1, 0.5, 1],
+                          scale: [1, 1.2, 1]
+                        }}
+                        transition={{
+                          duration: 1.5,
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      />
+                    </svg>
                   </motion.div>
                   <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
                     Welcome to MAIA

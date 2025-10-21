@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { MaiaRealtimeWebRTC, MaiaRealtimeConfig } from '../voice/MaiaRealtimeWebRTC';
+import { getMaiaSystemPrompt } from '../voice/MaiaSystemPrompt';
 
 export interface VoiceMessage {
   id: string;
@@ -47,12 +48,18 @@ export function useMaiaVoice(options: UseMaiaVoiceOptions = {}) {
     }
 
     try {
+      // Generate MAIA's personality prompt if not provided
+      const systemPrompt = options.systemPrompt || getMaiaSystemPrompt({
+        conversationStyle: options.conversationStyle || 'natural',
+        element: options.element || 'aether',
+      });
+
       const config: MaiaRealtimeConfig = {
         userId: options.userId || 'anonymous',
         element: options.element || 'aether',
         conversationStyle: options.conversationStyle || 'natural',
         voice: options.voice || 'shimmer',
-        systemPrompt: options.systemPrompt || '',
+        systemPrompt,
         onTranscript: (text: string, isUser: boolean) => {
           if (isUser) {
             userTranscriptBuffer.current += text;

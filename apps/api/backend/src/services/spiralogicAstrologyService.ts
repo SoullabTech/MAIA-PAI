@@ -1,12 +1,5 @@
-// Mock swisseph for now - TODO: implement proper astrology calculations
-const swisseph = {
-  swe_set_ephe_path: () => {},
-  swe_calc: () => ({ longitude: 0, latitude: 0, distance: 0 }),
-  SE_SUN: 0,
-  SE_MOON: 1,
-  SE_MERCURY: 2,
-  SEFLG_SWIEPH: 2,
-};
+// Real Swiss Ephemeris for accurate astronomical calculations
+import swisseph from 'swisseph';
 
 import { supabase } from "../lib/supabaseClient";
 
@@ -17,8 +10,12 @@ interface ComprehensiveBirthChart {
   aspects: any[];
 }
 
-// Initialize Swiss Ephemeris (mocked)
-swisseph.swe_set_ephe_path("./node_modules/swisseph/ephe");
+// Initialize Swiss Ephemeris with ephemeris data path
+try {
+  swisseph.swe_set_ephe_path(__dirname + "/../../node_modules/swisseph/ephe");
+} catch (error) {
+  console.warn("Swiss Ephemeris data path not set, calculations may use less accurate algorithms");
+}
 
 export interface SpiralogicBirthData {
   date: Date;
@@ -287,7 +284,7 @@ class SpiralogicAstrologyService {
     const day = date.getDate();
     const ut = hours + minutes / 60;
 
-    return swisseph.swe_julday(year, month, day, ut, swisseph.SE_GREG_CAL);
+    return swisseph.swe_julday(year, month, day, ut, 1); // 1 = Gregorian calendar
   }
 
   private calculateHouses(
@@ -317,34 +314,38 @@ class SpiralogicAstrologyService {
   ): Promise<Map<string, any>> {
     const planets = new Map();
     const planetList = [
-      { id: swisseph.SE_SUN, name: "Sun" },
-      { id: swisseph.SE_MOON, name: "Moon" },
-      { id: swisseph.SE_MERCURY, name: "Mercury" },
-      { id: swisseph.SE_VENUS, name: "Venus" },
-      { id: swisseph.SE_MARS, name: "Mars" },
-      { id: swisseph.SE_JUPITER, name: "Jupiter" },
-      { id: swisseph.SE_SATURN, name: "Saturn" },
-      { id: swisseph.SE_URANUS, name: "Uranus" },
-      { id: swisseph.SE_NEPTUNE, name: "Neptune" },
-      { id: swisseph.SE_PLUTO, name: "Pluto" },
-      { id: swisseph.SE_TRUE_NODE, name: "NorthNode" },
+      { id: 0, name: "Sun" },      // SE_SUN
+      { id: 1, name: "Moon" },     // SE_MOON
+      { id: 2, name: "Mercury" },  // SE_MERCURY
+      { id: 3, name: "Venus" },    // SE_VENUS
+      { id: 4, name: "Mars" },     // SE_MARS
+      { id: 5, name: "Jupiter" },  // SE_JUPITER
+      { id: 6, name: "Saturn" },   // SE_SATURN
+      { id: 7, name: "Uranus" },   // SE_URANUS
+      { id: 8, name: "Neptune" },  // SE_NEPTUNE
+      { id: 9, name: "Pluto" },    // SE_PLUTO
+      { id: 11, name: "NorthNode" }, // SE_TRUE_NODE
     ];
 
     for (const planet of planetList) {
-      const result = swisseph.swe_calc_ut(
-        julianDay,
-        planet.id,
-        swisseph.SEFLG_SPEED,
-      );
+      try {
+        const result = swisseph.swe_calc_ut(
+          julianDay,
+          planet.id,
+          2 | 256, // SEFLG_SWIEPH | SEFLG_SPEED
+        );
 
-      if (result.flag === swisseph.OK) {
-        planets.set(planet.name, {
-          degree: result.longitude,
-          speed: result.speed,
-          retrograde: result.speed < 0,
-          sign: this.getZodiacSign(result.longitude),
-          house: 0, // Will be calculated based on house cusps
-        });
+        if (result && result.longitude !== undefined) {
+          planets.set(planet.name, {
+            degree: result.longitude,
+            speed: result.longitudeSpeed || 0,
+            retrograde: (result.longitudeSpeed || 0) < 0,
+            sign: this.getZodiacSign(result.longitude),
+            house: 0, // Will be calculated based on house cusps
+          });
+        }
+      } catch (error) {
+        console.error(`Error calculating ${planet.name}:`, error);
       }
     }
 
