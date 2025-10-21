@@ -367,7 +367,7 @@ export const TransformationalPresence: React.FC<TransformationalPresenceProps> =
         className="breath-ring"
         animate={{
           scale: breathPhase === 'inhale' ? 1.1 : 1,
-          opacity: breathPhase === 'inhale' ? 0.8 : 0.4
+          opacity: breathPhase === 'inhale' ? 0.7 : 0.4
         }}
         transition={{
           duration: essence.breathCycle / 2000,
@@ -375,10 +375,16 @@ export const TransformationalPresence: React.FC<TransformationalPresenceProps> =
         }}
         style={{
           position: 'absolute',
-          width: 140,
-          height: 140,
+          width: 200,
+          height: 200,
           borderRadius: '50%',
-          border: `2px solid ${currentColor}`,
+          background: `radial-gradient(circle, transparent 45%, ${currentColor}20 60%, ${currentColor}40 75%, transparent 100%)`,
+          boxShadow: `
+            0 0 30px ${currentColor}40,
+            0 0 50px ${currentColor}20,
+            inset 0 0 30px ${currentColor}15
+          `,
+          filter: 'blur(2px)',
           pointerEvents: 'none'
         }}
       />
