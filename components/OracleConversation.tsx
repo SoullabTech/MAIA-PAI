@@ -2216,16 +2216,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 0 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
-                      className={`bg-soul-surface/95 rounded-lg p-4 text-soul-textPrimary
-                               border border-soul-border/40 shadow-[0_2px_12px_rgba(0,0,0,0.6)] max-w-full
-                               cursor-pointer hover:bg-soul-surfaceHover transition-all duration-300 group
+                      className={`bg-transparent p-4 text-soul-textPrimary max-w-full
+                               cursor-pointer transition-all duration-300 group
                                ${message.role === 'user' ? 'message-user' : 'message-maia'}`}
                       data-role={message.role === 'user' ? 'user' : 'assistant'}
                       onClick={handleCopyMessage}
                       style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)' }}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <div className="text-xs text-gold-divine/60">
+                        <div className="text-xs" style={{ color: '#D4A574', opacity: 0.8, fontFamily: 'Spectral, Georgia, serif', letterSpacing: '0.05em' }}>
                           {message.role === 'user' ? 'You' : agentConfig.name}
                         </div>
                         <div className="flex items-center gap-1 text-xs text-gold-divine/40
@@ -2236,7 +2235,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           <span className="sm:hidden">Tap to copy</span>
                         </div>
                       </div>
-                      <div className="text-base sm:text-lg md:text-xl leading-relaxed break-words text-white/95">
+                      <div className="text-base sm:text-lg md:text-xl leading-relaxed break-words" style={{ color: '#E8C99B', fontFamily: 'Spectral, Georgia, serif' }}>
                         {message.role === 'oracle' ? (
                           <FormattedMessage text={message.text} />
                         ) : (
@@ -2369,11 +2368,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         className="flex-1 min-h-[42px] max-h-[100px] px-3 py-2
                                  bg-[#1a1f2e]/95 backdrop-blur-md
                                  border border-gold-divine/30 rounded-2xl
-                                 text-gold-divine placeholder-gold-divine/50
+                                 placeholder:text-gold-divine/50
                                  text-sm leading-relaxed
                                  focus:outline-none focus:border-gold-divine/50 focus:ring-1 focus:ring-gold-divine/20
                                  disabled:opacity-50 resize-none
                                  touch-manipulation"
+                        style={{ color: '#E8C99B', fontFamily: 'Spectral, Georgia, serif' }}
                         autoComplete="off"
                         autoFocus={false}
                       />

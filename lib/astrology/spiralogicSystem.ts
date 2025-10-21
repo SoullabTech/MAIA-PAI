@@ -1,16 +1,35 @@
 /**
  * Spiralogic System - Complete Consciousness Process Mapping
  *
- * Integrates:
- * - 12 Astrological Houses → Consciousness States
- * - 4 Elements → Brain Regions (McGilchrist's Divided Brain)
- * - Alchemical Processes → Transformation Stages
- * - Jungian Personality Types → Elemental Functions
- * - 12 Hybrid Facets → Element Combinations
+ * Created by Kelly Nezat - 35 years of phenomenological wisdom practice
+ * Integrating computational neuroscience, alchemy, and consciousness evolution
  *
- * This is a comprehensive framework for mapping human development,
- * consciousness process, and neural activation patterns through
- * astrological coordinates.
+ * IMPORTANT: This is NOT a psychological system. It is computational neuroscience
+ * mapped through elemental intelligence and astrological coordinates.
+ *
+ * Core Framework:
+ * - 4 Elements × 3 Phases = 12 Focus States (NOT 12 personality types)
+ * - Elements map to specific brain regions (McGilchrist's divided brain model)
+ * - Phases map to alchemical transformation stages (Calcinatio, Solutio, Coagulatio, Sublimatio)
+ * - 12 Astrological Houses → Consciousness States and developmental territories
+ * - Jungian Functions integrated as elemental perspectives (Intuition=Fire, Feeling=Water, Sensation=Earth, Thinking=Air)
+ * - 12 Hybrid Facets → Element Combinations revealing developmental capacities
+ * - Aether (5th element) → Transcendent integration, unity consciousness
+ *
+ * Philosophy:
+ * "Assessment reimagined as mirror, not metric" - Kelly Nezat
+ * This framework reflects consciousness patterns back to the person so they can
+ * recognize themselves, not measure or categorize them.
+ *
+ * Integration with 36 Faces:
+ * Austin Coppock's decan system (36 decans of 10° each) fully integrated.
+ * Each planetary position maps to: Sign → House → Element → Phase → Decan
+ * Providing unprecedented depth for consciousness cartography.
+ *
+ * Right-Hemisphere Awakening:
+ * Inspired by Iain McGilchrist's "The Master and His Emissary" - this framework
+ * helps rebalance left-brain dominance and awaken right-hemisphere consciousness.
+ * The technology participates in transformation (like HeartMath), not just explains it.
  */
 
 // ============================================================================

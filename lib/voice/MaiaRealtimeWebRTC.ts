@@ -84,6 +84,10 @@ export class MaiaRealtimeWebRTC {
       const offer = await this.peerConnection.createOffer();
       await this.peerConnection.setLocalDescription(offer);
 
+      // Step 5.5: Wait for ICE gathering to complete (or timeout after 2 seconds)
+      console.log('🧊 Waiting for ICE candidates...');
+      await this.waitForICEGathering();
+
       console.log('📤 Sending SDP offer to backend...');
 
       // Step 6: Send SDP + mode to our backend (unified interface)
@@ -169,6 +173,56 @@ export class MaiaRealtimeWebRTC {
         this.config.onDisconnected();
       }
     };
+  }
+
+  /**
+   * Wait for ICE gathering to complete or timeout after 3 seconds
+   * This ensures the SDP offer contains all ICE candidates before sending to server
+   */
+  private waitForICEGathering(): Promise<void> {
+    return new Promise((resolve) => {
+      if (!this.peerConnection) {
+        resolve();
+        return;
+      }
+
+      // Set timeout to prevent indefinite waiting
+      const timeout = setTimeout(() => {
+        console.log('⏱️ ICE gathering timeout - proceeding with current candidates');
+        resolve();
+      }, 3000);
+
+      // Check if already complete
+      if (this.peerConnection.iceGatheringState === 'complete') {
+        console.log('✅ ICE gathering already complete');
+        clearTimeout(timeout);
+        resolve();
+        return;
+      }
+
+      // Wait for gathering to complete
+      this.peerConnection.onicegatheringstatechange = () => {
+        const state = this.peerConnection?.iceGatheringState;
+        console.log(`🧊 ICE gathering state: ${state}`);
+
+        if (state === 'complete') {
+          console.log('✅ ICE gathering complete');
+          clearTimeout(timeout);
+          resolve();
+        }
+      };
+
+      // Log ICE candidates as they arrive
+      this.peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          console.log(`🧊 ICE candidate: ${event.candidate.type} ${event.candidate.protocol}`);
+        } else {
+          console.log('🧊 ICE candidate gathering finished (null candidate)');
+          clearTimeout(timeout);
+          resolve();
+        }
+      };
+    });
   }
 
   private setupDataChannelHandlers(): void {

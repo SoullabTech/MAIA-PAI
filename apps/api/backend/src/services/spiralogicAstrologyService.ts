@@ -3,6 +3,23 @@ import swisseph from 'swisseph';
 
 import { supabase } from "../lib/supabaseClient";
 
+// 36 Faces Decan System Integration
+import {
+  calculateBirthChartDecans,
+  calculatePlanetaryDecan,
+  getDecanSummary,
+  calculateDecanElementDistribution,
+  getStrongestDecanInfluence,
+  type BirthChartDecans,
+  type PlanetaryDecan,
+} from '../../../../../lib/astrology/decanCalculator';
+
+import {
+  getDecanByDegree,
+  interpretPlanetInDecan,
+  type Decan,
+} from '../../../../../lib/astrology/decanSystem';
+
 // Mock ComprehensiveBirthChart - TODO: fix import
 interface ComprehensiveBirthChart {
   planets: any[];
@@ -42,6 +59,12 @@ export interface PlanetPlacement {
   degree: number;
   retrograde: boolean;
   dignity?: string;
+  // 36 Faces Decan Enhancement
+  decan?: Decan;
+  decanNumber?: 1 | 2 | 3;
+  decanRuler?: string;
+  decanName?: string;
+  tarotCard?: string;
 }
 
 export interface SpiralogicReport {
@@ -63,6 +86,14 @@ export interface SpiralogicReport {
     pluto: KarmicPoint;
   };
   reflectiveProtocols: ReflectiveProtocol[];
+  // 36 Faces Decan Enhancement
+  decanPlacements?: BirthChartDecans;
+  decanSummary?: string;
+  strongestDecanInfluence?: {
+    ruler: string;
+    count: number;
+    interpretation: string;
+  };
   generatedAt: Date;
 }
 
@@ -212,6 +243,12 @@ class SpiralogicAstrologyService {
       karmicAxis,
     );
 
+    // 36 FACES DECAN INTEGRATION
+    // Calculate decan placements for all planets
+    const decanPlacements = calculateBirthChartDecans(chart.planets);
+    const decanSummary = getDecanSummary(decanPlacements);
+    const strongestDecanInfluence = getStrongestDecanInfluence(decanPlacements);
+
     return {
       userId,
       birthChartId,
@@ -221,6 +258,10 @@ class SpiralogicAstrologyService {
       elementalInsights,
       karmicAxis,
       reflectiveProtocols,
+      // Austin Coppock's 36 Faces Integration
+      decanPlacements,
+      decanSummary,
+      strongestDecanInfluence,
       generatedAt: new Date(),
     };
   }
@@ -336,12 +377,21 @@ class SpiralogicAstrologyService {
         );
 
         if (result && result.longitude !== undefined) {
+          // Calculate decan placement
+          const decan = getDecanByDegree(result.longitude);
+
           planets.set(planet.name, {
             degree: result.longitude,
             speed: result.longitudeSpeed || 0,
             retrograde: (result.longitudeSpeed || 0) < 0,
             sign: this.getZodiacSign(result.longitude),
             house: 0, // Will be calculated based on house cusps
+            // 36 Faces Decan Data
+            decan: decan,
+            decanNumber: decan?.decanNumber,
+            decanRuler: decan?.ruler,
+            decanName: decan?.name,
+            tarotCard: decan?.tarotCard,
           });
         }
       } catch (error) {

@@ -63,6 +63,18 @@ export function MenuBar() {
         </div>
       )}
 
+      {/* Subtle drawer handle indicator - shows users the menu is interactive */}
+      <div className="fixed left-1/2 -translate-x-1/2 bottom-[72px] z-30 pointer-events-none">
+        <div className="flex flex-col items-center gap-1 opacity-30 hover:opacity-60 transition-opacity">
+          {/* Three subtle dots in a horizontal line */}
+          <div className="flex gap-1">
+            <div className="w-1 h-1 rounded-full bg-soul-textTertiary/40"></div>
+            <div className="w-1 h-1 rounded-full bg-soul-textTertiary/40"></div>
+            <div className="w-1 h-1 rounded-full bg-soul-textTertiary/40"></div>
+          </div>
+        </div>
+      </div>
+
       {/* INSTRUMENT PANEL: Ancient-future navigation - Bottom menu bar */}
       <div className="flex fixed left-1/2 -translate-x-1/2 bottom-0 z-40 items-center gap-1.5 md:gap-3 bg-soul-surface/95 backdrop-blur-md border-t border-soul-border/50 px-4 md:px-6 py-3 md:py-4 rounded-t-2xl shadow-lg" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
 

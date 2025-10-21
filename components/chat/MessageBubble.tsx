@@ -119,24 +119,50 @@ export default function MessageBubble({
           position: relative;
           max-width: ${isMaia ? '80%' : '70%'};
           padding: 16px 20px;
-          border-radius: 24px;
+          border-radius: 2px;
           font-family: 'Spectral', Georgia, serif;
-          line-height: 1.6;
-          letter-spacing: 0.015em;
+          line-height: 1.7;
+          letter-spacing: 0.03em;
           word-wrap: break-word;
           overflow-wrap: break-word;
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
-        
+
         .message-content.user {
-          background: linear-gradient(135deg, rgba(217, 119, 6, 0.15) 0%, rgba(180, 83, 9, 0.1) 100%);
-          color: #FEF3C7;
-          box-shadow: 0 2px 8px rgba(217, 119, 6, 0.12);
+          background: transparent;
+          color: #D4A574;
+          box-shadow: none;
+          border-left: 2px solid rgba(212, 165, 116, 0.3);
+          padding-left: 18px;
         }
 
         .message-content.maia {
-          background: linear-gradient(135deg, rgba(181, 126, 220, 0.1) 0%, rgba(147, 51, 234, 0.05) 100%);
-          color: #F59E0B;
-          box-shadow: 0 2px 12px rgba(181, 126, 220, 0.08);
+          background: transparent;
+          color: #E8C99B;
+          box-shadow: none;
+          border-left: 3px solid rgba(255, 140, 50, 0.4);
+          padding-left: 20px;
+          position: relative;
+        }
+
+        .message-content.maia::after {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 3px;
+          background: linear-gradient(180deg,
+            rgba(255, 140, 50, 0.6) 0%,
+            rgba(212, 165, 116, 0.3) 50%,
+            rgba(255, 140, 50, 0.6) 100%
+          );
+          animation: spice-flow 4s ease-in-out infinite;
+        }
+
+        @keyframes spice-flow {
+          0%, 100% { opacity: 0.4; }
+          50% { opacity: 0.8; }
         }
         
         .message-content.maia.breathing {
@@ -147,30 +173,35 @@ export default function MessageBubble({
         .message-content.maia.breathing::before {
           content: '';
           position: absolute;
-          top: -2px;
-          left: -2px;
-          right: -2px;
-          bottom: -2px;
-          background: linear-gradient(45deg, 
-            rgba(181, 126, 220, 0.3), 
-            transparent, 
-            rgba(181, 126, 220, 0.3)
+          top: -4px;
+          left: -8px;
+          right: -8px;
+          bottom: -4px;
+          background: radial-gradient(ellipse at center,
+            rgba(255, 140, 50, 0.15),
+            rgba(212, 165, 116, 0.08),
+            transparent
           );
-          border-radius: 26px;
-          opacity: 0.6;
-          animation: breathing-aura 6s ease-in-out infinite;
+          border-radius: 2px;
+          opacity: 0.5;
+          animation: prescient-glow 8s ease-in-out infinite;
           z-index: -1;
           pointer-events: none;
+          filter: blur(8px);
         }
-        
-        @keyframes breathing-aura {
-          0%, 100% { 
-            opacity: 0.3;
-            transform: scale(1);
+
+        @keyframes prescient-glow {
+          0%, 100% {
+            opacity: 0.2;
+            transform: scaleY(1);
           }
-          50% { 
-            opacity: 0.6;
-            transform: scale(1.02);
+          33% {
+            opacity: 0.5;
+            transform: scaleY(1.03);
+          }
+          66% {
+            opacity: 0.35;
+            transform: scaleY(0.98);
           }
         }
         
@@ -242,10 +273,13 @@ export default function MessageBubble({
         }
         
         .timestamp {
-          font-size: 11px;
-          color: #9CA3AF;
-          margin-top: 4px;
+          font-size: 10px;
+          color: #8B7355;
+          margin-top: 6px;
           text-align: ${isMaia ? 'left' : 'right'};
+          letter-spacing: 0.05em;
+          opacity: 0.6;
+          font-family: monospace;
         }
         
         /* Mobile adjustments */

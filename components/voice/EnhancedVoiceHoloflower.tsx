@@ -91,7 +91,7 @@ export default function EnhancedVoiceHoloflower({
           }}
         />
 
-        {/* Outer pulsing ring - distinct animations for each speaker */}
+        {/* Plasma-like field - distinct colors for each speaker */}
         <AnimatePresence>
           {(isListening || isSpeaking) && (
             <motion.div
@@ -100,50 +100,77 @@ export default function EnhancedVoiceHoloflower({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              {/* First pulse ring */}
+              {/* Outer plasma ring - vibrant color for active speaker */}
               <motion.div
-                className="absolute inset-0 rounded-full border-2"
-                style={{ borderColor: getPulseColor() }}
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: isListening
+                    ? 'radial-gradient(circle at center, transparent 40%, rgba(107, 155, 209, 0.4) 70%, rgba(107, 155, 209, 0.6) 85%, transparent 100%)'
+                    : 'radial-gradient(circle at center, transparent 40%, rgba(255, 140, 50, 0.4) 70%, rgba(255, 140, 50, 0.6) 85%, transparent 100%)',
+                  filter: 'blur(12px)',
+                }}
                 animate={{
-                  scale: isListening ? [1, 1.3, 1] : [1, 1.2, 1],
-                  opacity: [0.8, 0.2, 0.8],
+                  scale: isListening ? [1, 1.15, 1] : [1, 1.12, 1],
+                  opacity: [0.6, 0.9, 0.6],
+                  rotate: [0, 360],
                 }}
                 transition={{
-                  duration: isListening ? 1.5 : 2,
+                  scale: {
+                    duration: isListening ? 2.5 : 3,
+                    repeat: Infinity,
+                    ease: 'easeInOut'
+                  },
+                  opacity: {
+                    duration: isListening ? 2 : 2.5,
+                    repeat: Infinity,
+                    ease: 'easeInOut'
+                  },
+                  rotate: {
+                    duration: 8,
+                    repeat: Infinity,
+                    ease: 'linear'
+                  }
+                }}
+              />
+
+              {/* Inner plasma layer - softer glow */}
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: isListening
+                    ? 'radial-gradient(circle at center, transparent 50%, rgba(107, 155, 209, 0.3) 75%, transparent 100%)'
+                    : 'radial-gradient(circle at center, transparent 50%, rgba(212, 165, 116, 0.3) 75%, transparent 100%)',
+                  filter: 'blur(20px)',
+                }}
+                animate={{
+                  scale: isListening ? [1.05, 1.25, 1.05] : [1.03, 1.2, 1.03],
+                  opacity: [0.4, 0.7, 0.4],
+                }}
+                transition={{
+                  duration: isListening ? 3 : 3.5,
+                  delay: 0.5,
                   repeat: Infinity,
                   ease: 'easeInOut'
                 }}
               />
 
-              {/* Second pulse ring with offset timing */}
-              <motion.div
-                className="absolute inset-0 rounded-full border"
-                style={{ borderColor: getPulseColor() }}
-                animate={{
-                  scale: isListening ? [1.1, 1.4, 1.1] : [1.05, 1.25, 1.05],
-                  opacity: [0.6, 0.1, 0.6],
-                }}
-                transition={{
-                  duration: isListening ? 1.5 : 2,
-                  delay: 0.3,
-                  repeat: Infinity,
-                  ease: 'easeInOut'
-                }}
-              />
-
-              {/* Audio level indicator ring */}
+              {/* Audio level reactive plasma burst */}
               {audioLevel > 0 && (
                 <motion.div
                   className="absolute inset-0 rounded-full"
                   style={{
-                    border: `${Math.max(2, audioLevel * 10)}px solid ${getPulseColor()}`,
-                    opacity: audioLevel * 0.5,
+                    background: isListening
+                      ? `radial-gradient(circle at center, transparent 45%, rgba(107, 155, 209, ${audioLevel * 0.6}) 70%, transparent 90%)`
+                      : `radial-gradient(circle at center, transparent 45%, rgba(255, 140, 50, ${audioLevel * 0.6}) 70%, transparent 90%)`,
+                    filter: 'blur(8px)',
                   }}
                   animate={{
-                    scale: 1 + audioLevel * 0.3,
+                    scale: 1 + audioLevel * 0.2,
+                    opacity: audioLevel * 0.8,
                   }}
                   transition={{
-                    duration: 0.1
+                    duration: 0.15,
+                    ease: 'easeOut'
                   }}
                 />
               )}

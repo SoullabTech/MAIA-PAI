@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     console.log(`📞 Received SDP offer from client (mode: ${mode})`);
+    console.log(`📋 SDP length: ${sdp.length} chars, starts with: ${sdp.substring(0, 50)}`);
 
     // Mode-specific configurations
     const modeConfigs = {
@@ -141,7 +142,11 @@ You are the witnessing presence. Trust the unfolding.`,
       throw new Error('OPENAI_API_KEY not configured');
     }
 
-    console.log('🔑 Calling OpenAI Realtime API with model:', sessionConfig.model);
+    console.log('🔑 Calling OpenAI Realtime API...');
+    console.log(`   Model: ${sessionConfig.model}`);
+    console.log(`   SDP being sent: ${sdp.length} chars`);
+    console.log(`   SDP first line: ${sdp.split('\n')[0]}`);
+    console.log(`   SDP last line: ${sdp.split('\n').pop()}`);
 
     // IMPORTANT: OpenAI WebRTC expects:
     // 1. URL with model as query parameter
