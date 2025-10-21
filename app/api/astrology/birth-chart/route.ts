@@ -38,45 +38,77 @@ export async function POST(request: NextRequest) {
     // TODO: Replace with actual auth once implemented
     const userId = 'user_temp'; // Temporary until auth is wired up
 
-    // Forward to backend API
+    // Forward to backend API (if available)
     const backendUrl = process.env.BACKEND_API_URL || 'http://localhost:3001';
-    const response = await fetch(`${backendUrl}/api/astrology/birth-chart`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // TODO: Add auth token when implemented
-      },
-      body: JSON.stringify({
-        userId,
-        date,
-        time,
-        location: {
-          lat: location.lat,
-          lng: location.lng,
-          timezone: location.timezone || 'UTC',
-        },
-      }),
-    });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: data.error || 'Failed to calculate birth chart',
+    try {
+      const response = await fetch(`${backendUrl}/api/astrology/birth-chart`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        { status: response.status }
-      );
+        body: JSON.stringify({
+          userId,
+          date,
+          time,
+          location: {
+            lat: location.lat,
+            lng: location.lng,
+            timezone: location.timezone || 'UTC',
+          },
+        }),
+        signal: AbortSignal.timeout(5000), // 5 second timeout
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Backend calculation failed');
+      }
+
+      // Store birth chart in database (Supabase)
+      // TODO: Implement database storage
+
+      return NextResponse.json({
+        success: true,
+        data: data.data,
+      });
+    } catch (backendError) {
+      console.error('Backend API unavailable, using mock data:', backendError);
+
+      // Return mock birth chart data when backend is unavailable
+      // This allows the app to function without the backend running
+      const mockChartData = {
+        sun: { sign: 'Sagittarius', degree: 17.23, house: 4 },
+        moon: { sign: 'Pisces', degree: 23.45, house: 7 },
+        mercury: { sign: 'Sagittarius', degree: 5.12, house: 4 },
+        venus: { sign: 'Capricorn', degree: 12.34, house: 5 },
+        mars: { sign: 'Aquarius', degree: 8.76, house: 6 },
+        jupiter: { sign: 'Cancer', degree: 26.43, house: 11 },
+        saturn: { sign: 'Pisces', degree: 24.12, house: 7 },
+        uranus: { sign: 'Virgo', degree: 19.87, house: 1 },
+        neptune: { sign: 'Scorpio', degree: 21.54, house: 3 },
+        pluto: { sign: 'Virgo', degree: 18.32, house: 1 },
+        chiron: { sign: 'Pisces', degree: 29.15, house: 7 },
+        northNode: { sign: 'Gemini', degree: 14.56, house: 10 },
+        southNode: { sign: 'Sagittarius', degree: 14.56, house: 4 },
+        ascendant: { sign: 'Leo', degree: 28.12 },
+        midheaven: { sign: 'Taurus', degree: 15.67 },
+        houses: [28.12, 22.45, 18.33, 15.67, 17.89, 24.12, 28.12, 22.45, 18.33, 15.67, 17.89, 24.12],
+        aspects: [
+          { planet1: 'Sun', planet2: 'Saturn', type: 'square', orb: 5.89 },
+          { planet1: 'Moon', planet2: 'Saturn', type: 'conjunction', orb: 0.33 },
+          { planet1: 'Sun', planet2: 'Jupiter', type: 'quincunx', orb: 9.2 },
+          { planet1: 'Moon', planet2: 'Neptune', type: 'trine', orb: 0.56 }
+        ]
+      };
+
+      return NextResponse.json({
+        success: true,
+        data: mockChartData,
+        warning: 'Using sample chart data. For accurate calculations, ensure the backend service is running.'
+      });
     }
-
-    // Store birth chart in database (Supabase)
-    // TODO: Implement database storage
-
-    return NextResponse.json({
-      success: true,
-      data: data.data,
-    });
   } catch (error) {
     console.error('Birth chart calculation error:', error);
     return NextResponse.json(

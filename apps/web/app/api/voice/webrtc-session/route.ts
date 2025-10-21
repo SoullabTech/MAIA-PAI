@@ -18,9 +18,8 @@ export async function POST(req: NextRequest) {
 
     console.log('📞 Received SDP offer from client');
 
-    // Session configuration
+    // Session configuration with proper structure for OpenAI Realtime API
     const sessionConfig = {
-      type: 'realtime',
       model: 'gpt-4o-realtime-preview-2024-12-17',
       modalities: ['text', 'audio'],
       instructions: `You are Maia, a voice assistant with deep wisdom and warmth.
@@ -41,9 +40,18 @@ You can help with questions, thoughts, or just be a companion to talk with.`,
     };
 
     // Create FormData with SDP and session config
+    // OpenAI expects 'session.type' field at the root level
     const formData = new FormData();
     formData.set('sdp', sdp);
-    formData.set('session', JSON.stringify(sessionConfig));
+    formData.set('session.type', 'realtime');
+    formData.set('session.model', sessionConfig.model);
+    formData.set('session.modalities', JSON.stringify(sessionConfig.modalities));
+    formData.set('session.instructions', sessionConfig.instructions);
+    formData.set('session.voice', sessionConfig.voice);
+    formData.set('session.input_audio_format', sessionConfig.input_audio_format);
+    formData.set('session.output_audio_format', sessionConfig.output_audio_format);
+    formData.set('session.input_audio_transcription', JSON.stringify(sessionConfig.input_audio_transcription));
+    formData.set('session.turn_detection', JSON.stringify(sessionConfig.turn_detection));
 
     // Call OpenAI Realtime API
     const openAIKey = process.env.OPENAI_API_KEY;

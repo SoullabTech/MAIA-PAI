@@ -25,7 +25,8 @@ import { OracleResponse, ConversationContext } from '@/lib/oracle-response';
 // import { useElementalVoice } from '@/hooks/useElementalVoice'; // DISABLED - was causing OpenAI Realtime browser errors
 import { mapResponseToMotion, enrichOracleResponse } from '@/lib/motion-mapper';
 import { VoiceState } from '@/lib/voice/voice-capture';
-import { useMaiaVoice } from '@/hooks/useMaiaVoice';
+// import { useMaiaVoice } from '@/hooks/useMaiaVoice'; // OLD TTS SYSTEM - replaced with WebRTC
+import { useMaiaRealtime } from '@/hooks/useMaiaRealtime';
 import { cleanMessage, cleanMessageForVoice, formatMessageForDisplay } from '@/lib/cleanMessage';
 import { getAgentConfig, AgentConfig } from '@/lib/agent-config';
 import { toast } from 'react-hot-toast';
@@ -36,10 +37,12 @@ import { generateGreeting } from '@/lib/services/greetingService';
 import { BrandedWelcome } from './BrandedWelcome';
 import { userTracker } from '@/lib/tracking/userActivityTracker';
 import { ModeSwitcher } from './ui/ModeSwitcher';
+import { SacredLabDrawer } from './ui/SacredLabDrawer';
 import { ConversationStylePreference } from '@/lib/preferences/conversation-style-preference';
 import { detectJournalCommand, detectBreakthroughPotential } from '@/lib/services/conversationEssenceExtractor';
 import { useFieldProtocolIntegration } from '@/hooks/useFieldProtocolIntegration';
 import { BookPlus } from 'lucide-react';
+import { TransformationalPresence, type PresenceState } from './nlp/TransformationalPresence';
 
 interface OracleConversationProps {
   userId?: string;
@@ -48,6 +51,8 @@ interface OracleConversationProps {
   initialCheckIns?: Record<string, number>;
   showAnalytics?: boolean;
   voiceEnabled?: boolean;
+  initialMode?: 'normal' | 'patient' | 'session'; // Control mode from parent
+  onModeChange?: (mode: 'normal' | 'patient' | 'session') => void; // Notify parent of mode changes
   onMessageAdded?: (message: ConversationMessage) => void;
   onSessionEnd?: (reason?: string) => void;
 }
@@ -87,11 +92,135 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   initialCheckIns = {},
   showAnalytics = false,
   voiceEnabled = true,
+  initialMode = 'normal',
+  onModeChange,
   onMessageAdded,
   onSessionEnd
 }) => {
-  // Maia Voice Integration - Initialize immediately for Voice mode
-  const { speak: maiaSpeak, voiceState: maiaVoiceState, isReady: maiaReady } = useMaiaVoice();
+  // Listening mode for different conversation styles - MUST be defined early
+  type ListeningMode = 'normal' | 'patient' | 'session';
+  const [listeningMode, setListeningMode] = useState<ListeningMode>(initialMode);
+
+  // Sync with parent's initialMode prop when it changes
+  useEffect(() => {
+    if (initialMode !== listeningMode) {
+      setListeningMode(initialMode);
+    }
+  }, [initialMode]);
+
+  // Notify parent when mode changes (use ref to avoid dependency loop)
+  const onModeChangeRef = useRef(onModeChange);
+  useEffect(() => {
+    onModeChangeRef.current = onModeChange;
+  }, [onModeChange]);
+
+  useEffect(() => {
+    if (onModeChangeRef.current) {
+      onModeChangeRef.current(listeningMode);
+    }
+  }, [listeningMode]);
+
+  // Map old mode names to new realtime mode names
+  const realtimeMode: 'dialogue' | 'patient' | 'scribe' =
+    listeningMode === 'normal' ? 'dialogue' :
+    listeningMode === 'patient' ? 'patient' : 'scribe';
+
+  // Maia Realtime Integration - WebRTC with full interruption support
+  const {
+    isConnected: maiaConnected,
+    isConnecting: maiaConnecting,
+    isSpeaking: maiaIsSpeaking,
+    error: maiaError,
+    transcript: maiaTranscript,
+    connect: maiaConnect,
+    disconnect: maiaDisconnect,
+    sendText: maiaSendText,
+    cancelResponse: maiaCancelResponse,
+    changeMode: maiaChangeMode,
+  } = useMaiaRealtime({
+    userId: userId || 'anonymous',
+    userName: userName || 'Explorer',
+    voice: 'shimmer',
+    mode: realtimeMode,
+    onTranscript: (text, isUser) => {
+      if (isUser) {
+        setUserTranscript(text);
+      } else {
+        setMaiaResponseText(prev => prev + text);
+      }
+    },
+    onAudioStart: () => {
+      setIsResponding(true);
+      setIsAudioPlaying(true);
+      console.log('🔊 MAIA started speaking');
+    },
+    onAudioEnd: () => {
+      setIsResponding(false);
+      setIsAudioPlaying(false);
+      console.log('🔇 MAIA finished speaking');
+
+      // CRITICAL FIX: Auto-restart listening after MAIA finishes speaking
+      // This fixes the "conversation dies after first exchange" bug
+      setTimeout(() => {
+        if (!isMuted && voiceEnabled && voiceMicRef.current?.startListening) {
+          voiceMicRef.current.startListening();
+          console.log('🎤 Auto-restarted listening for next turn');
+        }
+      }, 1000); // 1 second delay to prevent echo
+    },
+    onError: (error) => {
+      console.error('❌ MAIA Realtime error:', error);
+    },
+    onConnected: () => {
+      console.log('✅ MAIA Realtime connected');
+    },
+    onDisconnected: () => {
+      console.log('🔌 MAIA Realtime disconnected');
+    },
+  });
+
+  // Legacy TTS stubs (voice now handled by WebRTC realtime above)
+  const maiaReady = maiaConnected;
+  const maiaSpeak = useCallback(async (text: string) => {
+    console.log('🎙️ maiaSpeak called with:', text.substring(0, 50));
+
+    // FALLBACK: Use browser TTS if WebRTC isn't working
+    if (!maiaConnected && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      console.log('🔊 Using browser TTS fallback');
+      return new Promise<void>((resolve) => {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.95; // Slightly slower, more natural
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        // Try to use a more natural voice
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(v =>
+          v.name.includes('Samantha') ||
+          v.name.includes('Karen') ||
+          v.name.includes('Female')
+        );
+        if (preferredVoice) {
+          utterance.voice = preferredVoice;
+        }
+
+        utterance.onend = () => {
+          console.log('✅ Browser TTS completed');
+          resolve();
+        };
+        utterance.onerror = (error) => {
+          console.error('❌ Browser TTS error:', error);
+          resolve(); // Resolve anyway to not block
+        };
+
+        window.speechSynthesis.speak(utterance);
+      });
+    }
+
+    console.warn('⚠️ WebRTC not connected and no browser TTS available');
+    return Promise.resolve();
+  }, [maiaConnected]);
+  const maiaVoiceState = { isPlaying: maiaIsSpeaking };
 
   // Field Protocol Integration
   const {
@@ -105,6 +234,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     autoCapture: true,
     captureThreshold: 5
   });
+
+  // Sacred Lab Drawer state
+  const [showLabDrawer, setShowLabDrawer] = useState(false);
+
+  // Bottom bar visibility - show on hover in bottom area (macOS Dock style)
+  const [showBottomBar, setShowBottomBar] = useState(true); // Start visible so users see it
+
+  // Auto-hide the bottom bar after 3 seconds on first load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowBottomBar(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // 🌀 Soullab Realtime - DISABLED
   // This was trying to use OpenAI Realtime API in browser (not supported without dangerouslyAllowBrowser)
@@ -179,6 +322,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [isIOSAudioEnabled, setIsIOSAudioEnabled] = useState(false);
   const [needsIOSAudioPermission, setNeedsIOSAudioPermission] = useState(false);
+  const [voiceAmplitude, setVoiceAmplitude] = useState(0); // For voice visualization ring
 
   // Sync refs with state to avoid stale closures in callbacks
   useEffect(() => {
@@ -189,9 +333,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     isRespondingRef.current = isResponding;
   }, [isResponding]);
 
-  // Listening mode for different conversation styles
-  type ListeningMode = 'normal' | 'patient' | 'session';
-  const [listeningMode, setListeningMode] = useState<ListeningMode>('normal');
+  // REMOVED - Listening mode now defined earlier before hooks (line 95-96)
   const [streamingText, setStreamingText] = useState<string>('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [isMicrophonePaused, setIsMicrophonePaused] = useState(false);
@@ -217,6 +359,29 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [isSavingJournal, setIsSavingJournal] = useState(false);
   const [showJournalSuggestion, setShowJournalSuggestion] = useState(false);
   const [breakthroughScore, setBreakthroughScore] = useState(0);
+
+  // Connect MAIA Realtime on mount
+  useEffect(() => {
+    if (!maiaConnected && !maiaConnecting) {
+      console.log('🔌 Connecting MAIA Realtime...');
+      maiaConnect();
+    }
+
+    return () => {
+      if (maiaConnected) {
+        console.log('🔌 Disconnecting MAIA Realtime...');
+        maiaDisconnect();
+      }
+    };
+  }, []); // Only on mount/unmount
+
+  // Handle mode changes
+  useEffect(() => {
+    if (maiaConnected) {
+      console.log(`🔄 Mode changed to ${realtimeMode}`);
+      maiaChangeMode(realtimeMode);
+    }
+  }, [realtimeMode, maiaConnected, maiaChangeMode]);
 
   // Client-side only check
   useEffect(() => {
@@ -358,20 +523,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       onMessageAdded?.(acknowledgmentMessage);
 
       // Optionally speak the acknowledgment if voice is enabled
-      if (voiceEnabled && maiaSpeak) {
-        setTimeout(() => {
-          maiaSpeak(acknowledgment).catch(err =>
-            console.error('Failed to speak acknowledgment:', err)
-          );
-        }, 500);
-      }
+      // NOTE: Speech now handled automatically by WebRTC realtime voice system
+      // if (voiceEnabled && maiaSendText) {
+      //   setTimeout(() => {
+      //     maiaSendText(acknowledgment);
+      //   }, 500);
+      // }
     };
 
     window.addEventListener('maya-style-changed', handleStyleChange as EventListener);
     return () => {
       window.removeEventListener('maya-style-changed', handleStyleChange as EventListener);
     };
-  }, [voiceEnabled, maiaSpeak, onMessageAdded]);
+  }, [voiceEnabled, onMessageAdded]);
 
   // UI states
   const [showChatInterface, setShowChatInterface] = useState(false); // Default to voice mode - shows blue plasma visualization
@@ -477,19 +641,44 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
   }, [showChatInterface, isProcessing, messages.length]);
 
-  // Update motion state based on voice activity
+  // Update motion state and voice amplitude based on voice activity
   useEffect(() => {
     if (userVoiceState?.isSpeaking) {
       setCurrentMotionState('listening');
       setIsListening(true);
 
-      // Map voice amplitude to petal breathing
-      const breathingIntensity = userVoiceState.amplitude;
-      // This will be picked up by the Holoflower's motion orchestrator
+      // Update voice visualization ring amplitude
+      const amplitude = userVoiceState.amplitude || 0;
+      setVoiceAmplitude(Math.min(1, amplitude * 2)); // Amplify for better visualization
     } else {
       setIsListening(false);
+      // Fade out voice ring when not speaking
+      setVoiceAmplitude(prev => Math.max(0, prev * 0.8));
     }
   }, [userVoiceState]);
+
+  // Update voice amplitude when MAIA is speaking
+  useEffect(() => {
+    if (isResponding || maiaIsSpeaking) {
+      // Pulse effect for MAIA speaking
+      const pulseInterval = setInterval(() => {
+        setVoiceAmplitude(prev => {
+          const target = 0.5 + Math.sin(Date.now() / 200) * 0.3;
+          return prev * 0.7 + target * 0.3; // Smooth lerp
+        });
+      }, 50);
+
+      return () => clearInterval(pulseInterval);
+    } else {
+      // Fade out when MAIA stops
+      const fadeInterval = setInterval(() => {
+        setVoiceAmplitude(prev => Math.max(0, prev * 0.9));
+      }, 50);
+
+      setTimeout(() => clearInterval(fadeInterval), 500);
+      return () => clearInterval(fadeInterval);
+    }
+  }, [isResponding, maiaIsSpeaking]);
 
   // iOS PWA: Resume AudioContext on visibility change and user interaction
   useEffect(() => {
@@ -1098,7 +1287,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setIsResponding(false);
       setCurrentMotionState('idle');
     }
-  }, [isProcessing, isAudioPlaying, isResponding, sessionId, userId, onMessageAdded, agentConfig, messages.length, showChatInterface, voiceEnabled, maiaReady, maiaSpeak]);
+  }, [isProcessing, isAudioPlaying, isResponding, sessionId, userId, onMessageAdded, agentConfig, messages.length, showChatInterface, voiceEnabled, maiaReady]);
 
   // Handle voice transcript from mic button
   const handleVoiceTranscript = useCallback(async (transcript: string) => {
@@ -1275,7 +1464,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setIsProcessing(false);
       setIsResponding(false);
     }
-  }, [handleTextMessage, isProcessing, isResponding, isAudioPlaying, messages, echoSuppressUntil, maiaReady, maiaSpeak, isMuted]);
+  }, [handleTextMessage, isProcessing, isResponding, isAudioPlaying, messages, echoSuppressUntil, maiaReady, isMuted]);
 
   // Clear all check-ins
   const clearCheckIns = useCallback(() => {
@@ -1502,7 +1691,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         <MaiaSettingsPanel onClose={() => setShowSettingsPanel(false)} />
       )}
 
-      {/* Agent Customizer - Only show when settings clicked */}
+      {/* 🧠 NLP-INFORMED TRANSFORMATIONAL PRESENCE - No explanatory UI, only experience */}
+      {/* State transitions happen through breathing, color, field - unconscious installation */}
+      {/* Gestures replace buttons: swipe down = deepen, swipe up = quicken, long press = stay */}
+
+      {/* Agent Customizer - Moved to SacredLabDrawer in future iteration */}
       {showCustomizer && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={() => setShowCustomizer(false)} />
@@ -1511,108 +1704,45 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               position="center"
               onConfigChange={(config) => {
                 setAgentConfig(config);
-                // Save voice preference to localStorage
                 if (typeof window !== 'undefined') {
                   localStorage.setItem('selected_voice', config.name);
-                  // Cancel any playing audio when voice changes
                   if (window.speechSynthesis) {
                     window.speechSynthesis.cancel();
                   }
                 }
-                // Refresh conversation with new agent
                 console.log('Agent changed to:', config.name);
-                setShowCustomizer(false); // Close after selection
+                setShowCustomizer(false);
               }}
             />
           </div>
         </div>
       )}
 
-      {/* Listening Mode Controls - Voice mode only */}
-      {voiceEnabled && !showChatInterface && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed top-20 left-1/2 -translate-x-1/2 z-[30] flex items-center gap-2 bg-black/40 backdrop-blur-md rounded-full px-4 py-2 border border-amber-900/20"
+      {/* 🧠 TRANSFORMATIONAL PRESENCE - NLP-Informed State Container */}
+      {/* Breathing entrainment, color transitions, field expansion based on state */}
+      {/* NO cognitive UI - the experience itself induces the transformation */}
+      <div className="fixed top-32 md:top-28 lg:top-24 left-1/2 -translate-x-1/2 z-[25]">
+        <TransformationalPresence
+          currentState={realtimeMode as PresenceState}
+          onStateChange={(newState, transition) => {
+            console.log('🌀 State transition:', transition);
+            // Map back to listeningMode
+            const newListeningMode =
+              newState === 'dialogue' ? 'normal' :
+              newState === 'patient' ? 'patient' : 'scribe';
+            setListeningMode(newListeningMode);
+            // Update Maia Realtime mode
+            maiaChangeMode(newState);
+          }}
+          userSilenceDuration={0} // TODO: Track actual silence duration
+          userSpeechTempo={120} // TODO: Track actual speech tempo
+          isListening={isListening}
+          isSpeaking={isResponding}
+          biometricEnabled={true} // ⌚ APPLE WATCH INTEGRATION ENABLED
         >
-          <span className="text-xs text-amber-400/60 mr-2">Mode:</span>
-          <button
-            onClick={() => setListeningMode('normal')}
-            className={`px-3 py-1 rounded-full text-xs transition-all ${
-              listeningMode === 'normal'
-                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                : 'text-stone-400 hover:text-amber-400/80 hover:bg-amber-500/10'
-            }`}
-            title="Dialogue Mode: 3.5 second pause triggers response"
-          >
-            Dialogue
-          </button>
-          <button
-            onClick={() => setListeningMode('patient')}
-            className={`px-3 py-1 rounded-full text-xs transition-all ${
-              listeningMode === 'patient'
-                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                : 'text-stone-400 hover:text-amber-400/80 hover:bg-amber-500/10'
-            }`}
-            title="Patient Mode: 8 second pause triggers response - for gathering thoughts"
-          >
-            Patient
-          </button>
-          <button
-            onClick={() => setListeningMode('session')}
-            className={`px-3 py-1 rounded-full text-xs transition-all ${
-              listeningMode === 'session'
-                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
-                : 'text-stone-400 hover:text-amber-400/80 hover:bg-amber-500/10'
-            }`}
-            title="Scribe Mode: Maia listens without interrupting until you say you're done"
-          >
-            Scribe
-          </button>
-          {listeningMode === 'session' && (
-            <button
-              onClick={() => {
-                // Manually trigger transcript processing when in session mode
-                if (voiceMicRef.current?.isListening) {
-                  voiceMicRef.current.stopListening();
-                  // The transcript will be sent automatically when stopped
-                  setTimeout(() => {
-                    if (!isProcessing && !isResponding) {
-                      voiceMicRef.current?.startListening();
-                    }
-                  }, 1000);
-                }
-              }}
-              className="ml-2 px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/40 rounded-full text-xs hover:bg-green-500/30 transition-all"
-            >
-              I'm Done Speaking
-            </button>
-          )}
-        </motion.div>
-      )}
-
-      {/* Mode Status Indicator */}
-      {voiceEnabled && !showChatInterface && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[25] text-center"
-        >
-          <div className="text-xs text-amber-400/40">
-            {listeningMode === 'session' ? (
-              <span>🎙️ Scribe Mode Active - Speak freely, I'm just listening...</span>
-            ) : listeningMode === 'patient' ? (
-              <span>🤔 Patient Mode - Taking time for your thoughts...</span>
-            ) : (
-              <span>💬 Dialogue Mode - Natural conversation</span>
-            )}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Subtle Holoflower - Lower position, not dominating */}
-      <motion.div
-        className="fixed top-32 md:top-28 lg:top-24 left-1/2 -translate-x-1/2 z-[25] cursor-pointer opacity-60 hover:opacity-80 transition-opacity"
+          {/* Holoflower wrapped in Transformational Presence - inherits breathing, color, field */}
+          <motion.div
+            className="cursor-pointer opacity-60 hover:opacity-80 transition-opacity"
         onClick={async (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -1667,6 +1797,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             isProcessing={isProcessing}
             isResponding={isResponding}
             showBreakthrough={showBreakthrough}
+            voiceAmplitude={voiceAmplitude}
+            isMaiaSpeaking={isResponding || maiaIsSpeaking}
             dimmed={conversationMode === 'chat' || messages.length > 0}
           />
 
@@ -1999,6 +2131,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           </div>
         </div>
       </motion.div>
+        </TransformationalPresence>
+      </div>
 
       {/* Shadow petal overlay */}
       {shadowPetals.length > 0 && (
@@ -2040,12 +2174,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         }`}
              style={{
                height: showChatInterface
-                 ? 'calc(100vh - 220px)'
-                 : 'calc(100vh - 240px)',
+                 ? 'calc(100vh - 300px)'
+                 : 'calc(100vh - 320px)',
                maxHeight: showChatInterface
-                 ? 'calc(100vh - 220px)'
-                 : 'calc(100vh - 240px)',
-               bottom: showChatInterface ? '200px' : '120px',
+                 ? 'calc(100vh - 300px)'
+                 : 'calc(100vh - 320px)',
+               bottom: showChatInterface ? '280px' : '200px',
                overflow: 'hidden'
              }}>
           <div className="h-full overflow-y-scroll overflow-x-hidden pr-2 mobile-scroll"
@@ -2201,7 +2335,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
               {/* Compact text input area - mobile-first, fixed at bottom */}
               {showChatInterface && (
-              <div className="fixed inset-x-0 bottom-16 z-[60]">
+              <div className="fixed inset-x-0 z-[60]" style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
                 {/* Text input area - Ultra compact mobile design - Raised above bottom menu bar */}
                 <div className="bg-soul-surface/90 px-2 py-2 border-t border-soul-border/40">
                   <form
@@ -2310,13 +2444,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             </>
           ) : null}
 
-          {/* Mic Hint Message - Bottom placement below menu bar */}
+          {/* Mic Hint Message - Bottom placement above menu bar */}
           {!showChatInterface && isMuted && (
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="fixed bottom-20 sm:bottom-24 left-1/2 transform -translate-x-1/2 z-50"
+              className="fixed left-1/2 transform -translate-x-1/2 z-50"
+              style={{ bottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
             >
               <div className="bg-soul-surface/90 backdrop-blur-md rounded-lg px-4 py-2 border border-soul-border/40">
                 <p className="text-soul-textSecondary text-sm">Click the holoflower to activate voice</p>
@@ -2396,322 +2531,118 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Redesigned Bottom Icon Bar - Sacred Style - Always visible - Scrollable on mobile */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 pb-safe mb-2 overflow-x-auto overflow-y-hidden
-                      md:left-1/2 md:right-auto md:transform md:-translate-x-1/2 md:overflow-x-visible"
-           style={{
-             WebkitOverflowScrolling: 'touch',
-             scrollbarWidth: 'none',
-             msOverflowStyle: 'none'
-           }}>
-        <style jsx>{`
-          div::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
-        <div className="flex justify-start items-center gap-4 md:gap-8 py-4 px-4 md:px-8 bg-soul-surface/90 rounded-full border border-soul-border/30
-                        md:justify-center min-w-max md:min-w-0">
-          {/* Voice Toggle - Activate mic when switching to voice mode */}
+      {/* Hover Zone - Full bottom edge to trigger bottom bar (macOS Dock style) */}
+      <div
+        className="fixed bottom-0 left-0 right-0 h-4 z-40 pointer-events-auto"
+        onMouseEnter={() => setShowBottomBar(true)}
+      />
+
+      {/* Sacred Minimal Bottom Bar - Integrated with Global Navigation (macOS Dock style) */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 ease-out"
+        onMouseEnter={() => setShowBottomBar(true)}
+        onMouseLeave={() => setShowBottomBar(false)}
+        style={{
+          paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+          transform: showBottomBar ? 'translateY(0)' : 'translateY(calc(100% - 0.25rem))',
+          opacity: showBottomBar ? 1 : 0,
+        }}
+      >
+        <div className="flex justify-center items-center gap-4 md:gap-6 py-3 md:py-4 px-4 md:px-8 mx-4 md:mx-auto md:max-w-2xl bg-gradient-to-b from-[#1a1a2e]/95 to-[#16213e]/95 backdrop-blur-md rounded-full border border-[#D4B896]/20 shadow-2xl">
+          {/* Home Button - Holoflower */}
+          <a
+            href="/maya"
+            className="p-3 md:p-4 rounded-full bg-[#D4B896]/10 hover:bg-[#D4B896]/20 transition-all duration-300"
+            title="Home"
+          >
+            <svg className="w-5 h-5 md:w-6 md:h-6 text-[#D4B896]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+          </a>
+
+          {/* Microphone On/Off Toggle */}
           <button
             onClick={async () => {
-              setShowChatInterface(false);
-              setIsMuted(false); // Unmute FIRST
-              await enableAudio();
-              // Start listening when switching to voice mode
-              setTimeout(async () => {
-                if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
-                  await voiceMicRef.current.startListening();
-                  console.log('🎤 Voice started via mode switch');
+              if (!isMuted) {
+                // Turn mic OFF
+                setIsMuted(true);
+                if (voiceMicRef.current?.stopListening) {
+                  voiceMicRef.current.stopListening();
+                  console.log('🔇 Microphone OFF');
                 }
-              }, 300); // Slightly longer delay to ensure state updates
-            }}
-            className={`p-3 rounded-full transition-all duration-300 ${
-              !showChatInterface
-                ? 'bg-[#D4B896]/20 text-[#D4B896]'
-                : 'text-[#D4B896]/40 hover:text-[#D4B896]/60'
-            }`}
-            title="Voice Mode"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-            </svg>
-          </button>
-
-          {/* Microphone Mute Toggle - Only visible in Voice mode */}
-          {!showChatInterface && (
-            <button
-              onClick={async () => {
-                if (!isMuted) {
-                  // Mute the microphone
-                  setIsMuted(true);
-                  if (voiceMicRef.current?.stopListening) {
-                    voiceMicRef.current.stopListening();
-                    console.log('🔇 Microphone muted');
+              } else {
+                // Turn mic ON
+                setShowChatInterface(false);
+                setIsMuted(false);
+                await enableAudio();
+                setTimeout(async () => {
+                  if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
+                    await voiceMicRef.current.startListening();
+                    console.log('🎤 Microphone ON');
                   }
-                } else {
-                  // Unmute and start listening
-                  setIsMuted(false);
-                  await enableAudio();
-                  setTimeout(async () => {
-                    if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
-                      await voiceMicRef.current.startListening();
-                      console.log('🎤 Microphone unmuted');
-                    }
-                  }, 100);
-                }
-              }}
-              className={`p-3 rounded-full transition-all duration-300 ${
-                isMuted
-                  ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                  : 'bg-[#D4B896]/20 text-[#D4B896] hover:bg-[#D4B896]/30'
-              }`}
-              title={isMuted ? "Unmute Microphone" : "Mute Microphone"}
-            >
-              {isMuted ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                        d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                </svg>
-              )}
-            </button>
-          )}
+                }, 100);
+              }
+            }}
+            className={`p-4 rounded-full transition-all duration-300 ${
+              !isMuted
+                ? 'bg-[#D4B896]/20 text-[#D4B896] shadow-lg shadow-[#D4B896]/20'
+                : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
+            }`}
+            title={isMuted ? "Turn Microphone ON" : "Turn Microphone OFF"}
+          >
+            {isMuted ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+              </svg>
+            )}
+          </button>
 
           {/* EMERGENCY STOP - Shows when MAIA is speaking */}
           {(isResponding || isAudioPlaying || maiaVoiceState?.isPlaying) && (
             <button
               onClick={handleEmergencyStop}
-              className="p-3 rounded-full bg-red-500/80 text-white hover:bg-red-600 transition-all duration-300 pulse-red"
+              className="p-4 rounded-full bg-red-500/80 text-white hover:bg-red-600 transition-all duration-300 animate-pulse shadow-lg shadow-red-500/50"
               title="Stop MAIA"
             >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                 <rect x="6" y="6" width="12" height="12" rx="1" />
               </svg>
             </button>
           )}
 
-          {/* Heart/Favorites */}
-          <button
-            className="p-3 rounded-full text-[#D4B896]/40 hover:text-[#D4B896]/60 transition-all duration-300"
-            title="Favorites"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </button>
-
-          {/* Profile/User */}
-          <button
-            onClick={() => window.location.href = '/profile'}
-            className="p-3 rounded-full text-[#D4B896]/40 hover:text-[#D4B896]/60 transition-all duration-300"
-            title="Your Profile"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          </button>
-
-          {/* Birth Chart / Astrology - Holoflower Icon */}
-          <button
-            onClick={() => window.location.href = '/birth-chart'}
-            className="p-3 rounded-full text-[#D4B896]/40 hover:text-[#D4B896]/60 transition-all duration-300 group"
-            title="Your Cosmic Blueprint"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              {/* Outer circle (zodiac wheel) */}
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" fill="none" />
-              {/* Inner holoflower petals */}
-              <path d="M12 4 L12 8" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* North */}
-              <path d="M17.66 6.34 L15.18 8.82" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* NE */}
-              <path d="M20 12 L16 12" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* East */}
-              <path d="M17.66 17.66 L15.18 15.18" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* SE */}
-              <path d="M12 20 L12 16" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* South */}
-              <path d="M6.34 17.66 L8.82 15.18" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* SW */}
-              <path d="M4 12 L8 12" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* West */}
-              <path d="M6.34 6.34 L8.82 8.82" stroke="currentColor" strokeWidth="1" opacity="0.6" /> {/* NW */}
-              {/* Center point */}
-              <circle cx="12" cy="12" r="1.5" fill="currentColor" className="group-hover:animate-pulse" />
-            </svg>
-          </button>
-
-          {/* Lab Notes */}
-          <button
-            onClick={() => window.location.href = '/lab-notes'}
-            className="p-3 rounded-full text-[#D4B896]/40 hover:text-[#D4B896]/60 transition-all duration-300"
-            title="Lab Notes"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </button>
-
-          {/* Journal/Book Icon - Open Book Style */}
-          <button
-            onClick={() => window.location.href = '/journal'}
-            className="p-3 rounded-full text-[#D4B896]/40 hover:text-[#D4B896]/60 transition-all duration-300 group"
-            title="Sacred Journal"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-              {/* Left page */}
-              <path
-                d="M 4,8 Q 4,6 6,6 L 14,6 L 14,24 Q 14,25 13,25 L 6,25 Q 4,25 4,23 Z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="group-hover:animate-pulse"
-              />
-              {/* Right page */}
-              <path
-                d="M 28,8 Q 28,6 26,6 L 18,6 L 18,24 Q 18,25 19,25 L 26,25 Q 28,25 28,23 Z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="group-hover:animate-pulse"
-              />
-              {/* Book spine */}
-              <path
-                d="M 14,6 L 14,25 L 18,25 L 18,6 Z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {/* Text lines */}
-              <path d="M 7,10 L 11,10" stroke="currentColor" strokeWidth="0.8" opacity="0.3" />
-              <path d="M 7,13 L 11,13" stroke="currentColor" strokeWidth="0.8" opacity="0.3" />
-              <path d="M 20,10 L 24,10" stroke="currentColor" strokeWidth="0.8" opacity="0.3" />
-              <path d="M 20,13 L 24,13" stroke="currentColor" strokeWidth="0.8" opacity="0.3" />
-            </svg>
-          </button>
-
           {/* Chat Toggle */}
           <button
-            onClick={() => setShowChatInterface(true)}
-            className={`p-3 rounded-full transition-all duration-300 ${
+            onClick={() => setShowChatInterface(!showChatInterface)}
+            className={`p-4 rounded-full transition-all duration-300 ${
               showChatInterface
-                ? 'bg-[#D4B896]/20 text-[#D4B896]'
-                : 'text-[#D4B896]/40 hover:text-[#D4B896]/60'
+                ? 'bg-[#D4B896]/20 text-[#D4B896] shadow-lg shadow-[#D4B896]/20'
+                : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
             }`}
-            title="Chat Mode"
+            title="Toggle Chat Mode"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </button>
 
-          {/* Text Display Toggle - Only visible in Voice mode */}
-          {!showChatInterface && (
-            <button
-              onClick={() => setShowVoiceText(!showVoiceText)}
-              className="p-3 rounded-full text-[#D4B896]/40 hover:text-[#D4B896]/60 transition-all duration-300"
-              title={showVoiceText ? "Hide Text" : "Show Text"}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d={showVoiceText
-                        ? "M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
-                        : "M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                      } />
-              </svg>
-            </button>
-          )}
-
-          {/* File Upload for Maia */}
-          <input
-            type="file"
-            id="maiaFileUpload"
-            className="hidden"
-            multiple
-            accept="*"
-            onChange={(e) => {
-              const files = Array.from(e.target.files || []);
-              if (files.length > 0) {
-                const fileNames = files.map(f => f.name).join(', ');
-                handleTextMessage(`Please analyze these files: ${fileNames}`, files);
-                e.target.value = ''; // Reset input
-              }
-            }}
-          />
-          <label
-            htmlFor="maiaFileUpload"
-            className="p-3 rounded-full text-[#D4B896]/40 hover:text-[#D4B896]/80 hover:bg-[#D4B896]/10 transition-all duration-300 cursor-pointer"
-            title="Upload files for Maia to explore"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-          </label>
-
-          {/* Quick Mode Toggle - Easy mode switching */}
-          <QuickModeToggle />
-
-          {/* Field Protocol - Document consciousness explorations */}
+          {/* Sacred Menu - Opens Lab Drawer */}
           <button
-            onClick={() => {
-              if (isFieldRecording) {
-                completeFieldRecording().then(() => {
-                  toast.success('Field Record completed');
-                });
-              } else {
-                startFieldRecording();
-                toast.success('Field Recording started');
-              }
-            }}
-            className={`p-3 rounded-full transition-all duration-300 group relative ${
-              isFieldRecording
-                ? 'text-green-400 bg-green-400/20 animate-pulse'
-                : 'text-purple-400/70 hover:text-purple-400 hover:bg-purple-400/10'
-            }`}
-            title={isFieldRecording ? 'Complete Field Recording' : 'Start Field Recording'}
+            onClick={() => setShowLabDrawer(true)}
+            className="p-4 rounded-full bg-white/5 text-[#D4B896]/80 hover:bg-[#D4B896]/10 hover:text-[#D4B896] transition-all duration-300"
+            title="Lab Tools & Navigation"
           >
-            <BookPlus className="w-5 h-5" />
-            {isFieldRecording && (
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-ping" />
-            )}
-          </button>
-
-          {/* Quick Settings - Opens comprehensive MAIA settings - GOLD HIGHLIGHT */}
-          <button
-            onClick={() => setShowSettingsPanel(!showSettingsPanel)}
-            className="p-3 rounded-full text-amber-400/70 hover:text-amber-400 hover:bg-amber-400/10 transition-all duration-300 group relative"
-            title="MAIA Settings - Voice, Memory, Personality"
-            style={{ filter: 'drop-shadow(0 0 3px rgba(255, 215, 0, 0.3))' }}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span className="absolute -top-1 -right-1 w-2 h-2 bg-amber-400 rounded-full group-hover:opacity-100 transition-opacity animate-pulse"></span>
-          </button>
-
-          {/* Download/Share */}
-          <button
-            onClick={downloadTranscript}
-            disabled={messages.length === 0}
-            className="p-3 rounded-full text-[#D4B896]/40 hover:text-[#D4B896]/60 transition-all duration-300 disabled:opacity-30"
-            title="Download Transcript"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                    d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
         </div>
@@ -2736,12 +2667,59 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             autoStart={true}
             silenceThreshold={
               listeningMode === 'session' ? 999999 : // Session mode: never auto-send (effectively infinite)
-              listeningMode === 'patient' ? 8000 :    // Patient mode: 8 seconds
-              3500                                      // Normal mode: 3.5 seconds
+              listeningMode === 'patient' ? 10000 :   // Patient mode: 10 seconds (increased for full thoughts)
+              6000                                     // Normal mode: 6 seconds (increased from 3.5s to prevent mid-sentence cutoff)
             }
           />
         </div>
       )}
+
+      {/* Hidden File Upload Input */}
+      <input
+        type="file"
+        id="maiaFileUpload"
+        className="hidden"
+        multiple
+        accept="*"
+        onChange={(e) => {
+          const files = Array.from(e.target.files || []);
+          if (files.length > 0) {
+            const fileNames = files.map(f => f.name).join(', ');
+            handleTextMessage(`Please analyze these files: ${fileNames}`, files);
+            e.target.value = ''; // Reset input
+          }
+        }}
+      />
+
+      {/* Sacred Lab Drawer - Organized navigation and tools */}
+      <SacredLabDrawer
+        isOpen={showLabDrawer}
+        onClose={() => setShowLabDrawer(false)}
+        onNavigate={(path) => {
+          window.location.href = path;
+          setShowLabDrawer(false);
+        }}
+        onAction={(action) => {
+          if (action === 'upload') {
+            document.getElementById('maiaFileUpload')?.click();
+          }
+          if (action === 'toggle-text') {
+            setShowVoiceText(!showVoiceText);
+          }
+          if (action === 'field-protocol') {
+            if (isFieldRecording) {
+              completeFieldRecording().then(() => {
+                toast.success('Field Record completed');
+              });
+            } else {
+              startFieldRecording();
+              toast.success('Field Recording started');
+            }
+          }
+        }}
+        showVoiceText={showVoiceText}
+        isFieldRecording={isFieldRecording}
+      />
     </div>
   );
 };

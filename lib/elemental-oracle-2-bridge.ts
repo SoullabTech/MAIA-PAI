@@ -200,7 +200,7 @@ export class ElementalOracle2Bridge {
    * Prepare optimized query for your Oracle 2.0
    */
   private prepareOracleQuery(context: Oracle2Context): string {
-    const elementalPriorities = context.elementalNeeds
+    const elementalPriorities = context.elementalNeeds && typeof context.elementalNeeds === 'object'
       ? Object.entries(context.elementalNeeds)
           .filter(([_, need]) => (need || 0) > 0.3)
           .sort(([_, a], [__, b]) => (b || 0) - (a || 0))

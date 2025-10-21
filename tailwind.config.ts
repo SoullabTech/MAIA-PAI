@@ -120,6 +120,18 @@ const config: Config = {
           'water-deep': '#1A4D4A',     // Backgrounds for reflection
           'ocean-mist': '#5FA8A3',     // Subtle highlights
 
+          // 💗 HEALTH & WELLNESS - Desert Rose & Spice Vitality
+          'desert-rose': '#E8B4B8',        // Primary wellness bg, soft blush
+          'rose-deep': '#C97C85',          // Rich rose text, deep vitality
+          'rose-gold': '#E5A3A3',          // Luxury wellness accent
+          'spice-pink': '#F7CDD2',         // Light wellness highlights
+          'wellness-crimson': '#D45D79',   // Active health states, vitality pulse
+          'heart-coral': '#FF7B9C',        // Cardiovascular health, love
+          'bloom-magenta': '#E94B8A',      // Peak vitality, breakthrough moments
+          'sunset-blush': '#FFB5BA',       // Gentle transitions, recovery
+          'arrakis-mauve': '#D4A5A5',      // Meditative health states
+          'spice-trance-pink': '#EE82B4',  // Deep coherence, HRV peaks
+
           // Semantic Colors
           'bene-gesserit-gold': '#B8860B',  // Wisdom, insights
           'navigator-purple': '#6A4C93',    // Prescient states, patterns

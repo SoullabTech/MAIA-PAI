@@ -32,7 +32,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     isProcessing = false,
     isSpeaking = false,
     autoStart = true,
-    silenceThreshold = 2500, // Increased from 1200ms to 2.5s for more natural pauses
+    silenceThreshold = 4500, // Increased to 4.5s to allow fuller thoughts before processing
     vadSensitivity = 0.3
   } = props;
 
@@ -504,7 +504,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   // Restart listening when Maya stops speaking
   useEffect(() => {
     if (isListening && !isSpeaking && !isProcessing && !isRecording && !isRestartingRef.current) {
-      // Restart recognition after Maya finishes
+      // Restart recognition after Maya finishes - LONGER DELAY to prevent echo
       const timer = setTimeout(() => {
         if (recognitionRef.current && isListening && !isRecording && !isRestartingRef.current) {
           try {
@@ -521,7 +521,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
             isRestartingRef.current = false;
           }
         }
-      }, 500);
+      }, 1500); // Increased from 500ms to 1.5s to prevent picking up MAIA's voice echo
       return () => clearTimeout(timer);
     }
   }, [isSpeaking, isProcessing, isListening, isRecording]);

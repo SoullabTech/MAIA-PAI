@@ -14,6 +14,7 @@
 export interface MaiaRealtimeConfig {
   model?: string;
   voice?: 'alloy' | 'echo' | 'shimmer' | 'ash' | 'ballad' | 'coral' | 'sage' | 'verse';
+  mode?: 'dialogue' | 'patient' | 'scribe'; // Three conversation modes
   systemPrompt?: string;
   userId?: string;
   element?: string;
@@ -37,6 +38,7 @@ export class MaiaRealtimeWebRTC {
     this.config = {
       model: config.model || 'gpt-4o-realtime-preview-2024-12-17',
       voice: config.voice || 'shimmer',
+      mode: config.mode || 'dialogue', // Default to dialogue mode
       systemPrompt: config.systemPrompt || '',
       userId: config.userId || 'anonymous',
       element: config.element || 'aether',
@@ -84,14 +86,17 @@ export class MaiaRealtimeWebRTC {
 
       console.log('📤 Sending SDP offer to backend...');
 
-      // Step 6: Send SDP to our backend (unified interface)
-      // Our backend combines SDP with session config and forwards to OpenAI
+      // Step 6: Send SDP + mode to our backend (unified interface)
+      // Our backend combines SDP with mode-specific session config and forwards to OpenAI
       const sdpResponse = await fetch('/api/voice/webrtc-session', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/sdp',
+          'Content-Type': 'application/json',
         },
-        body: offer.sdp,
+        body: JSON.stringify({
+          sdp: offer.sdp,
+          mode: this.config.mode
+        }),
       });
 
       if (!sdpResponse.ok) {
@@ -174,7 +179,29 @@ export class MaiaRealtimeWebRTC {
     this.dataChannel.onopen = () => {
       console.log('📡 Data channel opened! State:', this.dataChannel?.readyState);
 
-      // Send session configuration
+      // Mode-specific turn detection settings
+      const turnDetectionByMode = {
+        dialogue: {
+          type: 'server_vad' as const,
+          threshold: 0.5,
+          prefix_padding_ms: 300,
+          silence_duration_ms: 700 // Natural conversational pauses
+        },
+        patient: {
+          type: 'server_vad' as const,
+          threshold: 0.6, // Higher = less sensitive = fewer interruptions
+          prefix_padding_ms: 500,
+          silence_duration_ms: 2000 // Longer pauses before responding
+        },
+        scribe: {
+          type: 'server_vad' as const,
+          threshold: 0.7, // Very high = minimal interruption
+          prefix_padding_ms: 800,
+          silence_duration_ms: 5000 // Very long pauses - they control when you speak
+        }
+      };
+
+      // Send session configuration with mode-specific settings
       this.sendEvent({
         type: 'session.update',
         session: {
@@ -186,12 +213,7 @@ export class MaiaRealtimeWebRTC {
           input_audio_transcription: {
             model: 'whisper-1',
           },
-          turn_detection: {
-            type: 'server_vad',
-            threshold: 0.5,
-            prefix_padding_ms: 300,
-            silence_duration_ms: 500,
-          },
+          turn_detection: turnDetectionByMode[this.config.mode],
         },
       });
     };
@@ -350,5 +372,34 @@ export class MaiaRealtimeWebRTC {
     this.sendEvent({
       type: 'response.cancel',
     });
+  }
+
+  // Change conversation mode dynamically (requires reconnection)
+  async changeMode(newMode: 'dialogue' | 'patient' | 'scribe'): Promise<void> {
+    if (newMode === this.config.mode) {
+      console.log(`Already in ${newMode} mode`);
+      return;
+    }
+
+    console.log(`🔄 Changing mode from ${this.config.mode} to ${newMode}`);
+
+    const wasConnected = this.isConnected();
+
+    // Disconnect if connected
+    if (wasConnected) {
+      await this.disconnect();
+    }
+
+    // Update mode
+    this.config.mode = newMode;
+
+    // Reconnect if we were connected
+    if (wasConnected) {
+      await this.connect();
+    }
+  }
+
+  getCurrentMode(): 'dialogue' | 'patient' | 'scribe' {
+    return this.config.mode;
   }
 }

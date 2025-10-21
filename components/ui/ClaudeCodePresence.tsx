@@ -158,7 +158,7 @@ export function ClaudeCodePresence() {
     <>
       {/* My presence at the top right - clean and away from the Holoflower */}
       <motion.div
-        className="fixed top-4 right-4 z-[26] cursor-pointer"
+        className="fixed top-16 right-4 z-[26] cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}

@@ -71,10 +71,26 @@ export function useMaiaRealtime(config: MaiaRealtimeConfig) {
     }
   }, []);
 
-  const sendMessage = useCallback((message: string) => {
+  const sendText = useCallback((message: string) => {
     if (clientRef.current) {
-      clientRef.current.sendMessage(message);
+      clientRef.current.sendText(message);
     }
+  }, []);
+
+  const cancelResponse = useCallback(() => {
+    if (clientRef.current) {
+      clientRef.current.cancelResponse();
+    }
+  }, []);
+
+  const changeMode = useCallback(async (newMode: 'dialogue' | 'patient' | 'scribe') => {
+    if (clientRef.current) {
+      await clientRef.current.changeMode(newMode);
+    }
+  }, []);
+
+  const getCurrentMode = useCallback((): 'dialogue' | 'patient' | 'scribe' | undefined => {
+    return clientRef.current?.getCurrentMode();
   }, []);
 
   return {
@@ -85,6 +101,9 @@ export function useMaiaRealtime(config: MaiaRealtimeConfig) {
     transcript,
     connect,
     disconnect,
-    sendMessage,
+    sendText,
+    cancelResponse, // ✅ Interruption support
+    changeMode, // ✅ Dynamic mode switching
+    getCurrentMode,
   };
 }
