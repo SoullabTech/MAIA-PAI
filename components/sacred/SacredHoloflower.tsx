@@ -21,6 +21,8 @@ interface SacredHoloflowerProps {
   isResponding?: boolean;
   showBreakthrough?: boolean;
   dimmed?: boolean; // Dim for chat mode (accessibility)
+  voiceAmplitude?: number; // 0.0 - 1.0 for voice visualization
+  isMaiaSpeaking?: boolean; // true when MAIA is speaking
 }
 
 export const SacredHoloflower: React.FC<SacredHoloflowerProps> = ({
@@ -38,7 +40,9 @@ export const SacredHoloflower: React.FC<SacredHoloflowerProps> = ({
   isProcessing = false,
   isResponding = false,
   showBreakthrough = false,
-  dimmed = false
+  dimmed = false,
+  voiceAmplitude = 0,
+  isMaiaSpeaking = false
 }) => {
   const [hoveredFacet, setHoveredFacet] = useState<string | null>(null);
   const [currentMotionState, setCurrentMotionState] = useState<MotionState>(motionState);
@@ -275,20 +279,41 @@ export const SacredHoloflower: React.FC<SacredHoloflowerProps> = ({
           );
         })}
 
-        {/* Center sacred geometry preservation - HIDDEN (distracting) */}
+        {/* Dynamic Voice Visualization Ring */}
         <circle
           cx={size / 2}
           cy={size / 2}
-          r={size * 0.1}
+          r={size * 0.42}
           fill="none"
-          stroke="white"
-          strokeWidth="0.5"
-          opacity="0"
-          className={`center-aether ${
-            currentMotionState === 'responding' && activeFacetId ? 'center-aether-active' : ''
-          }`}
+          stroke={isMaiaSpeaking ? 'url(#maia-voice-gradient)' : 'url(#user-voice-gradient)'}
+          strokeWidth={2 + voiceAmplitude * 4}
+          opacity={0.3 + voiceAmplitude * 0.7}
+          className="voice-ring"
+          style={{
+            filter: `blur(${voiceAmplitude * 2}px) drop-shadow(0 0 ${voiceAmplitude * 10}px ${isMaiaSpeaking ? 'rgba(147, 51, 234, 0.8)' : 'rgba(59, 130, 246, 0.8)'})`,
+            transform: `scale(${1 + voiceAmplitude * 0.1})`,
+            transformOrigin: 'center',
+            transition: 'all 0.1s ease-out'
+          }}
           pointerEvents="none"
         />
+
+        {/* Voice gradient definitions */}
+        <defs>
+          {/* MAIA speaking - purple/violet gradient */}
+          <linearGradient id="maia-voice-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#9333ea" stopOpacity="1" />
+            <stop offset="50%" stopColor="#c084fc" stopOpacity="1" />
+            <stop offset="100%" stopColor="#e879f9" stopOpacity="1" />
+          </linearGradient>
+
+          {/* User speaking - blue/cyan gradient */}
+          <linearGradient id="user-voice-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#3b82f6" stopOpacity="1" />
+            <stop offset="50%" stopColor="#60a5fa" stopOpacity="1" />
+            <stop offset="100%" stopColor="#93c5fd" stopOpacity="1" />
+          </linearGradient>
+        </defs>
       </svg>
 
       {/* Facet info tooltip */}

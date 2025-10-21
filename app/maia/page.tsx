@@ -12,6 +12,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { OracleConversation } from '@/components/OracleConversation';
 import { ClaudeCodePresence } from '@/components/ui/ClaudeCodePresence';
 import { WisdomJourneyDashboard } from '@/components/maya/WisdomJourneyDashboard';
@@ -59,14 +60,32 @@ function getInitialUserData() {
 export default function MAIAPage() {
   const router = useRouter();
 
-  const initialData = getInitialUserData();
-  const [explorerId, setExplorerId] = useState(initialData.id);
-  const [explorerName, setExplorerName] = useState(initialData.name);
-  const [sessionId] = useState(() => Date.now().toString());
+  // Fix hydration: Initialize with safe defaults, update in useEffect
+  const [explorerId, setExplorerId] = useState('guest');
+  const [explorerName, setExplorerName] = useState('Explorer');
+  const [sessionId, setSessionId] = useState('');
   const [showDashboard, setShowDashboard] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [maiaMode, setMaiaMode] = useState<'normal' | 'patient' | 'session'>('normal');
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   const hasCheckedAuth = useRef(false);
+
+  // Fix hydration: Initialize user data and session after mount
+  useEffect(() => {
+    setIsMounted(true);
+    setSessionId(Date.now().toString());
+
+    const initialData = getInitialUserData();
+    setExplorerId(initialData.id);
+    setExplorerName(initialData.name);
+
+    // Check welcome message in client-side only
+    const welcomeSeen = localStorage.getItem('maia_welcome_seen');
+    setShowWelcome(!welcomeSeen);
+  }, []);
 
   const handleSignOut = () => {
     localStorage.removeItem('beta_user');
@@ -205,7 +224,13 @@ export default function MAIAPage() {
                       ease: "easeInOut"
                     }}
                   >
-                    <Sparkles className="w-5 h-5 text-amber-400/80" />
+                    <Image
+                      src="/holoflower-amber.png"
+                      alt="SOULLAB Holoflower"
+                      width={32}
+                      height={32}
+                      className="w-8 h-8"
+                    />
                   </motion.div>
                   <div>
                     <h1 className="text-sm font-bold text-white/90">SOUL​LAB</h1>
@@ -253,6 +278,65 @@ export default function MAIAPage() {
                     Neural patterns emerging from dialogue
                   </span>
                 </div>
+              </div>
+
+              {/* Center - Mode & Voice Controls */}
+              <div className="flex items-center gap-3">
+                {/* Mode Selector */}
+                <div className="flex items-center gap-1 bg-black/20 border border-white/5 rounded-lg p-1">
+                  <button
+                    onClick={() => setMaiaMode('normal')}
+                    className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                      maiaMode === 'normal'
+                        ? 'bg-amber-600/20 text-amber-400 border border-amber-600/30'
+                        : 'text-stone-400 hover:text-stone-300 hover:bg-white/5'
+                    }`}
+                    title="Quick conversational responses"
+                  >
+                    Dialogue
+                  </button>
+                  <button
+                    onClick={() => setMaiaMode('patient')}
+                    className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                      maiaMode === 'patient'
+                        ? 'bg-purple-600/20 text-purple-400 border border-purple-600/30'
+                        : 'text-stone-400 hover:text-stone-300 hover:bg-white/5'
+                    }`}
+                    title="Deep listening with longer pauses"
+                  >
+                    Patient
+                  </button>
+                  <button
+                    onClick={() => setMaiaMode('session')}
+                    className={`px-3 py-1 rounded text-xs font-medium transition-all ${
+                      maiaMode === 'session'
+                        ? 'bg-blue-600/20 text-blue-400 border border-blue-600/30'
+                        : 'text-stone-400 hover:text-stone-300 hover:bg-white/5'
+                    }`}
+                    title="Witnessing presence - speak when ready"
+                  >
+                    Scribe
+                  </button>
+                </div>
+
+                {/* Voice Toggle */}
+                <button
+                  onClick={() => setVoiceEnabled(!voiceEnabled)}
+                  className={`px-3 py-1.5 rounded-lg border transition-all flex items-center gap-2 ${
+                    voiceEnabled
+                      ? 'bg-green-600/20 border-green-600/30 text-green-400'
+                      : 'bg-black/20 border-white/5 text-stone-400 hover:bg-black/30'
+                  }`}
+                  title={voiceEnabled ? 'Voice enabled' : 'Voice disabled'}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                  </svg>
+                  <span className="text-xs font-medium hidden sm:inline">
+                    {voiceEnabled ? 'Voice On' : 'Voice Off'}
+                  </span>
+                </button>
               </div>
 
               {/* Right side - Actions */}
@@ -311,7 +395,9 @@ export default function MAIAPage() {
               userId={explorerId}
               userName={explorerName}
               sessionId={sessionId}
-              voiceEnabled={true}
+              voiceEnabled={voiceEnabled}
+              initialMode={maiaMode}
+              onModeChange={setMaiaMode}
             />
 
             {/* Claude Code's Living Presence - My expressive space! */}
@@ -377,7 +463,7 @@ export default function MAIAPage() {
         </div>
 
         {/* Welcome Message for First-Time Users */}
-        {typeof window !== 'undefined' && !localStorage.getItem('maia_welcome_seen') && (
+        {isMounted && showWelcome && (
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}

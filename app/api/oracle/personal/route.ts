@@ -219,29 +219,33 @@ export async function POST(request: NextRequest) {
         recordToneMetric(soulprint.dominantElement || 'unknown', phase);
       }
 
-      // 🔥 NEW: Save conversation to maia_messages for memory continuity
-      await saveMaiaConversationPair(
-        requestUserId,
-        sessionId || `session_${Date.now()}`,
-        userInput,
-        responseText,
-        {
-          coherenceLevel: 0.7, // Can be enhanced with actual coherence calculation
-          element: element,
-          context: 'conversation'
-        }
-      ).catch(err => console.error('Failed to save conversation memory:', err));
+      // 🚀 PERFORMANCE FIX: Run memory operations in background (non-blocking)
+      // This prevents 20-30 second delays in voice responses
+      Promise.all([
+        // 🔥 Save conversation to maia_messages for memory continuity
+        saveMaiaConversationPair(
+          requestUserId,
+          sessionId || `session_${Date.now()}`,
+          userInput,
+          responseText,
+          {
+            coherenceLevel: 0.7,
+            element: element,
+            context: 'conversation'
+          }
+        ).catch(err => console.error('Failed to save conversation memory:', err)),
 
-      // 🧠 MEMORY CAPTURE: Store memories from this interaction
-      await simpleMemoryCapture.capture({
-        userId: requestUserId,
-        sessionId: sessionId || `session_${Date.now()}`,
-        userInput,
-        mayaResponse: responseText,
-        emotionalTone: element,
-        isKeyMoment: consciousnessResponse.metadata?.transformative || false,
-        isTransformative: consciousnessResponse.metadata?.transformative || false
-      }).catch(err => console.error('Failed to capture memory:', err));
+        // 🧠 MEMORY CAPTURE: Store memories from this interaction
+        simpleMemoryCapture.capture({
+          userId: requestUserId,
+          sessionId: sessionId || `session_${Date.now()}`,
+          userInput,
+          mayaResponse: responseText,
+          emotionalTone: element,
+          isKeyMoment: consciousnessResponse.metadata?.transformative || false,
+          isTransformative: consciousnessResponse.metadata?.transformative || false
+        }).catch(err => console.error('Failed to capture memory:', err))
+      ]).catch(err => console.error('Background memory operations failed:', err));
 
       return NextResponse.json({
         success: true,

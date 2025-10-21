@@ -103,6 +103,11 @@
   .animate-lumen {
     animation: lumen 14s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
   }
+
+  /* Utility class for pages with bottom menu bar */
+  .pb-menu-bar {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
 }
 
 /* Ensure inputs are always readable - prevents white text on white background */

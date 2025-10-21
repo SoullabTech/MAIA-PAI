@@ -19,7 +19,9 @@ export function ConditionalMenuBar() {
     '/beta-welcome',
     '/beta-reset-notice',
     '/login',
-    '/signup'
+    '/signup',
+    '/maia',  // MAIA page has its own integrated bottom bar
+    '/maya'   // Redirects to /maia, but hide here too
   ];
 
   const shouldHide = hideOnPages.some(page => pathname?.startsWith(page));

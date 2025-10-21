@@ -3,31 +3,36 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star } from 'lucide-react';
+import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star, Home } from 'lucide-react';
+import Image from 'next/image';
 
 /**
  * Unified Menu Bar
  *
- * Contains all menu icons:
+ * Bottom navigation bar with menu icons:
+ * - Home (Holoflower icon)
  * - MAIA Training Progress
+ * - Astrology Chart
  * - Soul-Building Circle (Community)
- * - Conversation Style Toggle
+ * - Conversation Mode
+ * - Settings
  * - Report a Problem (Feedback)
  */
 export function MenuBar() {
   const pathname = usePathname();
   const [trainingProgress] = useState(0); // TODO: Connect to actual training data
-  const [showRotateHint, setShowRotateHint] = useState(true);
+  const [showRotateHint, setShowRotateHint] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   // Don't show on community pages
   const hideCommunityLink = pathname?.startsWith('/community');
 
   useEffect(() => {
+    setIsMounted(true);
     // Auto-hide rotate hint after 5 seconds, or if already dismissed
     const hintDismissed = localStorage.getItem('rotateHintDismissed');
-    if (hintDismissed) {
-      setShowRotateHint(false);
-    } else {
+    if (!hintDismissed) {
+      setShowRotateHint(true);
       const timer = setTimeout(() => {
         setShowRotateHint(false);
       }, 5000);
@@ -58,8 +63,33 @@ export function MenuBar() {
         </div>
       )}
 
-      {/* INSTRUMENT PANEL: Ancient-future navigation - Positioned left of sign out button */}
-      <div className="flex fixed right-16 z-40 items-center gap-1.5 md:gap-2" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 0.75rem)' }}>
+      {/* INSTRUMENT PANEL: Ancient-future navigation - Bottom menu bar */}
+      <div className="flex fixed left-1/2 -translate-x-1/2 bottom-0 z-40 items-center gap-1.5 md:gap-3 bg-soul-surface/95 backdrop-blur-md border-t border-soul-border/50 px-4 md:px-6 py-3 md:py-4 rounded-t-2xl shadow-lg" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
+
+      {/* Home Icon - Holoflower */}
+      <Link
+        href="/maya"
+        className="group relative"
+        aria-label="Home"
+      >
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-accent/60">
+          <div className="w-3.5 h-3.5 md:w-4 md:h-4 relative">
+            <Image
+              src="/holoflower.svg"
+              alt="Home"
+              width={16}
+              height={16}
+              className="w-full h-full opacity-70 group-hover:opacity-100 transition-opacity"
+            />
+          </div>
+
+          {/* Tooltip - Matte instrument label */}
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Home
+          </span>
+        </div>
+      </Link>
+
       {/* MAIA Training Progress Icon */}
       <Link
         href="/maya/training"
@@ -94,7 +124,7 @@ export function MenuBar() {
           </svg>
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Training {Math.round(trainingProgress * 100)}%
           </span>
         </div>
@@ -111,7 +141,7 @@ export function MenuBar() {
           <Star className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500" />
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Chart
           </span>
         </div>
@@ -128,7 +158,7 @@ export function MenuBar() {
             <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-waterWarm/70 transition-all group-hover:text-soul-waterWarm" />
 
             {/* Tooltip - Matte instrument label */}
-            <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
               Circle
             </span>
           </div>
@@ -145,7 +175,7 @@ export function MenuBar() {
           <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-link/70 transition-all group-hover:text-soul-link" />
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Mode
           </span>
         </div>
@@ -161,7 +191,7 @@ export function MenuBar() {
           <Settings className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent/70 transition-all group-hover:text-soul-accent group-hover:rotate-45" />
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Settings
           </span>
         </div>
@@ -181,7 +211,7 @@ export function MenuBar() {
           <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-textTertiary/70 transition-all group-hover:text-soul-textTertiary" />
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -bottom-8 right-0 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Feedback
           </span>
         </div>
