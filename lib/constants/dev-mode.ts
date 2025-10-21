@@ -54,14 +54,27 @@ export function checkMAIAPersonalityHealth(response: string): {
   }
 
   const issues: string[] = [];
+  const trimmed = response.trim();
+  const wordCount = trimmed.split(/\s+/).length;
 
-  // Check word count
-  const wordCount = response.trim().split(/\s+/).length;
-  if (wordCount < CONVERSATION_DEFAULTS.minHealthyWordCount) {
-    issues.push(`Response too short (${wordCount} words, expected ${CONVERSATION_DEFAULTS.minHealthyWordCount}+)`);
+  // Detect if this is a simple acknowledgment/greeting response
+  const simpleGreetingPatterns = [
+    /^(yes|yeah|absolutely|certainly|of course)[\s,]/i,
+    /(can hear you|hear you|hello|hi there)/i,
+    /how (may|can) I (assist|help)/i,
+    /what can I do for you/i
+  ];
+
+  const isSimpleResponse = simpleGreetingPatterns.some(pattern => pattern.test(trimmed));
+
+  // For simple greetings/acknowledgments, allow shorter responses (7+ words)
+  const minWords = isSimpleResponse ? 7 : CONVERSATION_DEFAULTS.minHealthyWordCount;
+
+  if (wordCount < minWords) {
+    issues.push(`Response too short (${wordCount} words, expected ${minWords}+)`);
   }
 
-  // Check for degradation patterns
+  // Check for degradation patterns (actual broken speech)
   for (const pattern of CONVERSATION_DEFAULTS.degradationPatterns) {
     if (pattern.test(response)) {
       issues.push(`Contains degradation pattern: ${pattern.source}`);
@@ -69,21 +82,28 @@ export function checkMAIAPersonalityHealth(response: string): {
   }
 
   // Check for philosophical depth markers (should be present in healthy MAIA)
-  const depthMarkers = [
-    /witness/i,
-    /sacred/i,
-    /transformation/i,
-    /spiral/i,
-    /element/i,
-    /breath/i,
-    /presence/i,
-    /emerge/i
-  ];
+  // BUT: Only check for complex responses, not simple acknowledgments
+  if (!isSimpleResponse && wordCount > 50) {
+    const depthMarkers = [
+      /witness/i,
+      /sacred/i,
+      /transformation/i,
+      /spiral/i,
+      /element/i,
+      /breath/i,
+      /presence/i,
+      /emerge/i,
+      /soul/i,
+      /being/i,
+      /essence/i,
+      /journey/i
+    ];
 
-  const hasDepth = depthMarkers.some(marker => marker.test(response));
-  if (!hasDepth && wordCount > 50) {
-    // Only flag if response is long but lacks depth (not just a brief acknowledgment)
-    issues.push('Lacks philosophical depth markers');
+    const hasDepth = depthMarkers.some(marker => marker.test(response));
+    if (!hasDepth) {
+      // Only flag if response is long but lacks any depth markers
+      issues.push('Lacks philosophical depth markers (in long response)');
+    }
   }
 
   return {
