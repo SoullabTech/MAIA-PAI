@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Droplets, Mountain, Wind, Sparkles, Edit3 } from 'lucide-react';
+import { Flame, Droplets, Mountain, Wind, Sparkles, Edit3, Copy, Check } from 'lucide-react';
 import { Message, ElementalHint } from './types';
 
 interface MessageBubbleProps {
@@ -36,9 +36,21 @@ export default function MessageBubble({
 }: MessageBubbleProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [formattedTime, setFormattedTime] = useState<string>('');
+  const [isCopied, setIsCopied] = useState(false);
 
   const isMaia = message.sender === 'maia';
   const hasElementalHints = message.elementalHints && message.elementalHints.length > 0;
+
+  // Copy message content to clipboard
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text:', err);
+    }
+  };
 
   // Split message into paragraphs for cascade animation
   const paragraphs = message.content.split('\n\n').filter(p => p.trim());
@@ -272,6 +284,33 @@ export default function MessageBubble({
           }
         }
         
+        .copy-button {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          background: rgba(212, 165, 116, 0.15);
+          border: 1px solid rgba(212, 165, 116, 0.3);
+          border-radius: 6px;
+          padding: 6px 8px;
+          cursor: pointer;
+          color: #D4A574;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease;
+          z-index: 10;
+        }
+
+        .copy-button:hover {
+          background: rgba(212, 165, 116, 0.25);
+          border-color: rgba(212, 165, 116, 0.5);
+          transform: scale(1.05);
+        }
+
+        .copy-button:active {
+          transform: scale(0.95);
+        }
+
         .timestamp {
           font-size: 10px;
           color: #8B7355;
@@ -281,7 +320,7 @@ export default function MessageBubble({
           opacity: 0.6;
           font-family: monospace;
         }
-        
+
         /* Mobile adjustments */
         @media (max-width: 768px) {
           .elemental-indicators {
@@ -309,10 +348,22 @@ export default function MessageBubble({
         >
           {/* Elemental Indicators */}
           {renderElementalIndicators()}
-          
+
           {/* Journal Shimmer */}
           {renderJournalShimmer()}
-          
+
+          {/* Copy Button - appears on hover */}
+          <motion.button
+            className="copy-button"
+            onClick={handleCopy}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: isHovered ? 1 : 0, scale: isHovered ? 1 : 0.8 }}
+            transition={{ duration: 0.2 }}
+            aria-label="Copy message"
+          >
+            {isCopied ? <Check size={14} /> : <Copy size={14} />}
+          </motion.button>
+
           {/* Message Content with Cascade Animation */}
           {paragraphs.length > 1 ? (
             paragraphs.map((paragraph, index) => (

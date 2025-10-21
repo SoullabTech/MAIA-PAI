@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star, Home } from 'lucide-react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 /**
  * Unified Menu Bar
@@ -64,15 +65,27 @@ export function MenuBar() {
       )}
 
       {/* Subtle drawer handle indicator - shows users the menu is interactive */}
-      <div className="fixed left-1/2 -translate-x-1/2 bottom-[72px] z-30 pointer-events-none">
-        <div className="flex flex-col items-center gap-1 opacity-30 hover:opacity-60 transition-opacity">
+      <div className="fixed left-1/2 -translate-x-1/2 bottom-[76px] z-30 pointer-events-none">
+        <motion.div
+          className="flex flex-col items-center gap-1"
+          initial={{ opacity: 0.4 }}
+          animate={{
+            opacity: [0.4, 0.7, 0.4],
+            y: [0, -2, 0]
+          }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
           {/* Three subtle dots in a horizontal line */}
-          <div className="flex gap-1">
-            <div className="w-1 h-1 rounded-full bg-soul-textTertiary/40"></div>
-            <div className="w-1 h-1 rounded-full bg-soul-textTertiary/40"></div>
-            <div className="w-1 h-1 rounded-full bg-soul-textTertiary/40"></div>
+          <div className="flex gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-soul-accent/60 shadow-sm shadow-soul-accent/30"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-soul-accent/60 shadow-sm shadow-soul-accent/30"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-soul-accent/60 shadow-sm shadow-soul-accent/30"></div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* INSTRUMENT PANEL: Ancient-future navigation - Bottom menu bar */}
