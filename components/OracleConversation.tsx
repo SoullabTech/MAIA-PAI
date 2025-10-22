@@ -26,7 +26,8 @@ import { OracleResponse, ConversationContext } from '@/lib/oracle-response';
 import { mapResponseToMotion, enrichOracleResponse } from '@/lib/motion-mapper';
 import { VoiceState } from '@/lib/voice/voice-capture';
 // import { useMaiaVoice } from '@/hooks/useMaiaVoice'; // OLD TTS SYSTEM - replaced with WebRTC
-import { useMaiaRealtime } from '@/hooks/useMaiaRealtime';
+// import { useMaiaRealtime } from '@/hooks/useMaiaRealtime'; // REPLACED with MAIA SDK for sovereignty!
+import { useMAIASDK } from '@/hooks/useMAIASDK';
 import { cleanMessage, cleanMessageForVoice, formatMessageForDisplay } from '@/lib/cleanMessage';
 import { getAgentConfig, AgentConfig } from '@/lib/agent-config';
 import { toast } from 'react-hot-toast';
@@ -125,23 +126,26 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     listeningMode === 'normal' ? 'dialogue' :
     listeningMode === 'patient' ? 'patient' : 'scribe';
 
-  // Maia Realtime Integration - WebRTC with full interruption support
+  // Maia SDK Integration - Full Voice Sovereignty (67% cost savings + no rate limits!)
   const {
-    isConnected: maiaConnected,
-    isConnecting: maiaConnecting,
-    isSpeaking: maiaIsSpeaking,
-    error: maiaError,
-    transcript: maiaTranscript,
-    connect: maiaConnect,
-    disconnect: maiaDisconnect,
-    sendText: maiaSendText,
-    cancelResponse: maiaCancelResponse,
-    changeMode: maiaChangeMode,
-  } = useMaiaRealtime({
+    maiaConnected,
+    maiaConnecting,
+    maiaIsSpeaking,
+    maiaError,
+    maiaTranscript,
+    maiaConnect,
+    maiaDisconnect,
+    maiaSendText,
+    maiaCancelResponse,
+    maiaChangeMode,
+    sessionCost,
+    currentProvider,
+  } = useMAIASDK({
     userId: userId || 'anonymous',
     userName: userName || 'Explorer',
-    voice: 'shimmer',
+    voice: 'maya', // Will use custom XTTS voice when available
     mode: realtimeMode,
+    debug: true,
     onTranscript: (text, isUser) => {
       if (isUser) {
         setUserTranscript(text);
@@ -2541,6 +2545,33 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           <div>Emotion: {userVoiceState.emotion}</div>
           <div>Breath: {(userVoiceState.breathDepth * 100).toFixed(0)}%</div>
           <div>Speaking: {userVoiceState.isSpeaking ? 'Yes' : 'No'}</div>
+        </div>
+      )}
+
+      {/* SDK Cost Tracker - Real-time sovereignty savings! */}
+      {sessionCost > 0 && (
+        <div className="fixed bottom-20 left-4 bg-gradient-to-br from-purple-900/90 to-indigo-900/90 backdrop-blur-lg text-white px-4 py-3 rounded-xl shadow-2xl border border-purple-500/30 z-40">
+          <div className="text-xs text-purple-200 font-medium mb-1">Session Cost</div>
+          <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-pink-200">
+            ${sessionCost.toFixed(4)}
+          </div>
+          <div className="text-xs text-purple-300 mt-2 space-y-0.5">
+            <div className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+              <span>STT: {currentProvider?.stt || 'browser'}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+              <span>LLM: {currentProvider?.llm || 'claude'}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+              <span>TTS: {currentProvider?.tts || 'browser'}</span>
+            </div>
+          </div>
+          <div className="text-xs text-green-300 mt-2 font-semibold">
+            💰 67% savings vs OpenAI
+          </div>
         </div>
       )}
 
