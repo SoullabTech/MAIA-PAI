@@ -150,7 +150,35 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       if (isUser) {
         setUserTranscript(text);
       } else {
-        setMaiaResponseText(prev => prev + text);
+        // MAIA's response from SDK - add to messages
+        setMaiaResponseText(text);
+
+        const oracleMessage: ConversationMessage = {
+          id: `msg-${Date.now()}-oracle`,
+          role: 'oracle',
+          text: text,
+          timestamp: new Date(),
+          motionState: 'responding',
+          source: 'maia'
+        };
+
+        // Add to messages (this will appear after SDK synthesizes voice)
+        setMessages(prev => [...prev, oracleMessage]);
+        onMessageAdded?.(oracleMessage);
+
+        // Save MAIA's response to long-term memory
+        if (oracleAgentId) {
+          saveConversationMemory({
+            oracleAgentId,
+            content: text,
+            memoryType: 'conversation',
+            sourceType: 'voice',
+            sessionId
+          }).catch(err => console.error('Failed to save MAIA voice response:', err));
+        }
+
+        // Store MAIA's response for echo detection
+        lastMaiaResponseRef.current = text;
       }
     },
     onAudioStart: () => {
@@ -1463,25 +1491,74 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       voiceEnabled,
       isMuted
     });
-    console.log('📞 Calling handleTextMessage...');
 
     const voiceStartTime = Date.now();
     trackEvent.voiceResult(userId || 'anonymous', transcript, 0);
 
+    // Ensure SDK is connected before processing
+    if (!maiaConnected && !maiaConnecting) {
+      console.log('🔌 SDK not connected, connecting now...');
+      await maiaConnect();
+      // Wait a bit for connection to establish
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    // Add user message to UI immediately
+    const cleanedText = cleanMessage(transcript);
+    const userMessage: ConversationMessage = {
+      id: `msg-${Date.now()}`,
+      role: 'user',
+      text: cleanedText,
+      timestamp: new Date(),
+      source: 'voice'
+    };
+    setMessages(prev => [...prev, userMessage]);
+    onMessageAdded?.(userMessage);
+
+    // Track user activity
+    const trackingUserId = userId || `anon_${sessionId}`;
+    userTracker.trackActivity(trackingUserId, 'voice');
+
+    // Save user message to long-term memory
+    if (oracleAgentId) {
+      saveConversationMemory({
+        oracleAgentId,
+        content: cleanedText,
+        memoryType: 'conversation',
+        sourceType: 'voice',
+        sessionId
+      }).catch(err => console.error('Failed to save voice user message:', err));
+    }
+
     try {
-      // Route all voice through text message handler for reliability
-      await handleTextMessage(transcript);
+      // 🚀 USE SDK FLOW: Browser STT → SDK.processText → SDK.synthesize → OpenAI TTS
+      console.log('🚀 Calling SDK maiaSendText (processText + synthesize)...');
+      await maiaSendText(cleanedText);
+
       const duration = Date.now() - voiceStartTime;
       trackEvent.voiceResult(userId || 'anonymous', transcript, duration);
-      console.log('✅ handleTextMessage completed');
+      console.log('✅ SDK voice flow completed');
     } catch (error) {
-      console.error('❌ Error in handleTextMessage:', error);
-      trackEvent.error(userId || 'anonymous', 'voice_processing_error', String(error));
+      console.error('❌ Error in SDK voice flow:', error);
+      trackEvent.error(userId || 'anonymous', 'sdk_voice_error', String(error));
+
+      // Show error message
+      const errorMessage: ConversationMessage = {
+        id: `msg-${Date.now()}-error`,
+        role: 'oracle',
+        text: 'I apologize, I\'m having trouble connecting right now. Please try again.',
+        timestamp: new Date(),
+        motionState: 'idle',
+        source: 'system'
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      onMessageAdded?.(errorMessage);
+
       // Reset states on error
       setIsProcessing(false);
       setIsResponding(false);
     }
-  }, [handleTextMessage, isProcessing, isResponding, isAudioPlaying, messages, echoSuppressUntil, maiaReady, isMuted]);
+  }, [maiaSendText, maiaConnect, maiaConnected, maiaConnecting, isProcessing, isResponding, isAudioPlaying, messages, echoSuppressUntil, maiaReady, isMuted, sessionId, userId, oracleAgentId, onMessageAdded]);
 
   // Clear all check-ins
   const clearCheckIns = useCallback(() => {
