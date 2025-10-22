@@ -183,6 +183,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const maiaReady = maiaConnected;
   const maiaSpeak = useCallback(async (text: string) => {
     console.log('🎙️ maiaSpeak called with:', text.substring(0, 50));
+    console.log('🔍 maiaSpeak state check:', { maiaConnected, maiaConnecting, maiaIsSpeaking });
 
     // FALLBACK: Use browser TTS if WebRTC isn't working
     if (!maiaConnected && typeof window !== 'undefined' && 'speechSynthesis' in window) {
