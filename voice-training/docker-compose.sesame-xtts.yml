@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  sesame-xtts:
+    image: ghcr.io/coqui-ai/tts:latest
+    container_name: maia-voice-xtts
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount voice embeddings
+      - ./voice-recordings:/app/voices:ro
+      # Mount models cache
+      - ./models-cache:/root/.local/share/tts:rw
+      # Mount custom configuration
+      - ./xtts-config.json:/app/config.json:ro
+    environment:
+      # Model configuration
+      - TTS_MODEL=tts_models/multilingual/multi-dataset/xtts_v2
+      - COQUI_TOS_AGREED=1
+
+      # Voice cloning
+      - ENABLE_VOICE_CLONING=true
+      - MAYA_VOICE_PATH=/app/voices/maya_embedding.wav
+      - ANTHONY_VOICE_PATH=/app/voices/anthony_embedding.wav
+
+      # Performance tuning
+      - CUDA_VISIBLE_DEVICES=0  # Use GPU 0, or -1 for CPU only
+      - TTS_CACHE_DIR=/root/.local/share/tts
+      - MAX_WORKERS=2
+
+      # API configuration
+      - API_PORT=8000
+      - API_HOST=0.0.0.0
+      - LOG_LEVEL=INFO
+
+    deploy:
+      resources:
+        # GPU acceleration (comment out if CPU-only)
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+        # Memory limits
+        limits:
+          memory: 8G
+          cpus: '4'
+        reservations:
+          memory: 4G
+          cpus: '2'
+
+    command: >
+      python3 -m TTS.server.server
+      --model_name tts_models/multilingual/multi-dataset/xtts_v2
+      --use_cuda true
+      --port 8000
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s  # XTTS takes time to load
+
+    restart: unless-stopped
+
+    networks:
+      - maia-network
+
+networks:
+  maia-network:
+    driver: bridge

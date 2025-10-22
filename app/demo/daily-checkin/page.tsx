@@ -5,31 +5,32 @@ import { DailyCheckIn } from '@/components/DailyCheckIn';
 
 export default function DailyCheckInDemo() {
   const [scenario, setScenario] = useState<'firstVisit' | 'returning' | 'breakthrough' | 'longAbsence'>('firstVisit');
+  const [demoUserName, setDemoUserName] = useState('Explorer');
 
   const scenarios = {
     firstVisit: {
-      userName: 'Kelly',
+      userName: demoUserName,
       userId: 'demo-user-1',
       lastVisit: undefined,
       lastConversationTheme: undefined,
       hasHadBreakthrough: false
     },
     returning: {
-      userName: 'Kelly',
+      userName: demoUserName,
       userId: 'demo-user-1',
       lastVisit: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
       lastConversationTheme: 'self-worth patterns',
       hasHadBreakthrough: false
     },
     breakthrough: {
-      userName: 'Kelly',
+      userName: demoUserName,
       userId: 'demo-user-1',
       lastVisit: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
       lastConversationTheme: 'transformation',
       hasHadBreakthrough: true
     },
     longAbsence: {
-      userName: 'Kelly',
+      userName: demoUserName,
       userId: 'demo-user-1',
       lastVisit: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
       lastConversationTheme: 'boundaries',

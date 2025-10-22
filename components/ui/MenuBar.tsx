@@ -64,26 +64,26 @@ export function MenuBar() {
         </div>
       )}
 
-      {/* Subtle drawer handle indicator - shows users the menu is interactive */}
-      <div className="fixed left-1/2 -translate-x-1/2 bottom-[76px] z-30 pointer-events-none">
+      {/* Drawer handle indicator - shows users the menu is interactive */}
+      <div className="fixed left-1/2 -translate-x-1/2 bottom-[82px] z-30 pointer-events-none">
         <motion.div
-          className="flex flex-col items-center gap-1"
-          initial={{ opacity: 0.4 }}
+          className="flex flex-col items-center gap-1.5"
+          initial={{ opacity: 0.6 }}
           animate={{
-            opacity: [0.4, 0.7, 0.4],
-            y: [0, -2, 0]
+            opacity: [0.6, 1, 0.6],
+            y: [0, -3, 0]
           }}
           transition={{
-            duration: 2.5,
+            duration: 2,
             repeat: Infinity,
             ease: "easeInOut"
           }}
         >
-          {/* Three subtle dots in a horizontal line */}
-          <div className="flex gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-soul-accent/60 shadow-sm shadow-soul-accent/30"></div>
-            <div className="w-1.5 h-1.5 rounded-full bg-soul-accent/60 shadow-sm shadow-soul-accent/30"></div>
-            <div className="w-1.5 h-1.5 rounded-full bg-soul-accent/60 shadow-sm shadow-soul-accent/30"></div>
+          {/* Three-dot drawer handle with enhanced visibility */}
+          <div className="flex gap-2 px-3 py-1.5 rounded-full bg-gradient-to-b from-white/20 to-white/10 backdrop-blur-sm border border-white/30 shadow-lg">
+            <div className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.6)]"></div>
+            <div className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.6)]"></div>
+            <div className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.6)]"></div>
           </div>
         </motion.div>
       </div>
@@ -121,8 +121,8 @@ export function MenuBar() {
         className="group relative"
         aria-label="MAIA Training Progress"
       >
-        <div className="relative p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-accent/40">
-          <Brain className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent/70 transition-all group-hover:text-soul-accent" />
+        <div className="relative p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-amber-500/40">
+          <Brain className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500" />
 
           {/* Progress Ring */}
           <svg className="absolute inset-0 w-full h-full -rotate-90" style={{ filter: 'drop-shadow(0 0 2px rgba(251, 191, 36, 0.3))' }}>
@@ -179,8 +179,8 @@ export function MenuBar() {
           className="group relative"
           aria-label="Soul-Building Circle"
         >
-          <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-waterWarm/40">
-            <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-waterWarm/70 transition-all group-hover:text-soul-waterWarm" />
+          <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-amber-500/40">
+            <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500" />
 
             {/* Tooltip - Matte instrument label */}
             <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
@@ -196,8 +196,8 @@ export function MenuBar() {
         className="group relative"
         aria-label="Conversation Mode"
       >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-link/40">
-          <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-link/70 transition-all group-hover:text-soul-link" />
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-amber-500/40">
+          <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500" />
 
           {/* Tooltip - Matte instrument label */}
           <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
@@ -212,8 +212,8 @@ export function MenuBar() {
         className="group relative"
         aria-label="Settings"
       >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-accent/40">
-          <Settings className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-accent/70 transition-all group-hover:text-soul-accent group-hover:rotate-45" />
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-amber-500/40">
+          <Settings className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500 group-hover:rotate-45" />
 
           {/* Tooltip - Matte instrument label */}
           <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
@@ -232,8 +232,8 @@ export function MenuBar() {
         className="group relative"
         aria-label="Report a Problem"
       >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-soul-textTertiary/40">
-          <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-soul-textTertiary/70 transition-all group-hover:text-soul-textTertiary" />
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-amber-500/40">
+          <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500" />
 
           {/* Tooltip - Matte instrument label */}
           <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">

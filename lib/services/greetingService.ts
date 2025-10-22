@@ -30,10 +30,17 @@ export class GreetingService {
     const { userName, contentLevel } = context;
 
     // First visit is ALWAYS simple, human connection - Maia as mirror, not expert
-    const simpleGreetings = [
+    // Handle cases where userName might not be provided
+    const hasName = userName && userName !== 'friend' && userName.trim() !== '';
+
+    const simpleGreetings = hasName ? [
       `Hi ${userName}. I'm here to listen and reflect back what I notice. How are you today?`,
       `Hello ${userName}. Think of me as a thinking partner - I'm here to help you see your own patterns more clearly. What's on your mind?`,
       `Hey ${userName}. I'm curious about your experience. Tell me what's present for you right now.`
+    ] : [
+      `Hi Explorer. I'm here to listen and reflect back what I notice. How are you today?`,
+      `Hello. Think of me as a thinking partner - I'm here to help you see your own patterns more clearly. What's on your mind?`,
+      `Hey there. I'm curious about your experience. Tell me what's present for you right now.`
     ];
 
     return simpleGreetings[Math.floor(Math.random() * simpleGreetings.length)];
@@ -42,72 +49,128 @@ export class GreetingService {
   private static getGreetingPool(context: GreetingContext): string[] {
     const { userName, timeOfDay, daysSinceLastVisit, contentLevel = 'companion' } = context;
 
+    // Check if we have a valid user name
+    const hasName = userName && userName !== 'friend' && userName.trim() !== '';
+    const name = hasName ? userName : '';
+
     // Greeting pools adapt to user's readiness level
     // Companion: Simple, human, present-focused
     // Lab_collaborator: Full depth, lab language
     const companionPools = {
-      morning: [
-        `Morning, ${userName}! Ready for whatever today brings?`,
-        `Good morning, ${userName}. Hope you slept well.`,
-        `${userName}, hi there! New day, fresh possibilities.`,
-        `Morning, ${userName}. What's stirring in you today?`,
-        `Hey ${userName}. I love morning energy - how's yours?`
+      morning: hasName ? [
+        `Morning, ${name}! Ready for whatever today brings?`,
+        `Good morning, ${name}. Hope you slept well.`,
+        `${name}, hi there! New day, fresh possibilities.`,
+        `Morning, ${name}. What's stirring in you today?`,
+        `Hey ${name}. I love morning energy - how's yours?`
+      ] : [
+        `Morning! Ready for whatever today brings?`,
+        `Good morning. Hope you slept well.`,
+        `Hi there! New day, fresh possibilities.`,
+        `Morning. What's stirring in you today?`,
+        `Hey. I love morning energy - how's yours?`
       ],
-      afternoon: [
-        `Welcome back, ${userName}! Good to see you again.`,
-        `${userName}, hey! Hope your day's been kind to you.`,
-        `Hi ${userName}. The afternoon light feels good, doesn't it?`,
-        `Hey ${userName}. What's been the highlight so far?`,
-        `Afternoon, ${userName}. Love this time of day - how about you?`
+      afternoon: hasName ? [
+        `Welcome back, ${name}! Good to see you again.`,
+        `${name}, hey! Hope your day's been kind to you.`,
+        `Hi ${name}. The afternoon light feels good, doesn't it?`,
+        `Hey ${name}. What's been the highlight so far?`,
+        `Afternoon, ${name}. Love this time of day - how about you?`
+      ] : [
+        `Welcome back! Good to see you again.`,
+        `Hey! Hope your day's been kind to you.`,
+        `Hi. The afternoon light feels good, doesn't it?`,
+        `Hey. What's been the highlight so far?`,
+        `Afternoon. Love this time of day - how about you?`
       ],
-      evening: [
-        `Evening, ${userName}. There's something magical about this time.`,
-        `Long day, ${userName}? Time to breathe and settle.`,
-        `${userName}, the day's winding down beautifully.`,
-        `Evening, ${userName}. I love how the world softens now.`,
-        `Evening, ${userName}. What's your heart telling you tonight?`
+      evening: hasName ? [
+        `Evening, ${name}. There's something magical about this time.`,
+        `Long day, ${name}? Time to breathe and settle.`,
+        `${name}, the day's winding down beautifully.`,
+        `Evening, ${name}. I love how the world softens now.`,
+        `Evening, ${name}. What's your heart telling you tonight?`
+      ] : [
+        `Evening. There's something magical about this time.`,
+        `Long day? Time to breathe and settle.`,
+        `The day's winding down beautifully.`,
+        `Evening. I love how the world softens now.`,
+        `Evening. What's your heart telling you tonight?`
       ],
-      night: [
-        `Late night, ${userName}. The quiet hours have their own wisdom.`,
-        `Can't sleep, ${userName}? Sometimes the night calls us to listen.`,
-        `The deep hours, ${userName}. There's beauty in this stillness.`,
-        `${userName}, night thoughts can be the most honest ones.`,
-        `Night watch, ${userName}. What's your soul whispering?`
+      night: hasName ? [
+        `Late night, ${name}. The quiet hours have their own wisdom.`,
+        `Can't sleep, ${name}? Sometimes the night calls us to listen.`,
+        `The deep hours, ${name}. There's beauty in this stillness.`,
+        `${name}, night thoughts can be the most honest ones.`,
+        `Night watch, ${name}. What's your soul whispering?`
+      ] : [
+        `Late night. The quiet hours have their own wisdom.`,
+        `Can't sleep? Sometimes the night calls us to listen.`,
+        `The deep hours. There's beauty in this stillness.`,
+        `Night thoughts can be the most honest ones.`,
+        `Night watch. What's your soul whispering?`
       ]
     };
 
     const labPools = {
-      morning: [
-        `Morning, ${userName}. What are we exploring today?`,
-        `Good morning, ${userName}. Ready to experiment?`,
-        `${userName}, welcome back to the lab.`,
-        `Early today, ${userName}. What's on your mind?`,
-        `Hey ${userName}. Fresh data today?`,
-        `Morning, ${userName}. What's emerging?`
+      morning: hasName ? [
+        `Morning, ${name}. What are we exploring today?`,
+        `Good morning, ${name}. Ready to experiment?`,
+        `${name}, welcome back to the lab.`,
+        `Early today, ${name}. What's on your mind?`,
+        `Hey ${name}. Fresh data today?`,
+        `Morning, ${name}. What's emerging?`
+      ] : [
+        `Morning. What are we exploring today?`,
+        `Good morning. Ready to experiment?`,
+        `Welcome back to the lab.`,
+        `Early today. What's on your mind?`,
+        `Hey. Fresh data today?`,
+        `Morning. What's emerging?`
       ],
-      afternoon: [
-        `Welcome back, ${userName}.`,
-        `${userName}, good to see you.`,
-        `Back to the work, ${userName}.`,
-        `Hey ${userName}. Where should we dive in?`,
-        `${userName}, continuing the experiment?`,
-        `Afternoon, ${userName}. How's it going?`
+      afternoon: hasName ? [
+        `Welcome back, ${name}.`,
+        `${name}, good to see you.`,
+        `Back to the work, ${name}.`,
+        `Hey ${name}. Where should we dive in?`,
+        `${name}, continuing the experiment?`,
+        `Afternoon, ${name}. How's it going?`
+      ] : [
+        `Welcome back.`,
+        `Good to see you.`,
+        `Back to the work.`,
+        `Hey. Where should we dive in?`,
+        `Continuing the experiment?`,
+        `Afternoon. How's it going?`
       ],
-      evening: [
-        `Evening, ${userName}.`,
-        `Long day, ${userName}?`,
-        `${userName}, how are you doing?`,
-        `Evening, ${userName}. What emerged today?`,
-        `Evening, ${userName}. Time to process?`,
-        `Hey ${userName}. What did today reveal?`
+      evening: hasName ? [
+        `Evening, ${name}.`,
+        `Long day, ${name}?`,
+        `${name}, how are you doing?`,
+        `Evening, ${name}. What emerged today?`,
+        `Evening, ${name}. Time to process?`,
+        `Hey ${name}. What did today reveal?`
+      ] : [
+        `Evening.`,
+        `Long day?`,
+        `How are you doing?`,
+        `Evening. What emerged today?`,
+        `Evening. Time to process?`,
+        `Hey. What did today reveal?`
       ],
-      night: [
-        `Late night in the lab, ${userName}.`,
-        `Can't sleep, ${userName}?`,
-        `The deep hours, ${userName}. I'm here.`,
-        `${userName}, what's keeping you awake?`,
-        `Night watch, ${userName}. What's stirring?`,
-        `Late experiment, ${userName}?`
+      night: hasName ? [
+        `Late night in the lab, ${name}.`,
+        `Can't sleep, ${name}?`,
+        `The deep hours, ${name}. I'm here.`,
+        `${name}, what's keeping you awake?`,
+        `Night watch, ${name}. What's stirring?`,
+        `Late experiment, ${name}?`
+      ] : [
+        `Late night in the lab.`,
+        `Can't sleep?`,
+        `The deep hours. I'm here.`,
+        `What's keeping you awake?`,
+        `Night watch. What's stirring?`,
+        `Late experiment?`
       ]
     };
 
@@ -129,26 +192,29 @@ export class GreetingService {
     const { userName, daysSinceLastVisit, hasHadBreakthrough, lastConversationTheme } = context;
     const greetings = [...baseGreetings];
 
+    // Check if we have a valid user name
+    const hasName = userName && userName !== 'friend' && userName.trim() !== '';
+
     if (daysSinceLastVisit > 7) {
       greetings.push(
-        `Been a while, ${userName}. What's shifted?`,
-        `${userName}, welcome back. What's been transforming?`,
-        `Long time, ${userName}. Let's catch up on the data.`
+        hasName ? `Been a while, ${userName}. What's shifted?` : `Been a while. What's shifted?`,
+        hasName ? `${userName}, welcome back. What's been transforming?` : `Welcome back. What's been transforming?`,
+        hasName ? `Long time, ${userName}. Let's catch up on the data.` : `Long time. Let's catch up on the data.`
       );
     }
 
     if (daysSinceLastVisit <= 1 && hasHadBreakthrough) {
       greetings.push(
-        `${userName}, still integrating that last discovery?`,
-        `Back so soon, ${userName}. That breakthrough still working through you?`,
-        `${userName}, how's that insight landing?`
+        hasName ? `${userName}, still integrating that last discovery?` : `Still integrating that last discovery?`,
+        hasName ? `Back so soon, ${userName}. That breakthrough still working through you?` : `Back so soon. That breakthrough still working through you?`,
+        hasName ? `${userName}, how's that insight landing?` : `How's that insight landing?`
       );
     }
 
     if (lastConversationTheme) {
       greetings.push(
-        `${userName}, still working with ${lastConversationTheme}?`,
-        `Back to ${lastConversationTheme}, ${userName}?`
+        hasName ? `${userName}, still working with ${lastConversationTheme}?` : `Still working with ${lastConversationTheme}?`,
+        hasName ? `Back to ${lastConversationTheme}, ${userName}?` : `Back to ${lastConversationTheme}?`
       );
     }
 

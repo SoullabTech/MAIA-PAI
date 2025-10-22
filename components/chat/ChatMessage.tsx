@@ -22,9 +22,10 @@ interface ChatMessageProps {
   message: ChatMessageData;
   isLatest?: boolean;
   onPlayAudio?: (audioUrl: string) => void;
+  userName?: string;
 }
 
-export function ChatMessage({ message, isLatest = false, onPlayAudio }: ChatMessageProps) {
+export function ChatMessage({ message, isLatest = false, onPlayAudio, userName }: ChatMessageProps) {
   const isUser = message.role === 'user';
   const hasAudio = message.audioUrl && message.role === 'assistant';
   const hasCitations = message.citations && message.citations.length > 0;
@@ -71,7 +72,7 @@ export function ChatMessage({ message, isLatest = false, onPlayAudio }: ChatMess
         {/* Message Header */}
         <div className={`flex items-center gap-2 mb-1 text-xs text-gray-400 ${isUser ? 'justify-end' : 'justify-start'}`}>
           <span>
-            {isUser ? 'You' : 'Maya'}
+            {isUser ? (userName || 'You') : 'MAIA'}
           </span>
           {message.metadata?.element && !isUser && (
             <>

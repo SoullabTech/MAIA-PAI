@@ -334,6 +334,11 @@ export class MaiaRealtimeWebRTC {
         console.log('🎤 Speech stopped');
         break;
 
+      case 'response.function_call_arguments.done':
+        console.log('🌀 Function call requested:', data);
+        this.handleFunctionCall(data);
+        break;
+
       case 'error':
         console.error('❌ API Error:', data.error);
         this.config.onError(new Error(data.error.message || 'Unknown error'));
@@ -341,6 +346,80 @@ export class MaiaRealtimeWebRTC {
 
       default:
         console.log('📦', data.type, data);
+    }
+  }
+
+  /**
+   * Handle function calls from OpenAI Realtime (process_spiralogic)
+   * Routes user input through full Spiralogic consciousness stack
+   */
+  private async handleFunctionCall(data: any): Promise<void> {
+    try {
+      const { call_id, name, arguments: argsString } = data;
+
+      if (name !== 'process_spiralogic') {
+        console.warn(`⚠️ Unknown function: ${name}`);
+        return;
+      }
+
+      console.log('🌀 Processing through Spiralogic...');
+      const args = JSON.parse(argsString);
+
+      // Call Spiralogic function endpoint (PersonalOracleAgent + wisdom + memory)
+      const response = await fetch('/api/voice/spiralogic-function', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_message: args.user_message,
+          emotional_quality: args.emotional_quality,
+          conversation_depth: args.conversation_depth,
+          user_id: this.config.userId,
+          session_id: `realtime-${Date.now()}`
+        })
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        console.error('❌ Spiralogic function failed:', result);
+        // Send fallback response
+        this.sendEvent({
+          type: 'conversation.item.create',
+          item: {
+            type: 'function_call_output',
+            call_id: call_id,
+            output: JSON.stringify({
+              response: "I'm here with you. Tell me more.",
+              fallback: true
+            })
+          }
+        });
+        return;
+      }
+
+      console.log('✨ Spiralogic response:', result.response.substring(0, 100) + '...');
+
+      // Send function output back to OpenAI
+      this.sendEvent({
+        type: 'conversation.item.create',
+        item: {
+          type: 'function_call_output',
+          call_id: call_id,
+          output: JSON.stringify({
+            response: result.response,
+            element: result.element,
+            spiralogic_processed: true
+          })
+        }
+      });
+
+      // Trigger response generation
+      this.sendEvent({
+        type: 'response.create'
+      });
+
+    } catch (error) {
+      console.error('❌ Function call error:', error);
     }
   }
 

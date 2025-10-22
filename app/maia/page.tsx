@@ -20,7 +20,7 @@ import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
 import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrainTrustMonitor } from '@/components/consciousness/BrainTrustMonitor';
-import { LogOut, Sparkles, Menu, X, Brain } from 'lucide-react';
+import { LogOut, Sparkles, Menu, X, Brain, Volume2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function getInitialUserData() {
@@ -70,6 +70,8 @@ export default function MAIAPage() {
   const [maiaMode, setMaiaMode] = useState<'normal' | 'patient' | 'session'>('normal');
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [showVoiceSettings, setShowVoiceSettings] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'>('shimmer');
 
   const hasCheckedAuth = useRef(false);
 
@@ -85,7 +87,20 @@ export default function MAIAPage() {
     // Check welcome message in client-side only
     const welcomeSeen = localStorage.getItem('maia_welcome_seen');
     setShowWelcome(!welcomeSeen);
+
+    // Load saved voice preference
+    const savedVoice = localStorage.getItem('selected_voice') as 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+    if (savedVoice) {
+      setSelectedVoice(savedVoice);
+    }
   }, []);
+
+  const handleVoiceChange = (voice: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer') => {
+    setSelectedVoice(voice);
+    localStorage.setItem('selected_voice', voice);
+    // Dispatch event to notify other components
+    window.dispatchEvent(new Event('conversationStyleChanged'));
+  };
 
   const handleSignOut = () => {
     localStorage.removeItem('beta_user');
@@ -280,8 +295,94 @@ export default function MAIAPage() {
                 </div>
               </div>
 
-              {/* Center - Subtle Field Indicators (Dune aesthetic, experiential not explanatory) */}
+              {/* Center - Voice & Mode Controls */}
               <div className="flex items-center gap-3">
+                {/* Voice Selection - Prominent with speaker icon */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowVoiceSettings(!showVoiceSettings)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-black/20 border border-amber-500/30 rounded-lg hover:bg-black/30 hover:border-amber-500/50 transition-all group"
+                  >
+                    <Volume2 className="w-4 h-4 text-amber-400 group-hover:text-amber-300 transition-colors" />
+                    <span className="text-[10px] font-medium text-amber-400 group-hover:text-amber-300 uppercase tracking-wide">
+                      Voice: {selectedVoice}
+                    </span>
+                    <motion.div
+                      animate={{ rotate: showVoiceSettings ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <svg className="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </motion.div>
+                  </button>
+
+                  {/* Voice Options Dropdown */}
+                  <AnimatePresence>
+                    {showVoiceSettings && (
+                      <>
+                        {/* Backdrop to close when clicking outside */}
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setShowVoiceSettings(false)}
+                        />
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute top-full mt-2 left-0 w-72 bg-stone-900/95 backdrop-blur-xl border border-amber-500/30 rounded-xl shadow-2xl shadow-black/50 overflow-hidden z-50"
+                        >
+                          <div className="p-3">
+                            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/10">
+                              <Volume2 className="w-4 h-4 text-amber-400" />
+                              <h3 className="text-sm font-semibold text-white">Choose MAIA's Voice</h3>
+                            </div>
+                            <div className="space-y-1">
+                              {[
+                                { id: 'shimmer', name: 'Shimmer', description: 'Gentle & soothing • Feminine', emoji: '✨' },
+                                { id: 'fable', name: 'Fable', description: 'Storytelling • Feminine', emoji: '📖' },
+                                { id: 'nova', name: 'Nova', description: 'Bright & energetic • Feminine', emoji: '⭐' },
+                                { id: 'alloy', name: 'Alloy', description: 'Neutral & balanced • Gender-neutral', emoji: '🔘' },
+                                { id: 'echo', name: 'Echo', description: 'Warm & expressive • Masculine', emoji: '🌊' },
+                                { id: 'onyx', name: 'Onyx', description: 'Deep & resonant • Masculine', emoji: '🖤' },
+                              ].map((voice) => (
+                                <motion.button
+                                  key={voice.id}
+                                  onClick={() => {
+                                    handleVoiceChange(voice.id as any);
+                                    setShowVoiceSettings(false);
+                                  }}
+                                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+                                    selectedVoice === voice.id
+                                      ? 'bg-amber-500/20 border border-amber-500/50 text-amber-300'
+                                      : 'bg-black/20 border border-white/5 text-white/70 hover:bg-white/5 hover:border-white/10'
+                                  }`}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                >
+                                  <span className="text-xl">{voice.emoji}</span>
+                                  <div className="flex-1 text-left">
+                                    <div className="text-sm font-medium">{voice.name}</div>
+                                    <div className="text-[10px] text-white/50">{voice.description}</div>
+                                  </div>
+                                  {selectedVoice === voice.id && (
+                                    <motion.div
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
+                                      className="w-2 h-2 rounded-full bg-amber-400"
+                                    />
+                                  )}
+                                </motion.button>
+                              ))}
+                            </div>
+                          </div>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
+
                 {/* Subtle mode selector - feel the shift through color/breathing, not explanation */}
                 <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm rounded-lg p-0.5">
                   <button

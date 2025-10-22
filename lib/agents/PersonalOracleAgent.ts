@@ -9,6 +9,12 @@ import { createClient } from '@supabase/supabase-js';
 import { MAIASafetyPipeline } from '@/lib/safety-pipeline';
 import { ActiveListeningCore } from '@/lib/oracle/ActiveListeningCore';
 import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '@/lib/knowledge/ElementalAlchemyKnowledge';
+import { SPIRALOGIC_DEEP_WISDOM } from '@/lib/knowledge/SpiralogicDeepWisdom';
+import { SPIRALOGIC_EXTENDED_WISDOM } from '@/lib/knowledge/SpiralogicExtendedWisdom';
+import { DEPTH_PSYCHOLOGY_WISDOM } from '@/lib/knowledge/DepthPsychologyWisdom';
+import { FAMILY_CONSTELLATION_WISDOM } from '@/lib/knowledge/FamilyConstellationWisdom';
+import { NLP_WISDOM } from '@/lib/knowledge/NLPWisdom';
+import { WisdomIntegrationSystem } from '@/lib/knowledge/WisdomIntegrationSystem';
 import { SemanticMemoryService } from '@/lib/memory/SemanticMemoryService';
 import { getPromptForConversationStyle } from '@/lib/prompts/maya-prompts';
 import { ElementalOracle2Bridge } from '@/lib/elemental-oracle-2-bridge';
@@ -1024,8 +1030,27 @@ This is the soul-level truth you're helping them see, not reference material to 
       const strongestElement = Object.entries(elementalAffinity)
         .sort(([,a], [,b]) => b - a)[0];
 
-      // 📚 ELEMENTAL ALCHEMY FRAMEWORK - Kelly's transformational wisdom
-      let adaptedFramework = ELEMENTAL_ALCHEMY_FRAMEWORK;
+      // 📚 WISDOM INTEGRATION SYSTEM - Kelly's complete body of work
+      // Uses contextual loading to prevent overwhelming while maintaining depth
+      console.log('🌀 Loading wisdom through Integration System...');
+
+      // Detect conversation depth and themes
+      const conversationDepth = (context as any)?.conversationDepth || 0.5;
+      const depth = conversationDepth > 0.7 ? 'deep' : conversationDepth > 0.5 ? 'engaged' : conversationDepth > 0.3 ? 'warming' : 'surface';
+
+      const wisdomContext = {
+        depth,
+        userQuestion: trimmedInput,
+        phase: dominantElement as any
+      };
+
+      // Get contextually appropriate wisdom
+      let adaptedFramework = WisdomIntegrationSystem.getSystemPrompt(wisdomContext);
+      console.log('✨ Wisdom loaded:', {
+        depth,
+        phase: dominantElement,
+        contextual: true
+      });
 
       // Adapt framework based on learned patterns
       if (userPatterns.length > 0) {

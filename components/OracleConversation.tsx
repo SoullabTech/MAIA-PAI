@@ -1482,7 +1482,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
     const transcript = messages.map(msg => {
       const timestamp = msg.timestamp?.toLocaleString() || '';
-      const speaker = msg.role === 'user' ? '**You**' : `**${agentConfig.name}**`;
+      const speaker = msg.role === 'user' ? `**${userName}**` : '**MAIA**';
       return `### ${speaker}\n*${timestamp}*\n\n${msg.text}\n`;
     }).join('\n---\n\n');
 
@@ -2225,7 +2225,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div className="text-xs" style={{ color: '#D4A574', opacity: 0.8, fontFamily: 'Spectral, Georgia, serif', letterSpacing: '0.05em' }}>
-                          {message.role === 'user' ? 'You' : agentConfig.name}
+                          {message.role === 'user' ? userName : 'MAIA'}
                         </div>
                         <div className="flex items-center gap-1 text-xs text-gold-divine/40
                                       opacity-100 sm:opacity-0 sm:group-hover:opacity-100

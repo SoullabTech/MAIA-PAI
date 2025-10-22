@@ -30,9 +30,12 @@ interface MaiaSettings {
 }
 
 const VOICE_OPTIONS = [
-  { id: 'shimmer', name: 'Shimmer', emoji: '✨' },
-  { id: 'fable', name: 'Fable', emoji: '📖' },
-  { id: 'nova', name: 'Nova', emoji: '⭐' },
+  { id: 'shimmer', name: 'Shimmer', emoji: '💧', gender: 'Female', quality: 'Warm & Empathetic' },
+  { id: 'nova', name: 'Nova', emoji: '⭐', gender: 'Female', quality: 'Energetic & Bright' },
+  { id: 'alloy', name: 'Alloy', emoji: '🌍', gender: 'Neutral', quality: 'Balanced & Clear' },
+  { id: 'echo', name: 'Echo', emoji: '🎙️', gender: 'Male', quality: 'Professional & Clear' },
+  { id: 'fable', name: 'Fable', emoji: '📖', gender: 'Male', quality: 'Expressive & British' },
+  { id: 'onyx', name: 'Onyx', emoji: '🗣️', gender: 'Male', quality: 'Deep & Authoritative' },
 ];
 
 const ARCHETYPE_OPTIONS = [
@@ -309,12 +312,12 @@ export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps)
                     <Mic size={16} />
                     Voice Model
                   </label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {VOICE_OPTIONS.map((voice) => (
                       <motion.button
                         key={voice.id}
                         onClick={() => updateSetting('voice.openaiVoice', voice.id)}
-                        className={`py-3 px-3 rounded-xl border transition-all min-h-[56px] ${
+                        className={`py-3 px-3 rounded-xl border transition-all min-h-[72px] ${
                           settings.voice.openaiVoice === voice.id
                             ? 'border-amber-500/50 bg-amber-500/15 text-amber-400'
                             : 'border-white/10 bg-black/20 text-white/60'
@@ -333,7 +336,9 @@ export function QuickSettingsSheet({ isOpen, onClose }: QuickSettingsSheetProps)
                         >
                           {voice.emoji}
                         </motion.div>
-                        <div className="text-xs">{voice.name}</div>
+                        <div className="text-xs font-medium">{voice.name}</div>
+                        <div className="text-[10px] opacity-60">{voice.gender}</div>
+                        <div className="text-[9px] opacity-50 mt-0.5">{voice.quality}</div>
                       </motion.button>
                     ))}
                   </div>

@@ -84,29 +84,35 @@ export async function POST(request: NextRequest) {
 
     // Fallback: Mock signin for beta testing
     // This allows signin to work even without database
-    const validExplorers = [
-      'MAIA-ARCHITECT',
-      'MAIA-APPRENTICE',
-      'MAIA-ALCHEMIST',
-      'MAIA-NAVIGATOR',
-      'MAIA-SEEKER',
-      'MAIA-WITNESS',
-      'MAIA-DREAMER',
-      'MAIA-CATALYST',
-      'MAIA-ORACLE',
-      'MAIA-GUARDIAN',
-      'MAIA-EXPLORER',
-      'MAIA-WEAVER',
-      'MAIA-MYSTIC',
-      'MAIA-BUILDER',
-      'MAIA-SAGE',
-      'MAIA-VOYAGER',
-      'MAIA-KEEPER',
-      'MAIA-LISTENER',
-      'MAIA-PIONEER',
-      'MAIA-WANDERER',
-      'MAIA-ILLUMINATOR'
+    // Support both MAIA- and Soullab- prefixes for backwards compatibility
+    const validPrefixes = ['MAIA-', 'Soullab-'];
+    const validExplorerSuffixes = [
+      'ARCHITECT',
+      'APPRENTICE',
+      'ALCHEMIST',
+      'NAVIGATOR',
+      'SEEKER',
+      'WITNESS',
+      'DREAMER',
+      'CATALYST',
+      'ORACLE',
+      'GUARDIAN',
+      'EXPLORER',
+      'WEAVER',
+      'MYSTIC',
+      'BUILDER',
+      'SAGE',
+      'VOYAGER',
+      'KEEPER',
+      'LISTENER',
+      'PIONEER',
+      'WANDERER',
+      'ILLUMINATOR'
     ];
+
+    const validExplorers = validPrefixes.flatMap(prefix =>
+      validExplorerSuffixes.map(suffix => `${prefix}${suffix}`)
+    );
 
     if (!validExplorers.includes(explorerName)) {
       return NextResponse.json(
@@ -115,15 +121,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For mock signin, map known explorer codes to real names
-    const nameMapping: Record<string, string> = {
-      'MAIA-ARCHITECT': 'Kelly',
-      'MAIA-APPRENTICE': 'Alex',
-      'MAIA-ALCHEMIST': 'Jordan',
-      // Add other mappings as needed
-    };
+    // Require user name for signin - no defaults
+    // This ensures proper personalization for all users
+    if (!name || name.trim() === '') {
+      return NextResponse.json(
+        {
+          error: 'Please provide your name to personalize your MAIA experience.',
+          requiresName: true
+        },
+        { status: 400 }
+      );
+    }
 
-    const mockName = name || nameMapping[explorerName] || explorerName.replace('MAIA-', '').toLowerCase().replace(/^./, c => c.toUpperCase());
+    const mockName = name.trim();
 
     // Return mock successful signin
     return NextResponse.json({
