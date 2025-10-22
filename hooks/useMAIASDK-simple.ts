@@ -91,9 +91,14 @@ export function useMAIASDK(options: UseMAIASDKOptions = {}) {
         options.onTranscript?.(data.text, true);
       });
 
+      // Buffer MAIA's response text until TTS completes
+      let bufferedResponse: string | null = null;
+
       sdkRef.current.on('llm.completed', (data: any) => {
         console.log('🤖 [useMAIASDK] MAIA responds:', data.text.substring(0, 100));
-        options.onTranscript?.(data.text, false);
+        // Buffer response - don't show text until AFTER she speaks
+        bufferedResponse = data.text;
+        console.log('📝 [useMAIASDK] Response buffered - will show after TTS completes');
       });
 
       sdkRef.current.on('tts.started', () => {
@@ -106,6 +111,13 @@ export function useMAIASDK(options: UseMAIASDKOptions = {}) {
         console.log('✅ [useMAIASDK] TTS completed');
         setIsSpeaking(false);
         options.onAudioEnd?.();
+
+        // NOW show the transcript after she's done speaking
+        if (bufferedResponse) {
+          console.log('📤 [useMAIASDK] Showing buffered response in UI');
+          options.onTranscript?.(bufferedResponse, false);
+          bufferedResponse = null;
+        }
       });
 
       sdkRef.current.on('cost.update', (data: any) => {
