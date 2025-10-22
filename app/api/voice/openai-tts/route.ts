@@ -148,9 +148,22 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('OpenAI TTS error:', response.status, error);
-      throw new Error(`OpenAI TTS failed: ${response.status}`);
+      const errorText = await response.text();
+      let errorDetails = errorText;
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorDetails = errorJson.error?.message || errorJson.message || errorText;
+      } catch (e) {
+        // Error isn't JSON, use text as-is
+      }
+      console.error('❌ OpenAI TTS API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorDetails,
+        voice: config.voice,
+        textLength: cleanedText.length
+      });
+      throw new Error(`OpenAI TTS failed: ${response.status} - ${errorDetails}`);
     }
 
     // Get the audio data

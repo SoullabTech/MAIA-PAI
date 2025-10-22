@@ -219,20 +219,23 @@ export class MAIARealtimeSDK extends EventEmitter {
       this.emit('tts.started', { text });
 
       if (ttsProvider.name === 'openai-tts') {
-        // Use OpenAI TTS API
-        const response = await fetch('/api/voice/openai-tts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text,
-            voice: ttsProvider.config?.voice || 'shimmer',
-            model: 'tts-1'
-          })
-        });
+        try {
+          // Use OpenAI TTS API
+          const response = await fetch('/api/voice/openai-tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text,
+              voice: ttsProvider.config?.voice || 'shimmer',
+              model: 'tts-1'
+            })
+          });
 
-        if (!response.ok) {
-          throw new Error(`OpenAI TTS error: ${response.status}`);
-        }
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('❌ OpenAI TTS failed:', response.status, errorData);
+            throw new Error(`OpenAI TTS error: ${response.status}`);
+          }
 
         const audioBlob = await response.blob();
         const audioUrl = URL.createObjectURL(audioBlob);
@@ -259,6 +262,27 @@ export class MAIARealtimeSDK extends EventEmitter {
           total: this.session.cost.total,
           breakdown: this.session.cost
         });
+
+        } catch (openaiError) {
+          // Fallback to browser TTS if OpenAI fails
+          console.warn('⚠️ OpenAI TTS failed, falling back to browser TTS:', openaiError);
+          this.emit('tts.fallback', { provider: 'browser-tts', reason: String(openaiError) });
+
+          await new Promise<void>((resolve, reject) => {
+            if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+              reject(new Error('Browser TTS not available'));
+              return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.95;
+            utterance.pitch = 1.0;
+            utterance.onend = () => resolve();
+            utterance.onerror = reject;
+
+            window.speechSynthesis.speak(utterance);
+          });
+        }
 
       } else if (ttsProvider.name === 'browser-tts') {
         // Use browser speech synthesis
