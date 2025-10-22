@@ -24,11 +24,11 @@ export * from './core/types';
 export { BaseProvider } from './providers/base-provider';
 
 // Provider exports
-export { OpenAIRealtimeAdapter } from './providers/openai/realtime-adapter';
+// export { OpenAIRealtimeAdapter } from './providers/openai/realtime-adapter'; // Removed - using sovereignty mode
 
 // Provider factory
 import { BaseProvider } from './providers/base-provider';
-import { OpenAIRealtimeAdapter } from './providers/openai/realtime-adapter';
+// import { OpenAIRealtimeAdapter } from './providers/openai/realtime-adapter'; // Removed - using sovereignty mode
 import { ProviderConfig } from './core/types';
 
 export type ProviderType = 'openai' | 'local' | 'anthropic';
@@ -56,8 +56,8 @@ export async function createProvider(
 
   switch (type) {
     case 'openai':
-      provider = new OpenAIRealtimeAdapter();
-      break;
+      // OpenAI provider removed - using sovereignty mode with browser STT + Claude + browser TTS
+      throw new Error('OpenAI provider removed - use useMAIASDK hook for sovereignty mode');
 
     case 'local':
       // TODO: Implement LocalWhisperXTTSAdapter
