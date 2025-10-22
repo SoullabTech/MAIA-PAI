@@ -166,7 +166,9 @@ export class MAIARealtimeSDK extends EventEmitter {
         body: JSON.stringify({
           input: userText,  // Use 'input' which is the primary field
           userId: 'current-user',
-          sessionId: this.session.id
+          sessionId: this.session.id,
+          modality: 'voice',  // CRITICAL: Tell API this is voice mode for fast path
+          preferences: { isVoice: true }  // Alternative field check
         })
       });
 
