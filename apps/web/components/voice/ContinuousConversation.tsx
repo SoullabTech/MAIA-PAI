@@ -265,6 +265,41 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     return recognition;
   }, [isListening, isRecording, isSpeaking, silenceThreshold, onInterimTranscript, onRecordingStateChange]);
 
+  // 🔇 CRITICAL: Stop recognition when MAIA starts speaking to prevent voice feedback loop
+  useEffect(() => {
+    if (isSpeaking && recognitionRef.current && isRecording) {
+      console.log('🔇 [Voice Feedback Prevention] MAIA started speaking - stopping STT');
+      try {
+        recognitionRef.current.stop();
+        setIsRecording(false);
+      } catch (err) {
+        console.warn('⚠️ [Voice Feedback Prevention] Error stopping recognition:', err);
+      }
+    }
+  }, [isSpeaking, isRecording]);
+
+  // 🎤 CRITICAL: Restart recognition after MAIA finishes speaking
+  useEffect(() => {
+    if (!isSpeaking && !isRecording && isListening && recognitionRef.current) {
+      console.log('✅ [effect] Recognition restarted after Maya stopped speaking');
+      const restartTimer = setTimeout(() => {
+        if (recognitionRef.current && !isRecording && !isSpeaking && isListening) {
+          try {
+            recognitionRef.current.start();
+            setIsRecording(true);
+          } catch (err) {
+            // Ignore if already started
+            if (!err.message?.includes('already started')) {
+              console.warn('⚠️ [Voice Feedback Prevention] Error restarting recognition:', err);
+            }
+          }
+        }
+      }, 500); // Small delay to ensure audio has stopped
+
+      return () => clearTimeout(restartTimer);
+    }
+  }, [isSpeaking, isRecording, isListening]);
+
   // Process accumulated transcript
   const processAccumulatedTranscript = useCallback(() => {
     const transcript = accumulatedTranscript.current.trim();
