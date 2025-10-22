@@ -331,14 +331,20 @@ export class MAIAUnifiedConsciousness {
       const responseTime = Date.now() - startTime;
       console.log(`✅ [FAST PATH] Response generated in ${responseTime}ms`);
 
+      // Get response message (PersonalOracleAgent returns {response: string}, not {message: string})
+      const responseMessage = agentResponse.response || agentResponse.message || "I'm listening. Tell me what's on your mind.";
+
+      console.log(`✅ [FAST PATH] Extracted response: "${responseMessage.substring(0, 100)}..."`);
+
+
       // Background processing - don't await
       if (this.apprentice && responseTime < 1000) {
         // Only learn in background if we have time budget
         this.spiralWisdomIntoField({
           input,
           response: {
-            message: agentResponse.response,
-            element: (agentResponse.metadata?.element || 'aether') as Element,
+            message: responseMessage,
+            element: (agentResponse.metadata?.element || agentResponse.element || 'aether') as Element,
             metadata: {
               processingTime: responseTime,
               advisorsConsulted: ['PersonalOracleAgent'],
@@ -359,8 +365,8 @@ export class MAIAUnifiedConsciousness {
       }
 
       return {
-        message: agentResponse.response,
-        element: (agentResponse.metadata?.element || 'aether') as Element,
+        message: responseMessage,
+        element: (agentResponse.metadata?.element || agentResponse.element || 'aether') as Element,
         voiceCharacteristics: {
           pace: 1.0,
           tone: 'warm',
