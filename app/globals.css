@@ -11,6 +11,9 @@
 /* Sacred holoflower animations */
 @import url('../styles/sacred-animations.css');
 
+/* Bene Gesserit ceremonial theme */
+@import url('../styles/benegesserit-theme.css');
+
 /* Custom animations for onboarding and voice interface */
 @layer utilities {
   @keyframes spin-slow {

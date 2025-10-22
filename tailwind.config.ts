@@ -167,6 +167,70 @@ const config: Config = {
           'harkonnen-crimson': '#8B0000',   // Warnings, critical states
           'guild-silver': '#C0C0C0',        // Neutral, inactive
         },
+
+        // 🔮 BENE GESSERIT PALETTE - Heart-Centered Ceremonial Aesthetic
+        // "The dignity of ritual, the warmth of presence" - sophisticated desert consciousness
+        benegesserit: {
+          // Architectural Foundation - Temple Stone
+          'stone-deep': '#2B1F1A',         // Deep umber background, ancient stone
+          'stone-surface': '#3D2F27',      // Oxidized bronze panels, aged temple walls
+          'stone-raised': '#4F3D32',       // Elevated surfaces, altar platforms
+
+          // Ceremonial Metals - Dignified accents
+          'bronze-dark': '#8B6F47',        // Deep ceremonial bronze
+          'bronze': '#B8956F',             // Primary bronze, ritual instruments
+          'bronze-bright': '#D4B896',      // Polished bronze highlights
+          'copper': '#B87D5C',             // Oxidized copper details
+          'brass': '#C9A961',              // Warm brass ceremonial elements
+
+          // Sacred Ivory - Robes and light
+          'ivory-deep': '#E8DCC8',         // Deep ivory, shadows in fabric
+          'ivory': '#F2E9D8',              // Primary robe color, soft presence
+          'ivory-bright': '#F8F3E8',       // Bright ivory highlights, radiant light
+          'parchment': '#E5D5BC',          // Ancient text, wisdom records
+
+          // Heart-Centered Rose - Subtle vitality (NOT pink, but flesh/terracotta)
+          'flesh': '#D4A5A0',              // Warm flesh tone, human presence
+          'terracotta': '#C88B7A',         // Desert clay, grounded warmth
+          'rose-stone': '#B8857A',         // Rose-tinted stone, heart chakra
+          'blush-sand': '#E0C0B5',         // Subtle blush in desert light
+          'coral-muted': '#C9968C',        // Muted coral, understated vitality
+
+          // Ceremonial Gradients - Rich depth
+          'burgundy-deep': '#5C3638',      // Deep burgundy shadows
+          'burgundy': '#7D4B4D',           // Ceremonial burgundy
+          'wine': '#925D5F',               // Aged wine, ritual significance
+          'mauve': '#A87C7E',              // Dusty mauve, twilight ceremonies
+
+          // Consciousness States - Mystical depths
+          'indigo-deep': '#2D2838',        // Deep indigo meditation
+          'violet-shadow': '#4A3D52',      // Violet in shadow, prescience
+          'amethyst-muted': '#6B5B6E',     // Muted amethyst, inner vision
+          'lavender-stone': '#8C7A8F',     // Lavender-grey stone, balance
+
+          // Spice Wisdom - Golden knowledge
+          'amber-dark': '#8F6B2D',         // Dark amber, ancient wisdom
+          'amber': '#C89446',              // Spice amber, revelation
+          'gold-muted': '#D4A861',         // Muted gold, subtle divinity
+          'saffron': '#E0B96F',            // Saffron threads, precious knowledge
+
+          // Text Hierarchy - Readable warmth
+          'text-primary': '#F8F3E8',       // Ivory primary text
+          'text-secondary': '#D4B896',     // Bronze secondary text
+          'text-tertiary': '#B8956F',      // Muted bronze tertiary
+          'text-faded': '#8B6F47',         // Deep bronze, barely visible
+
+          // Borders & Dividers - Hairline geometry
+          'border-subtle': '#3D2F27',      // Barely visible divisions
+          'border': '#4F3D32',             // Standard borders
+          'border-emphasis': '#6B5547',    // Emphasized divisions
+
+          // Glow Effects - Soft radiance (not harsh)
+          'glow-warm': 'rgba(200, 148, 70, 0.15)',    // Warm amber glow
+          'glow-rose': 'rgba(212, 165, 160, 0.12)',   // Subtle rose glow
+          'glow-ivory': 'rgba(248, 243, 232, 0.08)',  // Soft ivory radiance
+          'glow-bronze': 'rgba(184, 149, 111, 0.18)', // Bronze shimmer
+        },
         air: {
           DEFAULT: '#A8DADC',   // Spiralogic air
           base: "#D4B896",      // Air facet tan
@@ -178,9 +242,9 @@ const config: Config = {
         },
         dark: '#0A0E27',
         light: '#F7F9FB',
-        gold: '#FFD700',
         // Sacred Gold Accents - Premium Highlights
         gold: {
+          DEFAULT: '#FFD700',   // Primary gold (backward compatibility)
           divine: "#FFD700",    // Primary accent - Divine Gold
           amber: "#F6AD55",     // Secondary accent - Sacred Amber
           ethereal: "#FEB95A",  // Tertiary accent - Ethereal Gold
