@@ -1,7 +1,8 @@
 # 🚀 MAIA SDK IS ACTUALLY LIVE NOW!
 
-**Commit**: `5644a926`
-**Status**: ✅ Building on Vercel
+**Latest Commit**: `b251c912` (Voice Flow Fix)
+**Previous Commit**: `5644a926` (SDK Implementation)
+**Status**: ✅ Deploying to Vercel
 **Date**: October 22, 2024
 
 ---
@@ -87,10 +88,46 @@ SAVINGS: 67%!
 
 ---
 
+## 🔧 VOICE FLOW FIX (Commit b251c912)
+
+### What Was Broken:
+The voice transcript was calling `handleTextMessage` which:
+1. Made direct API call to `/api/oracle/personal` ✅
+2. Called `maiaSpeak` which checked WebRTC connection ❌
+3. WebRTC not connected → fell back to browser TTS ❌
+4. Result: **Robotic voice** instead of OpenAI's natural shimmer voice
+
+### What We Fixed:
+Voice transcript now calls SDK's `maiaSendText`:
+```
+Browser STT → handleVoiceTranscript → SDK.handleUserSpeech
+                                    ↓
+                             SDK.processText (Claude API)
+                                    ↓
+                             SDK.synthesize (OpenAI TTS)
+                                    ↓
+                             Natural shimmer voice! 🎤
+```
+
+### Key Changes:
+1. **handleVoiceTranscript** (line 1500): Now calls `maiaSendText` instead of `handleTextMessage`
+2. **onTranscript callback** (line 149): Adds MAIA's response to message history
+3. **Auto-connect SDK** (line 1498): Ensures SDK session started before first voice input
+4. **Proper state management**: User message added to UI immediately, MAIA response added when SDK emits event
+
+### Result:
+✅ Voice goes through SDK flow
+✅ OpenAI TTS synthesizes with shimmer voice
+✅ Cost tracking updates in real-time
+✅ No more generic fallback responses
+✅ No more robotic browser TTS
+
+---
+
 ## 🧪 HOW TO TEST
 
 ### Step 1: Wait for Build (2-3 mins)
-Check Vercel for deployment `5644a926`
+Check Vercel for deployment `b251c912` (Voice Flow Fix)
 
 ### Step 2: Hard Refresh
 ```
@@ -107,13 +144,18 @@ Look for these logs:
 ```
 
 ### Step 4: Speak to MAIA
-You should see:
+You should see these logs (indicating SDK flow is working):
 ```
+🎯 Voice transcript received: [your message]
+🔌 SDK not connected, connecting now... (first time only)
+🎙️ [useMAIASDK] Session started
+🚀 Calling SDK maiaSendText (processText + synthesize)...
 👤 [useMAIASDK] User said: [your message]
 🤖 [useMAIASDK] MAIA responds: [real response, not generic!]
 🔊 [useMAIASDK] TTS started
 ✅ [useMAIASDK] TTS completed
 💰 [useMAIASDK] Cost: $0.0032
+✅ SDK voice flow completed
 ```
 
 ### Step 5: Check Voice Quality
