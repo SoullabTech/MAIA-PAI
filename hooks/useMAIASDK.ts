@@ -117,20 +117,23 @@ export function useMAIASDK(options: UseMAIASDKOptions = {}) {
             priority: 50,
             capabilities: ['stt']
           },
-          // Browser TTS (always available, fallback)
+          // OpenAI TTS (good quality voice, use until XTTS is trained)
+          {
+            name: 'openai-tts',
+            endpoint: '/api/voice/openai-tts',
+            priority: 80,
+            capabilities: ['tts'],
+            config: {
+              voice: options.voice || 'shimmer',
+              model: 'tts-1'
+            }
+          },
+          // Browser TTS (fallback)
           {
             name: 'browser-tts',
             endpoint: 'browser',
             priority: 50,
             capabilities: ['tts']
-          },
-          // OpenAI (fallback for everything)
-          {
-            name: 'openai',
-            endpoint: 'https://api.openai.com/v1',
-            apiKey: process.env.OPENAI_API_KEY,
-            priority: 30,
-            capabilities: ['stt', 'llm', 'tts']
           }
         ],
         fallbackChain: ['browser-stt', 'local-whisper', 'openai'],

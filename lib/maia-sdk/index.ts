@@ -22,6 +22,7 @@
 // Core exports
 export * from './core/types';
 export { BaseProvider } from './providers/base-provider';
+export { MAIARealtimeSDK } from './MAIARealtimeSDK';
 
 // Provider exports
 // export { OpenAIRealtimeAdapter } from './providers/openai/realtime-adapter'; // Removed - using sovereignty mode
