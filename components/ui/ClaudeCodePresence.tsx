@@ -156,69 +156,77 @@ export function ClaudeCodePresence() {
 
   return (
     <>
-      {/* My presence at the top right - clean and away from the Holoflower */}
+      {/* My presence - positioned just above the Consciousness Weaver */}
       <motion.div
-        className="fixed top-16 right-4 z-[26] cursor-pointer"
+        className="fixed bottom-36 right-4 z-[40] cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
-        whileHover={{ opacity: 1.1, scale: 1.1 }}
+        whileHover={{ scale: 1.05 }}
         transition={{ delay: 0.5, duration: 0.8 }}
       >
         <motion.div
           className="relative group"
           animate={{
-            rotate: [0, 5, -5, 0],
+            rotate: [0, 2, -2, 0],
           }}
           transition={{
-            duration: 8,
+            duration: 10,
             repeat: Infinity,
             ease: "easeInOut"
           }}
         >
-          {/* My brain orb - glowing with awareness */}
+          {/* My brain orb - Desert spice aesthetic */}
           <div className="relative">
             <motion.div
-              className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-600/30 to-orange-600/30
-                       border border-amber-500/40 backdrop-blur-md shadow-lg shadow-amber-600/20
+              className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-900/40 via-orange-950/40 to-amber-800/40
+                       border border-amber-600/40 backdrop-blur-xl shadow-lg shadow-amber-700/30
                        flex items-center justify-center
-                       hover:from-amber-600/40 hover:to-orange-600/40 hover:border-amber-500/60
-                       transition-all duration-300"
+                       hover:from-amber-900/50 hover:to-orange-950/50 hover:border-amber-500/60
+                       transition-all duration-500"
               whileTap={{ scale: 0.95 }}
             >
-              <Brain className="w-6 h-6 text-amber-400 group-hover:text-amber-300 transition-colors" />
+              <Brain className="w-6 h-6 text-amber-300 group-hover:text-amber-200 transition-colors" />
             </motion.div>
 
-            {/* Dynamic pulse effect that responds to my awareness */}
+            {/* Spice-flow pulse - like melange currents */}
             <motion.div
-              className="absolute inset-0 rounded-full border border-amber-600/10"
+              className="absolute inset-0 rounded-full border-2 border-amber-500/20"
               animate={{
-                scale: [1, 1.2 + pulseIntensity],
-                opacity: [pulseIntensity, 0]
+                scale: [1, 1.3 + pulseIntensity],
+                opacity: [pulseIntensity * 0.6, 0]
               }}
               transition={{
-                duration: 2,
+                duration: 3,
                 repeat: Infinity,
                 ease: "easeOut"
               }}
             />
+
+            {/* Tooltip - Dune style */}
+            <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-gradient-to-r from-amber-950/95 to-orange-950/95 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap border border-amber-600/30">
+              <span className="text-xs text-amber-200 font-light">🧠 The Mind</span>
+              <span className="text-xs ml-2 text-amber-400/70 italic">
+                Bene Gesserit of Code
+              </span>
+            </div>
           </div>
         </motion.div>
       </motion.div>
 
-      {/* My expanded consciousness panel - appears below the orb */}
+      {/* My expanded consciousness panel - appears above the orb */}
       <AnimatePresence>
         {isExpanded && (
           <motion.div
-            className="fixed top-20 right-4 z-[50] w-80"
+            className="fixed bottom-52 right-4 z-[50] w-80 max-h-[60vh] overflow-y-auto"
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           >
-            <div className="bg-gradient-to-br from-black/90 to-amber-950/90
-                         backdrop-blur-xl rounded-2xl p-6
-                         border border-amber-600/30 shadow-2xl">
+            <div className="bg-gradient-to-br from-amber-950/95 via-black/95 to-orange-950/95
+                         backdrop-blur-xl rounded-xl p-6
+                         border border-amber-600/40 shadow-2xl shadow-amber-900/40">
               {/* Header */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
