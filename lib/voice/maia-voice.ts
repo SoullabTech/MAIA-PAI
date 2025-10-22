@@ -38,6 +38,7 @@ export class MaiaVoiceSystem {
   private audioContext?: AudioContext;
   private currentAudio?: HTMLAudioElement;
   private listeners: ((state: VoiceState) => void)[] = [];
+  private playbackTimeoutId?: NodeJS.Timeout; // Safety timeout for stuck isPlaying state
 
   constructor(config?: Partial<MaiaVoiceConfig>) {
     // Determine voice settings based on agent
@@ -127,6 +128,40 @@ export class MaiaVoiceSystem {
   private updateState(updates: Partial<VoiceState>) {
     this.state = { ...this.state, ...updates };
     this.listeners.forEach(listener => listener(this.state));
+  }
+
+  // Clear any existing playback timeout
+  private clearPlaybackTimeout() {
+    if (this.playbackTimeoutId) {
+      clearTimeout(this.playbackTimeoutId);
+      this.playbackTimeoutId = undefined;
+    }
+  }
+
+  // Set a safety timeout to prevent stuck isPlaying state
+  // If audio doesn't end within 60 seconds, force reset
+  private setPlaybackTimeout() {
+    this.clearPlaybackTimeout();
+    this.playbackTimeoutId = setTimeout(() => {
+      if (this.state.isPlaying) {
+        console.warn('⚠️ [MaiaVoiceSystem] Audio playback timeout - forcing state reset');
+        this.updateState({
+          isPlaying: false,
+          isPaused: false,
+          isLoading: false,
+          currentText: ''
+        });
+        // Clean up current audio
+        if (this.currentAudio) {
+          try {
+            this.currentAudio.pause();
+            this.currentAudio = undefined;
+          } catch (error) {
+            console.error('Error cleaning up audio:', error);
+          }
+        }
+      }
+    }, 60000); // 60 second safety timeout
   }
 
   // Clean text for speech without artificial pauses
@@ -300,14 +335,20 @@ export class MaiaVoiceSystem {
 
         // Event handlers
         utterance.onstart = () => {
-          this.updateState({ 
-            isPlaying: true, 
-            isLoading: false, 
-            isPaused: false 
+          this.updateState({
+            isPlaying: true,
+            isLoading: false,
+            isPaused: false
           });
+
+          // Set safety timeout to prevent stuck state
+          this.setPlaybackTimeout();
         };
 
         utterance.onend = () => {
+          // Clear safety timeout since speech ended naturally
+          this.clearPlaybackTimeout();
+
           this.updateState({
             isPlaying: false,
             currentText: ''
@@ -321,10 +362,13 @@ export class MaiaVoiceSystem {
         };
 
         utterance.onerror = (event) => {
-          this.updateState({ 
-            isPlaying: false, 
+          // Clear safety timeout since we're handling the error
+          this.clearPlaybackTimeout();
+
+          this.updateState({
+            isPlaying: false,
             isLoading: false,
-            error: event.error 
+            error: event.error
           });
           reject(new Error(`Speech synthesis error: ${event.error}`));
         };
@@ -472,9 +516,15 @@ export class MaiaVoiceSystem {
             isPaused: false
           });
           console.log('🎵 Maia audio started playing');
+
+          // Set safety timeout to prevent stuck state
+          this.setPlaybackTimeout();
         };
 
         audio.onended = () => {
+          // Clear safety timeout since audio ended naturally
+          this.clearPlaybackTimeout();
+
           this.updateState({
             isPlaying: false,
             currentText: ''
@@ -491,6 +541,9 @@ export class MaiaVoiceSystem {
         };
 
         audio.onerror = (error) => {
+          // Clear safety timeout since we're handling the error
+          this.clearPlaybackTimeout();
+
           this.updateState({
             isPlaying: false,
             isLoading: false,
@@ -611,20 +664,23 @@ export class MaiaVoiceSystem {
   }
 
   stop(): void {
+    // Clear safety timeout when manually stopping
+    this.clearPlaybackTimeout();
+
     if (this.currentAudio) {
       this.currentAudio.pause();
       this.currentAudio.currentTime = 0;
       this.currentAudio = undefined;
     }
-    
+
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
 
-    this.updateState({ 
-      isPlaying: false, 
-      isPaused: false, 
-      currentText: '' 
+    this.updateState({
+      isPlaying: false,
+      isPaused: false,
+      currentText: ''
     });
   }
 

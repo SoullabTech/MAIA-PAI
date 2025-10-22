@@ -33,6 +33,7 @@ export class MaiaRealtimeWebRTC {
   private config: Required<MaiaRealtimeConfig>;
   private audioElement: HTMLAudioElement | null = null;
   private isConnecting: boolean = false;
+  private responseTimeoutId?: NodeJS.Timeout; // Detect when API doesn't respond
 
   constructor(config: MaiaRealtimeConfig) {
     this.config = {
@@ -296,6 +297,23 @@ export class MaiaRealtimeWebRTC {
     };
   }
 
+  // Start watching for API response timeout after user speech
+  private startResponseTimeout(): void {
+    this.clearResponseTimeout();
+    this.responseTimeoutId = setTimeout(() => {
+      console.warn('⏰ [MaiaRealtimeWebRTC] OpenAI API response timeout (15s) - may be rate limited or experiencing delays');
+      this.config.onAudioEnd(); // Signal that we're done waiting
+      this.config.onError(new Error('OpenAI API response timeout - please wait a moment and try again'));
+    }, 15000); // 15 second timeout for API response
+  }
+
+  private clearResponseTimeout(): void {
+    if (this.responseTimeoutId) {
+      clearTimeout(this.responseTimeoutId);
+      this.responseTimeoutId = undefined;
+    }
+  }
+
   private handleEvent(data: any): void {
     console.log('📥 Event:', data.type);
 
@@ -312,16 +330,22 @@ export class MaiaRealtimeWebRTC {
         if (data.transcript) {
           console.log('🎤 User said:', data.transcript);
           this.config.onTranscript(data.transcript, true);
+          // Start timeout - waiting for OpenAI to respond
+          this.startResponseTimeout();
         }
         break;
 
       case 'response.audio_transcript.delta':
+        // Clear timeout - OpenAI is responding!
+        this.clearResponseTimeout();
         if (data.delta) {
           this.config.onTranscript(data.delta, false);
         }
         break;
 
       case 'response.audio.done':
+        // Clear timeout - response completed
+        this.clearResponseTimeout();
         this.config.onAudioEnd();
         console.log('🔊 Audio playback done');
         break;
@@ -339,8 +363,21 @@ export class MaiaRealtimeWebRTC {
         this.handleFunctionCall(data);
         break;
 
+      case 'response.done':
+        // Also clear timeout when full response is done
+        this.clearResponseTimeout();
+        console.log('✅ Response complete');
+        break;
+
+      case 'rate_limit_exceeded':
+        console.error('⚠️ OpenAI Rate Limit Exceeded');
+        this.clearResponseTimeout();
+        this.config.onError(new Error('OpenAI rate limit exceeded - please wait a moment'));
+        break;
+
       case 'error':
         console.error('❌ API Error:', data.error);
+        this.clearResponseTimeout();
         this.config.onError(new Error(data.error.message || 'Unknown error'));
         break;
 
@@ -458,6 +495,9 @@ export class MaiaRealtimeWebRTC {
   }
 
   async disconnect(): Promise<void> {
+    // Clear any pending timeouts
+    this.clearResponseTimeout();
+
     if (this.dataChannel) {
       this.dataChannel.close();
       this.dataChannel = null;
