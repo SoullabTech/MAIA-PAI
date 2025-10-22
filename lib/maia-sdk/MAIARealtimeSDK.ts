@@ -152,22 +152,42 @@ export class MAIARealtimeSDK extends EventEmitter {
 
     // Get LLM response via API (which uses Claude!)
     try {
+      if (this.config.debug) {
+        console.log('📤 [MAIARealtimeSDK] Sending to API:', {
+          endpoint: '/api/oracle/personal',
+          message: userText.substring(0, 50) + '...',
+          sessionId: this.session.id
+        });
+      }
+
       const response = await fetch('/api/oracle/personal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: userText,
-          userId: 'current-user', // Will be passed from hook
+          input: userText,  // Use 'input' which is the primary field
+          userId: 'current-user',
           sessionId: this.session.id
         })
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ [MAIARealtimeSDK] API error:', response.status, errorText);
         throw new Error(`API error: ${response.status}`);
       }
 
       const data = await response.json();
-      const assistantText = data.text || data.response || data.message;
+
+      if (this.config.debug) {
+        console.log('📥 [MAIARealtimeSDK] API response:', {
+          hasData: !!data,
+          keys: Object.keys(data),
+          fullResponse: data
+        });
+      }
+
+      // Try multiple possible response fields
+      const assistantText = data.text || data.response || data.message || data.data?.message || data.data?.response;
 
       // Add to transcript
       this.session.transcript.push({
