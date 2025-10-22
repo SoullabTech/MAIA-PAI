@@ -145,8 +145,15 @@ export function useMAIASDK(options: UseMAIASDKOptions = {}) {
 
   // Handle user speech (called by ContinuousConversation with transcribed text)
   const handleUserSpeech = useCallback(async (text: string) => {
-    if (!sdkRef.current || !isConnected) {
-      console.warn('⚠️ [useMAIASDK] Not connected, cannot process speech');
+    if (!sdkRef.current) {
+      console.warn('⚠️ [useMAIASDK] SDK not initialized');
+      return;
+    }
+
+    // Check if SDK has an active session (more reliable than React state)
+    const hasSession = (sdkRef.current as any).session !== null;
+    if (!hasSession) {
+      console.warn('⚠️ [useMAIASDK] No active session, cannot process speech');
       return;
     }
 
@@ -158,7 +165,7 @@ export function useMAIASDK(options: UseMAIASDKOptions = {}) {
       console.error('❌ [useMAIASDK] Speech processing failed:', err);
       setError(err instanceof Error ? err.message : 'Processing failed');
     }
-  }, [isConnected]);
+  }, []); // No dependencies - always use latest SDK ref
 
   // Disconnect
   const disconnect = useCallback(async () => {

@@ -1495,14 +1495,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     const voiceStartTime = Date.now();
     trackEvent.voiceResult(userId || 'anonymous', transcript, 0);
 
-    // Ensure SDK is connected before processing
-    if (!maiaConnected && !maiaConnecting) {
-      console.log('🔌 SDK not connected, connecting now...');
-      await maiaConnect();
-      // Wait a bit for connection to establish
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-
     // Add user message to UI immediately
     const cleanedText = cleanMessage(transcript);
     const userMessage: ConversationMessage = {
@@ -1558,7 +1550,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setIsProcessing(false);
       setIsResponding(false);
     }
-  }, [maiaSendText, maiaConnect, maiaConnected, maiaConnecting, isProcessing, isResponding, isAudioPlaying, messages, echoSuppressUntil, maiaReady, isMuted, sessionId, userId, oracleAgentId, onMessageAdded]);
+  }, [maiaSendText, isProcessing, isResponding, isAudioPlaying, messages, echoSuppressUntil, maiaReady, isMuted, sessionId, userId, oracleAgentId, onMessageAdded]);
 
   // Clear all check-ins
   const clearCheckIns = useCallback(() => {
