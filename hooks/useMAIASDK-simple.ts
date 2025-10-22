@@ -180,6 +180,16 @@ export function useMAIASDK(options: UseMAIASDKOptions = {}) {
     }
   }, [options]);
 
+  // Change mode (stub for now - SDK doesn't need mode changes)
+  const changeMode = useCallback((mode: string) => {
+    console.log(`⚠️ Mode change not implemented: ${mode}`);
+  }, []);
+
+  // Cancel response (stub for now)
+  const cancelResponse = useCallback(() => {
+    console.log('⚠️ Cancel not implemented');
+  }, []);
+
   // Compatibility with useMaiaRealtime interface
   return {
     // New SDK methods
@@ -196,8 +206,8 @@ export function useMAIASDK(options: UseMAIASDKOptions = {}) {
     maiaConnect: connect,
     maiaDisconnect: disconnect,
     maiaSendText: handleUserSpeech, // Text goes to handleUserSpeech
-    maiaCancelResponse: () => console.log('⚠️ Cancel not implemented'),
-    maiaChangeMode: () => console.log('⚠️ Mode change not implemented'),
+    maiaCancelResponse: cancelResponse,
+    maiaChangeMode: changeMode,
 
     // Standard names
     isConnected,
