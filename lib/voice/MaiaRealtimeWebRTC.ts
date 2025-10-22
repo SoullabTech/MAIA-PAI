@@ -343,6 +343,13 @@ export class MaiaRealtimeWebRTC {
         }
         break;
 
+      case 'conversation.item.input_audio_transcription.failed':
+        console.error('❌ OpenAI transcription failed:', data.error);
+        console.error('   Item ID:', data.item_id);
+        console.error('   Error details:', JSON.stringify(data.error, null, 2));
+        // Note: Browser STT will be used as fallback automatically
+        break;
+
       case 'response.audio_transcript.delta':
         // Clear timeout - OpenAI is responding!
         this.clearResponseTimeout();
