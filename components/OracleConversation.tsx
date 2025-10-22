@@ -26,8 +26,8 @@ import { OracleResponse, ConversationContext } from '@/lib/oracle-response';
 import { mapResponseToMotion, enrichOracleResponse } from '@/lib/motion-mapper';
 import { VoiceState } from '@/lib/voice/voice-capture';
 // import { useMaiaVoice } from '@/hooks/useMaiaVoice'; // OLD TTS SYSTEM - replaced with WebRTC
-// import { useMaiaRealtime } from '@/hooks/useMaiaRealtime'; // REPLACED with MAIA SDK for sovereignty!
-import { useMAIASDK } from '@/hooks/useMAIASDK';
+import { useMaiaRealtime } from '@/hooks/useMaiaRealtime'; // Back to WebRTC for now - SDK needs MAIARealtimeSDK class
+// import { useMAIASDK } from '@/hooks/useMAIASDK'; // TODO: Implement after MAIARealtimeSDK class is created
 import { cleanMessage, cleanMessageForVoice, formatMessageForDisplay } from '@/lib/cleanMessage';
 import { getAgentConfig, AgentConfig } from '@/lib/agent-config';
 import { toast } from 'react-hot-toast';
@@ -126,26 +126,23 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     listeningMode === 'normal' ? 'dialogue' :
     listeningMode === 'patient' ? 'patient' : 'scribe';
 
-  // Maia SDK Integration - Full Voice Sovereignty (67% cost savings + no rate limits!)
+  // Maia Realtime Integration - WebRTC with full interruption support
   const {
-    maiaConnected,
-    maiaConnecting,
-    maiaIsSpeaking,
-    maiaError,
-    maiaTranscript,
-    maiaConnect,
-    maiaDisconnect,
-    maiaSendText,
-    maiaCancelResponse,
-    maiaChangeMode,
-    sessionCost,
-    currentProvider,
-  } = useMAIASDK({
+    isConnected: maiaConnected,
+    isConnecting: maiaConnecting,
+    isSpeaking: maiaIsSpeaking,
+    error: maiaError,
+    transcript: maiaTranscript,
+    connect: maiaConnect,
+    disconnect: maiaDisconnect,
+    sendText: maiaSendText,
+    cancelResponse: maiaCancelResponse,
+    changeMode: maiaChangeMode,
+  } = useMaiaRealtime({
     userId: userId || 'anonymous',
     userName: userName || 'Explorer',
-    voice: 'maya', // Will use custom XTTS voice when available
+    voice: 'shimmer',
     mode: realtimeMode,
-    debug: true,
     onTranscript: (text, isUser) => {
       if (isUser) {
         setUserTranscript(text);
