@@ -2617,33 +2617,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* SDK Cost Tracker - Real-time sovereignty savings! */}
-      {sessionCost > 0 && (
-        <div className="fixed bottom-20 left-4 bg-gradient-to-br from-purple-900/90 to-indigo-900/90 backdrop-blur-lg text-white px-4 py-3 rounded-xl shadow-2xl border border-purple-500/30 z-40">
-          <div className="text-xs text-purple-200 font-medium mb-1">Session Cost</div>
-          <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-pink-200">
-            ${sessionCost.toFixed(4)}
-          </div>
-          <div className="text-xs text-purple-300 mt-2 space-y-0.5">
-            <div className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span>
-              <span>STT: {currentProvider?.stt || 'browser'}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-              <span>LLM: {currentProvider?.llm || 'claude'}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
-              <span>TTS: {currentProvider?.tts || 'browser'}</span>
-            </div>
-          </div>
-          <div className="text-xs text-green-300 mt-2 font-semibold">
-            💰 67% savings vs OpenAI
-          </div>
-        </div>
-      )}
-
       {/* Hover Zone - Full bottom edge to trigger bottom bar (macOS Dock style) */}
       <div
         className="fixed bottom-0 left-0 right-0 h-4 z-40 pointer-events-auto"
