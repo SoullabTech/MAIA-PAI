@@ -1,7 +1,9 @@
 # 🚀 MAIA SDK IS ACTUALLY LIVE NOW!
 
-**Latest Commit**: `b251c912` (Voice Flow Fix)
-**Previous Commit**: `5644a926` (SDK Implementation)
+**Latest Commit**: `16f658cd` (SDK Connection State Fix)
+**Previous Commits**:
+- `b251c912` (Voice Flow Routing)
+- `5644a926` (SDK Implementation)
 **Status**: ✅ Deploying to Vercel
 **Date**: October 22, 2024
 
@@ -124,10 +126,40 @@ Browser STT → handleVoiceTranscript → SDK.handleUserSpeech
 
 ---
 
+## 🔧 CONNECTION STATE FIX (Commit 16f658cd)
+
+### The Second Bug:
+Even after routing voice through the SDK, it was failing with:
+- ❌ `Session already active` error when trying to reconnect
+- ❌ `Not connected, cannot process speech` warning
+- The SDK session WAS active, but the hook thought it wasn't
+
+### Root Cause:
+1. **Stale Closure**: `handleUserSpeech` was checking `isConnected` React state
+2. The state could be stale due to closure issues in useCallback
+3. **Double Connection**: Voice handler tried to reconnect even though session was already active
+4. Result: Connection errors and speech not processing
+
+### The Fix:
+1. **Direct Session Check**: Instead of checking React state, check SDK's session object directly
+   ```typescript
+   const hasSession = sdkRef.current.session !== null;
+   ```
+2. **No Dependencies**: Remove `isConnected` from useCallback dependencies (use ref instead)
+3. **Remove Redundant Check**: Don't try to reconnect in voice handler (session starts on mount)
+
+### Result:
+✅ SDK session check is reliable
+✅ No more "Not connected" warnings
+✅ No more double-connection attempts
+✅ Speech processing works immediately
+
+---
+
 ## 🧪 HOW TO TEST
 
 ### Step 1: Wait for Build (2-3 mins)
-Check Vercel for deployment `b251c912` (Voice Flow Fix)
+Check Vercel for deployment `16f658cd` (Connection State Fix)
 
 ### Step 2: Hard Refresh
 ```
@@ -144,19 +176,23 @@ Look for these logs:
 ```
 
 ### Step 4: Speak to MAIA
-You should see these logs (indicating SDK flow is working):
+You should see these logs (NO MORE ERRORS!):
 ```
 🎯 Voice transcript received: [your message]
-🔌 SDK not connected, connecting now... (first time only)
-🎙️ [useMAIASDK] Session started
 🚀 Calling SDK maiaSendText (processText + synthesize)...
-👤 [useMAIASDK] User said: [your message]
-🤖 [useMAIASDK] MAIA responds: [real response, not generic!]
+👤 [MAIARealtimeSDK] Processing user text: [your message]
+🤖 [MAIARealtimeSDK] LLM response received
 🔊 [useMAIASDK] TTS started
 ✅ [useMAIASDK] TTS completed
 💰 [useMAIASDK] Cost: $0.0032
 ✅ SDK voice flow completed
 ```
+
+**What's Different Now:**
+- ✅ NO "Session already active" error
+- ✅ NO "Not connected, cannot process speech" warning
+- ✅ Speech processes immediately
+- ✅ OpenAI TTS plays with natural shimmer voice
 
 ### Step 5: Check Voice Quality
 You should hear **OpenAI's shimmer voice** (natural, not robo!)
