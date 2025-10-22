@@ -544,8 +544,13 @@ export class MaiaRealtimeWebRTC {
       },
     });
 
+    // Request response with AUDIO modality (not just text!)
     this.sendEvent({
       type: 'response.create',
+      response: {
+        modalities: ['audio', 'text'], // CRITICAL: Request audio output!
+        instructions: 'Respond naturally with warmth and empathy using your voice.',
+      },
     });
   }
 
