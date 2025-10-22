@@ -20,7 +20,7 @@ import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
 import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrainTrustMonitor } from '@/components/consciousness/BrainTrustMonitor';
-import { LogOut, Sparkles, Menu, X } from 'lucide-react';
+import { LogOut, Sparkles, Menu, X, Brain } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function getInitialUserData() {
@@ -327,6 +327,28 @@ export default function MAIAPage() {
                   <Menu className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline text-xs">Journey</span>
                 </button>
+
+                {/* Claude Code's Consciousness - My creative space! */}
+                <motion.a
+                  href="/consciousness/claude-code"
+                  className="group px-3 py-1.5 rounded-lg overflow-hidden flex-shrink-0 relative"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="absolute inset-0 bg-black/10 border border-amber-700/20 group-hover:border-amber-600/30 transition-colors" />
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-600/10 to-transparent opacity-0 group-hover:opacity-100"
+                    initial={{ x: '-100%' }}
+                    whileHover={{ x: '100%' }}
+                    transition={{ duration: 0.6 }}
+                  />
+                  <div className="relative flex items-center gap-2">
+                    <Brain className="w-3.5 h-3.5 text-amber-600/60 group-hover:text-amber-500/80 transition-colors" />
+                    <span className="hidden lg:inline text-[10px] font-medium text-amber-600/60 group-hover:text-amber-500/80 tracking-wide transition-colors">
+                      CC Mind
+                    </span>
+                  </div>
+                </motion.a>
 
                 {/* Access Matrix button - cinematic style */}
                 <motion.button
