@@ -152,6 +152,7 @@ export class MaiaRealtimeWebRTC {
       console.log('🔌 Connection state:', state, '| ICE:', iceState);
 
       if (state === 'connected') {
+        console.log('✅ WebRTC connection state: connected');
         this.config.onConnected();
       } else if (state === 'failed' || state === 'closed') {
         console.log('🔴 Connection closed. State:', state);
@@ -167,6 +168,13 @@ export class MaiaRealtimeWebRTC {
     this.peerConnection.oniceconnectionstatechange = () => {
       const state = this.peerConnection?.iceConnectionState;
       console.log('🧊 ICE connection state:', state);
+
+      // CRITICAL FIX: Call onConnected when ICE connects, even if main connection state hasn't updated yet
+      // This is because some browsers/network configs show ICE as 'connected' but connectionState stays at 'connecting'
+      if (state === 'connected' && this.peerConnection?.connectionState !== 'connected') {
+        console.log('✅ ICE connected (connection state not yet updated) - treating as connected');
+        this.config.onConnected();
+      }
 
       if (state === 'failed') {
         console.error('❌ ICE connection failed');
