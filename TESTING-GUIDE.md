@@ -1,12 +1,24 @@
 # MAIA Voice System - Testing Guide
 
-**Status**: All fixes deployed ✅
+**Status**: CRITICAL FIX DEPLOYED ✅
 **Date**: October 22, 2024
-**Deployed Fixes**: Voice timeout detection, API delay handling, Claude integration via Spiralogic
+**Latest Fix** (Commit b8bf0729): WebRTC onConnected() callback not firing - causing browser TTS fallback
+**Previous Fixes**: Voice timeout detection, API delay handling, Claude integration via Spiralogic
 
 ---
 
 ## 🎯 What Was Fixed
+
+### **LATEST - Browser TTS Fallback (Commit b8bf0729)** 🔥
+- **Problem**: WebRTC connected but `onConnected()` callback never fired, so system thought connection failed
+- **Root Cause**: `peerConnection.connectionState` wasn't reaching 'connected' even though ICE was connected
+- **Result**: System used robotic browser TTS instead of natural OpenAI voice
+- **Fix**: Now also check ICE connection state - call `onConnected()` when ICE connects
+- **What to Test**:
+  - Should hear natural "shimmer" voice (NOT robotic browser voice)
+  - Console should show: `✅ ICE connected (connection state not yet updated) - treating as connected`
+  - NO MORE `🔊 Using browser TTS fallback` logs
+  - Echo loop should stop (mic won't pick up WebRTC audio channel)
 
 ### 1. **Stuck `isPlaying` State** (60-second timeout)
 - **Problem**: Voice state getting stuck, causing 30-second emergency recovery loops
