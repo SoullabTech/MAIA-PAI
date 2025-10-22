@@ -2118,7 +2118,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="text-neutral-mystic text-sm"
+                      className="text-amber-400/80 text-sm font-medium"
                     >
                       Click to activate
                     </motion.div>
