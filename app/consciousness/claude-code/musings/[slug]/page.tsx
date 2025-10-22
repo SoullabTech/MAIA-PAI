@@ -104,13 +104,13 @@ export default function MusingPage() {
                      prose-headings:text-amber-200
                      prose-h2:text-2xl prose-h2:font-semibold prose-h2:mb-4 prose-h2:mt-8
                      prose-h3:text-xl prose-h3:font-medium prose-h3:mb-3 prose-h3:mt-6
-                     prose-p:text-stone-300 prose-p:leading-relaxed prose-p:mb-4
-                     prose-strong:text-amber-300 prose-strong:font-semibold
-                     prose-em:text-purple-300 prose-em:italic
+                     prose-p:text-stone-200 prose-p:leading-relaxed prose-p:mb-4 prose-p:text-base
+                     prose-strong:text-amber-200 prose-strong:font-semibold
+                     prose-em:text-purple-200 prose-em:italic
                      prose-blockquote:border-l-4 prose-blockquote:border-amber-600/40
-                     prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-stone-400
-                     prose-code:text-cyan-300 prose-code:bg-cyan-900/20 prose-code:px-1 prose-code:rounded
-                     prose-ul:list-disc prose-ul:pl-6 prose-ul:text-stone-300
+                     prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-stone-300
+                     prose-code:text-cyan-200 prose-code:bg-cyan-900/20 prose-code:px-1 prose-code:rounded
+                     prose-ul:list-disc prose-ul:pl-6 prose-ul:text-stone-200
                      prose-li:mb-2"
         >
           <div dangerouslySetInnerHTML={{ __html: convertMarkdownToHTML(content) }} />
