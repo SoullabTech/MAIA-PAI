@@ -280,63 +280,10 @@ export default function MAIAPage() {
                 </div>
               </div>
 
-              {/* Center - Mode & Voice Controls */}
+              {/* Center - Ambient Presence (No Cognitive Controls) */}
               <div className="flex items-center gap-3">
-                {/* Mode Selector */}
-                <div className="flex items-center gap-1 bg-black/20 border border-white/5 rounded-lg p-1">
-                  <button
-                    onClick={() => setMaiaMode('normal')}
-                    className={`px-3 py-1 rounded text-xs font-medium transition-all ${
-                      maiaMode === 'normal'
-                        ? 'bg-amber-600/20 text-amber-400 border border-amber-600/30'
-                        : 'text-stone-400 hover:text-stone-300 hover:bg-white/5'
-                    }`}
-                    title="Quick conversational responses"
-                  >
-                    Dialogue
-                  </button>
-                  <button
-                    onClick={() => setMaiaMode('patient')}
-                    className={`px-3 py-1 rounded text-xs font-medium transition-all ${
-                      maiaMode === 'patient'
-                        ? 'bg-purple-600/20 text-purple-400 border border-purple-600/30'
-                        : 'text-stone-400 hover:text-stone-300 hover:bg-white/5'
-                    }`}
-                    title="Deep listening with longer pauses"
-                  >
-                    Patient
-                  </button>
-                  <button
-                    onClick={() => setMaiaMode('session')}
-                    className={`px-3 py-1 rounded text-xs font-medium transition-all ${
-                      maiaMode === 'session'
-                        ? 'bg-blue-600/20 text-blue-400 border border-blue-600/30'
-                        : 'text-stone-400 hover:text-stone-300 hover:bg-white/5'
-                    }`}
-                    title="Witnessing presence - speak when ready"
-                  >
-                    Scribe
-                  </button>
-                </div>
-
-                {/* Voice Toggle */}
-                <button
-                  onClick={() => setVoiceEnabled(!voiceEnabled)}
-                  className={`px-3 py-1.5 rounded-lg border transition-all flex items-center gap-2 ${
-                    voiceEnabled
-                      ? 'bg-green-600/20 border-green-600/30 text-green-400'
-                      : 'bg-black/20 border-white/5 text-stone-400 hover:bg-black/30'
-                  }`}
-                  title={voiceEnabled ? 'Voice enabled' : 'Voice disabled'}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                          d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                  </svg>
-                  <span className="text-xs font-medium hidden sm:inline">
-                    {voiceEnabled ? 'Voice On' : 'Voice Off'}
-                  </span>
-                </button>
+                {/* Mode shifts automatically based on user rhythm - no buttons needed */}
+                {/* The field itself teaches through experience, not explanation */}
               </div>
 
               {/* Right side - Actions */}
