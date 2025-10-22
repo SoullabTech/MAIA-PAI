@@ -185,6 +185,18 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     console.log('🎙️ maiaSpeak called with:', text.substring(0, 50));
     console.log('🔍 maiaSpeak state check:', { maiaConnected, maiaConnecting, maiaIsSpeaking });
 
+    // PRIMARY PATH: WebRTC handles audio automatically via text channel
+    if (maiaConnected) {
+      console.log('✅ Using OpenAI Realtime WebRTC - sending text via data channel');
+      // Send text message via WebRTC data channel for server-side TTS
+      // The audio will come back automatically through the audio track
+      maiaSendText(text);
+
+      // Return immediately - WebRTC handles audio playback asynchronously
+      // The onAudioStart/onAudioEnd callbacks will fire when audio plays
+      return Promise.resolve();
+    }
+
     // FALLBACK: Use browser TTS if WebRTC isn't working
     if (!maiaConnected && typeof window !== 'undefined' && 'speechSynthesis' in window) {
       console.log('🔊 Using browser TTS fallback');
@@ -220,7 +232,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
     console.warn('⚠️ WebRTC not connected and no browser TTS available');
     return Promise.resolve();
-  }, [maiaConnected]);
+  }, [maiaConnected, maiaSendText]);
   const maiaVoiceState = { isPlaying: maiaIsSpeaking };
 
   // Field Protocol Integration
