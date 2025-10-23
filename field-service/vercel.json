@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd field-service && npm install && npm run build",
+  "outputDirectory": "field-service/.next",
+  "installCommand": "cd field-service && npm install",
+  "framework": "nextjs",
+  "regions": ["iad1"]
+}
