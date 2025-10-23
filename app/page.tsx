@@ -30,10 +30,10 @@ export default function HomePage() {
   // Show loading while checking onboarding status
   if (isOnboarded === null) {
     return (
-      <div className="min-h-screen bg-ain-soph-blue flex items-center justify-center">
+      <div className="min-h-screen bg-fremen-night flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-2 border-ain-soph-gold border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-          <p className="text-ain-soph-gold text-lg font-light">Initializing Soul Technology...</p>
+          <div className="w-16 h-16 border-2 border-spice-orange border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+          <p className="text-bene-gesserit-gold text-lg font-cinzel">Initializing Desert Protocol...</p>
         </div>
       </div>
     );
@@ -41,13 +41,13 @@ export default function HomePage() {
 
   // Show loading while redirecting
   return (
-    <div className="min-h-screen bg-ain-soph-blue flex items-center justify-center">
+    <div className="min-h-screen bg-fremen-night flex items-center justify-center">
       <div className="text-center max-w-md">
-        <h1 className="text-5xl font-thin text-ain-soph-gold mb-4 tracking-wide">Soullab</h1>
-        <p className="text-ain-soph-gold/70 text-lg font-light mb-8 tracking-widest">Changing Our World To Soul</p>
-        <div className="w-16 h-16 border-2 border-ain-soph-gold border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-        <p className="text-ain-soph-gold text-xl font-light">Connecting...</p>
-        <p className="text-ain-soph-gold/60 text-sm mt-3 font-light">Soul Technology Interface</p>
+        <h1 className="text-dune-hero font-cormorant text-bene-gesserit-gold mb-4 tracking-wide">Soullab</h1>
+        <p className="text-dune-amber/80 text-lg font-cinzel mb-8 tracking-widest">The Desert Remembers</p>
+        <div className="w-16 h-16 border-2 border-spice-orange border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+        <p className="text-spice-orange text-xl font-raleway">Establishing Connection...</p>
+        <p className="text-dune-amber/60 text-sm mt-3 font-raleway">Consciousness Interface</p>
       </div>
     </div>
   );

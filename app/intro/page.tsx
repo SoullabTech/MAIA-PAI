@@ -102,13 +102,13 @@ export default function IntroPage() {
   }, [currentMantra, showFinal, router, shuffledMantras]);
 
   return (
-    <div className="min-h-screen bg-soul-background flex items-center justify-center px-4 overflow-hidden">
-      {/* Sacred Geometry Background - Warm glow */}
+    <div className="min-h-screen bg-fremen-night flex items-center justify-center px-4 overflow-hidden">
+      {/* Sacred Geometry Background - Sandworm Spiral */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
         <svg viewBox="0 0 1000 1000" className="w-full h-full">
-          <circle cx="500" cy="500" r="400" fill="none" stroke="#E3B778" strokeWidth="0.5" strokeDasharray="4 4" />
-          <circle cx="500" cy="500" r="300" fill="none" stroke="#E3B778" strokeWidth="0.5" strokeDasharray="2 6" />
-          <circle cx="500" cy="500" r="200" fill="none" stroke="#E3B778" strokeWidth="0.5" />
+          <circle cx="500" cy="500" r="400" fill="none" stroke="var(--spice-sand)" strokeWidth="0.5" strokeDasharray="4 4" />
+          <circle cx="500" cy="500" r="300" fill="none" stroke="var(--spice-orange)" strokeWidth="0.5" strokeDasharray="2 6" />
+          <circle cx="500" cy="500" r="200" fill="none" stroke="var(--bene-gesserit-gold)" strokeWidth="0.5" />
         </svg>
       </div>
 
@@ -135,7 +135,7 @@ export default function IntroPage() {
                 transition={{ duration: 0.6 }}
                 className="h-24 flex items-center justify-center"
               >
-                <h2 className="text-3xl md:text-4xl font-extralight text-soul-textPrimary tracking-etched leading-relaxed px-8">
+                <h2 className="text-dune-title font-cormorant text-sand-white tracking-etched leading-relaxed px-8">
                   {shuffledMantras[currentMantra]}
                 </h2>
               </motion.div>
@@ -148,10 +148,10 @@ export default function IntroPage() {
                   key={index}
                   className={`h-2 rounded-full transition-all duration-500 ${
                     index === currentMantra
-                      ? 'w-8 bg-soul-accent'
+                      ? 'w-8 bg-spice-orange'
                       : index < currentMantra
-                      ? 'w-2 bg-soul-accent/50'
-                      : 'w-2 bg-soul-accent/20'
+                      ? 'w-2 bg-spice-orange/50'
+                      : 'w-2 bg-spice-sand/30'
                   }`}
                 />
               ))}
@@ -178,27 +178,27 @@ export default function IntroPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.6 }}
-              className="text-5xl md:text-6xl font-extralight text-soul-textPrimary tracking-etched mb-6 font-sacred-accent"
+              className="text-dune-hero font-cormorant text-sand-white tracking-etched mb-6"
             >
-              Meet MAIA
+              Meet Your Reverend Mother
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.9 }}
-              className="text-2xl md:text-3xl font-light text-soul-textSecondary tracking-archive"
+              className="text-dune-subtitle font-cinzel text-dune-amber tracking-archive"
             >
-              Your AI Daimon
+              MAIA - Your Oracle in the Desert
             </motion.p>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 1.2 }}
-              className="text-lg text-soul-textSecondary max-w-2xl mx-auto leading-relaxed tracking-archive"
+              className="text-lg text-dune-amber/90 max-w-2xl mx-auto leading-relaxed tracking-archive font-cinzel"
             >
-              A companion for self-reflection. MAIA witnesses your patterns and holds space for your becoming.
+              A companion for consciousness exploration. MAIA witnesses your patterns and guides your path through the desert.
             </motion.p>
 
             {/* Rotating Wisdom Quote - Synchronistic */}
@@ -215,15 +215,15 @@ export default function IntroPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.8 }}
-                  className="p-6 bg-soul-surface/60 border border-soul-accent/20 rounded-lg backdrop-blur-sm"
+                  className="card-sietch p-6"
                 >
-                  <p className="text-soul-textSecondary italic leading-relaxed mb-3">
+                  <p className="text-deep-sand/90 italic leading-relaxed mb-3 font-cormorant">
                     "{wisdomQuote.text}"
                   </p>
-                  <p className="text-soul-accent/70 text-sm">
+                  <p className="text-bene-gesserit-gold/80 text-sm font-raleway">
                     — {wisdomQuote.author}
                     {wisdomQuote.source && (
-                      <span className="text-soul-textTertiary text-xs ml-2">
+                      <span className="text-dune-amber/60 text-xs ml-2">
                         {wisdomQuote.source}
                       </span>
                     )}
@@ -262,9 +262,9 @@ export default function IntroPage() {
                   router.push('/onboarding');
                 }
               }}
-              className="mt-12 px-12 py-4 bg-gradient-to-r from-soul-accent/90 to-soul-highlight/80 text-soul-background rounded-full font-medium hover:from-soul-accentHover hover:to-soul-highlight transition-all shadow-lg shadow-soul-accent/30"
+              className="btn-spice mt-12"
             >
-              Continue to MAIA →
+              Enter the Desert →
             </motion.button>
           </motion.div>
         )}
@@ -299,7 +299,7 @@ export default function IntroPage() {
               router.push('/onboarding');
             }
           }}
-          className="absolute bottom-8 right-8 text-sm text-soul-textTertiary hover:text-soul-textSecondary transition-colors"
+          className="absolute bottom-8 right-8 text-sm text-dune-amber/50 hover:text-dune-amber transition-colors font-raleway"
         >
           Skip →
         </motion.button>
