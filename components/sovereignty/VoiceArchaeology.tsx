@@ -304,7 +304,7 @@ function StepCapture({
           onChange={(e) =>
             setVoice({ ...voice, internalStatement: e.target.value })
           }
-          placeholder='Example: "You\'re not good enough" or "Everyone will judge you" or "You should be doing more" or "You\'re wasting your life"'
+          placeholder="Example: 'You're not good enough' or 'Everyone will judge you' or 'You should be doing more' or 'You're wasting your life'"
           className="w-full h-32 bg-stone-800/40 border border-stone-700/40 rounded-xl p-4 text-stone-200 placeholder-stone-500 focus:outline-none focus:border-blue-500/50"
         />
 
@@ -614,7 +614,7 @@ function StepTransform({
           onChange={(e) =>
             setVoice({ ...voice, transformedVoice: e.target.value })
           }
-          placeholder='Example: "You\'re not good enough" becomes "I want you to grow and become your fullest self" OR "You should be productive" dissolves into nothing - there was no wisdom, just conditioning'
+          placeholder="Example: 'You're not good enough' becomes 'I want you to grow and become your fullest self' OR 'You should be productive' dissolves into nothing - there was no wisdom, just conditioning"
           className="w-full h-32 bg-stone-800/40 border border-stone-700/40 rounded-xl p-4 text-stone-200 placeholder-stone-500 focus:outline-none focus:border-blue-500/50"
         />
 

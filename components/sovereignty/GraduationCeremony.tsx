@@ -226,7 +226,7 @@ function StepAcknowledgment({
           },
           {
             title: 'You Recognized Patterns',
-            desc: 'Saw the conditioning that wasn't yours',
+            desc: "Saw the conditioning that wasn't yours",
             icon: '🔍',
           },
           {

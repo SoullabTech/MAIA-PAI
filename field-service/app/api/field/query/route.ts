@@ -4,6 +4,11 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import {
+  calculateFieldResonanceIndex,
+  type Vector,
+  type FieldState,
+} from "../../lib/resonance";
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +63,16 @@ export async function POST(req: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    // Get field state (frequencies and trust scores)
+    const { data: fieldStateData, error: stateError } = await supabase.rpc("get_field_state");
+
+    const fieldState: FieldState = fieldStateData || {
+      elementFrequencies: {},
+      archetypeFrequencies: {},
+      nodeTrustScores: {},
+      totalVectors: 0
+    };
+
     // Search similar embeddings using the match function
     const { data, error } = await supabase.rpc("match_field_vectors", {
       query_embedding: qvec as any,
@@ -73,56 +88,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Aggregate by element/archetype
-    const buckets: Record<string, {
-      element: string;
-      archetype: string;
-      count: number;
-      totalSimilarity: number;
-      nodes: Set<string>;
-      latestResonance: Date;
-    }> = {};
+    // Convert Supabase results to Vector format
+    const vectors: Vector[] = (data ?? []).map((row: any) => ({
+      id: row.id,
+      embedding: [], // Don't need full embedding for calculation, similarity already computed
+      element: row.element || "Unknown",
+      archetype: row.archetype || "Unknown",
+      nodeId: row.node_id,
+      timestamp: new Date(row.created_at),
+      similarity: row.similarity
+    }));
 
-    for (const row of data ?? []) {
-      const key = `${row.element || "Unknown"}:${row.archetype || "Unknown"}`;
+    // Calculate Field Resonance Index
+    const resonanceResult = calculateFieldResonanceIndex(
+      qvec,
+      vectors,
+      fieldState,
+      limit
+    );
 
-      if (!buckets[key]) {
-        buckets[key] = {
-          element: row.element || "Unknown",
-          archetype: row.archetype || "Unknown",
-          count: 0,
-          totalSimilarity: 0,
-          nodes: new Set(),
-          latestResonance: new Date(row.created_at)
-        };
-      }
-
-      buckets[key].count++;
-      buckets[key].totalSimilarity += row.similarity;
-      buckets[key].nodes.add(row.node_id);
-
-      const rowDate = new Date(row.created_at);
-      if (rowDate > buckets[key].latestResonance) {
-        buckets[key].latestResonance = rowDate;
-      }
+    // Filter by element/archetype hints if provided
+    let patterns = resonanceResult.topPatterns;
+    if (elementHint || archetypeHint) {
+      patterns = patterns.filter(p =>
+        (!elementHint || p.element === elementHint) &&
+        (!archetypeHint || p.archetype === archetypeHint)
+      );
     }
-
-    // Calculate aggregated results
-    const results = Object.values(buckets)
-      .map(bucket => ({
-        element: bucket.element,
-        archetype: bucket.archetype,
-        count: bucket.count,
-        avgSimilarity: bucket.totalSimilarity / bucket.count,
-        nodeCount: bucket.nodes.size,
-        latestResonance: bucket.latestResonance.toISOString()
-      }))
-      .filter(r =>
-        (!elementHint || r.element === elementHint) &&
-        (!archetypeHint || r.archetype === archetypeHint)
-      )
-      .sort((a, b) => b.count - a.count)
-      .slice(0, limit);
 
     // Log query for analytics (optional)
     if (process.env.LOG_FIELD_QUERIES === "true") {
@@ -130,16 +122,21 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString(),
         origin,
         queryText: queryText?.slice(0, 50),
-        resultsCount: results.length,
-        totalMatches: data?.length ?? 0
+        FRI: resonanceResult.FRI,
+        interpretation: resonanceResult.interpretation,
+        patternsCount: patterns.length
       });
     }
 
     return NextResponse.json({
-      results,
+      resonance: {
+        FRI: resonanceResult.FRI,
+        interpretation: resonanceResult.interpretation,
+        components: resonanceResult.components
+      },
+      patterns,
       metadata: {
-        totalMatches: data?.length ?? 0,
-        aggregatedPatterns: results.length,
+        ...resonanceResult.metadata,
         queryOrigin: origin,
         timestamp: new Date().toISOString()
       }

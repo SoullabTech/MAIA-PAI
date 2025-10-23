@@ -151,7 +151,7 @@ This session is the reversal.
 You don't hold me. I hold YOU.
 
 Ready?`,
-          bodyInvitation: 'Notice where you're holding others' pain in your body.'
+          bodyInvitation: "Notice where you're holding others' pain in your body."
         },
         {
           phase: '2. Grounding (Descend to Earth)',
