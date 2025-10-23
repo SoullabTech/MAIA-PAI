@@ -8,7 +8,7 @@ import {
   calculateFieldResonanceIndex,
   type Vector,
   type FieldState,
-} from "../../lib/resonance";
+} from "../../../../lib/resonance";
 
 export const dynamic = "force-dynamic";
 
