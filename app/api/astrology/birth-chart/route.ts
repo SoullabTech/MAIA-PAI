@@ -76,30 +76,31 @@ export async function POST(request: NextRequest) {
     } catch (backendError) {
       console.error('Backend API unavailable, using mock data:', backendError);
 
-      // Return mock birth chart data when backend is unavailable
-      // This allows the app to function without the backend running
+      // Return Kelly's verified birth chart data when backend is unavailable
+      // Source: KELLY_VERIFIED_CHART_DATA.md - Time Passages Professional Report
+      // Birth: Dec 9, 1966, 10:29 PM CST, Baton Rouge, LA (30.45°N, 91.19°W)
       const mockChartData = {
-        sun: { sign: 'Sagittarius', degree: 17.23, house: 4 },
-        moon: { sign: 'Pisces', degree: 23.45, house: 7 },
-        mercury: { sign: 'Sagittarius', degree: 5.12, house: 4 },
-        venus: { sign: 'Capricorn', degree: 12.34, house: 5 },
-        mars: { sign: 'Aquarius', degree: 8.76, house: 6 },
-        jupiter: { sign: 'Cancer', degree: 26.43, house: 11 },
-        saturn: { sign: 'Pisces', degree: 24.12, house: 7 },
-        uranus: { sign: 'Virgo', degree: 19.87, house: 1 },
-        neptune: { sign: 'Scorpio', degree: 21.54, house: 3 },
-        pluto: { sign: 'Virgo', degree: 18.32, house: 1 },
-        chiron: { sign: 'Pisces', degree: 29.15, house: 7 },
-        northNode: { sign: 'Gemini', degree: 14.56, house: 10 },
-        southNode: { sign: 'Sagittarius', degree: 14.56, house: 4 },
-        ascendant: { sign: 'Leo', degree: 28.12 },
-        midheaven: { sign: 'Taurus', degree: 15.67 },
-        houses: [28.12, 22.45, 18.33, 15.67, 17.89, 24.12, 28.12, 22.45, 18.33, 15.67, 17.89, 24.12],
+        sun: { sign: 'Sagittarius', degree: 17.66, house: 4, retrograde: false },
+        moon: { sign: 'Scorpio', degree: 22.55, house: 3, retrograde: false },
+        mercury: { sign: 'Scorpio', degree: 28.08, house: 4, retrograde: false },
+        venus: { sign: 'Sagittarius', degree: 25.3, house: 5, retrograde: false },
+        mars: { sign: 'Libra', degree: 3.27, house: 2, retrograde: false },
+        jupiter: { sign: 'Leo', degree: 3.9, house: 12, retrograde: true },
+        saturn: { sign: 'Pisces', degree: 23.08, house: 7, retrograde: false },
+        uranus: { sign: 'Virgo', degree: 24.23, house: 1, retrograde: false },
+        neptune: { sign: 'Scorpio', degree: 22.83, house: 3, retrograde: false },
+        pluto: { sign: 'Virgo', degree: 20.6, house: 1, retrograde: false },
+        chiron: { sign: 'Pisces', degree: 21.7, house: 7, retrograde: false },
+        northNode: { sign: 'Taurus', degree: 15.98, house: 9, retrograde: true },
+        southNode: { sign: 'Scorpio', degree: 15.98, house: 3, retrograde: true },
+        ascendant: { sign: 'Leo', degree: 29.42 },
+        midheaven: { sign: 'Taurus', degree: 26.85 },
+        houses: [29.42, 28.5, 25.0, 26.85, 29.0, 0.5, 29.42, 28.5, 25.0, 26.85, 29.0, 0.5],
         aspects: [
-          { planet1: 'Sun', planet2: 'Saturn', type: 'square', orb: 5.89 },
-          { planet1: 'Moon', planet2: 'Saturn', type: 'conjunction', orb: 0.33 },
-          { planet1: 'Sun', planet2: 'Jupiter', type: 'quincunx', orb: 9.2 },
-          { planet1: 'Moon', planet2: 'Neptune', type: 'trine', orb: 0.56 }
+          { planet1: 'Sun', planet2: 'Saturn', type: 'square', orb: 5.42 },
+          { planet1: 'Moon', planet2: 'Neptune', type: 'conjunction', orb: 0.28 },
+          { planet1: 'Saturn', planet2: 'Chiron', type: 'conjunction', orb: 1.38 },
+          { planet1: 'Uranus', planet2: 'Pluto', type: 'conjunction', orb: 3.63 }
         ]
       };
 
