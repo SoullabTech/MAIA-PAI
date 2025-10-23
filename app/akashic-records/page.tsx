@@ -11,6 +11,10 @@ const FieldResonance = dynamic(() => import("@/components/FieldResonance"), {
   ssr: false,
 });
 
+const ResonanceDisplay = dynamic(() => import("@/components/ResonanceDisplay"), {
+  ssr: false,
+});
+
 const ELEMENTS = ["Fire", "Water", "Earth", "Air", "Aether"];
 const ARCHETYPES = [
   "MainOracle",
@@ -56,6 +60,7 @@ interface QueryResult {
 export default function AkashicRecordsPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<QueryResult[]>([]);
+  const [fieldResonance, setFieldResonance] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"semantic" | "keyword" | "hybrid">("hybrid");
 
@@ -267,7 +272,31 @@ export default function AkashicRecordsPage() {
           </div>
         </motion.div>
 
-        {/* Results */}
+        {/* Field Resonance - Collective Echo */}
+        <AnimatePresence>
+          {fieldResonance && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="mb-12"
+            >
+              <h2 className="text-3xl font-light mb-6 text-purple-200">
+                The Field Speaks
+              </h2>
+              <ResonanceDisplay
+                resonance={fieldResonance}
+                onReflect={() => {
+                  // Future: Open journal/reflection interface
+                  console.log("Reflection triggered");
+                }}
+                mode="both"
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Personal Records - Local Insights */}
         <AnimatePresence>
           {results.length > 0 && (
             <motion.div
