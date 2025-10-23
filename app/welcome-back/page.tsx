@@ -73,16 +73,13 @@ export default function WelcomeBackPage() {
     setGreeting(greetingText);
 
     setLoading(false);
-
-    // Auto-advance after 3 seconds
-    const timer = setTimeout(() => {
-      router.push('/maia');
-    }, 3000);
-
-    return () => clearTimeout(timer);
   }, [router]);
 
-  const handleContinue = () => {
+  const handleHoloflowerCheckIn = () => {
+    router.push('/holoflower-checkin');
+  };
+
+  const handleContinueToMaia = () => {
     router.push('/maia');
   };
 
@@ -239,21 +236,31 @@ export default function WelcomeBackPage() {
             )}
           </motion.div>
 
-          {/* Continue Button */}
+          {/* Choice: Check In or Continue */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.9 }}
+            className="space-y-4"
           >
-            <button
-              onClick={handleContinue}
-              className="btn-spice inline-flex items-center gap-3"
-            >
-              <span>Continue</span>
-              <Sparkles className="w-4 h-4" />
-            </button>
-            <p className="mt-4 text-dune-amber/70 text-sm italic font-raleway">
-              (Continuing in 3 seconds...)
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={handleHoloflowerCheckIn}
+                className="btn-spice inline-flex items-center gap-3 justify-center"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>Check In with Holoflower</span>
+              </button>
+              <button
+                onClick={handleContinueToMaia}
+                className="px-6 py-3 rounded-lg bg-transparent border border-spice-orange/40 text-spice-orange hover:bg-spice-orange/10 transition-all inline-flex items-center gap-3 justify-center font-raleway"
+              >
+                <span>Continue to MAIA</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-dune-amber/60 text-sm italic font-raleway text-center">
+              Check in to share your current state with MAIA
             </p>
           </motion.div>
         </motion.div>
