@@ -66,11 +66,11 @@ export async function POST(req: NextRequest) {
     // Get field state (frequencies and trust scores)
     const { data: fieldStateData, error: stateError } = await supabase.rpc("get_field_state");
 
-    const fieldState: FieldState = fieldStateData || {
-      elementFrequencies: {},
-      archetypeFrequencies: {},
-      nodeTrustScores: {},
-      totalVectors: 0
+    const fieldState: FieldState = {
+      elementFrequencies: fieldStateData?.elementFrequencies || {},
+      archetypeFrequencies: fieldStateData?.archetypeFrequencies || {},
+      nodeTrustScores: fieldStateData?.nodeTrustScores || {},
+      totalVectors: fieldStateData?.totalVectors || 0
     };
 
     // Search similar embeddings using the match function
