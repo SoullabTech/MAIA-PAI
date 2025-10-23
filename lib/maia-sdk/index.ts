@@ -25,11 +25,11 @@ export { BaseProvider } from './providers/base-provider';
 export { MAIARealtimeSDK } from './MAIARealtimeSDK';
 
 // Provider exports
-// export { OpenAIRealtimeAdapter } from './providers/openai/realtime-adapter'; // Removed - using sovereignty mode
+export { OpenAIRealtimeAdapter } from './providers/openai/realtime-adapter'; // Hybrid mode - with sovereignty fallback
 
 // Provider factory
 import { BaseProvider } from './providers/base-provider';
-// import { OpenAIRealtimeAdapter } from './providers/openai/realtime-adapter'; // Removed - using sovereignty mode
+import { OpenAIRealtimeAdapter } from './providers/openai/realtime-adapter'; // Hybrid mode enabled
 import { ProviderConfig } from './core/types';
 
 export type ProviderType = 'openai' | 'local' | 'anthropic';
@@ -45,7 +45,7 @@ export type ProviderType = 'openai' | 'local' | 'anthropic';
  * ```typescript
  * const provider = await createProvider('openai', {
  *   apiKey: process.env.OPENAI_API_KEY,
- *   model: 'gpt-4o-realtime-preview-2024-10-01'
+ *   model: 'gpt-4o-realtime-preview-2024-12-17'
  * });
  * ```
  */
@@ -57,8 +57,9 @@ export async function createProvider(
 
   switch (type) {
     case 'openai':
-      // OpenAI provider removed - using sovereignty mode with browser STT + Claude + browser TTS
-      throw new Error('OpenAI provider removed - use useMAIASDK hook for sovereignty mode');
+      // OpenAI Realtime API - Full interruption/VAD/turn-taking support
+      provider = new OpenAIRealtimeAdapter();
+      break;
 
     case 'local':
       // TODO: Implement LocalWhisperXTTSAdapter

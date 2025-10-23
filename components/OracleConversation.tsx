@@ -26,8 +26,9 @@ import { OracleResponse, ConversationContext } from '@/lib/oracle-response';
 import { mapResponseToMotion, enrichOracleResponse } from '@/lib/motion-mapper';
 import { VoiceState } from '@/lib/voice/voice-capture';
 // import { useMaiaVoice } from '@/hooks/useMaiaVoice'; // OLD TTS SYSTEM - replaced with WebRTC
-// import { useMaiaRealtime } from '@/hooks/useMaiaRealtime'; // Replaced with MAIA SDK!
-import { useMAIASDK } from '@/hooks/useMAIASDK-simple'; // Sovereign: Browser STT + Claude + OpenAI TTS
+import { useMaiaRealtime } from '@/hooks/useMaiaRealtime'; // FULL DYNAMIC EXPERIENCE - OpenAI Realtime API (worth the cost!)
+// import { useMAIASDK } from '@/hooks/useMAIASDK-simple'; // Fallback option (if needed)
+// import { useMAIAHybrid as useMAIASDK } from '@/hooks/useMAIAHybrid'; // Hybrid (removed - we want full dynamics always)
 import { cleanMessage, cleanMessageForVoice, formatMessageForDisplay } from '@/lib/cleanMessage';
 import { getAgentConfig, AgentConfig } from '@/lib/agent-config';
 import { toast } from 'react-hot-toast';
@@ -52,6 +53,7 @@ interface OracleConversationProps {
   initialCheckIns?: Record<string, number>;
   showAnalytics?: boolean;
   voiceEnabled?: boolean;
+  voice?: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'; // Voice selection for TTS
   initialMode?: 'normal' | 'patient' | 'session'; // Control mode from parent
   onModeChange?: (mode: 'normal' | 'patient' | 'session') => void; // Notify parent of mode changes
   onMessageAdded?: (message: ConversationMessage) => void;
@@ -93,6 +95,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   initialCheckIns = {},
   showAnalytics = false,
   voiceEnabled = true,
+  voice = 'alloy',
   initialMode = 'normal',
   onModeChange,
   onMessageAdded,
@@ -126,31 +129,28 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     listeningMode === 'normal' ? 'dialogue' :
     listeningMode === 'patient' ? 'patient' : 'scribe';
 
-  // MAIA SDK - Sovereign Voice (Browser STT + Claude + OpenAI TTS)
+  // OpenAI Realtime API - Full Dynamic Experience (interruption, VAD, turn-taking)
   const {
-    maiaConnected,
-    maiaConnecting,
-    maiaIsSpeaking,
-    maiaError,
-    maiaTranscript,
-    maiaConnect,
-    maiaDisconnect,
-    maiaSendText,
-    maiaCancelResponse,
-    maiaChangeMode,
-    sessionCost,
-    currentProvider,
-  } = useMAIASDK({
+    isConnected: maiaConnected,
+    isConnecting: maiaConnecting,
+    isSpeaking: maiaIsSpeaking,
+    error: maiaError,
+    transcript: maiaTranscript,
+    connect: maiaConnect,
+    disconnect: maiaDisconnect,
+    sendText: maiaSendText,
+    cancelResponse: maiaCancelResponse,
+    changeMode: maiaChangeMode,
+  } = useMaiaRealtime({
     userId: userId || 'anonymous',
     userName: userName || 'Explorer',
-    voice: 'shimmer',
+    voice: voice, // Use voice prop from parent (MAIA page voice selector)
     mode: realtimeMode,
-    debug: true,
     onTranscript: (text, isUser) => {
       if (isUser) {
         setUserTranscript(text);
       } else {
-        // MAIA's response from SDK - add to messages
+        // MAIA's response from OpenAI Realtime API - add to messages
         setMaiaResponseText(text);
 
         const oracleMessage: ConversationMessage = {
@@ -162,7 +162,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           source: 'maia'
         };
 
-        // Add to messages (this will appear after SDK synthesizes voice)
+        // Add to messages (streaming from Realtime API)
         setMessages(prev => [...prev, oracleMessage]);
         onMessageAdded?.(oracleMessage);
 

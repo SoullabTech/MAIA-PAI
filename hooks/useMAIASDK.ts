@@ -124,7 +124,7 @@ export function useMAIASDK(options: UseMAIASDKOptions = {}) {
             priority: 80,
             capabilities: ['tts'],
             config: {
-              voice: options.voice || 'shimmer',
+              voice: options.voice || 'alloy', // Default: Neutral & balanced
               model: 'tts-1'
             }
           },

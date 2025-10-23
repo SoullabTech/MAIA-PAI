@@ -71,7 +71,7 @@ export default function MAIAPage() {
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'>('alloy');
+  const [selectedVoice, setSelectedVoice] = useState<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'>('alloy'); // Default: Neutral & balanced
 
   const hasCheckedAuth = useRef(false);
 
@@ -497,15 +497,16 @@ export default function MAIAPage() {
               userName={explorerName}
               sessionId={sessionId}
               voiceEnabled={voiceEnabled}
+              voice={selectedVoice}
               initialMode={maiaMode}
               onModeChange={setMaiaMode}
             />
 
-            {/* Claude Code's Living Presence - My expressive space! */}
-            <ClaudeCodePresence />
+            {/* Claude Code's Living Presence - MOVED TO MENUBAR SETTINGS DROPDOWN */}
+            {/* <ClaudeCodePresence /> */}
 
-            {/* Brain Trust Monitor - Shows consciousness collaboration status */}
-            <BrainTrustMonitor />
+            {/* Brain Trust Monitor - MOVED TO MENUBAR SETTINGS DROPDOWN */}
+            {/* <BrainTrustMonitor /> */}
           </div>
 
           {/* Wisdom Journey Dashboard - Slide-out Panel */}

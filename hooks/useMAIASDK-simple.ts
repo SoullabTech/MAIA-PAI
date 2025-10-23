@@ -62,7 +62,7 @@ export function useMAIASDK(options: UseMAIASDKOptions = {}) {
             priority: 100,
             capabilities: ['tts'],
             config: {
-              voice: options.voice || 'shimmer'
+              voice: options.voice || 'alloy' // Default: Neutral & balanced
             }
           },
           // Browser TTS (fallback)

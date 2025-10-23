@@ -34,11 +34,11 @@ class BetaSessionManager {
   private sessionListeners: Set<(state: SessionState) => void> = new Set();
 
   private constructor() {
-    // Initialize on construction
-    this.restoreSession();
-
-    // Listen for storage changes from other tabs
+    // Initialize on construction (only in browser)
     if (typeof window !== 'undefined') {
+      this.restoreSession();
+
+      // Listen for storage changes from other tabs
       window.addEventListener('storage', this.handleStorageChange.bind(this));
     }
   }
@@ -54,6 +54,16 @@ class BetaSessionManager {
    * Restore session from localStorage on app load
    */
   public restoreSession(): SessionState {
+    // Safety check: only run in browser
+    if (typeof window === 'undefined') {
+      return {
+        isAuthenticated: false,
+        user: null,
+        needsOnboarding: false,
+        source: 'none'
+      };
+    }
+
     try {
       const betaUserStr = localStorage.getItem('beta_user');
 
