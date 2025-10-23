@@ -2624,9 +2624,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Hover Zone - Full bottom edge to trigger bottom bar (macOS Dock style) */}
+      {/* Hover Zone - Extended bottom edge to trigger bottom bar (macOS Dock style) */}
       <div
-        className="fixed bottom-0 left-0 right-0 h-4 z-40 pointer-events-auto"
+        className="fixed bottom-0 left-0 right-0 h-20 z-40 pointer-events-auto"
         onMouseEnter={() => setShowBottomBar(true)}
       />
 
@@ -2795,6 +2795,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         onAction={(action) => {
           if (action === 'upload') {
             document.getElementById('maiaFileUpload')?.click();
+          }
+          if (action === 'download-transcript') {
+            downloadTranscript();
+            setShowLabDrawer(false);
           }
           if (action === 'toggle-text') {
             setShowVoiceText(!showVoiceText);

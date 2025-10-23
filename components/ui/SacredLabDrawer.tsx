@@ -19,7 +19,8 @@ import {
   Upload,
   Eye,
   EyeOff,
-  Heart
+  Heart,
+  Download
 } from 'lucide-react';
 
 interface SacredLabDrawerProps {
@@ -98,6 +99,12 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
           label: 'Upload Files',
           action: () => onAction?.('upload'),
           description: 'Share files with MAIA'
+        },
+        {
+          icon: Download,
+          label: 'Download Transcript',
+          action: () => onAction?.('download-transcript'),
+          description: 'Save conversation as markdown file'
         },
         {
           icon: showVoiceText ? Eye : EyeOff,

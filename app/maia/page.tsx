@@ -71,7 +71,7 @@ export default function MAIAPage() {
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'>('shimmer');
+  const [selectedVoice, setSelectedVoice] = useState<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'>('alloy');
 
   const hasCheckedAuth = useRef(false);
 
@@ -188,7 +188,7 @@ export default function MAIAPage() {
     <ErrorBoundary>
       <div className="h-screen bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 flex flex-col overflow-hidden">
         {/* DREAM-WEAVER SYSTEM - Combined Header & Banner */}
-        <div className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/10 backdrop-blur-sm">
+        <div className="flex-shrink-0 relative bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/10 backdrop-blur-sm">
           {/* Spice particle effect - very subtle movement */}
           <div className="absolute inset-0 opacity-5 pointer-events-none">
             <motion.div
@@ -323,7 +323,7 @@ export default function MAIAPage() {
                       <>
                         {/* Backdrop to close when clicking outside */}
                         <div
-                          className="fixed inset-0 z-40"
+                          className="fixed inset-0 z-[90]"
                           onClick={() => setShowVoiceSettings(false)}
                         />
                         <motion.div
@@ -331,7 +331,7 @@ export default function MAIAPage() {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute top-full mt-2 left-0 w-72 bg-stone-900/95 backdrop-blur-xl border border-amber-500/30 rounded-xl shadow-2xl shadow-black/50 overflow-hidden z-50"
+                          className="absolute top-full mt-2 left-0 w-72 bg-stone-900/95 backdrop-blur-xl border border-amber-500/30 rounded-xl shadow-2xl shadow-black/50 overflow-hidden z-[100]"
                         >
                           <div className="p-3">
                             <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/10">
