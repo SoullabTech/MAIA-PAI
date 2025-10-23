@@ -75,27 +75,57 @@ export default function AkashicRecordsPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/akashic/query", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          query,
-          mode,
-          filters: {
-            elements: selectedElements.length > 0 ? selectedElements : undefined,
-            archetypes: selectedArchetypes.length > 0 ? selectedArchetypes : undefined,
-            minRelevance,
-          },
-          limit: 20,
+      // Query both local insights AND field resonance in parallel
+      const [localResponse, fieldResponse] = await Promise.all([
+        // Local akashic query
+        fetch("/api/akashic/query", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query,
+            mode,
+            filters: {
+              elements: selectedElements.length > 0 ? selectedElements : undefined,
+              archetypes: selectedArchetypes.length > 0 ? selectedArchetypes : undefined,
+              minRelevance,
+            },
+            limit: 20,
+          }),
         }),
-      });
+        // Field resonance query
+        fetch("/api/akashic/field", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query,
+            elementHint: selectedElements.length === 1 ? selectedElements[0] : undefined,
+            archetypeHint: selectedArchetypes.length === 1 ? selectedArchetypes[0] : undefined,
+            limit: 10,
+          }),
+        })
+      ]);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setResults(data.results || []);
+      // Handle local results
+      const localData = await localResponse.json();
+      if (localResponse.ok) {
+        setResults(localData.results || []);
       } else {
-        console.error("Query failed:", data.error);
+        console.error("Local query failed:", localData.error);
+        setResults([]);
+      }
+
+      // Handle field resonance
+      const fieldData = await fieldResponse.json();
+      if (fieldResponse.ok && fieldData.resonance) {
+        // Field service returned resonance data
+        setFieldResonance({
+          ...fieldData.resonance,
+          patterns: fieldData.patterns || [],
+          metadata: fieldData.metadata
+        });
+      } else {
+        // No resonance data (field might be empty or unavailable)
+        setFieldResonance(null);
       }
     } catch (error) {
       console.error("Query error:", error);
