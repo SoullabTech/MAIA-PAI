@@ -188,7 +188,7 @@ export default function Week2WelcomePage() {
                 transition={{ delay: 0.3 }}
                 className="text-dune-hero font-cormorant text-sand-white tracking-wide mb-6"
               >
-                Welcome to the Sietch
+                Welcome to Soullab
               </motion.h1>
 
               <motion.p
@@ -197,7 +197,7 @@ export default function Week2WelcomePage() {
                 transition={{ delay: 0.6 }}
                 className="text-xl text-dune-amber/90 max-w-lg mx-auto leading-relaxed font-cinzel"
               >
-                Meet MAIA, your Reverend Mother. Your journey into the desert begins here.
+                Meet MAIA, your guide through consciousness. Your journey begins here.
               </motion.p>
 
               <motion.button
@@ -207,7 +207,7 @@ export default function Week2WelcomePage() {
                 onClick={handleBegin}
                 className="btn-spice mt-8"
               >
-                Enter the Desert →
+                Begin →
               </motion.button>
             </motion.div>
           )}
@@ -224,10 +224,10 @@ export default function Week2WelcomePage() {
               <div className="text-center mb-8">
                 <Holoflower size="lg" glowIntensity="medium" className="mb-6 mx-auto" />
                 <h2 className="text-dune-title font-cormorant text-sand-white mb-4">
-                  Your Sietch Name
+                  Your Name
                 </h2>
                 <p className="text-dune-amber/80 leading-relaxed font-cinzel">
-                  This is your unique identifier in the desert—your Soullab-[NAME].
+                  How shall we know you in the field?
                 </p>
               </div>
 
@@ -242,7 +242,7 @@ export default function Week2WelcomePage() {
                       type="text"
                       value={soullabName}
                       onChange={(e) => setSoullabName(e.target.value)}
-                      placeholder="Speak your name to the desert..."
+                      placeholder="Your name..."
                       className="input-water pl-10"
                       autoFocus
                     />
@@ -281,13 +281,13 @@ export default function Week2WelcomePage() {
               <div className="text-center mb-8">
                 <Holoflower size="lg" glowIntensity="medium" className="mb-6 mx-auto" />
                 <h2 className="text-dune-title font-cormorant text-sand-white mb-4">
-                  The Water Bond
+                  Sacred Threshold
                 </h2>
                 <p className="text-dune-amber/90 leading-relaxed mb-2 font-cinzel">
                   Welcome, <span className="text-spice-orange font-medium">{soullabName}</span>
                 </p>
                 <p className="text-dune-amber/70 text-sm font-raleway">
-                  Choose your credentials for passage through the desert
+                  Choose your credentials for safe passage
                 </p>
               </div>
 
@@ -302,13 +302,13 @@ export default function Week2WelcomePage() {
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Your desert name..."
+                      placeholder="Choose a username..."
                       className="input-water pl-10"
                       autoFocus
                     />
                   </div>
                   <p className="text-xs text-dune-amber/50 mt-1.5 font-raleway">
-                    Use this for quick passage later
+                    Use this for swift return
                   </p>
                 </div>
 
@@ -322,12 +322,12 @@ export default function Week2WelcomePage() {
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Your maker hook (min 6 characters)..."
+                      placeholder="Create a password (min 6 characters)..."
                       className="input-water pl-10"
                     />
                   </div>
                   <p className="text-xs text-dune-amber/50 mt-1.5 font-raleway">
-                    Sacred protection for your bond
+                    Your key to the sanctuary
                   </p>
                 </div>
 
@@ -349,7 +349,7 @@ export default function Week2WelcomePage() {
                   {loading ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Creating Water Bond...
+                      Creating...
                     </>
                   ) : (
                     <>
@@ -361,7 +361,7 @@ export default function Week2WelcomePage() {
               </form>
 
               <p className="text-center text-xs text-dune-amber/40 mt-6 font-raleway">
-                Returning Fremen? Your password will grant passage
+                Returning? Your password grants passage
               </p>
             </motion.div>
           )}
@@ -417,7 +417,7 @@ export default function Week2WelcomePage() {
                 onClick={handleComplete}
                 className="btn-spice mt-8 w-full flex items-center justify-center gap-2"
               >
-                Enter the Desert
+                Enter MAIA
                 <ArrowRight className="w-5 h-5" />
               </motion.button>
             </motion.div>
@@ -435,7 +435,7 @@ export default function Week2WelcomePage() {
               <h2 className="text-dune-title font-cormorant text-sand-white">
                 Welcome, {soullabName}
               </h2>
-              <p className="text-dune-amber/80 font-cinzel">The desert awaits...</p>
+              <p className="text-dune-amber/80 font-cinzel">Entering MAIA...</p>
             </motion.div>
           )}
         </AnimatePresence>

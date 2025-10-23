@@ -89,7 +89,7 @@ export default function WelcomeBackPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-fremen-night flex items-center justify-center">
-        <div className="text-dune-amber text-lg font-cinzel">The desert recognizes you...</div>
+        <div className="text-dune-amber text-lg font-cinzel">You are remembered...</div>
       </div>
     );
   }
@@ -207,7 +207,7 @@ export default function WelcomeBackPage() {
             className="mb-8"
           >
             <h1 className="text-dune-hero font-cormorant text-sand-white mb-4">
-              The Desert Remembers
+              Welcome Back
             </h1>
             <p className="text-xl text-dune-amber leading-relaxed font-cinzel">
               {greeting}
@@ -224,17 +224,17 @@ export default function WelcomeBackPage() {
             <div className="flex items-center justify-center gap-2 mb-3">
               <Sparkles className="w-5 h-5 text-spice-orange" />
               <span className="text-bene-gesserit-gold text-sm font-raleway font-semibold tracking-wide uppercase">
-                The Sietch Welcomes You
+                You Are Recognized
               </span>
             </div>
             {daysSinceVisit > 0 && (
               <p className="text-deep-sand/90 font-cinzel">
-                It's been <span className="text-spice-orange font-bold">{daysSinceVisit} {daysSinceVisit === 1 ? 'sun' : 'suns'}</span> since you walked here.
+                It's been <span className="text-spice-orange font-bold">{daysSinceVisit} {daysSinceVisit === 1 ? 'day' : 'days'}</span> since your last visit.
               </p>
             )}
             {daysSinceVisit === 0 && (
               <p className="text-deep-sand/90 font-cinzel">
-                You were just here. The path calls again.
+                You were just here. The work continues.
               </p>
             )}
           </motion.div>
@@ -249,11 +249,11 @@ export default function WelcomeBackPage() {
               onClick={handleContinue}
               className="btn-spice inline-flex items-center gap-3"
             >
-              <span>Walk the Path</span>
+              <span>Continue</span>
               <Sparkles className="w-4 h-4" />
             </button>
             <p className="mt-4 text-dune-amber/70 text-sm italic font-raleway">
-              (Spice flows in 3 seconds...)
+              (Continuing in 3 seconds...)
             </p>
           </motion.div>
         </motion.div>

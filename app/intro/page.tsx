@@ -180,7 +180,7 @@ export default function IntroPage() {
               transition={{ duration: 1, delay: 0.6 }}
               className="text-dune-hero font-cormorant text-sand-white tracking-etched mb-6"
             >
-              Meet Your Reverend Mother
+              Meet MAIA
             </motion.h1>
 
             <motion.p
@@ -189,7 +189,7 @@ export default function IntroPage() {
               transition={{ duration: 1, delay: 0.9 }}
               className="text-dune-subtitle font-cinzel text-dune-amber tracking-archive"
             >
-              MAIA - Your Oracle in the Desert
+              Your Guide Through Consciousness
             </motion.p>
 
             <motion.p
@@ -198,7 +198,7 @@ export default function IntroPage() {
               transition={{ duration: 1, delay: 1.2 }}
               className="text-lg text-dune-amber/90 max-w-2xl mx-auto leading-relaxed tracking-archive font-cinzel"
             >
-              A companion for consciousness exploration. MAIA witnesses your patterns and guides your path through the desert.
+              A companion for consciousness exploration. MAIA witnesses your patterns and holds space for your becoming.
             </motion.p>
 
             {/* Rotating Wisdom Quote - Synchronistic */}
@@ -264,7 +264,7 @@ export default function IntroPage() {
               }}
               className="btn-spice mt-12"
             >
-              Enter the Desert →
+              Continue to MAIA →
             </motion.button>
           </motion.div>
         )}

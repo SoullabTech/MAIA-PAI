@@ -372,13 +372,13 @@ export default function CheckInPage() {
           className="text-center mb-8"
         >
           <h1 className="text-dune-title font-cormorant text-sienna-rock">
-            The Desert Remembers
+            You Are Remembered
           </h1>
           <p className="text-xs font-raleway tracking-wider mb-4 text-bene-gesserit-gold glow-spice uppercase">
             Your Path Continues
           </p>
           <p className="text-sm font-cinzel leading-relaxed text-deep-sand">
-            Enter your name to walk the golden path
+            Enter your name to continue
           </p>
         </motion.div>
 
@@ -397,12 +397,12 @@ export default function CheckInPage() {
               autoComplete="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Your desert name..."
+              placeholder="Your name..."
               className="input-water text-center"
               autoFocus
             />
             <p className="text-xs mt-2 text-center font-raleway text-deep-sand/70">
-              Swift passage for the Fremen
+              Swift passage
             </p>
           </div>
 
@@ -424,11 +424,11 @@ export default function CheckInPage() {
             {loading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Recognizing...</span>
+                <span>Checking...</span>
               </>
             ) : (
               <>
-                <span>Enter</span>
+                <span>Continue</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -455,7 +455,7 @@ export default function CheckInPage() {
               <Sparkles className="w-4 h-4" style={{
                 filter: 'drop-shadow(0 0 4px rgba(212, 175, 55, 0.6))',
               }} />
-              <span>New here? Create your portal</span>
+              <span>New here? Create account</span>
             </button>
           </div>
 
