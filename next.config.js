@@ -25,6 +25,11 @@ const nextConfig = {
         tls: false,
       };
     }
+    // Ensure astronomy-engine is properly resolved
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'astronomy-engine': require.resolve('astronomy-engine'),
+    };
     return config;
   },
 };
