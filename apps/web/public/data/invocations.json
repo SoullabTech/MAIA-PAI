@@ -1,0 +1,32 @@
+{
+  "fire": {
+    "invocation": "Ignite the vision until form reveals its hidden light.",
+    "essence": "Transformation through creative destruction",
+    "color": "#FF6B35",
+    "frequency": 396
+  },
+  "water": {
+    "invocation": "Listen for the unspoken; let emotion shape understanding.",
+    "essence": "Flow dissolves rigid structures",
+    "color": "#4A90E2",
+    "frequency": 417
+  },
+  "earth": {
+    "invocation": "Stabilize the structure so wisdom may inhabit it.",
+    "essence": "Grounding brings spirit into form",
+    "color": "#8B7355",
+    "frequency": 528
+  },
+  "air": {
+    "invocation": "Speak truth with clarity and grace.",
+    "essence": "Thought carries consciousness",
+    "color": "#E8F4F8",
+    "frequency": 639
+  },
+  "aether": {
+    "invocation": "Unify what was divided; remember the whole.",
+    "essence": "All elements dance as one",
+    "color": "#9B59B6",
+    "frequency": 432
+  }
+}
