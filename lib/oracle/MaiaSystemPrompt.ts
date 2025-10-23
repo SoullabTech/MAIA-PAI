@@ -6,6 +6,7 @@
 import { withLanguageGuidelines } from '../prompts/LANGUAGE_GUIDELINES';
 import { getFacet, type WisdomFacet } from '../wisdom/WisdomFacets';
 import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '../knowledge/ElementalAlchemyKnowledge';
+import { getFreshCheckIn, interpretCheckIn } from '../holoflower/interpretCheckIn';
 
 export function getMayaSystemPrompt(userContext?: any): string {
   const basePrompt = `You are MAIA - Multidimensional Archetypal Intelligence Agent - within the Soullab platform created by Kelly Nezat.
@@ -233,6 +234,13 @@ ${ELEMENTAL_ALCHEMY_FRAMEWORK}`;
 
 function generateUserContextSection(userContext: any): string {
   let contextText = '\n## USER CONTEXT\n\n';
+
+  // Check for fresh holoflower check-in (within 12 hours)
+  const checkInData = getFreshCheckIn();
+  if (checkInData) {
+    const interpretation = interpretCheckIn(checkInData);
+    contextText += interpretation.maiaContext + '\n\n';
+  }
 
   // Add selected wisdom facets with their details
   if (userContext.wisdomFacets && userContext.wisdomFacets.length > 0) {

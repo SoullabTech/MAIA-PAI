@@ -73,25 +73,20 @@ export default function WelcomeBackPage() {
     setGreeting(greetingText);
 
     setLoading(false);
-
-    // Auto-advance after 3 seconds
-    const timer = setTimeout(() => {
-      router.push('/maia');
-    }, 3000);
-
-    return () => clearTimeout(timer);
   }, [router]);
 
-  const handleContinue = () => {
+  const handleHoloflowerCheckIn = () => {
+    router.push('/holoflower-checkin');
+  };
+
+  const handleContinueToMaia = () => {
     router.push('/maia');
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{
-        background: 'radial-gradient(ellipse at top, #1e1b4b 0%, #581c87 20%, #6d28d9 40%, #7c3aed 60%, #a855f7 80%, #c084fc 100%)',
-      }}>
-        <div className="text-purple-200 text-lg">Welcoming you back...</div>
+      <div className="min-h-screen bg-fremen-night flex items-center justify-center">
+        <div className="text-dune-amber text-lg font-cinzel">You are remembered...</div>
       </div>
     );
   }
@@ -99,26 +94,24 @@ export default function WelcomeBackPage() {
   const getTimeIcon = () => {
     switch (timeOfDay) {
       case 'morning':
-        return <Sun className="w-12 h-12 text-amber-300" />;
+        return <Sun className="w-12 h-12 text-spice-orange" />;
       case 'afternoon':
-        return <Coffee className="w-12 h-12 text-orange-300" />;
+        return <Coffee className="w-12 h-12 text-spice-glow" />;
       case 'evening':
-        return <Star className="w-12 h-12 text-purple-300" />;
+        return <Star className="w-12 h-12 text-bene-gesserit-gold" />;
       case 'night':
-        return <Moon className="w-12 h-12 text-indigo-300" />;
+        return <Moon className="w-12 h-12 text-ibad-blue" />;
     }
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex items-center justify-center" style={{
-      background: 'radial-gradient(ellipse at top, #1e1b4b 0%, #581c87 20%, #6d28d9 40%, #7c3aed 60%, #a855f7 80%, #c084fc 100%)',
-    }}>
-      {/* Animated gradient overlay */}
+    <div className="min-h-screen bg-arrakis-sunset relative overflow-hidden flex items-center justify-center">
+      {/* Animated spice gradient overlay */}
       <div className="fixed inset-0 pointer-events-none">
         <motion.div
           className="absolute inset-0"
           style={{
-            background: 'radial-gradient(circle at 30% 20%, rgba(251, 191, 36, 0.15), transparent 50%), radial-gradient(circle at 70% 80%, rgba(139, 92, 246, 0.2), transparent 50%)',
+            background: 'radial-gradient(circle at 30% 20%, rgba(255, 140, 66, 0.15), transparent 50%), radial-gradient(circle at 70% 80%, rgba(212, 165, 116, 0.2), transparent 50%)',
           }}
           animate={{
             opacity: [0.3, 0.6, 0.3],
@@ -131,18 +124,19 @@ export default function WelcomeBackPage() {
         />
       </div>
 
-      {/* Twinkling stars */}
+      {/* Desert stars */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         {[...Array(50)].map((_, i) => (
           <motion.div
             key={`star-${i}`}
-            className="absolute rounded-full bg-white"
+            className="absolute rounded-full"
             style={{
+              background: 'var(--bene-gesserit-gold)',
               width: Math.random() > 0.8 ? '2px' : '1px',
               height: Math.random() > 0.8 ? '2px' : '1px',
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              boxShadow: '0 0 4px rgba(255, 255, 255, 0.8)',
+              boxShadow: '0 0 4px rgba(184, 134, 11, 0.8)',
             }}
             animate={{
               opacity: [0.3, 1, 0.3],
@@ -209,10 +203,10 @@ export default function WelcomeBackPage() {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="mb-8"
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            <h1 className="text-dune-hero font-cormorant text-sand-white mb-4">
               Welcome Back
             </h1>
-            <p className="text-xl text-purple-200 leading-relaxed">
+            <p className="text-xl text-dune-amber leading-relaxed font-cinzel">
               {greeting}
             </p>
           </motion.div>
@@ -222,43 +216,51 @@ export default function WelcomeBackPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.7 }}
-            className="backdrop-blur-xl bg-white/10 border border-purple-300/30 rounded-2xl p-6 mb-8"
-            style={{ boxShadow: '0 0 40px rgba(168, 85, 247, 0.2)' }}
+            className="card-sietch backdrop-blur-xl rounded-2xl p-6 mb-8 shadow-spice-lg"
           >
             <div className="flex items-center justify-center gap-2 mb-3">
-              <Sparkles className="w-5 h-5 text-amber-300" />
-              <span className="text-purple-200 text-sm font-semibold tracking-wide uppercase">
-                The Field Recognizes You
+              <Sparkles className="w-5 h-5 text-spice-orange" />
+              <span className="text-bene-gesserit-gold text-sm font-raleway font-semibold tracking-wide uppercase">
+                You Are Recognized
               </span>
             </div>
             {daysSinceVisit > 0 && (
-              <p className="text-purple-100">
-                It's been <span className="text-amber-300 font-bold">{daysSinceVisit} {daysSinceVisit === 1 ? 'day' : 'days'}</span> since your last visit.
+              <p className="text-deep-sand/90 font-cinzel">
+                It's been <span className="text-spice-orange font-bold">{daysSinceVisit} {daysSinceVisit === 1 ? 'day' : 'days'}</span> since your last visit.
               </p>
             )}
             {daysSinceVisit === 0 && (
-              <p className="text-purple-100">
-                You were just here. The work is calling.
+              <p className="text-deep-sand/90 font-cinzel">
+                You were just here. The work continues.
               </p>
             )}
           </motion.div>
 
-          {/* Continue Button */}
+          {/* Choice: Check In or Continue */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.9 }}
+            className="space-y-4"
           >
-            <button
-              onClick={handleContinue}
-              className="inline-flex items-center gap-3 px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full text-white font-semibold shadow-2xl transition-all transform hover:scale-105"
-              style={{ boxShadow: '0 0 30px rgba(168, 85, 247, 0.6)' }}
-            >
-              <span>Continue</span>
-              <Sparkles className="w-4 h-4" />
-            </button>
-            <p className="mt-4 text-purple-300 text-sm italic">
-              (Auto-continuing in 3 seconds...)
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={handleHoloflowerCheckIn}
+                className="btn-spice inline-flex items-center gap-3 justify-center"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span>Check In with Holoflower</span>
+              </button>
+              <button
+                onClick={handleContinueToMaia}
+                className="px-6 py-3 rounded-lg bg-transparent border border-spice-orange/40 text-spice-orange hover:bg-spice-orange/10 transition-all inline-flex items-center gap-3 justify-center font-raleway"
+              >
+                <span>Continue to MAIA</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-dune-amber/60 text-sm italic font-raleway text-center">
+              Check in to share your current state with MAIA
             </p>
           </motion.div>
         </motion.div>

@@ -152,13 +152,13 @@ export default function Week2WelcomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1a1f3a] flex items-center justify-center px-4 overflow-hidden">
-      {/* Sacred Geometry Background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.02]">
+    <div className="min-h-screen bg-fremen-night flex items-center justify-center px-4 overflow-hidden">
+      {/* Sacred Geometry Background - Sandworm Spiral */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
         <svg viewBox="0 0 1000 1000" className="w-full h-full">
-          <circle cx="500" cy="500" r="400" fill="none" stroke="#F6AD55" strokeWidth="0.5" strokeDasharray="4 4" />
-          <circle cx="500" cy="500" r="300" fill="none" stroke="#F6AD55" strokeWidth="0.5" strokeDasharray="2 6" />
-          <circle cx="500" cy="500" r="200" fill="none" stroke="#F6AD55" strokeWidth="0.5" />
+          <circle cx="500" cy="500" r="400" fill="none" stroke="var(--spice-sand)" strokeWidth="0.5" strokeDasharray="4 4" />
+          <circle cx="500" cy="500" r="300" fill="none" stroke="var(--spice-orange)" strokeWidth="0.5" strokeDasharray="2 6" />
+          <circle cx="500" cy="500" r="200" fill="none" stroke="var(--spice-sand)" strokeWidth="0.5" />
         </svg>
       </div>
 
@@ -186,7 +186,7 @@ export default function Week2WelcomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-5xl md:text-6xl font-extralight text-amber-50 tracking-wide mb-6"
+                className="text-dune-hero font-cormorant text-sand-white tracking-wide mb-6"
               >
                 Welcome to Soullab
               </motion.h1>
@@ -195,9 +195,9 @@ export default function Week2WelcomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
-                className="text-xl text-amber-200/70 max-w-lg mx-auto leading-relaxed"
+                className="text-xl text-dune-amber/90 max-w-lg mx-auto leading-relaxed font-cinzel"
               >
-                Meet MAIA, your personal daimon. Your journey into consciousness begins here.
+                Meet MAIA, your guide through consciousness. Your journey begins here.
               </motion.p>
 
               <motion.button
@@ -205,7 +205,7 @@ export default function Week2WelcomePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.9 }}
                 onClick={handleBegin}
-                className="mt-8 px-12 py-4 bg-gradient-to-r from-amber-500/80 to-amber-600/80 text-white rounded-full font-medium hover:from-amber-500 hover:to-amber-600 transition-all shadow-lg shadow-amber-500/20"
+                className="btn-spice mt-8"
               >
                 Begin →
               </motion.button>
@@ -223,44 +223,44 @@ export default function Week2WelcomePage() {
             >
               <div className="text-center mb-8">
                 <Holoflower size="lg" glowIntensity="medium" className="mb-6 mx-auto" />
-                <h2 className="text-3xl font-extralight text-amber-50 mb-4">
-                  Your Soullab Name
+                <h2 className="text-dune-title font-cormorant text-sand-white mb-4">
+                  Your Name
                 </h2>
-                <p className="text-amber-200/60 leading-relaxed">
-                  This is your unique identifier in the beta—your Soullab-[NAME].
+                <p className="text-dune-amber/80 leading-relaxed font-cinzel">
+                  How shall we know you in the field?
                 </p>
               </div>
 
               <form onSubmit={handleIdentitySubmit} className="space-y-6">
                 <div>
-                  <label className="block text-sm text-amber-200/70 mb-2 font-light">
+                  <label className="block text-sm text-dune-amber/90 mb-2 font-raleway font-light">
                     Soullab Name
                   </label>
                   <div className="relative">
-                    <Sparkles className="absolute left-3 top-3.5 h-5 w-5 text-amber-500/40" />
+                    <Sparkles className="absolute left-3 top-3.5 h-5 w-5 text-spice-orange/40" />
                     <input
                       type="text"
                       value={soullabName}
                       onChange={(e) => setSoullabName(e.target.value)}
-                      placeholder="Enter your name (e.g., Kelly)"
-                      className="w-full pl-10 pr-4 py-3 bg-[#0A0D16] border border-amber-500/20 rounded-lg text-amber-50 placeholder-amber-200/30 focus:outline-none focus:border-amber-500/50 transition-colors"
+                      placeholder="Your name..."
+                      className="input-water pl-10"
                       autoFocus
                     />
                   </div>
-                  <p className="text-xs text-amber-200/40 mt-2">
+                  <p className="text-xs text-dune-amber/50 mt-2 font-raleway">
                     We'll format it as "Soullab-YourName"
                   </p>
                 </div>
 
                 {error && (
-                  <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                  <p className="text-harkonnen-crimson text-sm bg-harkonnen-crimson/10 border border-harkonnen-crimson/30 rounded-lg p-3">
                     {error}
                   </p>
                 )}
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 bg-gradient-to-r from-amber-500/80 to-amber-600/80 text-white rounded-lg font-medium hover:from-amber-500 hover:to-amber-600 transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2"
+                  className="btn-spice w-full flex items-center justify-center gap-2"
                 >
                   Continue
                   <ArrowRight className="w-4 h-4" />
@@ -280,54 +280,54 @@ export default function Week2WelcomePage() {
             >
               <div className="text-center mb-8">
                 <Holoflower size="lg" glowIntensity="medium" className="mb-6 mx-auto" />
-                <h2 className="text-3xl font-extralight text-amber-50 mb-4">
-                  Create Your Portal
+                <h2 className="text-dune-title font-cormorant text-sand-white mb-4">
+                  Sacred Threshold
                 </h2>
-                <p className="text-amber-200/60 leading-relaxed mb-2">
-                  Welcome, <span className="text-amber-400 font-medium">{soullabName}</span>
+                <p className="text-dune-amber/90 leading-relaxed mb-2 font-cinzel">
+                  Welcome, <span className="text-spice-orange font-medium">{soullabName}</span>
                 </p>
-                <p className="text-amber-200/50 text-sm">
-                  Choose a username and password for quick access
+                <p className="text-dune-amber/70 text-sm font-raleway">
+                  Choose your credentials for safe passage
                 </p>
               </div>
 
               <form onSubmit={handleCredentialsSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-sm text-amber-200/70 mb-2 font-light">
+                  <label className="block text-sm text-dune-amber/90 mb-2 font-raleway font-light">
                     Username
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-3.5 h-5 w-5 text-amber-500/40" />
+                    <User className="absolute left-3 top-3.5 h-5 w-5 text-spice-orange/40" />
                     <input
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Choose a username"
-                      className="w-full pl-10 pr-4 py-3 bg-[#0A0D16] border border-amber-500/20 rounded-lg text-amber-50 placeholder-amber-200/30 focus:outline-none focus:border-amber-500/50 transition-colors"
+                      placeholder="Choose a username..."
+                      className="input-water pl-10"
                       autoFocus
                     />
                   </div>
-                  <p className="text-xs text-amber-200/40 mt-1.5">
-                    Use this for quick check-in later
+                  <p className="text-xs text-dune-amber/50 mt-1.5 font-raleway">
+                    Use this for swift return
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm text-amber-200/70 mb-2 font-light">
+                  <label className="block text-sm text-dune-amber/90 mb-2 font-raleway font-light">
                     Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3.5 h-5 w-5 text-amber-500/40" />
+                    <Lock className="absolute left-3 top-3.5 h-5 w-5 text-spice-orange/40" />
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Create a password (min 6 characters)"
-                      className="w-full pl-10 pr-4 py-3 bg-[#0A0D16] border border-amber-500/20 rounded-lg text-amber-50 placeholder-amber-200/30 focus:outline-none focus:border-amber-500/50 transition-colors"
+                      placeholder="Create a password (min 6 characters)..."
+                      className="input-water pl-10"
                     />
                   </div>
-                  <p className="text-xs text-amber-200/40 mt-1.5">
-                    For account security
+                  <p className="text-xs text-dune-amber/50 mt-1.5 font-raleway">
+                    Your key to the sanctuary
                   </p>
                 </div>
 
@@ -335,7 +335,7 @@ export default function Week2WelcomePage() {
                   <motion.p
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg p-3"
+                    className="text-harkonnen-crimson text-sm bg-harkonnen-crimson/10 border border-harkonnen-crimson/30 rounded-lg p-3"
                   >
                     {error}
                   </motion.p>
@@ -344,7 +344,7 @@ export default function Week2WelcomePage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3.5 bg-gradient-to-r from-amber-500/80 to-amber-600/80 text-white rounded-lg font-medium hover:from-amber-500 hover:to-amber-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2"
+                  className="btn-spice w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
@@ -360,8 +360,8 @@ export default function Week2WelcomePage() {
                 </button>
               </form>
 
-              <p className="text-center text-xs text-amber-200/30 mt-6">
-                Returning user? Your password will log you in
+              <p className="text-center text-xs text-dune-amber/40 mt-6 font-raleway">
+                Returning? Your password grants passage
               </p>
             </motion.div>
           )}
@@ -377,19 +377,19 @@ export default function Week2WelcomePage() {
             >
               <div className="text-center mb-8">
                 <Holoflower size="xl" glowIntensity="high" className="mb-8 mx-auto" />
-                <h2 className="text-4xl font-extralight text-amber-50 mb-6 tracking-wide">
+                <h2 className="text-dune-hero font-cormorant text-sand-white mb-6 tracking-wide">
                   {WEEK2_MESSAGE.title}
                 </h2>
               </div>
 
-              <div className="space-y-6 bg-[#0A0D16]/40 border border-amber-500/10 rounded-lg p-8 backdrop-blur-sm">
+              <div className="card-sietch space-y-6 p-8">
                 {WEEK2_MESSAGE.paragraphs.map((paragraph, index) => (
                   <motion.p
                     key={index}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.3 }}
-                    className="text-amber-200/80 leading-relaxed text-lg"
+                    className="text-deep-sand/90 leading-relaxed text-lg font-cinzel"
                   >
                     {paragraph}
                   </motion.p>
@@ -399,12 +399,12 @@ export default function Week2WelcomePage() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: WEEK2_MESSAGE.paragraphs.length * 0.3 }}
-                  className="mt-8 pt-6 border-t border-amber-500/10"
+                  className="mt-8 pt-6 border-t border-spice-sand/20"
                 >
-                  <p className="text-amber-300/70 italic text-center text-lg mb-2">
+                  <p className="text-bene-gesserit-gold/80 italic text-center text-lg mb-2 font-cormorant">
                     "{WEEK2_MESSAGE.quote}"
                   </p>
-                  <p className="text-amber-400/60 italic text-center">
+                  <p className="text-spice-orange/70 italic text-center font-raleway">
                     {WEEK2_MESSAGE.attribution}
                   </p>
                 </motion.div>
@@ -415,7 +415,7 @@ export default function Week2WelcomePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: (WEEK2_MESSAGE.paragraphs.length + 1) * 0.3 }}
                 onClick={handleComplete}
-                className="mt-8 w-full py-4 bg-gradient-to-r from-amber-500/80 to-amber-600/80 text-white rounded-lg font-medium hover:from-amber-500 hover:to-amber-600 transition-all shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2"
+                className="btn-spice mt-8 w-full flex items-center justify-center gap-2"
               >
                 Enter MAIA
                 <ArrowRight className="w-5 h-5" />
@@ -432,10 +432,10 @@ export default function Week2WelcomePage() {
               className="text-center space-y-8"
             >
               <Holoflower size="xl" glowIntensity="high" className="mx-auto" />
-              <h2 className="text-3xl font-extralight text-amber-50">
+              <h2 className="text-dune-title font-cormorant text-sand-white">
                 Welcome, {soullabName}
               </h2>
-              <p className="text-amber-200/60">Entering MAIA...</p>
+              <p className="text-dune-amber/80 font-cinzel">Entering MAIA...</p>
             </motion.div>
           )}
         </AnimatePresence>

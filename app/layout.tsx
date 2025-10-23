@@ -17,7 +17,7 @@ import { Toaster } from 'react-hot-toast';
 // import "../public/compiled.css"; // TEMP: Disabled - Next.js CSS loaders broken
 // import "./globals-mobile.css"; // TEMP: Disabled - Next.js CSS loaders broken
 // import "@/styles/typography-refresh.css"; // TEMP: Disabled - Next.js CSS loaders broken
-// import "@/styles/dune-theme.css"; // 🏜️ DUNE AESTHETIC SYSTEM - Available for future use
+import "@/styles/dune-theme.css"; // 🏜️ DUNE AESTHETIC SYSTEM - Now active!
 
 const inter = Inter({ subsets: ["latin"] });
 
