@@ -2566,7 +2566,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       </p>
                       <div className="flex gap-2">
                         <button
-                          onClick={handleSaveAsJournal}
+                          onClick={async () => {
+                            await handleSaveAsJournal();
+                            // Ensure popup dismisses after save completes
+                            setTimeout(() => setShowJournalSuggestion(false), 500);
+                          }}
                           disabled={isSavingJournal}
                           className="px-4 py-2 bg-amber-500/30 hover:bg-amber-500/40 border border-amber-400/50
                                    rounded-lg text-amber-200 text-sm font-medium transition-all active:scale-95
@@ -2575,7 +2579,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           {isSavingJournal ? 'Saving...' : 'Save to Journal'}
                         </button>
                         <button
-                          onClick={() => setShowJournalSuggestion(false)}
+                          onClick={() => {
+                            setShowJournalSuggestion(false);
+                            console.log('🚫 [Journal] User dismissed journal suggestion');
+                          }}
                           className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/20
                                    rounded-lg text-white/60 text-sm transition-all active:scale-95"
                         >
