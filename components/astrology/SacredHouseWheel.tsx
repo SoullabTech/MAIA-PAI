@@ -206,12 +206,12 @@ const houseStates = {
   3: { symbol: '💨', phase: 'Consciousness', brain: 'Left PFC' },    // Gemini - Communication
 };
 
-// Elemental colors
+// Elemental colors - Dune aesthetic with distinct elemental presence
 const elementalColors = {
-  fire: { day: '#C85450', night: '#F5A362', glow: 'rgba(200, 84, 80, 0.4)' },      // Red/Orange
-  water: { day: '#6B9BD1', night: '#8BADD6', glow: 'rgba(107, 155, 209, 0.4)' },   // Blue
-  earth: { day: '#7A9A65', night: '#A8C69F', glow: 'rgba(122, 154, 101, 0.4)' },   // Green
-  air: { day: '#E4C247', night: '#F5D565', glow: 'rgba(228, 194, 71, 0.4)' },      // Yellow
+  fire: { day: '#D4874E', night: '#E89850', glow: 'rgba(232, 152, 80, 0.6)' },       // Spice flame, desert fire - vibrant orange/bronze
+  water: { day: '#5B8A9A', night: '#6BA5B8', glow: 'rgba(107, 165, 184, 0.5)' },     // Fremen water reserves - precious blue/teal
+  earth: { day: '#7A9168', night: '#8BAA78', glow: 'rgba(139, 170, 120, 0.5)' },     // Sietch gardens, desert sage - olive/green
+  air: { day: '#D4A760', night: '#E8C070', glow: 'rgba(232, 192, 112, 0.6)' },      // Arrakeen sunlight, sandstorm gold - bright yellow/gold
 };
 
 // Aspect geometry (angles in degrees)
@@ -223,13 +223,13 @@ const aspectAngles = {
   opposition: 180,
 };
 
-// Aspect colors for sacred geometry
+// Aspect colors for sacred geometry - Bene Gesserit ceremonial wisdom tones
 const aspectColors = {
-  conjunction: '#F59E0B',  // Amber - union
-  sextile: '#10B981',      // Green - harmony
-  square: '#EF4444',       // Red - tension
-  trine: '#3B82F6',        // Blue - flow
-  opposition: '#8B5CF6',   // Purple - polarity
+  conjunction: '#E3B778',  // Amber Bronze - union
+  sextile: '#9B8B7E',      // Temple Stone - harmony
+  square: '#B8865B',       // Oxidized Bronze - tension
+  trine: '#8B7BA8',        // Amethyst - flow of consciousness
+  opposition: '#6B5B7E',   // Deep Wisdom Purple - polarity
 };
 
 export function SacredHouseWheel({
@@ -415,7 +415,7 @@ export function SacredHouseWheel({
             return points.join(' ');
           })()}
           fill="none"
-          stroke={isDayMode ? '#9B8FAA' : '#8B5CF6'}
+          stroke={isDayMode ? '#9B8B7E' : '#8B7BA8'}
           strokeWidth="0.8"
           opacity="0.15"
           strokeLinecap="round"
@@ -450,7 +450,7 @@ export function SacredHouseWheel({
             return points.join(' ');
           })()}
           fill="none"
-          stroke={isDayMode ? '#C85450' : '#F5A362'}
+          stroke={isDayMode ? '#C89968' : '#E3B778'}
           strokeWidth="1"
           opacity="0.2"
           strokeLinecap="round"
@@ -499,7 +499,7 @@ export function SacredHouseWheel({
             return points.join(' ');
           })()}
           fill="none"
-          stroke={isDayMode ? '#7A9A65' : '#A8C69F'}
+          stroke={isDayMode ? '#6B5D52' : '#8B7968'}
           strokeWidth="1.2"
           opacity="0.15"
           strokeLinecap="round"
@@ -534,7 +534,7 @@ export function SacredHouseWheel({
             return points.join(' ');
           })()}
           fill="none"
-          stroke={isDayMode ? '#6B9BD1' : '#8BADD6'}
+          stroke={isDayMode ? '#9B8B7E' : '#B8A99A'}
           strokeWidth="0.8"
           opacity="0.12"
           strokeLinecap="round"
@@ -569,7 +569,7 @@ export function SacredHouseWheel({
             return points.join(' ');
           })()}
           fill="none"
-          stroke={isDayMode ? '#D4B896' : '#E8D4BF'}
+          stroke={isDayMode ? '#E8DCC8' : '#F0C98A'}
           strokeWidth="0.6"
           opacity="0.1"
           strokeLinecap="round"
@@ -603,7 +603,7 @@ export function SacredHouseWheel({
             return points.join(' ');
           })()}
           fill="none"
-          stroke="#D4AF37"
+          stroke="#E3B778"
           strokeWidth="0.7"
           opacity="0.08"
           strokeLinecap="round"
@@ -638,7 +638,7 @@ export function SacredHouseWheel({
             return points.join(' ');
           })()}
           fill="none"
-          stroke={isDayMode ? '#9B8FAA' : '#C8A8E0'}
+          stroke={isDayMode ? '#9B8B7E' : '#B8A99A'}
           strokeWidth="0.5"
           opacity="0.1"
           strokeLinecap="round"
@@ -660,24 +660,24 @@ export function SacredHouseWheel({
           <g opacity="0.7">
             {/* TORUS FUNNEL - Consciousness Vortex (Elemental Alchemy book cover inspired) */}
             <g>
-              {/* Top funnel (golden/fire - descending) - ENHANCED for book cover glow */}
+              {/* Top funnel (bronze/fire - descending consciousness) - Ceremonial glow */}
               <defs>
                 <radialGradient id="topFunnelGradient" cx="50%" cy="50%">
-                  <stop offset="0%" stopColor="#F5A362" stopOpacity="0.6" />
-                  <stop offset="50%" stopColor="#D4AF37" stopOpacity="0.4" />
-                  <stop offset="100%" stopColor="#C8A572" stopOpacity="0.2" />
+                  <stop offset="0%" stopColor="#E3B778" stopOpacity="0.6" />
+                  <stop offset="50%" stopColor="#C89968" stopOpacity="0.4" />
+                  <stop offset="100%" stopColor="#B8A99A" stopOpacity="0.2" />
                 </radialGradient>
                 <radialGradient id="bottomFunnelGradient" cx="50%" cy="50%">
-                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.6" />
-                  <stop offset="50%" stopColor="#6B9BD1" stopOpacity="0.4" />
-                  <stop offset="100%" stopColor="#8BADD6" stopOpacity="0.2" />
+                  <stop offset="0%" stopColor="#8B7BA8" stopOpacity="0.6" />
+                  <stop offset="50%" stopColor="#9B8B7E" stopOpacity="0.4" />
+                  <stop offset="100%" stopColor="#B8A99A" stopOpacity="0.2" />
                 </radialGradient>
-                {/* Outer glow for cosmic dragonfly effect */}
+                {/* Outer glow for ceremonial temple aura */}
                 <radialGradient id="torusGlowGradient" cx="50%" cy="50%">
-                  <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.1" />
-                  <stop offset="40%" stopColor="#F5A362" stopOpacity="0.4" />
-                  <stop offset="70%" stopColor="#8B5CF6" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#6B9BD1" stopOpacity="0" />
+                  <stop offset="0%" stopColor="#E3B778" stopOpacity="0.15" />
+                  <stop offset="40%" stopColor="#C89968" stopOpacity="0.4" />
+                  <stop offset="70%" stopColor="#8B7BA8" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#9B8B7E" stopOpacity="0" />
                 </radialGradient>
               </defs>
 
@@ -717,7 +717,7 @@ export function SacredHouseWheel({
                     y1={y1}
                     x2={x2}
                     y2={y2}
-                    stroke="#F5A362"
+                    stroke="#E3B778"
                     strokeWidth="1"
                     strokeOpacity="0.6"
                     initial={{ pathLength: 0, opacity: 0 }}
@@ -752,7 +752,7 @@ export function SacredHouseWheel({
                     y1={y1}
                     x2={x2}
                     y2={y2}
-                    stroke="#8B5CF6"
+                    stroke="#8B7BA8"
                     strokeWidth="1"
                     strokeOpacity="0.6"
                     initial={{ pathLength: 0, opacity: 0 }}
@@ -778,7 +778,7 @@ export function SacredHouseWheel({
                   cy="200"
                   r={radius}
                   fill="none"
-                  stroke={i < 3 ? "#F5A362" : "#8B5CF6"}
+                  stroke={i < 3 ? "#E3B778" : "#8B7BA8"}
                   strokeWidth="0.8"
                   strokeOpacity="0.3"
                   strokeDasharray="2,3"
@@ -804,7 +804,7 @@ export function SacredHouseWheel({
                 rx="70"
                 ry="25"
                 fill="url(#topFunnelGradient)"
-                stroke="#F5A362"
+                stroke="#E3B778"
                 strokeWidth="1.2"
                 strokeOpacity="0.5"
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -827,7 +827,7 @@ export function SacredHouseWheel({
                 rx="70"
                 ry="25"
                 fill="url(#bottomFunnelGradient)"
-                stroke="#8B5CF6"
+                stroke="#8B7BA8"
                 strokeWidth="1.2"
                 strokeOpacity="0.45"
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -849,9 +849,9 @@ export function SacredHouseWheel({
                 cx="200"
                 cy="200"
                 r="12"
-                fill="#D4AF37"
+                fill="#E3B778"
                 fillOpacity="0.2"
-                stroke="#D4AF37"
+                stroke="#E3B778"
                 strokeWidth="2"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{
@@ -870,7 +870,7 @@ export function SacredHouseWheel({
                 cx="200"
                 cy="200"
                 r="4"
-                fill="#D4AF37"
+                fill="#E3B778"
                 animate={{
                   opacity: [0.8, 1, 0.8]
                 }}
@@ -894,7 +894,7 @@ export function SacredHouseWheel({
                   return `${x},${y}`;
                 }).join(' ')}
                 fill="none"
-                stroke="#D4AF37"
+                stroke="#E3B778"
                 strokeWidth="1.5"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 0.5 }}
@@ -911,7 +911,7 @@ export function SacredHouseWheel({
                   return `${x},${y}`;
                 }).join(' ')}
                 fill="none"
-                stroke="#D4AF37"
+                stroke="#E3B778"
                 strokeWidth="1.2"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 0.4 }}
@@ -934,7 +934,7 @@ export function SacredHouseWheel({
                     y1={y1}
                     x2={x2}
                     y2={y2}
-                    stroke="#D4AF37"
+                    stroke="#E3B778"
                     strokeWidth="0.8"
                     initial={{ pathLength: 0, opacity: 0 }}
                     animate={{ pathLength: 1, opacity: 0.3 }}
@@ -955,7 +955,7 @@ export function SacredHouseWheel({
                   return `M ${points[0]} L ${points[1]} L ${points[2]} L ${points[3]} L ${points[4]} Z`;
                 })()}
                 fill="none"
-                stroke="#D4AF37"
+                stroke="#E3B778"
                 strokeWidth="1"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{
@@ -968,13 +968,13 @@ export function SacredHouseWheel({
             </g>
 
             {/* Seed of Life - 7 circles at center (source pattern) */}
-            <circle cx="200" cy="200" r="15" fill="none" stroke="#D4AF37" strokeWidth="0.5" />
+            <circle cx="200" cy="200" r="15" fill="none" stroke="#E3B778" strokeWidth="0.5" />
             {[...Array(6)].map((_, i) => {
               const angle = (i * 60) * (Math.PI / 180);
               const x = 200 + 15 * Math.cos(angle);
               const y = 200 + 15 * Math.sin(angle);
               return (
-                <circle key={`seed-${i}`} cx={x} cy={y} r="15" fill="none" stroke="#D4AF37" strokeWidth="0.5" />
+                <circle key={`seed-${i}`} cx={x} cy={y} r="15" fill="none" stroke="#E3B778" strokeWidth="0.5" />
               );
             })}
 
@@ -988,7 +988,7 @@ export function SacredHouseWheel({
                 return `${x},${y}`;
               }).join(' ')}
               fill="none"
-              stroke="#D4AF37"
+              stroke="#E3B778"
               strokeWidth="1"
               strokeDasharray="4,4"
               initial={{ opacity: 0 }}
@@ -1005,7 +1005,7 @@ export function SacredHouseWheel({
                 return `${x},${y}`;
               }).join(' ')}
               fill="none"
-              stroke="#D4AF37"
+              stroke="#E3B778"
               strokeWidth="1"
               strokeDasharray="3,3"
               initial={{ opacity: 0 }}
@@ -1022,7 +1022,7 @@ export function SacredHouseWheel({
                 return `${x},${y}`;
               }).join(' ')}
               fill="none"
-              stroke="#D4AF37"
+              stroke="#E3B778"
               strokeWidth="1"
               strokeDasharray="2,2"
               initial={{ opacity: 0 }}
@@ -1034,7 +1034,7 @@ export function SacredHouseWheel({
             <motion.polygon
               points="200,140 230,180 170,180"
               fill="none"
-              stroke="#D4AF37"
+              stroke="#E3B778"
               strokeWidth="1.5"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.35 }}
@@ -1053,7 +1053,7 @@ export function SacredHouseWheel({
                     y1={pos1.y}
                     x2={pos2.x}
                     y2={pos2.y}
-                    stroke="#D4AF37"
+                    stroke="#E3B778"
                     strokeWidth="0.3"
                     opacity="0.15"
                   />
@@ -1260,7 +1260,7 @@ export function SacredHouseWheel({
                   <AlchemicalSymbol
                     element={element}
                     size={24}
-                    color="#D4AF37"
+                    color="#E3B778"
                     opacity={hoveredHouse === house ? 1.0 : 0.7}
                   />
                 </foreignObject>
