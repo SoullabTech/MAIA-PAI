@@ -184,6 +184,9 @@ export default function AstrologyPage() {
   // Edit mode state
   const [isEditingBirthData, setIsEditingBirthData] = useState(false);
 
+  // Track whether user has started missions (for smart button text)
+  const [hasMissions, setHasMissions] = useState(false);
+
   useEffect(() => {
     // Force night mode for Arrakis aesthetic
     setIsDayMode(false);
@@ -292,6 +295,20 @@ export default function AstrologyPage() {
     };
 
     loadBirthChart();
+  }, []);
+
+  // Check if user has started missions (for smart button text)
+  useEffect(() => {
+    try {
+      const betaUser = localStorage.getItem('beta_user');
+      if (betaUser) {
+        const userData = JSON.parse(betaUser);
+        const sessionCount = userData.session_count || 0;
+        setHasMissions(sessionCount > 0);
+      }
+    } catch (error) {
+      console.error('Error checking mission status:', error);
+    }
   }, []);
 
 
@@ -806,7 +823,7 @@ export default function AstrologyPage() {
                     boxShadow: '0 2px 8px rgba(16, 185, 129, 0.3)',
                   }}
                 >
-                  🎯 Start Your Missions with MAIA
+                  {hasMissions ? '🎯 Continue Your Missions' : '🎯 Start Your Missions with MAIA'}
                 </button>
               )}
             </div>
