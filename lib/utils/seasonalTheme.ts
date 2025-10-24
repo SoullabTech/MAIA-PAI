@@ -10,6 +10,7 @@ export type Season = 'spring' | 'summer' | 'fall' | 'winter';
 export interface SeasonalTheme {
   season: Season;
   bgClass: string;
+  bgStyle: string; // Inline gradient as fallback
   name: string;
   emoji: string;
   energy: string;
@@ -53,6 +54,7 @@ export function getSeasonalTheme(season?: Season): SeasonalTheme {
     spring: {
       season: 'spring',
       bgClass: 'bg-season-spring',
+      bgStyle: 'linear-gradient(135deg, #8B7B8B 0%, #9B8B7C 25%, #7B9B7B 60%, #4A5D4A 100%)',
       name: 'Spring Renewal',
       emoji: '🌸',
       energy: 'Renewal & Fresh Beginnings',
@@ -61,6 +63,7 @@ export function getSeasonalTheme(season?: Season): SeasonalTheme {
     summer: {
       season: 'summer',
       bgClass: 'bg-season-summer',
+      bgStyle: 'linear-gradient(135deg, #E8B86D 0%, #D4A86A 30%, #5B8FA3 70%, #2F5D7C 100%)',
       name: 'Summer Vitality',
       emoji: '☀️',
       energy: 'Radiance & Full Expression',
@@ -69,6 +72,7 @@ export function getSeasonalTheme(season?: Season): SeasonalTheme {
     fall: {
       season: 'fall',
       bgClass: 'bg-season-fall',
+      bgStyle: 'linear-gradient(135deg, #D2691E 0%, #B8442D 25%, #8B2500 60%, #4A1504 100%)',
       name: 'Autumn Harvest',
       emoji: '🍂',
       energy: 'Transformation & Integration',
@@ -77,6 +81,7 @@ export function getSeasonalTheme(season?: Season): SeasonalTheme {
     winter: {
       season: 'winter',
       bgClass: 'bg-season-winter',
+      bgStyle: 'linear-gradient(135deg, #4A5D6A 0%, #3D4F5C 30%, #2C3E50 70%, #1A252F 100%)',
       name: 'Winter Stillness',
       emoji: '❄️',
       energy: 'Reflection & Inner Work',

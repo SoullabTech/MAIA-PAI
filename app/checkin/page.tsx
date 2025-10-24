@@ -219,7 +219,10 @@ export default function CheckInPage() {
   };
 
   return (
-    <div className={`min-h-screen ${seasonalTheme.bgClass} text-amber-50 flex items-center justify-center px-4`}>
+    <div
+      className="min-h-screen text-amber-50 flex items-center justify-center px-4"
+      style={{ background: seasonalTheme.bgStyle }}
+    >
       {/* Film grain texture overlay */}
       <div className="fixed inset-0 pointer-events-none texture-sand opacity-[0.05]" />
 

@@ -1,0 +1,98 @@
+✨ MAIA Platform Update: Your Archetypal Journey is Now Indestructible
+
+Hi {{name}}! 👋
+
+Some magical transformations happened this weekend, and I wanted to share what's now available for you on the MAIA platform.
+
+═══════════════════════════════════════════════════════════════
+
+🌟 YOUR JOURNEY IS NOW INDESTRUCTIBLE
+
+✨ Enter your birth data once → Saved forever
+✨ Access from any device → Automatic sync everywhere
+✨ Your Archetypal Field Map → Always shows your actual chart
+✨ Easy editing → Update your information anytime
+✨ No more "stuck" moments → Smooth sailing everywhere
+
+═══════════════════════════════════════════════════════════════
+
+🎯 YOUR COMPLETE ARCHETYPAL JOURNEY
+
+When you visit /astrology, you'll experience:
+
+• Consciousness Field Map (Sacred House Wheel)
+• 3D Torus visualization
+• Your missions appearing in the correct houses
+• Planetary positions, aspects, and insights
+• Elemental balance and Spiralogic wisdom
+
+═══════════════════════════════════════════════════════════════
+
+🚀 HOW TO GET STARTED
+
+YOUR PERSONAL PASSCODE: {{passcode}}
+
+STEP 1 - Clear Cache (one-time):
+This ensures you experience all the new features.
+• Chrome: Settings → Privacy → Clear browsing data → "Cached images and files"
+• Safari: Preferences → Privacy → Manage Website Data → Remove All
+• Firefox: Settings → Privacy → Clear Data → "Cached Web Content"
+
+STEP 2 - Log In Fresh:
+1. Visit https://maia.soullab.ai
+2. Use your passcode: {{passcode}}
+3. Explore your Archetypal Journey!
+
+STEP 3 - Add Your Birth Data (if you haven't):
+1. Go to /astrology
+2. Enter your birth date, time, and location
+3. Watch your cosmic blueprint unfold ✨
+4. It saves automatically — you'll never need to re-enter it!
+
+═══════════════════════════════════════════════════════════════
+
+✨ WHAT MAKES THIS SPECIAL
+
+Unlike other platforms where your data disappears:
+
+• MAIA remembers you across all devices and sessions
+• Your journey continues wherever you left off
+• Nothing gets lost — your cosmic blueprint is permanent
+• Easy to update — Edit your information anytime with one click
+
+This isn't just astrology — it's YOUR PERSONAL MYTHOLOGY BECOMING VISIBLE.
+
+═══════════════════════════════════════════════════════════════
+
+💫 NEED HELP?
+
+Quick Fix (works 99% of the time):
+1. Clear browser cache (see Step 1 above)
+2. Close browser completely
+3. Reopen and log in with: {{passcode}}
+
+Still stuck? Email me directly and I'll help you personally!
+
+═══════════════════════════════════════════════════════════════
+
+Your cosmic blueprint awaits ✨
+
+You're one of 42 explorers in this beta cohort, and every one of you now has:
+• A permanent account in the system
+• Birth chart storage ready
+• Cross-device synchronization
+• The complete Archetypal Journey unlocked
+
+The platform remembers you now. Your journey persists. The magic is permanent.
+
+Welcome to the full MAIA experience! 🌟
+
+With gratitude for your exploration,
+Kelly
+
+───────────────────────────────────────────────────────────────
+
+Platform: https://maia.soullab.ai
+Your Passcode: {{passcode}}
+
+P.S. Your birth chart data is stored securely in our database and syncs across all your devices. You're in complete control — you can view, edit, or remove it anytime.

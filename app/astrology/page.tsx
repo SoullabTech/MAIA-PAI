@@ -684,6 +684,35 @@ export default function AstrologyPage() {
       {/* Content */}
       <div className="relative z-10 w-full mx-auto px-0 sm:px-2 md:px-4 pt-1 md:pt-8 pb-32">
 
+        {/* Back to MAIA Navigation */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex justify-center mb-4 md:mb-6"
+        >
+          <button
+            onClick={() => window.location.href = '/maia'}
+            className="group flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-lg font-serif text-sm md:text-base transition-all duration-300 backdrop-blur-md"
+            style={{
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              color: '#10B981',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.25) 100%)';
+              e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.5)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%)';
+              e.currentTarget.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+            }}
+          >
+            <span className="text-lg md:text-xl transition-transform group-hover:-translate-x-1">←</span>
+            <span>Return to MAIA</span>
+          </button>
+        </motion.div>
+
         {/* Header - Spiralogic Evolutionary Report - HIDE ON MOBILE */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
