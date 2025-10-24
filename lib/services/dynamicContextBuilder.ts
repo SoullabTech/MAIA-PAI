@@ -92,6 +92,7 @@ export async function buildDynamicContext(
     includeFieldInsights?: boolean;
     includePatternContext?: boolean;
     includePatternEchoes?: boolean;
+    includeTransitContext?: boolean;
     fieldMatchThreshold?: number;
     fieldMatchCount?: number;
   }
@@ -100,12 +101,13 @@ export async function buildDynamicContext(
     includeFieldInsights: options?.includeFieldInsights ?? true,
     includePatternContext: options?.includePatternContext ?? true,
     includePatternEchoes: options?.includePatternEchoes ?? true,
+    includeTransitContext: options?.includeTransitContext ?? true,
     fieldMatchThreshold: options?.fieldMatchThreshold ?? 0.7,
     fieldMatchCount: options?.fieldMatchCount ?? 5,
   };
 
   // Retrieve all intelligence sources in parallel
-  const [fieldInsights, patternResonance, patternEchoes] = await Promise.all([
+  const [fieldInsights, patternResonance, patternEchoes, transitContext] = await Promise.all([
     config.includeFieldInsights
       ? getFieldContext(currentInput, {
           matchThreshold: config.fieldMatchThreshold,
@@ -115,6 +117,7 @@ export async function buildDynamicContext(
       : Promise.resolve(""),
     config.includePatternContext ? getPatternResonance(userId) : Promise.resolve(null),
     config.includePatternEchoes ? findPatternEchoes(userId, currentInput) : Promise.resolve(null),
+    config.includeTransitContext ? getTransitContext(userId) : Promise.resolve(""),
   ]);
 
   // Format pattern context
@@ -142,7 +145,7 @@ export async function buildDynamicContext(
   let fullSystemPrompt = basePrompt;
 
   // Add accumulated intelligence
-  if (patternContext || fieldInsights || patternEchoesText) {
+  if (patternContext || fieldInsights || patternEchoesText || transitContext) {
     fullSystemPrompt += "\n\n---\n\n";
     fullSystemPrompt += "# Accumulated Intelligence from Akashic Field\n\n";
     fullSystemPrompt +=
@@ -161,6 +164,11 @@ export async function buildDynamicContext(
       fullSystemPrompt += patternEchoesText;
     }
 
+    if (transitContext) {
+      fullSystemPrompt += transitContext;
+      fullSystemPrompt += "\n";
+    }
+
     fullSystemPrompt += "---\n\n";
     fullSystemPrompt +=
       "Use this accumulated wisdom to respond with awareness of their journey arc, symbolic threads, and recurring patterns. ";
@@ -174,20 +182,25 @@ export async function buildDynamicContext(
     fieldInsights,
     patternContext,
     patternEchoes: patternEchoesText,
+    transitContext,
     fullSystemPrompt,
   };
 }
 
 /**
  * Build lightweight context (when full context would be too heavy)
- * Includes only most essential patterns
+ * Includes only most essential patterns + current transit weather
  */
 export async function buildLightweightContext(
   userId: string,
   basePrompt: string
 ): Promise<string> {
   try {
-    const resonance = await getPatternResonance(userId);
+    // Fetch both pattern resonance and transit context in parallel
+    const [resonance, transitContext] = await Promise.all([
+      getPatternResonance(userId),
+      getTransitContext(userId)
+    ]);
 
     let context = basePrompt;
 
@@ -207,6 +220,12 @@ export async function buildLightweightContext(
         const topThreads = resonance.symbolicThreads.slice(0, 3);
         context += `- Symbolic Threads: ${topThreads.map((t) => t.motif).join(", ")}\n`;
       }
+    }
+
+    // Add transit weather if available
+    if (transitContext) {
+      context += "\n";
+      context += transitContext;
     }
 
     return context;
