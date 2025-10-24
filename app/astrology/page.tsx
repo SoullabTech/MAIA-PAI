@@ -434,28 +434,28 @@ export default function AstrologyPage() {
       style={{
         background: isDayMode
           ? 'radial-gradient(circle at 50% 30%, #E8DCC8 0%, #D4C4B0 100%)'
-          : 'radial-gradient(ellipse at top, #1e3a5f 0%, #1a2947 20%, #15203a 40%, #0f1729 60%, #0a0f1e 80%, #050911 100%)'
+          : 'radial-gradient(ellipse at top, #2C231F 0%, #231A17 30%, #1A1513 60%, #12100E 85%, #0A0907 100%)'
       }}>
 
-      {/* Twilight horizon - hint of sunlight just past dusk */}
+      {/* Temple stone horizon - warm ceremonial glow */}
       {!isDayMode && (
         <motion.div
           className="absolute bottom-0 left-0 right-0 h-64 pointer-events-none"
           style={{
-            background: 'linear-gradient(to top, rgba(255, 147, 79, 0.08) 0%, rgba(255, 120, 50, 0.05) 30%, transparent 100%)',
+            background: 'linear-gradient(to top, rgba(227, 183, 120, 0.08) 0%, rgba(212, 165, 116, 0.04) 30%, transparent 100%)',
           }}
           animate={{
-            opacity: [0.6, 0.8, 0.6],
+            opacity: [0.5, 0.7, 0.5],
           }}
           transition={{
-            duration: 8,
+            duration: 10,
             repeat: Infinity,
             ease: 'easeInOut',
           }}
         />
       )}
 
-      {/* Twilight Sky - Twinkling stars */}
+      {/* Sacred temple sky - Golden starlight */}
       <div className="absolute inset-0">
         {/* Distant stars - subtle shimmer */}
         {[...Array(200)].map((_, i) => {
@@ -466,7 +466,7 @@ export default function AstrologyPage() {
               key={`star-${i}`}
               initial={{ opacity: 0 }}
               animate={{
-                opacity: [0.1, size > 0.8 ? 0.9 : 0.5, 0.1],
+                opacity: [0.1, size > 0.8 ? 0.8 : 0.4, 0.1],
               }}
               transition={{
                 duration: twinkleSpeed,
@@ -474,25 +474,26 @@ export default function AstrologyPage() {
                 delay: Math.random() * 3,
                 ease: "easeInOut"
               }}
-              className={`absolute rounded-full ${isDayMode ? 'bg-amber-400/40' : 'bg-orange-200/90'}`}
+              className="absolute rounded-full"
               style={{
                 width: size > 0.9 ? '3px' : size > 0.7 ? '2px' : '1px',
                 height: size > 0.9 ? '3px' : size > 0.7 ? '2px' : '1px',
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-                boxShadow: size > 0.8 ? `0 0 ${size * 8}px rgba(249, 115, 22, ${isDayMode ? 0.3 : 0.7})` : 'none',
+                backgroundColor: isDayMode ? '#E3B778' : '#FDF5E6',
+                boxShadow: size > 0.8 ? `0 0 ${size * 8}px rgba(227, 183, 120, ${isDayMode ? 0.3 : 0.6})` : 'none',
               }}
             />
           );
         })}
 
-        {/* Bright navigational stars - like Arrakis */}
+        {/* Bright wisdom stars - ceremonial markers */}
         {[...Array(12)].map((_, i) => (
           <motion.div
             key={`bright-${i}`}
             initial={{ opacity: 0, scale: 0 }}
             animate={{
-              opacity: [0.4, 1, 0.4],
+              opacity: [0.3, 0.9, 0.3],
               scale: [0.8, 1.2, 0.8],
             }}
             transition={{
@@ -501,46 +502,47 @@ export default function AstrologyPage() {
               delay: Math.random() * 2,
               ease: "easeInOut"
             }}
-            className={`absolute rounded-full ${isDayMode ? 'bg-amber-500' : 'bg-orange-400'}`}
+            className="absolute rounded-full"
             style={{
               width: '4px',
               height: '4px',
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              boxShadow: `0 0 20px rgba(249, 115, 22, ${isDayMode ? 0.4 : 0.9}), 0 0 40px rgba(217, 119, 6, ${isDayMode ? 0.2 : 0.5})`,
+              backgroundColor: isDayMode ? '#D4A574' : '#F0C98A',
+              boxShadow: `0 0 20px rgba(227, 183, 120, ${isDayMode ? 0.4 : 0.8}), 0 0 40px rgba(212, 165, 116, ${isDayMode ? 0.2 : 0.4})`,
             }}
           />
         ))}
 
-        {/* Subtle nebula clouds */}
+        {/* Ceremonial bronze mist - temple atmosphere */}
         {!isDayMode && (
           <>
             <motion.div
               animate={{
-                opacity: [0.03, 0.08, 0.03],
+                opacity: [0.03, 0.07, 0.03],
                 scale: [1, 1.15, 1],
               }}
               transition={{ duration: 20, repeat: Infinity }}
               className="absolute top-0 right-1/4 w-[600px] h-[600px] rounded-full blur-3xl"
-              style={{ background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1), transparent)' }}
+              style={{ background: 'radial-gradient(circle, rgba(184, 134, 91, 0.08), transparent)' }}
             />
             <motion.div
               animate={{
-                opacity: [0.02, 0.06, 0.02],
+                opacity: [0.02, 0.05, 0.02],
                 scale: [1, 1.2, 1],
               }}
               transition={{ duration: 25, repeat: Infinity, delay: 5 }}
               className="absolute bottom-1/4 left-1/4 w-[700px] h-[700px] rounded-full blur-3xl"
-              style={{ background: 'radial-gradient(circle, rgba(59, 130, 246, 0.08), transparent)' }}
+              style={{ background: 'radial-gradient(circle, rgba(155, 107, 60, 0.06), transparent)' }}
             />
           </>
         )}
       </div>
 
-      {/* Ambient elemental glows - soft presence */}
+      {/* Ambient elemental glows - ceremonial presence */}
       <motion.div
         animate={{
-          opacity: [0.08, 0.15, 0.08],
+          opacity: [0.06, 0.12, 0.06],
           scale: [1, 1.1, 1],
         }}
         transition={{ duration: 8, repeat: Infinity }}
@@ -549,7 +551,7 @@ export default function AstrologyPage() {
       />
       <motion.div
         animate={{
-          opacity: [0.08, 0.12, 0.08],
+          opacity: [0.06, 0.10, 0.06],
           scale: [1, 1.2, 1],
         }}
         transition={{ duration: 10, repeat: Infinity, delay: 2 }}
@@ -568,11 +570,14 @@ export default function AstrologyPage() {
           className="text-center mb-6 hidden md:block"
         >
           <h1 className="text-3xl md:text-5xl font-serif mb-4 tracking-wide transition-colors duration-500"
-            style={{ color: isDayMode ? '#C67A28' : '#D88A2D' }}>
+            style={{
+              color: isDayMode ? '#C67A28' : '#E3B778',
+              textShadow: isDayMode ? 'none' : '0 2px 12px rgba(227, 183, 120, 0.3)'
+            }}>
             Alchemical Journey
           </h1>
           <div className="text-sm font-serif space-y-1 transition-colors duration-500"
-            style={{ color: isDayMode ? '#3D2E1F' : '#E7E2CF' }}>
+            style={{ color: isDayMode ? '#3D2E1F' : '#E8DCC8' }}>
             <p className="italic">Your soul's navigation through the waters of life</p>
             <p className="text-xs mt-4 opacity-70">Birth Pattern: {chartData.sun.sign} Sun · {chartData.moon.sign} Moon · {chartData.ascendant.sign} Rising</p>
 
@@ -1845,65 +1850,112 @@ export default function AstrologyPage() {
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{
-            background: 'rgba(0, 0, 0, 0.85)',
-            backdropFilter: 'blur(8px)',
+            background: 'radial-gradient(ellipse at center, rgba(44, 35, 31, 0.98) 0%, rgba(26, 21, 19, 0.98) 100%)',
+            backdropFilter: 'blur(12px)',
           }}
           onClick={() => setShowWelcomeModal(false)}
         >
           <motion.div
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
-            className="max-w-lg w-full rounded-2xl border border-amber-500/30 p-8 text-center"
+            className="max-w-lg w-full rounded-3xl p-10 text-center relative overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%)',
-              boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(251, 191, 36, 0.15)',
+              background: 'linear-gradient(135deg, rgba(61, 48, 38, 0.95) 0%, rgba(44, 35, 31, 0.98) 50%, rgba(58, 47, 40, 0.95) 100%)',
+              border: '1px solid rgba(184, 134, 91, 0.3)',
+              boxShadow: '0 30px 80px rgba(0, 0, 0, 0.7), 0 0 60px rgba(184, 134, 91, 0.15), inset 0 1px 0 rgba(253, 251, 249, 0.1)',
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Holoflower icon */}
-            <div className="mb-6 flex justify-center">
-              <MiniHoloflower size={80} />
-            </div>
+            {/* Radial sacred geometry background */}
+            <div
+              className="absolute inset-0 opacity-20 pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle at 50% 20%, rgba(227, 183, 120, 0.3) 0%, transparent 50%)',
+              }}
+            />
 
-            <h2 className="text-2xl font-serif mb-4 text-amber-300">
-              🎉 Your Consciousness Field Map is Ready!
-            </h2>
+            {/* Temple stone texture overlay */}
+            <div
+              className="absolute inset-0 opacity-10 pointer-events-none"
+              style={{
+                backgroundImage: 'repeating-linear-gradient(0deg, rgba(155, 107, 60, 0.1) 0px, transparent 2px, transparent 4px, rgba(155, 107, 60, 0.1) 6px)',
+              }}
+            />
 
-            <p className="text-stone-300 mb-6 leading-relaxed">
-              This is your personal consciousness field - a living map of archetypal energies woven through your birth chart.
-            </p>
+            {/* Content */}
+            <div className="relative z-10">
+              {/* Holoflower icon with ceremonial glow */}
+              <div className="mb-8 flex justify-center">
+                <div
+                  className="relative"
+                  style={{
+                    filter: 'drop-shadow(0 0 20px rgba(227, 183, 120, 0.4))',
+                  }}
+                >
+                  <MiniHoloflower size={100} />
+                </div>
+              </div>
 
-            <p className="text-stone-400 text-sm mb-8 leading-relaxed">
-              Want a guided tour using Kelly's chart as an example? You'll see how mission dots work, how to read planetary nodes, and what the sacred geometry means.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => {
-                  setShowWelcomeModal(false);
-                  setShowExampleChart(true);
-                }}
-                className="px-6 py-3 rounded-lg font-serif tracking-wide transition-all"
+              <h2
+                className="text-3xl font-serif mb-5"
                 style={{
-                  background: 'linear-gradient(135deg, #D4AF37 0%, #FFB84D 100%)',
-                  color: '#2C1810',
-                  boxShadow: '0 4px 20px rgba(212, 175, 55, 0.4)',
+                  color: '#FDF5E6',
+                  textShadow: '0 2px 8px rgba(227, 183, 120, 0.3)',
+                  letterSpacing: '0.02em',
                 }}
               >
-                Yes, show me how it works
-              </button>
+                Your Consciousness Field Map is Ready
+              </h2>
 
-              <button
-                onClick={() => setShowWelcomeModal(false)}
-                className="px-6 py-3 rounded-lg font-serif tracking-wide transition-all backdrop-blur-md"
+              <p
+                className="mb-6 leading-relaxed text-base"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  border: '1px solid rgba(212, 175, 55, 0.4)',
-                  color: '#E8D4BF',
+                  color: '#E8DCC8',
                 }}
               >
-                Explore on my own
-              </button>
+                This is your personal consciousness field — a living map of archetypal energies woven through your birth chart.
+              </p>
+
+              <p
+                className="text-sm mb-10 leading-relaxed"
+                style={{
+                  color: '#C9B896',
+                }}
+              >
+                Want a guided tour using Kelly's chart as an example? You'll see how mission dots work, how to read planetary nodes, and what the sacred geometry means.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => {
+                    setShowWelcomeModal(false);
+                    setShowExampleChart(true);
+                  }}
+                  className="px-8 py-4 rounded-xl font-serif tracking-wide transition-all transform hover:scale-105 hover:shadow-2xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #E3B778 0%, #D4A574 50%, #C89968 100%)',
+                    color: '#2C1810',
+                    boxShadow: '0 8px 24px rgba(227, 183, 120, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
+                    fontWeight: 500,
+                  }}
+                >
+                  Yes, show me how it works
+                </button>
+
+                <button
+                  onClick={() => setShowWelcomeModal(false)}
+                  className="px-8 py-4 rounded-xl font-serif tracking-wide transition-all transform hover:scale-105"
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(184, 134, 91, 0.15) 0%, rgba(155, 107, 60, 0.15) 100%)',
+                    border: '1px solid rgba(184, 134, 91, 0.4)',
+                    color: '#E8DCC8',
+                    backdropFilter: 'blur(8px)',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(253, 251, 249, 0.1)',
+                  }}
+                >
+                  Explore on my own
+                </button>
+              </div>
             </div>
           </motion.div>
         </motion.div>

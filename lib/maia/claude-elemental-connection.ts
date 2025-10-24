@@ -309,7 +309,7 @@ export class ElementalMaiaConnection {
 
     // Presence types
     map.set('witness', ['I see.', 'Watching.', 'Here.', 'With you.']);
-    map.set('hold', ['Got you.', 'Holding.', 'Safe.', 'I'm here.']);
+    map.set('hold', ['Got you.', 'Holding.', 'Safe.', `I'm here.`]);
     map.set('echo', ['Yeah.', 'Same.', 'I know.', 'Me too.']);
     map.set('space', [null, '...', '', '    ']);
     map.set('silence', [null]);

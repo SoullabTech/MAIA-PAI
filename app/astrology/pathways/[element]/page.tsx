@@ -58,11 +58,11 @@ const PATHWAYS = {
         ]
       }
     ],
-    color: 'from-orange-500 to-red-600',
-    bgGradient: 'from-orange-950/20 to-red-950/20',
-    borderColor: 'border-orange-500/30',
-    textColor: 'text-orange-400',
-    glowColor: 'shadow-orange-600/30'
+    color: 'from-[#E3B778] to-[#C89968]',
+    bgGradient: 'from-[#3D3026]/20 to-[#2C231F]/20',
+    borderColor: 'border-[#E3B778]/30',
+    textColor: 'text-[#E3B778]',
+    glowColor: 'shadow-[#E3B778]/30'
   },
   water: {
     name: 'Water Pathway',
@@ -106,11 +106,11 @@ const PATHWAYS = {
         ]
       }
     ],
-    color: 'from-blue-500 to-indigo-600',
-    bgGradient: 'from-blue-950/20 to-indigo-950/20',
-    borderColor: 'border-blue-500/30',
-    textColor: 'text-blue-400',
-    glowColor: 'shadow-blue-600/30'
+    color: 'from-[#B8A99A] to-[#9B8B7E]',
+    bgGradient: 'from-[#3D3026]/20 to-[#2C231F]/20',
+    borderColor: 'border-[#B8A99A]/30',
+    textColor: 'text-[#B8A99A]',
+    glowColor: 'shadow-[#B8A99A]/30'
   },
   earth: {
     name: 'Earth Pathway',
@@ -154,11 +154,11 @@ const PATHWAYS = {
         ]
       }
     ],
-    color: 'from-green-500 to-emerald-600',
-    bgGradient: 'from-green-950/20 to-emerald-950/20',
-    borderColor: 'border-green-500/30',
-    textColor: 'text-green-400',
-    glowColor: 'shadow-green-600/30'
+    color: 'from-[#8B7968] to-[#6B5D52]',
+    bgGradient: 'from-[#3D3026]/20 to-[#2C231F]/20',
+    borderColor: 'border-[#8B7968]/30',
+    textColor: 'text-[#8B7968]',
+    glowColor: 'shadow-[#8B7968]/30'
   },
   air: {
     name: 'Air Pathway',
@@ -202,11 +202,11 @@ const PATHWAYS = {
         ]
       }
     ],
-    color: 'from-cyan-500 to-sky-600',
-    bgGradient: 'from-cyan-950/20 to-sky-950/20',
-    borderColor: 'border-cyan-500/30',
-    textColor: 'text-cyan-400',
-    glowColor: 'shadow-cyan-600/30'
+    color: 'from-[#F0C98A] to-[#E8DCC8]',
+    bgGradient: 'from-[#3D3026]/20 to-[#2C231F]/20',
+    borderColor: 'border-[#F0C98A]/30',
+    textColor: 'text-[#F0C98A]',
+    glowColor: 'shadow-[#F0C98A]/30'
   }
 };
 
@@ -219,10 +219,10 @@ export default function PathwayDetailPage() {
 
   if (!pathway) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-stone-950 via-amber-950/20 to-black flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#2C231F] via-[#3D3026]/20 to-[#0A0907] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-amber-400/60 mb-4">Pathway not found</p>
-          <Link href="/astrology" className="text-amber-500 hover:text-amber-400">
+          <p className="text-[#E3B778]/60 mb-4">Pathway not found</p>
+          <Link href="/astrology" className="text-[#E3B778] hover:text-[#F0C98A]">
             ← Return to chart
           </Link>
         </div>
@@ -233,18 +233,18 @@ export default function PathwayDetailPage() {
   const Icon = pathway.icon;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-950 via-amber-950/20 to-black">
-      {/* Ambient background */}
+    <div className="min-h-screen bg-gradient-to-br from-[#2C231F] via-[#3D3026]/20 to-[#0A0907]">
+      {/* Ambient background - Ceremonial temple glow */}
       <div className="fixed inset-0 opacity-10">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-600 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#E3B778] rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#C89968] rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Back button */}
         <Link
           href="/astrology"
-          className="inline-flex items-center gap-2 text-amber-500/60 hover:text-amber-400 transition-colors mb-8"
+          className="inline-flex items-center gap-2 text-[#E3B778]/60 hover:text-[#F0C98A] transition-colors mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Cosmic Blueprint
@@ -261,11 +261,11 @@ export default function PathwayDetailPage() {
             <span className="text-white font-semibold">{pathway.name}</span>
           </div>
 
-          <h1 className="text-5xl font-bold text-amber-100 mb-4">
+          <h1 className="text-5xl font-bold text-[#FDF5E6] mb-4">
             {pathway.subtitle}
           </h1>
 
-          <p className="text-amber-300/80 text-lg max-w-3xl mx-auto leading-relaxed">
+          <p className="text-[#E8DCC8]/80 text-lg max-w-3xl mx-auto leading-relaxed">
             {pathway.description}
           </p>
         </motion.div>
@@ -278,7 +278,7 @@ export default function PathwayDetailPage() {
                 <span className={`${pathway.textColor} font-semibold`}>{stage}</span>
               </div>
               {i < pathway.journey.length - 1 && (
-                <div className="mx-2 text-amber-600">→</div>
+                <div className="mx-2 text-[#C89968]">→</div>
               )}
             </div>
           ))}
@@ -292,7 +292,7 @@ export default function PathwayDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className={`bg-gradient-to-br from-stone-900/80 via-amber-950/40 to-stone-900/80 backdrop-blur-xl border ${pathway.borderColor} rounded-2xl p-8 shadow-2xl ${pathway.glowColor}`}
+              className={`bg-gradient-to-br from-[#3D3026]/80 via-[#2C231F]/40 to-[#3D3026]/80 backdrop-blur-xl border ${pathway.borderColor} rounded-2xl p-8 shadow-2xl ${pathway.glowColor}`}
             >
               <div className="flex items-start justify-between mb-6">
                 <div>
@@ -301,8 +301,8 @@ export default function PathwayDetailPage() {
                       {house.number}
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-amber-100">{house.name}</h2>
-                      <p className="text-amber-500/60 text-sm uppercase tracking-wider">
+                      <h2 className="text-2xl font-bold text-[#FDF5E6]">{house.name}</h2>
+                      <p className="text-[#E3B778]/60 text-sm uppercase tracking-wider">
                         {house.theme}
                       </p>
                     </div>
@@ -313,21 +313,21 @@ export default function PathwayDetailPage() {
                 </div>
               </div>
 
-              <p className="text-amber-300/80 text-lg leading-relaxed mb-8">
+              <p className="text-[#E8DCC8]/80 text-lg leading-relaxed mb-8">
                 {house.description}
               </p>
 
               {/* Soul Questions */}
               <div className="space-y-4">
-                <h3 className="text-amber-100 font-semibold flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
+                <h3 className="text-[#FDF5E6] font-semibold flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#E3B778]" />
                   Soul Questions
                 </h3>
                 <div className="space-y-3">
                   {house.questions.map((question, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-3 text-amber-400/70 italic"
+                      className="flex items-start gap-3 text-[#E8DCC8]/70 italic"
                     >
                       <span className={`${pathway.textColor} mt-1`}>•</span>
                       <span>{question}</span>
@@ -337,8 +337,8 @@ export default function PathwayDetailPage() {
               </div>
 
               {/* TODO: Show planets in this house from user's chart */}
-              <div className="mt-8 pt-6 border-t border-amber-900/30">
-                <p className="text-amber-600/60 text-sm">
+              <div className="mt-8 pt-6 border-t border-[#3D3026]/50">
+                <p className="text-[#B8865B]/60 text-sm">
                   Connect your birth chart to see which planets activate this house in your life
                 </p>
               </div>

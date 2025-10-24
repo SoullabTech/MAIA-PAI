@@ -200,7 +200,7 @@ export function BetaOnboarding({ onComplete }: BetaOnboardingProps) {
 
                 <div className="space-y-3">
                   <label className="flex items-center gap-2" style={{ color: '#E8DCC8' }}>
-                    <Calendar className="w-5 h-5" style={{ color: '#8B7BA8' }} />
+                    <Calendar className="w-5 h-5" style={{ color: '#6B9B9E' }} />
                     <span className="font-medium">When were you born?</span>
                   </label>
                   <input
@@ -210,10 +210,10 @@ export function BetaOnboarding({ onComplete }: BetaOnboardingProps) {
                     onKeyDown={(e) => e.key === 'Enter' && handleNext()}
                     style={{
                       background: 'linear-gradient(135deg, rgba(26, 21, 19, 0.6), rgba(44, 35, 31, 0.4))',
-                      borderColor: 'rgba(139, 123, 168, 0.3)',
+                      borderColor: 'rgba(107, 155, 158, 0.3)',
                       color: '#FDF5E6',
                     }}
-                    className="w-full border rounded-xl px-6 py-4 focus:outline-none focus:border-[#8B7BA8]/50 focus:ring-2 focus:ring-[#8B7BA8]/20 transition-all text-lg"
+                    className="w-full border rounded-xl px-6 py-4 focus:outline-none focus:border-[#6B9B9E]/50 focus:ring-2 focus:ring-[#6B9B9E]/20 transition-all text-lg"
                   />
                 </div>
 
@@ -232,9 +232,9 @@ export function BetaOnboarding({ onComplete }: BetaOnboardingProps) {
                   <button
                     onClick={handleNext}
                     style={{
-                      background: 'linear-gradient(135deg, #8B7BA8 0%, #9B8B7E 100%)',
+                      background: 'linear-gradient(135deg, #6B9B9E 0%, #7BA5A8 100%)',
                       color: '#FDF5E6',
-                      boxShadow: '0 8px 24px rgba(139, 123, 168, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                      boxShadow: '0 8px 24px rgba(107, 155, 158, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
                     }}
                     className="flex-1 py-4 px-6 rounded-xl font-semibold text-lg transition-all flex items-center justify-center gap-2"
                   >

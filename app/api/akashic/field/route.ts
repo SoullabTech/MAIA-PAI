@@ -39,9 +39,9 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. Embed the query (1536 dimensions to match table)
+    // IMPORTANT: Must use same model as field population (ada-002)
     const embeddingResponse = await openai.embeddings.create({
-      model: "text-embedding-3-large",
-      dimensions: 1536,
+      model: "text-embedding-ada-002",
       input: query.slice(0, 8000),
     });
     const queryVector = embeddingResponse.data[0].embedding;
@@ -179,6 +179,10 @@ async function queryDistributedField({
   const NODE_ID = process.env.AKASHIC_NODE_ID || "default-node";
 
   try {
+    // Add 5 second timeout to prevent hanging
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     const response = await fetch(`${FIELD_URL}/api/field/query`, {
       method: "POST",
       headers: {
@@ -194,7 +198,10 @@ async function queryDistributedField({
         origin: NODE_ID,
         queryText: query.slice(0, 200) // Truncated for logging only
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(`Field service returned ${response.status}`);

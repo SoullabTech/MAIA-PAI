@@ -109,7 +109,7 @@ export class ElementalRefiner {
         [/\bfix\s+this\b/gi, 'work with this', 'aether:integration'],
         [/\bissue\b/gi, 'dynamic', 'aether:reframe'],
         [/\bI understand\b/gi, 'I see the pattern', 'aether:everyday'],
-        [/\bthere's something bigger\b/gi, 'there's a pattern here', 'aether:natural'],
+        [/\bthere's something bigger\b/gi, `there's a pattern here`, 'aether:natural'],
       ],
     };
 

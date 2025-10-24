@@ -1,5 +1,5 @@
-// Maya Enhanced PWA Service Worker v2.0
-const VERSION = 'v2.0.0';
+// Maya Enhanced PWA Service Worker v2.1 - Fixed error handling
+const VERSION = 'v2.1.0';
 const CACHE_NAME = `maya-${VERSION}`;
 const STATIC_CACHE = `maya-static-${VERSION}`;
 const RUNTIME_CACHE = `maya-runtime-${VERSION}`;
@@ -180,10 +180,16 @@ async function cacheFirst(request) {
     }
     return response;
   } catch (error) {
+    // Silently log non-critical fetch failures
+    console.warn('[SW] Cache-first fetch failed:', request.url);
     if (request.mode === 'navigate') {
       return caches.match('/offline.html');
     }
-    throw error;
+    // Return a minimal response instead of throwing
+    return new Response('Resource unavailable', {
+      status: 503,
+      statusText: 'Service Unavailable'
+    });
   }
 }
 
@@ -214,12 +220,23 @@ async function staleWhileRevalidate(request) {
   const cache = await caches.open(RUNTIME_CACHE);
   const cached = await cache.match(request);
 
-  const fetchPromise = fetch(request).then(async response => {
-    if (response.ok && request.method === 'GET') {
-      await safeCachePut(cache, request, response.clone());
-    }
-    return response;
-  });
+  const fetchPromise = fetch(request)
+    .then(async response => {
+      if (response.ok && request.method === 'GET') {
+        await safeCachePut(cache, request, response.clone());
+      }
+      return response;
+    })
+    .catch(error => {
+      // Silently fail if fetch fails and we have cache
+      if (cached) {
+        console.warn('[SW] Fetch failed, using cache:', request.url);
+        return cached;
+      }
+      // Only log error if we have no fallback
+      console.error('[SW] Fetch failed with no cache:', request.url, error);
+      throw error;
+    });
 
   return cached || fetchPromise;
 }

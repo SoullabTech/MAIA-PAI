@@ -275,7 +275,7 @@ export class ReflectionPortalGenerator {
       evolution: [
         'How has your language around this changed?',
         'What did you not see then that you see now?',
-        "What was true then that's still true?"
+        `What was true then that's still true?`
       ],
       recognition: [
         'Who were you then?',

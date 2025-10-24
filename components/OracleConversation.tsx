@@ -150,35 +150,41 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       if (isUser) {
         setUserTranscript(text);
       } else {
-        // MAIA's response from OpenAI Realtime API - add to messages
-        setMaiaResponseText(text);
+        // MAIA's response from OpenAI Realtime API - incremental deltas
+        // Accumulate the delta text instead of creating new messages
+        streamingMessageTextRef.current += text;
+        const accumulatedText = streamingMessageTextRef.current;
 
-        const oracleMessage: ConversationMessage = {
-          id: `msg-${Date.now()}-oracle`,
-          role: 'oracle',
-          text: text,
-          timestamp: new Date(),
-          motionState: 'responding',
-          source: 'maia'
-        };
+        setMaiaResponseText(accumulatedText);
 
-        // Add to messages (streaming from Realtime API)
-        setMessages(prev => [...prev, oracleMessage]);
-        onMessageAdded?.(oracleMessage);
+        // If this is the first delta, create a new message
+        if (!streamingMessageIdRef.current) {
+          const messageId = `msg-${Date.now()}-oracle`;
+          streamingMessageIdRef.current = messageId;
 
-        // Save MAIA's response to long-term memory
-        if (oracleAgentId) {
-          saveConversationMemory({
-            oracleAgentId,
-            content: text,
-            memoryType: 'conversation',
-            sourceType: 'voice',
-            sessionId
-          }).catch(err => console.error('Failed to save MAIA voice response:', err));
+          const oracleMessage: ConversationMessage = {
+            id: messageId,
+            role: 'oracle',
+            text: accumulatedText,
+            timestamp: new Date(),
+            motionState: 'responding',
+            source: 'maia'
+          };
+
+          // Add the initial message
+          setMessages(prev => [...prev, oracleMessage]);
+          onMessageAdded?.(oracleMessage);
+        } else {
+          // Update the existing message with accumulated text
+          setMessages(prev => prev.map(msg =>
+            msg.id === streamingMessageIdRef.current
+              ? { ...msg, text: accumulatedText }
+              : msg
+          ));
         }
 
         // Store MAIA's response for echo detection
-        lastMaiaResponseRef.current = text;
+        lastMaiaResponseRef.current = accumulatedText;
       }
     },
     onAudioStart: () => {
@@ -190,6 +196,25 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setIsResponding(false);
       setIsAudioPlaying(false);
       console.log('🔇 MAIA finished speaking');
+
+      // Save the completed response to long-term memory
+      const finalText = streamingMessageTextRef.current;
+      if (finalText && oracleAgentId) {
+        saveConversationMemory({
+          oracleAgentId,
+          content: finalText,
+          memoryType: 'conversation',
+          sourceType: 'voice',
+          sessionId,
+          userId,
+          role: 'assistant',
+          conversationMode: realtimeMode
+        }).catch(err => console.error('Failed to save MAIA voice response:', err));
+      }
+
+      // Reset streaming refs for next response
+      streamingMessageIdRef.current = null;
+      streamingMessageTextRef.current = '';
 
       // CRITICAL FIX: Auto-restart listening after MAIA finishes speaking
       // This fixes the "conversation dies after first exchange" bug
@@ -392,6 +417,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const lastMaiaResponseRef = useRef<string>('');
   const lastVoiceErrorRef = useRef<number>(0);
   const lastProcessedTranscriptRef = useRef<{ text: string; timestamp: number } | null>(null);
+
+  // Track streaming message for incremental transcript updates
+  const streamingMessageIdRef = useRef<string | null>(null);
+  const streamingMessageTextRef = useRef<string>('');
 
   // Oracle Agent ID for memory persistence
   const [oracleAgentId, setOracleAgentId] = useState<string | null>(null);
@@ -1055,14 +1084,17 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       });
     }
 
-    // Save user message to long-term memory
+    // Save user message to long-term memory (dual-save to memories + Akashic Records)
     if (oracleAgentId) {
       saveConversationMemory({
         oracleAgentId,
         content: text,
         memoryType: 'conversation',
         sourceType: 'text',
-        sessionId
+        sessionId,
+        userId,
+        role: 'user',
+        conversationMode: realtimeMode
       }).catch(err => console.error('Failed to save user message:', err));
     }
 
@@ -1184,7 +1216,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           });
         }
 
-        // Save chat response to long-term memory
+        // Save chat response to long-term memory (dual-save to memories + Akashic Records)
         if (oracleAgentId) {
           saveConversationMemory({
             oracleAgentId,
@@ -1194,7 +1226,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             emotionalTone: oracleResponse.emotionalResonance,
             wisdomThemes: oracleResponse.themes,
             elementalResonance: element,
-            sessionId
+            sessionId,
+            userId,
+            role: 'assistant',
+            conversationMode: realtimeMode
           }).catch(err => console.error('Failed to save chat response:', err));
         }
       }
@@ -1255,7 +1290,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             setMessages(prev => [...prev, oracleMessage]);
             onMessageAdded?.(oracleMessage);
 
-            // Save voice response to long-term memory
+            // Save voice response to long-term memory (dual-save to memories + Akashic Records)
             if (oracleAgentId) {
               saveConversationMemory({
                 oracleAgentId,
@@ -1265,7 +1300,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 emotionalTone: oracleResponse.emotionalResonance,
                 wisdomThemes: oracleResponse.themes,
                 elementalResonance: element,
-                sessionId
+                sessionId,
+                userId,
+                role: 'assistant',
+                conversationMode: realtimeMode
               }).catch(err => console.error('Failed to save voice response:', err));
             }
           }
@@ -1511,14 +1549,17 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     const trackingUserId = userId || `anon_${sessionId}`;
     userTracker.trackActivity(trackingUserId, 'voice');
 
-    // Save user message to long-term memory
+    // Save user message to long-term memory (dual-save to memories + Akashic Records)
     if (oracleAgentId) {
       saveConversationMemory({
         oracleAgentId,
         content: cleanedText,
         memoryType: 'conversation',
         sourceType: 'voice',
-        sessionId
+        sessionId,
+        userId,
+        role: 'user',
+        conversationMode: realtimeMode
       }).catch(err => console.error('Failed to save voice user message:', err));
     }
 

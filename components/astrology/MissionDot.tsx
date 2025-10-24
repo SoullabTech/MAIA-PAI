@@ -267,7 +267,7 @@ export function MissionPopup({ mission, onClose }: MissionPopupProps) {
         <div className="p-6">
           <div className="text-xs text-stone-500 mb-2">Placed in {mission.house}th House</div>
           {mission.transitContext && (
-            <div className="text-sm text-purple-300">
+            <div className="text-sm text-cyan-300">
               Transit: {mission.transitContext.transitDescription}
             </div>
           )}

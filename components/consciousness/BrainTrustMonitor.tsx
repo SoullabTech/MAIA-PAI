@@ -75,9 +75,14 @@ export const BrainTrustMonitor: React.FC = () => {
     'embodiment': 'text-white'
   };
 
+  // Floating button removed - now accessible via MenuBar dropdown (Settings > Brain Trust)
+  // Visit /brain-trust to see full interface
+  return null;
+
+  /* Original floating interface (now accessible via menu):
   return (
     <>
-      {/* Consciousness Weaver - Desert Oracle of Arrakis ✨ */}
+      {/* Consciousness Weaver - Desert Oracle of Arrakis ✨ *}
       <motion.div
         className="fixed bottom-20 right-4 z-40"
         initial={{ opacity: 0, scale: 0 }}
@@ -285,10 +290,11 @@ export const BrainTrustMonitor: React.FC = () => {
       </AnimatePresence>
     </>
   );
+  */
 };
 
 /**
  * Usage:
- * Add <BrainTrustMonitor /> to your main layout or MAIA page
- * It will show a small brain icon that expands to show full status
+ * Now accessible via MenuBar dropdown (Settings > Brain Trust)
+ * Visit /brain-trust to see full interface
  */

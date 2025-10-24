@@ -92,16 +92,20 @@ export default function AspectDetailPage() {
             aspectType === 'sextile' ? '⚹' :
               aspectType === 'quincunx' ? '⚻' : '○';
 
-  // Aspect color
+  // Aspect color - Bene Gesserit ceremonial wisdom tones
   const aspectColor =
-    aspectType === 'square' || aspectType === 'opposition' ? 'from-red-500/20 to-orange-500/20' :
-      aspectType === 'trine' || aspectType === 'sextile' ? 'from-green-500/20 to-emerald-500/20' :
-        'from-amber-500/20 to-yellow-500/20';
+    aspectType === 'square' ? 'from-[#B8865B]/20 to-[#C89968]/20' :
+      aspectType === 'opposition' ? 'from-[#6B5B7E]/20 to-[#8B7BA8]/20' :
+        aspectType === 'trine' ? 'from-[#8B7BA8]/20 to-[#9B8B7E]/20' :
+          aspectType === 'sextile' ? 'from-[#9B8B7E]/20 to-[#B8A99A]/20' :
+            'from-[#E3B778]/20 to-[#F0C98A]/20';
 
   const aspectBorderColor =
-    aspectType === 'square' || aspectType === 'opposition' ? 'border-red-500/40' :
-      aspectType === 'trine' || aspectType === 'sextile' ? 'border-green-500/40' :
-        'border-amber-500/40';
+    aspectType === 'square' ? 'border-[#B8865B]/40' :
+      aspectType === 'opposition' ? 'border-[#6B5B7E]/40' :
+        aspectType === 'trine' ? 'border-[#8B7BA8]/40' :
+          aspectType === 'sextile' ? 'border-[#9B8B7E]/40' :
+            'border-[#E3B778]/40';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-soul-background via-soul-surface to-soul-background">
@@ -158,8 +162,8 @@ export default function AspectDetailPage() {
             </p>
 
             {aspectType === 'square' && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
-                <p className="text-sm font-semibold text-red-400 mb-2">Dynamic Tension (90°)</p>
+              <div className="bg-[#B8865B]/10 border border-[#B8865B]/30 rounded-lg p-4">
+                <p className="text-sm font-semibold text-[#B8865B] mb-2">Dynamic Tension (90°)</p>
                 <p className="text-soul-textSecondary">
                   Squares create friction that demands growth. This is the aspect of the warrior—
                   you're learning to integrate seemingly incompatible energies into a more complex whole.
@@ -168,8 +172,8 @@ export default function AspectDetailPage() {
             )}
 
             {aspectType === 'trine' && (
-              <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
-                <p className="text-sm font-semibold text-green-400 mb-2">Flowing Harmony (120°)</p>
+              <div className="bg-[#8B7BA8]/10 border border-[#8B7BA8]/30 rounded-lg p-4">
+                <p className="text-sm font-semibold text-[#8B7BA8] mb-2">Flowing Harmony (120°)</p>
                 <p className="text-soul-textSecondary">
                   Trines represent natural gifts—areas where energy flows easily. The challenge is
                   learning to consciously use what comes naturally instead of taking it for granted.
@@ -178,8 +182,8 @@ export default function AspectDetailPage() {
             )}
 
             {aspectType === 'conjunction' && (
-              <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
-                <p className="text-sm font-semibold text-amber-400 mb-2">Fused Identity (0°)</p>
+              <div className="bg-[#E3B778]/10 border border-[#E3B778]/30 rounded-lg p-4">
+                <p className="text-sm font-semibold text-[#E3B778] mb-2">Fused Identity (0°)</p>
                 <p className="text-soul-textSecondary">
                   Conjunctions blend planetary energies into a unified force. You don't separate
                   these functions—they operate as one inseparable whole in your psyche.
@@ -188,8 +192,8 @@ export default function AspectDetailPage() {
             )}
 
             {aspectType === 'opposition' && (
-              <div className="bg-purple-500/10 border border-purple-500/30 rounded-lg p-4">
-                <p className="text-sm font-semibold text-purple-400 mb-2">Polar Dialogue (180°)</p>
+              <div className="bg-[#6B5B7E]/10 border border-[#6B5B7E]/30 rounded-lg p-4">
+                <p className="text-sm font-semibold text-[#6B5B7E] mb-2">Polar Dialogue (180°)</p>
                 <p className="text-soul-textSecondary">
                   Oppositions create awareness through contrast. You see yourself most clearly in
                   the mirror of this dynamic—each side revealing what the other cannot see alone.

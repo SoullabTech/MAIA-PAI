@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calculateBirthChart } from '@/lib/astrology/ephemerisCalculator';
+import { saveAstrologyToAkashic } from '@/lib/saveUnifiedAkashic';
 
 /**
  * Birth Chart API Route
@@ -62,6 +63,17 @@ export async function POST(request: NextRequest) {
     console.log(`[Birth Chart] Sun: ${chartData.sun.sign} ${chartData.sun.degree.toFixed(2)}° (House ${chartData.sun.house})`);
     console.log(`[Birth Chart] Moon: ${chartData.moon.sign} ${chartData.moon.degree.toFixed(2)}° (House ${chartData.moon.house})`);
     console.log(`[Birth Chart] Ascendant: ${chartData.ascendant.sign} ${chartData.ascendant.degree.toFixed(2)}°`);
+
+    // Save to Akashic Records for semantic search
+    const userId = body.userId; // Optional user ID from request
+    const sessionId = body.sessionId; // Optional session ID
+
+    await saveAstrologyToAkashic(
+      "birth-chart",
+      chartData,
+      userId,
+      sessionId
+    ).catch(err => console.warn('[Birth Chart] Akashic archival skipped:', err));
 
     // Store birth chart in database (Supabase)
     // TODO: Implement database storage with user association

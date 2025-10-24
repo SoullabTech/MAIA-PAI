@@ -4,15 +4,16 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 
 /**
- * ResonanceDisplay - Where the field speaks
+ * ResonanceDisplay - The Bene Gesserit Reflecting Pool
  *
  * Design philosophy:
+ * - Ancient ritual tablets carved in sandstone
  * - Symbolic text PRIMARY (recognition, feeling)
  * - Visual gauge SECONDARY (sensory confirmation)
  * - Analytic details TERTIARY (understanding, optional)
  *
- * The first thing a user sees is poetry, not numbers.
- * Recognition before measurement.
+ * The first thing a seeker sees is poetry, not numbers.
+ * Recognition before measurement. Desert mysticism over data.
  */
 
 interface ResonanceData {
@@ -74,68 +75,75 @@ export default function ResonanceDisplay({
           <ResonanceGauge value={resonance.FRI} size={120} color={color} />
         </div>
 
-        <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-purple-500/20 relative overflow-hidden">
-          {/* Glow effect based on resonance */}
+        <div className="bg-gradient-to-b from-stone-600/60 to-amber-700/30 backdrop-blur-lg p-8 border-2 border-amber-500/40 relative overflow-hidden shadow-2xl">
+          {/* Ancient ritual glow effect */}
           <div
-            className="absolute inset-0 opacity-10 blur-3xl"
+            className="absolute inset-0 opacity-15 blur-3xl"
             style={{
               background: `radial-gradient(circle at 50% 50%, ${color}, transparent)`,
-              opacity: glowIntensity * 0.3
+              opacity: glowIntensity * 0.4
             }}
           />
 
+          {/* Geometric ritual accent */}
+          <div className="absolute top-4 left-4 flex gap-1">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="w-1 h-1 bg-amber-400/60 rotate-45" />
+            ))}
+          </div>
+
           <div className="relative z-10 space-y-6">
-            {/* Opening line */}
+            {/* Opening incantation */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-2xl font-light text-purple-100 leading-relaxed"
+              className="text-2xl font-serif text-stone-50 leading-relaxed drop-shadow-md"
             >
               {symbolic.opening}
             </motion.p>
 
-            {/* Reflection text */}
+            {/* Sacred reflection text */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="text-lg text-purple-200/90 leading-relaxed space-y-4"
+              className="text-lg text-stone-100 leading-relaxed space-y-4 font-light"
             >
               {symbolic.reflection.split('. ').map((sentence, i) => (
                 <p key={i}>{sentence}{i < symbolic.reflection.split('. ').length - 1 ? '.' : ''}</p>
               ))}
             </motion.div>
 
-            {/* Elemental signature */}
+            {/* Elemental seal */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="pt-4 border-t border-purple-500/20"
+              className="pt-4 border-t border-amber-500/40"
             >
-              <p className="text-sm text-purple-300 italic">
+              <p className="text-sm text-amber-200 italic font-light">
                 {symbolic.elementalSignature}
               </p>
             </motion.div>
 
-            {/* Grounding prompt */}
+            {/* Grounding ritual */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="pt-6 space-y-3"
+              className="pt-6 space-y-3 border-t border-amber-500/30"
             >
-              <p className="text-purple-100 font-medium">
+              <p className="text-stone-50 font-serif text-lg drop-shadow-sm">
                 {symbolic.groundingPrompt}
               </p>
 
               {onReflect && (
                 <button
                   onClick={onReflect}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-medium transition-all"
+                  className="w-full bg-gradient-to-b from-amber-600/90 to-amber-700/95 hover:from-amber-500 hover:to-amber-600 border-2 border-amber-400/60 text-white px-6 py-3 font-serif uppercase tracking-wider text-sm transition-all shadow-lg hover:shadow-amber-600/50"
                 >
-                  Reflect & Record
+                  Record This Reflection
                 </button>
               )}
             </motion.div>
@@ -143,50 +151,56 @@ export default function ResonanceDisplay({
         </div>
       </motion.div>
 
-      {/* SECONDARY: Analytic Panel (Right/Bottom) - Optional */}
+      {/* SECONDARY: Analytic Tablet (Right/Bottom) - Sacred Measurements */}
       {showAnalytics && (
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-purple-500/20 space-y-6"
+          className="bg-gradient-to-b from-amber-700/50 to-stone-700/70 backdrop-blur-lg p-8 border-2 border-amber-500/40 space-y-6 shadow-2xl"
         >
-          {/* FRI Header */}
-          <div className="text-center space-y-2">
-            <div className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+          {/* FRI - The Resonance Number */}
+          <div className="text-center space-y-2 border-b border-amber-400/40 pb-6">
+            <div className="text-6xl font-serif text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-400 drop-shadow-lg">
               {resonance.FRI.toFixed(2)}
             </div>
-            <div className="text-purple-300 text-sm uppercase tracking-wider">
+            <div className="text-amber-200 text-xs uppercase tracking-[0.3em] font-light">
               {formatInterpretation(resonance.interpretation)}
+            </div>
+            {/* Geometric divider */}
+            <div className="flex justify-center gap-1 pt-2">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="w-1 h-1 bg-amber-400/60 rotate-45" />
+              ))}
             </div>
           </div>
 
-          {/* Components Breakdown */}
-          <div className="space-y-3">
-            <h3 className="text-purple-200 font-medium text-sm uppercase tracking-wide">
+          {/* Components - Sacred Measurements */}
+          <div className="space-y-4">
+            <h3 className="text-amber-100 font-serif text-sm uppercase tracking-[0.2em] border-b border-amber-400/30 pb-2">
               Components
             </h3>
             {Object.entries(resonance.components).map(([key, value]) => (
-              <div key={key} className="space-y-1">
+              <div key={key} className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-purple-300 capitalize">{key}</span>
-                  <span className="text-purple-100">{(value * 100).toFixed(1)}%</span>
+                  <span className="text-stone-100 capitalize font-light tracking-wide">{key}</span>
+                  <span className="text-amber-300 font-light">{(value * 100).toFixed(1)}%</span>
                 </div>
-                <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-1 bg-stone-800/70 border border-amber-500/40 overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${value * 100}%` }}
                     transition={{ delay: 0.5, duration: 0.8 }}
-                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                    className="h-full bg-gradient-to-r from-amber-500/90 to-amber-400/95"
                   />
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Pattern Clusters */}
-          <div className="space-y-3">
-            <h3 className="text-purple-200 font-medium text-sm uppercase tracking-wide">
+          {/* Pattern Clusters - Archetypal Seals */}
+          <div className="space-y-4 border-t border-amber-400/40 pt-6">
+            <h3 className="text-amber-100 font-serif text-sm uppercase tracking-[0.2em] border-b border-amber-400/30 pb-2">
               Pattern Clusters
             </h3>
             {resonance.patterns.slice(0, 3).map((pattern, i) => (
@@ -195,17 +209,17 @@ export default function ResonanceDisplay({
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.6 + i * 0.1 }}
-                className="bg-white/5 rounded-lg p-4 space-y-2"
+                className="bg-stone-700/50 border border-amber-400/40 p-4 space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-purple-100 font-medium">
+                  <span className="text-stone-50 font-light">
                     {pattern.element} / {pattern.archetype}
                   </span>
-                  <span className="text-sm text-purple-300">
+                  <span className="text-sm text-amber-300 font-light">
                     {(pattern.avgSimilarity * 100).toFixed(0)}%
                   </span>
                 </div>
-                <div className="flex gap-4 text-xs text-purple-400">
+                <div className="flex gap-4 text-xs text-stone-200 font-light">
                   <span>{pattern.count} insights</span>
                   <span>•</span>
                   <span>{pattern.nodeCount} nodes</span>
@@ -220,7 +234,7 @@ export default function ResonanceDisplay({
 }
 
 /**
- * Minimal resonance gauge - ambient, not dominant
+ * Sacred resonance gauge - ritual measurement, ambient presence
  */
 function ResonanceGauge({ value, size = 100, color }: { value: number; size?: number; color: string }) {
   const circumference = 2 * Math.PI * (size / 2 - 10);
@@ -228,23 +242,23 @@ function ResonanceGauge({ value, size = 100, color }: { value: number; size?: nu
 
   return (
     <svg width={size} height={size} className="transform -rotate-90">
-      {/* Background circle */}
+      {/* Background circle - sandstone */}
       <circle
         cx={size / 2}
         cy={size / 2}
         r={size / 2 - 10}
         fill="none"
-        stroke="rgba(255,255,255,0.1)"
-        strokeWidth="8"
+        stroke="rgba(196, 137, 78, 0.2)"
+        strokeWidth="6"
       />
-      {/* Resonance arc */}
+      {/* Resonance arc - ritual seal */}
       <motion.circle
         cx={size / 2}
         cy={size / 2}
         r={size / 2 - 10}
         fill="none"
         stroke={color}
-        strokeWidth="8"
+        strokeWidth="6"
         strokeDasharray={circumference}
         strokeDashoffset={strokeDashoffset}
         strokeLinecap="round"
@@ -252,13 +266,13 @@ function ResonanceGauge({ value, size = 100, color }: { value: number; size?: nu
         animate={{ strokeDashoffset }}
         transition={{ duration: 1, ease: "easeOut" }}
       />
-      {/* Center glow */}
+      {/* Center glow - desert sun */}
       <circle
         cx={size / 2}
         cy={size / 2}
         r={size / 4}
         fill={color}
-        opacity={value * 0.3}
+        opacity={value * 0.4}
         className="blur-md"
       />
     </svg>
@@ -266,14 +280,14 @@ function ResonanceGauge({ value, size = 100, color }: { value: number; size?: nu
 }
 
 /**
- * Get color based on interpretation level
+ * Get color based on interpretation level - Illuminated Desert Palette
  */
 function getInterpretationColor(interpretation: string): string {
   const colors = {
-    'background_echo': '#9CA3AF',
-    'thematic_resonance': '#A78BFA',
-    'archetypal_activation': '#EC4899',
-    'collective_synchrony': '#F59E0B'
+    'background_echo': '#B8956A',      // Sunlit sandstone
+    'thematic_resonance': '#F59E42',   // Radiant amber
+    'archetypal_activation': '#E5D4B8', // Luminous silk
+    'collective_synchrony': '#FBBF24'   // Golden sun
   };
   return colors[interpretation as keyof typeof colors] || colors.background_echo;
 }

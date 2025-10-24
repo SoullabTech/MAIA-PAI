@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { extractConversationEssence, ConversationMessage } from '@/lib/services/conversationEssenceExtractor';
 import { createClient } from '@supabase/supabase-js';
+import { saveDocumentToAkashic } from '@/lib/saveUnifiedAkashic';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -120,6 +121,21 @@ export async function POST(req: NextRequest) {
 
       console.log('✅ [journal.save] Entry saved successfully:', data.id);
 
+      // Save to Akashic Records for semantic search across all wisdom
+      await saveDocumentToAkashic(
+        "journal",
+        essence.synthesizedEntry,
+        {
+          fileName: `journal-${data.id}.txt`,
+          fileSize: essence.synthesizedEntry.length,
+          uploadedAt: new Date().toISOString(),
+          conversationId,
+          sessionId
+        },
+        authenticatedUserId,
+        sessionId
+      ).catch(err => console.warn('[journal.save] Akashic archival skipped:', err));
+
       // Also return the entry for client-side localStorage backup
       return NextResponse.json({
         ok: true,
@@ -132,6 +148,22 @@ export async function POST(req: NextRequest) {
     } else {
       // Return essence for client-side localStorage storage (beta users)
       console.log('📦 [API] Returning essence for localStorage storage (beta user)');
+
+      // Still save to Akashic Records even for beta users
+      await saveDocumentToAkashic(
+        "journal",
+        essence.synthesizedEntry,
+        {
+          fileName: `journal-local-${Date.now()}.txt`,
+          fileSize: essence.synthesizedEntry.length,
+          uploadedAt: new Date().toISOString(),
+          conversationId,
+          sessionId
+        },
+        authenticatedUserId,
+        sessionId
+      ).catch(err => console.warn('[journal.save] Akashic archival skipped:', err));
+
       return NextResponse.json({
         ok: true,
         success: true,

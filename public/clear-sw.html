@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Clear Service Worker - MAIA</title>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #D4A574;
+    }
+    button {
+      background: #C4894E;
+      color: #1a1a1a;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px 0;
+      font-weight: 600;
+    }
+    button:hover {
+      background: #D4A574;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 15px;
+      background: #2a2a2a;
+      border: 1px solid #C4894E;
+    }
+    h1 {
+      color: #D4A574;
+      font-weight: 300;
+      border-bottom: 1px solid #C4894E;
+      padding-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🜃 Service Worker Reset</h1>
+  <p>Click the button below to unregister all service workers and clear all caches.</p>
+
+  <button onclick="clearEverything()">Clear All Service Workers & Caches</button>
+
+  <div class="status" id="status">Ready to clear...</div>
+
+  <script>
+    async function clearEverything() {
+      const status = document.getElementById('status');
+      status.innerHTML = 'Working...';
+
+      try {
+        // 1. Unregister all service workers
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const registration of registrations) {
+          await registration.unregister();
+          status.innerHTML += '<br>✅ Unregistered service worker';
+        }
+
+        // 2. Clear all caches
+        const cacheNames = await caches.keys();
+        for (const cacheName of cacheNames) {
+          await caches.delete(cacheName);
+          status.innerHTML += `<br>✅ Deleted cache: ${cacheName}`;
+        }
+
+        status.innerHTML += '<br><br><strong>✨ All cleared! Refresh the page to reload the new service worker.</strong>';
+
+        // Auto-refresh after 2 seconds
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+
+      } catch (error) {
+        status.innerHTML = `❌ Error: ${error.message}`;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 'use client';
 
 import { createClientComponentClient } from '@/lib/supabase';
+import { saveMaiaToAkashic } from '@/lib/saveMaiaInsight'; // 🎙️ Dual-save to Akashic Records
 
 export interface ConversationMemory {
   oracleAgentId: string;
@@ -11,12 +12,16 @@ export interface ConversationMemory {
   wisdomThemes?: string[];
   elementalResonance?: string;
   sessionId?: string;
+  userId?: string; // 🆕 For Akashic Records integration
+  role?: 'user' | 'assistant'; // 🆕 Who said this (user or MAIA)
+  conversationMode?: string; // 🆕 MAIA mode: "dialogue" | "patient" | "scribe"
 }
 
 export async function saveConversationMemory(memory: ConversationMemory) {
   const supabase = createClientComponentClient();
 
   try {
+    // 1️⃣ Save to memories table (existing behavior)
     const { data, error } = await supabase
       .from('memories')
       .insert({
@@ -36,7 +41,20 @@ export async function saveConversationMemory(memory: ConversationMemory) {
 
     if (error) throw error;
 
-    console.log('✅ Memory saved to Supabase:', data.id);
+    console.log('✅ Memory saved to memories table:', data.id);
+
+    // 2️⃣ DUAL-SAVE: Also save to Akashic Records (insight_history)
+    // This enables semantic search across MAIA conversations
+    if (memory.role) {
+      await saveMaiaToAkashic(
+        memory.role,
+        memory.content,
+        memory.userId,
+        memory.conversationMode,
+        memory.sessionId
+      );
+    }
+
     return { success: true, memory: data };
   } catch (error) {
     console.error('Failed to save memory:', error);

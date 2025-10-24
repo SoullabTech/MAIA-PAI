@@ -45,10 +45,10 @@ export function DecanTransitInvitationCard({ invitation, onDismiss, variant = 'c
       glow: 'shadow-amber-600/20'
     },
     air: {
-      bg: 'from-purple-950/40 to-blue-950/40',
-      border: 'border-purple-600/30',
-      text: 'text-purple-200',
-      glow: 'shadow-purple-600/20'
+      bg: 'from-cyan-950/40 to-teal-950/40',
+      border: 'border-cyan-600/30',
+      text: 'text-cyan-200',
+      glow: 'shadow-cyan-600/20'
     }
   };
 

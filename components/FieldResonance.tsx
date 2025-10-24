@@ -12,13 +12,14 @@ type Resonance = {
   avgDepth?: number;
 };
 
+// Dune Cerulean Palette
 const ELEMENT_COLORS: Record<string, string> = {
-  Fire: "#ff784e",      // ember gold
-  Water: "#4fc3f7",     // glacial blue
-  Earth: "#b8c58a",     // moss stone
-  Air: "#c9a0dc",       // violet haze
-  Aether: "#f5e6b3",    // pale light
-  Unknown: "#9e9e9e",
+  Fire: "#D4A574",      // Copper Dawn
+  Water: "#A8C5C7",     // Pale Cerulean
+  Earth: "#B5C4A8",     // Sage Bloom
+  Air: "#C5B8A4",       // Silver Sand
+  Aether: "#8FA89A",    // Desert Reed
+  Unknown: "#B8C5C7",
 };
 
 const ARCHETYPE_SYMBOLS: Record<string, string> = {
@@ -69,9 +70,9 @@ export default function FieldResonance({
 
   if (loading) {
     return (
-      <div className="w-full h-96 flex items-center justify-center rounded-2xl border border-purple-500/20 bg-gradient-to-b from-black/40 to-black/70">
-        <div className="text-xs text-neutral-400 opacity-60 animate-pulse">
-          Attuning to the field...
+      <div className="w-full h-96 flex items-center justify-center border border-[#8FA89A]/20 bg-white/20 backdrop-blur-md rounded-2xl">
+        <div className="text-xs text-[#6B7868] uppercase tracking-widest animate-pulse font-light">
+          Attuning to the pool...
         </div>
       </div>
     );
@@ -79,9 +80,9 @@ export default function FieldResonance({
 
   if (resonance.length === 0) {
     return (
-      <div className="w-full h-96 flex items-center justify-center rounded-2xl border border-purple-500/20 bg-gradient-to-b from-black/40 to-black/70">
-        <div className="text-xs text-neutral-400 opacity-60">
-          The field awaits resonance...
+      <div className="w-full h-96 flex items-center justify-center border border-[#8FA89A]/20 bg-white/20 backdrop-blur-md rounded-2xl">
+        <div className="text-xs text-[#6B7868] uppercase tracking-widest font-light">
+          The waters await their first ripple...
         </div>
       </div>
     );
@@ -92,7 +93,7 @@ export default function FieldResonance({
   const maxCount = Math.max(...resonance.map((r) => r.count), 1);
 
   return (
-    <div className="relative w-full h-96 overflow-hidden rounded-2xl border border-purple-500/20 bg-gradient-to-b from-slate-950/40 via-purple-950/40 to-slate-900/70 backdrop-blur-sm">
+    <div className="relative w-full h-96 overflow-hidden border border-[#8FA89A]/30 bg-white/25 backdrop-blur-lg rounded-2xl shadow-2xl">
       {/* SVG Field Layer */}
       <svg
         viewBox="0 0 800 400"
@@ -231,7 +232,7 @@ export default function FieldResonance({
         </AnimatePresence>
       </svg>
 
-      {/* Atmospheric current — subtle movement */}
+      {/* Atmospheric current — desert winds */}
       {breathe && (
         <motion.div
           className="absolute inset-0 pointer-events-none"
@@ -245,13 +246,13 @@ export default function FieldResonance({
           }}
           style={{
             backgroundImage:
-              "radial-gradient(circle at 50% 50%, rgba(255,255,255,0.03), transparent 70%)",
+              "radial-gradient(circle at 50% 50%, rgba(212, 165, 116, 0.05), transparent 70%)",
             backgroundSize: "200% 200%",
           }}
         />
       )}
 
-      {/* Overlay Info */}
+      {/* Overlay Info - Ancient Markings */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -259,11 +260,17 @@ export default function FieldResonance({
           transition={{ delay: 0.5 }}
           className="mb-6"
         >
-          <div className="text-[10px] uppercase tracking-widest text-purple-300 opacity-70 mb-1">
-            Field Resonance
+          <div className="text-[10px] uppercase tracking-[0.3em] text-amber-700/70 mb-1 font-light">
+            The Pool's Depth
           </div>
-          <div className="text-2xl font-light text-purple-200">
-            {totalResonance} <span className="text-sm opacity-60">presences</span>
+          <div className="text-2xl font-serif text-amber-100/90">
+            {totalResonance} <span className="text-sm opacity-60 font-light">reflections</span>
+          </div>
+          {/* Geometric divider */}
+          <div className="flex justify-center gap-1 mt-2">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="w-1 h-1 bg-amber-800/40 rotate-45" />
+            ))}
           </div>
         </motion.div>
 
@@ -280,23 +287,23 @@ export default function FieldResonance({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.8 + i * 0.1 }}
-                className="flex items-center gap-1.5 bg-black/30 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10"
+                className="flex items-center gap-1.5 bg-stone-950/50 backdrop-blur-sm px-3 py-1.5 border border-amber-900/40"
               >
                 <span
-                  className="inline-block w-2 h-2 rounded-full"
+                  className="inline-block w-2 h-2"
                   style={{ background: ELEMENT_COLORS[r.element] || "#b0bec5" }}
                 />
-                <span className="text-[11px] text-purple-200">{r.element}</span>
-                <span className="text-[10px] text-purple-400">
+                <span className="text-[11px] text-amber-200/80 font-light">{r.element}</span>
+                <span className="text-[10px] text-amber-700/70">
                   {ARCHETYPE_SYMBOLS[r.archetype] || "◯"}
                 </span>
-                <span className="text-[10px] text-purple-400 opacity-60">
+                <span className="text-[10px] text-amber-600/70 font-light">
                   {r.count}
                 </span>
               </motion.div>
             ))}
             {resonance.length > 8 && (
-              <div className="text-[10px] text-purple-400 opacity-60">
+              <div className="text-[10px] text-amber-700/60 font-light">
                 +{resonance.length - 8} more
               </div>
             )}

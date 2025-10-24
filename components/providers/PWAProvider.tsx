@@ -13,8 +13,26 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // Register service worker
+    // TEMPORARILY DISABLED: Unregister all service workers to clear errors
     if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        registrations.forEach(reg => {
+          reg.unregister();
+          console.log('🧹 Unregistered service worker:', reg.scope);
+        });
+      });
+
+      // Clear all caches
+      caches.keys().then(keys => {
+        Promise.all(keys.map(key => caches.delete(key)))
+          .then(() => console.log('🧹 Cleared all caches'));
+      });
+
+      return; // Exit early - don't register SW
+    }
+
+    // Register service worker (DISABLED)
+    if (false && 'serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
           .register('/sw-enhanced.js')

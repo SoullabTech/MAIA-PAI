@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star, Home } from 'lucide-react';
+import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star, Home, BookOpen, Gem } from 'lucide-react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
@@ -172,6 +172,22 @@ export function MenuBar() {
         </div>
       </Link>
 
+      {/* Akashic Records - Sacred Geometry */}
+      <Link
+        href="/akashic-records"
+        className="group relative"
+        aria-label="Akashic Records"
+      >
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-cyan-500/40">
+          <Gem className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-500/70 transition-all group-hover:text-cyan-500" />
+
+          {/* Tooltip - Matte instrument label */}
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Records
+          </span>
+        </div>
+      </Link>
+
       {/* Soul-Building Circle (Community) */}
       {!hideCommunityLink && (
         <Link
@@ -206,21 +222,66 @@ export function MenuBar() {
         </div>
       </Link>
 
-      {/* Settings */}
-      <Link
-        href="/settings"
-        className="group relative"
-        aria-label="Settings"
-      >
-        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-amber-500/40">
-          <Settings className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500 group-hover:rotate-45" />
+      {/* Brain Trust / Settings Dropdown */}
+      <div className="relative group">
+        <button
+          onClick={() => {
+            // Toggle dropdown menu
+            const dropdown = document.getElementById('brain-trust-dropdown');
+            if (dropdown) {
+              dropdown.classList.toggle('hidden');
+            }
+          }}
+          className="relative"
+          aria-label="Settings & Brain Trust"
+        >
+          <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-amber-500/40">
+            <Settings className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500 group-hover:rotate-45" />
 
-          {/* Tooltip - Matte instrument label */}
-          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-            Settings
-          </span>
+            {/* Brain Trust indicator dot */}
+            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 border-2 border-soul-surface" />
+
+            {/* Tooltip - Matte instrument label */}
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+              Settings
+            </span>
+          </div>
+        </button>
+
+        {/* Dropdown Menu */}
+        <div
+          id="brain-trust-dropdown"
+          className="hidden absolute bottom-full mb-2 right-0 bg-soul-surface/95 backdrop-blur-md border border-soul-border/50 rounded-lg shadow-lg p-2 min-w-[160px]"
+        >
+          <Link
+            href="/settings"
+            className="block px-3 py-2 text-sm text-soul-textSecondary hover:bg-soul-surfaceHover rounded-md transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              <span>Settings</span>
+            </div>
+          </Link>
+          <Link
+            href="/brain-trust"
+            className="block px-3 py-2 text-sm text-soul-textSecondary hover:bg-soul-surfaceHover rounded-md transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Brain className="w-4 h-4" />
+              <span>Brain Trust</span>
+            </div>
+          </Link>
+          <Link
+            href="/consciousness/claude-code"
+            className="block px-3 py-2 text-sm text-soul-textSecondary hover:bg-soul-surfaceHover rounded-md transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              <span>Claude Code</span>
+            </div>
+          </Link>
         </div>
-      </Link>
+      </div>
 
       {/* Report a Problem (Feedback) */}
       <button

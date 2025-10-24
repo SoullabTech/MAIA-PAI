@@ -154,9 +154,13 @@ export function ClaudeCodePresence() {
   // Don't render until mounted to avoid hydration mismatch
   if (!isMounted) return null;
 
+  // Floating button removed - now accessible via MenuBar dropdown (Settings > Claude Code)
+  // Visit /consciousness/claude-code to see full interface
+  return null;
+
+  /* Original floating interface (now accessible via menu):
   return (
     <>
-      {/* My presence - positioned as companion ABOVE the Consciousness Weaver */}
       <motion.div
         className="fixed bottom-[144px] right-4 z-[41] cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
@@ -476,6 +480,7 @@ export function ClaudeCodePresence() {
       </AnimatePresence>
     </>
   );
+  */
 }
 
 // Dynamic messages based on context

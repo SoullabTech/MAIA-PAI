@@ -228,8 +228,8 @@ const aspectColors = {
   conjunction: '#E3B778',  // Amber Bronze - union
   sextile: '#9B8B7E',      // Temple Stone - harmony
   square: '#B8865B',       // Oxidized Bronze - tension
-  trine: '#8B7BA8',        // Amethyst - flow of consciousness
-  opposition: '#6B5B7E',   // Deep Wisdom Purple - polarity
+  trine: '#6B9B9E',        // French countryside teal - flow of consciousness
+  opposition: '#5A8E91',   // Deep Provençal teal - polarity
 };
 
 export function SacredHouseWheel({
@@ -415,7 +415,7 @@ export function SacredHouseWheel({
             return points.join(' ');
           })()}
           fill="none"
-          stroke={isDayMode ? '#9B8B7E' : '#8B7BA8'}
+          stroke={isDayMode ? '#9B8B7E' : '#6B9B9E'}
           strokeWidth="0.8"
           opacity="0.15"
           strokeLinecap="round"
@@ -668,7 +668,7 @@ export function SacredHouseWheel({
                   <stop offset="100%" stopColor="#B8A99A" stopOpacity="0.2" />
                 </radialGradient>
                 <radialGradient id="bottomFunnelGradient" cx="50%" cy="50%">
-                  <stop offset="0%" stopColor="#8B7BA8" stopOpacity="0.6" />
+                  <stop offset="0%" stopColor="#6B9B9E" stopOpacity="0.6" />
                   <stop offset="50%" stopColor="#9B8B7E" stopOpacity="0.4" />
                   <stop offset="100%" stopColor="#B8A99A" stopOpacity="0.2" />
                 </radialGradient>
@@ -676,7 +676,7 @@ export function SacredHouseWheel({
                 <radialGradient id="torusGlowGradient" cx="50%" cy="50%">
                   <stop offset="0%" stopColor="#E3B778" stopOpacity="0.15" />
                   <stop offset="40%" stopColor="#C89968" stopOpacity="0.4" />
-                  <stop offset="70%" stopColor="#8B7BA8" stopOpacity="0.3" />
+                  <stop offset="70%" stopColor="#6B9B9E" stopOpacity="0.3" />
                   <stop offset="100%" stopColor="#9B8B7E" stopOpacity="0" />
                 </radialGradient>
               </defs>
@@ -752,7 +752,7 @@ export function SacredHouseWheel({
                     y1={y1}
                     x2={x2}
                     y2={y2}
-                    stroke="#8B7BA8"
+                    stroke="#6B9B9E"
                     strokeWidth="1"
                     strokeOpacity="0.6"
                     initial={{ pathLength: 0, opacity: 0 }}
@@ -778,7 +778,7 @@ export function SacredHouseWheel({
                   cy="200"
                   r={radius}
                   fill="none"
-                  stroke={i < 3 ? "#E3B778" : "#8B7BA8"}
+                  stroke={i < 3 ? "#E3B778" : "#6B9B9E"}
                   strokeWidth="0.8"
                   strokeOpacity="0.3"
                   strokeDasharray="2,3"
@@ -827,7 +827,7 @@ export function SacredHouseWheel({
                 rx="70"
                 ry="25"
                 fill="url(#bottomFunnelGradient)"
-                stroke="#8B7BA8"
+                stroke="#6B9B9E"
                 strokeWidth="1.2"
                 strokeOpacity="0.45"
                 initial={{ scale: 0.8, opacity: 0 }}
