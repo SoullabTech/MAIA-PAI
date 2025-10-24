@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calculateBirthChart } from '@/lib/astrology/ephemerisCalculator';
 import { saveAstrologyToAkashic } from '@/lib/saveUnifiedAkashic';
+import { createClient } from '@supabase/supabase-js';
 
 /**
- * Birth Chart API Route
+ * Birth Chart API Route - Now with Persistent Storage! ✨
  *
  * Calculates comprehensive birth chart using real-time ephemeris calculations
  * Powered by astronomy-engine for professional-grade accuracy
+ *
+ * NEW: Birth charts are now saved to Supabase for persistent storage
+ * across devices and sessions - your cosmic blueprint is always available!
  *
  * Supports:
  * - Multiple house systems (Porphyry, Whole Sign, Equal, Placidus)
@@ -14,12 +18,19 @@ import { saveAstrologyToAkashic } from '@/lib/saveUnifiedAkashic';
  * - Aspect calculations with orbs
  * - Retrograde detection
  * - Real-time calculations for any birth date/time/location
+ * - Persistent database storage linked to your explorer account
  */
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { date, time, location, houseSystem } = body;
+    const { date, time, location, houseSystem, explorerId, email } = body;
 
     // Validate inputs
     if (!date || !time || !location) {
@@ -75,8 +86,43 @@ export async function POST(request: NextRequest) {
       sessionId
     ).catch(err => console.warn('[Birth Chart] Akashic archival skipped:', err));
 
-    // Store birth chart in database (Supabase)
-    // TODO: Implement database storage with user association
+    // ✨ Save birth chart to Supabase database for persistent storage
+    if (explorerId || email) {
+      try {
+        console.log('[Birth Chart] 💾 Saving to database...');
+
+        // Build the update object
+        const updateData = {
+          birth_date: date,
+          birth_time: time,
+          birth_location_name: location.name,
+          birth_latitude: location.lat,
+          birth_longitude: location.lng,
+          birth_timezone: location.timezone || 'UTC',
+          birth_chart_data: chartData,
+          birth_chart_calculated_at: new Date().toISOString()
+        };
+
+        // Update explorer by ID or email
+        const query = explorerId
+          ? supabase.from('explorers').update(updateData).eq('explorer_id', explorerId)
+          : supabase.from('explorers').update(updateData).eq('email', email);
+
+        const { data: savedExplorer, error: saveError } = await query.select().single();
+
+        if (saveError) {
+          console.error('[Birth Chart] ⚠️ Failed to save to database:', saveError.message);
+          // Don't fail the request - chart is still calculated
+        } else {
+          console.log('[Birth Chart] ✅ Saved to database for explorer:', savedExplorer?.explorer_name);
+        }
+      } catch (dbError) {
+        console.error('[Birth Chart] Database save error:', dbError);
+        // Continue - the chart calculation succeeded
+      }
+    } else {
+      console.log('[Birth Chart] ℹ️ No explorerId or email provided - skipping database save');
+    }
 
     return NextResponse.json({
       success: true,
@@ -107,28 +153,77 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Get user from session/auth
-    // TODO: Replace with actual auth once implemented
-    const userId = 'user_temp';
+    // Get explorer identifier from query params
+    const { searchParams } = new URL(request.url);
+    const explorerId = searchParams.get('explorerId');
+    const email = searchParams.get('email');
 
-    // Fetch stored birth chart from database (Supabase)
-    // TODO: Implement database fetch from user_profiles or birth_charts table
-    // For now, users must POST their birth data to calculate
+    if (!explorerId && !email) {
+      return NextResponse.json({
+        success: false,
+        error: 'Explorer ID or email required',
+        message: 'Provide ?explorerId=xxx or ?email=xxx to fetch your birth chart',
+      }, { status: 400 });
+    }
 
-    console.log(`[Birth Chart] GET request for user: ${userId}`);
+    console.log(`[Birth Chart] 🔍 Fetching chart for explorer:`, explorerId || email);
 
+    // Fetch birth chart from Supabase
+    const query = explorerId
+      ? supabase.from('explorers').select('*').eq('explorer_id', explorerId)
+      : supabase.from('explorers').select('*').eq('email', email);
+
+    const { data: explorer, error: fetchError } = await query.single();
+
+    if (fetchError || !explorer) {
+      console.log('[Birth Chart] ℹ️ No explorer found');
+      return NextResponse.json({
+        success: false,
+        error: 'Explorer not found',
+      }, { status: 404 });
+    }
+
+    // Check if birth chart data exists
+    if (!explorer.birth_chart_data) {
+      console.log('[Birth Chart] ℹ️ Explorer has no birth chart data yet');
+      return NextResponse.json({
+        success: false,
+        error: 'No birth chart data found',
+        message: 'This explorer has not entered their birth data yet. Please use POST to calculate.',
+      }, { status: 404 });
+    }
+
+    console.log(`[Birth Chart] ✅ Found chart for ${explorer.explorer_name}, calculated on ${explorer.birth_chart_calculated_at}`);
+
+    // Return the stored chart data
     return NextResponse.json({
-      success: false,
-      error: 'Chart retrieval not yet implemented. Please POST birth data to calculate.',
-      message: 'Use POST /api/astrology/birth-chart with { date, time, location } to calculate your chart',
-    }, { status: 501 }); // 501 Not Implemented
+      success: true,
+      data: explorer.birth_chart_data,
+      birthData: {
+        date: explorer.birth_date,
+        time: explorer.birth_time,
+        location: {
+          name: explorer.birth_location_name,
+          lat: explorer.birth_latitude,
+          lng: explorer.birth_longitude,
+          timezone: explorer.birth_timezone,
+        },
+      },
+      meta: {
+        calculatedAt: explorer.birth_chart_calculated_at,
+        explorerName: explorer.explorer_name,
+      }
+    });
 
   } catch (error) {
     console.error('[Birth Chart] Fetch error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+
     return NextResponse.json(
       {
         success: false,
         error: 'Failed to fetch birth chart',
+        details: errorMessage,
       },
       { status: 500 }
     );

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Holoflower } from '@/components/ui/Holoflower';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { getSeasonalTheme } from '@/lib/utils/seasonalTheme';
 
 // Optional announcement (set to null when no announcement)
 // Each announcement has a unique ID - when you change the announcement, change the ID
@@ -79,6 +80,7 @@ export default function CheckInPage() {
   const [loading, setLoading] = useState(false);
   const [quote] = useState(() => WELCOME_QUOTES[Math.floor(Math.random() * WELCOME_QUOTES.length)]);
   const [showAnnouncement, setShowAnnouncement] = useState(true);
+  const seasonalTheme = getSeasonalTheme();
   const router = useRouter();
 
   // Check localStorage to see if user already dismissed this specific announcement
@@ -217,7 +219,7 @@ export default function CheckInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-royal-sunset text-amber-50 flex items-center justify-center px-4">
+    <div className={`min-h-screen ${seasonalTheme.bgClass} text-amber-50 flex items-center justify-center px-4`}>
       {/* Film grain texture overlay */}
       <div className="fixed inset-0 pointer-events-none texture-sand opacity-[0.05]" />
 
@@ -291,7 +293,9 @@ export default function CheckInPage() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="text-center mb-6"
         >
-          <h2 className="text-2xl font-cormorant tracking-widest text-amber-200 glow-spice">
+          <h2 className="text-2xl font-cormorant tracking-widest text-amber-100" style={{
+            textShadow: '0 2px 12px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.5)'
+          }}>
             SOULLAB
           </h2>
         </motion.div>
@@ -314,10 +318,10 @@ export default function CheckInPage() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="mb-8"
           >
-            <div className="card-sietch rounded-xl p-5 backdrop-blur-md relative">
+            <div className="card-sietch rounded-xl p-5 backdrop-blur-md relative bg-black/30">
               <button
                 onClick={handleDismissAnnouncement}
-                className="absolute top-3 right-3 transition-colors text-xs text-amber-300/70 hover:text-amber-200"
+                className="absolute top-3 right-3 transition-colors text-xs text-white/70 hover:text-white"
               >
                 ✕
               </button>
@@ -329,16 +333,21 @@ export default function CheckInPage() {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-cormorant font-medium text-sm mb-1.5 text-amber-200">
+                  <h3 className="font-cormorant font-medium text-sm mb-1.5 text-white" style={{
+                    textShadow: '0 1px 4px rgba(0,0,0,0.8)'
+                  }}>
                     {CURRENT_ANNOUNCEMENT.title}
                   </h3>
-                  <p className="font-cinzel text-xs leading-relaxed text-amber-100/90">
+                  <p className="font-cinzel text-xs leading-relaxed text-amber-100" style={{
+                    textShadow: '0 1px 3px rgba(0,0,0,0.7)'
+                  }}>
                     {CURRENT_ANNOUNCEMENT.message}
                   </p>
                   {CURRENT_ANNOUNCEMENT.link && (
                     <a
                       href={CURRENT_ANNOUNCEMENT.link.url}
-                      className="inline-block mt-2 text-xs font-raleway font-medium transition-colors text-amber-300 hover:text-amber-200"
+                      className="inline-block mt-2 text-xs font-raleway font-medium transition-colors text-white hover:text-amber-100"
+                      style={{ textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}
                     >
                       {CURRENT_ANNOUNCEMENT.link.text} →
                     </a>
@@ -356,10 +365,14 @@ export default function CheckInPage() {
           transition={{ duration: 0.8, delay: shouldShowAnnouncement() ? 0.5 : 0.4 }}
           className="mb-12 text-center"
         >
-          <p className="text-lg font-cormorant leading-relaxed italic mb-3 text-amber-100">
+          <p className="text-lg font-cormorant leading-relaxed italic mb-3 text-white" style={{
+            textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,0.6)'
+          }}>
             "{quote.text}"
           </p>
-          <p className="text-sm font-raleway text-amber-200/90">
+          <p className="text-sm font-raleway text-amber-100" style={{
+            textShadow: '0 1px 6px rgba(0,0,0,0.8)'
+          }}>
             {quote.author}
           </p>
         </motion.div>
@@ -371,13 +384,19 @@ export default function CheckInPage() {
           transition={{ duration: 0.6, delay: 0.6 }}
           className="text-center mb-8"
         >
-          <h1 className="text-dune-title font-cormorant text-amber-100">
+          <h1 className="text-dune-title font-cormorant text-white" style={{
+            textShadow: '0 2px 12px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.6)'
+          }}>
             You Are Remembered
           </h1>
-          <p className="text-xs font-raleway tracking-wider mb-4 text-amber-300 glow-spice uppercase">
+          <p className="text-xs font-raleway tracking-wider mb-4 text-amber-200 uppercase" style={{
+            textShadow: '0 1px 8px rgba(0,0,0,0.8)'
+          }}>
             Your Path Continues
           </p>
-          <p className="text-sm font-cinzel leading-relaxed text-amber-200">
+          <p className="text-sm font-cinzel leading-relaxed text-amber-100" style={{
+            textShadow: '0 1px 6px rgba(0,0,0,0.8)'
+          }}>
             Enter your name to continue
           </p>
         </motion.div>
@@ -401,7 +420,9 @@ export default function CheckInPage() {
               className="input-water text-center"
               autoFocus
             />
-            <p className="text-xs mt-2 text-center font-raleway text-amber-200/70">
+            <p className="text-xs mt-2 text-center font-raleway text-amber-100" style={{
+              textShadow: '0 1px 4px rgba(0,0,0,0.7)'
+            }}>
               Swift passage
             </p>
           </div>
@@ -446,7 +467,8 @@ export default function CheckInPage() {
           <div className="text-center">
             <button
               onClick={() => router.push('/week2-welcome')}
-              className="transition-colors text-sm font-serif inline-flex items-center gap-2 text-amber-300 hover:text-amber-200"
+              className="transition-colors text-sm font-serif inline-flex items-center gap-2 text-white hover:text-amber-100"
+              style={{ textShadow: '0 1px 6px rgba(0,0,0,0.8)' }}
             >
               <Sparkles className="w-4 h-4" />
               <span>New here? Create account</span>
@@ -457,20 +479,23 @@ export default function CheckInPage() {
           <div className="text-center">
             <button
               onClick={() => router.push('/auth')}
-              className="transition-colors text-xs font-serif text-amber-300/70 hover:text-amber-200"
+              className="transition-colors text-xs font-serif text-amber-100 hover:text-white"
+              style={{ textShadow: '0 1px 4px rgba(0,0,0,0.7)' }}
             >
               Need password sign-in instead?
             </button>
           </div>
 
           {/* Help text */}
-          <div className="text-center pt-4 border-t border-amber-400/20">
-            <p className="text-xs font-serif leading-relaxed text-amber-200/70">
-              <strong className="text-amber-300">Tip:</strong> If you haven't been here in a while and your username doesn't work,
+          <div className="text-center pt-4 border-t border-white/20">
+            <p className="text-xs font-serif leading-relaxed text-amber-100" style={{
+              textShadow: '0 1px 4px rgba(0,0,0,0.7)'
+            }}>
+              <strong className="text-white">Tip:</strong> If you haven't been here in a while and your username doesn't work,
               <br />
               <button
                 onClick={() => router.push('/week2-welcome')}
-                className="font-serif underline underline-offset-2 transition-colors text-amber-300 hover:text-amber-200"
+                className="font-serif underline underline-offset-2 transition-colors text-white hover:text-amber-100"
               >
                 it's easy to create a fresh account
               </button>
@@ -486,14 +511,28 @@ export default function CheckInPage() {
           transition={{ duration: 2, delay: 1.5 }}
           className="mt-16 text-center"
         >
+          {/* Seasonal indicator */}
+          <div className="mb-4 flex items-center justify-center gap-2">
+            <span className="text-lg">{seasonalTheme.emoji}</span>
+            <p className="text-xs font-serif text-amber-100/80" style={{
+              textShadow: '0 1px 4px rgba(0,0,0,0.7)'
+            }}>
+              {seasonalTheme.name}
+            </p>
+          </div>
+
           <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="h-px w-8 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent" />
-            <p className="text-xs font-serif tracking-[0.12em] text-amber-300">
+            <div className="h-px w-8 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+            <p className="text-xs font-serif tracking-[0.12em] text-white" style={{
+              textShadow: '0 1px 6px rgba(0,0,0,0.8)'
+            }}>
               BIRTHED BY SOULLAB
             </p>
-            <div className="h-px w-8 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent" />
+            <div className="h-px w-8 bg-gradient-to-r from-transparent via-white/30 to-transparent" />
           </div>
-          <p className="text-xs font-serif italic text-amber-200/60">
+          <p className="text-xs font-serif italic text-amber-100/70" style={{
+            textShadow: '0 1px 4px rgba(0,0,0,0.7)'
+          }}>
             Technology that honors the work
           </p>
         </motion.div>

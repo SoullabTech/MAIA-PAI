@@ -181,57 +181,117 @@ export default function AstrologyPage() {
   // Welcome modal for first-time users
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
+  // Edit mode state
+  const [isEditingBirthData, setIsEditingBirthData] = useState(false);
+
   useEffect(() => {
     // Force night mode for Arrakis aesthetic
     setIsDayMode(false);
 
-    // Load saved birth data - check user profile FIRST (more persistent)
-    let birthDataToLoad = null;
+    // ✨ NEW FLOW: Try to fetch from database first, then fall back to localStorage
+    const loadBirthChart = async () => {
+      // Get explorer info for API calls
+      let explorerId = null;
+      let email = null;
 
-    // Priority 1: Check user profile
-    try {
-      const betaUser = localStorage.getItem('beta_user');
-      if (betaUser) {
-        const userData = JSON.parse(betaUser);
-        if (userData.birthData) {
-          birthDataToLoad = userData.birthData;
-          console.log('✅ Loaded birth data from user profile');
-        }
-      }
-    } catch (error) {
-      console.error('Error loading from user profile:', error);
-    }
-
-    // Priority 2: Fallback to birthChartData if no profile data
-    if (!birthDataToLoad) {
-      const savedBirthData = localStorage.getItem('birthChartData');
-      if (savedBirthData) {
-        try {
-          birthDataToLoad = JSON.parse(savedBirthData);
-          console.log('✅ Loaded birth data from localStorage');
-        } catch (error) {
-          console.error('Error parsing birthChartData:', error);
-        }
-      }
-    }
-
-    // If we have data from either source, calculate the chart
-    if (birthDataToLoad) {
       try {
-        // Ensure house system is set (default to Porphyry if not present)
-        if (!birthDataToLoad.houseSystem) {
-          birthDataToLoad.houseSystem = 'porphyry';
-          console.log('Using default Porphyry house system');
+        const betaUser = localStorage.getItem('beta_user');
+        if (betaUser) {
+          const userData = JSON.parse(betaUser);
+          explorerId = userData.explorer_id || userData.id;
+          email = userData.email;
         }
-        calculateChart(birthDataToLoad);
       } catch (error) {
-        console.error('Failed to calculate chart:', error);
+        console.error('Error loading explorer info:', error);
+      }
+
+      // Priority 1: Try to fetch from database (persistent across devices!)
+      if (explorerId || email) {
+        try {
+          console.log('🔍 Checking database for saved birth chart...');
+          const queryParam = explorerId ? `explorerId=${explorerId}` : `email=${email}`;
+          const response = await fetch(`/api/astrology/birth-chart?${queryParam}`);
+          const result = await response.json();
+
+          if (result.success && result.data) {
+            console.log('✅ Loaded birth chart from database!');
+            setChartData({
+              sun: result.data.sun,
+              moon: result.data.moon,
+              mercury: result.data.mercury,
+              venus: result.data.venus,
+              mars: result.data.mars,
+              jupiter: result.data.jupiter,
+              saturn: result.data.saturn,
+              uranus: result.data.uranus,
+              neptune: result.data.neptune,
+              pluto: result.data.pluto,
+              chiron: result.data.chiron,
+              northNode: result.data.northNode,
+              southNode: result.data.southNode,
+              ascendant: result.data.ascendant,
+              midheaven: result.data.midheaven,
+              houses: result.data.houses,
+              aspects: result.data.aspects,
+            });
+            setBirthData(result.birthData);
+            setLoading(false);
+            return; // Success! Chart loaded from database
+          } else {
+            console.log('ℹ️ No birth chart in database yet - will try localStorage fallback');
+          }
+        } catch (error) {
+          console.log('ℹ️ Could not fetch from database, trying localStorage fallback');
+        }
+      }
+
+      // Priority 2: Fallback to localStorage (for backwards compatibility)
+      let birthDataToLoad = null;
+
+      try {
+        const betaUser = localStorage.getItem('beta_user');
+        if (betaUser) {
+          const userData = JSON.parse(betaUser);
+          if (userData.birthData) {
+            birthDataToLoad = userData.birthData;
+            console.log('✅ Loaded birth data from localStorage user profile');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading from user profile:', error);
+      }
+
+      if (!birthDataToLoad) {
+        const savedBirthData = localStorage.getItem('birthChartData');
+        if (savedBirthData) {
+          try {
+            birthDataToLoad = JSON.parse(savedBirthData);
+            console.log('✅ Loaded birth data from localStorage');
+          } catch (error) {
+            console.error('Error parsing birthChartData:', error);
+          }
+        }
+      }
+
+      // If we have localStorage data, recalculate and save to database
+      if (birthDataToLoad) {
+        try {
+          if (!birthDataToLoad.houseSystem) {
+            birthDataToLoad.houseSystem = 'porphyry';
+          }
+          console.log('📊 Recalculating chart from localStorage data and saving to database...');
+          calculateChart(birthDataToLoad);
+        } catch (error) {
+          console.error('Failed to calculate chart:', error);
+          setLoading(false);
+        }
+      } else {
+        console.log('ℹ️ No saved birth data found - showing input form');
         setLoading(false);
       }
-    } else {
-      console.log('ℹ️ No saved birth data found - showing input form');
-      setLoading(false);
-    }
+    };
+
+    loadBirthChart();
   }, []);
 
 
@@ -239,15 +299,24 @@ export default function AstrologyPage() {
   const calculateChart = async (data: any) => {
     setLoading(true);
     setBirthData(data);
+    setIsEditingBirthData(false); // Exit edit mode
 
-    // Save birth data to localStorage for future visits
+    // Get explorer info to save to database
+    let explorerId = null;
+    let email = null;
+
+    // Save birth data to localStorage for future visits (backwards compatibility)
     localStorage.setItem('birthChartData', JSON.stringify(data));
 
-    // ALSO save to user profile for persistent storage across devices
+    // Get explorer info from beta_user
     try {
       const betaUser = localStorage.getItem('beta_user');
       if (betaUser) {
         const userData = JSON.parse(betaUser);
+        explorerId = userData.explorer_id || userData.id;
+        email = userData.email;
+
+        // Also save to localStorage profile for backwards compatibility
         userData.birthData = {
           date: data.date,
           time: data.time,
@@ -258,17 +327,24 @@ export default function AstrologyPage() {
           houseSystem: data.houseSystem || 'porphyry'
         };
         localStorage.setItem('beta_user', JSON.stringify(userData));
-        console.log('✅ Saved birth data to user profile');
+        console.log('✅ Saved birth data to localStorage profile');
       }
     } catch (error) {
       console.error('Failed to save birth data to user profile:', error);
     }
 
     try {
+      console.log('🌟 Calculating birth chart and saving to database...');
+
       const response = await fetch('/api/astrology/birth-chart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, houseSystem: 'porphyry' }),
+        body: JSON.stringify({
+          ...data,
+          houseSystem: 'porphyry',
+          explorerId,  // ✨ Send explorer ID for database save
+          email,       // ✨ Fallback to email if no ID
+        }),
       });
 
       const result = await response.json();
@@ -357,8 +433,14 @@ export default function AstrologyPage() {
     );
   }
 
-  // Birth data form - invitation to calculate chart
-  if (!chartData) {
+  // Handler to edit birth data
+  const handleEditBirthData = () => {
+    setIsEditingBirthData(true);
+    setChartData(null); // Clear chart to show form
+  };
+
+  // Birth data form - invitation to calculate chart (or edit existing)
+  if (!chartData || isEditingBirthData) {
     return (
       <div className="min-h-screen relative overflow-hidden transition-all duration-1000"
         style={{
@@ -393,6 +475,46 @@ export default function AstrologyPage() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-12 min-h-screen flex items-center">
           <div className="w-full">
+            {/* Editing message if returning to update data */}
+            {isEditingBirthData && birthData && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center mb-8 max-w-2xl mx-auto"
+              >
+                <div className="backdrop-blur-md bg-amber-900/20 border border-amber-700/30 rounded-lg p-6">
+                  <h2 className="text-xl font-serif mb-2" style={{ color: '#E3B778' }}>
+                    ✏️ Update Your Birth Data
+                  </h2>
+                  <p className="text-sm opacity-80" style={{ color: '#E8DCC8' }}>
+                    Your current chart will be recalculated with the new information and saved to your account.
+                  </p>
+                  <p className="text-xs mt-2 opacity-60" style={{ color: '#E8DCC8' }}>
+                    Current: {birthData.date} at {birthData.time} · {birthData.location?.name || 'Location saved'}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Welcome message for first-time users */}
+            {!isEditingBirthData && !birthData && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center mb-8 max-w-2xl mx-auto"
+              >
+                <h2 className="text-2xl md:text-3xl font-serif mb-3" style={{ color: '#E3B778', textShadow: '0 2px 12px rgba(227, 183, 120, 0.3)' }}>
+                  Welcome to Your Archetypal Journey ✨
+                </h2>
+                <p className="text-sm md:text-base font-serif italic mb-2" style={{ color: '#E8DCC8' }}>
+                  Enter your birth data once — it will be saved to your account and synced across all your devices
+                </p>
+                <p className="text-xs opacity-70" style={{ color: '#E8DCC8' }}>
+                  Your chart will be calculated with professional-grade ephemeris precision
+                </p>
+              </motion.div>
+            )}
+
             <BirthDataForm
               onSubmit={calculateChart}
               loading={loading}
@@ -581,6 +703,16 @@ export default function AstrologyPage() {
             <p className="italic">Your soul's navigation through the waters of life</p>
             <p className="text-xs mt-4 opacity-70">Birth Pattern: {chartData.sun.sign} Sun · {chartData.moon.sign} Moon · {chartData.ascendant.sign} Rising</p>
 
+            {/* Data Saved Indicator */}
+            {birthData && (
+              <div className="mt-3 flex items-center justify-center gap-2 text-xs">
+                <span className="inline-block w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                <span className="opacity-60">
+                  Birth data saved to your account {birthData.location?.name && `· ${birthData.location.name}`}
+                </span>
+              </div>
+            )}
+
             {/* Porphyry House System Note */}
             <div className="mt-4 text-xs italic opacity-60">
               <span className="opacity-40">Using Porphyry houses — the breathing middle path</span>
@@ -611,7 +743,17 @@ export default function AstrologyPage() {
             </p>
 
             {/* Toggle and CTA buttons */}
-            <div className="flex items-center justify-center gap-3 mb-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 mb-2">
+              {/* Edit Birth Data Button */}
+              {!showExampleChart && (
+                <button
+                  onClick={handleEditBirthData}
+                  className="px-4 py-2 rounded-lg text-xs font-serif tracking-wide transition-all bg-stone-800/40 text-stone-300 border border-stone-700/50 hover:bg-stone-700/50 hover:border-amber-600/50"
+                >
+                  ✏️ Edit Birth Data
+                </button>
+              )}
+
               {/* View Example Chart Toggle */}
               <button
                 onClick={() => setShowExampleChart(!showExampleChart)}

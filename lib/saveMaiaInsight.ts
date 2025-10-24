@@ -1,8 +1,10 @@
 // lib/saveMaiaInsight.ts
 // 🎙️ Archives MAIA voice conversations into Supabase insight_history table with elemental + archetypal classification
 // Part of Option A: Dual Save - MAIA conversations go to BOTH memories AND insight_history (Akashic Records)
+// 🜃 TRIPLE SAVE: Also embeds to field_vectors for semantic search across the Akashic Field
 
 import { createClient } from "@/lib/supabase";
+import { embedToField } from "@/lib/services/fieldEmbeddingService";
 
 /**
  * Detect elemental resonance in MAIA conversation text
@@ -122,10 +124,13 @@ export async function saveMaiaToAkashic(
       role,
       content,
       element,
-      archetype,
       source: "MAIA", // Distinguishes MAIA from ClaudeMirror
-      session_id: sessionId || null,
       created_at: new Date().toISOString(),
+      metadata: {
+        archetype,
+        session_id: sessionId || null,
+        conversation_mode: conversationMode || null,
+      },
     });
 
     if (error) {
@@ -133,6 +138,17 @@ export async function saveMaiaToAkashic(
       console.warn("[saveMaiaToAkashic] Insight not saved (table may not exist):", error.message);
     } else {
       console.debug(`🎙️ MAIA Akashic Record saved: ${element} • ${archetype} • ${role}`);
+
+      // 🜃 TRIPLE SAVE: Also embed to field_vectors for semantic search
+      // Non-blocking - runs in background
+      embedToField(content, element, archetype, {
+        source: "MAIA",
+        role,
+        conversation_mode: conversationMode,
+        session_id: sessionId,
+      }).catch((err) => {
+        console.debug("[saveMaiaToAkashic] Field embedding skipped:", err);
+      });
     }
   } catch (err) {
     // Silently handle errors - Akashic archival is optional

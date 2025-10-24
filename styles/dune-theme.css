@@ -264,6 +264,50 @@
     background: linear-gradient(135deg, #B85C3D 0%, #8B4513 30%, #654321 70%, #3D2817 100%);
   }
 
+  /* ========================================
+     SEASONAL THEMES - Auto-rotating beauty
+     ======================================== */
+
+  /* 🌸 SPRING (March 20 - June 20) - Renewal & Blossoms */
+  .bg-season-spring {
+    background: linear-gradient(135deg,
+      #8B7B8B 0%,      /* Soft mauve dawn */
+      #9B8B7C 25%,     /* Warm earth awakening */
+      #7B9B7B 60%,     /* Fresh spring green */
+      #4A5D4A 100%     /* Deep forest anchor */
+    );
+  }
+
+  /* ☀️ SUMMER (June 21 - September 22) - Vitality & Light */
+  .bg-season-summer {
+    background: linear-gradient(135deg,
+      #E8B86D 0%,      /* Golden sunlight */
+      #D4A86A 30%,     /* Warm sand */
+      #5B8FA3 70%,     /* Ocean depths */
+      #2F5D7C 100%     /* Deep water anchor */
+    );
+  }
+
+  /* 🍂 FALL (September 23 - December 20) - Harvest & Transformation */
+  .bg-season-fall {
+    background: linear-gradient(135deg,
+      #B85C3D 0%,      /* Terracotta warmth */
+      #8B4513 30%,     /* Saddle brown */
+      #654321 70%,     /* Dark sienna */
+      #3D2817 100%     /* Deep earth anchor */
+    );
+  }
+
+  /* ❄️ WINTER (December 21 - March 19) - Stillness & Crystalline Clarity */
+  .bg-season-winter {
+    background: linear-gradient(135deg,
+      #4A5D6A 0%,      /* Soft steel blue */
+      #3D4F5C 30%,     /* Deep slate */
+      #2C3E50 70%,     /* Midnight blue */
+      #1A252F 100%     /* Deep night anchor */
+    );
+  }
+
   .bg-caladan-waters {
     background: linear-gradient(135deg, var(--caladan-teal) 0%, var(--water-deep) 100%);
   }
