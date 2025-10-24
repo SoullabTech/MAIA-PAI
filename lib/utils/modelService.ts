@@ -25,9 +25,12 @@ class ModelService {
   private openai: OpenAI | null = null;
 
   constructor() {
-    const apiKey = process.env.OPENAI_API_KEY || process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-    if (apiKey) {
-      this.openai = new OpenAI({ apiKey });
+    // Only initialize OpenAI on server-side (not in browser)
+    if (typeof window === 'undefined') {
+      const apiKey = process.env.OPENAI_API_KEY || process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+      if (apiKey) {
+        this.openai = new OpenAI({ apiKey });
+      }
     }
   }
 
