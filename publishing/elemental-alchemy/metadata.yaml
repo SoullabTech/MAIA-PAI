@@ -1,0 +1,65 @@
+---
+title: "Elemental Alchemy: The Ancient Art of Living a Phenomenal Life"
+subtitle: "A Transmission of Sacred Geometry and Consciousness"
+author: Kelly Nezat
+publisher: Soullab Media
+rights: Copyright © 2024 Kelly Nezat. All rights reserved.
+language: en-US
+date: 2024-11-21
+
+# Book Description
+description: |
+  Elemental Alchemy is not a manual—it's a transmission. Born from inner journeys and visions, this work reveals the truth that flows like spice through direct experience. Stripping astrology back to its alchemical core, it shows that you are the alembic, consciousness is the prima materia, and the elements are transforming you right now.
+
+  Through sacred geometry, the four alchemical operations (Fire, Water, Earth, Air), and the integrative power of Aether, this book asks one question: "What does this evoke for you?" Not teaching, but evoking. Not interpreting, but recognizing. A radical return to direct experience—no prerequisites, no gatekeepers, just presence and receptivity.
+
+# Keywords for discoverability
+keywords:
+  - alchemy
+  - consciousness
+  - sacred geometry
+  - transformation
+  - astrology
+  - elemental wisdom
+  - spirituality
+  - personal development
+  - Spiralogic
+  - self-awareness
+
+# Cover image (to be added)
+cover-image: assets/cover/elemental-alchemy-cover.jpg
+
+# EPUB-specific settings
+epub-chapter-level: 2
+epub-embed-font: assets/fonts/Lato-Regular.ttf
+epub-metadata: |
+  <dc:subject>Body, Mind & Spirit / Inspiration & Personal Growth</dc:subject>
+  <dc:subject>Self-Help / Spiritual</dc:subject>
+  <dc:subject>Philosophy / Metaphysics</dc:subject>
+
+# Identifiers (to be filled with actual ISBN)
+# isbn-13: 978-X-XXXX-XXXX-X
+# isbn-10: X-XXXX-XXXX-X
+
+# Creator information
+creator:
+  - role: author
+    text: Kelly Nezat
+
+# Contributor information
+contributor:
+  - role: editor
+    text: Soullab Editorial Team
+  - role: designer
+    text: Soullab Design
+
+# Publication info
+published: 2024-11-21
+modified: 2024-10-24
+
+# Categories (BISAC codes)
+bisac:
+  - "BODY, MIND & SPIRIT / Inspiration & Personal Growth"
+  - "SELF-HELP / Spiritual"
+  - "PHILOSOPHY / Metaphysics"
+---

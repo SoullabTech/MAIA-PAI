@@ -454,6 +454,7 @@ export async function getUserSubscription(userId: string): Promise<UserSubscript
 
 /**
  * Increment conversation count (for free tier tracking)
+ * Uses database function for atomic operations with auto-reset
  */
 export async function incrementConversationCount(userId: string): Promise<void> {
   const supabase = createClient(
@@ -461,13 +462,15 @@ export async function incrementConversationCount(userId: string): Promise<void> 
     process.env.SUPABASE_SERVICE_ROLE_KEY || ''
   );
 
-  // Use the database function to handle monthly reset logic
+  // Call database function for atomic increment with monthly reset logic
   const { error } = await supabase.rpc('increment_monthly_conversations', {
     user_id: userId
   });
 
   if (error) {
     console.error('Failed to increment conversation count:', error);
+  } else {
+    console.log(`✅ Conversation count incremented for ${userId}`);
   }
 }
 

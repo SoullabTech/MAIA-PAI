@@ -1,0 +1,14 @@
+# DECORATIVE ELEMENTS
+
+## Section Break Ornament
+Horizontal decorative element featuring sacred geometry pattern, elemental symbols arranged symmetrically, sandy gold and emerald on transparent/deep purple, suitable for breaks between major sections, elegant and mystical, vector quality --ar 16:1 --style raw
+
+## Chapter Number Ornaments
+Stylized numbers 1-10 integrated with their associated elemental symbols and sacred geometry, can be used for chapter numbers, artistic typography meets sacred art --ar 1:1 (create set)
+
+## Border Elements
+Repeating sacred geometry pattern suitable for page borders or frames, subtle but elegant, Dune color palette, can tile seamlessly --ar 4:1 --style raw
+
+## Elemental Symbol Set
+Clean vector-quality symbols for Fire (△), Water (▽), Earth (▽—), Air (△—), Aether (pentagram or dodecahedron), in sandy gold on transparent background, suitable for inline text or margin notes --ar 1:1 --style raw
+

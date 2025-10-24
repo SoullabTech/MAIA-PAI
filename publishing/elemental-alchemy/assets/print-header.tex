@@ -1,0 +1,207 @@
+% LaTeX Header for Elemental Alchemy Print Editions
+% Dune-inspired typography and sacred geometry
+
+% ============================================
+% FONTS AND TYPOGRAPHY
+% ============================================
+
+% Use professional fonts
+\usepackage{fontspec}
+\setmainfont{Crimson Text}[
+  Numbers=OldStyle,
+  Ligatures=TeX
+]
+\setsansfont{Lato}[
+  Scale=MatchLowercase
+]
+\setmonofont{Courier New}[
+  Scale=MatchLowercase
+]
+
+% Micro-typography improvements
+\usepackage{microtype}
+
+% Better paragraph formatting
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0pt}
+
+% ============================================
+% PAGE LAYOUT
+% ============================================
+
+% Headers and footers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{} % Clear all headers/footers
+
+% Header style
+\fancyhead[LE]{\small\textit{\leftmark}} % Chapter on even pages
+\fancyhead[RO]{\small\textit{Elemental Alchemy}} % Book title on odd pages
+
+% Footer style (page numbers)
+\fancyfoot[LE,RO]{\small\thepage}
+
+% Remove header line
+\renewcommand{\headrulewidth}{0pt}
+
+% Chapter pages (no header)
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[LE,RO]{\small\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+% ============================================
+% CHAPTER STYLING
+% ============================================
+
+\usepackage{titlesec}
+
+% Chapter format
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\sffamily}
+  {\chaptertitlename\ \thechapter}
+  {20pt}
+  {\Huge\color{SandyGold}}
+
+% Section format
+\titleformat{\section}
+  {\normalfont\Large\bfseries\sffamily\color{DarkEmerald}}
+  {\thesection}
+  {1em}
+  {}
+
+% Subsection format
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\sffamily\color{SandyGold}}
+  {\thesubsection}
+  {1em}
+  {}
+
+% ============================================
+% COLORS (Dune Palette)
+% ============================================
+
+\usepackage{xcolor}
+\definecolor{SandyGold}{HTML}{d4b896}
+\definecolor{LighterGold}{HTML}{E3B778}
+\definecolor{Emerald}{HTML}{10B981}
+\definecolor{DarkEmerald}{HTML}{059669}
+\definecolor{DeepPurple}{HTML}{0f0c29}
+
+% ============================================
+% SPECIAL ELEMENTS
+% ============================================
+
+% Enhanced quotes
+\usepackage{csquotes}
+\SetBlockEnvironment{quote}
+
+% Custom quote environment with color bar
+\renewenvironment{quote}
+  {\begin{leftbar}[width=4pt,linecolor=Emerald]%
+   \itshape}
+  {\end{leftbar}}
+
+% Side bar for quotes
+\usepackage{framed}
+\renewenvironment{leftbar}[2][\hsize]
+{%
+  \def\FrameCommand
+  {%
+    {\color{#2}\vrule width #1}%
+    \hspace{10pt}%
+  }%
+  \MakeFramed{\hsize\hsize\advance\hsize-\width\FrameRestore}%
+}
+{\endMakeFramed}
+
+% ============================================
+% LINKS (for digital versions)
+% ============================================
+
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=DarkEmerald,
+  urlcolor=Emerald,
+  pdfauthor={Kelly Nezat},
+  pdftitle={Elemental Alchemy: The Ancient Art of Living a Phenomenal Life},
+  pdfsubject={Alchemy, Consciousness, Transformation},
+  pdfkeywords={alchemy, consciousness, sacred geometry, transformation, spirituality}
+}
+
+% ============================================
+% WIDOWS AND ORPHANS
+% ============================================
+
+% Prevent single lines at top/bottom of pages
+\widowpenalty=10000
+\clubpenalty=10000
+
+% ============================================
+% TABLES AND FIGURES
+% ============================================
+
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{float}
+
+% Better table spacing
+\renewcommand{\arraystretch}{1.2}
+
+% ============================================
+% SPECIAL SYMBOLS
+% ============================================
+
+% Alchemical symbols (if using special fonts)
+% \usepackage{wasysym}
+% Or define custom commands for elemental symbols
+
+\newcommand{\firesymbol}{$\triangle$}
+\newcommand{\watersymbol}{$\nabla$}
+\newcommand{\airsymbol}{$\triangle$\hspace{-0.6em}\raisebox{0.2ex}{--}}
+\newcommand{\earthsymbol}{$\nabla$\hspace{-0.6em}\raisebox{-0.2ex}{--}}
+
+% ============================================
+% SECTION BREAKS
+% ============================================
+
+% Custom section break
+\newcommand{\sectionbreak}{%
+  \vspace{1em}
+  \begin{center}
+    {\color{SandyGold} 🌀 ✨ 🜛}
+  \end{center}
+  \vspace{1em}
+}
+
+% ============================================
+% DEDICATION AND FRONT MATTER
+% ============================================
+
+% Custom environment for dedication, acknowledgments
+\newenvironment{dedication}
+  {\clearpage\thispagestyle{empty}\vspace*{\stretch{1}}\begin{center}\itshape}
+  {\end{center}\vspace*{\stretch{3}}\clearpage}
+
+% ============================================
+% DROP CAPS (First letter of chapters)
+% ============================================
+
+\usepackage{lettrine}
+\setlength{\DefaultNindent}{0em}
+\renewcommand{\LettrineFontHook}{\color{SandyGold}\sffamily\bfseries}
+
+% Use as: \lettrine{F}{ire} is the first element...
+
+% ============================================
+% PDF METADATA
+% ============================================
+
+\usepackage{datetime}
+\newdateformat{isodate}{\THEYEAR-\twodigit{\THEMONTH}-\twodigit{\THEDAY}}
+
+% ============================================
+% END OF HEADER
+% ============================================

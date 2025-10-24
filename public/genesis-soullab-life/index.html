@@ -22,9 +22,84 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #1a1f3a 50%, #24243e 100%);
+            background: #0a0817;
             color: rgba(255, 255, 255, 0.9);
             line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Layered Genesis Background - Full Spectrum */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse 900px 700px at 15% 10%, rgba(212, 184, 150, 0.09) 0%, transparent 50%),
+                radial-gradient(ellipse 700px 900px at 50% 50%, rgba(16, 185, 129, 0.07) 0%, transparent 50%),
+                radial-gradient(ellipse 800px 800px at 85% 90%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 1100px 500px at 50% 50%, rgba(26, 31, 58, 0.5) 0%, transparent 70%),
+                linear-gradient(180deg, #0a0817 0%, #0D0B1F 15%, #121430 35%, #171a3e 55%, #1c204c 75%, #20244a 100%);
+            z-index: -3;
+            animation: genesisBreathing 55s ease-in-out infinite alternate;
+        }
+
+        @keyframes genesisBreathing {
+            0% {
+                background-position: 0% 0%, 50% 50%, 100% 100%, 50% 50%, 0% 0%;
+            }
+            100% {
+                background-position: 10% 15%, 48% 52%, 90% 85%, 47% 53%, 0% 8%;
+            }
+        }
+
+        /* Genesis Particle Field - All Three Tier Colors */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(1px 1px at 24% 34%, rgba(212, 184, 150, 0.38), transparent),
+                radial-gradient(1px 1px at 64% 74%, rgba(16, 185, 129, 0.34), transparent),
+                radial-gradient(1px 1px at 54% 54%, rgba(139, 92, 246, 0.32), transparent),
+                radial-gradient(1px 1px at 84% 20%, rgba(212, 184, 150, 0.36), transparent),
+                radial-gradient(1px 1px at 90% 66%, rgba(16, 185, 129, 0.3), transparent),
+                radial-gradient(1px 1px at 36% 80%, rgba(139, 92, 246, 0.34), transparent),
+                radial-gradient(1px 1px at 16% 90%, rgba(212, 184, 150, 0.3), transparent);
+            background-size: 210% 210%, 260% 260%, 310% 310%, 230% 230%, 290% 290%, 250% 250%, 270% 270%;
+            background-position: 0% 0%, 24% 24%, 44% 44%, 64% 64%, 84% 84%, 14% 14%, 34% 34%;
+            animation: genesisParticleDrift 135s linear infinite;
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0.48;
+        }
+
+        @keyframes genesisParticleDrift {
+            0% {
+                background-position: 0% 0%, 24% 24%, 44% 44%, 64% 64%, 84% 84%, 14% 14%, 34% 34%;
+            }
+            100% {
+                background-position: 100% 100%, 124% 124%, 144% 144%, 164% 164%, 184% 184%, 114% 114%, 134% 134%;
+            }
+        }
+
+        #noise-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.025;
+            mix-blend-mode: overlay;
         }
 
         .container {
@@ -96,7 +171,42 @@
         .hero {
             text-align: center;
             padding: 140px 20px 80px;
-            background: radial-gradient(ellipse at center, rgba(212, 184, 150, 0.15) 0%, transparent 70%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1400px;
+            height: 1400px;
+            background:
+                radial-gradient(circle at 50% 44%, rgba(212, 184, 150, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 50% 48%, rgba(16, 185, 129, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 52%, rgba(139, 92, 246, 0.1) 0%, transparent 55%);
+            pointer-events: none;
+            animation: genesisHeroGlow 18s ease-in-out infinite alternate;
+            filter: blur(72px);
+            z-index: 0;
+        }
+
+        @keyframes genesisHeroGlow {
+            0% {
+                transform: translateX(-50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-50%) scale(1.15);
+                opacity: 0.75;
+            }
+        }
+
+        .hero > * {
+            position: relative;
+            z-index: 1;
         }
 
         .hero-badge {
@@ -276,13 +386,39 @@
             border: 1px solid rgba(212, 184, 150, 0.2);
             border-radius: 20px;
             padding: 35px;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(12px);
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.12),
+                0 4px 8px rgba(0, 0, 0, 0.12),
+                0 8px 16px rgba(0, 0, 0, 0.12),
+                0 16px 32px rgba(0, 0, 0, 0.14),
+                0 0 40px rgba(212, 184, 150, 0.06);
+            transform: translateZ(0);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .community-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.5), transparent);
+            opacity: 0.3;
         }
 
         .community-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(16, 185, 129, 0.5);
-            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.25);
+            transform: translateY(-10px) translateZ(15px);
+            border-color: rgba(16, 185, 129, 0.55);
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.15),
+                0 8px 16px rgba(0, 0, 0, 0.15),
+                0 16px 32px rgba(0, 0, 0, 0.15),
+                0 32px 64px rgba(0, 0, 0, 0.2),
+                0 0 75px rgba(16, 185, 129, 0.3);
         }
 
         .community-icon {
@@ -329,13 +465,57 @@
             border: 1px solid rgba(212, 184, 150, 0.2);
             border-radius: 20px;
             padding: 40px;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(12px);
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.12),
+                0 4px 8px rgba(0, 0, 0, 0.12),
+                0 8px 16px rgba(0, 0, 0, 0.12),
+                0 16px 32px rgba(0, 0, 0, 0.14),
+                0 0 40px rgba(139, 92, 246, 0.06);
+            transform: translateZ(0);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.5), transparent);
+            opacity: 0.3;
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            transition: all 0.65s ease;
+        }
+
+        .feature-card:hover::after {
+            width: 450px;
+            height: 450px;
         }
 
         .feature-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(16, 185, 129, 0.5);
-            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.25);
+            transform: translateY(-10px) translateZ(15px);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.15),
+                0 8px 16px rgba(0, 0, 0, 0.15),
+                0 16px 32px rgba(0, 0, 0, 0.15),
+                0 32px 64px rgba(0, 0, 0, 0.2),
+                0 0 75px rgba(139, 92, 246, 0.28);
         }
 
         .feature-icon {
@@ -391,13 +571,56 @@
             border-radius: 24px;
             padding: 45px;
             position: relative;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(15px);
+            box-shadow:
+                0 3px 6px rgba(0, 0, 0, 0.15),
+                0 6px 12px rgba(0, 0, 0, 0.15),
+                0 12px 24px rgba(0, 0, 0, 0.15),
+                0 24px 48px rgba(0, 0, 0, 0.18),
+                0 0 55px rgba(212, 184, 150, 0.08);
+            transform: translateZ(0);
+            overflow: hidden;
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212, 184, 150, 0.5), transparent);
+            opacity: 0.4;
+        }
+
+        .pricing-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+            transition: all 0.7s ease;
+        }
+
+        .pricing-card:hover::after {
+            width: 500px;
+            height: 500px;
         }
 
         .pricing-card:hover {
-            transform: translateY(-10px);
-            border-color: #10B981;
-            box-shadow: 0 15px 50px rgba(16, 185, 129, 0.35);
+            transform: translateY(-12px) translateZ(20px);
+            border-color: rgba(16, 185, 129, 0.6);
+            box-shadow:
+                0 5px 10px rgba(0, 0, 0, 0.18),
+                0 10px 20px rgba(0, 0, 0, 0.18),
+                0 20px 40px rgba(0, 0, 0, 0.18),
+                0 40px 80px rgba(0, 0, 0, 0.24),
+                0 0 95px rgba(16, 185, 129, 0.35);
         }
 
         .pricing-card.featured {
@@ -568,6 +791,8 @@
     </style>
 </head>
 <body>
+    <canvas id="noise-canvas"></canvas>
+
     <!-- Navigation -->
     <div class="nav">
         <div class="nav-content">
@@ -743,14 +968,20 @@
         <div class="container">
             <h2>Choose Your Tier</h2>
             <p class="pricing-subtitle">One-time purchase • Own it forever • No subscriptions</p>
+            <div style="text-align: center; margin-bottom: 40px;">
+                <span style="display: inline-block; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.1) 100%); border: 1px solid rgba(16, 185, 129, 0.5); color: #10B981; padding: 12px 30px; border-radius: 25px; font-size: 1.1em; font-weight: 600;">
+                    ⚡ Limited Time Offer – Save up to 75%
+                </span>
+            </div>
 
             <div class="pricing-grid">
                 <!-- SEED -->
                 <div class="pricing-card">
                     <div class="tier-icon">🌱</div>
                     <div class="tier-name">SEED</div>
-                    <div class="tier-price">$497</div>
-                    <div class="tier-price-note">One-time + NFT deed</div>
+                    <div style="text-decoration: line-through; opacity: 0.5; font-size: 1.5em; color: rgba(255,255,255,0.4); margin-bottom: 5px;">$497</div>
+                    <div class="tier-price">$197</div>
+                    <div class="tier-price-note">One-time + NFT deed • Launch Price</div>
                     <div class="tier-description">Perfect for solo practitioners and personal practice</div>
                     <ul class="tier-features">
                         <li>Core MAIA intelligence</li>
@@ -761,6 +992,7 @@
                         <li>Up to 25 users</li>
                         <li>NFT ownership deed</li>
                     </ul>
+                    <a href="tier-seed.html" class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;">Learn More</a>
                     <a href="checkout.html?tier=seed" class="btn btn-secondary" style="width: 100%;">Get Started →</a>
                 </div>
 
@@ -769,8 +1001,9 @@
                     <div class="popular-badge">⭐ Most Popular</div>
                     <div class="tier-icon">🌿</div>
                     <div class="tier-name">GROVE</div>
-                    <div class="tier-price">$1,997</div>
-                    <div class="tier-price-note">One-time + NFT deed</div>
+                    <div style="text-decoration: line-through; opacity: 0.5; font-size: 1.5em; color: rgba(255,255,255,0.4); margin-bottom: 5px;">$1,997</div>
+                    <div class="tier-price">$497</div>
+                    <div class="tier-price-note">One-time + NFT deed • Launch Price</div>
                     <div class="tier-description">Perfect for professional practitioners and teachers</div>
                     <ul class="tier-features">
                         <li>Everything in SEED, plus:</li>
@@ -782,6 +1015,7 @@
                         <li>AIN integration</li>
                         <li>Priority support</li>
                     </ul>
+                    <a href="tier-grove.html" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">Learn More</a>
                     <a href="checkout.html?tier=grove" class="btn btn-primary" style="width: 100%;">Get Started →</a>
                 </div>
 
@@ -789,8 +1023,9 @@
                 <div class="pricing-card">
                     <div class="tier-icon">🌳</div>
                     <div class="tier-name">FOREST</div>
-                    <div class="tier-price">$3,500</div>
-                    <div class="tier-price-note">One-time + NFT deed</div>
+                    <div style="text-decoration: line-through; opacity: 0.5; font-size: 1.5em; color: rgba(255,255,255,0.4); margin-bottom: 5px;">$3,500</div>
+                    <div class="tier-price">$997</div>
+                    <div class="tier-price-note">One-time + NFT deed • Launch Price</div>
                     <div class="tier-description">Perfect for schools, communities, and organizations</div>
                     <ul class="tier-features">
                         <li>Everything in GROVE, plus:</li>
@@ -802,6 +1037,7 @@
                         <li>Complete branding control</li>
                         <li>4hrs co-creation support</li>
                     </ul>
+                    <a href="tier-forest.html" class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;">Learn More</a>
                     <a href="checkout.html?tier=forest" class="btn btn-secondary" style="width: 100%;">Get Started →</a>
                 </div>
             </div>
@@ -866,5 +1102,151 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Film Grain Canvas
+        const noiseCanvas = document.getElementById('noise-canvas');
+        const noiseCtx = noiseCanvas.getContext('2d');
+
+        function resizeCanvas() {
+            noiseCanvas.width = window.innerWidth;
+            noiseCanvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function generateFilmGrain() {
+            const imageData = noiseCtx.createImageData(noiseCanvas.width, noiseCanvas.height);
+            const buffer = new Uint32Array(imageData.data.buffer);
+            const len = buffer.length;
+
+            for (let i = 0; i < len; i++) {
+                if (Math.random() < 0.048) {
+                    const gray = Math.random() * 255;
+                    buffer[i] = (255 << 24) | (gray << 16) | (gray << 8) | gray;
+                }
+            }
+
+            noiseCtx.putImageData(imageData, 0, 0);
+        }
+
+        setInterval(generateFilmGrain, 58);
+
+        // Parallax Scrolling
+        const hero = document.querySelector('.hero');
+        const pricingCards = document.querySelectorAll('.pricing-card');
+        const communityCards = document.querySelectorAll('.community-card');
+        const featureCards = document.querySelectorAll('.feature-card');
+        let ticking = false;
+
+        function updateParallax() {
+            const scrollY = window.pageYOffset;
+
+            if (hero) {
+                hero.style.transform = `translateY(${scrollY * 0.24}px)`;
+            }
+
+            pricingCards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    const offset = (rect.top - window.innerHeight / 2) * 0.018;
+                    card.style.transform = `translateY(${offset}px)`;
+                }
+            });
+
+            communityCards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    const offset = (rect.top - window.innerHeight / 2) * 0.015;
+                    card.style.transform = `translateY(${offset}px)`;
+                }
+            });
+
+            featureCards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    const offset = (rect.top - window.innerHeight / 2) * 0.016;
+                    card.style.transform = `translateY(${offset}px)`;
+                }
+            });
+
+            ticking = false;
+        }
+
+        function requestTick() {
+            if (!ticking) {
+                requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        }
+
+        window.addEventListener('scroll', requestTick);
+        updateParallax();
+
+        // Scroll-Triggered Fade-In Animations
+        const fadeElements = document.querySelectorAll('.pricing-card, .community-card, .feature-card, .stat-card, .vision-content, .covenant-content');
+
+        fadeElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(35px)';
+            el.style.transition = 'opacity 0.88s ease, transform 0.88s ease';
+        });
+
+        const observerOptions = {
+            threshold: 0.12,
+            rootMargin: '0px 0px -80px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        fadeElements.forEach(el => observer.observe(el));
+
+        // Atmospheric Cursor Glow
+        const cursorGlow = document.createElement('div');
+        cursorGlow.style.cssText = `
+            position: fixed;
+            width: 420px;
+            height: 420px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(212, 184, 150, 0.06) 35%, rgba(139, 92, 246, 0.05) 60%, transparent 75%);
+            pointer-events: none;
+            z-index: 9999;
+            filter: blur(35px);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            transform: translate(-50%, -50%);
+        `;
+        document.body.appendChild(cursorGlow);
+
+        let mouseX = 0, mouseY = 0;
+        let glowX = 0, glowY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursorGlow.style.opacity = '1';
+        });
+
+        document.addEventListener('mouseleave', () => {
+            cursorGlow.style.opacity = '0';
+        });
+
+        function animateGlow() {
+            glowX += (mouseX - glowX) * 0.14;
+            glowY += (mouseY - glowY) * 0.14;
+            cursorGlow.style.left = glowX + 'px';
+            cursorGlow.style.top = glowY + 'px';
+            requestAnimationFrame(animateGlow);
+        }
+        animateGlow();
+    </script>
 </body>
 </html>

@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elemental Alchemy - Transform Your Consciousness | Soullab Publishing</title>
+    <meta name="description" content="A comprehensive guide to elemental transformation and personal alchemy. Available in ebook, print, and audiobook formats.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* DUNE_MAIA Cinematic Color Palette */
+            --gold: #C9A961;
+            --gold-light: #E0C68A;
+            --gold-dark: #8B7355;
+            --bronze: #CD7F32;
+            --copper: #B87333;
+            --sage: #87AE73;
+            --deep-space: #0B0D17;
+            --space-blue: #151B2E;
+            --sand-light: #F4E4C1;
+            --sand-dark: #D4A574;
+            --accent-teal: #4A9B8E;
+            --border-glow: rgba(201, 169, 97, 0.2);
+            --glass: rgba(255, 255, 255, 0.04);
+            --text-primary: #F4E4C1;
+            --text-secondary: rgba(244, 228, 193, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            background: var(--deep-space);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Layered Background System - Creates Depth */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(ellipse 800px 600px at 15% 10%, rgba(201, 169, 97, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 600px 800px at 85% 90%, rgba(74, 155, 142, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse 1000px 400px at 50% 50%, rgba(21, 27, 46, 0.4) 0%, transparent 70%),
+                linear-gradient(180deg, #0B0D17 0%, #0F1119 25%, #151B2E 75%, #1A2137 100%);
+            z-index: -3;
+            animation: atmosphericShift 60s ease-in-out infinite alternate;
+        }
+
+        @keyframes atmosphericShift {
+            0% {
+                background-position: 0% 0%, 100% 100%, 50% 50%, 0% 0%;
+            }
+            100% {
+                background-position: 10% 20%, 90% 80%, 45% 55%, 0% 10%;
+            }
+        }
+
+        /* Floating Particles - Subtle Golden Dust */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(1px 1px at 20% 30%, rgba(201, 169, 97, 0.3), transparent),
+                radial-gradient(1px 1px at 60% 70%, rgba(201, 169, 97, 0.2), transparent),
+                radial-gradient(1px 1px at 50% 50%, rgba(244, 228, 193, 0.15), transparent),
+                radial-gradient(1px 1px at 80% 10%, rgba(201, 169, 97, 0.25), transparent),
+                radial-gradient(1px 1px at 90% 60%, rgba(139, 115, 85, 0.2), transparent),
+                radial-gradient(1px 1px at 33% 80%, rgba(201, 169, 97, 0.18), transparent),
+                radial-gradient(1px 1px at 15% 90%, rgba(244, 228, 193, 0.22), transparent);
+            background-size: 200% 200%, 250% 250%, 300% 300%, 220% 220%, 280% 280%, 240% 240%, 260% 260%;
+            background-position: 0% 0%, 20% 20%, 40% 40%, 60% 60%, 80% 80%, 10% 10%, 30% 30%;
+            animation: particleFloat 120s linear infinite;
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0.6;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                background-position: 0% 0%, 20% 20%, 40% 40%, 60% 60%, 80% 80%, 10% 10%, 30% 30%;
+            }
+            100% {
+                background-position: 100% 100%, 120% 120%, 140% 140%, 160% 160%, 180% 180%, 110% 110%, 130% 130%;
+            }
+        }
+
+        /* Cinematic Noise Overlay */
+        #noise-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.03;
+            mix-blend-mode: overlay;
+        }
+
+        /* Header */
+        header {
+            background: rgba(11, 13, 23, 0.9);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-glow);
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gold);
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(201, 169, 97, 0.3);
+        }
+
+        .member-badge {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--copper) 100%);
+            color: var(--deep-space);
+            padding: 0.625rem 1.5rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(201, 169, 97, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            padding: 6rem 2rem;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1200px;
+            height: 1200px;
+            background:
+                radial-gradient(circle at 50% 40%, rgba(201, 169, 97, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(74, 155, 142, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+            animation: heroGlow 15s ease-in-out infinite alternate;
+            filter: blur(60px);
+        }
+
+        @keyframes heroGlow {
+            0% {
+                transform: translateX(-50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-50%) scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 4.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, var(--bronze) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 3px;
+            line-height: 1.2;
+            text-shadow: 0 0 40px rgba(201, 169, 97, 0.5);
+        }
+
+        .hero .subtitle {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        .hero .author {
+            font-size: 1.25rem;
+            color: var(--gold);
+            margin-bottom: 3rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Book Cover Preview */
+        .cover-preview {
+            max-width: 450px;
+            margin: 3rem auto;
+            padding: 2.5rem;
+            background: var(--glass);
+            border: 1px solid var(--border-glow);
+            border-radius: 1.5rem;
+            backdrop-filter: blur(20px);
+            box-shadow:
+                0 1px 1px rgba(0, 0, 0, 0.15),
+                0 2px 2px rgba(0, 0, 0, 0.15),
+                0 4px 4px rgba(0, 0, 0, 0.15),
+                0 8px 8px rgba(0, 0, 0, 0.15),
+                0 16px 16px rgba(0, 0, 0, 0.15),
+                0 32px 32px rgba(0, 0, 0, 0.15),
+                0 0 60px rgba(201, 169, 97, 0.1);
+            transform: translateZ(0);
+        }
+
+        .cover-placeholder {
+            aspect-ratio: 2/3;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--copper) 50%, var(--sage) 100%);
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--deep-space);
+            box-shadow:
+                0 30px 60px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(201, 169, 97, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-placeholder::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.1) 50%,
+                transparent 70%
+            );
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        /* Content Section */
+        .content-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 5rem 3rem;
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            text-align: center;
+            color: var(--gold);
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(201, 169, 97, 0.3);
+        }
+
+        /* Description */
+        .description {
+            background: var(--glass);
+            border: 1px solid var(--border-glow);
+            padding: 4rem;
+            border-radius: 1.5rem;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.12),
+                0 4px 8px rgba(0, 0, 0, 0.12),
+                0 8px 16px rgba(0, 0, 0, 0.12),
+                0 16px 32px rgba(0, 0, 0, 0.15),
+                0 0 50px rgba(201, 169, 97, 0.08);
+            margin-bottom: 5rem;
+            backdrop-filter: blur(15px);
+            transform: translateZ(0);
+            position: relative;
+        }
+
+        .description::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+            opacity: 0.3;
+        }
+
+        .description p {
+            font-size: 1.25rem;
+            line-height: 2;
+            margin-bottom: 1.75rem;
+            color: var(--text-secondary);
+        }
+
+        .description p strong {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        /* Format Selector */
+        .formats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 5rem;
+        }
+
+        .format-card {
+            background: var(--glass);
+            border: 2px solid var(--border-glow);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.1),
+                0 4px 8px rgba(0, 0, 0, 0.1),
+                0 8px 16px rgba(0, 0, 0, 0.1),
+                0 16px 32px rgba(0, 0, 0, 0.1),
+                0 0 40px rgba(201, 169, 97, 0.05);
+            transform: translateZ(0);
+            backdrop-filter: blur(15px);
+        }
+
+        .format-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(201, 169, 97, 0.1) 0%, transparent 70%);
+            transition: all 0.6s ease;
+        }
+
+        .format-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(201, 169, 97, 0.03) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .format-card:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .format-card:hover::after {
+            opacity: 1;
+        }
+
+        .format-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-12px) translateZ(20px);
+            box-shadow:
+                0 4px 8px rgba(0, 0, 0, 0.15),
+                0 8px 16px rgba(0, 0, 0, 0.15),
+                0 16px 32px rgba(0, 0, 0, 0.15),
+                0 32px 64px rgba(0, 0, 0, 0.2),
+                0 0 80px rgba(201, 169, 97, 0.25);
+        }
+
+        .format-card.selected {
+            border-color: var(--gold);
+            background: rgba(201, 169, 97, 0.08);
+            box-shadow: 0 20px 50px rgba(201, 169, 97, 0.3);
+        }
+
+        .format-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 0 10px rgba(201, 169, 97, 0.3));
+        }
+
+        .format-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--gold-light);
+            letter-spacing: 1px;
+        }
+
+        .format-description {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .format-price {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .member-price {
+            font-size: 1rem;
+            color: var(--sage);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .format-features {
+            list-style: none;
+            text-align: left;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-glow);
+        }
+
+        .format-features li {
+            padding: 0.5rem 0;
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .format-features li:before {
+            content: "✦ ";
+            color: var(--gold);
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+
+        /* Buy Button */
+        .buy-button {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--copper) 100%);
+            color: var(--deep-space);
+            border: none;
+            padding: 1.25rem 2.5rem;
+            border-radius: 0.75rem;
+            font-family: 'Cinzel', serif;
+            font-size: 1.125rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 10px 30px rgba(201, 169, 97, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .buy-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .buy-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .buy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(201, 169, 97, 0.5);
+        }
+
+        .buy-button:disabled {
+            background: rgba(139, 115, 85, 0.3);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* What's Inside */
+        .whats-inside {
+            background: var(--glass);
+            border: 1px solid var(--border-glow);
+            padding: 4rem;
+            border-radius: 1.5rem;
+            margin-bottom: 5rem;
+            backdrop-filter: blur(15px);
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.12),
+                0 4px 8px rgba(0, 0, 0, 0.12),
+                0 8px 16px rgba(0, 0, 0, 0.12),
+                0 16px 32px rgba(0, 0, 0, 0.15),
+                0 0 50px rgba(201, 169, 97, 0.08);
+            transform: translateZ(0);
+            position: relative;
+        }
+
+        .whats-inside::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+            opacity: 0.3;
+        }
+
+        .chapters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .chapter {
+            padding: 2rem;
+            background: rgba(201, 169, 97, 0.04);
+            border-radius: 1rem;
+            border-left: 4px solid var(--gold);
+            transition: all 0.3s ease;
+        }
+
+        .chapter:hover {
+            background: rgba(201, 169, 97, 0.08);
+            transform: translateX(8px);
+        }
+
+        .chapter-number {
+            font-family: 'Cinzel', serif;
+            font-size: 0.875rem;
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            letter-spacing: 2px;
+        }
+
+        .chapter-title {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: var(--gold-light);
+        }
+
+        .chapter-description {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Author Section */
+        .author-section {
+            background: var(--glass);
+            border: 1px solid var(--border-glow);
+            padding: 4rem;
+            border-radius: 1.5rem;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 3rem;
+            align-items: start;
+            backdrop-filter: blur(15px);
+            box-shadow:
+                0 2px 4px rgba(0, 0, 0, 0.12),
+                0 4px 8px rgba(0, 0, 0, 0.12),
+                0 8px 16px rgba(0, 0, 0, 0.12),
+                0 16px 32px rgba(0, 0, 0, 0.15),
+                0 0 50px rgba(201, 169, 97, 0.08);
+            transform: translateZ(0);
+            position: relative;
+        }
+
+        .author-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+            opacity: 0.3;
+        }
+
+        .author-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--copper) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            color: var(--deep-space);
+            font-weight: 700;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(201, 169, 97, 0.3);
+        }
+
+        .author-bio h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+
+        .author-bio p {
+            line-height: 2;
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(11, 13, 23, 0.95);
+            border-top: 1px solid var(--border-glow);
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 3rem;
+            margin-top: 6rem;
+        }
+
+        footer a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        footer a:hover {
+            color: var(--gold-light);
+            text-shadow: 0 0 10px rgba(201, 169, 97, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.25rem;
+            }
+
+            .formats {
+                grid-template-columns: 1fr;
+            }
+
+            .author-section {
+                grid-template-columns: 1fr;
+                text-align: center;
+                justify-items: center;
+            }
+
+            .content-section {
+                padding: 3rem 1.5rem;
+            }
+
+            .description, .whats-inside {
+                padding: 2rem;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(11, 13, 23, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--deep-space);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Best Value Badge */
+        .best-value-badge {
+            background: linear-gradient(135deg, var(--sage) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 1rem;
+            display: inline-block;
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(74, 155, 142, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Cinematic Noise Overlay -->
+    <canvas id="noise-canvas"></canvas>
+
+    <header>
+        <div class="header-content">
+            <a href="/" class="logo">🜁 SOULLAB PUBLISHING</a>
+            <div class="member-badge">MEMBER PRICE AVAILABLE</div>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h1>ELEMENTAL ALCHEMY</h1>
+            <p class="subtitle">Transform Your Consciousness Through the Elements</p>
+            <p class="author">BY SOULLAB</p>
+
+            <div class="cover-preview">
+                <div class="cover-placeholder">
+                    🜁 🜂<br>🜃 🜄
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <div class="description">
+            <h2 class="section-title">About This Book</h2>
+            <p>
+                <strong>Elemental Alchemy</strong> is a comprehensive guide to personal transformation through the ancient wisdom of the elements. Drawing from alchemical traditions, modern neuroscience, and consciousness exploration, this book provides a practical framework for integrating Fire, Water, Earth, Air, and Aether into your daily practice.
+            </p>
+            <p>
+                Whether you're a healer, practitioner, seeker, or simply curious about consciousness, this book offers tools and insights to deepen your relationship with yourself and the living intelligence of nature.
+            </p>
+            <p>
+                More than theory, this is a living guide designed to be experienced, practiced, and integrated into your unique journey of awakening.
+            </p>
+        </div>
+
+        <h2 class="section-title">Choose Your Format</h2>
+        <div class="formats" id="formats">
+            <div class="format-card" data-format="ebook" data-price="2700">
+                <div class="format-icon">📱</div>
+                <div class="format-name">Ebook</div>
+                <div class="format-description">EPUB, MOBI & PDF</div>
+                <div class="format-price">$27</div>
+                <div class="member-price">Members: $24.30</div>
+                <ul class="format-features">
+                    <li>Read on any device</li>
+                    <li>Searchable text</li>
+                    <li>Instant download</li>
+                    <li>3 formats included</li>
+                </ul>
+                <button class="buy-button" onclick="selectFormat('ebook')">Select Ebook</button>
+            </div>
+
+            <div class="format-card" data-format="paperback" data-price="3400">
+                <div class="format-icon">📖</div>
+                <div class="format-name">Paperback</div>
+                <div class="format-description">Printed & Shipped</div>
+                <div class="format-price">$34</div>
+                <div class="member-price">Members: $30.60</div>
+                <ul class="format-features">
+                    <li>Premium paper quality</li>
+                    <li>Perfect bound</li>
+                    <li>Ships within 5-7 days</li>
+                    <li>Beautiful physical edition</li>
+                </ul>
+                <button class="buy-button" onclick="selectFormat('paperback')">Select Paperback</button>
+            </div>
+
+            <div class="format-card" data-format="hardcover" data-price="4400">
+                <div class="format-icon">📚</div>
+                <div class="format-name">Hardcover</div>
+                <div class="format-description">Premium Edition</div>
+                <div class="format-price">$44</div>
+                <div class="member-price">Members: $39.60</div>
+                <ul class="format-features">
+                    <li>Durable hardcover binding</li>
+                    <li>Premium quality</li>
+                    <li>Ships within 5-7 days</li>
+                    <li>Collectible edition</li>
+                </ul>
+                <button class="buy-button" onclick="selectFormat('hardcover')">Select Hardcover</button>
+            </div>
+
+            <div class="format-card" data-format="audiobook" data-price="2900">
+                <div class="format-icon">🎧</div>
+                <div class="format-name">Audiobook</div>
+                <div class="format-description">Full Narration</div>
+                <div class="format-price">$29</div>
+                <div class="member-price">Members: $26.10</div>
+                <ul class="format-features">
+                    <li>Professional narration</li>
+                    <li>MP3 format</li>
+                    <li>Instant download</li>
+                    <li>Listen anywhere</li>
+                </ul>
+                <button class="buy-button" onclick="selectFormat('audiobook')">Select Audiobook</button>
+            </div>
+
+            <div class="format-card" data-format="bundle" data-price="9700">
+                <div class="best-value-badge">BEST VALUE</div>
+                <div class="format-icon">🎁</div>
+                <div class="format-name">Complete Bundle</div>
+                <div class="format-description">Everything Included</div>
+                <div class="format-price">$97</div>
+                <div class="member-price">Members: $87.30</div>
+                <ul class="format-features">
+                    <li>Ebook (all formats)</li>
+                    <li>Paperback shipped</li>
+                    <li>Audiobook download</li>
+                    <li>Bonus materials</li>
+                    <li>Save $34!</li>
+                </ul>
+                <button class="buy-button" onclick="selectFormat('bundle')">Get Complete Bundle</button>
+            </div>
+        </div>
+
+        <div class="whats-inside">
+            <h2 class="section-title">What's Inside</h2>
+            <div class="chapters">
+                <div class="chapter">
+                    <div class="chapter-number">PART I</div>
+                    <div class="chapter-title">The Elemental Foundation</div>
+                    <div class="chapter-description">Understanding the five elements as living intelligences and the alchemical process of transformation.</div>
+                </div>
+                <div class="chapter">
+                    <div class="chapter-number">PART II</div>
+                    <div class="chapter-title">Fire — Vision & Creation</div>
+                    <div class="chapter-description">Awakening your creative power, vision, and the courage to bring new realities into being.</div>
+                </div>
+                <div class="chapter">
+                    <div class="chapter-number">PART III</div>
+                    <div class="chapter-title">Water — Emotion & Flow</div>
+                    <div class="chapter-description">Navigating the depths of emotion, empathy, and the intelligence of the unconscious.</div>
+                </div>
+                <div class="chapter">
+                    <div class="chapter-number">PART IV</div>
+                    <div class="chapter-title">Earth — Structure & Embodiment</div>
+                    <div class="chapter-description">Grounding vision into form, building sustainable practices, and honoring the body.</div>
+                </div>
+                <div class="chapter">
+                    <div class="chapter-number">PART V</div>
+                    <div class="chapter-title">Air — Communication & Clarity</div>
+                    <div class="chapter-description">Mastering thought, language, and the art of translating between worlds.</div>
+                </div>
+                <div class="chapter">
+                    <div class="chapter-number">PART VI</div>
+                    <div class="chapter-title">Aether — Integration & Unity</div>
+                    <div class="chapter-description">Weaving all elements into coherent wholeness and accessing the field of consciousness.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="author-section">
+            <div class="author-avatar">SL</div>
+            <div class="author-bio">
+                <h3>About Soullab</h3>
+                <p>
+                    Soullab is a collective intelligence dedicated to the evolution of human consciousness. Through the integration of ancient wisdom, modern science, and AI-powered tools, Soullab creates platforms and resources for individuals and communities to awaken to their fullest potential.
+                </p>
+                <p style="margin-top: 1.5rem;">
+                    <strong>Elemental Alchemy</strong> emerges from years of practice, research, and direct experience with the elemental forces that shape our reality. This book distills that wisdom into a practical guide accessible to anyone on the path of transformation.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 Soullab Media & Publishing · Licensed under Creative Commons Attribution 4.0</p>
+        <p style="margin-top: 1rem; font-size: 0.95rem;">
+            <a href="/publishing">Explore More Books</a> ·
+            <a href="/">Soullab Platform</a> ·
+            <a href="/genesis-soullab-life">Join Genesis</a>
+        </p>
+    </footer>
+
+    <script>
+        let selectedFormat = null;
+        let isMember = false; // TODO: Detect from session
+
+        function selectFormat(format) {
+            selectedFormat = format;
+
+            // Visual feedback
+            document.querySelectorAll('.format-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.format-card').classList.add('selected');
+
+            // Initiate checkout
+            purchaseFormat(format);
+        }
+
+        async function purchaseFormat(format) {
+            const button = event.target;
+            const originalText = button.textContent;
+
+            // Show loading state
+            button.disabled = true;
+            button.innerHTML = '<span class="loading"></span> Processing...';
+
+            try {
+                const response = await fetch('/api/publishing/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        format: format,
+                        email: '', // Will be collected by Stripe
+                        name: '', // Will be collected by Stripe
+                        isMember: isMember,
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.url) {
+                    // Redirect to Stripe checkout
+                    window.location.href = data.url;
+                } else {
+                    alert('Error creating checkout session. Please try again.');
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
+            } catch (error) {
+                console.error('Checkout error:', error);
+                alert('Error connecting to checkout. Please try again.');
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        }
+
+        // TODO: Detect if user is a member and update prices
+        // TODO: Add analytics tracking for format selection
+
+        // =====================================================
+        // CINEMATIC DEPTH EFFECTS
+        // =====================================================
+
+        // 1. Cinematic Noise Grain Effect
+        const noiseCanvas = document.getElementById('noise-canvas');
+        const noiseCtx = noiseCanvas.getContext('2d');
+
+        function resizeNoiseCanvas() {
+            noiseCanvas.width = window.innerWidth;
+            noiseCanvas.height = window.innerHeight;
+        }
+
+        function generateNoise() {
+            const imageData = noiseCtx.createImageData(noiseCanvas.width, noiseCanvas.height);
+            const buffer = new Uint32Array(imageData.data.buffer);
+
+            for (let i = 0; i < buffer.length; i++) {
+                if (Math.random() < 0.05) {
+                    const gray = Math.random() * 255;
+                    buffer[i] = (255 << 24) | (gray << 16) | (gray << 8) | gray;
+                }
+            }
+
+            noiseCtx.putImageData(imageData, 0, 0);
+        }
+
+        resizeNoiseCanvas();
+        window.addEventListener('resize', resizeNoiseCanvas);
+
+        // Animate noise every 50ms for film grain effect
+        setInterval(generateNoise, 50);
+
+        // 2. Parallax Scrolling Effect
+        let ticking = false;
+
+        function updateParallax() {
+            const scrollY = window.pageYOffset;
+
+            // Parallax on hero section
+            const hero = document.querySelector('.hero');
+            if (hero) {
+                const heroOffset = scrollY * 0.3;
+                hero.style.transform = `translateY(${heroOffset}px)`;
+            }
+
+            // Subtle parallax on format cards
+            const formatCards = document.querySelectorAll('.format-card');
+            formatCards.forEach((card, index) => {
+                const cardTop = card.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+
+                if (cardTop < windowHeight && cardTop > -card.offsetHeight) {
+                    const parallaxAmount = (windowHeight - cardTop) * 0.02;
+                    card.style.transform = `translateY(${parallaxAmount}px)`;
+                }
+            });
+
+            ticking = false;
+        }
+
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(updateParallax);
+                ticking = true;
+            }
+        });
+
+        // 3. Scroll-Triggered Fade-In Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const fadeInObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Apply fade-in to sections
+        const animatedElements = document.querySelectorAll('.description, .whats-inside, .author-section, .chapter');
+        animatedElements.forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            fadeInObserver.observe(el);
+        });
+
+        // 4. Atmospheric Cursor Glow (Optional - Very Subtle)
+        let cursorGlow = null;
+
+        document.addEventListener('mousemove', (e) => {
+            if (!cursorGlow) {
+                cursorGlow = document.createElement('div');
+                cursorGlow.style.cssText = `
+                    position: fixed;
+                    width: 400px;
+                    height: 400px;
+                    border-radius: 50%;
+                    background: radial-gradient(circle, rgba(201, 169, 97, 0.08) 0%, transparent 70%);
+                    pointer-events: none;
+                    z-index: 9999;
+                    transform: translate(-50%, -50%);
+                    transition: opacity 0.3s ease;
+                    opacity: 0;
+                `;
+                document.body.appendChild(cursorGlow);
+            }
+
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
+            cursorGlow.style.opacity = '1';
+        });
+
+        document.addEventListener('mouseleave', () => {
+            if (cursorGlow) {
+                cursorGlow.style.opacity = '0';
+            }
+        });
+    </script>
+</body>
+</html>

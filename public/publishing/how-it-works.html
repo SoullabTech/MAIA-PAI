@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How It Works | Soullab Publishing</title>
+    <meta name="description" content="From manuscript to published in 30 days. Step-by-step guide to publishing your wisdom on Soullab.">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(212, 184, 150, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(15, 12, 41, 0.9) 0%, rgba(26, 31, 58, 0.95) 50%, rgba(36, 36, 62, 1) 100%),
+                linear-gradient(135deg, #0a0817 0%, #141526 25%, #1a1f3a 50%, #1e2242 75%, #24243e 100%);
+            background-attachment: fixed;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            right: -50%;
+            bottom: -50%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(212, 184, 150, 0.2);
+            padding: 15px 20px;
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5em;
+            color: #d4b896;
+            font-weight: 300;
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 400;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #d4b896;
+        }
+
+        .nav-cta {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 140px 20px 80px;
+            background: radial-gradient(ellipse at center, rgba(212, 184, 150, 0.12) 0%, transparent 70%);
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            font-weight: 300;
+            color: #d4b896;
+            margin-bottom: 25px;
+            letter-spacing: 3px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Timeline */
+        .timeline {
+            max-width: 900px;
+            margin: 80px auto;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 40px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #10B981, rgba(16, 185, 129, 0.3));
+        }
+
+        .step {
+            position: relative;
+            padding-left: 100px;
+            margin-bottom: 80px;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: 300;
+            color: white;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+
+        .step-content {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 184, 150, 0.15);
+            border-radius: 16px;
+            padding: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .step-content:hover {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.05);
+            transform: translateX(10px);
+        }
+
+        .step h2 {
+            font-size: 2em;
+            color: #d4b896;
+            margin-bottom: 15px;
+            font-weight: 300;
+        }
+
+        .step h3 {
+            font-size: 1.3em;
+            color: #E3B778;
+            margin: 25px 0 15px;
+        }
+
+        .step p {
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .step ul {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .step ul li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .step ul li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #10B981;
+            font-weight: bold;
+        }
+
+        .step-note {
+            background: rgba(16, 185, 129, 0.05);
+            border-left: 3px solid #10B981;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .step-note strong {
+            color: #10B981;
+        }
+
+        /* Quick Links */
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 60px 0;
+        }
+
+        .quick-link {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 184, 150, 0.15);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .quick-link:hover {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.05);
+            transform: translateY(-5px);
+        }
+
+        .quick-link-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .quick-link h3 {
+            color: #E3B778;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .quick-link p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95em;
+        }
+
+        /* FAQ */
+        .faq {
+            max-width: 900px;
+            margin: 80px auto;
+        }
+
+        .faq h2 {
+            text-align: center;
+            font-size: 2.5em;
+            color: #d4b896;
+            font-weight: 300;
+            margin-bottom: 50px;
+        }
+
+        .faq-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 184, 150, 0.15);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .faq-item h3 {
+            color: #E3B778;
+            margin-bottom: 12px;
+            font-size: 1.2em;
+            font-weight: 400;
+        }
+
+        .faq-item p {
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.8;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 80px 40px;
+            background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.02) 70%);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 20px;
+            margin: 80px 0;
+        }
+
+        .cta-section h2 {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            color: #d4b896;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .cta-section p {
+            font-size: 1.25em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 18px 45px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 60px 20px 40px;
+            color: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(212, 184, 150, 0.1);
+            margin-top: 100px;
+            font-weight: 300;
+        }
+
+        footer a {
+            color: #10B981;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+
+            .step {
+                padding-left: 0;
+                padding-top: 100px;
+            }
+
+            .step-number {
+                left: 50%;
+                transform: translateX(-50%);
+                top: 0;
+            }
+
+            .timeline::before {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="nav-content">
+                <a href="/" class="nav-logo">SOULLAB PUBLISHING</a>
+                <div class="nav-links">
+                    <a href="index.html">Platform</a>
+                    <a href="benefits.html">Benefits</a>
+                    <a href="how-it-works.html" class="active">How It Works</a>
+                    <a href="elemental-alchemy.html">Featured</a>
+                    <a href="/genesis-soullab-life/index.html" class="nav-cta">Join Genesis</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero -->
+        <section class="hero">
+            <h1>How Publishing Works</h1>
+            <p>From manuscript to published in four simple steps</p>
+        </section>
+
+        <!-- Timeline -->
+        <div class="timeline">
+            <!-- Step 1 -->
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h2>Upload Your Work</h2>
+                    <p>
+                        Start by uploading your content. We support multiple file formats and make the
+                        process as simple as possible.
+                    </p>
+
+                    <h3>What You Can Upload</h3>
+                    <ul>
+                        <li>Manuscripts: DOCX, PDF, Markdown, EPUB</li>
+                        <li>Audio files: MP3, M4A, WAV (for audiobooks or music)</li>
+                        <li>Video files: MP4, MOV (for courses)</li>
+                        <li>Images: JPG, PNG (for covers, oracle decks, printables)</li>
+                        <li>Supplementary files: ZIP archives for workbooks, resources</li>
+                    </ul>
+
+                    <h3>What Happens Next</h3>
+                    <p>
+                        Our system automatically processes your upload:
+                    </p>
+                    <ul>
+                        <li>Virus scan for security</li>
+                        <li>Metadata extraction (word count, page count, duration)</li>
+                        <li>Preview generation</li>
+                        <li>Format validation</li>
+                    </ul>
+
+                    <div class="step-note">
+                        <strong>MAIA AI Assistance:</strong> MAIA can review your manuscript for clarity,
+                        suggest improvements, identify themes, and help you refine your work before publishing.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h2>Choose Your Formats</h2>
+                    <p>
+                        Decide how you want to publish your work. You can offer multiple formats—readers
+                        love having options!
+                    </p>
+
+                    <h3>Available Formats</h3>
+                    <ul>
+                        <li><strong>Ebook (EPUB):</strong> Works on Kindle, Kobo, Apple Books, Nook</li>
+                        <li><strong>Ebook (MOBI):</strong> Legacy Kindle format</li>
+                        <li><strong>PDF:</strong> Universal format, great for printables and workbooks</li>
+                        <li><strong>Paperback:</strong> Print-on-demand, ships globally</li>
+                        <li><strong>Hardcover:</strong> Premium print option</li>
+                        <li><strong>Audiobook:</strong> MP3 or M4B streaming/download</li>
+                        <li><strong>Video Course:</strong> Hosted streaming with downloadable resources</li>
+                    </ul>
+
+                    <h3>Automatic Conversion</h3>
+                    <p>
+                        Upload once, we handle the rest:
+                    </p>
+                    <ul>
+                        <li>DOCX → EPUB, MOBI, PDF (with professional formatting)</li>
+                        <li>Interior layout templates for print books</li>
+                        <li>Cover templates or upload your custom design</li>
+                        <li>Audio chapter splitting and metadata tagging</li>
+                        <li>Video encoding for optimal streaming</li>
+                    </ul>
+
+                    <div class="step-note">
+                        <strong>Grove & Forest tiers:</strong> Access enhanced templates, professional formatting,
+                        and priority conversion processing.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h2>Set Your Pricing</h2>
+                    <p>
+                        You're in full control of pricing. Set different prices for each format, create
+                        bundles, or offer member discounts.
+                    </p>
+
+                    <h3>Pricing Options</h3>
+                    <ul>
+                        <li><strong>Fixed Price:</strong> Set a specific price per format</li>
+                        <li><strong>Pay-What-You-Want:</strong> Set minimum with suggested price</li>
+                        <li><strong>Bundles:</strong> Offer ebook + audiobook at discount</li>
+                        <li><strong>Member Pricing:</strong> Special rates for Soullab members</li>
+                        <li><strong>Free + Donations:</strong> Give it away, accept tips</li>
+                    </ul>
+
+                    <h3>Royalty Calculator</h3>
+                    <p>
+                        You keep 91-95% of every sale:
+                    </p>
+                    <ul>
+                        <li>Ebooks/Digital: <strong>95% to you</strong>, 5% platform fee</li>
+                        <li>Print books: <strong>91% to you</strong> (after printing costs), 4% platform fee</li>
+                        <li>Audiobooks/Courses: <strong>95% to you</strong>, 5% platform fee</li>
+                    </ul>
+
+                    <p style="margin-top: 20px;">
+                        <strong>Example:</strong> $27 ebook = <span style="color: #10B981;">$25.65 to you</span>
+                    </p>
+
+                    <div class="step-note">
+                        <strong>Compare to Amazon:</strong> Amazon KDP gives 35-70% royalties. On a $27 ebook,
+                        Amazon pays you $9.45-18.90. With Soullab, you earn $25.65!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h2>Publish & Distribute</h2>
+                    <p>
+                        One click to publish. Your work goes live instantly on the Soullab marketplace,
+                        and you can enable wider distribution.
+                    </p>
+
+                    <h3>Distribution Channels</h3>
+                    <ul>
+                        <li><strong>Soullab Marketplace (All tiers):</strong> Featured to our engaged community</li>
+                        <li><strong>Amazon KDP (Optional):</strong> Reach Kindle readers worldwide</li>
+                        <li><strong>Smashwords (Grove+):</strong> Distributes to Apple, Kobo, B&N, libraries</li>
+                        <li><strong>IngramSpark (Grove+):</strong> Bookstores, libraries, global print</li>
+                        <li><strong>Audible (Forest):</strong> Via Findaway Voices audiobook distribution</li>
+                        <li><strong>Spotify/Apple Music (Forest):</strong> For music and sound healing</li>
+                    </ul>
+
+                    <h3>After You Publish</h3>
+                    <ul>
+                        <li>Your author page goes live with bio, photo, works</li>
+                        <li>Sales analytics dashboard updates in real-time</li>
+                        <li>Automated delivery to customers (download links, streaming access)</li>
+                        <li>Email notifications for sales and reviews</li>
+                        <li>Monthly royalty reports and payouts</li>
+                    </ul>
+
+                    <h3>Marketing Support (All tiers)</h3>
+                    <ul>
+                        <li>Featured in Soullab newsletter</li>
+                        <li>Social media promotion</li>
+                        <li>Cross-promotion with similar works</li>
+                        <li>Member-only promotions and bundles</li>
+                        <li>Launch campaign templates</li>
+                    </ul>
+
+                    <div class="step-note">
+                        <strong>Forest tier:</strong> Get dedicated launch support, email marketing automation,
+                        affiliate program setup, and quarterly strategy calls with the publishing team.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <section>
+            <h2 style="text-align: center; font-size: 2.5em; color: #d4b896; font-weight: 300; margin-bottom: 50px;">
+                Helpful Resources
+            </h2>
+            <div class="quick-links">
+                <a href="benefits.html" class="quick-link">
+                    <div class="quick-link-icon">📚</div>
+                    <h3>Compare Tiers</h3>
+                    <p>See what publishing features each Genesis tier includes</p>
+                </a>
+
+                <a href="elemental-alchemy.html" class="quick-link">
+                    <div class="quick-link-icon">✨</div>
+                    <h3>Example Book</h3>
+                    <p>See a published work on Soullab (Elemental Alchemy)</p>
+                </a>
+
+                <a href="/genesis-soullab-life/checkout.html" class="quick-link">
+                    <div class="quick-link-icon">🌱</div>
+                    <h3>Join Genesis</h3>
+                    <p>Get started with Seed, Grove, or Forest tier</p>
+                </a>
+
+                <a href="mailto:publishing@soullab.ai" class="quick-link">
+                    <div class="quick-link-icon">💬</div>
+                    <h3>Questions?</h3>
+                    <p>Contact our publishing team for help</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <div class="faq">
+            <h2>Common Questions</h2>
+
+            <div class="faq-item">
+                <h3>How long does the publishing process take?</h3>
+                <p>
+                    Ebooks can go live in 24-48 hours. Print books take 1-2 weeks for proof review and approval.
+                    Audiobooks and courses depend on content length but typically 1-2 weeks.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Do I need professional editing or design first?</h3>
+                <p>
+                    Not required, but recommended for best results. We offer à la carte editing and design services
+                    with member discounts. MAIA can also provide basic manuscript feedback.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>What if I don't have a cover design?</h3>
+                <p>
+                    All tiers include access to cover templates. Grove and Forest tiers get enhanced templates.
+                    You can also hire our design team or use your own designer.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Can I update my book after publishing?</h3>
+                <p>
+                    Yes! You can upload new versions anytime. Digital formats update instantly. Print books create
+                    a new edition. You control versioning and updates.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>How do I get paid?</h3>
+                <p>
+                    Royalties accumulate in your creator account. Request payout anytime (minimum $50).
+                    We pay via Stripe Connect to your bank account. Typically processes within 2-5 business days.
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>What about ISBN and copyright?</h3>
+                <p>
+                    We provide free ISBNs for all published works. Copyright remains 100% yours. We also offer
+                    guidance on copyright registration (US) and licensing options (Creative Commons, All Rights Reserved, etc.).
+                </p>
+            </div>
+
+            <div class="faq-item">
+                <h3>Can I publish collaboratively with others?</h3>
+                <p>
+                    Yes! Forest tier includes collaborative publishing tools with automatic royalty splitting.
+                    Perfect for anthologies, multi-author works, or community projects.
+                </p>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-section">
+            <h2>Ready to Publish?</h2>
+            <p>Join Genesis and start sharing your wisdom with the world</p>
+            <a href="/genesis-soullab-life/checkout.html" class="btn-primary">Get Started</a>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2025 Soullab Publishing. Technology in service of wisdom.</p>
+            <p style="margin-top: 15px;">
+                <a href="index.html">Home</a> ·
+                <a href="benefits.html">Benefits</a> ·
+                <a href="how-it-works.html">How It Works</a> ·
+                <a href="mailto:publishing@soullab.ai">Contact</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>

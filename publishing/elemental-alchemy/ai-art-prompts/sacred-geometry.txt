@@ -1,0 +1,46 @@
+# SACRED GEOMETRY ILLUSTRATIONS
+# For Midjourney v6 or DALL-E 3
+
+## The Torus (Primary Sacred Geometry)
+
+### Version 1: Full Detail
+A luminous torus energy field showing the flow of consciousness, golden amber light descending through the upper funnel representing manifestation, deep blue-purple light ascending through the lower funnel representing spirit returning to source, radial perspective grid lines emanating from the center showing the field of awareness, ethereal desert atmosphere with sandy gold (#d4b896) and emerald (#10B981) color accents, sacred geometry art style, highly detailed with visible energy flow patterns, 4K resolution, cinematic mystical lighting, viewed from a slight angle to show depth and dimensionality --ar 2:3 --style raw --v 6
+
+### Version 2: Simplified Diagram
+Clean sacred geometry diagram of a torus field, golden light pathway descending (labeled), blue-purple light pathway ascending (labeled), consciousness field grid, minimal color palette of sandy gold and emerald on deep purple background, educational diagram style but mystical, vector-quality clarity, suitable for book illustration --ar 16:9 --style raw
+
+### Version 3: Meditative
+Softly glowing torus in meditation space, gentle golden and blue energies flowing, peaceful desert twilight atmosphere, figure in silhouette meditating at the center of the torus field, transcendent and calming, warm color palette, spiritual photography style --ar 4:5
+
+## The Dragonfly (Metamorphosis Symbol)
+
+### Version 1: Mystical Detailed
+Sacred dragonfly with four luminous wings representing the four elements (fire-gold wing top left, water-blue wing bottom left, earth-green wing bottom right, air-silver wing top right), hovering in perfect stillness above desert sand, colored spheres of light pulsing outward from the dragonfly in concentric circles, each sphere containing sacred geometry patterns (triangle for fire, inverted triangle for water, etc.), iridescent wings catching golden hour desert light, background of distant purple mountains, mandala pattern subtle in the sky behind, mystical realism art style, extremely high detail, magical atmosphere --ar 2:3 --v 6
+
+### Version 2: Icon/Symbol
+Elegant dragonfly symbol in sacred geometry style, four wings clearly defined with elemental symbols integrated, suitable for chapter headers, clean vector design, sandy gold and emerald colors on deep purple, minimal but powerful --ar 1:1 --style raw
+
+## The Dodecahedron (Fifth Element - Aether)
+
+### Version 1: Cosmic Unity
+Luminous dodecahedron floating in cosmic space, each of the 12 pentagonal faces glowing with different colored light representing unified spectrum, all four elemental energies (fire/gold, water/blue, earth/green, air/silver) flowing INTO the dodecahedron and merging into pure white-gold light at center, representing aether/quintessence, deep purple cosmic background with distant stars and galaxies, sacred geometry overlays showing how the dodecahedron contains all other Platonic solids, transcendent and infinite atmosphere, divine unity visualization, ethereal and mystical, 4K detail --ar 1:1 --v 6
+
+### Version 2: Geometric Study
+Clean technical illustration of a dodecahedron showing geometric perfection, golden ratio proportions visible, pentagonal symmetry highlighted, sacred geometry educational diagram, sandy gold wireframe on deep purple background --ar 4:3 --style raw
+
+## Sacred Spirals
+
+### Version 1: Golden Ratio Spiral
+Fibonacci spiral in golden light emerging from desert sand, golden ratio proportions clearly visible (1.618), spiral expanding outward showing growth and evolution, subtle grid showing the mathematical perfection, sandy desert landscape with purple twilight sky, mystical mathematics visualization, beautiful and precise --ar 16:9 --style raw
+
+### Version 2: Multiple Frequency Spirals
+Three spirals interweaving - golden spiral (slow expansion), Fibonacci spiral (organic growth), and logarithmic spiral (consciousness evolution), each in different color (gold, emerald, silver), emanating from single point, showing how different timestreams of transformation breathe together, sacred geometry meets fractal art, mesmerizing and complex --ar 2:3 --v 6
+
+## The Trinity Framework
+
+### Version 1: Sacred Circles
+Three equal circles arranged in triangle formation, overlapping to create vesica piscis shapes between them, top circle labeled "AGENT" (initiating force) glowing gold, bottom left circle labeled "AGENCY" (creative medium) glowing emerald, bottom right circle labeled "MANIFESTATION" (result) glowing silver, central overlap area where all three meet glowing brilliant white, flowing energy lines connecting all three, clean sacred geometry diagram with Dune aesthetic colors, mystical but clear and educational --ar 4:3 --style raw
+
+### Version 2: Dynamic Energy
+Same trinity structure but showing active energy flow, streams of light flowing from Agent through Agency to Manifestation and back in continuous cycle, more atmospheric and alive, representing the living process of creation --ar 4:3 --v 6
+

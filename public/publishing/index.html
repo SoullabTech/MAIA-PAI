@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soullab Publishing - Publish Your Wisdom, Keep Your Sovereignty</title>
+    <meta name="description" content="The fairest publishing platform for conscious creators. Keep 95% royalties, 100% ownership. Books, courses, music, and more.">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(212, 184, 150, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 70%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(15, 12, 41, 0.9) 0%, rgba(26, 31, 58, 0.95) 50%, rgba(36, 36, 62, 1) 100%),
+                linear-gradient(135deg, #0a0817 0%, #141526 25%, #1a1f3a 50%, #1e2242 75%, #24243e 100%);
+            background-attachment: fixed;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.03) 2px, rgba(0, 0, 0, 0.03) 4px);
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            right: -50%;
+            bottom: -50%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(212, 184, 150, 0.2);
+            padding: 15px 20px;
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5em;
+            color: #d4b896;
+            font-weight: 300;
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 400;
+        }
+
+        .nav-links a:hover {
+            color: #d4b896;
+        }
+
+        .nav-cta {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 140px 20px 100px;
+            background: radial-gradient(ellipse at center, rgba(212, 184, 150, 0.15) 0%, transparent 70%);
+        }
+
+        .hero h1 {
+            font-size: 4em;
+            font-weight: 300;
+            color: #d4b896;
+            margin-bottom: 25px;
+            letter-spacing: 3px;
+            line-height: 1.2;
+        }
+
+        .hero .subtitle {
+            font-size: 1.8em;
+            color: #E3B778;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .hero .description {
+            font-size: 1.25em;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            margin: 0 auto 50px;
+            line-height: 1.8;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 18px 45px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            padding: 18px 45px;
+            background: rgba(212, 184, 150, 0.1);
+            color: #d4b896;
+            text-decoration: none;
+            border-radius: 10px;
+            border: 2px solid #d4b896;
+            font-weight: 500;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 184, 150, 0.2);
+            transform: translateY(-3px);
+        }
+
+        /* Stats Section */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 80px 0;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 184, 150, 0.15);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .stat-number {
+            font-size: 3.5em;
+            font-weight: 300;
+            color: #10B981;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Section */
+        .section {
+            margin: 100px 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-header h2 {
+            font-size: 3em;
+            font-weight: 300;
+            color: #d4b896;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .section-header p {
+            font-size: 1.3em;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 35px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 184, 150, 0.15);
+            border-radius: 16px;
+            padding: 40px;
+            transition: all 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.05);
+            box-shadow: 0 15px 40px rgba(16, 185, 129, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5em;
+            color: #E3B778;
+            margin-bottom: 15px;
+            font-weight: 400;
+        }
+
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.8;
+        }
+
+        /* Comparison Table */
+        .comparison {
+            background: rgba(16, 185, 129, 0.04);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 20px;
+            padding: 60px;
+            margin: 80px 0;
+        }
+
+        .comparison h2 {
+            text-align: center;
+            font-size: 2.5em;
+            color: #d4b896;
+            font-weight: 300;
+            margin-bottom: 50px;
+        }
+
+        .comparison-table {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 184, 150, 0.15);
+            border-radius: 16px;
+            overflow: hidden;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            padding: 25px;
+            border-bottom: 1px solid rgba(212, 184, 150, 0.1);
+            align-items: center;
+        }
+
+        .comparison-row:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-row.header {
+            background: rgba(212, 184, 150, 0.08);
+            font-weight: 500;
+        }
+
+        .comparison-row .highlight {
+            color: #10B981;
+            font-weight: 600;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 80px 0;
+        }
+
+        .testimonial {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 184, 150, 0.15);
+            border-radius: 16px;
+            padding: 40px;
+        }
+
+        .testimonial-quote {
+            font-size: 1.15em;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.85);
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            color: #E3B778;
+            font-weight: 500;
+        }
+
+        .testimonial-role {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95em;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 80px 40px;
+            background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.02) 70%);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 20px;
+            margin: 80px 0;
+        }
+
+        .cta-section h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #d4b896;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .cta-section p {
+            font-size: 1.3em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 60px 20px 40px;
+            color: rgba(255, 255, 255, 0.5);
+            border-top: 1px solid rgba(212, 184, 150, 0.1);
+            margin-top: 100px;
+            font-weight: 300;
+        }
+
+        footer a {
+            color: #10B981;
+            text-decoration: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5em;
+            }
+
+            .hero .subtitle {
+                font-size: 1.3em;
+            }
+
+            .section-header h2 {
+                font-size: 2em;
+            }
+
+            .comparison-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .comparison-row > div:first-child {
+                font-weight: 500;
+                color: #d4b896;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero-ctas {
+                flex-direction: column;
+            }
+
+            .comparison {
+                padding: 40px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="nav">
+            <div class="nav-content">
+                <a href="/" class="nav-logo">SOULLAB PUBLISHING</a>
+                <div class="nav-links">
+                    <a href="index.html">Platform</a>
+                    <a href="benefits.html">Benefits</a>
+                    <a href="how-it-works.html">How It Works</a>
+                    <a href="elemental-alchemy.html">Featured</a>
+                    <a href="/genesis-soullab-life/index.html" class="nav-cta">Join Genesis</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero -->
+        <section class="hero">
+            <h1>Publish Your Wisdom,<br>Keep Your Sovereignty</h1>
+            <p class="subtitle">The fairest publishing platform for conscious creators</p>
+            <p class="description">
+                Stop asking permission to share your gifts. Keep 95% of royalties, 100% of your rights,
+                and full creative control. Publish books, courses, music, and more—supported by AI and community.
+            </p>
+            <div class="hero-ctas">
+                <a href="/genesis-soullab-life/checkout.html" class="btn-primary">Start Publishing</a>
+                <a href="how-it-works.html" class="btn-secondary">See How It Works</a>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">95%</div>
+                <div class="stat-label">Royalties to Creators</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">You Keep All Rights</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">30 Days</div>
+                <div class="stat-label">Idea to Published</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">∞</div>
+                <div class="stat-label">Unlimited Publishing</div>
+            </div>
+        </div>
+
+        <!-- What You Can Publish -->
+        <section class="section">
+            <div class="section-header">
+                <h2>What You Can Publish</h2>
+                <p>Multi-format publishing for every kind of conscious creator</p>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>Books & Ebooks</h3>
+                    <p>
+                        Fiction, non-fiction, poetry, guides. Publish in ebook (EPUB, MOBI, PDF) and
+                        print-on-demand (paperback, hardcover). Distribute globally through our network.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎓</div>
+                    <h3>Courses & Programs</h3>
+                    <p>
+                        Video courses, meditation programs, healing protocols. Built-in video hosting,
+                        downloadable materials, drip content, and certificates.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎵</div>
+                    <h3>Music & Sound Healing</h3>
+                    <p>
+                        Albums, singles, guided meditations, sound baths. Distribute to Spotify, Apple Music,
+                        and beyond while keeping your rights and fair royalties.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔮</div>
+                    <h3>Oracle & Tarot Decks</h3>
+                    <p>
+                        Digital and print-on-demand decks. Templates for card design, guidebook integration,
+                        and beautiful packaging options.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎙️</div>
+                    <h3>Audiobooks & Podcasts</h3>
+                    <p>
+                        Narrate your own work or hire professionals. Distribute to Audible, Apple Books,
+                        and more. Full hosting included.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Workbooks & Printables</h3>
+                    <p>
+                        Journals, worksheets, planners, coloring books. Instant PDF delivery or
+                        print-on-demand physical copies.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comparison -->
+        <div class="comparison">
+            <h2>Why Soullab vs. Traditional Publishing</h2>
+
+            <div class="comparison-table">
+                <div class="comparison-row header">
+                    <div>Feature</div>
+                    <div>Traditional</div>
+                    <div>Amazon KDP</div>
+                    <div class="highlight">Soullab</div>
+                </div>
+
+                <div class="comparison-row">
+                    <div>Your Royalties</div>
+                    <div>10-25%</div>
+                    <div>35-70%</div>
+                    <div class="highlight">91-95%</div>
+                </div>
+
+                <div class="comparison-row">
+                    <div>Rights Ownership</div>
+                    <div>Publisher owns</div>
+                    <div>You own</div>
+                    <div class="highlight">You own 100%</div>
+                </div>
+
+                <div class="comparison-row">
+                    <div>Time to Publish</div>
+                    <div>12-18 months</div>
+                    <div>1-2 weeks</div>
+                    <div class="highlight">1-4 weeks</div>
+                </div>
+
+                <div class="comparison-row">
+                    <div>Creative Control</div>
+                    <div>Limited</div>
+                    <div>Full</div>
+                    <div class="highlight">Full</div>
+                </div>
+
+                <div class="comparison-row">
+                    <div>Marketing Support</div>
+                    <div>Minimal</div>
+                    <div>None</div>
+                    <div class="highlight">Included</div>
+                </div>
+
+                <div class="comparison-row">
+                    <div>AI Assistance</div>
+                    <div>No</div>
+                    <div>No</div>
+                    <div class="highlight">Yes (MAIA)</div>
+                </div>
+
+                <div class="comparison-row">
+                    <div>Built-in Audience</div>
+                    <div>Maybe</div>
+                    <div>No</div>
+                    <div class="highlight">Yes</div>
+                </div>
+
+                <div class="comparison-row">
+                    <div>Community</div>
+                    <div>No</div>
+                    <div>No</div>
+                    <div class="highlight">Yes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How It Works (Brief) -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Simple Publishing Process</h2>
+                <p>From manuscript to published in four easy steps</p>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">1️⃣</div>
+                    <h3>Upload Your Work</h3>
+                    <p>
+                        Upload manuscripts in DOCX, PDF, or Markdown. Add audio files, videos, or images.
+                        Our system handles the rest.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">2️⃣</div>
+                    <h3>Choose Formats</h3>
+                    <p>
+                        Select ebook, print, audiobook, or all of the above. Automatic conversion to
+                        professional formats with our templates.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">3️⃣</div>
+                    <h3>Set Your Pricing</h3>
+                    <p>
+                        You control the price. Set different prices per format. Offer member discounts,
+                        bundles, or pay-what-you-want.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">4️⃣</div>
+                    <h3>Publish & Distribute</h3>
+                    <p>
+                        One click to publish. Automatic distribution to multiple channels. You earn 91-95%
+                        of every sale, forever.
+                    </p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 50px;">
+                <a href="how-it-works.html" class="btn-secondary">See Detailed Process →</a>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="section">
+            <div class="section-header">
+                <h2>Creator Stories</h2>
+                <p>From our publishing community</p>
+            </div>
+
+            <div class="testimonials">
+                <div class="testimonial">
+                    <p class="testimonial-quote">
+                        "I had been sitting on my healing poetry for years. Within a month of joining Soullab,
+                        my collection was live in ebook, print, and audiobook. I've already earned $2,400 in
+                        the first quarter."
+                    </p>
+                    <div class="testimonial-author">Sarah M.</div>
+                    <div class="testimonial-role">Somatic Healer & Poet</div>
+                </div>
+
+                <div class="testimonial">
+                    <p class="testimonial-quote">
+                        "The video hosting and course tools made it so easy. I uploaded my 12-week meditation
+                        program, and Soullab members found it immediately. No ads, no social media hustle."
+                    </p>
+                    <div class="testimonial-author">James T.</div>
+                    <div class="testimonial-role">Meditation Teacher</div>
+                </div>
+
+                <div class="testimonial">
+                    <p class="testimonial-quote">
+                        "15 members contributed to our 'Voices of the Sacred' anthology. The royalty splitting
+                        worked perfectly. It brought our community closer together."
+                    </p>
+                    <div class="testimonial-author">The Sacred Circle</div>
+                    <div class="testimonial-role">Community Collective</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA -->
+        <div class="cta-section">
+            <h2>Ready to Share Your Wisdom?</h2>
+            <p>
+                Join Genesis to unlock publishing tools, keep your sovereignty, and earn what you deserve.
+                Your voice matters. Your work has value. Let's bring it into the world.
+            </p>
+            <div class="hero-ctas">
+                <a href="/genesis-soullab-life/checkout.html" class="btn-primary">Start Publishing Today</a>
+                <a href="benefits.html" class="btn-secondary">Compare Tiers</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2025 Soullab Publishing. Technology in service of wisdom.</p>
+            <p style="margin-top: 15px;">
+                <a href="/">Home</a> ·
+                <a href="benefits.html">Benefits</a> ·
+                <a href="how-it-works.html">How It Works</a> ·
+                <a href="mailto:publishing@soullab.ai">Contact</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
