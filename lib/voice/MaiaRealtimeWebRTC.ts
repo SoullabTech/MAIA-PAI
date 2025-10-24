@@ -34,6 +34,7 @@ export class MaiaRealtimeWebRTC {
   private audioElement: HTMLAudioElement | null = null;
   private isConnecting: boolean = false;
   private responseTimeoutId?: NodeJS.Timeout; // Detect when API doesn't respond
+  private microphoneStream: MediaStream | null = null; // Track microphone for muting during MAIA speech
 
   constructor(config: MaiaRealtimeConfig) {
     this.config = {
@@ -91,8 +92,9 @@ export class MaiaRealtimeWebRTC {
 
       console.log('📤 Sending SDP offer to backend...');
 
-      // Step 6: Send SDP + mode to our backend (unified interface)
+      // Step 6: Send SDP + mode + userId to our backend (unified interface)
       // Our backend combines SDP with mode-specific session config and forwards to OpenAI
+      // Includes userId for Akashic Field context retrieval
       const sdpResponse = await fetch('/api/voice/webrtc-session', {
         method: 'POST',
         headers: {
@@ -100,7 +102,8 @@ export class MaiaRealtimeWebRTC {
         },
         body: JSON.stringify({
           sdp: offer.sdp,
-          mode: this.config.mode
+          mode: this.config.mode,
+          userId: this.config.userId // Pass userId for context retrieval
         }),
       });
 
@@ -142,6 +145,7 @@ export class MaiaRealtimeWebRTC {
       }
 
       this.audioElement.srcObject = event.streams[0];
+      this.muteMicrophone(); // Prevent MAIA from hearing herself
       this.config.onAudioStart();
     };
 
@@ -361,6 +365,7 @@ export class MaiaRealtimeWebRTC {
       case 'response.audio.done':
         // Clear timeout - response completed
         this.clearResponseTimeout();
+        this.unmuteMicrophone(); // Re-enable microphone for user input
         this.config.onAudioEnd();
         console.log('🔊 Audio playback done');
         break;
@@ -488,6 +493,9 @@ export class MaiaRealtimeWebRTC {
 
       console.log('🎤 Microphone access granted');
 
+      // Store stream for later muting/unmuting
+      this.microphoneStream = stream;
+
       // Add audio track to peer connection
       stream.getAudioTracks().forEach((track) => {
         this.peerConnection?.addTrack(track, stream);
@@ -528,6 +536,12 @@ export class MaiaRealtimeWebRTC {
       this.audioElement = null;
     }
 
+    // Stop microphone tracks
+    if (this.microphoneStream) {
+      this.microphoneStream.getTracks().forEach((track) => track.stop());
+      this.microphoneStream = null;
+    }
+
     console.log('🛑 Disconnected from Realtime API');
     this.config.onDisconnected();
   }
@@ -565,6 +579,26 @@ export class MaiaRealtimeWebRTC {
     this.sendEvent({
       type: 'response.cancel',
     });
+  }
+
+  // Mute microphone to prevent audio feedback during MAIA speech
+  private muteMicrophone(): void {
+    if (this.microphoneStream) {
+      this.microphoneStream.getAudioTracks().forEach((track) => {
+        track.enabled = false;
+      });
+      console.log('🔇 Microphone muted (preventing echo)');
+    }
+  }
+
+  // Unmute microphone after MAIA finishes speaking
+  private unmuteMicrophone(): void {
+    if (this.microphoneStream) {
+      this.microphoneStream.getAudioTracks().forEach((track) => {
+        track.enabled = true;
+      });
+      console.log('🎤 Microphone unmuted (ready to listen)');
+    }
   }
 
   // Change conversation mode dynamically (requires reconnection)
