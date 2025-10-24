@@ -18,14 +18,15 @@
 import { createClient } from '@supabase/supabase-js';
 import { OpenAI } from 'openai';
 
-const supabase = createClient(
+// Only initialize on server-side (prevent browser crashes)
+const supabase = typeof window === 'undefined' ? createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+) : null as any;
 
-const openai = new OpenAI({
+const openai = typeof window === 'undefined' ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!
-});
+}) : null as any;
 
 // Journey threshold pattern
 export interface JourneyPattern {

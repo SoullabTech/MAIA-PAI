@@ -5,9 +5,17 @@
 import { createClient } from "@/lib/supabase";
 import OpenAI from "openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+// Lazy-load OpenAI client to prevent client-side instantiation
+// This ensures the client is only created when actually used (server-side)
+let _openaiClient: OpenAI | null = null;
+function getOpenAIClient(): OpenAI {
+  if (!_openaiClient) {
+    _openaiClient = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY!,
+    });
+  }
+  return _openaiClient;
+}
 
 export interface FieldInsight {
   element: string;
@@ -49,6 +57,7 @@ export async function queryAkashicField(
     }
 
     // Generate embedding for the query
+    const openai = getOpenAIClient();
     const embeddingResponse = await openai.embeddings.create({
       model: "text-embedding-ada-002",
       input: query.slice(0, 8000),

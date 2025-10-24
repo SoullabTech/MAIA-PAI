@@ -7,9 +7,17 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 import crypto from "crypto";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
+// Lazy-load OpenAI client to prevent client-side instantiation
+// This ensures the client is only created when actually used (server-side)
+let _openaiClient: OpenAI | null = null;
+function getOpenAIClient(): OpenAI {
+  if (!_openaiClient) {
+    _openaiClient = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY!,
+    });
+  }
+  return _openaiClient;
+}
 
 // Node identifier for this MAIA instance
 const NODE_ID = process.env.NEXT_PUBLIC_NODE_ID || "maia-primary";
@@ -65,6 +73,7 @@ export async function embedToField(
     }
 
     // Generate embedding using OpenAI ada-002 (1536 dimensions)
+    const openai = getOpenAIClient();
     const embeddingResponse = await openai.embeddings.create({
       model: "text-embedding-ada-002",
       input: content.slice(0, 8000), // Max 8000 chars for ada-002

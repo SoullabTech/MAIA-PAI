@@ -12,9 +12,10 @@ import { detectCommunicatorType, getHighBandwidthStrategy } from './HighBandwidt
 import { VoiceCognitiveArchitecture } from './VoiceCognitiveArchitecture';
 import { PersonalOracleAgent } from '../agents/PersonalOracleAgent';
 
-const openai = new OpenAI({
+// Only initialize on server-side (prevent browser crashes)
+const openai = typeof window === 'undefined' ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!
-});
+}) : null as any;
 
 // Initialize cognitive architecture for voice
 const cognitiveArchitecture = new VoiceCognitiveArchitecture();

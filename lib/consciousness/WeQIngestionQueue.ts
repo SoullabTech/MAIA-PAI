@@ -14,14 +14,15 @@
 import { OpenAI } from 'openai';
 import { createClient } from '@supabase/supabase-js';
 
-const openai = new OpenAI({
+// Only initialize on server-side (prevent browser crashes)
+const openai = typeof window === 'undefined' ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
-});
+}) : null as any;
 
-const supabase = createClient(
+const supabase = typeof window === 'undefined' ? createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+) : null as any;
 
 // Elemental balance across library
 export interface LibraryElementalBalance {
