@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Sparkles, Sun, Moon, Coffee, Star } from 'lucide-react';
+import { Sparkles, Sun, Moon, Coffee, Star, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 
 /**
