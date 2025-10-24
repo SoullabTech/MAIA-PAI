@@ -259,6 +259,11 @@
     background: linear-gradient(135deg, var(--spice-orange) 0%, var(--spice-deep) 50%, var(--desert-dark) 100%);
   }
 
+  /* Royal Sunset - Toned down, regal version with better readability */
+  .bg-royal-sunset {
+    background: linear-gradient(135deg, #B85C3D 0%, #8B4513 30%, #654321 70%, #3D2817 100%);
+  }
+
   .bg-caladan-waters {
     background: linear-gradient(135deg, var(--caladan-teal) 0%, var(--water-deep) 100%);
   }

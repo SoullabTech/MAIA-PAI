@@ -217,7 +217,7 @@ export default function CheckInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-arrakis-sunset text-deep-sand flex items-center justify-center px-4">
+    <div className="min-h-screen bg-royal-sunset text-amber-50 flex items-center justify-center px-4">
       {/* Film grain texture overlay */}
       <div className="fixed inset-0 pointer-events-none texture-sand opacity-[0.05]" />
 
@@ -291,7 +291,7 @@ export default function CheckInPage() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="text-center mb-6"
         >
-          <h2 className="text-2xl font-cormorant tracking-widest text-bene-gesserit-gold glow-spice">
+          <h2 className="text-2xl font-cormorant tracking-widest text-amber-200 glow-spice">
             SOULLAB
           </h2>
         </motion.div>
@@ -317,7 +317,7 @@ export default function CheckInPage() {
             <div className="card-sietch rounded-xl p-5 backdrop-blur-md relative">
               <button
                 onClick={handleDismissAnnouncement}
-                className="absolute top-3 right-3 transition-colors text-xs text-deep-sand/70 hover:text-deep-sand"
+                className="absolute top-3 right-3 transition-colors text-xs text-amber-300/70 hover:text-amber-200"
               >
                 ✕
               </button>
@@ -329,16 +329,16 @@ export default function CheckInPage() {
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-cormorant font-medium text-sm mb-1.5 text-sienna-rock">
+                  <h3 className="font-cormorant font-medium text-sm mb-1.5 text-amber-200">
                     {CURRENT_ANNOUNCEMENT.title}
                   </h3>
-                  <p className="font-cinzel text-xs leading-relaxed text-deep-sand/90">
+                  <p className="font-cinzel text-xs leading-relaxed text-amber-100/90">
                     {CURRENT_ANNOUNCEMENT.message}
                   </p>
                   {CURRENT_ANNOUNCEMENT.link && (
                     <a
                       href={CURRENT_ANNOUNCEMENT.link.url}
-                      className="inline-block mt-2 text-xs font-raleway font-medium transition-colors text-bene-gesserit-gold hover:text-spice-orange"
+                      className="inline-block mt-2 text-xs font-raleway font-medium transition-colors text-amber-300 hover:text-amber-200"
                     >
                       {CURRENT_ANNOUNCEMENT.link.text} →
                     </a>
@@ -356,10 +356,10 @@ export default function CheckInPage() {
           transition={{ duration: 0.8, delay: shouldShowAnnouncement() ? 0.5 : 0.4 }}
           className="mb-12 text-center"
         >
-          <p className="text-lg font-cormorant leading-relaxed italic mb-3 text-desert-dark">
+          <p className="text-lg font-cormorant leading-relaxed italic mb-3 text-amber-100">
             "{quote.text}"
           </p>
-          <p className="text-sm font-raleway text-deep-sand/80">
+          <p className="text-sm font-raleway text-amber-200/90">
             {quote.author}
           </p>
         </motion.div>
@@ -371,13 +371,13 @@ export default function CheckInPage() {
           transition={{ duration: 0.6, delay: 0.6 }}
           className="text-center mb-8"
         >
-          <h1 className="text-dune-title font-cormorant text-sienna-rock">
+          <h1 className="text-dune-title font-cormorant text-amber-100">
             You Are Remembered
           </h1>
-          <p className="text-xs font-raleway tracking-wider mb-4 text-bene-gesserit-gold glow-spice uppercase">
+          <p className="text-xs font-raleway tracking-wider mb-4 text-amber-300 glow-spice uppercase">
             Your Path Continues
           </p>
-          <p className="text-sm font-cinzel leading-relaxed text-deep-sand">
+          <p className="text-sm font-cinzel leading-relaxed text-amber-200">
             Enter your name to continue
           </p>
         </motion.div>
@@ -401,7 +401,7 @@ export default function CheckInPage() {
               className="input-water text-center"
               autoFocus
             />
-            <p className="text-xs mt-2 text-center font-raleway text-deep-sand/70">
+            <p className="text-xs mt-2 text-center font-raleway text-amber-200/70">
               Swift passage
             </p>
           </div>
@@ -446,15 +446,9 @@ export default function CheckInPage() {
           <div className="text-center">
             <button
               onClick={() => router.push('/week2-welcome')}
-              className="transition-colors text-sm font-serif inline-flex items-center gap-2"
-              style={{
-                color: '#D4AF37',
-                textShadow: '0 0 8px rgba(212, 175, 55, 0.3)',
-              }}
+              className="transition-colors text-sm font-serif inline-flex items-center gap-2 text-amber-300 hover:text-amber-200"
             >
-              <Sparkles className="w-4 h-4" style={{
-                filter: 'drop-shadow(0 0 4px rgba(212, 175, 55, 0.6))',
-              }} />
+              <Sparkles className="w-4 h-4" />
               <span>New here? Create account</span>
             </button>
           </div>
@@ -463,31 +457,20 @@ export default function CheckInPage() {
           <div className="text-center">
             <button
               onClick={() => router.push('/auth')}
-              className="transition-colors text-xs font-serif"
-              style={{
-                color: '#8B7355',
-              }}
+              className="transition-colors text-xs font-serif text-amber-300/70 hover:text-amber-200"
             >
               Need password sign-in instead?
             </button>
           </div>
 
           {/* Help text */}
-          <div className="text-center pt-4" style={{
-            borderTop: '1px solid rgba(201, 168, 106, 0.2)',
-          }}>
-            <p className="text-xs font-serif leading-relaxed" style={{
-              color: '#8B7355',
-              opacity: 0.8,
-            }}>
-              <strong style={{ color: '#6B5A4A' }}>Tip:</strong> If you haven't been here in a while and your username doesn't work,
+          <div className="text-center pt-4 border-t border-amber-400/20">
+            <p className="text-xs font-serif leading-relaxed text-amber-200/70">
+              <strong className="text-amber-300">Tip:</strong> If you haven't been here in a while and your username doesn't work,
               <br />
               <button
                 onClick={() => router.push('/week2-welcome')}
-                className="font-serif underline underline-offset-2 transition-colors"
-                style={{
-                  color: '#D4AF37',
-                }}
+                className="font-serif underline underline-offset-2 transition-colors text-amber-300 hover:text-amber-200"
               >
                 it's easy to create a fresh account
               </button>
@@ -504,24 +487,13 @@ export default function CheckInPage() {
           className="mt-16 text-center"
         >
           <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="h-px w-8" style={{
-              background: 'linear-gradient(to right, transparent, #D4AF37, transparent)',
-            }} />
-            <p className="text-xs font-serif tracking-wider" style={{
-              color: '#D4AF37',
-              textShadow: '0 0 6px rgba(212, 175, 55, 0.2)',
-              letterSpacing: '0.12em',
-            }}>
+            <div className="h-px w-8 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent" />
+            <p className="text-xs font-serif tracking-[0.12em] text-amber-300">
               BIRTHED BY SOULLAB
             </p>
-            <div className="h-px w-8" style={{
-              background: 'linear-gradient(to right, transparent, #D4AF37, transparent)',
-            }} />
+            <div className="h-px w-8 bg-gradient-to-r from-transparent via-amber-400/50 to-transparent" />
           </div>
-          <p className="text-xs font-serif italic" style={{
-            color: '#8B7355',
-            opacity: 0.7,
-          }}>
+          <p className="text-xs font-serif italic text-amber-200/60">
             Technology that honors the work
           </p>
         </motion.div>
