@@ -75,9 +75,10 @@ export default function WelcomeBackPage() {
     setLoading(false);
   }, [router]);
 
-  const handleHoloflowerCheckIn = () => {
-    router.push('/holoflower-checkin');
-  };
+  // TEMP: Holoflower check-in removed until redesign complete
+  // const handleHoloflowerCheckIn = () => {
+  //   router.push('/holoflower-checkin');
+  // };
 
   const handleContinueToMaia = () => {
     router.push('/maia');
@@ -236,33 +237,36 @@ export default function WelcomeBackPage() {
             )}
           </motion.div>
 
-          {/* Choice: Check In or Continue */}
+          {/* Continue to MAIA */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.9 }}
             className="space-y-4"
           >
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={handleHoloflowerCheckIn}
-                className="btn-spice inline-flex items-center gap-3 justify-center"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Check In with Holoflower</span>
-              </button>
+            <div className="flex justify-center">
               <button
                 onClick={handleContinueToMaia}
-                className="px-6 py-3 rounded-lg bg-transparent border border-spice-orange/40 text-spice-orange hover:bg-spice-orange/10 transition-all inline-flex items-center gap-3 justify-center font-raleway"
+                className="btn-spice inline-flex items-center gap-3 justify-center"
               >
                 <span>Continue to MAIA</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
             <p className="text-dune-amber/60 text-sm italic font-raleway text-center">
-              Check in to share your current state with MAIA
+              Ready to continue your journey
             </p>
           </motion.div>
+
+          {/* TEMP: Check-in removed until holoflower redesign complete
+          <button
+            onClick={handleHoloflowerCheckIn}
+            className="btn-spice inline-flex items-center gap-3 justify-center"
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>Check In with Holoflower</span>
+          </button>
+          */}
         </motion.div>
       </div>
     </div>

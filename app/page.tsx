@@ -15,12 +15,13 @@ export default function HomePage() {
     const betaUser = localStorage.getItem("beta_user");
 
     if (week2Onboarded) {
-      // Completed Week 2 onboarding - go to check-in
-      router.replace('/checkin');
+      // Completed Week 2 onboarding - go directly to MAIA
+      // TEMP: Check-in removed until holoflower redesign complete
+      router.replace('/maia');
     } else if (betaOnboarded || betaUser) {
-      // Returning user who completed original onboarding - send to check-in ritual
-      // (They get the beautiful quotes and Maia as Daimon)
-      router.replace('/checkin');
+      // Returning user who completed original onboarding - send directly to MAIA
+      // TEMP: Check-in removed until holoflower redesign complete
+      router.replace('/maia');
     } else {
       // New user - go through Week 2 welcome
       router.replace('/week2-welcome');
