@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * Soullab Blog Platform
- * Articles on consciousness, elemental wisdom, and awakening
+ * Soullab Blog Platform - Ancient Manuscript Edition
+ * Deep cinematic Dune aesthetic with leather journal feel
  */
 
 import { useState } from 'react';
@@ -119,276 +119,515 @@ export default function BlogPage() {
   const featuredPosts = BLOG_POSTS.filter(post => post.featured);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
-      {/* Header */}
-      <header className="relative py-20 px-6 overflow-hidden">
-        {/* Background gradient */}
+    <div className="min-h-screen relative" style={{ background: '#0a0605' }}>
+      {/* Deep atmospheric background - Dune-like */}
+      <div className="fixed inset-0 z-0">
+        {/* Base layer - deep shadows */}
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0"
           style={{
-            background: `radial-gradient(
-              circle at 50% 0%,
-              ${SOULLAB_COLORS.air}20 0%,
-              ${SOULLAB_COLORS.fire}15 40%,
-              transparent 70%
-            )`
+            background: `
+              radial-gradient(ellipse at top, ${SOULLAB_COLORS.leather}08 0%, transparent 50%),
+              radial-gradient(ellipse at bottom, ${SOULLAB_COLORS.brown}15 0%, transparent 50%)
+            `
           }}
         />
 
-        <div className="max-w-7xl mx-auto relative">
-          <div className="text-center mb-8">
-            <h1
-              className="text-6xl md:text-7xl font-light mb-6"
-              style={{ color: SOULLAB_COLORS.air }}
-            >
-              Soullab Insights
-            </h1>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Exploring consciousness, elemental wisdom, and the science of awakening
-            </p>
-          </div>
+        {/* Leather grain texture overlay */}
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: `
+              repeating-linear-gradient(0deg, transparent, transparent 2px, ${SOULLAB_COLORS.leather}05 2px, ${SOULLAB_COLORS.leather}05 4px),
+              repeating-linear-gradient(90deg, transparent, transparent 2px, ${SOULLAB_COLORS.leather}05 2px, ${SOULLAB_COLORS.leather}05 4px)
+            `,
+            mixBlendMode: 'overlay'
+          }}
+        />
 
-          {/* Element filters */}
-          <div className="flex flex-wrap justify-center gap-3">
-            {ELEMENTS.map((element) => (
-              <button
-                key={element}
-                onClick={() => setElementFilter(element)}
-                className="px-6 py-2 rounded-full border transition-all hover:scale-105 capitalize flex items-center gap-2"
+        {/* Scratched leather effect */}
+        <svg className="absolute inset-0 w-full h-full opacity-10">
+          <defs>
+            <pattern id="scratch" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+              <path
+                d="M0,50 Q50,45 100,50 T200,50"
+                stroke={SOULLAB_COLORS.leather}
+                strokeWidth="0.5"
+                fill="none"
+                opacity="0.3"
+              />
+              <path
+                d="M0,100 Q50,95 100,100 T200,100"
+                stroke={SOULLAB_COLORS.leather}
+                strokeWidth="0.3"
+                fill="none"
+                opacity="0.2"
+              />
+              <path
+                d="M50,0 Q45,50 50,100 T50,200"
+                stroke={SOULLAB_COLORS.leather}
+                strokeWidth="0.4"
+                fill="none"
+                opacity="0.25"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#scratch)" />
+        </svg>
+
+        {/* Vignette - deeper edges */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.6) 100%)'
+          }}
+        />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Header - Ancient manuscript title */}
+        <header className="relative py-32 px-6 overflow-hidden">
+          {/* Subtle glow behind title */}
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] opacity-10 blur-3xl"
+            style={{
+              background: `radial-gradient(ellipse, ${SOULLAB_COLORS.parchment}40 0%, transparent 70%)`
+            }}
+          />
+
+          <div className="max-w-7xl mx-auto relative">
+            <div className="text-center mb-12">
+              {/* Decorative top border */}
+              <div className="flex items-center justify-center gap-4 mb-8">
+                <div className="h-px w-20" style={{ background: `linear-gradient(to right, transparent, ${SOULLAB_COLORS.leather}60, transparent)` }} />
+                <svg width="30" height="30" viewBox="0 0 30 30">
+                  <circle cx="15" cy="15" r="12" fill="none" stroke={SOULLAB_COLORS.leather} strokeWidth="0.5" opacity="0.6" />
+                  <circle cx="15" cy="15" r="8" fill="none" stroke={SOULLAB_COLORS.leather} strokeWidth="0.3" opacity="0.4" />
+                </svg>
+                <div className="h-px w-20" style={{ background: `linear-gradient(to right, transparent, ${SOULLAB_COLORS.leather}60, transparent)` }} />
+              </div>
+
+              <h1
+                className="text-7xl md:text-8xl font-light mb-6 tracking-wider"
                 style={{
-                  borderColor: element === 'all'
-                    ? `${SOULLAB_COLORS.gray}40`
-                    : elementFilter === element
-                    ? SOULLAB_COLORS[element === 'aether' ? 'air' : element]
-                    : `${SOULLAB_COLORS.gray}40`,
-                  background: elementFilter === element
-                    ? element === 'all'
-                      ? `${SOULLAB_COLORS.gray}15`
-                      : `${SOULLAB_COLORS[element === 'aether' ? 'air' : element]}15`
-                    : 'transparent',
-                  color: elementFilter === element
-                    ? element === 'all'
-                      ? SOULLAB_COLORS.gray
-                      : SOULLAB_COLORS[element === 'aether' ? 'air' : element]
-                    : SOULLAB_COLORS.gray
+                  color: SOULLAB_COLORS.parchment,
+                  textShadow: `0 2px 30px ${SOULLAB_COLORS.leather}40, 0 0 60px ${SOULLAB_COLORS.leather}20`,
+                  fontVariant: 'small-caps',
+                  letterSpacing: '0.1em'
                 }}
               >
-                {element !== 'all' && (
-                  <span className="text-xl">
-                    {element === 'fire' || element === 'air' || element === 'aether' ? '△' : '▽'}
-                  </span>
-                )}
-                {element}
-              </button>
-            ))}
-          </div>
-        </div>
-      </header>
+                Codex
+              </h1>
 
-      {/* Featured Posts */}
-      {elementFilter === 'all' && categoryFilter === 'All' && featuredPosts.length > 0 && (
-        <section className="py-12 px-6">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-3xl font-light mb-8 text-white">Featured Articles</h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              {featuredPosts.map((post) => (
-                <Link
-                  key={post.id}
-                  href={`/blog/${post.id}`}
-                  className="group relative rounded-2xl overflow-hidden transition-all hover:scale-[1.02]"
-                >
-                  <div
-                    className="p-8 min-h-[300px] flex flex-col justify-end"
-                    style={{
-                      background: `linear-gradient(135deg, ${SOULLAB_COLORS[post.element]}20 0%, ${SOULLAB_COLORS[post.element]}05 100%)`,
-                      border: `1px solid ${SOULLAB_COLORS[post.element]}30`
-                    }}
-                  >
-                    {/* Element icon */}
-                    <div
-                      className="absolute top-6 right-6 text-6xl opacity-20"
-                      style={{ color: SOULLAB_COLORS[post.element] }}
-                    >
-                      {post.element === 'fire' || post.element === 'air' || post.element === 'aether' ? '△' : '▽'}
-                    </div>
-
-                    <div className="relative">
-                      <div className="flex items-center gap-3 mb-4">
-                        <span
-                          className="text-xs tracking-wider uppercase"
-                          style={{ color: SOULLAB_COLORS[post.element] }}
-                        >
-                          {post.category}
-                        </span>
-                        <span className="text-gray-500">•</span>
-                        <span className="text-xs text-gray-500">{post.readTime}</span>
-                      </div>
-
-                      <h3 className="text-3xl font-light mb-2 text-white group-hover:text-opacity-80 transition-colors">
-                        {post.title}
-                      </h3>
-                      <p className="text-lg mb-4" style={{ color: SOULLAB_COLORS[post.element] }}>
-                        {post.subtitle}
-                      </p>
-                      <p className="text-gray-400 mb-6 line-clamp-2">
-                        {post.excerpt}
-                      </p>
-
-                      <div className="flex items-center gap-3">
-                        <div className="text-sm text-gray-400">
-                          by <span className="text-white">{post.author}</span>
-                        </div>
-                        <span className="text-gray-600">•</span>
-                        <div className="text-sm text-gray-500">
-                          {new Date(post.publishedDate).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Category filters */}
-      <section className="py-8 px-6 border-y border-white/10">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap gap-3">
-            {CATEGORIES.map((category) => (
-              <button
-                key={category}
-                onClick={() => setCategoryFilter(category)}
-                className="px-5 py-2 rounded-full text-sm transition-all hover:scale-105"
+              <p
+                className="text-xl tracking-widest mb-2"
                 style={{
-                  background: categoryFilter === category ? `${SOULLAB_COLORS.air}15` : 'transparent',
-                  border: `1px solid ${categoryFilter === category ? SOULLAB_COLORS.air : SOULLAB_COLORS.gray}40`,
-                  color: categoryFilter === category ? SOULLAB_COLORS.air : SOULLAB_COLORS.gray
+                  color: SOULLAB_COLORS.leather,
+                  textShadow: `0 1px 10px ${SOULLAB_COLORS.leather}30`
                 }}
               >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+                SOULLAB ARCHIVES
+              </p>
 
-      {/* All Posts Grid */}
-      <section className="py-16 px-6">
-        <div className="max-w-7xl mx-auto">
-          {filteredPosts.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-gray-500 text-lg">No articles found for this filter.</p>
+              <p className="text-base max-w-2xl mx-auto" style={{ color: `${SOULLAB_COLORS.parchment}80` }}>
+                Ancient wisdom recorded • Modern science illuminated • Consciousness explored
+              </p>
+
+              {/* Decorative bottom border */}
+              <div className="flex items-center justify-center gap-4 mt-8">
+                <div className="h-px w-20" style={{ background: `linear-gradient(to right, transparent, ${SOULLAB_COLORS.leather}60, transparent)` }} />
+                <div className="w-2 h-2 rounded-full" style={{ background: SOULLAB_COLORS.leather, opacity: 0.4 }} />
+                <div className="h-px w-20" style={{ background: `linear-gradient(to right, transparent, ${SOULLAB_COLORS.leather}60, transparent)` }} />
+              </div>
             </div>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredPosts.map((post) => (
-                <Link
-                  key={post.id}
-                  href={`/blog/${post.id}`}
-                  className="group"
-                >
-                  <article
-                    className="rounded-xl overflow-hidden border transition-all hover:scale-[1.02]"
+
+            {/* Element filters - manuscript style */}
+            <div className="flex flex-wrap justify-center gap-3">
+              {ELEMENTS.map((element) => {
+                const isActive = elementFilter === element;
+                const elColor = element === 'all'
+                  ? SOULLAB_COLORS.leather
+                  : SOULLAB_COLORS[element === 'aether' ? 'air' : element];
+
+                return (
+                  <button
+                    key={element}
+                    onClick={() => setElementFilter(element)}
+                    className="px-6 py-2 rounded border transition-all hover:scale-105 capitalize flex items-center gap-2 relative overflow-hidden"
                     style={{
-                      background: `${SOULLAB_COLORS[post.element]}05`,
-                      borderColor: `${SOULLAB_COLORS[post.element]}20`
+                      borderColor: isActive ? `${elColor}60` : `${SOULLAB_COLORS.leather}30`,
+                      background: isActive
+                        ? `linear-gradient(135deg, ${elColor}15 0%, ${elColor}08 100%)`
+                        : `${SOULLAB_COLORS.brown}40`,
+                      color: isActive ? elColor : SOULLAB_COLORS.leather,
+                      backdropFilter: 'blur(10px)',
+                      boxShadow: isActive ? `0 4px 20px ${elColor}20` : 'none'
                     }}
                   >
-                    {/* Cover image placeholder */}
+                    {element !== 'all' && (
+                      <span className="text-xl">
+                        {element === 'fire' || element === 'air' || element === 'aether' ? '△' : '▽'}
+                      </span>
+                    )}
+                    {element}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </header>
+
+        {/* Featured Posts - Large manuscript pages */}
+        {elementFilter === 'all' && categoryFilter === 'All' && featuredPosts.length > 0 && (
+          <section className="py-12 px-6">
+            <div className="max-w-7xl mx-auto">
+              <h2
+                className="text-3xl font-light mb-12 text-center tracking-wider"
+                style={{
+                  color: SOULLAB_COLORS.parchment,
+                  fontVariant: 'small-caps'
+                }}
+              >
+                Featured Scrolls
+              </h2>
+              <div className="grid md:grid-cols-2 gap-8">
+                {featuredPosts.map((post) => (
+                  <Link
+                    key={post.id}
+                    href={`/blog/${post.id}`}
+                    className="group relative rounded-lg overflow-hidden transition-all hover:scale-[1.02]"
+                  >
+                    {/* Leather-bound card */}
                     <div
-                      className="aspect-video relative"
+                      className="p-10 min-h-[400px] flex flex-col justify-end relative overflow-hidden"
                       style={{
-                        background: `linear-gradient(135deg, ${SOULLAB_COLORS[post.element]}30 0%, ${SOULLAB_COLORS[post.element]}10 100%)`
+                        background: `linear-gradient(135deg, ${SOULLAB_COLORS.brown}80 0%, ${SOULLAB_COLORS.brown}60 100%)`,
+                        border: `1px solid ${SOULLAB_COLORS.leather}40`,
+                        backdropFilter: 'blur(20px)',
+                        boxShadow: `
+                          inset 0 1px 0 ${SOULLAB_COLORS.parchment}10,
+                          0 20px 60px rgba(0,0,0,0.5)
+                        `
                       }}
                     >
+                      {/* Aged paper texture overlay */}
                       <div
-                        className="absolute inset-0 flex items-center justify-center text-6xl opacity-20"
+                        className="absolute inset-0 opacity-30 mix-blend-overlay"
+                        style={{
+                          backgroundImage: `
+                            repeating-linear-gradient(0deg, transparent, transparent 1px, ${SOULLAB_COLORS.leather}10 1px, ${SOULLAB_COLORS.leather}10 2px)
+                          `
+                        }}
+                      />
+
+                      {/* Large element symbol watermark */}
+                      <div
+                        className="absolute top-8 right-8 text-9xl opacity-5 transition-all group-hover:opacity-10"
                         style={{ color: SOULLAB_COLORS[post.element] }}
                       >
                         {post.element === 'fire' || post.element === 'air' || post.element === 'aether' ? '△' : '▽'}
                       </div>
-                    </div>
 
-                    <div className="p-6">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span
-                          className="text-xs tracking-wider uppercase"
+                      {/* Subtle glow */}
+                      <div
+                        className="absolute top-0 left-0 w-full h-full opacity-0 group-hover:opacity-20 transition-opacity duration-500"
+                        style={{
+                          background: `radial-gradient(circle at 50% 50%, ${SOULLAB_COLORS[post.element]}40 0%, transparent 60%)`
+                        }}
+                      />
+
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-6">
+                          <span
+                            className="text-xs tracking-widest uppercase"
+                            style={{
+                              color: SOULLAB_COLORS[post.element],
+                              textShadow: `0 0 10px ${SOULLAB_COLORS[post.element]}40`
+                            }}
+                          >
+                            {post.category}
+                          </span>
+                          <span style={{ color: `${SOULLAB_COLORS.leather}60` }}>•</span>
+                          <span className="text-xs" style={{ color: `${SOULLAB_COLORS.parchment}60` }}>
+                            {post.readTime}
+                          </span>
+                        </div>
+
+                        <h3
+                          className="text-4xl font-light mb-3 group-hover:text-opacity-80 transition-colors"
+                          style={{
+                            color: SOULLAB_COLORS.parchment,
+                            textShadow: `0 2px 10px rgba(0,0,0,0.5)`
+                          }}
+                        >
+                          {post.title}
+                        </h3>
+
+                        <p
+                          className="text-lg mb-6"
+                          style={{
+                            color: SOULLAB_COLORS[post.element],
+                            textShadow: `0 1px 5px ${SOULLAB_COLORS[post.element]}30`
+                          }}
+                        >
+                          {post.subtitle}
+                        </p>
+
+                        <p className="mb-8 leading-relaxed line-clamp-2" style={{ color: `${SOULLAB_COLORS.parchment}90` }}>
+                          {post.excerpt}
+                        </p>
+
+                        <div className="flex items-center gap-3">
+                          <div className="text-sm" style={{ color: `${SOULLAB_COLORS.parchment}80` }}>
+                            by <span style={{ color: SOULLAB_COLORS.parchment }}>{post.author}</span>
+                          </div>
+                          <span style={{ color: `${SOULLAB_COLORS.leather}40` }}>•</span>
+                          <div className="text-sm" style={{ color: `${SOULLAB_COLORS.parchment}60` }}>
+                            {new Date(post.publishedDate).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Category filters - manuscript tabs */}
+        <section
+          className="py-8 px-6 border-y relative"
+          style={{
+            borderColor: `${SOULLAB_COLORS.leather}20`,
+            background: `${SOULLAB_COLORS.brown}30`,
+            backdropFilter: 'blur(10px)'
+          }}
+        >
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-wrap gap-3 justify-center">
+              {CATEGORIES.map((category) => {
+                const isActive = categoryFilter === category;
+                return (
+                  <button
+                    key={category}
+                    onClick={() => setCategoryFilter(category)}
+                    className="px-5 py-2 rounded text-sm transition-all hover:scale-105 border"
+                    style={{
+                      background: isActive
+                        ? `linear-gradient(135deg, ${SOULLAB_COLORS.leather}40 0%, ${SOULLAB_COLORS.leather}20 100%)`
+                        : `${SOULLAB_COLORS.brown}40`,
+                      border: `1px solid ${isActive ? SOULLAB_COLORS.leather : `${SOULLAB_COLORS.leather}30`}`,
+                      color: isActive ? SOULLAB_COLORS.parchment : SOULLAB_COLORS.leather,
+                      backdropFilter: 'blur(10px)',
+                      boxShadow: isActive ? `0 4px 15px ${SOULLAB_COLORS.leather}20` : 'none'
+                    }}
+                  >
+                    {category}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* All Posts Grid - Manuscript pages */}
+        <section className="py-20 px-6">
+          <div className="max-w-7xl mx-auto">
+            {filteredPosts.length === 0 ? (
+              <div className="text-center py-20">
+                <p className="text-lg" style={{ color: `${SOULLAB_COLORS.leather}80` }}>
+                  No scrolls found for this element.
+                </p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredPosts.map((post) => (
+                  <Link
+                    key={post.id}
+                    href={`/blog/${post.id}`}
+                    className="group"
+                  >
+                    <article
+                      className="rounded-lg overflow-hidden border transition-all hover:scale-[1.02] hover:shadow-2xl"
+                      style={{
+                        background: `linear-gradient(135deg, ${SOULLAB_COLORS.brown}70 0%, ${SOULLAB_COLORS.brown}50 100%)`,
+                        borderColor: `${SOULLAB_COLORS.leather}30`,
+                        backdropFilter: 'blur(20px)'
+                      }}
+                    >
+                      {/* Cover image placeholder with aged paper look */}
+                      <div
+                        className="aspect-video relative overflow-hidden"
+                        style={{
+                          background: `linear-gradient(135deg, ${SOULLAB_COLORS[post.element]}15 0%, ${SOULLAB_COLORS[post.element]}05 100%)`
+                        }}
+                      >
+                        {/* Paper grain */}
+                        <div
+                          className="absolute inset-0 opacity-50 mix-blend-overlay"
+                          style={{
+                            backgroundImage: `
+                              repeating-linear-gradient(0deg, transparent, transparent 1px, ${SOULLAB_COLORS.leather}08 1px, ${SOULLAB_COLORS.leather}08 2px)
+                            `
+                          }}
+                        />
+
+                        {/* Element symbol */}
+                        <div
+                          className="absolute inset-0 flex items-center justify-center text-7xl opacity-20 group-hover:opacity-30 transition-opacity"
                           style={{ color: SOULLAB_COLORS[post.element] }}
                         >
-                          {post.category}
-                        </span>
-                        <span className="text-gray-600">•</span>
-                        <span className="text-xs text-gray-500">{post.readTime}</span>
-                      </div>
-
-                      <h3 className="text-xl font-medium mb-2 text-white group-hover:text-opacity-80 transition-colors">
-                        {post.title}
-                      </h3>
-
-                      <p className="text-gray-400 text-sm mb-4 line-clamp-3">
-                        {post.excerpt}
-                      </p>
-
-                      <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                        <div className="text-xs text-gray-500">
-                          {new Date(post.publishedDate).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric'
-                          })}
+                          {post.element === 'fire' || post.element === 'air' || post.element === 'aether' ? '△' : '▽'}
                         </div>
-                        <div className="text-xs text-gray-400">{post.author}</div>
+
+                        {/* Subtle light effect */}
+                        <div
+                          className="absolute inset-0 opacity-0 group-hover:opacity-40 transition-opacity duration-500"
+                          style={{
+                            background: `radial-gradient(circle at 50% 30%, ${SOULLAB_COLORS[post.element]}30 0%, transparent 60%)`
+                          }}
+                        />
                       </div>
-                    </div>
-                  </article>
-                </Link>
-              ))}
+
+                      <div className="p-6">
+                        <div className="flex items-center gap-2 mb-3">
+                          <span
+                            className="text-xs tracking-wider uppercase"
+                            style={{
+                              color: SOULLAB_COLORS[post.element],
+                              textShadow: `0 0 8px ${SOULLAB_COLORS[post.element]}40`
+                            }}
+                          >
+                            {post.category}
+                          </span>
+                          <span style={{ color: `${SOULLAB_COLORS.leather}40` }}>•</span>
+                          <span className="text-xs" style={{ color: `${SOULLAB_COLORS.parchment}60` }}>
+                            {post.readTime}
+                          </span>
+                        </div>
+
+                        <h3
+                          className="text-xl font-medium mb-2 group-hover:text-opacity-80 transition-colors"
+                          style={{
+                            color: SOULLAB_COLORS.parchment,
+                            textShadow: '0 1px 3px rgba(0,0,0,0.3)'
+                          }}
+                        >
+                          {post.title}
+                        </h3>
+
+                        <p className="text-sm mb-4 line-clamp-3" style={{ color: `${SOULLAB_COLORS.parchment}80` }}>
+                          {post.excerpt}
+                        </p>
+
+                        <div
+                          className="flex items-center justify-between pt-4 border-t"
+                          style={{ borderColor: `${SOULLAB_COLORS.leather}20` }}
+                        >
+                          <div className="text-xs" style={{ color: `${SOULLAB_COLORS.parchment}60` }}>
+                            {new Date(post.publishedDate).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </div>
+                          <div className="text-xs" style={{ color: `${SOULLAB_COLORS.parchment}70` }}>
+                            {post.author}
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Newsletter CTA - Ancient scroll invitation */}
+        <section
+          className="py-24 px-6 relative"
+          style={{
+            background: `linear-gradient(135deg, ${SOULLAB_COLORS.brown}90 0%, ${SOULLAB_COLORS.brown}70 100%)`,
+            borderTop: `1px solid ${SOULLAB_COLORS.leather}30`,
+            borderBottom: `1px solid ${SOULLAB_COLORS.leather}30`
+          }}
+        >
+          {/* Decorative pattern */}
+          <div
+            className="absolute inset-0 opacity-5"
+            style={{
+              backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 50px, ${SOULLAB_COLORS.leather} 50px, ${SOULLAB_COLORS.leather} 51px)`
+            }}
+          />
+
+          <div className="max-w-2xl mx-auto text-center relative">
+            {/* Decorative top */}
+            <div className="flex items-center justify-center gap-4 mb-8">
+              <svg width="40" height="40" viewBox="0 0 40 40">
+                <circle cx="20" cy="20" r="15" fill="none" stroke={SOULLAB_COLORS.leather} strokeWidth="0.5" opacity="0.6" />
+                <circle cx="20" cy="20" r="10" fill="none" stroke={SOULLAB_COLORS.leather} strokeWidth="0.3" opacity="0.4" />
+                <circle cx="20" cy="20" r="5" fill="none" stroke={SOULLAB_COLORS.leather} strokeWidth="0.2" opacity="0.3" />
+              </svg>
             </div>
-          )}
-        </div>
-      </section>
 
-      {/* Newsletter CTA */}
-      <section
-        className="py-20 px-6"
-        style={{ background: `${SOULLAB_COLORS.brown}40` }}
-      >
-        <div className="max-w-2xl mx-auto text-center">
-          <h2
-            className="text-3xl font-light mb-4"
-            style={{ color: SOULLAB_COLORS.air }}
-          >
-            Never Miss an Insight
-          </h2>
-          <p className="text-gray-400 mb-8">
-            Get our latest articles on consciousness, elemental wisdom, and book updates delivered to your inbox.
-          </p>
-
-          <form className="flex gap-3 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              className="flex-1 px-4 py-3 rounded-full bg-[#1a1a1a] border text-white placeholder-gray-500"
-              style={{ borderColor: `${SOULLAB_COLORS.gray}40` }}
-            />
-            <button
-              type="submit"
-              className="px-8 py-3 rounded-full font-medium transition-all hover:scale-105"
+            <h2
+              className="text-4xl font-light mb-6 tracking-wider"
               style={{
-                background: `linear-gradient(135deg, ${SOULLAB_COLORS.fire}, ${SOULLAB_COLORS.air})`,
-                color: 'white'
+                color: SOULLAB_COLORS.parchment,
+                textShadow: `0 2px 15px ${SOULLAB_COLORS.leather}40`,
+                fontVariant: 'small-caps'
               }}
             >
-              Subscribe
-            </button>
-          </form>
-        </div>
-      </section>
+              Join the Archives
+            </h2>
+
+            <p className="mb-10 text-lg" style={{ color: `${SOULLAB_COLORS.parchment}80` }}>
+              Receive new scrolls of wisdom delivered to your chambers.
+              <br />
+              Ancient teachings • Modern insights • Consciousness codex
+            </p>
+
+            <form className="flex gap-3 max-w-md mx-auto">
+              <input
+                type="email"
+                placeholder="your@email.com"
+                className="flex-1 px-5 py-4 rounded border text-base"
+                style={{
+                  background: `${SOULLAB_COLORS.brown}60`,
+                  borderColor: `${SOULLAB_COLORS.leather}50`,
+                  color: SOULLAB_COLORS.parchment,
+                  backdropFilter: 'blur(10px)'
+                }}
+              />
+              <button
+                type="submit"
+                className="px-8 py-4 rounded font-medium transition-all hover:scale-105 border"
+                style={{
+                  background: `linear-gradient(135deg, ${SOULLAB_COLORS.leather}60, ${SOULLAB_COLORS.leather}40)`,
+                  borderColor: SOULLAB_COLORS.leather,
+                  color: SOULLAB_COLORS.parchment,
+                  boxShadow: `0 8px 30px ${SOULLAB_COLORS.leather}30`
+                }}
+              >
+                Subscribe
+              </button>
+            </form>
+
+            {/* Decorative bottom */}
+            <div className="flex items-center justify-center gap-4 mt-8">
+              <div className="h-px w-20" style={{ background: `linear-gradient(to right, transparent, ${SOULLAB_COLORS.leather}60, transparent)` }} />
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background: SOULLAB_COLORS.leather, opacity: 0.6 }} />
+              <div className="h-px w-20" style={{ background: `linear-gradient(to right, transparent, ${SOULLAB_COLORS.leather}60, transparent)` }} />
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

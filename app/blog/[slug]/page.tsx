@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * Individual Blog Post Page
- * Full article view with rich content and navigation
+ * Individual Blog Post - Ancient Manuscript
+ * Deep cinematic reading experience like an ancient tome
  */
 
 import { useParams } from 'next/navigation';
@@ -153,15 +153,6 @@ High-amplitude gamma oscillations (25-100 Hz) have been observed in advanced med
 - Moments of "oneness"
 
 These gamma waves represent **synchronization across brain regions** — literally, different parts of your brain working in harmony.
-
-### The Anterior Cingulate Cortex
-
-The ACC acts as a bridge between thinking and feeling. Contemplative practices strengthen this area, enhancing:
-
-- Emotional regulation
-- Conflict monitoring
-- Integration of cognition and emotion
-- Empathy and compassion
 
 ### Practical Applications
 
@@ -324,15 +315,17 @@ export default function BlogPostPage() {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0605' }}>
         <div className="text-center">
-          <h1 className="text-4xl font-light mb-4 text-white">Article Not Found</h1>
+          <h1 className="text-4xl font-light mb-4" style={{ color: SOULLAB_COLORS.parchment }}>
+            Scroll Not Found
+          </h1>
           <Link
             href="/blog"
             className="text-sm hover:underline"
-            style={{ color: SOULLAB_COLORS.air }}
+            style={{ color: SOULLAB_COLORS.leather }}
           >
-            ← Back to Blog
+            ← Return to Codex
           </Link>
         </div>
       </div>
@@ -342,248 +335,421 @@ export default function BlogPostPage() {
   const elementColor = SOULLAB_COLORS[post.element === 'aether' ? 'air' : post.element];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
-      {/* Hero Section */}
-      <header className="relative py-20 px-6 overflow-hidden">
-        {/* Background */}
+    <div className="min-h-screen relative" style={{ background: '#0a0605' }}>
+      {/* Deep atmospheric background */}
+      <div className="fixed inset-0 z-0">
+        {/* Base gradient with element glow */}
         <div
-          className="absolute inset-0 opacity-10"
+          className="absolute inset-0"
           style={{
-            background: `radial-gradient(
-              ellipse at top,
-              ${elementColor}40 0%,
-              transparent 60%
-            )`
+            background: `
+              radial-gradient(ellipse at top, ${elementColor}05 0%, transparent 50%),
+              radial-gradient(ellipse at bottom, ${SOULLAB_COLORS.brown}15 0%, transparent 50%)
+            `
           }}
         />
 
-        <div className="max-w-4xl mx-auto relative">
-          {/* Back link */}
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-2 mb-8 text-sm hover:underline"
-            style={{ color: elementColor }}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Blog
-          </Link>
+        {/* Parchment paper texture */}
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: `
+              repeating-linear-gradient(0deg, transparent, transparent 1px, ${SOULLAB_COLORS.leather}03 1px, ${SOULLAB_COLORS.leather}03 2px)
+            `,
+            mixBlendMode: 'overlay'
+          }}
+        />
 
-          {/* Category & Reading time */}
-          <div className="flex items-center gap-3 mb-6">
-            <span
-              className="text-sm tracking-wider uppercase"
-              style={{ color: elementColor }}
+        {/* Vignette */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.7) 100%)'
+          }}
+        />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10">
+        {/* Hero - Opening the manuscript */}
+        <header className="relative py-24 px-6 overflow-hidden">
+          <div className="max-w-4xl mx-auto relative">
+            {/* Back link */}
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 mb-12 text-sm hover:underline transition-colors"
+              style={{ color: SOULLAB_COLORS.leather }}
             >
-              {post.category}
-            </span>
-            <span className="text-gray-600">•</span>
-            <span className="text-sm text-gray-500">{post.readTime}</span>
-            <span className="text-gray-600">•</span>
-            <span className="text-sm text-gray-500">
-              {new Date(post.publishedDate).toLocaleDateString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric'
-              })}
-            </span>
-          </div>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Return to Codex
+            </Link>
 
-          {/* Title */}
-          <h1 className="text-5xl md:text-6xl font-light mb-4 text-white">
-            {post.title}
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-2xl mb-8" style={{ color: elementColor }}>
-            {post.subtitle}
-          </p>
-
-          {/* Author */}
-          <div className="flex items-center gap-4">
-            <div
-              className="w-12 h-12 rounded-full flex items-center justify-center text-xl"
-              style={{ background: `${elementColor}20`, color: elementColor }}
-            >
-              {post.element === 'fire' || post.element === 'air' || post.element === 'aether' ? '△' : '▽'}
-            </div>
-            <div>
-              <div className="text-white font-medium">{post.author}</div>
-              <div className="text-sm text-gray-500">{post.authorRole}</div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Article Content */}
-      <article className="py-12 px-6">
-        <div className="max-w-3xl mx-auto">
-          {/* Main content - rendered as markdown-style */}
-          <div
-            className="prose prose-invert prose-lg max-w-none"
-            style={{
-              '--tw-prose-headings': elementColor,
-              '--tw-prose-links': elementColor,
-              '--tw-prose-bold': 'white',
-              '--tw-prose-quotes': elementColor
-            } as any}
-          >
-            {post.content.split('\n').map((paragraph, i) => {
-              if (paragraph.startsWith('## ')) {
-                return (
-                  <h2
-                    key={i}
-                    className="text-3xl font-light mt-12 mb-6"
-                    style={{ color: elementColor }}
-                  >
-                    {paragraph.replace('## ', '')}
-                  </h2>
-                );
-              }
-              if (paragraph.startsWith('### ')) {
-                return (
-                  <h3
-                    key={i}
-                    className="text-2xl font-light mt-8 mb-4"
-                    style={{ color: elementColor }}
-                  >
-                    {paragraph.replace('### ', '')}
-                  </h3>
-                );
-              }
-              if (paragraph.startsWith('> ')) {
-                return (
-                  <blockquote
-                    key={i}
-                    className="border-l-4 pl-6 italic my-8"
-                    style={{ borderColor: elementColor, color: elementColor }}
-                  >
-                    {paragraph.replace('> ', '')}
-                  </blockquote>
-                );
-              }
-              if (paragraph.startsWith('- ')) {
-                return (
-                  <li key={i} className="text-gray-300 leading-relaxed ml-6">
-                    {paragraph.replace('- ', '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').split('<strong>').map((part, j) => {
-                      if (j % 2 === 1) {
-                        return <strong key={j} className="text-white">{part.replace('</strong>', '')}</strong>;
-                      }
-                      return part;
-                    })}
-                  </li>
-                );
-              }
-              if (paragraph.startsWith('**')) {
-                return (
-                  <h4 key={i} className="text-xl font-medium mt-6 mb-3 text-white">
-                    {paragraph.replace(/\*\*/g, '')}
-                  </h4>
-                );
-              }
-              if (paragraph.startsWith('*') && paragraph.endsWith('*')) {
-                return (
-                  <p
-                    key={i}
-                    className="text-center italic my-8"
-                    style={{ color: elementColor }}
-                  >
-                    {paragraph.replace(/\*/g, '')}
-                  </p>
-                );
-              }
-              if (paragraph.trim()) {
-                return (
-                  <p key={i} className="text-gray-300 leading-relaxed mb-6">
-                    {paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').split('<strong>').map((part, j) => {
-                      if (j % 2 === 1) {
-                        return <strong key={j} className="text-white">{part.replace('</strong>', '')}</strong>;
-                      }
-                      return part;
-                    })}
-                  </p>
-                );
-              }
-              return null;
-            })}
-          </div>
-
-          {/* Tags */}
-          <div className="flex flex-wrap gap-3 mt-12 pt-8 border-t border-white/10">
-            {post.tags.map((tag) => (
+            {/* Category & metadata */}
+            <div className="flex items-center gap-3 mb-8">
               <span
-                key={tag}
-                className="px-4 py-2 rounded-full text-sm border"
+                className="text-xs tracking-[0.2em] uppercase"
                 style={{
-                  borderColor: `${elementColor}30`,
-                  background: `${elementColor}08`,
-                  color: elementColor
+                  color: elementColor,
+                  textShadow: `0 0 10px ${elementColor}40`
                 }}
               >
-                {tag}
+                {post.category}
               </span>
-            ))}
-          </div>
-        </div>
-      </article>
+              <span style={{ color: `${SOULLAB_COLORS.leather}40` }}>•</span>
+              <span className="text-xs" style={{ color: `${SOULLAB_COLORS.parchment}60` }}>
+                {post.readTime}
+              </span>
+              <span style={{ color: `${SOULLAB_COLORS.leather}40` }}>•</span>
+              <span className="text-xs" style={{ color: `${SOULLAB_COLORS.parchment}60` }}>
+                {new Date(post.publishedDate).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric'
+                })}
+              </span>
+            </div>
 
-      {/* Author Bio */}
-      <section
-        className="py-12 px-6"
-        style={{ background: `${SOULLAB_COLORS.brown}40` }}
-      >
-        <div className="max-w-3xl mx-auto">
-          <div
-            className="p-8 rounded-2xl border"
-            style={{
-              borderColor: `${elementColor}30`,
-              background: `${elementColor}05`
-            }}
-          >
-            <div className="flex items-start gap-6">
+            {/* Decorative element ornament */}
+            <div className="flex items-center gap-4 mb-6">
               <div
-                className="w-20 h-20 rounded-full flex items-center justify-center text-3xl flex-shrink-0"
-                style={{ background: `${elementColor}20`, color: elementColor }}
+                className="w-16 h-16 rounded flex items-center justify-center text-3xl"
+                style={{
+                  background: `linear-gradient(135deg, ${elementColor}20 0%, ${elementColor}10 100%)`,
+                  border: `1px solid ${elementColor}30`,
+                  color: elementColor,
+                  textShadow: `0 0 20px ${elementColor}40`
+                }}
+              >
+                {post.element === 'fire' || post.element === 'air' || post.element === 'aether' ? '△' : '▽'}
+              </div>
+              <div className="flex-1 h-px" style={{ background: `linear-gradient(to right, ${SOULLAB_COLORS.leather}40, transparent)` }} />
+            </div>
+
+            {/* Title */}
+            <h1
+              className="text-5xl md:text-6xl font-light mb-6 tracking-wide"
+              style={{
+                color: SOULLAB_COLORS.parchment,
+                textShadow: `0 2px 20px rgba(0,0,0,0.5)`,
+                fontVariant: 'small-caps'
+              }}
+            >
+              {post.title}
+            </h1>
+
+            {/* Subtitle */}
+            <p
+              className="text-2xl mb-10 font-light"
+              style={{
+                color: elementColor,
+                textShadow: `0 1px 10px ${elementColor}30`
+              }}
+            >
+              {post.subtitle}
+            </p>
+
+            {/* Author */}
+            <div className="flex items-center gap-4">
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center text-xl"
+                style={{
+                  background: `${elementColor}15`,
+                  border: `1px solid ${elementColor}30`,
+                  color: elementColor
+                }}
               >
                 {post.element === 'fire' || post.element === 'air' || post.element === 'aether' ? '△' : '▽'}
               </div>
               <div>
-                <h3 className="text-2xl font-light mb-2 text-white">About {post.author}</h3>
-                <p className="text-sm mb-3" style={{ color: elementColor }}>
+                <div className="font-medium" style={{ color: SOULLAB_COLORS.parchment }}>
+                  {post.author}
+                </div>
+                <div className="text-sm" style={{ color: SOULLAB_COLORS.leather }}>
                   {post.authorRole}
-                </p>
-                <p className="text-gray-400 leading-relaxed">
-                  {post.authorBio}
-                </p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </header>
 
-      {/* Related / More Articles CTA */}
-      <section className="py-16 px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <h3
-            className="text-3xl font-light mb-6"
-            style={{ color: SOULLAB_COLORS.air }}
-          >
-            Continue Exploring
-          </h3>
-          <Link
-            href="/blog"
-            className="inline-block px-8 py-4 rounded-full border transition-all hover:scale-105"
-            style={{
-              borderColor: `${SOULLAB_COLORS.air}60`,
-              background: `${SOULLAB_COLORS.air}10`,
-              color: SOULLAB_COLORS.air
-            }}
-          >
-            View All Articles
-          </Link>
-        </div>
-      </section>
+        {/* Article - The manuscript page */}
+        <article className="py-12 px-6">
+          <div className="max-w-3xl mx-auto">
+            {/* Manuscript container */}
+            <div
+              className="relative rounded-lg p-12 md:p-16"
+              style={{
+                background: `linear-gradient(135deg, ${SOULLAB_COLORS.brown}50 0%, ${SOULLAB_COLORS.brown}30 100%)`,
+                border: `1px solid ${SOULLAB_COLORS.leather}20`,
+                backdropFilter: 'blur(20px)',
+                boxShadow: `
+                  inset 0 1px 0 ${SOULLAB_COLORS.parchment}05,
+                  0 20px 60px rgba(0,0,0,0.5)
+                `
+              }}
+            >
+              {/* Paper grain texture */}
+              <div
+                className="absolute inset-0 rounded-lg opacity-40 mix-blend-overlay pointer-events-none"
+                style={{
+                  backgroundImage: `
+                    repeating-linear-gradient(0deg, transparent, transparent 1px, ${SOULLAB_COLORS.leather}08 1px, ${SOULLAB_COLORS.leather}08 2px)
+                  `
+                }}
+              />
+
+              {/* Content */}
+              <div className="relative prose-manuscript max-w-none">
+                {post.content.split('\n').map((paragraph, i) => {
+                  // Heading 2
+                  if (paragraph.startsWith('## ')) {
+                    return (
+                      <div key={i} className="mt-16 mb-8 first:mt-0">
+                        <div className="flex items-center gap-4 mb-6">
+                          <div className="h-px flex-1" style={{ background: `linear-gradient(to right, ${elementColor}40, transparent)` }} />
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ background: elementColor, opacity: 0.6 }}
+                          />
+                          <div className="h-px flex-1" style={{ background: `linear-gradient(to left, ${elementColor}40, transparent)` }} />
+                        </div>
+                        <h2
+                          className="text-4xl font-light text-center tracking-wider"
+                          style={{
+                            color: elementColor,
+                            textShadow: `0 2px 15px ${elementColor}30`,
+                            fontVariant: 'small-caps'
+                          }}
+                        >
+                          {paragraph.replace('## ', '')}
+                        </h2>
+                      </div>
+                    );
+                  }
+
+                  // Heading 3
+                  if (paragraph.startsWith('### ')) {
+                    return (
+                      <h3
+                        key={i}
+                        className="text-2xl font-light mt-12 mb-6 tracking-wide"
+                        style={{
+                          color: elementColor,
+                          textShadow: `0 1px 10px ${elementColor}20`,
+                          fontVariant: 'small-caps'
+                        }}
+                      >
+                        {paragraph.replace('### ', '')}
+                      </h3>
+                    );
+                  }
+
+                  // Quote
+                  if (paragraph.startsWith('> ')) {
+                    return (
+                      <blockquote
+                        key={i}
+                        className="pl-8 py-6 my-10 italic border-l-2 relative"
+                        style={{
+                          borderColor: `${elementColor}60`,
+                          color: SOULLAB_COLORS.parchment
+                        }}
+                      >
+                        <div
+                          className="absolute left-0 top-0 text-6xl opacity-10"
+                          style={{ color: elementColor, transform: 'translate(-10px, -10px)' }}
+                        >
+                          "
+                        </div>
+                        {paragraph.replace('> ', '')}
+                      </blockquote>
+                    );
+                  }
+
+                  // List items
+                  if (paragraph.startsWith('- ')) {
+                    return (
+                      <li key={i} className="ml-8 my-3 leading-relaxed" style={{ color: `${SOULLAB_COLORS.parchment}95` }}>
+                        <span
+                          className="inline-block w-2 h-2 rounded-full mr-4"
+                          style={{ background: elementColor, opacity: 0.6 }}
+                        />
+                        {paragraph.replace('- ', '').replace(/\*\*(.*?)\*\*/g, (_, text) => text).split('**').map((part, j) => {
+                          if (j % 2 === 1) {
+                            return <strong key={j} style={{ color: SOULLAB_COLORS.parchment }}>{part}</strong>;
+                          }
+                          return part;
+                        })}
+                      </li>
+                    );
+                  }
+
+                  // Practice headings (bold text)
+                  if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
+                    return (
+                      <h4
+                        key={i}
+                        className="text-xl font-medium mt-8 mb-4 tracking-wide"
+                        style={{
+                          color: SOULLAB_COLORS.parchment,
+                          textShadow: '0 1px 5px rgba(0,0,0,0.3)'
+                        }}
+                      >
+                        {paragraph.replace(/\*\*/g, '')}
+                      </h4>
+                    );
+                  }
+
+                  // Closing italic
+                  if (paragraph.startsWith('*') && paragraph.endsWith('*')) {
+                    return (
+                      <p
+                        key={i}
+                        className="text-center italic my-10 text-lg"
+                        style={{
+                          color: elementColor,
+                          textShadow: `0 1px 10px ${elementColor}20`
+                        }}
+                      >
+                        {paragraph.replace(/\*/g, '')}
+                      </p>
+                    );
+                  }
+
+                  // Regular paragraph
+                  if (paragraph.trim()) {
+                    return (
+                      <p key={i} className="leading-relaxed mb-6 text-lg" style={{ color: `${SOULLAB_COLORS.parchment}90` }}>
+                        {paragraph.split('**').map((part, j) => {
+                          if (j % 2 === 1) {
+                            return <strong key={j} style={{ color: SOULLAB_COLORS.parchment }}>{part}</strong>;
+                          }
+                          return part;
+                        })}
+                      </p>
+                    );
+                  }
+
+                  return null;
+                })}
+              </div>
+            </div>
+
+            {/* Tags - manuscript seals */}
+            <div className="flex flex-wrap gap-3 mt-12">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="px-4 py-2 rounded border text-sm"
+                  style={{
+                    borderColor: `${elementColor}30`,
+                    background: `${elementColor}08`,
+                    color: elementColor,
+                    textShadow: `0 0 8px ${elementColor}20`
+                  }}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </article>
+
+        {/* Author Bio - Illuminated manuscript style */}
+        <section className="py-16 px-6">
+          <div className="max-w-3xl mx-auto">
+            <div
+              className="relative rounded-lg p-10 overflow-hidden"
+              style={{
+                background: `linear-gradient(135deg, ${SOULLAB_COLORS.brown}70 0%, ${SOULLAB_COLORS.brown}50 100%)`,
+                border: `1px solid ${SOULLAB_COLORS.leather}30`,
+                backdropFilter: 'blur(20px)',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+              }}
+            >
+              {/* Decorative corner ornaments */}
+              <svg className="absolute top-4 left-4 w-8 h-8 opacity-20" viewBox="0 0 30 30">
+                <circle cx="15" cy="15" r="10" fill="none" stroke={elementColor} strokeWidth="0.5" />
+                <circle cx="15" cy="15" r="6" fill="none" stroke={elementColor} strokeWidth="0.3" />
+              </svg>
+              <svg className="absolute top-4 right-4 w-8 h-8 opacity-20" viewBox="0 0 30 30">
+                <circle cx="15" cy="15" r="10" fill="none" stroke={elementColor} strokeWidth="0.5" />
+                <circle cx="15" cy="15" r="6" fill="none" stroke={elementColor} strokeWidth="0.3" />
+              </svg>
+
+              <div className="flex items-start gap-6">
+                <div
+                  className="w-24 h-24 rounded-full flex items-center justify-center text-4xl flex-shrink-0"
+                  style={{
+                    background: `linear-gradient(135deg, ${elementColor}20 0%, ${elementColor}10 100%)`,
+                    border: `1px solid ${elementColor}40`,
+                    color: elementColor,
+                    textShadow: `0 0 20px ${elementColor}40`
+                  }}
+                >
+                  {post.element === 'fire' || post.element === 'air' || post.element === 'aether' ? '△' : '▽'}
+                </div>
+                <div>
+                  <h3
+                    className="text-3xl font-light mb-3 tracking-wide"
+                    style={{
+                      color: SOULLAB_COLORS.parchment,
+                      fontVariant: 'small-caps'
+                    }}
+                  >
+                    About {post.author}
+                  </h3>
+                  <p className="text-sm mb-4" style={{ color: elementColor }}>
+                    {post.authorRole}
+                  </p>
+                  <p className="leading-relaxed" style={{ color: `${SOULLAB_COLORS.parchment}90` }}>
+                    {post.authorBio}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Continue Reading CTA */}
+        <section className="py-20 px-6">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="h-px w-20" style={{ background: `linear-gradient(to right, transparent, ${SOULLAB_COLORS.leather}60, transparent)` }} />
+              <svg width="30" height="30" viewBox="0 0 30 30">
+                <circle cx="15" cy="15" r="10" fill="none" stroke={SOULLAB_COLORS.leather} strokeWidth="0.5" opacity="0.6" />
+              </svg>
+              <div className="h-px w-20" style={{ background: `linear-gradient(to right, transparent, ${SOULLAB_COLORS.leather}60, transparent)` }} />
+            </div>
+
+            <h3
+              className="text-3xl font-light mb-8 tracking-wider"
+              style={{
+                color: SOULLAB_COLORS.parchment,
+                fontVariant: 'small-caps'
+              }}
+            >
+              Continue Your Journey
+            </h3>
+
+            <Link
+              href="/blog"
+              className="inline-block px-10 py-4 rounded border transition-all hover:scale-105"
+              style={{
+                borderColor: `${SOULLAB_COLORS.leather}60`,
+                background: `linear-gradient(135deg, ${SOULLAB_COLORS.leather}30 0%, ${SOULLAB_COLORS.leather}20 100%)`,
+                color: SOULLAB_COLORS.parchment,
+                backdropFilter: 'blur(10px)',
+                boxShadow: `0 8px 30px ${SOULLAB_COLORS.leather}20`
+              }}
+            >
+              Return to Codex
+            </Link>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

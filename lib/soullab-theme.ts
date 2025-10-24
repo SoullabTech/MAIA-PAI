@@ -14,6 +14,8 @@ export const SOULLAB_COLORS = {
   black: '#000000',
   gray: '#777777',
   brown: '#33251d',     // Dark earthy brown
+  leather: '#8b7355',   // Lighter leather brown - ancient manuscript
+  parchment: '#d4c5a9', // Aged parchment tone
 
   // Derived tones for gradients
   fireLight: '#c25530',
