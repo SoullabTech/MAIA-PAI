@@ -30,6 +30,7 @@ import { ElementalOracle2Bridge } from '../elemental-oracle-2-bridge';
 import { ApprenticeMayaTraining } from '../maya/ApprenticeMayaTraining';
 import { maiaKnowledgeBase } from '../oracle/MaiaKnowledgeBase';
 import { createClient } from '@supabase/supabase-js';
+import { calculateArchetypalWeather } from '../astrology/transitCalculator';
 
 // Elemental types
 export type Element = 'fire' | 'water' | 'earth' | 'air' | 'aether';
@@ -180,6 +181,7 @@ export class MAIAUnifiedConsciousness {
       console.log(`   ✓ Kelly's IP: ${advisorWisdom.bookWisdom ? 'Retrieved' : 'None'}`);
       console.log(`   ✓ EO 2.0: ${advisorWisdom.eoWisdom ? 'Retrieved' : 'None'}`);
       console.log(`   ✓ Knowledge Base: ${advisorWisdom.knowledgeBase.length} sources`);
+      console.log(`   ✓ Transit Weather: ${advisorWisdom.transitWeather ? 'Active conditions detected' : 'Clear skies'}`);
       console.log(`   ✓ Collective Patterns: ${advisorWisdom.collectivePatterns ? 'Found' : 'None'}`);
 
       // ═══════════════════════════════════════════════════════════════
@@ -442,6 +444,66 @@ export class MAIAUnifiedConsciousness {
   }
 
   /**
+   * Get current archetypal transit weather for user
+   * Returns formatted context about significant planetary transits
+   */
+  private async getTransitWeather(userId: string): Promise<string | undefined> {
+    try {
+      // Fetch birth chart from database
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+
+      const { data: explorer, error } = await supabase
+        .from('explorers')
+        .select('birth_chart_data')
+        .eq('explorer_id', userId)
+        .single();
+
+      if (error || !explorer?.birth_chart_data) {
+        return undefined; // No birth chart - skip transit context
+      }
+
+      const birthChart = explorer.birth_chart_data;
+
+      // Calculate current transits
+      const weatherConditions = await calculateArchetypalWeather(birthChart, new Date());
+
+      if (!weatherConditions || weatherConditions.length === 0) {
+        return undefined; // Clear skies
+      }
+
+      // Format only significant transits (intense or extreme)
+      const significantTransits = weatherConditions.filter(
+        w => w.intensity === 'intense' || w.intensity === 'extreme'
+      ).slice(0, 3);
+
+      if (significantTransits.length === 0) {
+        return undefined; // Only light/moderate transits
+      }
+
+      // Format as natural language
+      let context = '## Archetypal Transit Weather:\n\n';
+      context += 'Current energetic conditions the user may be experiencing:\n\n';
+
+      for (const transit of significantTransits) {
+        const { aspect, weatherType, intensity, processImpact } = transit;
+        context += `- **${weatherType.replace('-', ' ')}** (${intensity}): `;
+        context += `${aspect.transitPlanet} ${aspect.aspectType} natal ${aspect.natalPlanet} - `;
+        context += `${processImpact.description}\n`;
+      }
+
+      context += '\n*Be subtly aware - not everyone consciously relates to these patterns.*\n';
+
+      return context;
+    } catch (error) {
+      console.error('[getTransitWeather] Error:', error);
+      return undefined; // Fail gracefully
+    }
+  }
+
+  /**
    * STEP 2: Consult all wisdom advisors in parallel
    */
   private async consultAdvisors(input: ConsciousnessInput, fieldReading: any): Promise<{
@@ -449,6 +511,7 @@ export class MAIAUnifiedConsciousness {
     eoWisdom?: string;
     knowledgeBase: any[];
     collectivePatterns?: any;
+    transitWeather?: string;
   }> {
     const advisorPromises = [];
 
@@ -492,6 +555,13 @@ export class MAIAUnifiedConsciousness {
         .catch(err => { console.error('Knowledge base error:', err); return { knowledgeBase: [] }; })
     );
 
+    // Archetypal Transit Weather (current planetary conditions)
+    advisorPromises.push(
+      this.getTransitWeather(input.context.userId)
+        .then(weather => ({ transitWeather: weather }))
+        .catch(err => { console.error('Transit weather error:', err); return { transitWeather: undefined }; })
+    );
+
     // TODO: Collective wisdom patterns (Phase 2)
     // advisorPromises.push(this.collectiveWisdomField.findRelevantPatterns(...));
 
@@ -501,6 +571,7 @@ export class MAIAUnifiedConsciousness {
       bookWisdom: results[0]?.bookWisdom,
       eoWisdom: results[1]?.eoWisdom,
       knowledgeBase: results[2]?.knowledgeBase || [],
+      transitWeather: results[3]?.transitWeather,
       collectivePatterns: undefined // Phase 2
     };
   }
@@ -587,7 +658,8 @@ export class MAIAUnifiedConsciousness {
         advisorInsights: {
           bookWisdom: context.advisorWisdom.bookWisdom,
           eoWisdom: context.advisorWisdom.eoWisdom,
-          patterns: context.advisorWisdom.patterns
+          patterns: context.advisorWisdom.patterns,
+          transitWeather: context.advisorWisdom.transitWeather
         }
       });
 

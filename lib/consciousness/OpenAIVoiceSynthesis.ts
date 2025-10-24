@@ -29,6 +29,7 @@ export interface VoiceSynthesisContext {
     bookWisdom?: string;
     eoWisdom?: string;
     patterns?: string[];
+    transitWeather?: string;
   };
 }
 
@@ -190,6 +191,10 @@ This cognitive processing reveals what matters most in this moment. Let it infor
 
     if (context.advisorInsights.patterns && context.advisorInsights.patterns.length > 0) {
       wisdomContext += `\n\n## PATTERNS IN THEIR JOURNEY:\n${context.advisorInsights.patterns.join('\n- ')}`;
+    }
+
+    if (context.advisorInsights.transitWeather) {
+      wisdomContext += `\n\n${context.advisorInsights.transitWeather}`;
     }
 
     if (wisdomContext) {

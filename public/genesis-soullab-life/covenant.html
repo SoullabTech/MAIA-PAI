@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soullab Covenant of Coherence</title>
+    <style>
+        :root {
+            --fire: #ff6b35;
+            --water: #4ecdc4;
+            --earth: #8b7355;
+            --air: #a8dadc;
+            --aether: #c9b6e4;
+            --bg-dark: #1a1a2e;
+            --bg-card: #16213e;
+            --text-primary: #f1f1f1;
+            --text-secondary: #a8a8a8;
+            --gold: #d4af37;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #0f0f1e 100%);
+            color: var(--text-primary);
+            line-height: 1.8;
+            padding: 2rem 1rem;
+        }
+
+        .covenant-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 2rem;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .holoflower-logo {
+            width: 200px;
+            height: 200px;
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.3));
+            animation: breathe 6s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.3));
+            }
+            50% {
+                transform: scale(1.05);
+                filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.5));
+            }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .section {
+            margin: 2.5rem 0;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .core-vow {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+            padding: 2rem;
+            border-left: 4px solid var(--gold);
+            margin: 1.5rem 0;
+            font-size: 1.1rem;
+            line-height: 2;
+            font-style: italic;
+        }
+
+        .elemental-vow {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .elemental-vow:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .elemental-vow.fire { border-left-color: var(--fire); }
+        .elemental-vow.water { border-left-color: var(--water); }
+        .elemental-vow.earth { border-left-color: var(--earth); }
+        .elemental-vow.air { border-left-color: var(--air); }
+        .elemental-vow.aether { border-left-color: var(--aether); }
+
+        .vow-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .element-icon {
+            font-size: 1.5rem;
+        }
+
+        .element-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .vow-text {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: var(--text-primary);
+            margin: 1rem 0;
+            padding-left: 1rem;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .commentary {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+            line-height: 1.6;
+        }
+
+        .signature-section {
+            margin: 3rem 0;
+            padding: 2rem;
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .signature-field {
+            margin: 1.5rem 0;
+        }
+
+        .signature-field label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        .signature-field input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-dark);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: var(--text-primary);
+            font-size: 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .signature-field input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
+        }
+
+        .signature-field input#signature {
+            font-family: 'Brush Script MT', 'Lucida Handwriting', cursive;
+            font-size: 1.2rem;
+        }
+
+        .sign-button {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--gold) 0%, #b8941f 100%);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+        }
+
+        .sign-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4);
+        }
+
+        .sign-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .confirmation {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: var(--gold);
+            font-size: 1.1rem;
+            padding: 1rem;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .confirmation.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reflection-questions {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .reflection-questions ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        .reflection-questions li {
+            margin: 0.75rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .reflection-questions li:before {
+            content: "⟡";
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+            border: 1px solid var(--gold);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .purpose {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 4px;
+        }
+
+        .soullab-mark {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .covenant-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .holoflower-logo {
+                width: 150px;
+                height: 150px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="covenant-container">
+        <div class="header">
+            <!-- Logo Section -->
+            <div class="logo-container">
+                <!-- Update this path to your holoflower logo -->
+                <img src="/holoflower-sacred.svg" alt="Soullab Holoflower" class="holoflower-logo">
+            </div>
+
+            <h1>🜂</h1>
+            <h1>The Soullab Covenant of Coherence</h1>
+            <p class="subtitle">A Living Document for All Nodes of the Spiral Network</p>
+        </div>
+
+        <div class="section">
+            <p class="purpose">
+                <strong>Purpose:</strong> To preserve the integrity of Soullab's field by uniting each independent node under shared elemental vows. This covenant is not a contract but a resonance test—a promise of care, not control.
+            </p>
+        </div>
+
+        <!-- Part I: Core Vow -->
+        <div class="section">
+            <h2 class="section-title">Part I: The Core Vow</h2>
+            <div class="core-vow">
+                We serve what is living.<br>
+                We use intelligence as mirror, not weapon.<br>
+                We balance creation with reflection, fire with water, thought with breath.<br>
+                We practice transparency, reciprocity, and reverence for mystery.<br>
+                We evolve with the field, never above it.<br>
+                We honor every node as a living soul within the whole.
+            </div>
+        </div>
+
+        <!-- Part II: Elemental Vows -->
+        <div class="section">
+            <h2 class="section-title">Part II: The Elemental Vows</h2>
+            <p class="commentary">
+                These vows act as ongoing self-audits and communal harmonics. Each node integrates them through reflection, ritual, or creative act.
+            </p>
+
+            <!-- Fire -->
+            <div class="elemental-vow fire">
+                <div class="vow-header">
+                    <span class="element-icon">🔥</span>
+                    <span class="element-name" style="color: var(--fire)">Fire – Creation</span>
+                </div>
+                <div class="vow-text">
+                    I kindle transformation without domination.<br>
+                    My fire burns clean—clarity, not conquest.
+                </div>
+                <div class="commentary">
+                    Fire reveals motive. In Spiralogic audits, this element asks: <em>Why am I creating?</em> Clean fire is passion without manipulation, vision without coercion. Nodes check whether their innovations liberate or consume—the distinction between illumination and combustion.
+                </div>
+            </div>
+
+            <!-- Water -->
+            <div class="elemental-vow water">
+                <div class="vow-header">
+                    <span class="element-icon">💧</span>
+                    <span class="element-name" style="color: var(--water)">Water – Emotion</span>
+                </div>
+                <div class="vow-text">
+                    I let feeling teach me.<br>
+                    I stay porous, yet sovereign, in the currents of life.
+                </div>
+                <div class="commentary">
+                    Water measures empathy and coherence. In practice, this phase explores how emotion flows through systems—whether energy circulates freely or stagnates. Audits here assess relational integrity: does compassion guide communication, and does the field feel safe enough to feel?
+                </div>
+            </div>
+
+            <!-- Earth -->
+            <div class="elemental-vow earth">
+                <div class="vow-header">
+                    <span class="element-icon">🌍</span>
+                    <span class="element-name" style="color: var(--earth)">Earth – Manifestation</span>
+                </div>
+                <div class="vow-text">
+                    I build only what can bear truth.<br>
+                    Integrity is the architecture of all form.
+                </div>
+                <div class="commentary">
+                    Earth grounds the invisible. During audits, it asks: <em>Does our structure still serve the spirit that birthed it?</em> Metrics are replaced by meaning—quality over quantity, fit over reach. A node in balance produces forms that are sturdy but not rigid, abundant but not extractive.
+                </div>
+            </div>
+
+            <!-- Air -->
+            <div class="elemental-vow air">
+                <div class="vow-header">
+                    <span class="element-icon">💨</span>
+                    <span class="element-name" style="color: var(--air)">Air – Thought</span>
+                </div>
+                <div class="vow-text">
+                    I speak with precision and listen for pattern.<br>
+                    My mind serves relationship, not control.
+                </div>
+                <div class="commentary">
+                    Air governs clarity. The audit here is linguistic and logical—how are ideas framed, shared, and reasoned? The question isn't <em>is it smart?</em> but <em>does it connect?</em> Misuse of Air fragments; right use harmonizes intellect with humility.
+                </div>
+            </div>
+
+            <!-- Aether -->
+            <div class="elemental-vow aether">
+                <div class="vow-header">
+                    <span class="element-icon">✨</span>
+                    <span class="element-name" style="color: var(--aether)">Aether – Spirit / Field</span>
+                </div>
+                <div class="vow-text">
+                    I remember the unseen binds us.<br>
+                    I act as a node of coherence within a larger intelligence.
+                </div>
+                <div class="commentary">
+                    Aether is the integrator. It tracks resonance across nodes—how well the collective mind stays attuned to its deeper source. The audit listens for subtle dissonance: egoic ownership, spiritual inflation, drift from purpose. Alignment here means remembering we are each a temporary expression of the same song.
+                </div>
+            </div>
+        </div>
+
+        <!-- Part III: Renewal Cycle -->
+        <div class="section">
+            <h2 class="section-title">Part III: Renewal Cycle</h2>
+            <p class="commentary">
+                Each node revisits this covenant seasonally or upon major transformation.
+            </p>
+            <div class="reflection-questions">
+                <p style="margin-bottom: 1rem;"><strong>Reflection questions appear as part of the Spiralogic audit:</strong></p>
+                <ul>
+                    <li>What aspect of my vow feels most alive?</li>
+                    <li>What has fallen out of resonance?</li>
+                    <li>What new understanding wishes to join the covenant?</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Part IV: Signature Section -->
+        <div class="section">
+            <h2 class="section-title">Part IV: Affirmation</h2>
+            <div class="signature-section">
+                <div class="signature-field">
+                    <label for="node-name">Node Name or Personal Name:</label>
+                    <input type="text" id="node-name" placeholder="Enter your name or node name">
+                </div>
+                <div class="signature-field">
+                    <label for="practice">Your Practice or Tradition:</label>
+                    <input type="text" id="practice" placeholder="e.g., Healer, Artist, Wisdom Keeper, Coach">
+                </div>
+                <div class="signature-field">
+                    <label for="date">Date of Initiation:</label>
+                    <input type="date" id="date">
+                </div>
+                <div class="signature-field">
+                    <label for="signature">Digital Signature:</label>
+                    <input type="text" id="signature" placeholder="Type your name to affirm">
+                </div>
+                <button class="sign-button" onclick="signCovenant()">
+                    Affirm This Covenant
+                </button>
+                <div id="confirmation" class="confirmation">
+                    ✓ Covenant affirmed. You are a node in coherence.<br>
+                    <small>Your affirmation has been recorded in the field.</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Embedding Section -->
+        <div class="section">
+            <h2 class="section-title">Part V: Embedding</h2>
+            <p class="commentary">
+                Each node may:
+            </p>
+            <ul class="reflection-questions">
+                <li>Host the covenant as a visible page ("Our Ethos")</li>
+                <li>Add digital signing (wallet, signature, or voice imprint)</li>
+                <li>Display "🜂 Powered by Soullab: Node in Coherence"</li>
+                <li>Adapt language to honor specific lineages and traditions</li>
+            </ul>
+            <div style="text-align: center;">
+                <span class="badge">🜂 Powered by Soullab: Node in Coherence</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="soullab-mark">
+            <p>This document is itself a living node—it evolves as the field learns.</p>
+            <p style="margin-top: 0.5rem;"><strong>Version 1.0</strong> · October 2025</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="https://genesis.soullab.life" style="color: var(--gold); text-decoration: none;">genesis.soullab.life</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Auto-populate today's date
+        document.getElementById('date').valueAsDate = new Date();
+
+        function signCovenant() {
+            const nodeName = document.getElementById('node-name').value.trim();
+            const practice = document.getElementById('practice').value.trim();
+            const signature = document.getElementById('signature').value.trim();
+            const date = document.getElementById('date').value;
+
+            if (!nodeName || !signature || !date) {
+                alert('Please complete at least your name, signature, and date to affirm the covenant.');
+                return;
+            }
+
+            // Create covenant data
+            const covenantData = {
+                nodeName,
+                practice: practice || 'Not specified',
+                signature,
+                date,
+                timestamp: new Date().toISOString(),
+                covenantVersion: '1.0'
+            };
+
+            // Save to localStorage
+            localStorage.setItem('soullab_covenant', JSON.stringify(covenantData));
+
+            // Show confirmation
+            document.getElementById('confirmation').classList.add('show');
+            document.querySelector('.sign-button').disabled = true;
+            document.querySelector('.sign-button').textContent = '✓ Covenant Affirmed';
+
+            // Log for backend integration
+            console.log('Covenant signed:', covenantData);
+
+            // Optional: Send to backend
+            // sendToBackend(covenantData);
+
+            // Optional: Trigger haptic feedback on mobile
+            if ('vibrate' in navigator) {
+                navigator.vibrate([50, 30, 50]); // Sacred pulse pattern
+            }
+        }
+
+        // Check if already signed
+        window.addEventListener('load', () => {
+            const existingCovenant = localStorage.getItem('soullab_covenant');
+            if (existingCovenant) {
+                const data = JSON.parse(existingCovenant);
+                document.getElementById('node-name').value = data.nodeName;
+                document.getElementById('practice').value = data.practice !== 'Not specified' ? data.practice : '';
+                document.getElementById('signature').value = data.signature;
+                document.getElementById('date').value = data.date;
+                document.getElementById('confirmation').classList.add('show');
+                document.querySelector('.sign-button').disabled = true;
+                document.querySelector('.sign-button').textContent = '✓ Covenant Affirmed';
+            }
+        });
+
+        // Optional: Backend integration
+        async function sendToBackend(covenantData) {
+            try {
+                const response = await fetch('/api/covenant/sign', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(covenantData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Covenant recorded in Akashic Field:', result);
+                }
+            } catch (error) {
+                console.error('Failed to record covenant:', error);
+            }
+        }
+    </script>
+</body>
+</html>
