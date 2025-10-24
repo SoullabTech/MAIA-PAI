@@ -17,7 +17,6 @@ export default function MayaRedirectPage() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('🔄 [MAYA DEPRECATED] Redirecting to /maia (Claude Code enhanced version)');
     router.replace('/maia');
   }, [router]);
 

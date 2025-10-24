@@ -117,7 +117,7 @@ export function MenuBar() {
 
       {/* MAIA Training Progress Icon */}
       <Link
-        href="/maya/training"
+        href="/maia/training"
         className="group relative"
         aria-label="MAIA Training Progress"
       >
