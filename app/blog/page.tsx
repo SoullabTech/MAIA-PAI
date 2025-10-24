@@ -198,14 +198,9 @@ export default function BlogPage() {
 
           <div className="max-w-7xl mx-auto relative">
             <div className="text-center mb-12">
-              {/* Decorative top border */}
-              <div className="flex items-center justify-center gap-4 mb-8">
-                <div className="h-px w-20" style={{ background: `linear-gradient(to right, transparent, ${SOULLAB_COLORS.leather}60, transparent)` }} />
-                <svg width="30" height="30" viewBox="0 0 30 30">
-                  <circle cx="15" cy="15" r="12" fill="none" stroke={SOULLAB_COLORS.leather} strokeWidth="0.5" opacity="0.6" />
-                  <circle cx="15" cy="15" r="8" fill="none" stroke={SOULLAB_COLORS.leather} strokeWidth="0.3" opacity="0.4" />
-                </svg>
-                <div className="h-px w-20" style={{ background: `linear-gradient(to right, transparent, ${SOULLAB_COLORS.leather}60, transparent)` }} />
+              {/* Soullab Holoflower Logo */}
+              <div className="flex justify-center mb-8">
+                <SoullabSpiral className="w-20 h-20 opacity-60" />
               </div>
 
               <h1
@@ -567,13 +562,9 @@ export default function BlogPage() {
           />
 
           <div className="max-w-2xl mx-auto text-center relative">
-            {/* Decorative top */}
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <svg width="40" height="40" viewBox="0 0 40 40">
-                <circle cx="20" cy="20" r="15" fill="none" stroke={SOULLAB_COLORS.leather} strokeWidth="0.5" opacity="0.6" />
-                <circle cx="20" cy="20" r="10" fill="none" stroke={SOULLAB_COLORS.leather} strokeWidth="0.3" opacity="0.4" />
-                <circle cx="20" cy="20" r="5" fill="none" stroke={SOULLAB_COLORS.leather} strokeWidth="0.2" opacity="0.3" />
-              </svg>
+            {/* Soullab Holoflower */}
+            <div className="flex justify-center mb-8">
+              <SoullabSpiral className="w-16 h-16 opacity-50" />
             </div>
 
             <h2
@@ -629,5 +620,51 @@ export default function BlogPage() {
         </section>
       </div>
     </div>
+  );
+}
+
+// Soullab Holoflower (Spiral Logo) Component
+function SoullabSpiral({ className = 'w-full h-full', variant = 'parchment' }: { className?: string; variant?: 'full' | 'parchment' }) {
+  return (
+    <svg viewBox="0 0 100 100" className={className}>
+      <defs>
+        {variant === 'full' ? (
+          <linearGradient id="spiral-gradient-blog" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={SOULLAB_COLORS.fire} />
+            <stop offset="33%" stopColor={SOULLAB_COLORS.air} />
+            <stop offset="66%" stopColor={SOULLAB_COLORS.earth} />
+            <stop offset="100%" stopColor={SOULLAB_COLORS.water} />
+          </linearGradient>
+        ) : (
+          <linearGradient id="spiral-gradient-blog" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={SOULLAB_COLORS.parchment} />
+            <stop offset="50%" stopColor={SOULLAB_COLORS.leather} />
+            <stop offset="100%" stopColor={SOULLAB_COLORS.parchment} />
+          </linearGradient>
+        )}
+      </defs>
+      {[...Array(12)].map((_, ring) => (
+        <g key={ring}>
+          {[...Array(24)].map((_, dot) => {
+            const angle = (dot / 24) * Math.PI * 2 + (ring * Math.PI / 12);
+            const radius = 10 + ring * 3.5;
+            const x = 50 + Math.cos(angle) * radius;
+            const y = 50 + Math.sin(angle) * radius;
+            const size = 1.8 - (ring * 0.1);
+
+            return (
+              <circle
+                key={dot}
+                cx={x}
+                cy={y}
+                r={size}
+                fill="url(#spiral-gradient-blog)"
+                opacity={0.9 - (ring * 0.05)}
+              />
+            );
+          })}
+        </g>
+      ))}
+    </svg>
   );
 }

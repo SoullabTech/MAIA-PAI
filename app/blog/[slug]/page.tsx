@@ -716,12 +716,9 @@ export default function BlogPostPage() {
         {/* Continue Reading CTA */}
         <section className="py-20 px-6">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <div className="h-px w-20" style={{ background: `linear-gradient(to right, transparent, ${SOULLAB_COLORS.leather}60, transparent)` }} />
-              <svg width="30" height="30" viewBox="0 0 30 30">
-                <circle cx="15" cy="15" r="10" fill="none" stroke={SOULLAB_COLORS.leather} strokeWidth="0.5" opacity="0.6" />
-              </svg>
-              <div className="h-px w-20" style={{ background: `linear-gradient(to right, transparent, ${SOULLAB_COLORS.leather}60, transparent)` }} />
+            {/* Soullab Holoflower */}
+            <div className="flex justify-center mb-6">
+              <SoullabSpiral className="w-12 h-12 opacity-40" />
             </div>
 
             <h3
@@ -751,5 +748,42 @@ export default function BlogPostPage() {
         </section>
       </div>
     </div>
+  );
+}
+
+// Soullab Holoflower (Spiral Logo) Component
+function SoullabSpiral({ className = 'w-full h-full' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 100 100" className={className}>
+      <defs>
+        <linearGradient id="spiral-gradient-post" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={SOULLAB_COLORS.parchment} />
+          <stop offset="50%" stopColor={SOULLAB_COLORS.leather} />
+          <stop offset="100%" stopColor={SOULLAB_COLORS.parchment} />
+        </linearGradient>
+      </defs>
+      {[...Array(12)].map((_, ring) => (
+        <g key={ring}>
+          {[...Array(24)].map((_, dot) => {
+            const angle = (dot / 24) * Math.PI * 2 + (ring * Math.PI / 12);
+            const radius = 10 + ring * 3.5;
+            const x = 50 + Math.cos(angle) * radius;
+            const y = 50 + Math.sin(angle) * radius;
+            const size = 1.8 - (ring * 0.1);
+
+            return (
+              <circle
+                key={dot}
+                cx={x}
+                cy={y}
+                r={size}
+                fill="url(#spiral-gradient-post)"
+                opacity={0.9 - (ring * 0.05)}
+              />
+            );
+          })}
+        </g>
+      ))}
+    </svg>
   );
 }
