@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis Admin Dashboard | Soullab</title>
+    <meta name="robots" content="noindex, nofollow">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #1a1f3a 50%, #24243e 100%);
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        /* Login Screen */
+        .login-container {
+            max-width: 450px;
+            margin: 100px auto;
+            background: rgba(26, 31, 58, 0.8);
+            border: 1px solid rgba(212, 184, 150, 0.2);
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            font-size: 2.5em;
+            color: #d4b896;
+            margin-bottom: 15px;
+            font-weight: 300;
+        }
+
+        .login-container p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 30px;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(15, 12, 41, 0.6);
+            border: 1px solid rgba(212, 184, 150, 0.3);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1em;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #10B981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+
+        .login-form button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .error-message {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .dashboard.show {
+            display: block;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(212, 184, 150, 0.2);
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5em;
+            color: #d4b896;
+            font-weight: 300;
+        }
+
+        .logout-btn {
+            padding: 12px 28px;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(26, 31, 58, 0.8);
+            border: 1px solid rgba(212, 184, 150, 0.2);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3em;
+            color: #10B981;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            background: rgba(26, 31, 58, 0.8);
+            border: 1px solid rgba(212, 184, 150, 0.3);
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .filter-btn:hover {
+            border-color: #10B981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .filter-btn.active {
+            background: #10B981;
+            border-color: #10B981;
+            color: white;
+        }
+
+        /* Nodes Table */
+        .nodes-table {
+            background: rgba(26, 31, 58, 0.8);
+            border: 1px solid rgba(212, 184, 150, 0.2);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 2fr;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border-bottom: 1px solid rgba(212, 184, 150, 0.2);
+            font-weight: 600;
+            color: #d4b896;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 2fr;
+            gap: 15px;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .table-row:hover {
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .status-badge.pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+            border: 1px solid #10B981;
+        }
+
+        .status-badge.suspended {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn.approve {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+            border: 1px solid #10B981;
+        }
+
+        .action-btn.approve:hover {
+            background: #10B981;
+            color: white;
+        }
+
+        .action-btn.view {
+            background: rgba(212, 184, 150, 0.2);
+            color: #d4b896;
+            border: 1px solid #d4b896;
+        }
+
+        .action-btn.view:hover {
+            background: #d4b896;
+            color: #0f0c29;
+        }
+
+        .action-btn.suspend {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+
+        .action-btn.suspend:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: #10B981;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(26, 31, 58, 0.95);
+            border: 1px solid rgba(212, 184, 150, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            font-size: 2em;
+            color: #d4b896;
+            font-weight: 300;
+        }
+
+        .modal-close {
+            font-size: 2em;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .modal-close:hover {
+            color: #ef4444;
+        }
+
+        .detail-row {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .detail-value {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .table-header, .table-row {
+                grid-template-columns: 1fr;
+            }
+
+            .table-header {
+                display: none;
+            }
+
+            .table-row {
+                padding: 20px;
+                background: rgba(26, 31, 58, 0.8);
+                border-radius: 12px;
+                margin-bottom: 15px;
+                border: 1px solid rgba(212, 184, 150, 0.2);
+            }
+
+            .table-row > div {
+                margin-bottom: 10px;
+            }
+
+            .table-row > div:before {
+                content: attr(data-label);
+                display: block;
+                font-size: 0.85em;
+                color: rgba(255, 255, 255, 0.5);
+                margin-bottom: 5px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginContainer" class="login-container">
+        <h1>🔐 Genesis Admin</h1>
+        <p>Enter admin password to access dashboard</p>
+        <div class="error-message" id="loginError"></div>
+        <form class="login-form" onsubmit="login(event)">
+            <input type="password" id="adminPassword" placeholder="Admin Password" required autofocus>
+            <button type="submit">Access Dashboard</button>
+        </form>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <div class="dashboard-header">
+            <h1>Genesis Admin Dashboard</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-number" id="totalNodes">-</span>
+                <span class="stat-label">Total Nodes</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="pendingNodes">-</span>
+                <span class="stat-label">Pending Approval</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="activeNodes">-</span>
+                <span class="stat-label">Active Nodes</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number" id="totalCovenants">-</span>
+                <span class="stat-label">Covenants Signed</span>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <button class="filter-btn active" data-status="all" onclick="filterNodes('all')">All Nodes</button>
+            <button class="filter-btn" data-status="pending_setup" onclick="filterNodes('pending_setup')">Pending</button>
+            <button class="filter-btn" data-status="active" onclick="filterNodes('active')">Active</button>
+            <button class="filter-btn" data-status="suspended" onclick="filterNodes('suspended')">Suspended</button>
+        </div>
+
+        <!-- Nodes Table -->
+        <div id="nodesTable" class="nodes-table">
+            <div class="table-header">
+                <div>Node Name</div>
+                <div>Steward</div>
+                <div>Tradition</div>
+                <div>Status</div>
+                <div>Created</div>
+                <div>Actions</div>
+            </div>
+            <div id="nodesTableBody" class="loading">Loading nodes...</div>
+        </div>
+    </div>
+
+    <!-- Node Details Modal -->
+    <div id="nodeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Node Details</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        let allNodes = [];
+        let currentFilter = 'all';
+        let authToken = null;
+
+        // Check if already authenticated
+        const savedAuth = localStorage.getItem('genesis_admin_auth');
+        if (savedAuth) {
+            authToken = savedAuth;
+            showDashboard();
+        }
+
+        async function login(event) {
+            event.preventDefault();
+            const password = document.getElementById('adminPassword').value;
+            const errorEl = document.getElementById('loginError');
+
+            // Simple password check (in production, use proper auth)
+            // TODO: Replace with environment variable or Supabase auth
+            if (password === 'genesis2025') {
+                authToken = 'authenticated';
+                localStorage.setItem('genesis_admin_auth', authToken);
+                errorEl.classList.remove('show');
+                showDashboard();
+            } else {
+                errorEl.textContent = 'Invalid password';
+                errorEl.classList.add('show');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('genesis_admin_auth');
+            authToken = null;
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('dashboard').classList.remove('show');
+        }
+
+        function showDashboard() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('dashboard').classList.add('show');
+            loadNodes();
+        }
+
+        async function loadNodes() {
+            try {
+                const response = await fetch('https://www.soullab.life/api/genesis/admin/nodes', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        logout();
+                        return;
+                    }
+                    throw new Error('Failed to load nodes');
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    allNodes = data.nodes;
+                    displayNodes(allNodes);
+
+                    // Update stats
+                    const stats = data.statistics;
+                    document.getElementById('totalNodes').textContent = stats.total_nodes || 0;
+                    document.getElementById('pendingNodes').textContent = stats.pending_nodes || 0;
+                    document.getElementById('activeNodes').textContent = stats.active_nodes || 0;
+                    document.getElementById('totalCovenants').textContent = stats.total_covenants || 0;
+                } else {
+                    throw new Error(data.error || 'Failed to load nodes');
+                }
+            } catch (error) {
+                console.error('Failed to load nodes:', error);
+                document.getElementById('nodesTableBody').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">⚠️</div>
+                        <div>Failed to load nodes</div>
+                        <p style="margin-top: 20px;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function filterNodes(status) {
+            currentFilter = status;
+
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.status === status) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Filter and display
+            const filtered = status === 'all'
+                ? allNodes
+                : allNodes.filter(node => node.status === status);
+
+            displayNodes(filtered);
+        }
+
+        function displayNodes(nodes) {
+            const tbody = document.getElementById('nodesTableBody');
+
+            if (nodes.length === 0) {
+                tbody.innerHTML = '<div class="empty-state"><div class="icon">🌱</div><div>No nodes found</div></div>';
+                return;
+            }
+
+            tbody.innerHTML = nodes.map(node => {
+                const profile = node.genesis_profiles?.[0] || node.genesis_profiles;
+                return `
+                    <div class="table-row">
+                        <div data-label="Node Name">${node.node_name}</div>
+                        <div data-label="Steward">${profile?.name || 'N/A'}</div>
+                        <div data-label="Tradition">${node.tradition}</div>
+                        <div data-label="Status">
+                            <span class="status-badge ${node.status}">${node.status.replace('_', ' ')}</span>
+                        </div>
+                        <div data-label="Created">${new Date(node.created_at).toLocaleDateString()}</div>
+                        <div data-label="Actions" class="actions">
+                            ${node.status === 'pending_setup' ?
+                                `<button class="action-btn approve" onclick="approveNode('${node.id}')">Approve</button>` :
+                                `<button class="action-btn suspend" onclick="suspendNode('${node.id}')">Suspend</button>`
+                            }
+                            <button class="action-btn view" onclick="viewNode('${node.id}')">View</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function approveNode(nodeId) {
+            if (!confirm('Approve this node and make it active?')) return;
+
+            try {
+                const response = await fetch(`https://www.soullab.life/api/genesis/admin/nodes/${nodeId}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ status: 'active' })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    alert(`✅ Node approved! "${result.node.node_name}" is now active.`);
+                    loadNodes(); // Reload to update display
+                } else {
+                    throw new Error(result.error || 'Failed to approve node');
+                }
+            } catch (error) {
+                console.error('Failed to approve node:', error);
+                alert(`❌ Failed to approve node: ${error.message}`);
+            }
+        }
+
+        async function suspendNode(nodeId) {
+            if (!confirm('Suspend this node?')) return;
+
+            try {
+                const response = await fetch(`https://www.soullab.life/api/genesis/admin/nodes/${nodeId}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ status: 'suspended' })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    alert(`✅ Node suspended: "${result.node.node_name}"`);
+                    loadNodes(); // Reload to update display
+                } else {
+                    throw new Error(result.error || 'Failed to suspend node');
+                }
+            } catch (error) {
+                console.error('Failed to suspend node:', error);
+                alert(`❌ Failed to suspend node: ${error.message}`);
+            }
+        }
+
+        function viewNode(nodeId) {
+            const node = allNodes.find(n => n.id === nodeId);
+            if (!node) return;
+
+            const profile = node.genesis_profiles?.[0] || node.genesis_profiles;
+            const covenant = node.genesis_covenants?.[0] || node.genesis_covenants;
+
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="detail-row">
+                    <div class="detail-label">Node Name</div>
+                    <div class="detail-value">${node.node_name}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Node URL</div>
+                    <div class="detail-value">https://${node.node_name}.soullab.ai</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Steward Name</div>
+                    <div class="detail-value">${profile?.name || 'N/A'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Practice</div>
+                    <div class="detail-value">${profile?.practice || 'N/A'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Location</div>
+                    <div class="detail-value">${profile?.location || 'N/A'}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Story</div>
+                    <div class="detail-value">${profile?.story || 'N/A'}</div>
+                </div>
+                ${profile?.exploration ? `
+                <div class="detail-row">
+                    <div class="detail-label">Current Exploration</div>
+                    <div class="detail-value">${profile.exploration}</div>
+                </div>
+                ` : ''}
+                ${profile?.quote ? `
+                <div class="detail-row">
+                    <div class="detail-label">Quote</div>
+                    <div class="detail-value">"${profile.quote}"</div>
+                </div>
+                ` : ''}
+                <div class="detail-row">
+                    <div class="detail-label">Tradition</div>
+                    <div class="detail-value">${node.tradition}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Theme</div>
+                    <div class="detail-value">${node.theme}</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Tier</div>
+                    <div class="detail-value">${node.tier}</div>
+                </div>
+                ${node.maia_voice ? `
+                <div class="detail-row">
+                    <div class="detail-label">MAIA Voice</div>
+                    <div class="detail-value">${node.maia_voice}</div>
+                </div>
+                ` : ''}
+                ${covenant ? `
+                <div class="detail-row">
+                    <div class="detail-label">Covenant Signed</div>
+                    <div class="detail-value">${covenant.signed_date ? new Date(covenant.signed_date).toLocaleDateString() : 'N/A'}</div>
+                </div>
+                ` : ''}
+                <div class="detail-row">
+                    <div class="detail-label">Status</div>
+                    <div class="detail-value">
+                        <span class="status-badge ${node.status}">${node.status.replace('_', ' ')}</span>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Created</div>
+                    <div class="detail-value">${new Date(node.created_at).toLocaleString()}</div>
+                </div>
+            `;
+
+            document.getElementById('nodeModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('nodeModal').classList.remove('show');
+        }
+
+        // Close modal on outside click
+        document.getElementById('nodeModal').addEventListener('click', (e) => {
+            if (e.target.id === 'nodeModal') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
