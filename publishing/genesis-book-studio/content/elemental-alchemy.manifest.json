@@ -1,0 +1,171 @@
+{
+  "book": {
+    "id": "elemental-alchemy",
+    "title": "Elemental Alchemy: The Art of Living a Phenomenal Life",
+    "edition": "Beta Readers Copy"
+  },
+  "sections": [
+    {
+      "id": "intro-torus",
+      "title": "The Torus of Change",
+      "loc": {
+        "page_start": 21,
+        "page_end": 30
+      },
+      "tags": [
+        "aether",
+        "change",
+        "orientation"
+      ],
+      "intents": [
+        "crisis",
+        "transition",
+        "overview"
+      ],
+      "summary": "A map of dissolution → reorganization → integration."
+    },
+    {
+      "id": "fire-anger",
+      "title": "Fire Element: Anger as Transformative Energy",
+      "loc": {
+        "page_start": 47,
+        "page_end": 63
+      },
+      "tags": [
+        "fire",
+        "emotion",
+        "transformation"
+      ],
+      "intents": [
+        "anger",
+        "activation",
+        "empowerment"
+      ],
+      "practice_ids": [
+        "practice-fire-channel"
+      ]
+    },
+    {
+      "id": "fire-practice-channel",
+      "title": "Channeling Anger into Creative Power",
+      "loc": {
+        "page_start": 89,
+        "page_end": 95
+      },
+      "tags": [
+        "fire",
+        "practice"
+      ],
+      "intents": [
+        "anger",
+        "action"
+      ]
+    },
+    {
+      "id": "air-focus",
+      "title": "Air Element: Clarity & the Scattered Mind",
+      "loc": {
+        "page_start": 91,
+        "page_end": 110
+      },
+      "tags": [
+        "air",
+        "cognition"
+      ],
+      "intents": [
+        "focus",
+        "overwhelm",
+        "attention"
+      ],
+      "practice_ids": [
+        "practice-air-5min-breath"
+      ]
+    },
+    {
+      "id": "air-dmn",
+      "title": "Default Mode Network & Attention",
+      "loc": {
+        "page_start": 134,
+        "page_end": 142
+      },
+      "tags": [
+        "air",
+        "neuroscience"
+      ],
+      "intents": [
+        "evidence",
+        "attention"
+      ]
+    },
+    {
+      "id": "water-shadow",
+      "title": "Water Element: Shadow Integration",
+      "loc": {
+        "page_start": 150,
+        "page_end": 170
+      },
+      "tags": [
+        "water",
+        "shadow",
+        "healing"
+      ],
+      "intents": [
+        "grief",
+        "protection",
+        "depth"
+      ]
+    },
+    {
+      "id": "integrative-practices",
+      "title": "Integration: All Four Elements Together",
+      "loc": {
+        "page_start": 178,
+        "page_end": 200
+      },
+      "tags": [
+        "integration",
+        "practice"
+      ],
+      "intents": [
+        "transition",
+        "coherence"
+      ]
+    },
+    {
+      "id": "transition-practices",
+      "title": "Transition Practices",
+      "loc": {
+        "page_start": 201,
+        "page_end": 212
+      },
+      "tags": [
+        "practice",
+        "change"
+      ],
+      "intents": [
+        "crisis",
+        "transition"
+      ]
+    }
+  ],
+  "practices": [
+    {
+      "id": "practice-air-5min-breath",
+      "title": "5-Min Air Breathing Practice",
+      "tags": [
+        "air",
+        "regulation"
+      ],
+      "duration_minutes": 5
+    },
+    {
+      "id": "practice-fire-channel",
+      "title": "Channeling Anger",
+      "tags": [
+        "fire",
+        "transformation"
+      ],
+      "duration_minutes": 8
+    }
+  ]
+}

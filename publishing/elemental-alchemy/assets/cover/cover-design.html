@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elemental Alchemy - Book Cover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1a1a1a;
+            padding: 2rem;
+        }
+
+        /* Book Cover Container - Standard 6x9 ratio */
+        .book-cover {
+            width: 600px;
+            height: 900px;
+            position: relative;
+            background: linear-gradient(135deg, #0A0C15 0%, #12172A 50%, #1A2137 100%);
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.8),
+                0 0 100px rgba(212, 175, 106, 0.2);
+            overflow: hidden;
+        }
+
+        /* Atmospheric Background */
+        .cover-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 600px 400px at 50% 30%, rgba(212, 175, 106, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 400px 600px at 50% 70%, rgba(90, 186, 170, 0.1) 0%, transparent 60%);
+            animation: atmosphericShift 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes atmosphericShift {
+            0% { opacity: 0.6; transform: scale(1); }
+            100% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        /* Sacred Geometry Background */
+        .sacred-geometry {
+            position: absolute;
+            inset: 0;
+            opacity: 0.08;
+        }
+
+        /* Content Container */
+        .cover-content {
+            position: relative;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 4rem 3rem;
+            z-index: 2;
+        }
+
+        /* Top Section */
+        .top-section {
+            text-align: center;
+        }
+
+        .publisher {
+            font-family: 'Cinzel', serif;
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            color: #D4AF6A;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        /* Middle Section - Elemental Circle */
+        .middle-section {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .elemental-circle {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Animated Rings */
+        .ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(212, 175, 106, 0.3);
+        }
+
+        .ring-1 {
+            width: 320px;
+            height: 320px;
+            animation: rotate 30s linear infinite;
+            border-style: dashed;
+        }
+
+        .ring-2 {
+            width: 280px;
+            height: 280px;
+            animation: rotate 25s linear infinite reverse;
+        }
+
+        .ring-3 {
+            width: 240px;
+            height: 240px;
+            animation: rotate 20s linear infinite;
+            border-color: rgba(90, 186, 170, 0.3);
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Elemental Symbols */
+        .element {
+            position: absolute;
+            font-size: 3rem;
+            color: #D4AF6A;
+            text-shadow: 0 0 20px rgba(212, 175, 106, 0.6);
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+            animation: elementPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes elementPulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        .element.fire {
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0s;
+        }
+        .element.air {
+            top: 25%;
+            right: 10%;
+            animation-delay: 0.6s;
+        }
+        .element.water {
+            bottom: 25%;
+            right: 10%;
+            animation-delay: 1.2s;
+        }
+        .element.earth {
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 1.8s;
+        }
+        .element.aether {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3.5rem;
+            color: #5ABAAA;
+            text-shadow: 0 0 30px rgba(90, 186, 170, 0.8);
+            animation-delay: 2.4s;
+        }
+
+        /* Title Section */
+        .title-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .main-title {
+            font-family: 'Cinzel', serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #EDD9A8 0%, #D4AF6A 40%, #C9A961 70%, #CD7F32 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 4px 12px rgba(212, 175, 106, 0.4));
+        }
+
+        .subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            font-style: italic;
+            color: rgba(247, 237, 212, 0.8);
+            letter-spacing: 1px;
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        .author {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            letter-spacing: 3px;
+            color: #D4AF6A;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .author-prefix {
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            color: rgba(247, 237, 212, 0.6);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Decorative Elements */
+        .top-ornament,
+        .bottom-ornament {
+            width: 100px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #D4AF6A, transparent);
+            margin: 1rem auto;
+        }
+
+        /* Particle Effect */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #D4AF6A;
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-20px) translateX(10px); }
+            50% { transform: translateY(-40px) translateX(-5px); }
+            75% { transform: translateY(-20px) translateX(-10px); }
+        }
+
+        .particle:nth-child(1) { top: 20%; left: 15%; animation-delay: 0s; }
+        .particle:nth-child(2) { top: 40%; left: 85%; animation-delay: 2s; }
+        .particle:nth-child(3) { top: 60%; left: 10%; animation-delay: 4s; }
+        .particle:nth-child(4) { top: 80%; left: 90%; animation-delay: 6s; }
+        .particle:nth-child(5) { top: 30%; left: 50%; animation-delay: 8s; }
+        .particle:nth-child(6) { top: 70%; left: 45%; animation-delay: 10s; }
+    </style>
+</head>
+<body>
+    <div class="book-cover">
+        <!-- Atmospheric Background -->
+        <div class="cover-bg"></div>
+
+        <!-- Sacred Geometry SVG -->
+        <svg class="sacred-geometry" viewBox="0 0 600 900" xmlns="http://www.w3.org/2000/svg">
+            <!-- Flower of Life pattern -->
+            <defs>
+                <pattern id="flowerOfLife" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+                    <circle cx="50" cy="50" r="30" fill="none" stroke="#D4AF6A" stroke-width="0.5"/>
+                    <circle cx="50" cy="20" r="30" fill="none" stroke="#D4AF6A" stroke-width="0.5"/>
+                    <circle cx="50" cy="80" r="30" fill="none" stroke="#D4AF6A" stroke-width="0.5"/>
+                    <circle cx="24" cy="35" r="30" fill="none" stroke="#D4AF6A" stroke-width="0.5"/>
+                    <circle cx="76" cy="35" r="30" fill="none" stroke="#D4AF6A" stroke-width="0.5"/>
+                    <circle cx="24" cy="65" r="30" fill="none" stroke="#D4AF6A" stroke-width="0.5"/>
+                    <circle cx="76" cy="65" r="30" fill="none" stroke="#D4AF6A" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="600" height="900" fill="url(#flowerOfLife)"/>
+        </svg>
+
+        <!-- Floating Particles -->
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+
+        <!-- Main Content -->
+        <div class="cover-content">
+            <!-- Top Section -->
+            <div class="top-section">
+                <div class="publisher">🜁 SOULLAB PUBLISHING</div>
+            </div>
+
+            <!-- Middle Section - Elemental Circle -->
+            <div class="middle-section">
+                <div class="elemental-circle">
+                    <!-- Animated Rings -->
+                    <div class="ring ring-1"></div>
+                    <div class="ring ring-2"></div>
+                    <div class="ring ring-3"></div>
+
+                    <!-- Five Elements -->
+                    <div class="element fire">🜂</div>
+                    <div class="element air">🜁</div>
+                    <div class="element water">🜄</div>
+                    <div class="element earth">🜃</div>
+                    <div class="element aether">🜀</div>
+                </div>
+            </div>
+
+            <!-- Title Section -->
+            <div class="title-section">
+                <div class="top-ornament"></div>
+                <h1 class="main-title">ELEMENTAL<br>ALCHEMY</h1>
+                <div class="bottom-ornament"></div>
+                <p class="subtitle">The Art of Living a Phenomenal Life</p>
+                <div class="author">
+                    <span class="author-prefix">BY</span>
+                    KELLY NEZAT
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Optional: Add more dynamic effects if needed
+        console.log('Elemental Alchemy - Book Cover Loaded');
+    </script>
+</body>
+</html>

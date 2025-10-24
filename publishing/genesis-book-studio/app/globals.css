@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --fire: #a94724;
+    --air: #cea22c;
+    --earth: #6d7934;
+    --water: #236586;
+    --leather: #8b7355;
+    --parchment: #d4c5a9;
+  }
+
+  body {
+    @apply bg-white text-gray-900 font-body;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  /* Editor prose styles for book content */
+  .prose-book {
+    @apply max-w-none;
+    line-height: 1.6;
+  }
+
+  .prose-book p {
+    @apply mb-4;
+  }
+
+  .prose-book h1 {
+    @apply text-3xl font-bold mb-6 mt-8;
+  }
+
+  .prose-book h2 {
+    @apply text-2xl font-bold mb-4 mt-6;
+  }
+
+  .prose-book h3 {
+    @apply text-xl font-bold mb-3 mt-4;
+  }
+
+  .prose-book blockquote {
+    @apply border-l-4 pl-4 italic my-4;
+  }
+
+  .prose-book ul, .prose-book ol {
+    @apply ml-6 my-4;
+  }
+
+  .prose-book li {
+    @apply mb-2;
+  }
+
+  /* Image placeholders */
+  .prose-book .image-placeholder {
+    @apply bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center text-gray-500 my-6;
+  }
+
+  /* Elemental styling */
+  .element-fire {
+    @apply border-fire text-fire;
+  }
+
+  .element-air {
+    @apply border-air text-air;
+  }
+
+  .element-earth {
+    @apply border-earth text-earth;
+  }
+
+  .element-water {
+    @apply border-water text-water;
+  }
+
+  /* Collaboration cursors */
+  .collaboration-cursor {
+    @apply absolute pointer-events-none;
+    border-left: 2px solid;
+    height: 1.2em;
+    margin-top: -1px;
+  }
+
+  .collaboration-cursor__label {
+    @apply absolute top-0 left-0 px-1 py-0.5 text-xs text-white rounded-sm whitespace-nowrap;
+    transform: translateY(-100%);
+  }
+}

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elemental Alchemy - Final Cover</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #1a1a1a;
+            padding: 2rem;
+        }
+
+        /* Book Cover Container - Standard 6x9 ratio */
+        .book-cover {
+            width: 600px;
+            height: 924px;
+            position: relative;
+            background-image: url('/publishing/elemental-alchemy/cover-web.png');
+            background-size: cover;
+            background-position: center;
+            background-color: #1a1a1a;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.8),
+                0 0 100px rgba(212, 175, 106, 0.3);
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        /* Professional cover already has text - hide overlays */
+        .text-overlay {
+            display: none;
+        }
+
+        /* Content Container - Hidden for professional cover */
+        .cover-content {
+            display: none;
+        }
+
+        /* Top Section - Publisher */
+        .top-section {
+            text-align: center;
+        }
+
+        .publisher {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            color: #D4AF6A;
+            font-weight: 600;
+            text-transform: uppercase;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+        }
+
+        .holoflower-placeholder {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #D4AF6A 0%, #CD7F32 50%, #87AE73 100%);
+            filter: drop-shadow(0 0 8px rgba(212, 175, 106, 0.6));
+        }
+
+        /* Bottom Section - Title & Author */
+        .bottom-section {
+            text-align: center;
+        }
+
+        .main-title {
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #EDD9A8 0%, #D4AF6A 40%, #C9A961 70%, #CD7F32 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.9));
+        }
+
+        .subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-style: italic;
+            color: #F7EDD4;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            font-weight: 400;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+        }
+
+        .process-line {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            color: #5ABAAA;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 3rem;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+        }
+
+        .divider {
+            width: 120px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #D4AF6A, transparent);
+            margin: 1.5rem auto;
+        }
+
+        .author {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            letter-spacing: 4px;
+            color: #D4AF6A;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+        }
+
+        /* Instruction overlay */
+        .instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 12, 21, 0.95);
+            border: 2px solid #D4AF6A;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            text-align: center;
+            font-family: 'Cormorant Garamond', serif;
+            color: #F7EDD4;
+            display: none;
+        }
+
+        .instructions.show {
+            display: block;
+        }
+
+        .instructions h3 {
+            font-family: 'Cinzel', serif;
+            color: #D4AF6A;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .instructions p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .instructions button {
+            background: linear-gradient(135deg, #D4AF6A 0%, #CD7F32 100%);
+            color: #0A0C15;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="book-cover">
+        <!-- Text overlay for readability -->
+        <div class="text-overlay"></div>
+
+        <!-- Main Content -->
+        <div class="cover-content">
+            <!-- Top Section -->
+            <div class="top-section">
+                <div class="publisher">
+                    <div class="holoflower-placeholder"></div>
+                    SOULLAB PUBLISHING
+                </div>
+            </div>
+
+            <!-- Bottom Section -->
+            <div class="bottom-section">
+                <h1 class="main-title">ELEMENTAL<br>ALCHEMY</h1>
+                <p class="subtitle">The Art of Living a Phenomenal Life</p>
+                <div class="divider"></div>
+                <p class="process-line">The Spiralogic Process</p>
+                <p class="author">KELLY NEZAT</p>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions show" id="instructions">
+            <h3>Professional Cover Loaded</h3>
+            <p><strong>This is your press-ready front cover!</strong></p>
+            <p>Extracted from: EA_6x9IN_Cover_PRESS_spine will need adjusting.pdf</p>
+            <p>To view full size or save:<br>
+            1. Click "Hide Instructions"<br>
+            2. Right-click the cover to save or screenshot</p>
+            <button onclick="document.getElementById('instructions').classList.remove('show')">Hide Instructions</button>
+        </div>
+    </div>
+
+    <script>
+        console.log('Elemental Alchemy - Final Cover Loaded');
+        console.log('Next step: Add holoflower logo to replace placeholder circle');
+    </script>
+</body>
+</html>
