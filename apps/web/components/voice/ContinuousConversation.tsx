@@ -52,6 +52,8 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   const recognitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSentRef = useRef<string>("");
   const isRestartingRef = useRef(false);
+  const networkErrorCount = useRef<number>(0);
+  const lastNetworkErrorTime = useRef<number>(0);
 
   // Expose methods to parent
   useImperativeHandle(ref, () => ({
@@ -203,8 +205,18 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         }
         // No-speech is normal in continuous mode, auto-restart happens in onend
       } else if (event.error === 'network') {
-        console.warn('⚠️ Network error in speech recognition, will retry on restart');
-        // Network errors will be retried by the auto-restart mechanism
+        networkErrorCount.current++;
+        lastNetworkErrorTime.current = Date.now();
+
+        if (networkErrorCount.current >= 5) {
+          console.error('🚫 Too many network errors (5+), stopping recognition');
+          setIsListening(false);
+          // TODO: Show user-friendly toast message
+          return;
+        }
+
+        console.warn(`⚠️ Network error in speech recognition (${networkErrorCount.current}/5), will retry with backoff`);
+        // Network errors will be retried by the auto-restart mechanism with exponential backoff
       } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
         console.error('🚫 Microphone permission denied');
         // Stop listening permanently if permission denied
@@ -237,7 +249,20 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
 
       // Only restart if we're actively listening and not processing/speaking
       if (isListening && !isProcessingRef.current && !isSpeaking) {
-        console.log('🔄 [onend] Will restart recognition after delay...');
+        // Calculate backoff delay based on network error count
+        const timeSinceLastError = Date.now() - lastNetworkErrorTime.current;
+
+        // Reset error count if it's been more than 30 seconds since last error
+        if (timeSinceLastError > 30000) {
+          networkErrorCount.current = 0;
+        }
+
+        // Exponential backoff: 300ms, 600ms, 1200ms, 2400ms, 4800ms
+        const backoffDelay = networkErrorCount.current > 0
+          ? Math.min(300 * Math.pow(2, networkErrorCount.current - 1), 5000)
+          : 300;
+
+        console.log(`🔄 [onend] Will restart recognition after ${backoffDelay}ms delay (errors: ${networkErrorCount.current})...`);
         isRestartingRef.current = true;
 
         setTimeout(() => {
@@ -256,7 +281,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
           }
           // Clear the restarting flag
           isRestartingRef.current = false;
-        }, 300); // Increased from 50ms to 300ms for stability
+        }, backoffDelay);
       } else {
         console.log('🚫 [onend] Not restarting - conditions not met');
       }
