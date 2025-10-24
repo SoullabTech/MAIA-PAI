@@ -205,6 +205,60 @@
             margin-top: 8px;
         }
 
+        /* Name Availability Checker */
+        .name-check-indicator {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3em;
+        }
+
+        .name-availability {
+            margin-top: 10px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            display: none;
+        }
+
+        .name-availability.checking {
+            display: block;
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+        }
+
+        .name-availability.available {
+            display: block;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10B981;
+        }
+
+        .name-availability.taken {
+            display: block;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .name-suggestions {
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .suggestion-link {
+            color: #10B981;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-right: 10px;
+        }
+
+        .suggestion-link:hover {
+            color: #059669;
+        }
+
         /* Checklist */
         .checklist {
             list-style: none;
@@ -510,8 +564,12 @@
             <form id="nodeForm">
                 <div class="form-group">
                     <label class="form-label">Node Name *</label>
-                    <input type="text" class="form-input" id="nodeName" required placeholder="e.g., SacredGrove, InnerLight, DeepRoots">
-                    <div class="form-help">This will be part of your URL: [nodename].soullab.ai</div>
+                    <div style="position: relative;">
+                        <input type="text" class="form-input" id="nodeName" required placeholder="e.g., sacred-grove, inner-light, deep-roots">
+                        <div id="nameCheckIndicator" class="name-check-indicator"></div>
+                    </div>
+                    <div id="nameAvailability" class="name-availability"></div>
+                    <div class="form-help">Lowercase letters, numbers, and hyphens only. This will be: [nodename].soullab.ai</div>
                 </div>
 
                 <div class="form-group">
@@ -801,7 +859,98 @@
                     if (el) el.value = data[key];
                 });
             }
+
+            // Node name availability checker
+            const nodeNameInput = document.getElementById('nodeName');
+            if (nodeNameInput) {
+                nodeNameInput.addEventListener('input', debounce(checkNodeNameAvailability, 500));
+            }
         });
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Check node name availability
+        async function checkNodeNameAvailability() {
+            const nodeNameInput = document.getElementById('nodeName');
+            const indicator = document.getElementById('nameCheckIndicator');
+            const availability = document.getElementById('nameAvailability');
+            const nodeName = nodeNameInput.value.trim().toLowerCase();
+
+            // Clear previous state
+            indicator.innerHTML = '';
+            availability.className = 'name-availability';
+            availability.innerHTML = '';
+
+            if (!nodeName || nodeName.length < 3) {
+                return;
+            }
+
+            // Format the name (convert to lowercase, allow only valid characters)
+            const formattedName = nodeName.replace(/[^a-z0-9-]/g, '');
+            if (formattedName !== nodeName) {
+                nodeNameInput.value = formattedName;
+                return;
+            }
+
+            // Show checking state
+            indicator.innerHTML = '⏳';
+            availability.className = 'name-availability checking';
+            availability.innerHTML = 'Checking availability...';
+
+            try {
+                const response = await fetch(`https://www.soullab.life/api/genesis/check-name?name=${encodeURIComponent(formattedName)}`);
+                const result = await response.json();
+
+                if (result.error) {
+                    indicator.innerHTML = '❌';
+                    availability.className = 'name-availability taken';
+                    availability.innerHTML = result.error;
+                    return;
+                }
+
+                if (result.available) {
+                    indicator.innerHTML = '✅';
+                    availability.className = 'name-availability available';
+                    availability.innerHTML = `✓ "${formattedName}" is available!`;
+                } else {
+                    indicator.innerHTML = '❌';
+                    availability.className = 'name-availability taken';
+                    let message = `"${formattedName}" is already taken.`;
+
+                    if (result.suggestions && result.suggestions.length > 0) {
+                        message += '<div class="name-suggestions">Try these: ';
+                        result.suggestions.forEach((suggestion, index) => {
+                            message += `<span class="suggestion-link" onclick="useSuggestion('${suggestion}')">${suggestion}</span>`;
+                        });
+                        message += '</div>';
+                    }
+
+                    availability.innerHTML = message;
+                }
+            } catch (error) {
+                console.error('Failed to check name availability:', error);
+                indicator.innerHTML = '';
+                availability.className = 'name-availability';
+                availability.innerHTML = '';
+            }
+        }
+
+        // Use suggested name
+        function useSuggestion(suggestion) {
+            document.getElementById('nodeName').value = suggestion;
+            checkNodeNameAvailability();
+        }
     </script>
 </body>
 </html>
