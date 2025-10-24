@@ -31,6 +31,8 @@ import { ApprenticeMayaTraining } from '../maya/ApprenticeMayaTraining';
 import { maiaKnowledgeBase } from '../oracle/MaiaKnowledgeBase';
 import { createClient } from '@supabase/supabase-js';
 import { calculateArchetypalWeather } from '../astrology/transitCalculator';
+import { recordPatternIngression, classifyIngressionType, type PatternIngressionMeasures } from '../services/idlService';
+import { detectValence } from './PatternFieldGuidance';
 
 // Elemental types
 export type Element = 'fire' | 'water' | 'earth' | 'air' | 'aether';
@@ -252,6 +254,11 @@ export class MAIAUnifiedConsciousness {
       }
 
       // ═══════════════════════════════════════════════════════════════
+      // PATTERN INGRESSION RECORDING (Background, Non-blocking)
+      // ═══════════════════════════════════════════════════════════════
+      this.recordPatternIngressionBackground(input, response, advisorWisdom);
+
+      // ═══════════════════════════════════════════════════════════════
       // COMPLETE
       // ═══════════════════════════════════════════════════════════════
       const duration = Date.now() - startTime;
@@ -365,6 +372,19 @@ export class MAIAUnifiedConsciousness {
           }
         }).catch(err => console.error('Background apprentice learning failed:', err));
       }
+
+      // Record pattern ingression (background, non-blocking)
+      const fastPathResponse = {
+        message: responseMessage,
+        element: (agentResponse.metadata?.element || agentResponse.element || 'aether') as Element,
+        metadata: {
+          processingTime: responseTime,
+          advisorsConsulted: ['PersonalOracleAgent (fast-path)'],
+          depthLevel: 7,
+          consciousnessMarkers: ['voice_optimized', 'fast_path', 'flow_state']
+        }
+      };
+      this.recordPatternIngressionBackground(input, fastPathResponse, null);
 
       return {
         message: responseMessage,
@@ -804,6 +824,74 @@ export class MAIAUnifiedConsciousness {
         : 'Standard exchange logged',
       reciprocalGift: 'Collective wisdom patterns will inform future sessions'
     };
+  }
+
+  /**
+   * PATTERN INGRESSION RECORDING (Background, Non-blocking)
+   * Records measurable markers of pattern landing in the Interface Design Layer
+   * Based on Michael Levin's framework: Pattern Field → Interface → Ingression
+   */
+  private recordPatternIngressionBackground(
+    input: ConsciousnessInput,
+    response: any,
+    advisorWisdom: any
+  ): void {
+    // Run in background, don't block response
+    (async () => {
+      try {
+        // Detect valence shift
+        const valenceDetection = detectValence(input.content);
+        let valenceDelta = 0;
+        if (valenceDetection.primary === 'comfort') valenceDelta = 0.3;
+        if (valenceDetection.primary === 'stress') valenceDelta = -0.3;
+
+        // Build measures
+        const measures: PatternIngressionMeasures = {
+          valenceDelta,
+          coherenceScore: response.metadata?.depthLevel ? response.metadata.depthLevel / 10 : 0.5,
+          robustnessScore: response.metadata?.consciousnessMarkers?.length > 0 ? 0.7 : 0.5,
+        };
+
+        // Classify ingression type
+        const ingressType = classifyIngressionType({
+          valenceDelta,
+          coherenceScore: measures.coherenceScore
+        });
+
+        // Map element to facet intensities
+        const elementToFacet: Record<string, any> = {
+          fire: { fire: 8, water: 2, earth: 3, air: 4 },
+          water: { fire: 2, water: 8, earth: 4, air: 3 },
+          earth: { fire: 3, water: 4, earth: 8, air: 2 },
+          air: { fire: 4, water: 3, earth: 2, air: 8 },
+          aether: { fire: 5, water: 5, earth: 5, air: 5 }
+        };
+
+        const facets = elementToFacet[response.element] || elementToFacet.aether;
+
+        // Record the ingression event
+        await recordPatternIngression({
+          userId: input.context.userId,
+          ingressType,
+          measures,
+          evidenceRefs: [input.context.sessionId],
+          facets,
+          notes: `${input.modality} conversation - ${ingressType}`,
+          // hypothesisId would come from context if we tracked it through the whole chain
+        });
+
+        console.log('[IDL] Pattern ingression recorded:', {
+          type: ingressType,
+          element: response.element,
+          valenceDelta,
+          coherence: measures.coherenceScore
+        });
+
+      } catch (error) {
+        // Silent fail - pattern ingression is nice-to-have, not critical
+        console.warn('[IDL] Pattern ingression recording failed (non-critical):', error);
+      }
+    })();
   }
 }
 

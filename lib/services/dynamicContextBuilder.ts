@@ -1,11 +1,13 @@
 // lib/services/dynamicContextBuilder.ts
 // 🎯 Dynamic Context Builder for MAIA
 // Combines Akashic Field insights + AIN memory + Transit Weather into rich system prompts
+// Now includes Interface Design Layer (IDL) for pattern field tracking
 
 import { getFieldContext } from "./fieldQueryService";
 import { getPatternResonance, formatPatternContext, findPatternEchoes } from "./ainMemoryService";
 import { calculateArchetypalWeather } from "@/lib/astrology/transitCalculator";
 import { createClient } from "@/lib/supabase";
+import { recordInterfaceHypothesis, detectInterfaceDesign, type ElementType } from "./idlService";
 
 export interface DynamicContext {
   fieldInsights: string;        // Semantically relevant past conversations
@@ -13,6 +15,7 @@ export interface DynamicContext {
   patternEchoes: string;        // Connections between current input and patterns
   transitContext: string;       // Current archetypal weather (transits)
   fullSystemPrompt: string;     // Complete prompt for MAIA
+  interfaceHypothesisId?: string; // IDL hypothesis tracking (pattern field)
 }
 
 /**
@@ -178,12 +181,39 @@ export async function buildDynamicContext(
       "Let the field inform your presence without overtly mentioning you have access to this information.\n";
   }
 
+  // Detect and record interface hypothesis (Pattern Field tracking)
+  let interfaceHypothesisId: string | undefined;
+  try {
+    const interfaceDetection = detectInterfaceDesign(currentInput);
+    if (interfaceDetection.detected && interfaceDetection.elementBias) {
+      // User is designing an interface - record hypothesis
+      const hypothesis = await recordInterfaceHypothesis({
+        userId,
+        elementBias: interfaceDetection.elementBias,
+        facetFocus: interfaceDetection.facetFocus,
+        attractorLabel: patternResonance?.dominantArchetype || undefined,
+        interfaceNotes: interfaceDetection.interfaceNotes,
+        contextHash: Buffer.from(fullSystemPrompt).toString('base64').slice(0, 32) // Simple hash
+      });
+      interfaceHypothesisId = hypothesis.id;
+      console.log('[IDL] Interface hypothesis recorded:', {
+        id: hypothesis.id,
+        elements: interfaceDetection.elementBias,
+        facets: interfaceDetection.facetFocus
+      });
+    }
+  } catch (error) {
+    console.warn('[IDL] Interface hypothesis recording failed (non-critical):', error);
+    // Fail gracefully - don't break context building
+  }
+
   return {
     fieldInsights,
     patternContext,
     patternEchoes: patternEchoesText,
     transitContext,
     fullSystemPrompt,
+    interfaceHypothesisId,
   };
 }
 

@@ -7,6 +7,7 @@
  * - ACT-R Memory: Experience integration
  * - MicroPsi Core: Emotional resonance
  * - Five Elemental Agents: Specialized wisdom processing
+ * - Pattern Field Guidance: Interface detection & ingression markers (implicit)
  */
 
 import { LIDAWorkspace } from '../cognitive-engines/lida-workspace';
@@ -19,6 +20,12 @@ import { EarthAgent } from '../elemental-agents/earth-agent';
 import { AirAgent } from '../elemental-agents/air-agent';
 import { AetherAgent } from '../elemental-agents/aether-agent';
 import type { ConsciousnessProfile } from '../types/soullab-metadata';
+import {
+  detectInterfaceMarkers,
+  detectAttractorDynamics,
+  detectValence,
+  type InterfaceMarker
+} from './PatternFieldGuidance';
 
 export interface VoiceCognitiveState {
   element: 'fire' | 'water' | 'earth' | 'air' | 'aether';
@@ -30,6 +37,12 @@ export interface VoiceCognitiveState {
   };
   elementalWisdom: string;
   consciousnessMarkers: string[];
+  // Pattern Field awareness (implicit)
+  patternField?: {
+    interfaceMarkers: InterfaceMarker[];
+    attractorDynamics: { type: string | null; confidence: number };
+    valence: { primary: string; elements: any[] };
+  };
 }
 
 export class VoiceCognitiveArchitecture {
@@ -70,6 +83,12 @@ export class VoiceCognitiveArchitecture {
     // Build consciousness profile from conversation
     const consciousnessProfile = this.buildConsciousnessProfile(conversationHistory);
 
+    // Phase 0: Pattern Field Detection (Implicit)
+    // Detect interface markers, attractor dynamics, valence - informs all subsequent processing
+    const interfaceMarkers = detectInterfaceMarkers(userInput);
+    const attractorDynamics = detectAttractorDynamics(userInput);
+    const valence = detectValence(userInput);
+
     // Phase 1: LIDA - Focus conscious attention
     const attention = await this.lida.focusConsciousAttention(userInput, consciousnessProfile);
 
@@ -106,7 +125,12 @@ export class VoiceCognitiveArchitecture {
         emotionalTone: this.summarizeEmotion(emotionalResonance)
       },
       elementalWisdom,
-      consciousnessMarkers: this.extractConsciousnessMarkers(attention, wisdomPlan, emotionalResonance)
+      consciousnessMarkers: this.extractConsciousnessMarkers(attention, wisdomPlan, emotionalResonance),
+      patternField: {
+        interfaceMarkers,
+        attractorDynamics,
+        valence
+      }
     };
   }
 
