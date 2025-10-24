@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[Name] - Genesis Node Steward | Soullab</title>
+    <meta name="description" content="[Name]'s personal page - Node steward in the Soullab Spiral Network">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #1a1f3a 50%, #24243e 100%);
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 12, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(212, 184, 150, 0.2);
+            padding: 15px 20px;
+            z-index: 1000;
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5em;
+            color: #d4b896;
+            font-weight: 300;
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            margin-left: 30px;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #d4b896;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            margin-top: 100px;
+            text-align: center;
+            padding: 60px 20px;
+            background: radial-gradient(ellipse at center, rgba(212, 184, 150, 0.15) 0%, transparent 70%);
+        }
+
+        .profile-avatar {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            border: 4px solid #d4b896;
+            background: rgba(26, 31, 58, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6em;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-name {
+            font-size: 3em;
+            color: #d4b896;
+            margin-bottom: 15px;
+            font-weight: 300;
+        }
+
+        .profile-title {
+            font-size: 1.5em;
+            color: #10B981;
+            margin-bottom: 10px;
+            font-weight: 400;
+        }
+
+        .profile-location {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 30px;
+        }
+
+        .covenant-badge {
+            display: inline-block;
+            padding: 10px 25px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+            border: 1px solid #d4b896;
+            border-radius: 25px;
+            font-size: 0.95em;
+            margin-top: 20px;
+            color: #d4b896;
+        }
+
+        /* Main Content Grid */
+        .profile-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        /* Left Column - Story & Work */
+        .main-column {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .section {
+            background: rgba(26, 31, 58, 0.6);
+            border: 1px solid rgba(212, 184, 150, 0.2);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        .section h2 {
+            color: #10B981;
+            font-size: 2em;
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+
+        .section p {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.8;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .quote {
+            font-style: italic;
+            color: #E3B778;
+            font-size: 1.3em;
+            padding: 30px;
+            border-left: 4px solid #d4b896;
+            background: rgba(212, 184, 150, 0.05);
+            margin: 30px 0;
+            line-height: 1.7;
+        }
+
+        /* Right Column - Details */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .sidebar-section {
+            background: rgba(26, 31, 58, 0.6);
+            border: 1px solid rgba(212, 184, 150, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+        }
+
+        .sidebar-section h3 {
+            color: #d4b896;
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-icon {
+            font-size: 1.5em;
+        }
+
+        .detail-text {
+            flex: 1;
+        }
+
+        .detail-label {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 3px;
+        }
+
+        .detail-value {
+            font-size: 1.05em;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Interests Tags */
+        .interests-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .interest-tag {
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10B981;
+            border-radius: 20px;
+            font-size: 0.95em;
+        }
+
+        /* Contact Links */
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            color: #10B981;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .contact-link:hover {
+            background: rgba(16, 185, 129, 0.2);
+            transform: translateX(5px);
+        }
+
+        .contact-icon {
+            font-size: 1.3em;
+        }
+
+        /* Elemental Balance Visualization */
+        .elemental-balance {
+            margin-top: 20px;
+        }
+
+        .element-bar {
+            margin-bottom: 15px;
+        }
+
+        .element-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .element-name {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .element-value {
+            color: #10B981;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10B981 0%, #059669 100%);
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        .progress-fill.fire { background: linear-gradient(90deg, #ff6b35 0%, #ff8c42 100%); }
+        .progress-fill.water { background: linear-gradient(90deg, #4ecdc4 0%, #45b7af 100%); }
+        .progress-fill.earth { background: linear-gradient(90deg, #8b7355 0%, #a08968 100%); }
+        .progress-fill.air { background: linear-gradient(90deg, #a8dadc 0%, #b9e5e8 100%); }
+        .progress-fill.aether { background: linear-gradient(90deg, #c9b6e4 0%, #d6c7ee 100%); }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .profile-content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+
+            .profile-name {
+                font-size: 2.3em;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 80px;
+            padding: 40px 20px;
+            text-align: center;
+            border-top: 1px solid rgba(212, 184, 150, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .footer a {
+            color: #10B981;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="nav">
+        <div class="nav-content">
+            <a href="index-new.html" class="nav-logo">🌀 Genesis</a>
+            <div class="nav-links">
+                <a href="index-new.html">Home</a>
+                <a href="covenant.html">Covenant</a>
+                <a href="https://maia.soullab.ai">Try MAIA</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <!-- Replace with actual image: <img src="avatar.jpg" alt="[Name]"> -->
+                🌿
+            </div>
+            <h1 class="profile-name">[Your Name]</h1>
+            <p class="profile-title">[Your Practice / Tradition]</p>
+            <p class="profile-location">📍 [Your Location]</p>
+            <div class="covenant-badge">🜂 Powered by Soullab: Node in Coherence</div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="profile-content">
+            <!-- Main Column -->
+            <div class="main-column">
+                <!-- Personal Story -->
+                <div class="section">
+                    <h2>My Story</h2>
+                    <p>
+                        [Your story here - What brought you to this work? What wisdom traditions guide you?
+                        What mysteries call to you? This is your space to share what makes your journey epic and important.]
+                    </p>
+                    <p>
+                        [Every life is an adventure of consciousness. Your path matters. Your insights serve the whole.
+                        Tell your story in your own voice - first person, vulnerable, real.]
+                    </p>
+                    <div class="quote">
+                        "[Your personal philosophy, favorite quote, or guiding wisdom in your own words]"
+                    </div>
+                </div>
+
+                <!-- Practice / Work -->
+                <div class="section">
+                    <h2>My Practice</h2>
+                    <p>
+                        [Describe your practice - What do you offer? How do you work? What lineages or frameworks guide you?
+                        This could be healing arts, creative work, teaching, coaching, storytelling, or any wisdom practice.]
+                    </p>
+                    <p>
+                        [How does your Genesis node serve your work? How has MAIA enhanced your practice?
+                        What makes your approach unique?]
+                    </p>
+                </div>
+
+                <!-- Current Explorations -->
+                <div class="section">
+                    <h2>Current Explorations</h2>
+                    <p>
+                        [What are you exploring right now? What questions are alive for you? What projects or mysteries
+                        are you engaging with? This is the living edge of your work.]
+                    </p>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Quick Details -->
+                <div class="sidebar-section">
+                    <h3>Node Details</h3>
+                    <div class="detail-item">
+                        <span class="detail-icon">🌀</span>
+                        <div class="detail-text">
+                            <div class="detail-label">Node Type</div>
+                            <div class="detail-value">[SEED / GROVE / FOREST]</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">📅</span>
+                        <div class="detail-text">
+                            <div class="detail-label">Covenant Signed</div>
+                            <div class="detail-value">[Date]</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🌐</span>
+                        <div class="detail-text">
+                            <div class="detail-label">Node URL</div>
+                            <div class="detail-value">[yourname.soullab.ai]</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Elemental Balance -->
+                <div class="sidebar-section">
+                    <h3>Elemental Signature</h3>
+                    <p style="font-size: 0.95em; color: rgba(255, 255, 255, 0.6); margin-bottom: 20px;">
+                        Your current elemental balance from your latest holoflower check-in.
+                    </p>
+                    <div class="elemental-balance">
+                        <div class="element-bar">
+                            <div class="element-label">
+                                <span class="element-name">🔥 Fire</span>
+                                <span class="element-value">[75]</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill fire" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div class="element-bar">
+                            <div class="element-label">
+                                <span class="element-name">💧 Water</span>
+                                <span class="element-value">[60]</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill water" style="width: 60%"></div>
+                            </div>
+                        </div>
+                        <div class="element-bar">
+                            <div class="element-label">
+                                <span class="element-name">🌍 Earth</span>
+                                <span class="element-value">[85]</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill earth" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        <div class="element-bar">
+                            <div class="element-label">
+                                <span class="element-name">💨 Air</span>
+                                <span class="element-value">[70]</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill air" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        <div class="element-bar">
+                            <div class="element-label">
+                                <span class="element-name">✨ Aether</span>
+                                <span class="element-value">[80]</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill aether" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interests -->
+                <div class="sidebar-section">
+                    <h3>Interests & Fields</h3>
+                    <div class="interests-tags">
+                        <span class="interest-tag">[Tag 1]</span>
+                        <span class="interest-tag">[Tag 2]</span>
+                        <span class="interest-tag">[Tag 3]</span>
+                        <span class="interest-tag">[Tag 4]</span>
+                        <span class="interest-tag">[Tag 5]</span>
+                    </div>
+                </div>
+
+                <!-- Connect -->
+                <div class="sidebar-section">
+                    <h3>Connect</h3>
+                    <div class="contact-links">
+                        <a href="[your-node-url]" class="contact-link">
+                            <span class="contact-icon">🌐</span>
+                            <span>Visit My Node</span>
+                        </a>
+                        <a href="mailto:[email]" class="contact-link">
+                            <span class="contact-icon">✉️</span>
+                            <span>Email Me</span>
+                        </a>
+                        <!-- Add more links as needed -->
+                        <a href="[social]" class="contact-link">
+                            <span class="contact-icon">🔗</span>
+                            <span>Other Links</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2025 [Your Name]. Part of the <a href="index-new.html">Soullab Spiral Network</a>.</p>
+        <p style="margin-top: 15px; font-style: italic; color: #E3B778;">
+            Every story matters. Every practice serves the whole. Every node is sovereign.
+        </p>
+    </div>
+</body>
+</html>
