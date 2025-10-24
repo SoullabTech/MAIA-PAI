@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { sendNodeActivationEmail } from '@/lib/services/emailService';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -59,7 +60,15 @@ export async function PATCH(
       .from('genesis_nodes')
       .update({ status })
       .eq('id', id)
-      .select()
+      .select(`
+        id,
+        node_name,
+        status,
+        genesis_profiles (
+          name,
+          email
+        )
+      `)
       .single();
 
     if (updateError) {
@@ -83,10 +92,25 @@ export async function PATCH(
         }
       });
 
-    // TODO: Send email notification to steward if status changed to active
-    // if (status === 'active') {
-    //   await sendActivationEmail(node);
-    // }
+    // Send activation email if status changed to active
+    if (status === 'active' && node.genesis_profiles?.[0]) {
+      const profile = node.genesis_profiles[0];
+      if (profile.email) {
+        const nodeUrl = `https://${node.node_name}.soullab.ai`;
+
+        sendNodeActivationEmail({
+          to: profile.email,
+          name: profile.name,
+          nodeName: node.node_name,
+          nodeUrl,
+          accessInstructions: 'Your node URL and login credentials will be sent separately within 24 hours.'
+        }).catch(err => {
+          console.error('[GENESIS ADMIN] Failed to send activation email:', err);
+        });
+
+        console.log(`[GENESIS ADMIN] Activation email sent to ${profile.email}`);
+      }
+    }
 
     console.log(`[GENESIS ADMIN] Node ${id} status updated to: ${status}`);
 

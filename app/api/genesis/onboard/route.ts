@@ -5,6 +5,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import {
+  sendOnboardingCompleteEmail,
+  sendAdminNotificationEmail
+} from '@/lib/services/emailService';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -39,9 +43,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate profile required fields
-    if (!profile.name || !profile.practice || !profile.story) {
+    if (!profile.name || !profile.email || !profile.practice || !profile.story) {
       return NextResponse.json(
-        { error: 'Profile missing required fields: name, practice, story' },
+        { error: 'Profile missing required fields: name, email, practice, story' },
         { status: 400 }
       );
     }
@@ -98,6 +102,7 @@ export async function POST(request: NextRequest) {
       .insert({
         node_id: nodeData.id,
         name: profile.name,
+        email: profile.email,
         practice: profile.practice,
         location: profile.location || null,
         story: profile.story,
@@ -165,13 +170,37 @@ export async function POST(request: NextRequest) {
       tradition: node.tradition
     });
 
+    // Send emails (async, don't block response)
+    const nodeUrl = `https://${node.nodeName}.soullab.ai`;
+
+    // Send onboarding email to user
+    sendOnboardingCompleteEmail({
+      to: profile.email,
+      name: profile.name,
+      nodeName: node.nodeName,
+      nodeUrl
+    }).catch(err => {
+      console.error('[GENESIS] Failed to send onboarding email:', err);
+    });
+
+    // Send admin notification
+    sendAdminNotificationEmail({
+      nodeName: node.nodeName,
+      stewardName: profile.name,
+      practice: profile.practice,
+      story: profile.story,
+      tradition: node.tradition
+    }).catch(err => {
+      console.error('[GENESIS] Failed to send admin notification:', err);
+    });
+
     return NextResponse.json({
       success: true,
       message: 'Onboarding complete! Welcome to the network.',
       node: {
         id: nodeData.id,
         nodeName: node.nodeName,
-        url: `https://${node.nodeName}.soullab.ai`,
+        url: nodeUrl,
         status: 'pending_setup'
       },
       nextSteps: {

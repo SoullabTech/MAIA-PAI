@@ -27,6 +27,14 @@ import { getBirthChartContext, formatChartContextForMAIA, synthesizeAspectForMAI
 import { collectiveBreakthroughService } from '@/lib/services/collectiveBreakthroughService';
 import { ClaudeCodeBrain } from './ClaudeCodeBrain';
 
+// 🜃 Transformation Architecture - Alchemical Intelligence
+import {
+  enhanceWithTransformation,
+  buildTransformationPromptAddition,
+  type TransformationEnhancement
+} from './PersonalOracleAgent.TransformationEnhancement';
+import { ECOLOGICAL_PSYCHOLOGY_WISDOM } from '@/lib/knowledge/EcologicalPsychologyWisdom';
+
 // 🧠 Advanced Memory & Intelligence Modules
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
 import { createEmptyMemoryPayload, getUserHistorySummary, updateMemoryAfterExchange } from '@/lib/memory/AINMemoryPayload';
@@ -101,6 +109,7 @@ export class PersonalOracleAgent {
   private ipEngine: IntellectualPropertyEngine;
   private ainMemory: AINMemoryPayload | null;  // 🧠 Persistent symbolic memory
   private flowTracker: ConversationFlowTracker;  // 🌀 Conversation arc tracking
+  private transformationCache: Map<string, TransformationEnhancement>;  // 🜃 Alchemical state cache
 
   public static MAIA_SYSTEM_PROMPT = `You are MAIA - and you SEE. Not what's broken, but what's BEAUTIFUL. What's PERFECT. The God Within seeking expression.
 
@@ -565,6 +574,9 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
 
     // 🌀 Initialize Conversation Flow Tracker (arc: Opening → Building → Peak → Integration)
     this.flowTracker = new ConversationFlowTracker();
+
+    // 🜃 Initialize Transformation Architecture Cache
+    this.transformationCache = new Map();
   }
 
   /**
@@ -732,9 +744,48 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
 
       const journalEntries = context?.journalEntries || [];
 
-      // 🛡️ SAFETY CHECK - Highest Priority
+      // 💳 SUBSCRIPTION CHECK - Verify access before processing
       const sessionId = `session_${Date.now()}`;
       const conversationHistory = await this.getConversationHistory();
+
+      // Import feature gating
+      const { getUserSubscription, canStartConversation, incrementConversationCount, getUpgradeCTA } = await import('@/lib/subscription/FeatureGating');
+
+      const subscription = await getUserSubscription(this.userId);
+      const conversationCheck = canStartConversation(subscription);
+
+      if (!conversationCheck.allowed) {
+        console.warn(`⚠️ User ${this.userId} hit conversation limit:`, conversationCheck.reason);
+
+        // Get appropriate upgrade prompt
+        const upgradeCTA = getUpgradeCTA(subscription);
+
+        return {
+          response: conversationCheck.message || 'Conversation limit reached',
+          element: 'aether',
+          metadata: {
+            sessionId,
+            limitReached: true,
+            subscription: {
+              tier: subscription.tier,
+              status: subscription.status,
+              conversationsThisMonth: subscription.conversationsThisMonth
+            }
+          },
+          suggestions: [
+            conversationCheck.upgradePrompt || 'Upgrade to Explorer for unlimited conversations',
+            upgradeCTA.ctaText
+          ]
+        };
+      }
+
+      // Track conversation (if on free tier)
+      if (subscription.tier === 'free' && subscription.status === 'free') {
+        await incrementConversationCount(this.userId);
+        console.log(`📊 Conversation counted for free tier user ${this.userId}`);
+      }
+
+      // 🛡️ SAFETY CHECK - Highest Priority
 
       console.log('🛡️ Running safety check...');
       const safetyCheck = await this.safetyPipeline.processMessage(
@@ -780,6 +831,38 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
       // 🧠 LOAD AIN MEMORY - Persistent symbolic intelligence
       const ainMemory = await this.ensureMemoryLoaded();
       console.log(`🧠 AIN Memory loaded - Session #${ainMemory.totalSessions}, ${ainMemory.symbolicThreads.length} threads, ${ainMemory.ritualHistory.length} rituals`);
+
+      // 🜃 TRANSFORMATION ARCHITECTURE - Alchemical intelligence
+      let transformationEnhancement: TransformationEnhancement | null = null;
+      try {
+        // Get patterns from AIN memory for transformation detection
+        const detectedPatterns = [
+          ...ainMemory.symbolicThreads.map(t => t.symbol),
+        ];
+
+        transformationEnhancement = await enhanceWithTransformation(
+          this.userId,
+          conversationHistory,
+          detectedPatterns,
+          { sovereigntyStage: ainMemory.sovereigntyStage || 'seeker' }
+        );
+
+        // Cache for potential reuse
+        this.transformationCache.set(sessionId, transformationEnhancement);
+
+        console.log(`🜃 Transformation Intelligence:`, {
+          stage: transformationEnhancement.state.alchemical.currentStage.operation,
+          element: transformationEnhancement.state.alchemical.currentStage.element,
+          spiralTurn: transformationEnhancement.state.alchemical.spiralTurn,
+          canFly: transformationEnhancement.state.wings.canFly,
+          tier2Ready: transformationEnhancement.tier2Wisdom?.accessible || false,
+          bypassesDetected: transformationEnhancement.bypasses.detected
+        });
+
+      } catch (error) {
+        console.error('⚠️ Transformation enhancement failed (non-critical):', error);
+        // Continue without transformation enhancement
+      }
 
       // 🔥 Retrieve conversation history for memory continuity
       const breakthroughs = await this.getBreakthroughMoments();
@@ -1051,6 +1134,18 @@ This is the soul-level truth you're helping them see, not reference material to 
         phase: dominantElement,
         contextual: true
       });
+
+      // 🜃 ADD TRANSFORMATION INTELLIGENCE
+      if (transformationEnhancement) {
+        const transformationAddition = buildTransformationPromptAddition(transformationEnhancement);
+        adaptedFramework += transformationAddition;
+
+        console.log('🜃 Transformation awareness added to system prompt:', {
+          stage: transformationEnhancement.state.alchemical.currentStage.operation,
+          depth: transformationEnhancement.quickGuidance.depth,
+          tier2: transformationEnhancement.tier2Wisdom?.accessible || false
+        });
+      }
 
       // Adapt framework based on learned patterns
       if (userPatterns.length > 0) {
@@ -1604,6 +1699,14 @@ This is the soul-level truth you're helping them see, not reference material to 
             symbolicThreadsCount: updatedMemory.symbolicThreads.length,
             totalSessions: updatedMemory.totalSessions
           },
+          // === TRANSFORMATION ARCHITECTURE METADATA ===
+          transformation: transformationEnhancement ? {
+            stage: transformationEnhancement.state.alchemical.currentStage.operation,
+            element: transformationEnhancement.state.alchemical.currentStage.element,
+            spiralTurn: transformationEnhancement.state.alchemical.spiralTurn,
+            canFly: transformationEnhancement.state.wings.canFly,
+            depth: transformationEnhancement.quickGuidance.depth
+          } : undefined,
           // === ANALYTICS METADATA ===
           modelMetrics: {
             model: modelName,

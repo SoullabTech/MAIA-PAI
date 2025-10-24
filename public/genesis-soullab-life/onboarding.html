@@ -520,6 +520,12 @@
                 </div>
 
                 <div class="form-group">
+                    <label class="form-label">Your Email *</label>
+                    <input type="email" class="form-input" id="email" required placeholder="your@email.com">
+                    <div class="form-help">We'll use this to send you node access details and important updates.</div>
+                </div>
+
+                <div class="form-group">
                     <label class="form-label">Your Practice / Tradition *</label>
                     <input type="text" class="form-input" id="practice" required placeholder="e.g., Somatic Healer, Sound Artist, Wisdom Keeper">
                     <div class="form-help">How do you describe your work in the world?</div>
@@ -710,6 +716,7 @@
 
             profileData = {
                 name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
                 practice: document.getElementById('practice').value,
                 location: document.getElementById('location').value,
                 story: document.getElementById('story').value,
@@ -832,6 +839,14 @@
                     content.classList.add('active');
                 }
             });
+
+            // Populate email on completion step
+            if (currentStep === 5 && profileData && profileData.email) {
+                const confirmEmailEl = document.getElementById('confirmEmail');
+                if (confirmEmailEl) {
+                    confirmEmailEl.textContent = profileData.email;
+                }
+            }
 
             // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });

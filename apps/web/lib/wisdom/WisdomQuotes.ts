@@ -314,6 +314,89 @@ export const WISDOM_QUOTES: WisdomQuote[] = [
     elements: ['air', 'aether'],
     phases: ['integration', 'unity'],
     themes: ['perspective', 'care', 'wholeness']
+  },
+
+  // James Hillman - Archetypal & Ecological Psychology
+  {
+    id: 'hillman-1',
+    voice: 'hillman',
+    text: 'We can\'t be separated from nature—we ARE nature. Your cells are alive, your nerve fibers are alive, the minerals in you... they are nature.',
+    elements: ['earth', 'water', 'aether'],
+    phases: ['integration', 'unity'],
+    themes: ['nature', 'identity', 'embodiment', 'ecology']
+  },
+  {
+    id: 'hillman-2',
+    voice: 'hillman',
+    text: 'The psyche speaks in symptoms. Depression may not be a problem to fix but the soul demanding descent, not ascent.',
+    elements: ['water', 'aether'],
+    phases: ['power', 'harmony', 'integration'],
+    themes: ['soul', 'depression', 'pathologizing', 'descent']
+  },
+  {
+    id: 'hillman-3',
+    voice: 'hillman',
+    text: 'What would make you want not to destroy something would be your sense, your appreciation of its beauty. If we start with the world as beautiful, you fall in love with it.',
+    elements: ['aether', 'water', 'fire'],
+    phases: ['integration', 'unity'],
+    themes: ['beauty', 'love', 'ecology', 'aesthetics']
+  },
+  {
+    id: 'hillman-4',
+    voice: 'hillman',
+    text: 'Maybe the rage is outrage. Maybe it wants to be OUT. Maybe it is a political reaction to the world. You are by nature a political animal.',
+    source: 'Archetypal Psychology',
+    elements: ['fire', 'air'],
+    phases: ['power', 'integration'],
+    themes: ['rage', 'political', 'emotion', 'instinct']
+  },
+  {
+    id: 'hillman-5',
+    voice: 'hillman',
+    text: 'Spirit ascends, transcends, seeks light. Soul descends, embraces depth, shadow, complexity. Western culture overvalues spirit and neglects soul.',
+    elements: ['water', 'aether'],
+    phases: ['harmony', 'integration'],
+    themes: ['soul', 'spirit', 'shadow', 'depth']
+  },
+  {
+    id: 'hillman-6',
+    voice: 'hillman',
+    text: 'Icarus didn\'t die of hubris—he was freed into deeper refinement. The fall is calcination, not failure. What burns away is what was never truly yours.',
+    elements: ['fire', 'aether'],
+    phases: ['power', 'integration'],
+    themes: ['calcination', 'refinement', 'alchemy', 'failure']
+  },
+  {
+    id: 'hillman-7',
+    voice: 'hillman',
+    text: 'The soul inside the body is connected to the world. Whatever you do to yourself you do to the world; whatever you do to the world you do to yourself.',
+    elements: ['earth', 'water', 'aether'],
+    phases: ['integration', 'unity'],
+    themes: ['ecology', 'psyche', 'world-soul', 'interconnection']
+  },
+  {
+    id: 'hillman-8',
+    voice: 'hillman',
+    text: 'Those who resist the shadows resist the soil of rebirth and revolution. Light chasers hide in the \'light\' while avoiding the real work.',
+    elements: ['earth', 'water'],
+    phases: ['power', 'harmony', 'integration'],
+    themes: ['shadow', 'earth-work', 'soil', 'bypassing']
+  },
+  {
+    id: 'hillman-9',
+    voice: 'hillman',
+    text: 'We\'re anesthetized—we numb our senses from morning till night. Everything is to keep the senses stopped, shut down, so nobody sees the beauty.',
+    elements: ['earth', 'water', 'aether'],
+    phases: ['harmony', 'integration'],
+    themes: ['anesthetization', 'beauty', 'senses', 'awakening']
+  },
+  {
+    id: 'hillman-10',
+    voice: 'hillman',
+    text: 'Hope is one of the evils in Pandora\'s box. It projects you forward and takes you away from what IS. Be attentive to what\'s really here right now.',
+    elements: ['earth', 'air', 'aether'],
+    phases: ['harmony', 'integration'],
+    themes: ['hope', 'presence', 'now', 'future']
   }
 ];
 
