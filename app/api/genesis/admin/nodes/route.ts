@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
         created_at,
         genesis_profiles (
           name,
+          email,
           practice,
           location,
           story,
