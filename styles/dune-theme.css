@@ -291,10 +291,10 @@
   /* 🍂 FALL (September 23 - December 20) - Harvest & Transformation */
   .bg-season-fall {
     background: linear-gradient(135deg,
-      #B85C3D 0%,      /* Terracotta warmth */
-      #8B4513 30%,     /* Saddle brown */
-      #654321 70%,     /* Dark sienna */
-      #3D2817 100%     /* Deep earth anchor */
+      #D2691E 0%,      /* Rich burnt sienna */
+      #B8442D 25%,     /* Deep terracotta */
+      #8B2500 60%,     /* Burnt red */
+      #4A1504 100%     /* Deep burgundy anchor */
     );
   }
 
