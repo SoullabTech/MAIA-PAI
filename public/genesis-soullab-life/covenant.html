@@ -548,10 +548,10 @@
             // Log for backend integration
             console.log('Covenant signed:', covenantData);
 
-            // Optional: Send to backend
-            // sendToBackend(covenantData);
+            // Send to backend
+            sendToBackend(covenantData);
 
-            // Optional: Trigger haptic feedback on mobile
+            // Trigger haptic feedback on mobile
             if ('vibrate' in navigator) {
                 navigator.vibrate([50, 30, 50]); // Sacred pulse pattern
             }
@@ -572,21 +572,36 @@
             }
         });
 
-        // Optional: Backend integration
+        // Backend integration
         async function sendToBackend(covenantData) {
             try {
-                const response = await fetch('/api/covenant/sign', {
+                const response = await fetch('https://www.soullab.life/api/genesis/covenant/sign', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(covenantData)
                 });
 
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('Covenant recorded in Akashic Field:', result);
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    console.log('✅ Covenant recorded in the field:', result);
+
+                    // Store covenant ID
+                    const storedData = JSON.parse(localStorage.getItem('soullab_covenant'));
+                    storedData.covenantId = result.covenantId;
+                    localStorage.setItem('soullab_covenant', JSON.stringify(storedData));
+                } else {
+                    console.error('❌ Failed to record covenant:', result);
+
+                    // Still show success to user (they have localStorage copy)
+                    // But log the issue
+                    if (result.error) {
+                        console.error('API Error:', result.error, result.details || '');
+                    }
                 }
             } catch (error) {
-                console.error('Failed to record covenant:', error);
+                console.error('❌ Network error recording covenant:', error);
+                // Still show success to user (localStorage fallback)
             }
         }
     </script>
