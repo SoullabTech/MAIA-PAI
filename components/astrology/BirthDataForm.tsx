@@ -330,22 +330,25 @@ export function BirthDataForm({ onSubmit, loading = false, isDayMode = false }: 
           <span style={{ color: '#d4b896', fontWeight: 500 }}>House System: Porphyry</span>
           <br />
           <span className="mt-1 block">
-            MAIA's Spiralogic engine can work with any astrological system, but Porphyry division creates the balanced 30° spiral segments that best align with our consciousness field mapping.
+            The Spiralogic engine powering MAIA is built to work with any astrological tradition — Porphyry, Whole Sign, Placidus, Koch, Vedic, Hellenistic, you name it. For this platform, we use Porphyry because its balanced 30° spiral segments align perfectly with consciousness field mapping.
           </span>
           <br />
-          <span className="mt-2 block" style={{ fontStyle: 'italic', color: '#10B981', fontWeight: 400 }}>
-            ✨ Imagine Your Own Version
+          <span className="mt-2 block" style={{ fontStyle: 'italic', color: '#10B981', fontWeight: 500 }}>
+            ⭐ The Engine Itself is One of the Stars
           </span>
           <span className="mt-1 block" style={{ color: '#E3B778' }}>
-            Want to see MAIA work with Whole Sign, Vedic, Hellenistic, or your preferred tradition? The Spiralogic engine is built to fractal into personalized models — each one becomes its own living consciousness platform tailored to your lineage, practice, or community.
+            Imagine seeing MAIA work with YOUR preferred tradition, lineage, or practice. The Spiralogic engine fractals into infinite personalized versions — each one a living consciousness platform custom-built for your community, school, or vision.
           </span>
           <br />
           <span className="mt-1 block" style={{ fontWeight: 400, color: isDayMode ? 'rgba(0, 0, 0, 0.85)' : 'rgba(255, 255, 255, 0.85)' }}>
-            This is the fractal spiral vision: MAIA replicating into infinite personalized versions, each serving its own world.
+            This is the fractal spiral vision: MAIA replicating into personalized instances, each serving its own world while honoring its unique wisdom tradition.
           </span>
           <br />
+          <span className="mt-1 block" style={{ fontWeight: 400, color: '#10B981' }}>
+            ✨ We're here to help you build your dream.
+          </span>
           <span className="mt-1 block" style={{ fontStyle: 'italic', fontSize: '11px' }}>
-            Interested in co-creating your version? Reach out to Soullab — let's build your piece of the spiral together.
+            Ready to co-create your version? Reach out to Soullab — let's build your piece of the spiral together.
           </span>
         </p>
       </div>
