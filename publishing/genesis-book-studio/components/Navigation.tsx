@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BookOpen, Sparkles, Users, Home } from 'lucide-react'
+import { BookOpen, Sparkles, Users, Home, GraduationCap } from 'lucide-react'
 
 export default function Navigation() {
   const pathname = usePathname()
 
   const links = [
     { href: '/', label: 'Home', icon: Home },
+    { href: '/academy', label: 'Academy', icon: GraduationCap },
     { href: '/read-adaptive', label: 'Adaptive Reading', icon: BookOpen },
     { href: '/creed', label: 'The Creed', icon: Sparkles },
     { href: '/beta', label: 'Join Beta', icon: Users },

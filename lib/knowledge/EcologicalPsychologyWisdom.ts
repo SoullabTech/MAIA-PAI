@@ -401,7 +401,7 @@ export const ECOLOGICAL_DEPTH_READINESS = {
     'Recognizes political dimension of emotion',
     'Questions separation/control paradigms',
     'Has some shadow awareness',
-    'Can hear "you\'re not broken" at soul level'
+    'Can hear "you\'re not broken\" at soul level'
   ],
 
   contraindications: [

@@ -31,6 +31,12 @@ const RESOURCES: ResourceCategory[] = [
     description: 'The 34-year prophecy and Kelly\'s journey',
     resources: [
       {
+        title: 'Soullab\'s Earth Mission',
+        description: 'AI as renaissance for creatives — why this platform exists',
+        link: '/docs/SOULLAB_EARTH_MISSION.md',
+        tags: ['Core Mission', 'Why We Exist']
+      },
+      {
         title: 'Inner Gold Whitepaper',
         description: 'The complete vision - from 1991 spirit guides to 2025 manifestation',
         link: '/docs/INNER_GOLD_WHITEPAPER.md',
@@ -185,6 +191,18 @@ const RESOURCES: ResourceCategory[] = [
     description: 'How to work with MAIA for transformation',
     resources: [
       {
+        title: 'The Asymptosis Journey',
+        description: 'Creative process through the elements — from revelation to manifestation',
+        link: '/docs/ASYMPTOSIS_JOURNEY.md',
+        tags: ['Creative Process', 'Core Teaching']
+      },
+      {
+        title: 'Asymptosis: The Sacred State of Becoming',
+        description: 'Understanding the spiral of approaching apotheosis without arriving',
+        link: '/docs/ASYMPTOSIS.md',
+        tags: ['Theory', 'Spiralogic']
+      },
+      {
         title: 'Voice Mode Guide',
         description: 'Using dialogue, patient, and scribe modes for different depths',
         link: '/learn/voice-modes',
@@ -274,7 +292,7 @@ export default function LearnPage() {
                     <div className="card-sietch p-6 bg-gradient-to-br from-black/40 via-amber-950/20 to-black/40">
                       <div className="relative w-full aspect-[4/3] md:aspect-[16/9] overflow-hidden rounded-lg">
                         <Image
-                          src="/elemental-alchemy-four-panel.png"
+                          src="/images/elemental/elemental-alchemy-four-panel.png"
                           alt="Elemental Alchemy: Earth, Air, Water, Fire - The four sacred elements of transformation"
                           fill
                           className="object-contain"
