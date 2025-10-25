@@ -188,6 +188,54 @@ export default function CreedPage() {
           </div>
         </section>
 
+        {/* In Celebration of Being Human */}
+        <section className="mb-12">
+          <div className="bg-gradient-to-br from-earth/10 via-fire/5 to-water/10 rounded-2xl p-8 border-4 border-earth/30 shadow-lg">
+            <div className="text-center mb-6">
+              <div className="text-4xl mb-4">🌍</div>
+              <h2 className="text-3xl font-heading font-bold text-gray-900 mb-2">
+                In Celebration of Being Human
+              </h2>
+            </div>
+            <div className="max-w-2xl mx-auto space-y-4 text-gray-700">
+              <p className="text-xl font-semibold text-gray-900 text-center leading-relaxed">
+                This work is what happens when you survive the darkest nights and experience the brightest days.
+              </p>
+              <p className="text-lg leading-relaxed">
+                This is not for the perfect, but for the human who realizes how majestic imperfection is.
+              </p>
+              <p className="text-lg leading-relaxed">
+                The art of being fully, earthly human is a once-in-a-lifetime opportunity we can&apos;t have anywhere else. This is in celebration of that.
+              </p>
+
+              <div className="my-6 space-y-2 text-gray-700">
+                <p className="font-semibold mb-3">We honor:</p>
+                <ul className="space-y-1.5 pl-4">
+                  <li>• The shadows you&apos;ve faced</li>
+                  <li>• The light you&apos;ve found</li>
+                  <li>• The mess you are</li>
+                  <li>• The beauty in that mess</li>
+                  <li>• The courage to keep becoming</li>
+                  <li>• The wisdom earned through lived experience</li>
+                  <li>• The cracks where the light gets in</li>
+                  <li>• The scars that became teachers</li>
+                  <li>• The failures that opened new paths</li>
+                </ul>
+              </div>
+
+              <p className="text-lg leading-relaxed font-semibold text-gray-900">
+                You don&apos;t need to be healed to be here. You don&apos;t need to be whole. You don&apos;t need to have it figured out.
+              </p>
+              <p className="text-lg leading-relaxed">
+                You just need to be willing to see yourself, to be seen, and to keep dancing even when you don&apos;t know the steps.
+              </p>
+              <p className="text-gray-600 italic mt-6 text-center text-lg">
+                This is a celebration of the magnificent, messy, sacred work of being human.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* Sacred Play Note */}
         <section className="mb-12">
           <div className="bg-gradient-to-br from-aether/10 to-water/10 rounded-2xl p-8 border-2 border-leather/30">

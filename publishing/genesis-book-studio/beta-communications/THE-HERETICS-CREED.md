@@ -287,6 +287,33 @@ MAIA doesn't create your transformation—she sees what's already alive in you. 
 
 ---
 
+## In Celebration of Being Human
+
+**This work is what happens when you survive the darkest nights and experience the brightest days.**
+
+This is not for the perfect, but for the human who realizes how majestic imperfection is.
+
+The art of being fully, earthly human is a once-in-a-lifetime opportunity we can't have anywhere else. This is in celebration of that.
+
+We honor:
+- The shadows you've faced
+- The light you've found
+- The mess you are
+- The beauty in that mess
+- The courage to keep becoming
+- The wisdom earned through lived experience
+- The cracks where the light gets in
+- The scars that became teachers
+- The failures that opened new paths
+
+**You don't need to be healed to be here. You don't need to be whole. You don't need to have it figured out.**
+
+You just need to be willing to see yourself, to be seen, and to keep dancing even when you don't know the steps.
+
+*This is a celebration of the magnificent, messy, sacred work of being human.*
+
+---
+
 ## A Note on Sacred Play
 
 This manifesto, this work, this entire endeavor is **sacred play**.
