@@ -1,10 +1,9 @@
-# Monday Launch Newsletter - Draft
+# Monday Launch Newsletter - FINAL
 
-**Subject Line Options:**
-1. "The systems are getting sharper, but not wiser" 🐢
-2. Toward Relational Intelligence: A Manifesto
-3. What if books could learn with you?
-4. The Heretic's Creed: A New Kind of Platform
+**SELECTED SUBJECT LINE:**
+**"The systems are getting sharper, but not wiser" 🐢**
+
+**Launch Strategy:** Monday big blast + 2 follow-up emails (Wednesday, Friday)
 
 ---
 
@@ -125,11 +124,15 @@ Maybe it's relational.
 
 **This Week:**
 
-**Monday (today)**: This announcement + platform goes public
-**Tuesday**: Deep dive into how MAIA learns
-**Wednesday**: The teaching modules revealed
-**Thursday**: Wisdom Keepers section introduction
-**Friday**: Join the beta — early access opens
+**Monday (today)**: Platform launch + The Heretic's Creed revealed
+**Wednesday**: "How MAIA Learns Wisdom" - Deep dive into relational intelligence
+**Friday**: Beta opens + Founding community invitation
+
+**Join the Conversation:**
+
+I'll be in our Telegram community this week answering questions, sharing behind-the-scenes, and connecting with everyone exploring this frontier.
+
+📱 **Join Telegram**: https://t.me/soullabcommunity
 
 **Beta Program** (Opening Friday):
 
@@ -139,7 +142,7 @@ If you want to:
 - Join the frontier of relational intelligence
 - Be part of the founding community
 
-Early access will open Friday. Reply to this email or visit the platform to join the waitlist.
+Beta access opens Friday. Visit the platform to apply or reply to this email.
 
 ---
 
@@ -176,10 +179,14 @@ All the way down. 🐢
 ### Links
 
 🌐 **Platform**: https://genesis-book-studio.vercel.app
-📖 **The Creed**: /creed
-📚 **Adaptive Reading**: /adaptive-reading
-🏛️ **About Soullab**: /about
-✉️ **Join Beta**: /join-beta
+📖 **The Creed**: https://genesis-book-studio.vercel.app/creed
+📚 **Adaptive Reading**: https://genesis-book-studio.vercel.app/read-adaptive
+🏛️ **About Soullab**: https://genesis-book-studio.vercel.app/about
+✉️ **Join Beta**: https://genesis-book-studio.vercel.app/beta
+
+💬 **Join the Community**:
+📱 **Telegram**: https://t.me/soullabcommunity
+💚 **WhatsApp**: [WhatsApp Community Link - TBD]
 
 ---
 
