@@ -39,6 +39,11 @@ const LEGACY_ROUTES = [
 ];
 
 export function middleware(request: NextRequest) {
+  // TEMPORARILY DISABLED - debugging redirect loop
+  // Just let everything through
+  return NextResponse.next();
+
+  /*
   const pathname = request.nextUrl.pathname;
 
   // Check if current path is a legacy route
@@ -53,6 +58,7 @@ export function middleware(request: NextRequest) {
 
   // Allow request to continue
   return NextResponse.next();
+  */
 }
 
 // Configure which routes this middleware applies to
