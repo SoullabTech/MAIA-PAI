@@ -300,6 +300,12 @@ export default function FeaturesPage() {
                 Start Conversation →
               </button>
               <button
+                onClick={() => router.push('/learn')}
+                className="px-6 py-3 bg-black/20 border border-bene-gesserit-gold/30 rounded-lg text-sand-white hover:bg-black/30 transition-all font-raleway"
+              >
+                📚 Deep Dives (Theory & Applications)
+              </button>
+              <button
                 onClick={() => router.push('/whats-new')}
                 className="px-6 py-3 bg-black/20 border border-amber-500/30 rounded-lg text-sand-white hover:bg-black/30 transition-all font-raleway"
               >

@@ -272,6 +272,15 @@ export function MenuBar() {
               <span>All Features</span>
             </div>
           </Link>
+          <Link
+            href="/learn"
+            className="block px-3 py-2 text-sm text-soul-textSecondary hover:bg-soul-surfaceHover rounded-md transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-bene-gesserit-gold" />
+              <span>Deep Dives</span>
+            </div>
+          </Link>
           <div className="my-1 h-px bg-soul-border/30" />
           <Link
             href="/settings"
