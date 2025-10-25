@@ -10,6 +10,7 @@ import { FeedbackWidget } from "@/components/ui/FeedbackWidget";
 import { PWAInstallPrompt } from "@/components/ui/PWAInstallPrompt";
 import { ConditionalMenuBar } from "@/components/ui/ConditionalMenuBar";
 import { SessionGuard } from "@/components/auth/SessionGuard";
+import { MagicalCursor } from "@/components/ui/MagicalCursor";
 // import VoiceDebugOverlay from "@/components/debug/VoiceDebugOverlay"; // File doesn't exist
 // import { ToneDebugOverlay } from "@/components/voice/ToneDebugOverlay"; // Disabled for debugging
 import { Toaster } from 'react-hot-toast';
@@ -86,6 +87,9 @@ export default function RootLayout({
 
                   {/* 🎙️ Ambient Voice Indicator - Shows when voice active */}
                   <AmbientVoiceIndicator />
+
+                  {/* ✨ Magical Cursor - Wand with glowing trail */}
+                  <MagicalCursor glowIntensity="subtle" showWand={true} />
 
                   {/* <VoiceDebugOverlay /> - File doesn't exist */}
                   {/* {process.env.NODE_ENV === 'development' && <ToneDebugOverlay />} */}

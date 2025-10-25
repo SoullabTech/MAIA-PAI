@@ -215,15 +215,15 @@ export default function IntroPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.8 }}
-                  className="card-sietch p-6"
+                  className="border border-dune-amber/20 bg-gradient-to-br from-spice-sand/5 to-transparent rounded-lg p-8"
                 >
-                  <p className="text-deep-sand/90 italic leading-relaxed mb-3 font-cormorant">
+                  <p className="text-sand-white text-lg italic leading-relaxed mb-4 font-cormorant">
                     "{wisdomQuote.text}"
                   </p>
-                  <p className="text-bene-gesserit-gold/80 text-sm font-raleway">
+                  <p className="text-dune-amber text-sm font-raleway">
                     — {wisdomQuote.author}
                     {wisdomQuote.source && (
-                      <span className="text-dune-amber/60 text-xs ml-2">
+                      <span className="text-dune-amber/70 text-xs ml-2">
                         {wisdomQuote.source}
                       </span>
                     )}
