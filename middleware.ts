@@ -10,7 +10,7 @@ import type { NextRequest } from 'next/server';
 const LEGACY_ROUTES = [
   '/oracle-beta',
   '/maya-voice',
-  '/maya',  // OLD spelling - redirect to MAIA
+  // '/maya' handled by next.config.js redirects
   '/sacred-oracle',
   '/voice-chat',
   '/consciousness',
