@@ -39,11 +39,6 @@ const LEGACY_ROUTES = [
 ];
 
 export function middleware(request: NextRequest) {
-  // TEMPORARILY DISABLED - debugging redirect loop
-  // Just let everything through
-  return NextResponse.next();
-
-  /*
   const pathname = request.nextUrl.pathname;
 
   // Check if current path is a legacy route
@@ -58,7 +53,6 @@ export function middleware(request: NextRequest) {
 
   // Allow request to continue
   return NextResponse.next();
-  */
 }
 
 // Configure which routes this middleware applies to
@@ -69,7 +63,8 @@ export const config = {
      * - api routes
      * - _next (Next.js internals)
      * - static files
+     * - /maia (our main route - don't intercept it!)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|maia).*)',
   ],
 };
