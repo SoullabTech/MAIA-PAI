@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import {
@@ -11,7 +11,7 @@ import {
   Loader,
 } from 'lucide-react'
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const prefilledCode = searchParams.get('code') || ''
@@ -152,7 +152,7 @@ export default function SignupPage() {
                   required
                 />
                 <p className="text-xs text-gray-500 mt-2">
-                  Don't have a code?{' '}
+                  Don&apos;t have a code?{' '}
                   <Link href="/beta" className="text-fire hover:text-fire-dark">
                     Apply for beta access
                   </Link>
@@ -311,5 +311,13 @@ export default function SignupPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-parchment/30 to-white flex items-center justify-center"><Loader className="animate-spin" size={48} /></div>}>
+      <SignupForm />
+    </Suspense>
   )
 }

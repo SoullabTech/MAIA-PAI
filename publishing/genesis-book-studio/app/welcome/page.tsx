@@ -15,7 +15,7 @@ export default function WelcomePage() {
         </h1>
 
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          You're now part of our founding community. Let's create something extraordinary together.
+          You&apos;re now part of our founding community. Let&apos;s create something extraordinary together.
         </p>
 
         <div className="inline-flex items-center gap-2 px-6 py-3 bg-fire/10 text-fire rounded-full font-semibold mb-12">

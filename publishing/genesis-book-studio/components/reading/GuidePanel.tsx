@@ -29,7 +29,7 @@ export function GuidePanel({ path, onStepClick }: GuidePanelProps) {
           Your Reading Path
         </h3>
         <p className="text-sm text-gray-600">
-          Tell MAIA what you're facing and I'll create a personalized path through the book
+          Tell MAIA what you&apos;re facing and I&apos;ll create a personalized path through the book
         </p>
       </div>
     )

@@ -8,6 +8,7 @@
 import { motion } from 'framer-motion';
 import { BookOpen, Sparkles, Compass, History, Palette, Code, Heart, Brain } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface ResourceCategory {
   title: string;
@@ -261,6 +262,33 @@ export default function LearnPage() {
                     </p>
                   </div>
                 </div>
+
+                {/* Elemental Alchemy Visual - Only for Spiralogic Framework */}
+                {category.title === 'Spiralogic Framework' && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="mb-8 relative"
+                  >
+                    <div className="card-sietch p-6 bg-gradient-to-br from-black/40 via-amber-950/20 to-black/40">
+                      <div className="relative w-full aspect-[4/3] md:aspect-[16/9] overflow-hidden rounded-lg">
+                        <Image
+                          src="/elemental-alchemy-four-panel.png"
+                          alt="Elemental Alchemy: Earth, Air, Water, Fire - The four sacred elements of transformation"
+                          fill
+                          className="object-contain"
+                          priority
+                        />
+                      </div>
+                      <div className="mt-4 text-center">
+                        <p className="text-sm text-dune-amber/80 font-cinzel italic">
+                          The Four Sacred Elements of Consciousness Transformation
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
 
                 {/* Resources Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

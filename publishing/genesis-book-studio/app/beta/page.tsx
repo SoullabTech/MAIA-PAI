@@ -262,7 +262,7 @@ export default function BetaPage() {
             Is This Right for You?
           </h2>
           <p className="text-xl text-gray-600 mb-12">
-            We're looking for creators who are:
+            We&apos;re looking for creators who are:
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 text-left">
@@ -306,7 +306,7 @@ export default function BetaPage() {
               <CheckCircle className="text-fire flex-shrink-0 mt-1" size={24} />
               <div>
                 <h3 className="font-semibold mb-1">
-                  Creating "living books"
+                  Creating &ldquo;living books&rdquo;
                 </h3>
                 <p className="text-gray-600 text-sm">
                   Books that integrate with digital platforms and communities

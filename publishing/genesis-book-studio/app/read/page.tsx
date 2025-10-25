@@ -229,9 +229,9 @@ export default function ReadingExperience() {
                     MAIA Insight
                   </h3>
                   <p className="text-gray-700 text-sm leading-relaxed">
-                    Notice which element you felt drawn to as you read. That's often your entry point.
+                    Notice which element you felt drawn to as you read. That&apos;s often your entry point.
                     Fire speaks to visionaries, Water to empaths, Air to thinkers, Earth to builders.
-                    There's no wrong starting place - only YOUR starting place.
+                    There&apos;s no wrong starting place - only YOUR starting place.
                   </p>
                 </div>
               </div>
@@ -365,7 +365,7 @@ export default function ReadingExperience() {
             </div>
 
             <p className="text-xs text-gray-500 text-center mt-6">
-              Don't worry - you can change paths anytime during your reading journey
+              Don&apos;t worry - you can change paths anytime during your reading journey
             </p>
           </div>
         </div>

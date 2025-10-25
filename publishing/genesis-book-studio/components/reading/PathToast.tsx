@@ -58,13 +58,13 @@ export function PathToast({ intent, stepCount, onDismiss }: PathToastProps) {
           </div>
 
           <p className="text-sm text-gray-700 mb-3">
-            I've created a personalized {stepCount}-step path for your{' '}
+            I&apos;ve created a personalized {stepCount}-step path for your{' '}
             <span className="font-semibold capitalize">{intent}</span> journey.
           </p>
 
           <p className="text-xs text-gray-600">
             Each section is chosen based on what will serve you most right now.
-            As you complete practices, I'll learn what resonates with you.
+            As you complete practices, I&apos;ll learn what resonates with you.
           </p>
         </div>
       </div>

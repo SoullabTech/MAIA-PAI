@@ -250,7 +250,7 @@ export default function AdaptiveReadingExperience() {
                         </h3>
                         <p className="text-gray-700 text-sm leading-relaxed">
                           This section is part of your personalized path. Notice how the themes
-                          connect to what you're experiencing. When you're ready, continue to the
+                          connect to what you&apos;re experiencing. When you&apos;re ready, continue to the
                           next step.
                         </p>
                       </div>
