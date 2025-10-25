@@ -1011,14 +1011,17 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       console.log('🔇 PREEMPTIVE STOP: Microphone disabled before processing');
     }
 
-    // Prevent multiple processing - comprehensive guard
+    // Text input is a deliberate user action - FORCE state reset if stuck
     if (isProcessing || isResponding || isAudioPlaying) {
-      console.log('⚠️ Text message blocked - already processing/responding', {
+      console.log('⚠️ States were stuck - forcing reset for text input', {
         isProcessing,
         isResponding,
         isAudioPlaying
       });
-      return;
+      setIsProcessing(false);
+      setIsResponding(false);
+      setIsAudioPlaying(false);
+      // Don't return - continue processing the text
     }
 
     // Process attachments first if any
