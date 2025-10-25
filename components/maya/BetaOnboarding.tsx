@@ -36,17 +36,30 @@ export function BetaOnboarding({ onComplete }: BetaOnboardingProps) {
     if (betaUser) {
       try {
         const userData = JSON.parse(betaUser);
+        let shouldSkipToIntention = false;
+
         if (userData.username) {
           setName(userData.username);
           console.log('✅ Pre-filled name from preserved data:', userData.username);
+          shouldSkipToIntention = true;
         }
+
         if (userData.birthDate) {
           setBirthDate(userData.birthDate);
-          console.log('✅ Pre-filled birthday from preserved data');
+          console.log('✅ Pre-filled birthday from preserved data - skipping astrology step');
+          shouldSkipToIntention = true;
         }
+
         if (userData.intention) {
           setIntention(userData.intention);
           console.log('✅ Pre-filled intention from preserved data');
+        }
+
+        // If both name and birthDate exist, skip straight to intention (step 2)
+        // This prevents asking for astrology info again
+        if (shouldSkipToIntention && userData.birthDate) {
+          console.log('🎯 Astrology already provided - skipping to intention step');
+          setStep(2);
         }
       } catch (e) {
         console.error('Error loading preserved data:', e);

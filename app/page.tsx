@@ -14,14 +14,10 @@ export default function HomePage() {
     const betaOnboarded = localStorage.getItem("betaOnboardingComplete") === "true";
     const betaUser = localStorage.getItem("beta_user");
 
-    if (week2Onboarded) {
-      // Completed Week 2 onboarding - go directly to MAIA
-      // TEMP: Check-in removed until holoflower redesign complete
-      router.replace('/maia');
-    } else if (betaOnboarded || betaUser) {
-      // Returning user who completed original onboarding - send directly to MAIA
-      // TEMP: Check-in removed until holoflower redesign complete
-      router.replace('/maia');
+    if (week2Onboarded || betaOnboarded || betaUser) {
+      // Returning user - send to /intro (Meet MAIA page with rotating quotes)
+      // Then /intro will route to /onboarding (if needed) or /maia
+      router.replace('/intro');
     } else {
       // New user - go through Week 2 welcome
       router.replace('/week2-welcome');

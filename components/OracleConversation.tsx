@@ -679,14 +679,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   }, [showChatInterface]);
 
   // Auto-recovery timer - if processing states are stuck for too long, reset
+  // Set to 75s to allow API timeout (60s) to trigger first, plus buffer for response processing
   useEffect(() => {
     if (isProcessing || isResponding) {
       const recoveryTimer = setTimeout(() => {
         if (isProcessing || isResponding) {
-          console.warn('⚠️ States stuck for >30s - auto-recovery triggered');
+          console.warn('⚠️ States stuck for >75s - auto-recovery triggered');
           resetAllStates();
         }
-      }, 30000); // 30 second recovery timeout
+      }, 75000); // 75 second recovery timeout (gives API 60s + 15s buffer)
 
       return () => clearTimeout(recoveryTimer);
     }
@@ -971,8 +972,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         { duration: 4000 }
       );
 
-      setShowJournalSuggestion(false);
-
       // Track the journal save
       trackEvent('journal_saved_from_conversation', {
         userId,
@@ -991,6 +990,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       );
     } finally {
       setIsSavingJournal(false);
+      setShowJournalSuggestion(false);
     }
   }, [userId, messages, sessionId]);
 
@@ -1111,7 +1111,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // UNLEASHED: 60 second timeout for longer conversations
+      const timeoutId = setTimeout(() => {
+        console.error('⏱️ API request timeout after 60s - aborting');
+        controller.abort();
+      }, 60000); // UNLEASHED: 60 second timeout for longer conversations
 
       console.log('📤 Sending text message to API:', { cleanedText, userId, sessionId });
 
@@ -1210,11 +1213,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         // Process Oracle message for Field Protocol if recording
         if (isFieldRecording) {
           processFieldMessage({
-            content: enhancedResponse.response,
+            content: responseText,
             timestamp: new Date(),
             speaker: 'oracle',
             metadata: {
-              elements: enhancedResponse.elementalInfo?.dominantElements
+              elements: oracleResponse.elementalInfo?.dominantElements || [element]
             }
           });
         }
@@ -1352,14 +1355,24 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       });
       contextRef.current.coherenceHistory.push(oracleResponse.confidence || 0.85);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Text chat API error:', error);
       trackEvent.error(userId || 'anonymous', 'api_error', String(error));
+
+      // Provide specific error messages based on error type
+      let errorText = 'I apologize, I\'m having trouble connecting right now. Please try again.';
+      if (error.name === 'AbortError') {
+        console.error('🚨 API request timed out - MAIA may need to warm up or server may be slow');
+        errorText = 'I\'m taking longer than usual to respond. The server may need a moment to warm up. Please try again.';
+      } else if (error.message?.includes('fetch')) {
+        console.error('🚨 Network error - server may not be running');
+        errorText = 'I can\'t reach the server right now. Please check that the development server is running.';
+      }
 
       const errorMessage: ConversationMessage = {
         id: `msg-${Date.now()}-error`,
         role: 'oracle',
-        text: 'I apologize, I\'m having trouble connecting right now. Please try again.',
+        text: errorText,
         timestamp: new Date(),
         motionState: 'idle',
         source: 'system'
@@ -2508,23 +2521,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         autoFocus={false}
                       />
 
-                      {/* Journal button - shows when conversation has substance */}
-                      {messages.length >= 2 && (
-                        <button
-                          type="button"
-                          onClick={handleSaveAsJournal}
-                          disabled={isSavingJournal}
-                          className={`flex-shrink-0 w-10 h-10 border rounded-full flex items-center justify-center
-                                   active:scale-95 transition-all ${
-                            breakthroughScore >= 70
-                              ? 'bg-amber-500/20 border-amber-400/50 text-amber-300 hover:bg-amber-500/30 animate-pulse'
-                              : 'bg-gold-divine/10 border-gold-divine/30 text-gold-divine hover:bg-gold-divine/20'
-                          } ${isSavingJournal ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          title={breakthroughScore >= 70 ? 'Breakthrough detected - Save to journal' : 'Save as journal entry'}
-                        >
-                          <BookOpen className="w-5 h-5" />
-                        </button>
-                      )}
+                      {/* Compact send button - moved to left side next to text bar */}
+                      <button
+                        type="submit"
+                        disabled={isProcessing}
+                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/20 border border-gold-divine/30
+                                 rounded-full text-gold-divine flex items-center justify-center
+                                 hover:bg-gold-divine/30 active:scale-95 transition-all
+                                 disabled:opacity-30"
+                        aria-label="Send"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                      </button>
 
                       {/* File upload button */}
                       <input
@@ -2552,20 +2562,23 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         <Paperclip className="w-5 h-5" />
                       </label>
 
-                      {/* Compact send button */}
-                      <button
-                        type="submit"
-                        disabled={isProcessing}
-                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/20 border border-gold-divine/30
-                                 rounded-full text-gold-divine flex items-center justify-center
-                                 hover:bg-gold-divine/30 active:scale-95 transition-all
-                                 disabled:opacity-30"
-                        aria-label="Send"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                        </svg>
-                      </button>
+                      {/* Journal button - shows when conversation has substance */}
+                      {messages.length >= 2 && (
+                        <button
+                          type="button"
+                          onClick={handleSaveAsJournal}
+                          disabled={isSavingJournal}
+                          className={`flex-shrink-0 w-10 h-10 border rounded-full flex items-center justify-center
+                                   active:scale-95 transition-all ${
+                            breakthroughScore >= 70
+                              ? 'bg-amber-500/20 border-amber-400/50 text-amber-300 hover:bg-amber-500/30 animate-pulse'
+                              : 'bg-gold-divine/10 border-gold-divine/30 text-gold-divine hover:bg-gold-divine/20'
+                          } ${isSavingJournal ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          title={breakthroughScore >= 70 ? 'Breakthrough detected - Save to journal' : 'Save as journal entry'}
+                        >
+                          <BookOpen className="w-5 h-5" />
+                        </button>
+                      )}
                     </div>
                   </form>
                 </div>
@@ -2610,11 +2623,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       </p>
                       <div className="flex gap-2">
                         <button
-                          onClick={async () => {
-                            await handleSaveAsJournal();
-                            // Ensure popup dismisses after save completes
-                            setTimeout(() => setShowJournalSuggestion(false), 500);
-                          }}
+                          onClick={handleSaveAsJournal}
                           disabled={isSavingJournal}
                           className="px-4 py-2 bg-amber-500/30 hover:bg-amber-500/40 border border-amber-400/50
                                    rounded-lg text-amber-200 text-sm font-medium transition-all active:scale-95
