@@ -21,7 +21,10 @@ export function ConditionalMenuBar() {
     '/login',
     '/signup',
     '/maia',  // MAIA page has its own integrated bottom bar
-    '/maya'   // Redirects to /maia, but hide here too
+    '/maya',   // Redirects to /maia, but hide here too
+    '/week2-welcome',  // Sign-in ritual: Welcome and credentials
+    '/intro',  // Sign-in ritual: Meet MAIA with rotating quotes
+    '/onboarding'  // Sign-in ritual: Name, astrology, intention
   ];
 
   const shouldHide = hideOnPages.some(page => pathname?.startsWith(page));
