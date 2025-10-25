@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star, Home, BookOpen, Gem } from 'lucide-react';
+import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star, Home, BookOpen, Gem, Zap, Layers } from 'lucide-react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 
@@ -251,8 +251,28 @@ export function MenuBar() {
         {/* Dropdown Menu */}
         <div
           id="brain-trust-dropdown"
-          className="hidden absolute bottom-full mb-2 right-0 bg-soul-surface/95 backdrop-blur-md border border-soul-border/50 rounded-lg shadow-lg p-2 min-w-[160px]"
+          className="hidden absolute bottom-full mb-2 right-0 bg-soul-surface/95 backdrop-blur-md border border-soul-border/50 rounded-lg shadow-lg p-2 min-w-[180px]"
         >
+          <Link
+            href="/whats-new"
+            className="block px-3 py-2 text-sm text-soul-textSecondary hover:bg-soul-surfaceHover rounded-md transition-colors relative"
+          >
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-spice-orange" />
+              <span>What's New</span>
+              <span className="ml-auto px-1.5 py-0.5 bg-spice-orange/20 border border-spice-orange/50 rounded text-[10px] text-spice-orange">NEW</span>
+            </div>
+          </Link>
+          <Link
+            href="/features"
+            className="block px-3 py-2 text-sm text-soul-textSecondary hover:bg-soul-surfaceHover rounded-md transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <Layers className="w-4 h-4" />
+              <span>All Features</span>
+            </div>
+          </Link>
+          <div className="my-1 h-px bg-soul-border/30" />
           <Link
             href="/settings"
             className="block px-3 py-2 text-sm text-soul-textSecondary hover:bg-soul-surfaceHover rounded-md transition-colors"
