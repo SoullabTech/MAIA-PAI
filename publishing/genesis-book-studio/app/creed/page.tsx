@@ -164,7 +164,7 @@ export default function CreedPage() {
             </div>
             <div className="max-w-2xl mx-auto space-y-5 text-teal-300/70">
               <p className="text-lg leading-relaxed font-light">
-                Many will be intimidated by this platform, by the technology, by the frameworks.
+                Some may feel intimidated by this platform, by the technology, by the frameworks.
                 Please hear this:
               </p>
               <p className="text-2xl font-semibold text-teal-100 text-center my-8 tracking-wide">
