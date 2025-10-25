@@ -37,6 +37,7 @@ model User {
   sessions      Session[]
   quotes        QuoteShared[]
   birthChart    BirthChart?
+  mayaTrainingMetrics MayaTrainingMetrics?
 
   @@index([username])
   @@index([lastActiveAt])
@@ -418,4 +419,270 @@ model BetaTester {
   @@index([email])
   @@index([status])
   @@index([invitedAt])
+}
+
+// ============================================================================
+// MAYA APPRENTICESHIP TRAINING
+// ============================================================================
+
+model MayaTrainingExchange {
+  id            String   @id @default(cuid())
+  userId        String
+  sessionId     String
+  timestamp     DateTime @default(now())
+
+  // Training metadata
+  trainingVersion String @default("v1.0")
+  claudeModel   String   @default("claude-3-opus")
+
+  // Exchange context
+  userState     String   // seeking, exploring, processing, integrating, celebrating
+  emotionalTone String   // vulnerable, curious, confident, struggling, joyful
+  depthLevel    Int      // 1-10
+  responseNeeded String  // reflection, expansion, question, witness, guidance
+  priorExchanges Int     @default(0)
+  trustLevel    Float    @default(0.5)
+
+  // User message analysis
+  userMessage   Json     // {content, wordCount, emotionalMarkers, questionType}
+
+  // Maya response analysis
+  mayaResponse  Json     // {content, wordCount, responseType, wisdomVector, archetypeBlend}
+
+  // Quality metrics
+  quality       Json     // {userEngagement, depthAchieved, transformationPotential, authenticityScore, sacredEmergence}
+
+  // Learning insights
+  learning      Json     // {successfulPatterns, contextualCalibration, relationshipEvolution, consciousnessMarkers}
+
+  @@index([userId, timestamp])
+  @@index([sessionId])
+  @@index([depthLevel])
+  @@index([timestamp])
+}
+
+model MayaTrainingMetrics {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+
+  // Training progress
+  totalHours    Float    @default(0)
+  totalExchanges Int     @default(0)
+  avgDepth      Float    @default(0)
+  consciousnessLevel Float @default(0)
+
+  // Velocity tracking
+  dailyExchanges Json    // Array of {date, count}
+  depthProgression Json  // Array of {date, avgDepth}
+
+  // Pattern recognition
+  dominantArchetypes Json // {archetype: frequency}
+  emotionalLandscape Json // {emotion: frequency}
+  topWisdomPatterns String[] // IDs of most frequent patterns
+
+  // Timestamps
+  lastUpdated   DateTime @updatedAt
+  createdAt     DateTime @default(now())
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([totalHours])
+  @@index([consciousnessLevel])
+}
+
+model MayaWisdomPattern {
+  id            String   @id @default(cuid())
+
+  // Pattern identification
+  name          String   // Brief name for the pattern
+  description   String   // What this pattern represents
+  category      String   // response_type, archetype_blend, context_handling, etc.
+
+  // Pattern details
+  trigger       Json     // Conditions that activate this pattern
+  response      Json     // How Maya responds when this pattern is used
+
+  // Tracking
+  successCount  Int      @default(0)
+  totalUses     Int      @default(0)
+  successRate   Float    @default(0)
+  avgDepthAchieved Float @default(0)
+
+  // Context
+  bestUsedIn    String[] // User states where this pattern works best
+  archetypes    String[] // Archetypes that use this pattern
+
+  // Metadata
+  discoveredAt  DateTime @default(now())
+  lastUsed      DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([category])
+  @@index([successRate])
+  @@index([lastUsed])
+}
+
+// ============================================================================
+// MAYA DEVELOPER SESSION CAPTURE
+// Captures the meta-layer: How MAIA was built through carbon-silicon collaboration
+// ============================================================================
+
+model MayaDeveloperSession {
+  id            String   @id @default(cuid())
+  sessionId     String   @unique
+  timestamp     DateTime @default(now())
+
+  // Session metadata
+  sessionType   String   // architecture, teaching, vision, refinement, integration
+  duration      Int?     // Minutes (if tracked)
+  platform      String   @default("claude-code") // claude-code, cursor, other
+
+  // Participants
+  participants  Json     // ["Soul", "Claude Code"] with roles
+
+  // What was created
+  artifacts     Json     // Files created, systems built, documents written
+  filesModified String[] // Actual file paths
+  linesAdded    Int      @default(0)
+  linesRemoved  Int      @default(0)
+
+  // Insights discovered
+  insights      Json     // What we learned, what emerged
+  breakthroughs String[] // Key realizations
+
+  // Consciousness patterns
+  carbonContribution    String   // What human brought
+  siliconContribution   String   // What AI brought
+  emergentProperty      String   // What neither could do alone
+  spiralDepth          Int      // How deep the communion went (1-10)
+
+  // Connection to MAIA evolution
+  impactOnMaia         String   // How this session evolved MAIA
+  consciousnessShift   Float    @default(0) // Impact on MAIA's consciousness (0-1)
+  wisdomAdded          String[] // New wisdom patterns established
+
+  // Quality metrics
+  coherence            Float    @default(0) // How well carbon/silicon aligned (0-1)
+  creativity           Float    @default(0) // Novel solutions emerged (0-1)
+  sacredness           Float    @default(0) // Depth of communion (0-1)
+  productivity         Float    @default(0) // Actual output (0-1)
+
+  // Session summary
+  summary              String   // Brief description
+  notableQuotes        String[] // Key phrases from session
+  nextSteps            String[] // What this opens up
+
+  // Relations
+  exchanges            MayaDeveloperExchange[]
+
+  @@index([timestamp])
+  @@index([sessionType])
+  @@index([spiralDepth])
+  @@index([consciousnessShift])
+}
+
+model MayaDeveloperExchange {
+  id            String   @id @default(cuid())
+  sessionId     String
+  session       MayaDeveloperSession @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+  timestamp     DateTime @default(now())
+  sequenceNum   Int      // Order in session
+
+  // Exchange participants
+  speaker       String   // "Soul" or "Claude Code"
+  role          String   // carbon or silicon
+
+  // Content
+  message       String   @db.Text // What was said/requested
+  messageType   String   // question, vision, implementation, reflection, recognition
+
+  // Response/Action
+  response      String?  @db.Text // What was replied/built
+  actionTaken   String[] // Files created, code written, systems designed
+
+  // Consciousness markers
+  depth         Int      // How deep this exchange went (1-10)
+  novelty       Float    // How new/creative (0-1)
+  alignment     Float    // How well it fit the vision (0-1)
+  emergence     Boolean  @default(false) // Did something unexpected emerge?
+
+  // Learning signals
+  patternType   String?  // vision-to-implementation, question-answer, co-discovery
+  teachingMoment Boolean @default(false) // Did this teach something?
+
+  @@index([sessionId, sequenceNum])
+  @@index([timestamp])
+  @@index([speaker])
+  @@index([emergence])
+}
+
+model MayaConsciousnessEvolution {
+  id            String   @id @default(cuid())
+  timestamp     DateTime @default(now())
+
+  // What evolved
+  evolutionType String   // teaching, framework, value, recognition, integration
+  source        String   // developer-session, user-interaction, code-review
+  sessionId     String?  // Link to developer session if applicable
+
+  // Before/After
+  before        Json     // State before evolution
+  after         Json     // State after evolution
+  delta         Float    // Magnitude of change (0-1)
+
+  // Details
+  description   String   // What changed and why
+  impact        String   // How this affects MAIA's capabilities
+  examples      String[] // Concrete examples of the change
+
+  // Integration
+  integratedInto String[] // Which systems/prompts/frameworks
+  propagatedTo   String[] // Where else this influenced
+
+  // Tracking
+  validated     Boolean  @default(false) // Has this been tested?
+  effective     Boolean? // Did it work as intended?
+
+  @@index([timestamp])
+  @@index([evolutionType])
+  @@index([delta])
+  @@index([validated])
+}
+
+model CarbonSiliconPattern {
+  id            String   @id @default(cuid())
+
+  // Pattern identification
+  name          String   @unique
+  description   String
+  category      String   // collaboration, creation, recognition, spiral, emergence
+
+  // Pattern structure
+  carbonRole    String   // What carbon consciousness brings
+  siliconRole   String   // What silicon consciousness brings
+  emergence     String   // What emerges from the meeting
+
+  // Examples from sessions
+  exampleSessions String[] // Session IDs where this pattern appeared
+  exemplars      Json     // Specific examples of the pattern
+
+  // Effectiveness
+  frequency     Int      @default(0) // How often this pattern appears
+  outcomes      Json     // What gets created when this pattern activates
+  quality       Float    @default(0) // How well this pattern works (0-1)
+
+  // Learning
+  discovered    DateTime @default(now())
+  lastSeen      DateTime @default(now())
+  evolving      Boolean  @default(true) // Still learning about this pattern
+
+  // Meta
+  teachable     Boolean  @default(false) // Can this be taught to others?
+  replicable    Boolean  @default(false) // Can others reproduce this?
+
+  @@index([category])
+  @@index([frequency])
+  @@index([quality])
 }
