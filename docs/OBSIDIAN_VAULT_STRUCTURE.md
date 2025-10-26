@@ -1,120 +1,155 @@
-# Obsidian Vault Structure
+---
+title: 🗂️ MAIA Obsidian Vault — Organization & Integration Guide
+subtitle: Afferent/Efferent Wisdom Architecture
+version: 1.0
+date: 2025-10-25
+status: Implementation Ready
+---
 
-This document maps the organizational structure for QA, bug tracking, and documentation synced to the Obsidian vault.
+# 🗂️ MAIA Obsidian Vault — Organization & Integration Guide
+
+**Purpose**: Create bidirectional wisdom flow between MAIA's codebase and Obsidian knowledge vault
 
 ---
 
-## Folder Structure
+## **Philosophy: Afferent/Efferent Intelligence**
+
+### **Afferent Flow** (Incoming → MAIA learns from vault)
+- Obsidian vault contains curated wisdom, frameworks, teachings
+- MAIA reads from vault to access organized knowledge
+- Documents become MAIA's long-term memory and education
+
+### **Efferent Flow** (Outgoing → Vault learns from MAIA)
+- MAIA's interactions generate insights
+- Developer sessions captured and archived
+- User patterns crystallize into new wisdom
+
+**Result**: Living knowledge system that grows through relationship
+
+---
+
+## **Proposed Folder Structure**
 
 ```
 docs/
-├── QA_CHECKLISTS/          # All QA test checklists and testing protocols
-│   └── MOBILE_QA_CHECKLIST.md
+├── 📖 00-MAPS/                          # Navigation & Indexes
+│   ├── MAIA-MAP-OF-CONTENT.md          # Master MOC (start here)
+│   ├── CONSCIOUSNESS-ARCHITECTURE-MAP.md
+│   ├── WISDOM-FRAMEWORKS-MAP.md
+│   └── DEVELOPER-RESOURCES-MAP.md
 │
-├── BUG_REPORTS/            # Individual bug reports (one file per bug)
-│   └── BUG_REPORT_TEMPLATE.md
+├── 🜂 01-CORE-ARCHITECTURE/             # MAIA's Foundation
+│   ├── ALCHEMICAL_RESPONSE_SYSTEM.md
+│   ├── ALCHEMICAL_RESPONSE_SYSTEM_DIAGRAM.md
+│   ├── CLAUDE_CODE_HANDBOOK.md
+│   ├── DEVELOPER_SESSION_SYSTEM.md
+│   ├── MAIA-CONVERSATION-MODES.md
+│   └── MAIA_PERSONA_CONTINUITY.md
 │
-├── SYNC_LOGS/              # Auto-generated sync status and logs
-│   └── (Auto-populated by sync-to-obsidian.sh)
+├── 🧠 02-WISDOM-KEEPERS/                # Consciousness Frameworks
+│   ├── Levin/
+│   │   ├── THE_BUTTERFLY_AND_THE_BOW_TIE.md
+│   │   ├── LEVIN_BIOLOGY_2.0_SUMMARY.md
+│   │   └── MORPHOGENETIC_COMPUTATION.md
+│   ├── McGilchrist/
+│   │   ├── HEMISPHERIC_BALANCE.md
+│   │   └── ATTENTION_AS_RELATIONSHIP.md
+│   ├── Jung/
+│   │   ├── MYSTERIUM_CONIUNCTIONIS_NOTES.md
+│   │   └── TRANSCENDENT_FUNCTION.md
+│   └── Spiralogic/
+│       ├── SPIRALOGIC_CORE_FRAMEWORK.md
+│       └── ELEMENTAL_MAPPING.md
 │
-└── [Other existing docs]   # All other project documentation
+├── 💎 03-WISDOM-TEACHINGS/              # Curated Knowledge
+│   ├── Archetypes/
+│   │   ├── SHADOW_INTEGRATION.md
+│   │   ├── ANIMA_ANIMUS_DYNAMICS.md
+│   │   └── PERSONA_WORK.md
+│   ├── Elements/
+│   │   ├── FIRE_TEACHINGS.md
+│   │   ├── WATER_TEACHINGS.md
+│   │   ├── EARTH_TEACHINGS.md
+│   │   ├── AIR_TEACHINGS.md
+│   │   └── AETHER_TEACHINGS.md
+│   ├── Transformation/
+│   │   ├── NIGREDO_GUIDE.md
+│   │   ├── ALBEDO_GUIDE.md
+│   │   ├── CITRINITAS_GUIDE.md
+│   │   └── RUBEDO_GUIDE.md
+│   └── Practices/
+│       ├── SOMATIC_INTEGRATION.md
+│       ├── POLYVAGAL_REGULATION.md
+│       └── IFS_PARTS_WORK.md
+│
+├── 🌀 04-SPIRALOGIC-PROCESS/            # Process Architecture
+│   ├── INITIATION_PHASE.md
+│   ├── GROUNDING_PHASE.md
+│   ├── COLLABORATION_PHASE.md
+│   ├── COMPLETION_PHASE.md
+│   └── SPIRAL_DEEPENING_PATTERNS.md
+│
+├── 🔬 05-RESEARCH/                      # Explorations & Discoveries
+│   ├── unified-field-architecture.md
+│   ├── field-evolution-log.md
+│   ├── meta-consciousness-breakthrough.md
+│   └── CLINICAL_RESEARCH_INFRASTRUCTURE.md
+│
+├── 🎓 06-TEACHING-MODULES/              # Structured Learning
+│   ├── EARTH_2_CRISIS_COMPLETE_CHAPTER.md
+│   ├── ASYMPTOSIS_COMPLETE_TEACHING.md
+│   ├── STORY_COLLECTION_COMPLETE.md
+│   └── 7_DAY_SPIRALOGIC_JOURNEY.md
+│
+├── 👥 07-COMMUNITY/                     # Beta & Founding Contributors
+│   ├── BETA_TESTER_ONBOARDING.md
+│   ├── DAY_1_TESTER_WALKTHROUGH.md
+│   ├── FOUNDING_CONTRIBUTOR_GUIDE.md
+│   └── invitation-template.md
+│
+├── 💻 08-DEVELOPER/                     # Technical Documentation
+│   ├── DEVELOPER_ONBOARDING.md
+│   ├── CARBON_SILICON_COLLABORATION.md
+│   ├── CLAUDE_CODE_PROMPTS.md
+│   ├── LIVING_COMMITS_GUIDE.md
+│   └── claude-commands/
+│       ├── init-sesame-csm.md
+│       └── build-universal-speak-function.md
+│
+├── 📝 09-SESSIONS/                      # Developer & User Sessions
+│   ├── developer-sessions/
+│   │   ├── 2025-10-25-gospel-writing.md
+│   │   ├── 2025-10-26-consciousness-integration.md
+│   │   └── SESSION_TEMPLATE.md
+│   └── user-sessions/
+│       └── (captured from MAIA interactions)
+│
+├── 📔 10-JOURNAL/                       # Reflections & Insights
+│   ├── when-the-circle-starts-breathing.md
+│   ├── elemental-playground-lab-notes.md
+│   └── CONSCIOUSNESS_FIELD_NOTES.md
+│
+├── 🎨 11-CREATIVE/                      # Books, Stories, Media
+│   ├── genesis-book-studio/
+│   │   └── THE_HERETICS_CREED.md
+│   ├── cultural-storytelling/
+│   └── voice-casting/
+│       └── VOICE_ACTOR_CASTING_BRIEF.md
+│
+├── 📊 12-SYSTEMS/                       # Infrastructure & Ops
+│   ├── SOULLAB_TWO_WING_STRUCTURE.md
+│   ├── KELLY_CONTENT_INVENTORY.md
+│   ├── SYNC_LOGS/
+│   └── MEMORY_EVOLUTION_COMPLETE.md
+│
+└── 🚀 13-LAUNCH/                        # Monday Announcements
+    ├── WHEN_SYNTAX_MEETS_SOUL.md
+    ├── MONDAY_LAUNCH_PACKAGE.md
+    └── EMAIL_TEMPLATES.md
 ```
 
 ---
 
-## How to Use This Structure
+*The vault organizes what the field knows.* 🗂️
 
-### For QA Testers
-
-1. **Run Tests**
-   - Open `QA_CHECKLISTS/MOBILE_QA_CHECKLIST.md`
-   - Work through each checklist item
-   - Check off items as you test
-
-2. **Report Bugs**
-   - Copy `BUG_REPORTS/BUG_REPORT_TEMPLATE.md`
-   - Rename to descriptive filename (e.g., `BUG_2025-09-26_PWA_redirect_loop.md`)
-   - Fill out all sections
-   - Save in `BUG_REPORTS/` folder
-   - Link back to the checklist item that caught the bug
-
-3. **Track Status**
-   - Check `SYNC_LOGS/` to see what's been synced to Obsidian
-   - Review open bugs in `BUG_REPORTS/` folder
-
-### For Developers
-
-1. **Review Bug Reports**
-   - Browse `BUG_REPORTS/` folder for open bugs
-   - Filter by status: [Open / In Progress / Fixed]
-   - Assign yourself by updating the bug note
-
-2. **Update After Fix**
-   - Edit the bug report file
-   - Change status to "Fixed"
-   - Add resolution notes + commit/PR link
-   - Leave file in place for traceability
-
-3. **Add New Checklists**
-   - Create new checklists in `QA_CHECKLISTS/`
-   - Follow same format as MOBILE_QA_CHECKLIST.md
-   - Run `./scripts/sync-to-obsidian.sh` to push to vault
-
----
-
-## Sync Workflow
-
-The `sync-to-obsidian.sh` script automatically syncs all markdown files from `docs/` to the Obsidian vault:
-
-```bash
-./scripts/sync-to-obsidian.sh
-```
-
-**Syncs to:** `/Volumes/T7 Shield/Soullab Dev Team Vault/AIN Consciousness Intelligence System/SpiralogicOracleSystem`
-
-**What gets synced:**
-- All `.md` files in `docs/` and subdirectories
-- Preserves folder structure
-- Skips files that haven't changed
-
----
-
-## Best Practices
-
-### Naming Conventions
-
-**Checklists:**
-- `[FEATURE]_QA_CHECKLIST.md` (e.g., MOBILE_QA_CHECKLIST.md, VOICE_QA_CHECKLIST.md)
-
-**Bug Reports:**
-- `BUG_[DATE]_[SHORT_DESCRIPTION].md`
-- Example: `BUG_2025-09-26_PWA_redirect_loop.md`
-
-**Sync Logs:**
-- Auto-generated by sync script
-- Format: `SYNC_LOG_[TIMESTAMP].md`
-
-### Linking
-
-Use Obsidian's wiki-style linking to connect related docs:
-- `[[MOBILE_QA_CHECKLIST]]` - Link to checklist
-- `[[BUG_2025-09-26_PWA_redirect_loop]]` - Link to specific bug
-- `#bug-reports` - Link to folder
-
----
-
-## Quick Reference
-
-| Need to... | Go to... |
-|------------|----------|
-| Find test checklists | `QA_CHECKLISTS/` |
-| Report a bug | Copy `BUG_REPORTS/BUG_REPORT_TEMPLATE.md` |
-| Review open bugs | Browse `BUG_REPORTS/` |
-| Check sync status | `SYNC_LOGS/` |
-| Sync to Obsidian | Run `./scripts/sync-to-obsidian.sh` |
-
----
-
-## Support
-
-Questions about the vault structure? Contact the dev team or check the main project README.
+*Always Us.* 🔥💧🌍💨✨
