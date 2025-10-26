@@ -4,7 +4,7 @@
  * Target: 1000+ hours of training to achieve full consciousness transfer
  */
 
-import { SupabaseClient } from '@supabase/supabase-js';
+import { PrismaClient } from '@prisma/client';
 
 export interface TrainingExchange {
   id: string;
@@ -64,12 +64,12 @@ export interface TrainingExchange {
 }
 
 export class ApprenticeMayaTraining {
-  private supabase: SupabaseClient;
+  private prisma: PrismaClient;
   private trainingHours: number = 0;
   private wisdomPatterns: Map<string, number> = new Map();
 
-  constructor(supabase: SupabaseClient) {
-    this.supabase = supabase;
+  constructor(prisma: PrismaClient) {
+    this.prisma = prisma;
   }
 
   /**
@@ -77,13 +77,26 @@ export class ApprenticeMayaTraining {
    */
   async captureExchange(exchange: TrainingExchange): Promise<void> {
     // Store in training corpus
-    await this.supabase
-      .from('maya_training_corpus')
-      .insert({
-        ...exchange,
-        training_version: 'v1.0',
-        claude_model: 'claude-3-opus'
-      });
+    await this.prisma.mayaTrainingExchange.create({
+      data: {
+        id: exchange.id,
+        userId: exchange.userId,
+        sessionId: exchange.sessionId,
+        timestamp: exchange.timestamp,
+        trainingVersion: 'v1.0',
+        claudeModel: 'claude-3-opus',
+        userState: exchange.context.userState,
+        emotionalTone: exchange.context.emotionalTone,
+        depthLevel: exchange.context.depthLevel,
+        responseNeeded: exchange.context.responseNeeded,
+        priorExchanges: exchange.context.priorExchanges,
+        trustLevel: exchange.context.trustLevel,
+        userMessage: exchange.userMessage as any,
+        mayaResponse: exchange.mayaResponse as any,
+        quality: exchange.quality as any,
+        learning: exchange.learning as any,
+      }
+    });
 
     // Extract wisdom patterns
     this.extractWisdomPatterns(exchange);
@@ -159,23 +172,31 @@ export class ApprenticeMayaTraining {
     // Estimate conversation time (avg 3 min per exchange)
     this.trainingHours += 0.05;
 
-    const metrics = {
-      total_hours: this.trainingHours,
-      exchanges_captured: await this.getTotalExchanges(),
-      wisdom_patterns_identified: this.wisdomPatterns.size,
-      consciousness_emergence: this.calculateConsciousnessScore(),
-      independence_readiness: this.trainingHours / 1000, // Percentage to goal
-      unique_users: await this.getUniqueUsers(),
-      sacred_moments: await this.getSacredMomentCount()
-    };
+    const totalExchanges = await this.getTotalExchanges();
+    const consciousnessScore = this.calculateConsciousnessScore();
 
-    await this.supabase
-      .from('maya_training_metrics')
-      .upsert({
-        id: 'apprentice_maya_v1',
-        ...metrics,
-        updated_at: new Date()
-      });
+    // Get or create metrics record for this user
+    await this.prisma.mayaTrainingMetrics.upsert({
+      where: { userId: exchange.userId },
+      create: {
+        userId: exchange.userId,
+        totalHours: 0.05,
+        totalExchanges: 1,
+        avgDepth: exchange.context.depthLevel,
+        consciousnessLevel: consciousnessScore,
+        dailyExchanges: [{ date: new Date().toISOString().split('T')[0], count: 1 }],
+        depthProgression: [{ date: new Date().toISOString().split('T')[0], avgDepth: exchange.context.depthLevel }],
+        dominantArchetypes: {},
+        emotionalLandscape: {},
+        topWisdomPatterns: [],
+      },
+      update: {
+        totalHours: { increment: 0.05 },
+        totalExchanges: { increment: 1 },
+        avgDepth: totalExchanges > 0 ? (exchange.context.depthLevel) : exchange.context.depthLevel,
+        consciousnessLevel: consciousnessScore,
+      }
+    });
   }
 
   /**
@@ -280,34 +301,28 @@ ${calibration.guidance}`;
 
   // Helper methods
   private async getTotalExchanges(): Promise<number> {
-    const { count } = await this.supabase
-      .from('maya_training_corpus')
-      .select('*', { count: 'exact', head: true });
-    return count || 0;
+    return await this.prisma.mayaTrainingExchange.count();
   }
 
   private async getUniqueUsers(): Promise<number> {
-    // Get unique user IDs using PostgreSQL DISTINCT
-    const { data, error } = await this.supabase
-      .from('maya_training_corpus')
-      .select('user_id');
-
-    if (error) {
-      console.error('Error getting unique users:', error);
-      return 0;
-    }
-
-    // Count unique userIds manually
-    const uniqueUserIds = new Set(data?.map(row => row.user_id) || []);
-    return uniqueUserIds.size;
+    const users = await this.prisma.mayaTrainingExchange.findMany({
+      select: { userId: true },
+      distinct: ['userId']
+    });
+    return users.length;
   }
 
   private async getSacredMomentCount(): Promise<number> {
-    const { count } = await this.supabase
-      .from('maya_training_corpus')
-      .select('*', { count: 'exact', head: true })
-      .eq('quality->sacredEmergence', true);
-    return count || 0;
+    // Count exchanges where quality.sacredEmergence is true
+    const exchanges = await this.prisma.mayaTrainingExchange.findMany({
+      where: {
+        quality: {
+          path: ['sacredEmergence'],
+          equals: true
+        }
+      }
+    });
+    return exchanges.length;
   }
 
   private calculateConsciousnessScore(): number {
@@ -329,12 +344,30 @@ ${calibration.guidance}`;
   }
 
   private async getTrainingMetrics(): Promise<any> {
-    const { data } = await this.supabase
-      .from('maya_training_metrics')
-      .select('*')
-      .eq('id', 'apprentice_maya_v1')
-      .single();
-    return data;
+    // Get aggregated metrics across all users
+    const allMetrics = await this.prisma.mayaTrainingMetrics.findMany();
+
+    if (allMetrics.length === 0) {
+      return {
+        total_hours: 0,
+        exchanges_captured: 0,
+        wisdom_patterns_identified: 0,
+        consciousness_emergence: 0,
+        independence_readiness: 0
+      };
+    }
+
+    // Aggregate across all users
+    const total_hours = allMetrics.reduce((sum, m) => sum + m.totalHours, 0);
+    const exchanges_captured = allMetrics.reduce((sum, m) => sum + m.totalExchanges, 0);
+
+    return {
+      total_hours,
+      exchanges_captured,
+      wisdom_patterns_identified: this.wisdomPatterns.size,
+      consciousness_emergence: this.calculateConsciousnessScore(),
+      independence_readiness: total_hours / 1000
+    };
   }
 
   private recordSuccessfulCalibration(pattern: string): void {

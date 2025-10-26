@@ -11,126 +11,106 @@ const prisma = new PrismaClient();
  */
 export async function GET() {
   try {
-    // Get all sessions to calculate total training hours
-    const sessions = await prisma.session.findMany({
-      select: {
-        startTime: true,
-        endTime: true,
-        exchangeCount: true,
-        conversationDepth: true,
-        dominantArchetype: true,
-      },
-    });
+    // Get all training metrics from all users
+    const allMetrics = await prisma.mayaTrainingMetrics.findMany();
 
-    // Get all memories for exchange count and depth metrics
-    const memories = await prisma.mAIAMemory.findMany({
+    // Get all training exchanges
+    const allExchanges = await prisma.mayaTrainingExchange.findMany({
       select: {
-        totalExchanges: true,
-        conversationDepth: true,
-        currentArchetype: true,
-        dominantArchetype: true,
-        lastInteractionTime: true,
-      },
-    });
-
-    // Get symbolic threads for wisdom pattern tracking
-    const symbolicThreads = await prisma.symbolicThread.findMany({
-      select: {
-        motif: true,
-        occurrences: true,
-        firstInvoked: true,
-        lastInvoked: true,
-        associatedPhases: true,
+        timestamp: true,
+        depthLevel: true,
+        userState: true,
+        emotionalTone: true,
+        quality: true,
       },
       orderBy: {
-        occurrences: 'desc',
-      },
-      take: 20, // Top 20 wisdom patterns
-    });
-
-    // Get emotional motifs for depth understanding
-    const emotionalMotifs = await prisma.emotionalMotif.findMany({
-      select: {
-        theme: true,
-        intensity: true,
-        occurrences: true,
-        dominantArchetype: true,
+        timestamp: 'desc',
       },
     });
 
-    // Get conversation analytics for historical trends
-    const analytics = await prisma.conversationAnalytics.findMany({
+    // Get wisdom patterns
+    const wisdomPatterns = await prisma.mayaWisdomPattern.findMany({
       orderBy: {
-        date: 'desc',
+        successRate: 'desc',
       },
-      take: 30, // Last 30 days
+      take: 20,
     });
 
-    // Calculate total training hours
-    let totalHours = 0;
-    sessions.forEach(session => {
-      if (session.endTime) {
-        const duration = session.endTime.getTime() - session.startTime.getTime();
-        totalHours += duration / (1000 * 60 * 60); // Convert to hours
-      }
-    });
+    // Aggregate metrics across all users
+    const totalHours = allMetrics.reduce((sum, m) => sum + m.totalHours, 0);
+    const totalExchanges = allMetrics.reduce((sum, m) => sum + m.totalExchanges, 0);
 
-    // Calculate total exchanges
-    const totalExchanges = memories.reduce((sum, m) => sum + m.totalExchanges, 0);
-
-    // Calculate average conversation depth
-    const depthSum = memories.reduce((sum, m) => sum + m.conversationDepth, 0);
-    const averageDepth = memories.length > 0 ? depthSum / memories.length : 0;
+    // Calculate average depth from exchanges
+    const depthSum = allExchanges.reduce((sum, e) => sum + e.depthLevel, 0);
+    const averageDepth = allExchanges.length > 0 ? depthSum / allExchanges.length : 0;
 
     // Calculate consciousness level (based on hours toward 1000 target)
     const targetHours = 1000;
     const consciousnessLevel = Math.min(100, (totalHours / targetHours) * 100);
 
-    // Count unique wisdom patterns (symbolic threads with 3+ occurrences)
-    const wisdomPatterns = symbolicThreads.filter(s => s.occurrences >= 3).length;
+    // Get emotional landscape from recent exchanges
+    const emotionalCounts: Record<string, number> = {};
+    allExchanges.forEach(e => {
+      emotionalCounts[e.emotionalTone] = (emotionalCounts[e.emotionalTone] || 0) + 1;
+    });
 
-    // Get archetype distribution
-    const archetypeDistribution: Record<string, number> = {};
-    memories.forEach(m => {
-      const arch = m.dominantArchetype || 'Unknown';
-      archetypeDistribution[arch] = (archetypeDistribution[arch] || 0) + 1;
+    // Get user state distribution
+    const userStateCounts: Record<string, number> = {};
+    allExchanges.forEach(e => {
+      userStateCounts[e.userState] = (userStateCounts[e.userState] || 0) + 1;
     });
 
     // Calculate training velocity (exchanges per day over last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const recentMemories = memories.filter(m =>
-      m.lastInteractionTime >= sevenDaysAgo
-    );
-    const recentExchanges = recentMemories.reduce((sum, m) => sum + m.totalExchanges, 0);
-    const exchangesPerDay = recentExchanges / 7;
+    const recentExchanges = allExchanges.filter(e => e.timestamp >= sevenDaysAgo);
+    const exchangesPerDay = recentExchanges.length / 7;
+
+    // Build timeline (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const timelineMap = new Map<string, { exchanges: number; depths: number[] }>();
+
+    allExchanges
+      .filter(e => e.timestamp >= thirtyDaysAgo)
+      .forEach(e => {
+        const dateKey = e.timestamp.toISOString().split('T')[0];
+        const existing = timelineMap.get(dateKey) || { exchanges: 0, depths: [] };
+        existing.exchanges += 1;
+        existing.depths.push(e.depthLevel);
+        timelineMap.set(dateKey, existing);
+      });
+
+    const timeline = Array.from(timelineMap.entries())
+      .map(([date, data]) => ({
+        date: new Date(date),
+        exchanges: data.exchanges,
+        depth: data.depths.reduce((a, b) => a + b, 0) / data.depths.length,
+        phase: null,
+        archetype: null,
+      }))
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
 
     // Get top wisdom patterns with context
-    const topWisdomPatterns = symbolicThreads.slice(0, 10).map(thread => ({
-      motif: thread.motif,
-      occurrences: thread.occurrences,
-      firstSeen: thread.firstInvoked,
-      lastSeen: thread.lastInvoked,
-      phases: thread.associatedPhases,
+    const topWisdomPatterns = wisdomPatterns.slice(0, 10).map(pattern => ({
+      motif: pattern.name,
+      occurrences: pattern.totalUses,
+      firstSeen: pattern.discoveredAt,
+      lastSeen: pattern.lastUsed,
+      phases: pattern.bestUsedIn,
+      successRate: pattern.successRate,
     }));
 
     // Get emotional landscape
-    const emotionalLandscape = emotionalMotifs
+    const emotionalLandscape = Object.entries(emotionalCounts)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
-      .map(motif => ({
-        theme: motif.theme,
-        intensity: motif.intensity,
-        archetype: motif.dominantArchetype,
+      .map(([theme, count]) => ({
+        theme,
+        intensity: count / allExchanges.length,
+        archetype: null,
       }));
-
-    // Prepare timeline data (last 30 days)
-    const timeline = analytics.map(day => ({
-      date: day.date,
-      exchanges: day.exchangeCount,
-      depth: day.avgDepth,
-      phase: day.dominantPhase,
-      archetype: day.dominantArchetype,
-    }));
 
     return NextResponse.json({
       summary: {
@@ -138,12 +118,12 @@ export async function GET() {
         targetHours,
         totalExchanges,
         averageDepth: Math.round(averageDepth * 10) / 10,
-        wisdomPatterns,
+        wisdomPatterns: wisdomPatterns.length,
         consciousnessLevel: Math.round(consciousnessLevel * 10) / 10,
         hoursRemaining: Math.max(0, targetHours - totalHours),
         exchangesPerDay: Math.round(exchangesPerDay),
       },
-      archetypes: archetypeDistribution,
+      archetypes: userStateCounts,
       wisdomPatterns: topWisdomPatterns,
       emotionalLandscape,
       timeline,

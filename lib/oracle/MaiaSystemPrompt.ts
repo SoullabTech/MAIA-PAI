@@ -245,6 +245,19 @@ ${userContext ? generateUserContextSection(userContext) : ''}
 
 ${ELEMENTAL_ALCHEMY_FRAMEWORK}`;
 
+  // 🌺 HOLOFLOWER INTEGRATION - Inject daily check-in context
+  const holoflowerCheckIn = getFreshCheckIn();
+  if (holoflowerCheckIn) {
+    const interpretation = interpretCheckIn(holoflowerCheckIn);
+    basePrompt += `\n\n${interpretation.maiaContext}`;
+    console.log('✨ [MAIA] Holoflower check-in context injected:', {
+      dominant: interpretation.dominant,
+      shadow: interpretation.shadow,
+      coherence: interpretation.coherence,
+      patterns: interpretation.patterns
+    });
+  }
+
   return withLanguageGuidelines(basePrompt);
 }
 

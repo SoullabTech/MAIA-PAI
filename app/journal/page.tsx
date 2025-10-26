@@ -56,7 +56,7 @@ export default function JournalPage() {
       timestamp: new Date().toISOString(),
       mood: detectMood(content),
       element: detectElement(content),
-      holoflowerConfig: sessionStorage.getItem('lastHoloflowerConfig') || undefined
+      holoflowerConfig: localStorage.getItem('holoflower_checkin_today') || undefined
     };
 
     const updatedEntries = [entry, ...entries];

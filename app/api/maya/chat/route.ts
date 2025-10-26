@@ -17,23 +17,18 @@ import {
   MAYA_FALLBACK_RESPONSES
 } from '@/lib/prompts/maya-prompts';
 import { ConversationMode, DEFAULT_CONVERSATION_STYLE } from '@/lib/types/conversation-style';
-import { createClient } from '@supabase/supabase-js';
+import { PrismaClient } from '@prisma/client';
 
 // Initialize OpenAI if API key exists
 const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null;
 
-// Initialize Supabase for training capture
-const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
-  ? createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    )
-  : null;
+// Initialize Prisma for training capture
+const prisma = new PrismaClient();
 
 // Initialize apprentice training system
-const apprentice = supabase ? new ApprenticeMayaTraining(supabase) : null;
+const apprentice = new ApprenticeMayaTraining(prisma);
 
 // Get prompt based on conversation mode
 function getPromptForMode(mode: ConversationMode): string {
@@ -247,7 +242,7 @@ export async function POST(req: Request) {
           controller.enqueue(encoder.encode('data: [DONE]\n\n'));
 
           // Capture exchange for apprentice training (non-blocking)
-          if (apprentice && userId && sessionId && fullResponse) {
+          if (userId && sessionId && fullResponse) {
             captureTrainingExchange(
               apprentice,
               messages,
