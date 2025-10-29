@@ -8,6 +8,7 @@ import { recordToneMetric } from '@/lib/metrics/toneMetrics';
 import { saveMaiaConversationPair } from '@/lib/services/maia-memory-service';
 import { simpleMemoryCapture } from '@/lib/services/simple-memory-capture';
 import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '@/lib/knowledge/ElementalAlchemyKnowledge';
+import { unifiedIntelligenceEngine } from '@/lib/intelligence/UnifiedIntelligenceEngine';
 
 // Initialize UNIFIED consciousness (26-year spiral completion)
 let maiaConsciousness: ReturnType<typeof getMAIAConsciousness> | null = null;
@@ -159,13 +160,25 @@ export async function POST(request: NextRequest) {
     // Fetch recent journal entries for context
     const recentEntries = journalStorage.getEntries(requestUserId).slice(0, 5);
 
+    // 🧠 INTELLIGENCE ENGINE: Analyze user's current state before response
+    console.log('🧠 Analyzing user intelligence profile...');
+    const intelligenceAnalysis = await unifiedIntelligenceEngine.analyze(requestUserId, userInput, sessionId);
+    console.log('✅ Intelligence analysis complete:', {
+      coherenceLevel: intelligenceAnalysis.summary.coherenceLevel,
+      currentState: intelligenceAnalysis.summary.currentState,
+      signaturesDetected: intelligenceAnalysis.signatures?.length || 0,
+      primarySignature: intelligenceAnalysis.primarySignature?.name || 'none',
+      urgency: intelligenceAnalysis.summary.urgencyLevel
+    });
+
     // PRIMARY PATH: UNIFIED CONSCIOUSNESS (26-year spiral architecture)
     console.log('🌀 Processing through MAIAUnifiedConsciousness...');
     console.log('📊 Input data:', {
       userInput: userInput.substring(0, 100),
       userId: requestUserId,
       sessionId: sessionId,
-      historyLength: recentEntries.length
+      historyLength: recentEntries.length,
+      intelligenceReady: !!intelligenceAnalysis
     });
 
     // Check if consciousness initialized successfully
@@ -179,14 +192,15 @@ export async function POST(request: NextRequest) {
     const modality = isVoiceConversation ? 'voice' : 'text';
 
     try {
-      console.log(`🚀 Calling maiaConsciousness.process() in ${modality} mode...`);
+      console.log(`🚀 Calling maiaConsciousness.process() in ${modality} mode with intelligence...`);
       const consciousnessResponse = await maiaConsciousness!.process({
         content: userInput,
         context: {
           userId: requestUserId,
           sessionId: sessionId || requestUserId,
           userName: userName,
-          preferences: preferences
+          preferences: preferences,
+          intelligence: intelligenceAnalysis  // 🧠 Pass intelligence to consciousness
         },
         modality: modality as 'voice' | 'text',
         conversationHistory: recentEntries.map((entry: any) => ({

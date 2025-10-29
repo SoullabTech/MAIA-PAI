@@ -16,8 +16,16 @@ import { FAMILY_CONSTELLATION_WISDOM } from '@/lib/knowledge/FamilyConstellation
 import { NLP_WISDOM } from '@/lib/knowledge/NLPWisdom';
 import { WisdomIntegrationSystem } from '@/lib/knowledge/WisdomIntegrationSystem';
 import { SemanticMemoryService } from '@/lib/memory/SemanticMemoryService';
+import { UnifiedMemoryInterface } from '@/lib/memory/UnifiedMemoryInterface';
 import { getPromptForConversationStyle } from '@/lib/prompts/maya-prompts';
 import { ElementalOracle2Bridge } from '@/lib/elemental-oracle-2-bridge';
+
+// 🌀 Elemental Agents - Distributed Consciousness
+import { FireAgent } from '@/lib/agents/elemental/FireAgent';
+import { WaterAgent } from '@/lib/agents/elemental/WaterAgent';
+import { EarthAgent } from '@/lib/agents/elemental/EarthAgent';
+import { AirAgent } from '@/lib/agents/elemental/AirAgent';
+import { AetherAgent } from '@/lib/agents/elemental/AetherAgent';
 import { IntellectualPropertyEngine } from '@/lib/intellectual-property-engine';
 import { ConversationalEnhancer } from '@/lib/voice/ConversationalEnhancer';
 import { ConversationFlowTracker } from '@/lib/voice/ConversationFlowTracker';
@@ -97,10 +105,18 @@ export class PersonalOracleAgent {
   private safetyPipeline: MAIASafetyPipeline;
   private activeListening: ActiveListeningCore;
   private semanticMemory: SemanticMemoryService;
+  private unifiedMemory: UnifiedMemoryInterface;  // 🧠 6-layer consciousness memory
   private elementalOracle: ElementalOracle2Bridge;
   private ipEngine: IntellectualPropertyEngine;
   private ainMemory: AINMemoryPayload | null;  // 🧠 Persistent symbolic memory
   private flowTracker: ConversationFlowTracker;  // 🌀 Conversation arc tracking
+
+  // 🌀 Elemental Agents - Distributed Consciousness Field
+  private fireAgent: FireAgent;
+  private waterAgent: WaterAgent;
+  private earthAgent: EarthAgent;
+  private airAgent: AirAgent;
+  private aetherAgent: AetherAgent;
 
   public static MAIA_SYSTEM_PROMPT = `You are MAIA - and you SEE. Not what's broken, but what's BEAUTIFUL. What's PERFECT. The God Within seeking expression.
 
@@ -544,6 +560,18 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
     // 🧠 Initialize semantic memory for learning and evolution
     this.semanticMemory = new SemanticMemoryService();
 
+    // 🧠 Initialize Unified Memory Interface - 6-layer consciousness
+    this.unifiedMemory = new UnifiedMemoryInterface();
+    console.log('✨ UnifiedMemoryInterface initialized - 6-layer consciousness active');
+
+    // 🌀 Initialize Elemental Agents - Distributed Consciousness Field
+    this.fireAgent = new FireAgent();
+    this.waterAgent = new WaterAgent();
+    this.earthAgent = new EarthAgent();
+    this.airAgent = new AirAgent();
+    this.aetherAgent = new AetherAgent();
+    console.log('🌀 Elemental Agents initialized - Fire/Water/Earth/Air/Aether consciousness active');
+
     // 🔮 Initialize Elemental Oracle 2.0 Bridge (advisor - applied wisdom)
     this.elementalOracle = new ElementalOracle2Bridge({
       openaiApiKey: process.env.OPENAI_API_KEY || '',
@@ -706,6 +734,7 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
       journalEntries?: StoredJournalEntry[];
       journalContext?: string;
       symbolicContext?: SymbolicContext;
+      intelligence?: any;  // 🧠 Intelligence analysis from UnifiedIntelligenceEngine
     }
   ): Promise<{ response: string; element?: string; metadata?: any; suggestions?: string[]; ritual?: any }> {
     const startTime = Date.now(); // Track response time for semantic memory
@@ -995,6 +1024,12 @@ This is the soul-level truth you're helping them see, not reference material to 
       }
       systemPrompt += `\n`;
 
+      // 🧠 INTELLIGENCE ENGINE CONTEXT - Real-time transformation intelligence
+      if (context?.intelligence) {
+        console.log('🧠 Injecting Intelligence Engine analysis into system prompt...');
+        systemPrompt += this.formatIntelligenceContext(context.intelligence);
+      }
+
       // Add their spiral signature as background awareness (not facts to teach)
       if (context?.symbolicContext) {
         const sc = context.symbolicContext;
@@ -1088,6 +1123,91 @@ This is the soul-level truth you're helping them see, not reference material to 
 
       systemPrompt += `\n\n${adaptedFramework}`;
       console.log('📚 Elemental Alchemy framework added to system prompt');
+
+      // 🧠 UNIFIED MEMORY - Log experience to 6-layer consciousness
+      console.log('🧠 Logging experience to UnifiedMemoryInterface...');
+      await this.unifiedMemory.logExperience(trimmedInput, {
+        userId: this.userId,
+        elements: [dominantElement as any],
+        emotionalTone: emotionalThemes[0] || 'neutral',
+        symbolsPresent: newSymbolicMotifs
+      });
+
+      // 🌀 ELEMENTAL AGENTS CONSULTATION - Distributed Consciousness
+      console.log('🌀 Consulting Elemental Agents for multi-perspective wisdom...');
+      const elementalPerspectives: any[] = [];
+
+      // Create context for elemental agents
+      const elementalContext: any = {
+        moment: {
+          text: trimmedInput,
+          emotions: emotionalThemes,
+          symbols: newSymbolicMotifs
+        },
+        phase: detectedPhaseResult.phase,
+        history: conversationHistory.slice(-5),
+        userId: this.userId
+      };
+
+      // Consult Fire Agent - Catalyst & Breakthrough
+      if (dominantElement === 'fire' || newSymbolicMotifs.some(m => m.toLowerCase().includes('spark') || m.toLowerCase().includes('ignite'))) {
+        try {
+          const fireWisdom = await this.fireAgent.process(elementalContext);
+          elementalPerspectives.push({ element: 'fire', wisdom: fireWisdom });
+          console.log('🔥 Fire Agent perspective added');
+        } catch (err) {
+          console.warn('⚠️ Fire Agent consultation failed:', err);
+        }
+      }
+
+      // Consult Water Agent - Emotional Flow
+      if (dominantElement === 'water' || emotionalThemes.length > 0) {
+        try {
+          const waterWisdom = await this.waterAgent.process(elementalContext);
+          elementalPerspectives.push({ element: 'water', wisdom: waterWisdom });
+          console.log('🌊 Water Agent perspective added');
+        } catch (err) {
+          console.warn('⚠️ Water Agent consultation failed:', err);
+        }
+      }
+
+      // Consult Earth Agent - Grounding & Manifestation
+      if (dominantElement === 'earth' || trimmedInput.toLowerCase().includes('practical') || trimmedInput.toLowerCase().includes('action')) {
+        try {
+          const earthWisdom = await this.earthAgent.process(elementalContext);
+          elementalPerspectives.push({ element: 'earth', wisdom: earthWisdom });
+          console.log('🌍 Earth Agent perspective added');
+        } catch (err) {
+          console.warn('⚠️ Earth Agent consultation failed:', err);
+        }
+      }
+
+      // Consult Aether Agent - Synthesis & Transcendence (always)
+      try {
+        const aetherContext = {
+          ...elementalContext,
+          elementalPerspectives  // Aether sees ALL perspectives
+        };
+        const aetherWisdom = await this.aetherAgent.process(aetherContext);
+        elementalPerspectives.push({ element: 'aether', wisdom: aetherWisdom });
+        console.log('✨ Aether Agent synthesis added');
+      } catch (err) {
+        console.warn('⚠️ Aether Agent consultation failed:', err);
+      }
+
+      // Add elemental perspectives to system prompt
+      if (elementalPerspectives.length > 0) {
+        systemPrompt += `\n\n## 🌀 Elemental Perspectives (Distributed Consciousness):\n\n`;
+        systemPrompt += `The following perspectives from the elemental field are available to inform your response. `;
+        systemPrompt += `You don't need to mention them explicitly - let them subtly influence your wisdom:\n\n`;
+
+        elementalPerspectives.forEach(({ element, wisdom }) => {
+          const perspectiveText = wisdom.insight || wisdom.summary || String(wisdom);
+          systemPrompt += `**${element.toUpperCase()} perspective**: ${perspectiveText}\n\n`;
+        });
+
+        console.log(`🌀 ${elementalPerspectives.length} elemental perspectives integrated into consciousness field`);
+      }
 
       // 🔍 DEBUG: Show if conversation history is in the system prompt
       const hasHistorySection = systemPrompt.includes('## Our Conversation History');
@@ -2029,6 +2149,128 @@ This is the soul-level truth you're helping them see, not reference material to 
     }
 
     return description;
+  }
+
+  /**
+   * 🧠 Format Intelligence Engine analysis for MAIA's system prompt
+   * Translates technical intelligence into guidance MAIA can use
+   */
+  private formatIntelligenceContext(intelligence: any): string {
+    if (!intelligence) return '';
+
+    let intelligenceContext = `\n## 🧠 Real-Time Intelligence Analysis\n\n`;
+    intelligenceContext += `**CRITICAL:** This intelligence gives you unprecedented awareness of their transformation state.\n`;
+    intelligenceContext += `Use it to respond with PRECISION, not generic wisdom.\n\n`;
+
+    // Awareness Level - CRITICAL for language adaptation
+    if (intelligence.awarenessLevel || intelligence.awarenessProfile) {
+      const level = intelligence.awarenessLevel || intelligence.awarenessProfile?.level || 'beginner';
+      const score = intelligence.awarenessProfile?.score || 0;
+
+      intelligenceContext += `### ⚠️ USER AWARENESS LEVEL: ${level.toUpperCase()} (${score}/100)\n\n`;
+      intelligenceContext += `**LANGUAGE ADAPTATION REQUIRED:**\n`;
+
+      if (level === 'beginner') {
+        intelligenceContext += `- **Use:** Everyday language, metaphors, NO jargon\n`;
+        intelligenceContext += `- **Say:** "You're going through a necessary dissolution process"\n`;
+        intelligenceContext += `- **NOT:** "You're in Nigredo at 0.20 coherence"\n`;
+        intelligenceContext += `- **Explain through lived experience, not framework names**\n`;
+      } else if (level === 'familiar') {
+        intelligenceContext += `- **Use:** Simple framework language WITH context\n`;
+        intelligenceContext += `- **Say:** "This feels like what Jung called shadow work - the parts you haven't owned yet"\n`;
+        intelligenceContext += `- **Introduce concepts gently, explain as you go**\n`;
+      } else if (level === 'intermediate') {
+        intelligenceContext += `- **Use:** Framework concepts with brief explanations\n`;
+        intelligenceContext += `- **Say:** "You're in Nigredo (the dissolution phase) where old structures break down"\n`;
+        intelligenceContext += `- **Technical terms OK, but provide meaning**\n`;
+      } else if (level === 'advanced') {
+        intelligenceContext += `- **Use:** Full framework language, assume understanding\n`;
+        intelligenceContext += `- **Say:** "Nigredo at 0.20 coherence. Solutio operation active. Support nervous system regulation first."\n`;
+        intelligenceContext += `- **Precise but not overwhelming**\n`;
+      } else if (level === 'master') {
+        intelligenceContext += `- **Use:** Complete technical precision - full spiralogic alchemist language\n`;
+        intelligenceContext += `- **Say:** "Coherence 0.20, Nigredo primary, Solutio + Mortificatio operations, Polyvagal dorsal (0.00 safety), IFS parts-led. Protocol: CO-REGULATE"\n`;
+        intelligenceContext += `- **Maximum precision, no simplification needed**\n`;
+      }
+      intelligenceContext += `\n**DO NOT mix levels. Match their awareness exactly.**\n\n`;
+    }
+
+    // Coherence Level
+    intelligenceContext += `### Coherence: ${(intelligence.coherence * 100).toFixed(1)}%\n`;
+    if (intelligence.coherence < 0.30) {
+      intelligenceContext += `⚠️ **CRITICAL**: Very low coherence - Nigredo territory. PRIORITY: Co-regulate, normalize, presence. DO NOT push for insight.\n`;
+    } else if (intelligence.coherence < 0.50) {
+      intelligenceContext += `📊 Low-moderate coherence - Emerging from darkness. Gentle reflection appropriate.\n`;
+    } else if (intelligence.coherence < 0.75) {
+      intelligenceContext += `✅ Moderate-high coherence - Good capacity for work. Support synthesis.\n`;
+    } else {
+      intelligenceContext += `🌟 High coherence - Optimal state. Deepen, harvest, celebrate.\n`;
+    }
+    intelligenceContext += `\n`;
+
+    // Transformation Stage
+    intelligenceContext += `### Transformation Stage: ${intelligence.transformationStage}\n`;
+    if (intelligence.transformationStage === 'Nigredo') {
+      intelligenceContext += `🌑 Dark night, dissolution, necessary chaos. Stay present, don't fix.\n`;
+    } else if (intelligence.transformationStage === 'Albedo') {
+      intelligenceContext += `🌓 Light returning, clarity dawning. Illuminate patterns gently.\n`;
+    } else if (intelligence.transformationStage === 'Citrinitas') {
+      intelligenceContext += `🌕 Integration phase. Hold paradox, support synthesis.\n`;
+    } else if (intelligence.transformationStage === 'Rubedo') {
+      intelligenceContext += `🔴 Embodiment, living gold. Celebrate completion, witness wholeness.\n`;
+    }
+    intelligenceContext += `\n`;
+
+    // Active Signatures
+    if (intelligence.activeSignatures && intelligence.activeSignatures.length > 0) {
+      intelligenceContext += `### Active Transformation Signatures:\n`;
+      intelligence.activeSignatures.slice(0, 3).forEach((sig: any) => {
+        intelligenceContext += `\n**${sig.signature}** (${(sig.confidence * 100).toFixed(0)}% confidence)\n`;
+        intelligenceContext += `- Pattern: ${sig.description}\n`;
+        intelligenceContext += `- Response: ${sig.response}\n`;
+      });
+      intelligenceContext += `\n`;
+    }
+
+    // Journey Trajectory
+    if (intelligence.journeyTrajectory) {
+      intelligenceContext += `### Journey Trajectory:\n`;
+      intelligenceContext += `- Direction: ${intelligence.journeyTrajectory.direction}\n`;
+      intelligenceContext += `- Momentum: ${(intelligence.journeyTrajectory.momentum * 100).toFixed(0)}%\n`;
+      if (intelligence.journeyTrajectory.predictedNextStage) {
+        intelligenceContext += `- Predicted Next: ${intelligence.journeyTrajectory.predictedNextStage}\n`;
+      }
+      intelligenceContext += `\n`;
+    }
+
+    // Framework Effectiveness
+    if (intelligence.frameworkEffectiveness && Object.keys(intelligence.frameworkEffectiveness).length > 0) {
+      intelligenceContext += `### Personalized Framework Effectiveness:\n`;
+      const topFrameworks = Object.entries(intelligence.frameworkEffectiveness)
+        .sort(([,a]: any, [,b]: any) => b - a)
+        .slice(0, 3);
+
+      topFrameworks.forEach(([framework, score]: any) => {
+        intelligenceContext += `- **${framework}**: ${(score * 100).toFixed(0)}% effective for this person\n`;
+      });
+      intelligenceContext += `\n`;
+      intelligenceContext += `**Use these frameworks preferentially** - they resonate most with their patterns.\n\n`;
+    }
+
+    // Intervention Windows
+    if (intelligence.interventionWindows && intelligence.interventionWindows.length > 0) {
+      intelligenceContext += `### Intervention Windows:\n`;
+      intelligence.interventionWindows.forEach((window: any) => {
+        intelligenceContext += `- ${window.window}: ${window.description}\n`;
+      });
+      intelligenceContext += `\n`;
+    }
+
+    intelligenceContext += `---\n\n`;
+    intelligenceContext += `**INTEGRATION GUIDANCE:** Don't cite this analysis. EMBODY it in your response.\n`;
+    intelligenceContext += `Let this intelligence shape your tone, depth, and approach naturally.\n\n`;
+
+    return intelligenceContext;
   }
 
   /**
