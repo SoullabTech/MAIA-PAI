@@ -507,50 +507,31 @@ export default function MAIAPage() {
             {/* Brain Trust Monitor - Shows consciousness collaboration status */}
             <BrainTrustMonitor />
 
-            {/* Menu Discovery Hint - Guide users to bottom drawer */}
+            {/* Menu Discovery Bullseye - Positioned to activate drawer */}
             <motion.div
-              className="absolute bottom-2 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
+              className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1 }}
             >
-              {/* Subtle pulsing indicator */}
-              <div className="relative">
-                {/* Outer glow pulse */}
+              {/* Bullseye indicator */}
+              <div className="relative w-8 h-8">
+                {/* Outer pulse ring */}
                 <motion.div
-                  className="absolute inset-0 bg-amber-500/20 blur-md rounded-full"
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.1, 0.3] }}
+                  className="absolute inset-0 rounded-full border border-amber-500/30"
+                  animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 />
 
-                {/* Hint container */}
-                <div className="relative px-4 py-2 bg-stone-900/70 backdrop-blur-sm border border-amber-700/20 rounded-full">
-                  <div className="flex items-center gap-2">
-                    {/* Up arrow indicator */}
-                    <motion.div
-                      animate={{ y: [-2, 2, -2] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <svg className="w-3 h-3 text-amber-500/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                      </svg>
-                    </motion.div>
+                {/* Middle ring */}
+                <div className="absolute inset-2 rounded-full border border-amber-500/40" />
 
-                    <span className="text-xs text-amber-500/70 font-light tracking-wide">
-                      Hover here for menu
-                    </span>
-
-                    {/* Down arrow indicator */}
-                    <motion.div
-                      animate={{ y: [2, -2, 2] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      <svg className="w-3 h-3 text-amber-500/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </motion.div>
-                  </div>
-                </div>
+                {/* Inner dot */}
+                <motion.div
+                  className="absolute inset-3 rounded-full bg-amber-500/60"
+                  animate={{ opacity: [0.6, 1, 0.6] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                />
               </div>
             </motion.div>
           </div>
