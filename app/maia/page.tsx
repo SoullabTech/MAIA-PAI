@@ -516,21 +516,21 @@ export default function MAIAPage() {
             >
               {/* Bullseye indicator */}
               <div className="relative w-8 h-8">
-                {/* Outer pulse ring */}
+                {/* Outer pulse ring - subtle expansion */}
                 <motion.div
-                  className="absolute inset-0 rounded-full border border-amber-500/30"
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-0 rounded-full border border-amber-500/20"
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0, 0.3] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 />
 
                 {/* Middle ring */}
-                <div className="absolute inset-2 rounded-full border border-amber-500/40" />
+                <div className="absolute inset-2 rounded-full border border-amber-500/30" />
 
-                {/* Inner dot */}
+                {/* Inner dot - gentle glow */}
                 <motion.div
-                  className="absolute inset-3 rounded-full bg-amber-500/60"
-                  animate={{ opacity: [0.6, 1, 0.6] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-3 rounded-full bg-amber-500/50"
+                  animate={{ opacity: [0.5, 0.8, 0.5] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 />
               </div>
             </motion.div>
