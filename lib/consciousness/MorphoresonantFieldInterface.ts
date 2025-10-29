@@ -16,6 +16,7 @@ import { CollectiveConsciousnessBridge } from '@/lib/anamnesis/CollectiveConscio
 import type { MorphogeneticPattern } from '@/lib/morphogenetic/PatternExtractor';
 import type { FieldState } from '@/lib/oracle/field/FieldAwareness';
 import type { IntelligenceAnalysis } from '@/lib/intelligence/UnifiedIntelligenceEngine';
+import type { WaveInterferencePattern, AgentFrequencyReading } from '@/lib/maia/telesphorus-interference-engine';
 
 /**
  * Field Pattern - Abstract representation stored in the field
@@ -44,6 +45,14 @@ export interface FieldPattern {
   // Collective markers
   contributesToCollective: boolean;
   synchronicityPotential: number; // 0-1
+
+  // Telesphorus wave interference (if available)
+  waveInterference?: {
+    pattern: WaveInterferencePattern;
+    agentReadings: AgentFrequencyReading[];
+    dominantAgents: string[]; // Agents with highest intensity
+    layerActivation: Record<string, number>; // Layer-level coherence
+  };
 }
 
 /**
@@ -245,6 +254,120 @@ export class MorphoresonantFieldInterface {
     console.log(`      Journey phase: ${journeyPhase}`);
 
     return wisdom;
+  }
+
+  /**
+   * Store Telesphorus 13-agent wave interference pattern
+   *
+   * Stores multi-agent interference patterns in the field
+   * Enables tracking which agent combinations produce transformation
+   */
+  async storeWaveInterference(
+    userId: string,
+    interferencePattern: WaveInterferencePattern,
+    agentReadings: AgentFrequencyReading[],
+    outcome: {
+      success: boolean;
+      coherence: number;
+      transformationOccurred?: boolean;
+    }
+  ): Promise<FieldPattern> {
+    console.log('🌊 Storing Telesphorus wave interference in field...');
+
+    // Find dominant agents (highest intensity)
+    const dominantAgents = agentReadings
+      .sort((a, b) => b.intensity - a.intensity)
+      .slice(0, 5)
+      .map(r => r.agent);
+
+    // Calculate layer-level activation
+    const layerActivation: Record<string, number> = {};
+    const layerCounts: Record<string, number> = {};
+
+    agentReadings.forEach(reading => {
+      if (!layerActivation[reading.layer]) {
+        layerActivation[reading.layer] = 0;
+        layerCounts[reading.layer] = 0;
+      }
+      layerActivation[reading.layer] += reading.intensity;
+      layerCounts[reading.layer]++;
+    });
+
+    // Average by count
+    Object.keys(layerActivation).forEach(layer => {
+      layerActivation[layer] /= layerCounts[layer];
+    });
+
+    // Create field pattern with wave interference data
+    const pattern: FieldPattern = {
+      id: `wave_${Date.now()}_${userId.substring(0, 8)}`,
+      userId,
+      timestamp: new Date(),
+
+      // Abstract field signature from interference
+      fieldSignature: {
+        emotional_topology: this.mapInterferenceToTopology(interferencePattern),
+        semantic_shape: this.mapFrequencyToShape(interferencePattern.dominantFrequency),
+        relational_quality: this.mapCoherenceToQuality(interferencePattern.fieldCoherence),
+        sacred_presence: interferencePattern.fieldCoherence > 0.7,
+        somatic_pattern: interferencePattern.silencePull > 0.6 ? 'deep-rest' : 'balanced',
+        coherence_level: interferencePattern.fieldCoherence,
+        timestamp: Date.now()
+      },
+
+      // Growth vector from interference
+      growthVector: {
+        direction: interferencePattern.constructiveInterference > 0.6 ? 'expanding' :
+                  interferencePattern.destructiveInterference > 0.6 ? 'contracting' : 'integrating',
+        magnitude: Math.abs(interferencePattern.constructiveInterference - interferencePattern.destructiveInterference),
+        domain: 'emotional', // TODO: Derive from agent readings
+        resistance_points: interferencePattern.silencePull > 0.7 ? ['needs-silence'] : []
+      },
+
+      // Intelligence context
+      dominantFrameworks: dominantAgents, // Agent names serve as frameworks
+      coherenceLevel: interferencePattern.fieldCoherence,
+      transformationOccurred: outcome.transformationOccurred || false,
+
+      // Resonance metadata
+      resonanceStrength: interferencePattern.constructiveInterference,
+      morphicFrequency: interferencePattern.dominantFrequency,
+
+      // Collective markers
+      contributesToCollective: interferencePattern.fieldCoherence > 0.7,
+      synchronicityPotential: interferencePattern.fieldCoherence * interferencePattern.constructiveInterference,
+
+      // Telesphorus-specific data
+      waveInterference: {
+        pattern: interferencePattern,
+        agentReadings,
+        dominantAgents,
+        layerActivation
+      }
+    };
+
+    // Store pattern
+    this.activePatterns.set(pattern.id, pattern);
+
+    // Update morphic resonance for agent combinations
+    const agentComboHash = this.hashAgentCombination(dominantAgents);
+    const currentResonance = this.morphicResonances.get(agentComboHash) || 0;
+    this.morphicResonances.set(agentComboHash, currentResonance + pattern.resonanceStrength);
+
+    // If significant coherence, create holographic distribution
+    if (interferencePattern.fieldCoherence > 0.8 && outcome.transformationOccurred) {
+      console.log('   🔮 High coherence + transformation - creating holographic backup');
+      // TODO: Distribute holographically (adapt pattern format)
+    }
+
+    console.log(`   ✅ Wave interference stored: ${pattern.id}`);
+    console.log(`      Constructive: ${(interferencePattern.constructiveInterference * 100).toFixed(0)}%`);
+    console.log(`      Destructive: ${(interferencePattern.destructiveInterference * 100).toFixed(0)}%`);
+    console.log(`      Dominant freq: ${interferencePattern.dominantFrequency} Hz`);
+    console.log(`      Field coherence: ${(interferencePattern.fieldCoherence * 100).toFixed(0)}%`);
+    console.log(`      Dominant agents: ${dominantAgents.join(', ')}`);
+
+    return pattern;
   }
 
   /**
@@ -642,6 +765,61 @@ export class MorphoresonantFieldInterface {
       morphicResonances: this.morphicResonances.size,
       holographicFragments: holographicCount
     };
+  }
+
+  // Telesphorus-specific mapping helpers
+
+  /**
+   * Map wave interference to emotional topology
+   */
+  private mapInterferenceToTopology(interference: WaveInterferencePattern): string {
+    const constructive = interference.constructiveInterference;
+    const destructive = interference.destructiveInterference;
+
+    if (constructive > 0.7 && destructive < 0.3) return 'river'; // Aligned flow
+    if (destructive > 0.7) return 'storm'; // High conflict
+    if (constructive > 0.5 && destructive > 0.5) return 'rapids'; // Mixed signals
+    if (constructive < 0.3 && destructive < 0.3) return 'lake'; // Quiet, low energy
+
+    return 'terrain'; // Default
+  }
+
+  /**
+   * Map dominant frequency to semantic shape
+   */
+  private mapFrequencyToShape(frequency: number): string {
+    // High frequencies → expansive shapes
+    // Low frequencies → grounded shapes
+
+    if (frequency > 800) return 'cathedral'; // Very high - expansive, elevated
+    if (frequency > 600) return 'maze'; // High - complex, mental
+    if (frequency > 400) return 'forest'; // Mid-high - natural complexity
+    if (frequency > 200) return 'plain'; // Mid-low - open, simple
+    if (frequency > 100) return 'well'; // Low - deep, contained
+
+    return 'forest'; // Default
+  }
+
+  /**
+   * Map field coherence to relational quality
+   */
+  private mapCoherenceToQuality(coherence: number): string {
+    // High coherence → harmonious relationships
+    // Low coherence → fragmented or distant
+
+    if (coherence > 0.8) return 'sanctuary'; // Very high - safe, aligned
+    if (coherence > 0.6) return 'crossroads'; // High - meeting, connecting
+    if (coherence > 0.4) return 'marketplace'; // Medium - active but not deep
+    if (coherence > 0.2) return 'fortress'; // Low - defended, separate
+
+    return 'wasteland'; // Very low - disconnected
+  }
+
+  /**
+   * Hash agent combination for morphic resonance tracking
+   */
+  private hashAgentCombination(agents: string[]): string {
+    return agents.sort().join('_');
   }
 }
 
