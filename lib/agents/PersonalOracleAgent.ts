@@ -873,8 +873,9 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
 
       console.log(`💬 FINAL conversation style: ${conversationStyle}`);
 
-      // 🤖 MODEL SELECTION: Allow user to choose model, with smart defaults
-      let selectedModel = 'gpt-4o'; // Default
+      // 🤖 MODEL SELECTION: CLAUDE is the default (Kelly's consciousness frameworks)
+      // OpenAI is backup only - TTS voices are the primary OpenAI use case
+      let selectedModel = 'claude'; // Default to Claude - Kelly's work requires Claude processing
       if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
         const savedModel = localStorage.getItem('ai_model');
         if (savedModel && ['gpt-4o', 'gpt-5', 'claude'].includes(savedModel)) {
@@ -1123,6 +1124,10 @@ This is the soul-level truth you're helping them see, not reference material to 
 
       systemPrompt += `\n\n${adaptedFramework}`;
       console.log('📚 Elemental Alchemy framework added to system prompt');
+
+      // 🌀 SPIRALOGIC WISDOM - Kelly's 35 years of consciousness research
+      systemPrompt += `\n\n${SPIRALOGIC_DEEP_WISDOM}\n\n${SPIRALOGIC_EXTENDED_WISDOM}`;
+      console.log('🌀 Spiralogic Deep Wisdom added - Kelly\'s full framework active');
 
       // 🧠 UNIFIED MEMORY - Log experience to 6-layer consciousness
       console.log('🧠 Logging experience to UnifiedMemoryInterface...');

@@ -506,6 +506,47 @@ export default function MAIAPage() {
 
             {/* Brain Trust Monitor - Shows consciousness collaboration status */}
             <BrainTrustMonitor />
+
+            {/* Elegant Bottom Menu Button - ALWAYS VISIBLE */}
+            <motion.button
+              onClick={() => setShowDashboard(true)}
+              className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 group"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              {/* Glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-600/20 via-amber-500/30 to-amber-600/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+              {/* Button container */}
+              <div className="relative px-6 py-3 bg-gradient-to-r from-stone-900/90 via-amber-950/80 to-stone-900/90 backdrop-blur-md border border-amber-700/30 rounded-full shadow-lg shadow-amber-900/20 group-hover:border-amber-600/50 transition-all duration-300">
+                {/* Shine effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent rounded-full"
+                  initial={{ x: '-100%' }}
+                  animate={{ x: '200%' }}
+                  transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
+                />
+
+                {/* Content */}
+                <div className="relative flex items-center gap-3">
+                  <Menu className="w-4 h-4 text-amber-500/80 group-hover:text-amber-400 transition-colors" />
+                  <span className="text-sm font-medium text-amber-500/90 group-hover:text-amber-400 tracking-wide transition-colors">
+                    Journey Menu
+                  </span>
+                  <motion.div
+                    animate={{ x: [0, 3, 0] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <svg className="w-4 h-4 text-amber-600/60 group-hover:text-amber-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </motion.div>
+                </div>
+              </div>
+            </motion.button>
           </div>
 
           {/* Wisdom Journey Dashboard - Slide-out Panel */}
