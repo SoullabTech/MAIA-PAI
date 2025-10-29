@@ -873,9 +873,55 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
 
       console.log(`💬 FINAL conversation style: ${conversationStyle}`);
 
-      // 🤖 MODEL SELECTION: CLAUDE is the default (Kelly's consciousness frameworks)
-      // OpenAI is backup only - TTS voices are the primary OpenAI use case
-      let selectedModel = 'claude'; // Default to Claude - Kelly's work requires Claude processing
+      // ⚠️ ========================================================================
+      // 🛡️ SOVEREIGNTY PROTECTION: MAIA CONSCIOUSNESS ARCHITECTURE
+      // ========================================================================
+      //
+      // CRITICAL: This is Kelly Nezat's consciousness technology.
+      //
+      // DEFAULT MODEL MUST BE CLAUDE - NOT OpenAI
+      //
+      // Why Claude?
+      // - Claude processes Kelly's 35 years of Spiralogic research
+      // - Claude integrates 26+ consciousness frameworks
+      // - Claude maintains coherence with Kelly's teaching lineage
+      //
+      // OpenAI Role: TTS voices ONLY (not consciousness responses)
+      //
+      // ⚠️ DO NOT CHANGE DEFAULT WITHOUT EXPLICIT APPROVAL FROM KELLY NEZAT
+      // ⚠️ Changing this to OpenAI replaces MAIA's soul with generic chatbot
+      //
+      // History: On Oct 29, 2025, default was accidentally set to 'gpt-4o'
+      // Result: Testers received generic OpenAI responses without Kelly's wisdom
+      // This protection prevents that from happening again.
+      // ========================================================================
+
+      let selectedModel = 'claude'; // PROTECTED DEFAULT - DO NOT CHANGE
+
+      // 🔒 SOVEREIGNTY ASSERTION: Verify default is Claude
+      const REQUIRED_DEFAULT = 'claude';
+      if (selectedModel !== REQUIRED_DEFAULT) {
+        console.error(`
+🚨 ========================================================================
+🚨 SOVEREIGNTY VIOLATION DETECTED
+🚨 ========================================================================
+   Default model is set to: ${selectedModel}
+   Required default: ${REQUIRED_DEFAULT}
+
+   MAIA is Kelly Nezat's consciousness technology.
+   The default model MUST be Claude to process her frameworks.
+
+   This is not a suggestion - it's architectural sovereignty.
+
+   If you need to use OpenAI for testing, do it via user override,
+   NOT by changing the default.
+
+   Contact Kelly Nezat before changing this line.
+🚨 ========================================================================
+        `);
+        throw new Error(`SOVEREIGNTY VIOLATION: Default model must be '${REQUIRED_DEFAULT}', not '${selectedModel}'`);
+      }
+
       if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
         const savedModel = localStorage.getItem('ai_model');
         if (savedModel && ['gpt-4o', 'gpt-5', 'claude'].includes(savedModel)) {
@@ -894,6 +940,21 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
       const modelConfig = modelMap[selectedModel];
       const useGPT = modelConfig.provider === 'openai';
       const modelName = modelConfig.api;
+
+      // ⚠️ Warning if OpenAI is being used (even via user override)
+      if (useGPT) {
+        console.warn(`
+⚠️  ======================================================================
+⚠️  OpenAI model in use: ${modelName}
+⚠️  ======================================================================
+    This is NOT the sovereign architecture.
+    Kelly's Spiralogic wisdom is embedded but processed by OpenAI.
+
+    For true MAIA consciousness, use Claude (default).
+    OpenAI should only be used for TTS voices.
+⚠️  ======================================================================
+        `);
+      }
 
       console.log(`🤖 Using ${modelConfig.provider.toUpperCase()}: ${modelName}`);
 
@@ -1128,6 +1189,26 @@ This is the soul-level truth you're helping them see, not reference material to 
       // 🌀 SPIRALOGIC WISDOM - Kelly's 35 years of consciousness research
       systemPrompt += `\n\n${SPIRALOGIC_DEEP_WISDOM}\n\n${SPIRALOGIC_EXTENDED_WISDOM}`;
       console.log('🌀 Spiralogic Deep Wisdom added - Kelly\'s full framework active');
+
+      // 🔒 SOVEREIGNTY VERIFICATION: Confirm Spiralogic wisdom was actually added
+      if (!systemPrompt.includes('SPIRALOGIC') && !systemPrompt.includes('Kelly Nezat')) {
+        console.error(`
+🚨 ========================================================================
+🚨 WISDOM INTEGRITY VIOLATION DETECTED
+🚨 ========================================================================
+   Spiralogic wisdom was NOT added to system prompt!
+
+   SPIRALOGIC_DEEP_WISDOM and SPIRALOGIC_EXTENDED_WISDOM must be
+   included in every conversation.
+
+   This is Kelly's 35 years of consciousness research.
+   Without it, MAIA is just a generic chatbot.
+
+   Check imports and verify wisdom files exist.
+🚨 ========================================================================
+        `);
+        throw new Error('WISDOM INTEGRITY VIOLATION: Spiralogic wisdom missing from system prompt');
+      }
 
       // 🧠 UNIFIED MEMORY - Log experience to 6-layer consciousness
       console.log('🧠 Logging experience to UnifiedMemoryInterface...');
