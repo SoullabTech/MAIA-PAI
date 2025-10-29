@@ -9,6 +9,7 @@ import { saveMaiaConversationPair } from '@/lib/services/maia-memory-service';
 import { simpleMemoryCapture } from '@/lib/services/simple-memory-capture';
 import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '@/lib/knowledge/ElementalAlchemyKnowledge';
 import { unifiedIntelligenceEngine } from '@/lib/intelligence/UnifiedIntelligenceEngine';
+import { morphoresonantField } from '@/lib/consciousness/MorphoresonantFieldInterface';
 
 // Initialize UNIFIED consciousness (26-year spiral completion)
 let maiaConsciousness: ReturnType<typeof getMAIAConsciousness> | null = null;
@@ -265,7 +266,54 @@ export async function POST(request: NextRequest) {
           emotionalTone: element,
           isKeyMoment: consciousnessResponse.metadata?.transformative || false,
           isTransformative: consciousnessResponse.metadata?.transformative || false
-        }).catch(err => console.error('Failed to capture memory:', err))
+        }).catch(err => console.error('Failed to capture memory:', err)),
+
+        // 🌀 MORPHORESONANT FIELD: Store interaction pattern in field substrate
+        (async () => {
+          try {
+            // Create basic FieldState from available data
+            const basicFieldState: any = {
+              emotionalWeather: {
+                density: consciousnessResponse.metadata?.depth || 0.5,
+                texture: element === 'water' ? 'flowing' : 'still',
+                velocity: intelligenceAnalysis.summary.urgencyLevel === 'high' ? 0.8 : 0.4
+              },
+              semanticLandscape: {
+                depth_measure: consciousnessResponse.metadata?.depthLevel ?
+                  consciousnessResponse.metadata.depthLevel / 10 : 0.5,
+                complexity: (intelligenceAnalysis.signatures?.length || 0) / 10
+              },
+              connectionDynamics: {
+                coherence: intelligenceAnalysis.summary.coherenceLevel,
+                resonance_frequency: 432,
+                trust_coefficient: 0.7,
+                openness: 0.7
+              },
+              sacredMarkers: {
+                threshold_proximity: consciousnessResponse.metadata?.transformative ? 0.8 : 0.3,
+                sacred_geometries: []
+              },
+              somaticIntelligence: {
+                activation_level: 0.5,
+                groundedness: 0.5
+              }
+            };
+
+            await morphoresonantField.storeInteraction(
+              requestUserId,
+              intelligenceAnalysis,
+              basicFieldState,
+              {
+                success: true,
+                coherence: intelligenceAnalysis.summary.coherenceLevel,
+                transformationOccurred: consciousnessResponse.metadata?.transformative || false
+              }
+            );
+            console.log('✨ Pattern stored in morphoresonant field');
+          } catch (err) {
+            console.error('Failed to store in morphoresonant field:', err);
+          }
+        })()
       ]).catch(err => console.error('Background memory operations failed:', err));
 
       return NextResponse.json({

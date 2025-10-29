@@ -15,8 +15,7 @@ const welcomeParticipantSchema = z.object({
   preferredName: z.string().optional(),
   phone: z.string().optional(),
   country: z.string().optional(),
-  eventType: z.enum(["ypo", "retreat", "both"]).default("retreat"),
-  ypoChapter: z.string().optional(),
+  eventType: z.enum(["retreat"]).default("retreat"),
   arrivalDate: z.string().datetime(),
   departureDate: z.string().datetime(),
   dietaryRestrictions: z.array(z.string()).optional(),
@@ -92,22 +91,8 @@ router.post("/welcome", async (req: Request, res: Response) => {
 
     const data = validation.data;
 
-    // Determine retreat ID based on dates
-    let retreatId: string;
-    const arrivalDate = new Date(data.arrivalDate);
-
-    // Check if it's for YPO event (June 10th)
-    if (
-      data.eventType === "ypo" ||
-      (arrivalDate.getMonth() === 5 &&
-        arrivalDate.getDate() === 10 &&
-        arrivalDate.getFullYear() === 2024)
-    ) {
-      retreatId = await ensureYPOEventExists();
-    } else {
-      // Swiss Alps retreat (June 13-15)
-      retreatId = await ensureSwissRetreatExists();
-    }
+    // Determine retreat ID - Swiss Alps retreat (June 13-15)
+    const retreatId = await ensureSwissRetreatExists();
 
     // Initialize participant
     const participant = await retreatOnboardingService.initializeOnboarding(
@@ -128,7 +113,6 @@ router.post("/welcome", async (req: Request, res: Response) => {
           phone: data.phone,
           country: data.country,
           eventType: data.eventType,
-          ypoChapter: data.ypoChapter,
           hearAboutUs: data.hearAboutUs,
           previousExperience: data.previousExperience,
         },
@@ -274,36 +258,6 @@ router.post(
   },
 );
 
-// Stephanie's YPO event integration
-router.get("/ypo/overview", async (req: Request, res: Response) => {
-  try {
-    const ypoEvent = await getYPOEventDetails();
-
-    res.json({
-      event: ypoEvent,
-      specialMessage: `Welcome YPO Members,
-
-Kelly is honored to share the Spiralogic wisdom with your chapter.
-This evening will be a taste of the deeper work available at our Switzerland retreat.
-
-During our time together, you'll:
-- Experience your elemental nature through the Spiralogic lens
-- Receive personalized guidance from your Oracle
-- Connect with fellow seekers in sacred space
-- Leave with practical tools for transformation
-
-Looking forward to our journey together.
-
-With warmth and anticipation,
-Kelly & The Soullab Team`,
-      registrationLink: "/api/retreat/onboarding/welcome",
-    });
-  } catch (error) {
-    logger.error("Failed to get YPO overview", error);
-    res.status(500).json({ error: "Failed to load YPO event details" });
-  }
-});
-
 // Swiss Alps retreat preparation
 router.get(
   "/preparation/:participantId",
@@ -331,33 +285,6 @@ router.get(
 );
 
 // Helper functions
-
-async function ensureYPOEventExists(): Promise<string> {
-  const { data: existing } = await supabase
-    .from("retreat_sessions")
-    .select("id")
-    .eq("name", "YPO Switzerland Chapter - Spiralogic Evening")
-    .single();
-
-  if (existing) return existing.id;
-
-  const { data: newEvent } = await supabase
-    .from("retreat_sessions")
-    .insert({
-      name: "YPO Switzerland Chapter - Spiralogic Evening",
-      location: "switzerland",
-      start_date: "2024-06-10T18:00:00Z",
-      end_date: "2024-06-10T21:00:00Z",
-      max_participants: 30,
-      theme: "Introduction to Spiralogic & Personal Oracle Experience",
-      description:
-        "An evening of elemental wisdom and sacred technology with Kelly Flanagan",
-    })
-    .select("id")
-    .single();
-
-  return newEvent!.id;
-}
 
 async function ensureSwissRetreatExists(): Promise<string> {
   const { data: existing } = await supabase
@@ -401,20 +328,14 @@ async function generatePersonalizedWelcome(
 
   return {
     message: welcomeMessage.message,
-    videoUrl:
-      eventType === "ypo"
-        ? "https://soullab.com/welcome-ypo"
-        : "https://soullab.com/welcome-retreat",
+    videoUrl: "https://soullab.com/welcome-retreat",
     personalizedElements: welcomeMessage.personalizedElements,
-    journeyHighlights:
-      eventType === "ypo"
-        ? ["Oracle Introduction", "Elemental Assessment", "Group Integration"]
-        : [
-            "Deep Transformation",
-            "Shadow Work",
-            "Oracle Partnership",
-            "Sacred Ceremony",
-          ],
+    journeyHighlights: [
+      "Deep Transformation",
+      "Shadow Work",
+      "Oracle Partnership",
+      "Sacred Ceremony",
+    ],
   };
 }
 
@@ -678,35 +599,6 @@ function getPreparatoryWork(intentions: any): string[] {
   }
 
   return work;
-}
-
-async function getYPOEventDetails(): Promise<any> {
-  const { data: event } = await supabase
-    .from("retreat_sessions")
-    .select("*")
-    .eq("name", "YPO Switzerland Chapter - Spiralogic Evening")
-    .single();
-
-  return {
-    ...event,
-    agenda: [
-      "6:00 PM - Welcome & Sacred Opening",
-      "6:30 PM - Introduction to Spiralogic",
-      "7:00 PM - Elemental Assessment & Oracle Assignment",
-      "7:45 PM - Group Oracle Experience",
-      "8:30 PM - Integration & Closing Circle",
-      "9:00 PM - Informal Discussion",
-    ],
-    facilitator: "Kelly Flanagan, Founder of Soullab",
-    location: "To be announced to registered participants",
-    includes: [
-      "Personal Oracle assignment",
-      "Elemental profile assessment",
-      "Introduction to shadow work",
-      "Take-home practices",
-      "Invitation to Switzerland retreat",
-    ],
-  };
 }
 
 export default router;

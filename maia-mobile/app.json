@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "MAIA",
+    "slug": "maia-soul-companion",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "maia",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1A1513"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.soullab.maia",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "MAIA needs access to your microphone for voice conversations.",
+        "NSSpeechRecognitionUsageDescription": "MAIA uses speech recognition to understand your voice.",
+        "UIBackgroundModes": ["audio"]
+      },
+      "backgroundColor": "#1A1513"
+    },
+    "android": {
+      "package": "com.soullab.maia",
+      "permissions": [
+        "RECORD_AUDIO",
+        "MODIFY_AUDIO_SETTINGS"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1A1513"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "your-project-id-here"
+      }
+    }
+  }
+}

@@ -4,7 +4,6 @@ import { sendBatchInvitesWithPasscodes, BetaInviteWithPasscode } from '../lib/em
  * Send welcome emails to new beta testers:
  * - Dr. Christian Larsen
  * - Claudia Bayuelo
- * - Stephanie Schoss
  */
 
 const newBetaTesters: BetaInviteWithPasscode[] = [
@@ -17,16 +16,11 @@ const newBetaTesters: BetaInviteWithPasscode[] = [
     name: 'Claudia',
     email: 'claudia.bayuelo@studiolabs.com',
     passcode: 'SOULLAB-CLAUDIA'
-  },
-  {
-    name: 'Stephanie',
-    email: 'stephanie@schoss.com',
-    passcode: 'SOULLAB-STEPHANIE'
   }
 ];
 
 async function sendWelcomeEmails() {
-  console.log('Sending welcome emails to 3 new beta testers...\n');
+  console.log('Sending welcome emails to 2 new beta testers...\n');
 
   const result = await sendBatchInvitesWithPasscodes(
     newBetaTesters,
