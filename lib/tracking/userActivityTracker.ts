@@ -63,9 +63,10 @@ export class UserActivityTracker {
     // Try to store in database
     if (this.supabase) {
       try {
-        // Validate UUID format before database insert
+        // Validate UUID format or user_ prefix format before database insert
         const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-        if (uuidRegex.test(userId)) {
+        const userIdRegex = /^user_\d+$/;
+        if (uuidRegex.test(userId) || userIdRegex.test(userId)) {
           // Use users table instead of beta_users (correct schema)
           await this.supabase
             .from('users')
@@ -103,9 +104,10 @@ export class UserActivityTracker {
       // Update database if available (only for valid UUIDs)
       if (this.supabase) {
         try {
-          // Validate UUID format before database update
+          // Validate UUID format or user_ prefix format before database update
           const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-          if (uuidRegex.test(userId)) {
+          const userIdRegex = /^user_\d+$/;
+          if (uuidRegex.test(userId) || userIdRegex.test(userId)) {
             await this.supabase
               .from('users')
               .update({

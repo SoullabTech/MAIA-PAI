@@ -70,10 +70,11 @@ export async function getOracleAgentId(userId: string): Promise<string | null> {
   const supabase = createClientComponentClient();
 
   try {
-    // Validate UUID format to prevent database errors
+    // Validate UUID format or user_ prefix format to prevent database errors
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(userId)) {
-      console.log(`[memoryService] Skipping agent lookup for non-UUID user: ${userId}`);
+    const userIdRegex = /^user_\d+$/;
+    if (!uuidRegex.test(userId) && !userIdRegex.test(userId)) {
+      console.log(`[memoryService] Skipping agent lookup for non-UUID/user_ user: ${userId}`);
       return null;
     }
 
