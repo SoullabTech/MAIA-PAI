@@ -121,7 +121,7 @@ export default function AdminIntelligencePage() {
         <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
           <div className="text-sm text-red-600 font-medium">Critical</div>
           <div className="text-3xl font-bold text-red-700">{criticalCount}</div>
-          <div className="text-xs text-red-600">Coherence < 30%</div>
+          <div className="text-xs text-red-600">{'Coherence < 30%'}</div>
         </div>
         <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg">
           <div className="text-sm text-orange-600 font-medium">High Urgency</div>
@@ -133,7 +133,7 @@ export default function AdminIntelligencePage() {
           <div className="text-3xl font-bold text-green-700">
             {users.filter(u => u.coherence > 0.75).length}
           </div>
-          <div className="text-xs text-green-600">Coherence > 75%</div>
+          <div className="text-xs text-green-600">{'Coherence > 75%'}</div>
         </div>
       </div>
 
