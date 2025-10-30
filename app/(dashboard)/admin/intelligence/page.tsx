@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { unifiedIntelligence } from '@/lib/intelligence/UnifiedIntelligenceEngine';
+import { unifiedIntelligenceEngine } from '@/lib/intelligence/UnifiedIntelligenceEngine';
 
 interface UserIntelligenceSummary {
   userId: string;
@@ -76,7 +76,7 @@ export default function AdminIntelligencePage() {
 
   async function loadFullIntelligence(userId: string) {
     try {
-      const intelligence = await unifiedIntelligence.analyze(userId);
+      const intelligence = await unifiedIntelligenceEngine.analyze(userId);
       setSelectedIntelligence(intelligence);
     } catch (error) {
       console.error('Error loading intelligence:', error);

@@ -13,7 +13,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { unifiedIntelligence } from '@/lib/intelligence/UnifiedIntelligenceEngine';
+import { unifiedIntelligenceEngine } from '@/lib/intelligence/UnifiedIntelligenceEngine';
 
 interface IntelligenceData {
   coherence: number;
@@ -66,7 +66,7 @@ export default function IntelligenceDashboard({ userId, showComparative = true }
 
   async function loadIntelligence() {
     try {
-      const data = await unifiedIntelligence.analyze(userId);
+      const data = await unifiedIntelligenceEngine.analyze(userId);
       setIntelligence(data as any);
     } catch (error) {
       console.error('Error loading intelligence:', error);
