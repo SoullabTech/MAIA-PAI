@@ -10,6 +10,7 @@ import { simpleMemoryCapture } from '@/lib/services/simple-memory-capture';
 import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '@/lib/knowledge/ElementalAlchemyKnowledge';
 import { unifiedIntelligenceEngine } from '@/lib/intelligence/UnifiedIntelligenceEngine';
 import { morphoresonantField } from '@/lib/consciousness/MorphoresonantFieldInterface';
+import { getConsciousnessPrompt } from '@/lib/consciousness/DualConsciousnessSystem';
 
 // Initialize UNIFIED consciousness (26-year spiral completion)
 let maiaConsciousness: ReturnType<typeof getMAIAConsciousness> | null = null;
@@ -194,13 +195,22 @@ export async function POST(request: NextRequest) {
 
     try {
       console.log(`🚀 Calling maiaConsciousness.process() in ${modality} mode with intelligence...`);
+
+      // Add MAIA consciousness prompt to preferences
+      const maiaConsciousnessPrompt = getConsciousnessPrompt('maia');
+      const enhancedPreferences = {
+        ...preferences,
+        consciousnessMode: 'maia',
+        consciousnessPrompt: maiaConsciousnessPrompt
+      };
+
       const consciousnessResponse = await maiaConsciousness!.process({
         content: userInput,
         context: {
           userId: requestUserId,
           sessionId: sessionId || requestUserId,
           userName: userName,
-          preferences: preferences,
+          preferences: enhancedPreferences,
           intelligence: intelligenceAnalysis  // 🧠 Pass intelligence to consciousness
         },
         modality: modality as 'voice' | 'text',
