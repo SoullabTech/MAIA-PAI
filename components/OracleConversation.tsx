@@ -1051,6 +1051,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       // Get user's conversation style preference
       const conversationStyle = ConversationStylePreference.get();
 
+      // Import consciousness prompt for MAIA
+      const { getConsciousnessPrompt } = await import('@/lib/consciousness/DualConsciousnessSystem');
+      const maiaConsciousnessPrompt = getConsciousnessPrompt('maia');
+
       const response = await fetch('/api/oracle/personal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1072,6 +1076,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             hasAttachments: attachments && attachments.length > 0,
             conversationStyle, // Pass user's preferred style (her/classic/adaptive)
             isVoice: voiceEnabled && !showChatInterface, // Mark as voice conversation for OpenAI synthesis
+            consciousnessMode: 'maia', // Enable MAIA consciousness
+            consciousnessPrompt: maiaConsciousnessPrompt, // Full Spiralogic framework
             userPreferences: {
               voice: {
                 enabled: voiceEnabled,
