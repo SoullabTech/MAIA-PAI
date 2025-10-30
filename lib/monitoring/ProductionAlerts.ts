@@ -6,7 +6,8 @@
  */
 
 interface AlertConfig {
-  phoneNumber?: string;
+  telegramBotToken?: string;
+  telegramChatId?: string;
   email?: string;
   enabled: boolean;
 }
@@ -26,7 +27,8 @@ class ProductionAlertSystem {
 
   constructor() {
     this.config = {
-      phoneNumber: process.env.ALERT_PHONE_NUMBER, // Your phone number
+      telegramBotToken: process.env.TELEGRAM_BOT_TOKEN,
+      telegramChatId: process.env.TELEGRAM_CHAT_ID,
       email: process.env.ALERT_EMAIL,
       enabled: process.env.NODE_ENV === 'production' && process.env.ALERTS_ENABLED === 'true'
     };
@@ -58,8 +60,8 @@ class ProductionAlertSystem {
     // Send via multiple channels
     const promises = [];
 
-    if (this.config.phoneNumber) {
-      promises.push(this.sendSMS(this.config.phoneNumber, alertMessage));
+    if (this.config.telegramBotToken && this.config.telegramChatId) {
+      promises.push(this.sendTelegram(this.config.telegramBotToken, this.config.telegramChatId, alertMessage));
     }
 
     if (this.config.email) {
@@ -85,38 +87,29 @@ Check: https://vercel.com/your-project/logs`;
   }
 
   /**
-   * Send SMS via Twilio
+   * Send Telegram message
    */
-  private async sendSMS(to: string, message: string): Promise<void> {
+  private async sendTelegram(botToken: string, chatId: string, message: string): Promise<void> {
     try {
-      // If Twilio is configured
-      if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-        const response = await fetch('https://api.twilio.com/2010-04-01/Accounts/' +
-          process.env.TWILIO_ACCOUNT_SID + '/Messages.json', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Basic ' + Buffer.from(
-              process.env.TWILIO_ACCOUNT_SID + ':' + process.env.TWILIO_AUTH_TOKEN
-            ).toString('base64'),
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: new URLSearchParams({
-            To: to,
-            From: process.env.TWILIO_PHONE_NUMBER || '',
-            Body: message
-          })
-        });
+      const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'HTML'
+        })
+      });
 
-        if (response.ok) {
-          console.log('📱 SMS alert sent successfully');
-        } else {
-          console.error('❌ Failed to send SMS:', await response.text());
-        }
+      if (response.ok) {
+        console.log('📱 Telegram alert sent successfully');
       } else {
-        console.log('📱 SMS alert (Twilio not configured):', message);
+        console.error('❌ Failed to send Telegram alert:', await response.text());
       }
     } catch (error) {
-      console.error('❌ SMS alert failed:', error);
+      console.error('❌ Telegram alert failed:', error);
     }
   }
 
