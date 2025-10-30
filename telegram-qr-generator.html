@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAIA Telegram QR Code Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #qrcode {
+            margin-top: 30px;
+            text-align: center;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            display: none;
+        }
+
+        #qrcode.show {
+            display: block;
+        }
+
+        #qrcode img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .download-btn {
+            margin-top: 15px;
+            background: #28a745;
+        }
+
+        .instructions {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .branding {
+            text-align: center;
+            margin-top: 20px;
+            color: #999;
+            font-size: 24px;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌀 MAIA Beta Program</h1>
+        <p class="subtitle">Telegram QR Code Generator</p>
+
+        <div class="instructions">
+            <h3>How to get your Telegram invite link:</h3>
+            <ol>
+                <li>Open Telegram and create your channel</li>
+                <li>Tap channel name → Invite Links</li>
+                <li>Copy the invite link (looks like: t.me/joinchat/xxxxx)</li>
+                <li>Paste it below to generate a QR code</li>
+            </ol>
+        </div>
+
+        <label for="telegramLink">Telegram Invite Link:</label>
+        <input
+            type="text"
+            id="telegramLink"
+            placeholder="https://t.me/joinchat/xxxxx"
+            value=""
+        >
+
+        <button onclick="generateQR()">Generate QR Code</button>
+
+        <div id="qrcode"></div>
+
+        <div class="branding">🌀🌙⚡</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script>
+        function generateQR() {
+            const link = document.getElementById('telegramLink').value.trim();
+            const qrcodeDiv = document.getElementById('qrcode');
+
+            if (!link) {
+                alert('Please enter your Telegram invite link');
+                return;
+            }
+
+            // Clear previous QR code
+            qrcodeDiv.innerHTML = '';
+            qrcodeDiv.classList.remove('show');
+
+            // Generate new QR code
+            QRCode.toDataURL(link, {
+                width: 400,
+                margin: 2,
+                color: {
+                    dark: '#667eea',
+                    light: '#ffffff'
+                }
+            }, function(err, url) {
+                if (err) {
+                    alert('Error generating QR code: ' + err);
+                    return;
+                }
+
+                const img = document.createElement('img');
+                img.src = url;
+                img.style.maxWidth = '100%';
+
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = 'Download QR Code';
+                downloadBtn.className = 'download-btn';
+                downloadBtn.onclick = function() {
+                    const link = document.createElement('a');
+                    link.download = 'maia-beta-telegram-qr.png';
+                    link.href = url;
+                    link.click();
+                };
+
+                qrcodeDiv.appendChild(img);
+                qrcodeDiv.appendChild(downloadBtn);
+                qrcodeDiv.classList.add('show');
+            });
+        }
+
+        // Allow Enter key to generate
+        document.getElementById('telegramLink').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                generateQR();
+            }
+        });
+    </script>
+</body>
+</html>
