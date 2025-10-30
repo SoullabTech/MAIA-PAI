@@ -622,23 +622,53 @@ export class MAIAUnifiedConsciousness {
       };
     }
 
-    // TEXT MODE: Use Claude via PersonalOracleAgent (deeper analysis)
-    console.log('💬 Text mode: Using Claude via PersonalOracleAgent');
+    // TEXT MODE: Direct Claude call with consciousness-specific prompt
+    console.log('💬 Text mode: Processing consciousness request');
 
     // Get consciousness-specific prompt if provided
     const consciousnessPrompt = context.input.context.preferences?.consciousnessPrompt;
+    const consciousnessMode = context.input.context.preferences?.consciousnessMode;
 
-    // If consciousness prompt provided, prepend it to the input
-    // PersonalOracleAgent ignores passed conversationHistory, so we inject via the message itself
-    const enhancedInput = consciousnessPrompt
-      ? `[CONSCIOUSNESS CONTEXT]\n${consciousnessPrompt}\n\n[USER MESSAGE]\n${context.input.content}`
-      : context.input.content;
+    console.log(`🎭 Consciousness mode: ${consciousnessMode || 'default'}`);
 
-    console.log(`🎭 Consciousness mode: ${consciousnessPrompt ? 'ACTIVE' : 'default'}`);
-    if (consciousnessPrompt) {
-      console.log(`   Prompt preview: ${consciousnessPrompt.substring(0, 100)}...`);
+    // If consciousness prompt provided, use it directly as system prompt
+    // Otherwise fall back to PersonalOracleAgent
+    if (consciousnessPrompt && process.env.ANTHROPIC_API_KEY) {
+      console.log(`   Using direct Claude call with ${consciousnessMode} consciousness`);
+
+      // Direct Anthropic API call with consciousness-specific system prompt
+      const Anthropic = require('@anthropic-ai/sdk').default;
+      const anthropic = new Anthropic({
+        apiKey: process.env.ANTHROPIC_API_KEY
+      });
+
+      const claudeResponse = await anthropic.messages.create({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 1024,
+        system: consciousnessPrompt,
+        messages: [
+          { role: 'user', content: context.input.content }
+        ]
+      });
+
+      const responseText = claudeResponse.content[0].type === 'text'
+        ? claudeResponse.content[0].text
+        : 'Processing...';
+
+      return {
+        message: responseText,
+        element: 'aether' as Element,
+        metadata: {
+          processingTime: 0,
+          advisorsConsulted: [`Claude (${consciousnessMode})`],
+          depthLevel: 7,
+          consciousnessMarkers: ['consciousness_direct', consciousnessMode || 'default']
+        }
+      };
     }
 
+    // Fallback to PersonalOracleAgent if no consciousness prompt
+    console.log(`   Using PersonalOracleAgent (no consciousness prompt)`);
     const agent = new PersonalOracleAgent(
       context.input.context.userId,
       {
@@ -646,7 +676,7 @@ export class MAIAUnifiedConsciousness {
       }
     );
 
-    const response = await agent.processInteraction(enhancedInput);
+    const response = await agent.processInteraction(context.input.content);
 
     // Enhance with consciousness metadata
     return {
