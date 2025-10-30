@@ -5,28 +5,16 @@ import { MenuBar } from './MenuBar';
 
 /**
  * Conditionally renders MenuBar based on current route
- * Hides on onboarding/auth pages to avoid UI clutter
+ * ONLY shows on main home page - hidden everywhere else
  */
 export function ConditionalMenuBar() {
   const pathname = usePathname();
 
-  // Hide MenuBar on these pages
-  const hideOnPages = [
-    '/beta-signup',
-    '/beta-entry',
-    '/beta-orientation',
-    '/beta-onboarding',
-    '/beta-welcome',
-    '/beta-reset-notice',
-    '/login',
-    '/signup',
-    '/maia',  // MAIA page has its own integrated bottom bar
-    '/maya'   // Redirects to /maia, but hide here too
-  ];
+  // ONLY show MenuBar on the main home page
+  const showOnlyOnHome = pathname === '/';
 
-  const shouldHide = hideOnPages.some(page => pathname?.startsWith(page));
-
-  if (shouldHide) {
+  // Hide on all other pages
+  if (!showOnlyOnHome) {
     return null;
   }
 

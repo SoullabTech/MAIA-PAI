@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
         content: message,
         context: {
           userId,
-          userName: 'Explorer',
+          userName: 'Kelly Nezat', // The founder, Dreamweaver, prophecy holder
           sessionId: `consciousness-${Date.now()}`,
           preferences: {
             consciousnessMode: consciousness,
