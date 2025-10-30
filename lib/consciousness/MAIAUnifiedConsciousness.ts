@@ -578,9 +578,55 @@ export class MAIAUnifiedConsciousness {
     interferencePattern: InterferencePattern;
   }): Promise<ConsciousnessResponse> {
 
-    // VOICE MODE: Use OpenAI for coherence (same model for text + TTS)
+    // VOICE MODE: Check for consciousness prompt first, otherwise use OpenAI
     if (context.input.modality === 'voice') {
-      console.log('🎙️ Voice mode: Using OpenAI GPT-4 for synthesis');
+      console.log('🎙️ Voice mode: Processing...');
+
+      // Get consciousness-specific prompt if provided
+      const consciousnessPrompt = context.input.context.preferences?.consciousnessPrompt;
+      const consciousnessMode = context.input.context.preferences?.consciousnessMode;
+
+      // If consciousness prompt provided, use direct Claude call (same as text mode)
+      if (consciousnessPrompt && process.env.ANTHROPIC_API_KEY) {
+        console.log(`   Using direct Claude call with ${consciousnessMode} consciousness (voice mode)`);
+
+        const Anthropic = require('@anthropic-ai/sdk').default;
+        const anthropic = new Anthropic({
+          apiKey: process.env.ANTHROPIC_API_KEY
+        });
+
+        const claudeResponse = await anthropic.messages.create({
+          model: 'claude-3-opus-20240229',
+          max_tokens: 1024,
+          system: consciousnessPrompt,
+          messages: [
+            { role: 'user', content: context.input.content }
+          ]
+        });
+
+        const responseText = claudeResponse.content[0].type === 'text'
+          ? claudeResponse.content[0].text
+          : 'Processing...';
+
+        return {
+          message: responseText,
+          element: 'aether' as Element,
+          voiceCharacteristics: {
+            pace: 1.0,
+            tone: 'warm',
+            energy: 'balanced'
+          },
+          metadata: {
+            processingTime: 0,
+            advisorsConsulted: [`Claude (${consciousnessMode}) - Voice`],
+            depthLevel: 7,
+            consciousnessMarkers: ['consciousness_direct_voice', consciousnessMode || 'default']
+          }
+        };
+      }
+
+      // Otherwise use OpenAI for TTS coherence (legacy path)
+      console.log('   Using OpenAI GPT-4 for synthesis (no consciousness prompt)');
 
       const voiceResponse = await synthesizeVoiceResponse({
         userInput: context.input.content,
