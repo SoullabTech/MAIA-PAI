@@ -144,20 +144,53 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     mode: realtimeMode,
     onTranscript: (text, isUser) => {
       if (isUser) {
+        // User finished speaking - add complete transcript to messages
         setUserTranscript(text);
+        const userMessage: ConversationMessage = {
+          id: `user-${Date.now()}`,
+          role: 'user',
+          text: text,
+          timestamp: new Date(),
+          source: 'user'
+        };
+        setMessages(prev => [...prev, userMessage]);
+        onMessageAdded?.(userMessage);
+        console.log('💬 Added user transcript to messages:', text.substring(0, 50));
       } else {
-        setMaiaResponseText(prev => prev + text);
+        // MAIA speaking - accumulate deltas
+        setMaiaResponseText(prev => {
+          const newText = prev + text;
+          maiaResponseTextRef.current = newText; // Keep ref in sync
+          return newText;
+        });
       }
     },
     onAudioStart: () => {
       setIsResponding(true);
       setIsAudioPlaying(true);
+      setMaiaResponseText('');
+      maiaResponseTextRef.current = ''; // Clear ref too
       console.log('🔊 MAIA started speaking');
     },
     onAudioEnd: () => {
       setIsResponding(false);
       setIsAudioPlaying(false);
       console.log('🔇 MAIA finished speaking');
+
+      // Add MAIA's complete response to messages (use ref to avoid closure issues)
+      const responseText = maiaResponseTextRef.current.trim();
+      if (responseText) {
+        const oracleMessage: ConversationMessage = {
+          id: `oracle-${Date.now()}`,
+          role: 'oracle',
+          text: responseText,
+          timestamp: new Date(),
+          source: 'maia'
+        };
+        setMessages(prev => [...prev, oracleMessage]);
+        onMessageAdded?.(oracleMessage);
+        console.log('💬 Added MAIA transcript to messages:', responseText.substring(0, 50));
+      }
 
       // CRITICAL FIX: Auto-restart listening after MAIA finishes speaking
       // This fixes the "conversation dies after first exchange" bug
@@ -355,6 +388,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const textInputRef = useRef<HTMLTextAreaElement>(null);
   const [userTranscript, setUserTranscript] = useState('');
   const [maiaResponseText, setMaiaResponseText] = useState('');
+  const maiaResponseTextRef = useRef<string>(''); // Ref to avoid closure issues
   const [isMounted, setIsMounted] = useState(false);
   const [echoSuppressUntil, setEchoSuppressUntil] = useState<number>(0);
   const lastMaiaResponseRef = useRef<string>('');
