@@ -2415,7 +2415,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         id="chatFileUpload"
                         className="hidden"
                         multiple
-                        accept="image/*,application/pdf,.txt,.doc,.docx"
+                        accept="image/*,application/pdf,.txt,.md,.json,.csv,.py,.js,.jsx,.ts,.tsx,.doc,.docx,text/*"
                         onChange={(e) => {
                           const files = Array.from(e.target.files || []);
                           if (files.length > 0) {
