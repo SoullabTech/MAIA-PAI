@@ -122,10 +122,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { input, message, userText, text, userId = 'anonymous', userName, sessionId, preferences } = body;
+    const { input, message, userText, text, userInput: bodyUserInput, userId = 'anonymous', userName, sessionId, preferences } = body;
 
     // Accept multiple field names for compatibility
-    const userInput = (input || message || userText || text || '').trim();
+    const userInput = (bodyUserInput || input || message || userText || text || '').trim();
     const requestUserId = userId || 'beta-user';
 
     console.log('📨 /api/oracle/personal v2.0:', {

@@ -12,9 +12,20 @@ import { detectCommunicatorType, getHighBandwidthStrategy } from './HighBandwidt
 import { VoiceCognitiveArchitecture } from './VoiceCognitiveArchitecture';
 import { PersonalOracleAgent } from '../agents/PersonalOracleAgent';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!
-});
+// Lazy initialization to avoid crashing when OPENAI_API_KEY is missing
+let openaiClient: OpenAI | null = null;
+
+function getOpenAI(): OpenAI {
+  if (!openaiClient) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY environment variable is not set. Voice synthesis requires OpenAI API key.');
+    }
+    openaiClient = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+  }
+  return openaiClient;
+}
 
 // Initialize cognitive architecture for voice
 const cognitiveArchitecture = new VoiceCognitiveArchitecture();
@@ -228,7 +239,7 @@ This wisdom is not "background" - it's your living knowledge. Integrate it natur
       prefix: process.env.OPENAI_API_KEY?.substring(0, 7)
     });
 
-    const completion = await openai.chat.completions.create({
+    const completion = await getOpenAI().chat.completions.create({
       model: 'gpt-4',
       messages,
       temperature: 0.95, // High variation - MAIA should feel alive, not robotic
