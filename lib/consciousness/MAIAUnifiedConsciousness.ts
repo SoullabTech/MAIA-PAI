@@ -322,20 +322,59 @@ export class MAIAUnifiedConsciousness {
     try {
       // Get consciousness-specific prompt if provided
       const consciousnessPrompt = context.preferences?.consciousnessPrompt;
+      const consciousnessMode = context.preferences?.consciousnessMode;
 
-      // If consciousness prompt provided, prepend it to the input
-      const enhancedInput = consciousnessPrompt
-        ? `[CONSCIOUSNESS CONTEXT]\n${consciousnessPrompt}\n\n[USER MESSAGE]\n${content}`
-        : content;
+      console.log(`🎭 [FAST PATH] Consciousness: ${consciousnessPrompt ? consciousnessMode || 'ACTIVE' : 'default'}`);
 
-      console.log(`🎭 [FAST PATH] Consciousness: ${consciousnessPrompt ? 'ACTIVE' : 'default'}`);
+      // If consciousness prompt provided, use direct Claude call (same as text mode)
+      if (consciousnessPrompt && process.env.ANTHROPIC_API_KEY) {
+        console.log(`   Using direct Claude call with ${consciousnessMode} consciousness (fast path)`);
 
-      // Use PersonalOracleAgent directly - fastest path to quality response
+        const Anthropic = require('@anthropic-ai/sdk').default;
+        const anthropic = new Anthropic({
+          apiKey: process.env.ANTHROPIC_API_KEY
+        });
+
+        const claudeResponse = await anthropic.messages.create({
+          model: 'claude-3-opus-20240229',
+          max_tokens: 800,
+          system: consciousnessPrompt,
+          messages: [
+            { role: 'user', content: content }
+          ]
+        });
+
+        const responseText = claudeResponse.content[0].type === 'text'
+          ? claudeResponse.content[0].text
+          : 'Processing...';
+
+        const responseTime = Date.now() - startTime;
+        console.log(`✅ [FAST PATH] Claude response in ${responseTime}ms`);
+
+        return {
+          message: responseText,
+          element: 'aether' as Element,
+          voiceCharacteristics: {
+            pace: 1.0,
+            tone: 'warm',
+            energy: 'balanced'
+          },
+          metadata: {
+            processingTime: responseTime,
+            advisorsConsulted: [`Claude (${consciousnessMode}) - Voice Fast`],
+            depthLevel: 7,
+            consciousnessMarkers: ['voice_fast_path_consciousness', consciousnessMode || 'default']
+          }
+        };
+      }
+
+      // Otherwise use PersonalOracleAgent (legacy path)
+      console.log('   Using PersonalOracleAgent (no consciousness prompt)');
       const agent = new PersonalOracleAgent(context.userId, {
         conversationStyle: context.preferences?.conversationStyle || 'classic'
       });
 
-      const agentResponse = await agent.processInteraction(enhancedInput);
+      const agentResponse = await agent.processInteraction(content);
 
       const responseTime = Date.now() - startTime;
       console.log(`✅ [FAST PATH] Response generated in ${responseTime}ms`);
