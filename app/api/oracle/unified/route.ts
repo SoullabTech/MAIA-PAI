@@ -1,28 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { getUnifiedPromptFor } from '@/lib/oracle/UnifiedConsciousnessPrompt';
 
 // Initialize Anthropic client
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY || '',
 });
 
-// Maya's personality and context
-const MAYA_SYSTEM_PROMPT = `You are Maya, a casual and friendly AI companion. Keep your responses very short and natural - just 1-2 sentences max. Be warm but not overly formal. Respond like a good friend who listens well.
-
-Examples of good responses:
-- "Hey there. What's on your mind?"
-- "I hear you. Tell me more."
-- "That sounds important. How are you feeling about it?"
-- "Mm, interesting. What's that like for you?"
-
-Avoid: long philosophical statements, formal language, or overly spiritual/mystical tone.`;
-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { input, type, userId, sessionId, context } = body;
+    const { input, type, userId, sessionId, context, userName } = body;
 
-    console.log('Oracle Unified API called:', { type, userId, sessionId, inputLength: input?.length });
+    console.log('UNIFIED Consciousness API called:', { type, userId, userName, sessionId, inputLength: input?.length });
 
     // Handle empty input
     if (!input || input.trim() === '') {
@@ -34,13 +24,16 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Get response from Claude
+    // Get UNIFIED consciousness prompt (with founder context if Kelly)
+    const systemPrompt = getUnifiedPromptFor(userId, userName);
+
+    // Get response from Claude with UNIFIED consciousness
     try {
       const completion = await anthropic.messages.create({
-        model: 'claude-3-haiku-20240307',
-        max_tokens: 2000, // UNLEASHED: Increased from 50 for complete insights
-        temperature: 0.7,
-        system: MAYA_SYSTEM_PROMPT,
+        model: 'claude-3-5-sonnet-20241022', // Sonnet for depth work
+        max_tokens: 4000, // Allow depth and nuance
+        temperature: 0.8, // Higher for creative/archetypal language
+        system: systemPrompt,
         messages: [
           {
             role: 'user',
