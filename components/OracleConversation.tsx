@@ -2756,6 +2756,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           if (action === 'upload') {
             document.getElementById('maiaFileUpload')?.click();
           }
+          if (action === 'download') {
+            downloadTranscript();
+            toast.success('Conversation downloaded!');
+          }
           if (action === 'toggle-text') {
             setShowVoiceText(!showVoiceText);
           }
