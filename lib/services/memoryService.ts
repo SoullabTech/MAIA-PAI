@@ -92,3 +92,23 @@ export async function getOracleAgentId(userId: string): Promise<string | null> {
     return null;
   }
 }
+
+/**
+ * Get relevant memories for elemental agents
+ * Stub implementation - returns empty array for now
+ */
+export async function getRelevantMemories(userId: string, context?: any): Promise<any[]> {
+  // TODO: Implement semantic memory retrieval
+  // For now, return empty array so elemental agents don't crash
+  return [];
+}
+
+/**
+ * Store memory item from elemental agents
+ * Stub implementation - no-op for now
+ */
+export async function storeMemoryItem(userId: string, memory: any): Promise<void> {
+  // TODO: Implement memory storage
+  // For now, no-op so elemental agents don't crash
+  return;
+}

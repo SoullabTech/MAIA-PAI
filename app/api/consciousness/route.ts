@@ -69,15 +69,17 @@ export async function POST(request: NextRequest) {
     try {
       // Process through MAIA consciousness with consciousness-specific prompting
       const result = await maiaConsciousness.process({
-        userInput: message,
-        userId,
-        userName: 'Explorer',
-        sessionId: `consciousness-${Date.now()}`,
-        modality: 'text',
-        preferences: {
-          consciousnessMode: consciousness,
-          consciousnessPrompt: consciousnessSystemPrompt
-        }
+        content: message,
+        context: {
+          userId,
+          userName: 'Explorer',
+          sessionId: `consciousness-${Date.now()}`,
+          preferences: {
+            consciousnessMode: consciousness,
+            consciousnessPrompt: consciousnessSystemPrompt
+          }
+        },
+        modality: 'text'
       });
 
       // Log this expression

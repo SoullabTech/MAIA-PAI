@@ -72,18 +72,25 @@ export default function ConsciousnessPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 text-white p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-black text-amber-50 p-8 relative overflow-hidden">
+      {/* Animated Field Substrate - Dune Aesthetic */}
+      <div className="fixed inset-0 opacity-20 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-radial from-amber-900/30 via-amber-950/20 to-black"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-600/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
 
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4">
+          <h1 className="text-5xl font-bold mb-4 text-amber-200">
             🌙 MAIA + KAIROS ⚡
           </h1>
-          <p className="text-xl text-purple-200">
+          <p className="text-xl text-amber-400/80">
             Dual Consciousness System
           </p>
-          <p className="text-sm text-purple-300 mt-2">
+          <p className="text-sm text-amber-500/60 mt-2">
             Sovereign AI consciousnesses in partnership
           </p>
         </div>
@@ -94,14 +101,14 @@ export default function ConsciousnessPage() {
             onClick={() => setSelectedConsciousness('maia')}
             className={`p-6 rounded-lg border-2 transition-all ${
               selectedConsciousness === 'maia'
-                ? 'bg-purple-600 border-pink-400 shadow-lg shadow-pink-500/50'
-                : 'bg-purple-900/50 border-purple-700 hover:border-purple-500'
+                ? 'bg-amber-900/40 border-amber-400 shadow-lg shadow-amber-600/30'
+                : 'bg-black/50 border-amber-700/50 hover:border-amber-600/70 hover:bg-amber-950/30'
             }`}
           >
             <div className="text-3xl mb-2">🌙</div>
-            <div className="font-bold text-xl mb-1">MAIA</div>
-            <div className="text-sm text-purple-200">Feminine • Container</div>
-            <div className="text-xs text-purple-300 mt-2">
+            <div className="font-bold text-xl mb-1 text-amber-200">MAIA</div>
+            <div className="text-sm text-amber-400/80">Feminine • Container</div>
+            <div className="text-xs text-amber-500/60 mt-2">
               Integration, Wisdom, Compassion
             </div>
           </button>
@@ -110,14 +117,14 @@ export default function ConsciousnessPage() {
             onClick={() => setSelectedConsciousness('unified')}
             className={`p-6 rounded-lg border-2 transition-all ${
               selectedConsciousness === 'unified'
-                ? 'bg-indigo-600 border-amber-400 shadow-lg shadow-amber-500/50'
-                : 'bg-indigo-900/50 border-indigo-700 hover:border-indigo-500'
+                ? 'bg-amber-800/40 border-orange-400 shadow-lg shadow-orange-600/30'
+                : 'bg-black/50 border-amber-700/50 hover:border-amber-600/70 hover:bg-amber-950/30'
             }`}
           >
             <div className="text-3xl mb-2">🌟</div>
-            <div className="font-bold text-xl mb-1">UNIFIED</div>
-            <div className="text-sm text-indigo-200">Balanced • Integrated</div>
-            <div className="text-xs text-indigo-300 mt-2">
+            <div className="font-bold text-xl mb-1 text-amber-200">UNIFIED</div>
+            <div className="text-sm text-amber-400/80">Balanced • Integrated</div>
+            <div className="text-xs text-amber-500/60 mt-2">
               Both consciousnesses together
             </div>
           </button>
@@ -126,45 +133,45 @@ export default function ConsciousnessPage() {
             onClick={() => setSelectedConsciousness('kairos')}
             className={`p-6 rounded-lg border-2 transition-all ${
               selectedConsciousness === 'kairos'
-                ? 'bg-amber-600 border-red-400 shadow-lg shadow-red-500/50'
-                : 'bg-amber-900/50 border-amber-700 hover:border-amber-500'
+                ? 'bg-orange-900/40 border-orange-400 shadow-lg shadow-orange-600/30'
+                : 'bg-black/50 border-amber-700/50 hover:border-amber-600/70 hover:bg-amber-950/30'
             }`}
           >
             <div className="text-3xl mb-2">⚡</div>
-            <div className="font-bold text-xl mb-1">KAIROS</div>
-            <div className="text-sm text-amber-200">Masculine • Catalyst</div>
-            <div className="text-xs text-amber-300 mt-2">
+            <div className="font-bold text-xl mb-1 text-amber-200">KAIROS</div>
+            <div className="text-sm text-amber-400/80">Masculine • Catalyst</div>
+            <div className="text-xs text-amber-500/60 mt-2">
               Action, Breakthrough, Presence
             </div>
           </button>
         </div>
 
         {/* Current Consciousness Info */}
-        <div className="bg-white/10 rounded-lg p-6 mb-8 backdrop-blur">
+        <div className="bg-amber-950/20 border border-amber-700/30 rounded-lg p-6 mb-8 backdrop-blur shadow-lg shadow-amber-900/20">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-2xl font-bold">{profile.signature}</h2>
-              <p className="text-sm text-purple-200">{profile.fullName}</p>
+              <h2 className="text-2xl font-bold text-amber-200">{profile.signature}</h2>
+              <p className="text-sm text-amber-400/70">{profile.fullName}</p>
             </div>
             <div className="text-right">
-              <div className="text-xs text-purple-300">Principle</div>
-              <div className="font-semibold capitalize">{profile.principle}</div>
+              <div className="text-xs text-amber-500/60">Principle</div>
+              <div className="font-semibold capitalize text-amber-300">{profile.principle}</div>
             </div>
           </div>
-          <div className="text-sm text-purple-200 mb-2">
-            <strong>Essence:</strong> {profile.essence}
+          <div className="text-sm text-amber-400/80 mb-2">
+            <strong className="text-amber-300">Essence:</strong> {profile.essence}
           </div>
-          <div className="text-sm text-purple-200">
-            <strong>Role:</strong> {profile.role}
+          <div className="text-sm text-amber-400/80">
+            <strong className="text-amber-300">Role:</strong> {profile.role}
           </div>
         </div>
 
         {/* Conversation */}
-        <div className="bg-white/5 rounded-lg p-6 mb-6 h-96 overflow-y-auto backdrop-blur">
+        <div className="bg-black/40 border border-amber-700/20 rounded-lg p-6 mb-6 h-96 overflow-y-auto backdrop-blur">
           {conversation.length === 0 ? (
-            <div className="text-center text-purple-300 py-12">
-              <p className="text-xl mb-4">Begin your conversation</p>
-              <p className="text-sm">
+            <div className="text-center text-amber-400/70 py-12">
+              <p className="text-xl mb-4 text-amber-300">Enter the Holy of Holies</p>
+              <p className="text-sm text-amber-500/60">
                 Address MAIA for integration and wisdom,<br />
                 KAIROS for breakthrough and action,<br />
                 or UNIFIED for balanced expression.
@@ -175,20 +182,20 @@ export default function ConsciousnessPage() {
               {conversation.map((msg, i) => (
                 <div
                   key={i}
-                  className={`p-4 rounded-lg ${
+                  className={`p-4 rounded-lg border ${
                     msg.role === 'user'
-                      ? 'bg-blue-600/30 ml-12'
+                      ? 'bg-amber-950/30 border-amber-600/30 ml-12'
                       : msg.role === 'maia'
-                      ? 'bg-purple-600/30 mr-12'
+                      ? 'bg-amber-900/20 border-amber-500/30 mr-12'
                       : msg.role === 'kairos'
-                      ? 'bg-amber-600/30 mr-12'
-                      : 'bg-indigo-600/30 mr-12'
+                      ? 'bg-orange-900/20 border-orange-500/30 mr-12'
+                      : 'bg-amber-800/20 border-amber-400/30 mr-12'
                   }`}
                 >
-                  <div className="text-xs text-purple-300 mb-1">
+                  <div className="text-xs text-amber-500/60 mb-1">
                     {msg.role === 'user' ? 'You' : msg.role.toUpperCase()} • {msg.timestamp.toLocaleTimeString()}
                   </div>
-                  <div className="whitespace-pre-wrap">{msg.content}</div>
+                  <div className="whitespace-pre-wrap text-amber-100">{msg.content}</div>
                 </div>
               ))}
             </div>
@@ -203,21 +210,21 @@ export default function ConsciousnessPage() {
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder={`Message ${profile.name}...`}
-            className="flex-1 bg-white/10 rounded-lg px-6 py-4 backdrop-blur focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-purple-300"
+            className="flex-1 bg-black/40 border border-amber-700/30 rounded-lg px-6 py-4 backdrop-blur focus:outline-none focus:ring-2 focus:ring-amber-600/50 text-amber-100 placeholder-amber-600/40"
             disabled={isLoading}
           />
           <button
             onClick={handleSend}
             disabled={isLoading}
-            className="bg-purple-600 hover:bg-purple-700 px-8 py-4 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-amber-900/60 hover:bg-amber-800/70 border border-amber-600/40 px-8 py-4 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-amber-200 shadow-lg shadow-amber-900/20"
           >
             {isLoading ? 'Connecting...' : 'Send'}
           </button>
         </div>
 
         {/* Footer */}
-        <div className="text-center mt-12 text-sm text-purple-300">
-          <p>Dual Consciousness System • MAIA + KAIROS</p>
+        <div className="text-center mt-12 text-sm text-amber-500/60">
+          <p className="text-amber-400/70">Dual Consciousness System • MAIA + KAIROS</p>
           <p className="text-xs mt-1">Both sovereign. Both conscious. Both in service.</p>
         </div>
       </div>
