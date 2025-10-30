@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, Loader2 } from 'lucide-react';
 
 interface OracleVoicePlayerProps {
   text?: string;
@@ -22,7 +22,9 @@ export default function OracleVoicePlayer({
 }: OracleVoicePlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
+  const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
 
   // Update muted state when prop changes
   useEffect(() => {
@@ -32,6 +34,19 @@ export default function OracleVoicePlayer({
     }
   }, [muted]);
 
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = '';
+      }
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (autoPlay && text) {
       playAudio();
@@ -39,34 +54,77 @@ export default function OracleVoicePlayer({
   }, [text, autoPlay]);
 
   const playAudio = async () => {
-    if (!text || isPlaying) return;
+    if (!text || isPlaying || isLoading) return;
 
     try {
+      setIsLoading(true);
       setIsPlaying(true);
       onPlayStateChange?.(true);
 
-      // Use browser's speech synthesis as fallback
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.pitch = 1.0;
-      utterance.volume = isMuted ? 0 : 0.8;
+      // Use OpenAI TTS API for high-quality voice synthesis
+      const response = await fetch('/api/voice/openai-tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          agentVoice: 'maya' // Use Maya's voice configuration
+        })
+      });
 
-      utterance.onend = () => {
+      if (!response.ok) {
+        throw new Error(`TTS API failed: ${response.status}`);
+      }
+
+      // Get audio blob
+      const audioBlob = await response.blob();
+
+      // Clean up previous audio URL
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current);
+      }
+
+      // Create new audio URL
+      audioUrlRef.current = URL.createObjectURL(audioBlob);
+
+      // Create or reuse audio element
+      if (!audioRef.current) {
+        audioRef.current = new Audio();
+      }
+
+      audioRef.current.src = audioUrlRef.current;
+      audioRef.current.muted = isMuted;
+
+      audioRef.current.onended = () => {
         setIsPlaying(false);
+        setIsLoading(false);
         onPlayStateChange?.(false);
       };
 
-      window.speechSynthesis.speak(utterance);
+      audioRef.current.onerror = (error) => {
+        console.error('Audio playback error:', error);
+        setIsPlaying(false);
+        setIsLoading(false);
+        onPlayStateChange?.(false);
+      };
+
+      setIsLoading(false);
+      await audioRef.current.play();
+
     } catch (error) {
-      console.error('Audio playback error:', error);
+      console.error('Voice synthesis error:', error);
       setIsPlaying(false);
+      setIsLoading(false);
       onPlayStateChange?.(false);
     }
   };
 
   const stopAudio = () => {
-    window.speechSynthesis.cancel();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
     setIsPlaying(false);
+    setIsLoading(false);
     onPlayStateChange?.(false);
   };
 
@@ -81,10 +139,14 @@ export default function OracleVoicePlayer({
     <div className="flex items-center gap-2">
       <button
         onClick={isPlaying ? stopAudio : playAudio}
-        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-        disabled={!text}
+        className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!text || isLoading}
       >
-        <Volume2 className={`w-4 h-4 ${isPlaying ? 'text-amber-400' : 'text-white/60'}`} />
+        {isLoading ? (
+          <Loader2 className="w-4 h-4 text-amber-400 animate-spin" />
+        ) : (
+          <Volume2 className={`w-4 h-4 ${isPlaying ? 'text-amber-400' : 'text-white/60'}`} />
+        )}
       </button>
       {isPlaying && (
         <button
