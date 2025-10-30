@@ -221,12 +221,12 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
       <div className="relative h-[calc(100vh-140px)]">
         {/* Holoflower with Voice Visualizer */}
         <div className="absolute inset-0 flex items-center justify-center">
-          {/* Pulsing Light Cloud - Ambient breathing */}
+          {/* Subtle Ambient Glow - Always Gentle */}
           <motion.div
-            className="absolute w-96 h-96 rounded-full"
+            className="absolute w-64 h-64 rounded-full pointer-events-none"
             animate={{
-              scale: [1, 1.1, 1],
-              opacity: [0.2, 0.3, 0.2],
+              scale: [1, 1.05, 1],
+              opacity: [0.15, 0.2, 0.15],
             }}
             transition={{
               duration: 4,
@@ -234,125 +234,13 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
               ease: "easeInOut"
             }}
             style={{
-              background: 'radial-gradient(circle, rgba(212,184,150,0.2) 0%, transparent 70%)',
-              filter: 'blur(40px)'
+              background: 'radial-gradient(circle, rgba(212,184,150,0.3) 0%, transparent 60%)',
+              filter: 'blur(25px)'
             }}
           />
 
-          {/* User Voice Glow - Golden when speaking */}
-          {isListening && (
-            <motion.div
-              className="absolute w-80 h-80 rounded-full"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.5, 0.3],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              style={{
-                background: 'radial-gradient(circle, rgba(212,184,150,0.4) 0%, rgba(182,154,120,0.2) 50%, transparent 70%)',
-                filter: 'blur(30px)'
-              }}
-            />
-          )}
 
-          {/* Maia Voice Signature - Purple/violet when speaking */}
-          {isMaiaSpeaking && (
-            <motion.div
-              className="absolute w-72 h-72 rounded-full"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{
-                scale: [1, 1.3, 1],
-                opacity: [0.4, 0.6, 0.4],
-                rotate: [0, 180, 360],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              style={{
-                background: 'radial-gradient(circle, rgba(139,92,246,0.3) 0%, rgba(168,85,247,0.2) 50%, transparent 70%)',
-                filter: 'blur(35px)'
-              }}
-            />
-          )}
-
-          {/* Sparkles Container */}
-          <div className="absolute inset-0 pointer-events-none">
-            {/* Golden Sparkles for User Voice */}
-            {isListening && (
-              <>
-                {[...Array(6)].map((_, i) => (
-                  <motion.div
-                    key={`user-sparkle-${i}`}
-                    className="absolute w-1 h-1 bg-[#D4B896] rounded-full"
-                    initial={{
-                      x: 0,
-                      y: 0,
-                      opacity: 0,
-                    }}
-                    animate={{
-                      x: [0, (Math.random() - 0.5) * 200],
-                      y: [0, (Math.random() - 0.5) * 200],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      duration: 2,
-                      delay: i * 0.2,
-                      repeat: Infinity,
-                      ease: "easeOut"
-                    }}
-                    style={{
-                      left: '50%',
-                      top: '50%',
-                      boxShadow: '0 0 6px rgba(212,184,150,0.8)'
-                    }}
-                  />
-                ))}
-              </>
-            )}
-
-            {/* Purple Sparkles for Maia Voice */}
-            {isMaiaSpeaking && (
-              <>
-                {[...Array(8)].map((_, i) => (
-                  <motion.div
-                    key={`maia-sparkle-${i}`}
-                    className="absolute w-1 h-1 bg-amber-400 rounded-full"
-                    initial={{
-                      x: 0,
-                      y: 0,
-                      opacity: 0,
-                    }}
-                    animate={{
-                      x: [0, (Math.random() - 0.5) * 250],
-                      y: [0, (Math.random() - 0.5) * 250],
-                      opacity: [0, 1, 0],
-                      scale: [0, 1.5, 0],
-                    }}
-                    transition={{
-                      duration: 2.5,
-                      delay: i * 0.15,
-                      repeat: Infinity,
-                      ease: "easeOut"
-                    }}
-                    style={{
-                      left: '50%',
-                      top: '50%',
-                      boxShadow: '0 0 8px rgba(168,85,247,0.9)'
-                    }}
-                  />
-                ))}
-              </>
-            )}
-          </div>
-
-          {/* Sacred Geometry Holoflower - Visible & Elegant */}
+          {/* Sacred Geometry Holoflower - Clean Flower of Life */}
           <motion.div
             onClick={() => {
               if (!showChatInterface) {
@@ -362,104 +250,77 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
               }
             }}
             className="relative cursor-pointer"
-            style={{ width: '300px', height: '300px' }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            style={{ width: '320px', height: '320px' }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
           >
-            {/* Outer rotating ring - Flower of Life */}
-            <motion.div
-              className="absolute inset-0"
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
-            >
-              {/* 6 overlapping circles forming sacred geometry */}
-              {[...Array(6)].map((_, i) => {
-                const angle = (i * 60) * (Math.PI / 180);
-                const radius = 70;
-                const x = Math.cos(angle) * radius;
-                const y = Math.sin(angle) * radius;
+            {/* Outer ring of 6 circles - Flower of Life pattern */}
+            {[...Array(6)].map((_, i) => {
+              const angle = (i * 60) * (Math.PI / 180);
+              const radius = 55;
+              const x = Math.cos(angle) * radius;
+              const y = Math.sin(angle) * radius;
 
-                return (
-                  <motion.div
-                    key={i}
-                    className="absolute"
-                    style={{
-                      left: `calc(50% + ${x}px)`,
-                      top: `calc(50% + ${y}px)`,
-                      transform: 'translate(-50%, -50%)',
-                      width: '80px',
-                      height: '80px',
-                      borderRadius: '50%',
-                      border: '2px solid rgba(212,184,150,0.6)',
-                      background: 'radial-gradient(circle, rgba(212,184,150,0.15), transparent)',
-                    }}
-                    animate={{
-                      opacity: getEnergyState() === 'radiant' ? [0.6, 1, 0.6] : [0.4, 0.7, 0.4],
-                      borderColor: getEnergyState() === 'radiant'
-                        ? ['rgba(212,184,150,0.6)', 'rgba(168,85,247,0.8)', 'rgba(212,184,150,0.6)']
-                        : 'rgba(212,184,150,0.6)'
-                    }}
-                    transition={{
-                      duration: 3,
-                      delay: i * 0.2,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  />
-                );
-              })}
-            </motion.div>
-
-            {/* Central sacred core */}
-            <motion.div
-              className="absolute top-1/2 left-1/2"
-              style={{
-                transform: 'translate(-50%, -50%)',
-                width: '120px',
-                height: '120px',
-              }}
-              animate={{
-                scale: getEnergyState() === 'radiant' ? [1, 1.15, 1] : [1, 1.05, 1],
-                rotate: [0, -360],
-              }}
-              transition={{
-                scale: { duration: 3, repeat: Infinity, ease: "easeInOut" },
-                rotate: { duration: 60, repeat: Infinity, ease: "linear" },
-              }}
-            >
-              {/* Outer glow ring */}
-              <div
-                className="w-full h-full rounded-full"
-                style={{
-                  border: '3px solid rgba(212,184,150,0.7)',
-                  background: getEnergyState() === 'radiant'
-                    ? 'radial-gradient(circle, rgba(168,85,247,0.4), rgba(212,184,150,0.2), transparent)'
-                    : 'radial-gradient(circle, rgba(212,184,150,0.3), rgba(212,184,150,0.1), transparent)',
-                  boxShadow: getEnergyState() === 'radiant'
-                    ? '0 0 50px rgba(168,85,247,0.6), inset 0 0 30px rgba(168,85,247,0.3)'
-                    : '0 0 40px rgba(212,184,150,0.5), inset 0 0 20px rgba(212,184,150,0.2)',
-                }}
-              />
-              {/* Bright inner core */}
-              <motion.div
-                className="absolute inset-0 flex items-center justify-center"
-                animate={{
-                  rotate: [0, 360],
-                }}
-                transition={{
-                  duration: 40,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-              >
-                <div
-                  className="w-16 h-16 rounded-full"
+              return (
+                <motion.div
+                  key={i}
+                  className="absolute"
                   style={{
-                    background: 'radial-gradient(circle, rgba(255,255,255,1), rgba(212,184,150,0.8))',
-                    boxShadow: '0 0 30px rgba(212,184,150,1), 0 0 60px rgba(212,184,150,0.6)',
+                    left: `calc(50% + ${x}px)`,
+                    top: `calc(50% + ${y}px)`,
+                    transform: 'translate(-50%, -50%)',
+                    width: '110px',
+                    height: '110px',
+                    borderRadius: '50%',
+                    border: '2px solid rgba(212,184,150,0.8)',
+                    background: 'transparent',
+                  }}
+                  animate={{
+                    opacity: [0.6, 0.9, 0.6],
+                    borderColor: ['rgba(212,184,150,0.8)', 'rgba(251,191,36,0.9)', 'rgba(212,184,150,0.8)']
+                  }}
+                  transition={{
+                    duration: 4,
+                    delay: i * 0.3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
                   }}
                 />
-              </motion.div>
+              );
+            })}
+
+            {/* Center circle - same size and position as outer 6 */}
+            <motion.div
+              className="absolute"
+              style={{
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '110px',
+                height: '110px',
+                borderRadius: '50%',
+                border: '2px solid rgba(212,184,150,0.8)',
+                background: 'transparent',
+              }}
+              animate={{
+                opacity: [0.6, 0.9, 0.6],
+                borderColor: ['rgba(212,184,150,0.8)', 'rgba(251,191,36,0.9)', 'rgba(212,184,150,0.8)']
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              {/* Bright center point at exact geometric center */}
+              <div
+                className="absolute top-1/2 left-1/2 w-3 h-3 rounded-full"
+                style={{
+                  transform: 'translate(-50%, -50%)',
+                  background: 'radial-gradient(circle, rgba(255,255,255,1), rgba(251,191,36,0.9))',
+                  boxShadow: '0 0 15px rgba(251,191,36,0.9), 0 0 30px rgba(212,184,150,0.7)',
+                }}
+              />
             </motion.div>
           </motion.div>
 

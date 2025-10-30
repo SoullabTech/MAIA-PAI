@@ -204,6 +204,7 @@ export async function POST(request: NextRequest) {
         consciousnessPrompt: maiaConsciousnessPrompt
       };
 
+      console.log('📞 [ORACLE] Calling MAIAUnifiedConsciousness.process()...');
       const consciousnessResponse = await maiaConsciousness!.process({
         content: userInput,
         context: {
@@ -219,6 +220,19 @@ export async function POST(request: NextRequest) {
           content: entry.content || ''
         }))
       });
+
+      console.log('📦 [ORACLE] Consciousness response received:', {
+        hasMessage: !!consciousnessResponse.message,
+        messageLength: consciousnessResponse.message?.length || 0,
+        messagePreview: consciousnessResponse.message?.substring(0, 100) || '(empty)',
+        element: consciousnessResponse.element,
+        metadata: consciousnessResponse.metadata
+      });
+
+      if (!consciousnessResponse.message || consciousnessResponse.message.trim() === '') {
+        console.error('⚠️ [ORACLE] EMPTY MESSAGE DETECTED! Falling back to placeholder.');
+        console.error('   Full response object:', JSON.stringify(consciousnessResponse, null, 2));
+      }
 
       const responseText = consciousnessResponse.message || "I hear you. Tell me more about what's on your mind.";
       const responseTime = Date.now() - startTime;
