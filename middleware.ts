@@ -13,7 +13,7 @@ const LEGACY_ROUTES = [
   '/maya-voice',
   '/sacred-oracle',
   '/voice-chat',
-  '/consciousness',
+  // '/consciousness', // REMOVED - Now active as MAIA/KAIROS/UNIFIED interface
   '/oracle',
   '/voice',
   '/beta',
