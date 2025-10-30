@@ -175,12 +175,16 @@ export class UnifiedMemoryInterface {
       }
     }
 
-    // Add to semantic memory for pattern matching
-    await this.semanticMemory.addMemory(content, {
-      userId: context.userId,
-      timestamp: new Date(),
-      elements: context.elements
-    });
+    // Add to semantic memory for pattern matching (if available)
+    if (this.semanticMemory && typeof this.semanticMemory.addMemory === 'function') {
+      await this.semanticMemory.addMemory(content, {
+        userId: context.userId,
+        timestamp: new Date(),
+        elements: context.elements
+      });
+    } else {
+      console.warn('⚠️ Semantic memory not available - skipping memory addition');
+    }
 
     // Track symbols for collective patterns
     if (context.symbolsPresent) {
