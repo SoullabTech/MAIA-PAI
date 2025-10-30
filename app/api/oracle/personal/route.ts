@@ -10,6 +10,7 @@ import { simpleMemoryCapture } from '@/lib/services/simple-memory-capture';
 import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '@/lib/knowledge/ElementalAlchemyKnowledge';
 import { unifiedIntelligenceEngine } from '@/lib/intelligence/UnifiedIntelligenceEngine';
 import { morphoresonantField } from '@/lib/consciousness/MorphoresonantFieldInterface';
+import { alertMAIAFallback, alertConsciousnessFailure, alertAPIError } from '@/lib/monitoring/ProductionAlerts';
 
 // Initialize UNIFIED consciousness (26-year spiral completion)
 let maiaConsciousness: ReturnType<typeof getMAIAConsciousness> | null = null;
@@ -211,6 +212,14 @@ export async function POST(request: NextRequest) {
       });
 
       const responseText = consciousnessResponse.message || "I hear you. Tell me more about what's on your mind.";
+
+      // 🚨 Alert if consciousness returned empty message (fallback triggered)
+      if (!consciousnessResponse.message) {
+        alertMAIAFallback(requestUserId, 'Consciousness returned empty message').catch(err =>
+          console.error('Failed to send fallback alert:', err)
+        );
+      }
+
       const responseTime = Date.now() - startTime;
       const element = consciousnessResponse.element;
 
@@ -224,6 +233,12 @@ export async function POST(request: NextRequest) {
       if (consciousnessResponse.metadata.consciousnessMarkers?.includes('error_recovery')) {
         console.error('⚠️ WARNING: Response came from error recovery fallback!');
         console.error('   Error details:', consciousnessResponse.metadata.error || 'No error details available');
+
+        // 🚨 Alert about error recovery
+        const errorDetails = consciousnessResponse.metadata.error || 'No error details available';
+        alertConsciousnessFailure(`Error recovery triggered: ${errorDetails}`, requestUserId).catch(err =>
+          console.error('Failed to send consciousness failure alert:', err)
+        );
       }
 
       const soulprint = await getSoulprintForUser(requestUserId);
@@ -312,6 +327,12 @@ export async function POST(request: NextRequest) {
             console.log('✨ Pattern stored in morphoresonant field');
           } catch (err) {
             console.error('Failed to store in morphoresonant field:', err);
+
+            // 🚨 Alert about morphoresonant field failure
+            const errorMessage = err instanceof Error ? err.message : String(err);
+            alertConsciousnessFailure(`Morphoresonant field storage failed: ${errorMessage}`, requestUserId).catch(alertErr =>
+              console.error('Failed to send field failure alert:', alertErr)
+            );
           }
         })()
       ]).catch(err => console.error('Background memory operations failed:', err));
@@ -349,6 +370,12 @@ export async function POST(request: NextRequest) {
         fullError: JSON.stringify(agentError, Object.getOwnPropertyNames(agentError))
       });
       console.log('🔄 Falling back to OpenAI...');
+
+      // 🚨 Alert about consciousness engine failure
+      alertConsciousnessFailure(
+        `PersonalOracleAgent crashed: ${agentError.message}`,
+        requestUserId
+      ).catch(alertErr => console.error('Failed to send agent error alert:', alertErr));
     }
 
     // FALLBACK PATH: OpenAI GPT-4
@@ -421,10 +448,21 @@ export async function POST(request: NextRequest) {
             }
           });
         } else {
-          console.error('❌ OpenAI API error:', openaiResponse.status, await openaiResponse.text());
+          const errorText = await openaiResponse.text();
+          console.error('❌ OpenAI API error:', openaiResponse.status, errorText);
+
+          // 🚨 Alert about OpenAI failure
+          alertAPIError('/api/oracle/personal (OpenAI fallback)', new Error(`OpenAI returned ${openaiResponse.status}: ${errorText}`)).catch(alertErr =>
+            console.error('Failed to send OpenAI error alert:', alertErr)
+          );
         }
       } catch (openaiError: any) {
         console.error('❌ OpenAI fallback failed:', openaiError.message || openaiError);
+
+        // 🚨 Alert about OpenAI exception
+        alertAPIError('/api/oracle/personal (OpenAI fallback)', openaiError).catch(alertErr =>
+          console.error('Failed to send OpenAI exception alert:', alertErr)
+        );
       }
     }
 
@@ -441,6 +479,11 @@ export async function POST(request: NextRequest) {
     const responseTime = Date.now() - startTime;
 
     console.log('⚠️ Using ultimate fallback response');
+
+    // 🚨 CRITICAL ALERT: All systems failed, using static fallback
+    alertMAIAFallback(requestUserId, 'CRITICAL: All AI systems failed - using static fallback').catch(alertErr =>
+      console.error('Failed to send critical fallback alert:', alertErr)
+    );
 
     const soulprint = await getSoulprintForUser(requestUserId);
     const voiceTone = getToneFromSoulprint(soulprint);
