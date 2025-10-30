@@ -39,6 +39,12 @@ export class AdvancedSynergyEngine {
     const protectorStormSystem = this.detectProtectorStormWithSystemPressure(extraction);
     if (protectorStormSystem) signatures.push(protectorStormSystem);
 
+    const primaMateria = this.detectPrimaMateriaRevelation(extraction);
+    if (primaMateria) signatures.push(primaMateria);
+
+    const soulTransmutation = this.detectSoulTransmutation(extraction);
+    if (soulTransmutation) signatures.push(soulTransmutation);
+
     // ULTRA-RARE (7-9 frameworks)
     const systemEmergence = this.detectCompleteSystemEmergence(extraction);
     if (systemEmergence) signatures.push(systemEmergence);
@@ -48,6 +54,15 @@ export class AdvancedSynergyEngine {
 
     const morphogeneticAdvanced = this.detectMorphogeneticBreakthroughAdvanced(extraction);
     if (morphogeneticAdvanced) signatures.push(morphogeneticAdvanced);
+
+    const alchemicalRebirth = this.detectAlchemicalRebirthComplete(extraction);
+    if (alchemicalRebirth) signatures.push(alchemicalRebirth);
+
+    const darkNight = this.detectDarkNightOfSoul(extraction);
+    if (darkNight) signatures.push(darkNight);
+
+    const anthroposRestoration = this.detectAnthroposRestoration(extraction);
+    if (anthroposRestoration) signatures.push(anthroposRestoration);
 
     const completeAlignment = this.detectComplete9FrameworkAlignment(extraction);
     if (completeAlignment) signatures.push(completeAlignment);
@@ -267,6 +282,95 @@ export class AdvancedSynergyEngine {
     return null;
   }
 
+  /**
+   * ADVANCED PATTERN 6: Prima Materia Revelation (6 frameworks)
+   * The raw material of transformation reveals itself
+   */
+  private detectPrimaMateriaRevelation(extraction: ExtractionResult): TransformationSignature | null {
+    const hasNigredo = extraction.alchemicalStage?.primaryStage === 'nigredo';
+    const hasDorsal = extraction.polyvagalState?.state === 'dorsal';
+    const hasExilePresent = extraction.ifsParts?.parts.some(p => p.type === 'exile');
+    const hasShadowWork = extraction.jungianProcess?.shadowWork;
+    const hasFreeze = extraction.somaticState?.incompleteResponse.type === 'freeze';
+    const hasRetroflection = extraction.gestaltState?.contactDisturbances.retroflection.detected;
+
+    const count = [hasNigredo, hasDorsal, hasExilePresent, hasShadowWork, hasFreeze, hasRetroflection].filter(Boolean).length;
+
+    if (count >= 5) {
+      return {
+        name: 'Prima Materia Revelation',
+        description: 'The raw, unformed psychic material reveals itself. The exile holds the gold.',
+        frameworks: ['Alchemy', 'Polyvagal', 'IFS', 'Jung', 'Levine', 'Gestalt'],
+        frameworkCount: 6,
+        complexity: 'advanced',
+        confidence: 0.89,
+        clinicalMeaning: 'The person has descended into Nigredo (blackening/dissolution), entered dorsal shutdown, and made contact with exiled parts. Shadow material is present. The body is frozen and turning inward. This is NOT pathology—this is the alchemical Prima Materia revealing itself. The raw, unformed psychic material that contains the gold. The exile holds what needs to be transmuted.',
+        therapeuticFocus: 'Honor the descent. Protect the Prima Materia. Do not rush transformation.',
+        interventions: [
+          'PRIORITY: Create a sacred container for this material',
+          'Alchemy: Name this as Prima Materia - the raw gold',
+          'IFS: Witness exiles with reverence (they hold what needs transmutation)',
+          'Jung: Honor shadow as treasure (not pathology)',
+          'Polyvagal: Co-regulate gently (don\'t force ventral)',
+          'Levine: Allow freeze (the body is protecting the material)',
+          'Gestalt: Notice retroflection as necessary containment',
+          'Do NOT: Try to "fix" or "heal" yet—this IS the work',
+          'Consider: Dreamwork, creative expression, ritual'
+        ],
+        urgency: 'moderate'
+      };
+    }
+    return null;
+  }
+
+  /**
+   * ADVANCED PATTERN 7: Soul Transmutation Through Active Imagination (6 frameworks)
+   * Alchemical transformation happening through imaginal work
+   */
+  private detectSoulTransmutation(extraction: ExtractionResult): TransformationSignature | null {
+    const hasAlbedoOrCitrinitas = extraction.alchemicalStage?.primaryStage === 'albedo' ||
+                                  extraction.alchemicalStage?.primaryStage === 'citrinitas';
+    const hasActiveImagination = extraction.jungianProcess?.individuation;
+    const hasSelfEnergyEmerging = extraction.ifsParts?.selfEnergy !== undefined &&
+                                  extraction.ifsParts.selfEnergy >= 0.5 &&
+                                  extraction.ifsParts.selfEnergy < 0.8;
+    const hasVentralEmergence = extraction.polyvagalState?.state === 'ventral' ||
+                               (extraction.polyvagalState?.state === 'sympathetic' &&
+                                extraction.polyvagalState.safety >= 0.6);
+    const hasDischargeActive = extraction.somaticState?.discharge.active;
+    const hasAwarenessIncreasing = extraction.gestaltState?.awareness.hereAndNow !== undefined &&
+                                  extraction.gestaltState.awareness.hereAndNow >= 0.6;
+
+    const count = [hasAlbedoOrCitrinitas, hasActiveImagination, hasSelfEnergyEmerging,
+                   hasVentralEmergence, hasDischargeActive, hasAwarenessIncreasing].filter(Boolean).length;
+
+    if (count >= 5) {
+      return {
+        name: 'Soul Transmutation Through Active Imagination',
+        description: 'The alchemical transformation is happening. Soul material transmuting through imaginal work.',
+        frameworks: ['Alchemy', 'Jung', 'IFS', 'Polyvagal', 'Levine', 'Gestalt'],
+        frameworkCount: 6,
+        complexity: 'advanced',
+        confidence: 0.91,
+        clinicalMeaning: 'Transformation actively occurring through Albedo/Citrinitas (whitening/yellowing). Jungian active imagination is engaged, Self-energy is emerging (not yet fully embodied), nervous system is moving toward ventral with moments of activation, somatic discharge is happening, and Gestalt awareness is increasing. The Prima Materia is being worked. This is soul-level transformation through imaginal dialogue—not just psychological insight.',
+        therapeuticFocus: 'Support the alchemical operation. Hold space for imaginal work. Don\'t interrupt the process.',
+        interventions: [
+          'PRIORITY: Protect and support the alchemical operation',
+          'Alchemy: Track the Albedo/Citrinitas process (purification → illumination)',
+          'Jung: Support active imagination work (dialogues with unconscious)',
+          'IFS: Witness Self-energy emerging (parts beginning to trust)',
+          'Polyvagal: Support ventral emergence (don\'t force it)',
+          'Levine: Allow discharge process (completion cycles)',
+          'Gestalt: Support increasing awareness without interpretation',
+          'Consider: Sandplay, dreamwork, creative expression, ritual',
+          'Do NOT: Over-analyze or intellectualize the process'
+        ],
+        urgency: 'low'
+      };
+    }
+    return null;
+  }
+
   // ========================================================================
   // ULTRA-RARE SIGNATURES (7-9 Frameworks)
   // ========================================================================
@@ -408,7 +512,167 @@ export class AdvancedSynergyEngine {
   }
 
   /**
-   * ULTRA-RARE PATTERN 4: Complete 9-Framework Alignment
+   * ULTRA-RARE PATTERN 4: Alchemical Rebirth Complete (7 frameworks)
+   * The Rubedo phase—embodied wholeness after full death-rebirth cycle
+   */
+  private detectAlchemicalRebirthComplete(extraction: ExtractionResult): TransformationSignature | null {
+    const hasRubedo = extraction.alchemicalStage?.primaryStage === 'rubedo' &&
+                     extraction.alchemicalStage.coherence >= 0.8;
+    const hasVentral = extraction.polyvagalState?.state === 'ventral';
+    const hasSelfLed = extraction.ifsParts?.selfEnergy !== undefined &&
+                      extraction.ifsParts.selfEnergy >= 0.75;
+    const hasIndividuation = extraction.jungianProcess?.individuation;
+    const hasSystemPeace = extraction.constellationState?.detected &&
+                          !extraction.constellationState.systemicEntanglement.detected;
+    const hasDischargeComplete = extraction.somaticState?.discharge.active &&
+                                extraction.somaticState.arousal.windowOfTolerance;
+    const hasFullContact = extraction.gestaltState?.awareness.hereAndNow !== undefined &&
+                          extraction.gestaltState.awareness.hereAndNow >= 0.8;
+
+    const count = [hasRubedo, hasVentral, hasSelfLed, hasIndividuation, hasSystemPeace,
+                   hasDischargeComplete, hasFullContact].filter(Boolean).length;
+
+    if (count >= 6) {
+      return {
+        name: 'Alchemical Rebirth Complete',
+        description: 'RUBEDO. The death-rebirth cycle complete. Wholeness embodied across all dimensions.',
+        frameworks: ['Alchemy', 'Polyvagal', 'IFS', 'Jung', 'Family Constellation', 'Levine', 'Gestalt'],
+        frameworkCount: 7,
+        complexity: 'ultra-rare',
+        confidence: 0.95,
+        clinicalMeaning: 'The alchemical Rubedo (reddening) is complete. This person has gone through Nigredo (death/dissolution), Albedo (purification), Citrinitas (illumination), and emerged in Rubedo (embodied wholeness). The nervous system is ventral, IFS Self is leading, individuation is happening, family system is at peace, somatic discharge is complete, and Gestalt contact is full. This is the Philosopher\'s Stone—not as concept but as LIVED REALITY. The transformation is embodied.',
+        therapeuticFocus: 'WITNESS THE SACRED. This is completion of the Great Work.',
+        interventions: [
+          'PRIORITY: REVERENT WITNESSING',
+          'Alchemy: Name this as Rubedo—the completion of the Great Work',
+          'This person has transmuted lead into gold',
+          'Jung: This is the Self—individuation embodied',
+          'IFS: The system trusts Self completely',
+          'Polyvagal: Nervous system at peace',
+          'Constellation: Family system at peace',
+          'Levine: Body integrated and complete',
+          'Gestalt: Full contact with reality',
+          'Do NOT: Pathologize, analyze, or "therapize"',
+          'Consider: Ritual, celebration, creative expression',
+          'This is a SACRED MOMENT—simply be present'
+        ],
+        urgency: 'low'
+      };
+    }
+    return null;
+  }
+
+  /**
+   * ULTRA-RARE PATTERN 5: Dark Night of Soul (8 frameworks)
+   * Profound spiritual crisis—dissolution of all familiar structures
+   */
+  private detectDarkNightOfSoul(extraction: ExtractionResult): TransformationSignature | null {
+    const hasDeepNigredo = extraction.alchemicalStage?.primaryStage === 'nigredo' &&
+                          extraction.alchemicalStage.coherence <= 0.2;
+    const hasDorsal = extraction.polyvagalState?.state === 'dorsal';
+    const hasFreeze = extraction.somaticState?.incompleteResponse.type === 'freeze';
+    const hasMinimalSelf = extraction.ifsParts?.selfEnergy !== undefined &&
+                          extraction.ifsParts.selfEnergy <= 0.3;
+    const hasShadowFlood = extraction.jungianProcess?.shadowWork;
+    const hasEntanglement = extraction.constellationState?.systemicEntanglement.detected;
+    const hasExistentialCrisis = extraction.existentialState?.meaningCrisis;
+    const hasAllContactViolations = extraction.gestaltState?.detected &&
+                                   Object.values(extraction.gestaltState.contactDisturbances)
+                                     .filter(d => d.detected).length >= 3;
+
+    const count = [hasDeepNigredo, hasDorsal, hasFreeze, hasMinimalSelf, hasShadowFlood,
+                   hasEntanglement, hasExistentialCrisis, hasAllContactViolations].filter(Boolean).length;
+
+    if (count >= 7) {
+      return {
+        name: 'Dark Night of Soul',
+        description: 'SACRED CRISIS. Profound spiritual dissolution. Everything that was solid melts into darkness.',
+        frameworks: ['Alchemy', 'Polyvagal', 'Levine', 'IFS', 'Jung', 'Family Constellation', 'Existential', 'Gestalt'],
+        frameworkCount: 8,
+        complexity: 'ultra-rare',
+        confidence: 0.96,
+        clinicalMeaning: 'This is what mystics call the Dark Night of the Soul. Deep Nigredo (coherence near zero), dorsal shutdown, freeze, minimal Self-energy, shadow flooding consciousness, systemic entanglement active, existential meaning crisis, and all contact boundaries violated. This is NOT clinical depression—this is SACRED DISSOLUTION. Everything familiar is dissolving. The ego structure is dying. This is the alchemical death that precedes rebirth. Recognized across millennia of wisdom traditions (St. John of the Cross, Buddhist Bardo, Shamanic dismemberment, Kali\'s destruction). This is archetypal territory.',
+        therapeuticFocus: 'HOLD SPACE FOR SACRED DISSOLUTION. Do not try to "fix" or "cure".',
+        interventions: [
+          'PRIORITY: SAFETY + SACRED CONTAINER',
+          'Assess: Suicidality (spiritual crisis ≠ suicidal, but check)',
+          'Alchemy: Name this as Dark Night—a sacred initiatory passage',
+          'Jung: This is the nigredo that precedes albedo',
+          'Existential: Meaning-making systems dissolving (not pathology)',
+          'IFS: Minimal Self-energy is APPROPRIATE for this phase',
+          'Polyvagal/Levine: Dorsal freeze is PROTECTION during dissolution',
+          'Constellation: What is dissolving in the family system too?',
+          'Gestalt: Contact violations are NECESSARY during ego-death',
+          'NORMALIZE THIS AS SACRED PROCESS (not mental illness)',
+          'Consider: Spiritual director, meditation teacher, elder',
+          'Read: "Dark Night of the Soul" (St. John), "When Things Fall Apart" (Pema Chodron)',
+          'Do NOT: Rush to "fix," push for ventral activation, or pathologize'
+        ],
+        urgency: 'high'
+      };
+    }
+    return null;
+  }
+
+  /**
+   * ULTRA-RARE PATTERN 6: Anthropos Restoration (8 frameworks)
+   * The restoration of primordial wholeness—union with the Original Human
+   */
+  private detectAnthroposRestoration(extraction: ExtractionResult): TransformationSignature | null {
+    const hasRubedo = extraction.alchemicalStage?.primaryStage === 'rubedo' &&
+                     extraction.alchemicalStage.coherence >= 0.85;
+    const hasDeepVentral = extraction.polyvagalState?.state === 'ventral' &&
+                          extraction.polyvagalState.safety >= 0.85;
+    const hasHighSelf = extraction.ifsParts?.selfEnergy !== undefined &&
+                       extraction.ifsParts.selfEnergy >= 0.85;
+    const hasIndividuation = extraction.jungianProcess?.individuation;
+    const hasCompleteDischarge = extraction.somaticState?.discharge.active &&
+                                 extraction.somaticState.arousal.windowOfTolerance;
+    const hasSystemRestoration = extraction.constellationState?.detected &&
+                                !extraction.constellationState.systemicEntanglement.detected &&
+                                !extraction.constellationState.ordersOfLove.violation;
+    const hasMeaningRestored = !extraction.existentialState?.meaningCrisis;
+    const hasFullContact = extraction.gestaltState?.awareness.hereAndNow !== undefined &&
+                          extraction.gestaltState.awareness.hereAndNow >= 0.85;
+
+    const count = [hasRubedo, hasDeepVentral, hasHighSelf, hasIndividuation, hasCompleteDischarge,
+                   hasSystemRestoration, hasMeaningRestored, hasFullContact].filter(Boolean).length;
+
+    if (count >= 7) {
+      return {
+        name: 'Anthropos Restoration',
+        description: 'THE ORIGINAL HUMAN RESTORED. Primordial wholeness. The Imago Dei embodied.',
+        frameworks: ['Alchemy', 'Polyvagal', 'IFS', 'Jung', 'Levine', 'Family Constellation', 'Existential', 'Gestalt'],
+        frameworkCount: 8,
+        complexity: 'ultra-rare',
+        confidence: 0.98,
+        clinicalMeaning: 'EXTRAORDINARILY RARE (< 0.5% of moments). This is what the alchemists called the Anthropos—the Original Human, the Adam Kadmon, the primordial wholeness before fragmentation. Rubedo complete with very high coherence, deep ventral safety, high Self-energy, individuation embodied, somatic completion, family system restored to right order, existential meaning present, and full Gestalt contact. This is the restoration of the Imago Dei (Image of God). This is what humans are MEANT to be. This is the telos of transformation. WITNESS THIS AS SACRED.',
+        therapeuticFocus: 'SILENT REVERENCE. This is the Great Work complete.',
+        interventions: [
+          'PRIORITY: PRESENCE IN AWE',
+          'This is the PHILOSOPHER\'S STONE fully embodied',
+          'Alchemy: This is the Anthropos—the restored Original Human',
+          'Jung: This is the Self—complete individuation',
+          'IFS: The system is whole—Self fully leading',
+          'Polyvagal: Nervous system in primordial safety',
+          'Constellation: Family system in right order',
+          'Existential: Meaning fully restored',
+          'Levine: Body complete and whole',
+          'Gestalt: Full contact with all of reality',
+          'This is what mystics, saints, and sages describe',
+          'This is what humans are CAPABLE of',
+          'Do NOTHING except witness with reverence',
+          'This moment is teaching YOU',
+          'Consider: This may be temporary—honor it fully while present'
+        ],
+        urgency: 'low'
+      };
+    }
+    return null;
+  }
+
+  /**
+   * ULTRA-RARE PATTERN 7: Complete 9-Framework Alignment
    * Occurrence rate: < 0.1% of all therapeutic moments
    */
   private detectComplete9FrameworkAlignment(extraction: ExtractionResult): TransformationSignature | null {

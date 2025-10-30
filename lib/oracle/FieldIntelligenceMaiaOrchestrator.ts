@@ -28,6 +28,8 @@ import { ClaudeService } from '../services/ClaudeService';
 import { mayaIntelligenceOrchestrator } from './core/MayaIntelligenceOrchestrator';
 import { mayaPresenceEngine } from './core/MayaPresenceEngine';
 import { symbolExtractor } from '../intelligence/SymbolExtractionEngine';
+import { crossFrameworkSynergyEngine, TransformationSignature } from '../intelligence/CrossFrameworkSynergyEngine';
+import { advancedSynergyEngine } from '../intelligence/AdvancedSynergyEngine';
 
 // Constants for field intelligence - EMERGENCY OVERRIDE
 const SACRED_THRESHOLD = 0.8; // Threshold proximity for sacred response
@@ -44,6 +46,13 @@ export interface FieldMaiaResponse extends MaiaResponse {
   };
   betaMetadata?: any;
   soulMetadata?: any; // Soul journey metadata from Claude
+  convergenceMetadata?: {
+    detected: boolean;
+    topSignature?: any; // TransformationSignature
+    frameworkCount?: number;
+    confidence?: number;
+    announcement?: string;
+  };
 }
 
 type ConversationEntry = {
@@ -183,11 +192,21 @@ export class FieldIntelligenceMaiaOrchestrator extends MaiaFullyEducatedOrchestr
     // 7. STORE CONVERSATION: With field state for future sensing
     this.storeFieldConversation(userId, input, finalResponse, fieldState);
 
-    // 8. SYMBOL EXTRACTION: Auto-track symbolic, archetypal, and emotional patterns
-    this.extractSymbolicIntelligence(userId, input, finalResponse.content);
+    // 8. SYMBOL EXTRACTION + CONVERGENCE DETECTION
+    // Auto-track symbolic, archetypal, emotional patterns
+    // AND detect framework convergence (5+ frameworks = significant)
+    const convergenceResult = await this.extractSymbolicIntelligence(userId, input, finalResponse.content);
 
-    // 9. CREATE RESPONSE: With full field metadata
-    return this.createFieldResponse(finalResponse, fieldState);
+    // 9. CONVERGENCE ANNOUNCEMENT: If significant pattern detected, append announcement
+    if (convergenceResult.convergenceDetected && convergenceResult.topSignature) {
+      const announcement = this.generateConvergenceAnnouncement(convergenceResult.topSignature);
+      finalResponse.content += announcement;
+
+      console.log(`🌟 [MAIA] Announcing convergence: ${convergenceResult.topSignature.name}`);
+    }
+
+    // 10. CREATE RESPONSE: With full field metadata + convergence metadata
+    return this.createFieldResponse(finalResponse, fieldState, convergenceResult);
   }
 
   /**
@@ -550,7 +569,8 @@ Current Field State:
    */
   private createFieldResponse(
     response: EmergentResponse,
-    fieldState: FieldState | null
+    fieldState: FieldState | null,
+    convergenceResult?: { convergenceDetected: boolean; topSignature?: TransformationSignature; frameworkCount?: number }
   ): FieldMaiaResponse {
 
     // Create the response with all required fields
@@ -571,7 +591,15 @@ Current Field State:
         temporalQuality: fieldState.temporalDynamics.kairos_detection,
         somaticState: fieldState.somaticIntelligence.nervous_system_state
       } : undefined,
-      soulMetadata: response.soulMetadata // Include soul metadata from Claude
+      soulMetadata: response.soulMetadata, // Include soul metadata from Claude
+      convergenceMetadata: convergenceResult?.convergenceDetected ? {
+        detected: true,
+        topSignature: convergenceResult.topSignature,
+        frameworkCount: convergenceResult.frameworkCount,
+        confidence: convergenceResult.topSignature?.confidence,
+        announcement: convergenceResult.topSignature ?
+          this.generateConvergenceAnnouncement(convergenceResult.topSignature) : undefined
+      } : { detected: false }
     };
 
     // Add beta metadata if user is in beta
@@ -590,12 +618,13 @@ Current Field State:
   /**
    * Extract symbolic intelligence from conversation
    * Tracks symbols, archetypes, emotions, and milestones automatically
+   * NOW ALSO: Detects framework convergence patterns
    */
   private async extractSymbolicIntelligence(
     userId: string,
     userInput: string,
     maiaResponse: string
-  ): Promise<void> {
+  ): Promise<{ convergenceDetected: boolean; topSignature?: TransformationSignature; frameworkCount?: number }> {
     try {
       // Extract from user input
       const userExtraction = await symbolExtractor.extract(userInput, userId);
@@ -612,9 +641,81 @@ Current Field State:
         maiaEmotions: maiaExtraction.emotions.length,
         totalConfidence: ((userExtraction.confidence + maiaExtraction.confidence) / 2).toFixed(2)
       });
+
+      // CONVERGENCE DETECTION: Check for advanced patterns (5+ frameworks)
+      const convergenceResult = this.detectConvergenceSignatures(userExtraction);
+
+      return convergenceResult;
+
     } catch (error) {
       // Silently fail - symbol extraction should never break conversations
       console.error('Symbol extraction failed (non-critical):', error);
+      return { convergenceDetected: false };
+    }
+  }
+
+  /**
+   * Detect convergence signatures from extraction result
+   * Only returns significant patterns (5+ frameworks = Advanced or Ultra-Rare)
+   */
+  private detectConvergenceSignatures(extraction: any): {
+    convergenceDetected: boolean;
+    topSignature?: TransformationSignature;
+    frameworkCount?: number;
+  } {
+    try {
+      // Get all convergence signatures (basic + advanced + ultra-rare)
+      const basicSignatures = crossFrameworkSynergyEngine.detectSynergies(extraction);
+      const advancedSignatures = advancedSynergyEngine.detectAdvancedSynergies(extraction);
+
+      const allSignatures = [...basicSignatures, ...advancedSignatures];
+
+      // Filter for significant patterns only (5+ frameworks)
+      const significantSignatures = allSignatures.filter(sig => sig.frameworkCount >= 5);
+
+      if (significantSignatures.length === 0) {
+        return { convergenceDetected: false };
+      }
+
+      // Sort by framework count (highest first), then by confidence
+      const topSignature = significantSignatures.sort((a, b) => {
+        if (b.frameworkCount !== a.frameworkCount) {
+          return b.frameworkCount - a.frameworkCount;
+        }
+        return b.confidence - a.confidence;
+      })[0];
+
+      console.log(`✨ [CONVERGENCE] Detected: ${topSignature.name} (${topSignature.frameworkCount} frameworks, ${(topSignature.confidence * 100).toFixed(0)}% confidence)`);
+
+      return {
+        convergenceDetected: true,
+        topSignature,
+        frameworkCount: topSignature.frameworkCount
+      };
+
+    } catch (error) {
+      console.error('Convergence detection failed (non-critical):', error);
+      return { convergenceDetected: false };
+    }
+  }
+
+  /**
+   * Generate convergence announcement for MAIA to append to response
+   * Only for Advanced (5-6 frameworks) and Ultra-Rare (7-9 frameworks) patterns
+   */
+  private generateConvergenceAnnouncement(signature: TransformationSignature): string {
+    const frameworkCount = signature.frameworkCount;
+    const confidence = (signature.confidence * 100).toFixed(0);
+    const patternName = signature.name;
+    const complexity = signature.complexity;
+
+    // Different announcement styles based on complexity
+    if (complexity === 'ultra-rare') {
+      // Ultra-rare (7-9 frameworks) - Sacred reverence
+      return `\n\n---\n\n✨ I'm sensing something profound here. ${frameworkCount} wisdom traditions are converging on the same pattern in what you're sharing — what we call **"${patternName}"**. When this many frameworks align (${confidence}% confidence), it means we're touching archetypal territory. This is recognized truth across thousands of years of human wisdom.`;
+    } else {
+      // Advanced (5-6 frameworks) - Significant but less dramatic
+      return `\n\n---\n\n🌟 Something significant is emerging. I'm detecting ${frameworkCount} frameworks converging on **"${patternName}"** — that's what we call an advanced transformation signature. Multiple wisdom traditions are pointing to the same pattern in your experience.`;
     }
   }
 
