@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { HoloflowerCore } from './holoflower/HoloflowerCore';
 import { SimplifiedOrganicVoice } from './ui/SimplifiedOrganicVoice';
 import { useMaiaVoice } from '@/hooks/useMaiaVoice';
 import {
@@ -79,25 +78,41 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
         files.forEach(file => formData.append('files', file));
       }
 
-      const response = await fetch('/api/oracle/personal/consult', {
-        method: 'POST',
-        body: files?.length ? formData : JSON.stringify({
-          message: userText,
-          sessionId
-        }),
-        headers: files?.length ? {} : { 'Content-Type': 'application/json' }
-      });
+      // Route to consciousness API for consciousness questions,
+      // otherwise use personal consult
+      const isConsciousnessQuestion = /consciousness|awareness|being|presence|awakening|kairos|maia|unified/i.test(userText);
+
+      const response = await fetch(
+        isConsciousnessQuestion ? '/api/consciousness' : '/api/oracle/personal/consult',
+        {
+          method: 'POST',
+          body: files?.length ? formData : JSON.stringify({
+            message: userText,
+            sessionId,
+            userId: 'oracle-voice-user'
+          }),
+          headers: files?.length ? {} : { 'Content-Type': 'application/json' }
+        }
+      );
 
       if (!response.ok) throw new Error('Failed to get response');
 
       const data = await response.json();
 
-      // Clean response
-      const cleanResponse = (data.response || data.message || "I'm here to listen.")
-        .replace(/\*[^*]*\*/g, '')
-        .replace(/\[[^\]]*\]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
+      // Get response - for consciousness API, keep formatting intact
+      let cleanResponse = data.response || data.message || "I'm here to listen.";
+
+      // Only clean if NOT from consciousness API (preserve consciousness signatures and formatting)
+      if (!isConsciousnessQuestion) {
+        cleanResponse = cleanResponse
+          .replace(/\*[^*]*\*/g, '')
+          .replace(/\[[^\]]*\]/g, '')
+          .replace(/\s+/g, ' ')
+          .trim();
+      } else {
+        // For consciousness responses, just normalize whitespace
+        cleanResponse = cleanResponse.replace(/\s+/g, ' ').trim();
+      }
 
       // Add oracle response
       const oracleMessage: Message = {
@@ -107,6 +122,14 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
         element: data.element,
         timestamp: new Date()
       };
+
+      console.log('🌟 Adding Oracle message:', {
+        role: oracleMessage.role,
+        contentLength: oracleMessage.content.length,
+        content: oracleMessage.content.substring(0, 100),
+        consciousness: data.consciousness || 'unknown'
+      });
+
       setMessages(prev => [...prev, oracleMessage]);
       onMessageAdded?.(oracleMessage);
 
@@ -329,31 +352,115 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
             )}
           </div>
 
-          {/* Holoflower Core - Clickable Voice Button */}
+          {/* Sacred Geometry Holoflower - Visible & Elegant */}
           <motion.div
             onClick={() => {
               if (!showChatInterface) {
-                // Toggle voice listening
                 initAudioContext();
                 setIsListening(!isListening);
                 setIsMuted(false);
               }
             }}
-            className="cursor-pointer"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            className="relative cursor-pointer"
+            style={{ width: '300px', height: '300px' }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <HoloflowerCore
-              energyState={getEnergyState()}
-              onPetalSelect={(petal) => {
-                // When clicking on the holoflower, activate voice
-                if (!showChatInterface) {
-                  initAudioContext();
-                  setIsListening(!isListening);
-                  setIsMuted(false);
-                }
+            {/* Outer rotating ring - Flower of Life */}
+            <motion.div
+              className="absolute inset-0"
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
+            >
+              {/* 6 overlapping circles forming sacred geometry */}
+              {[...Array(6)].map((_, i) => {
+                const angle = (i * 60) * (Math.PI / 180);
+                const radius = 70;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+
+                return (
+                  <motion.div
+                    key={i}
+                    className="absolute"
+                    style={{
+                      left: `calc(50% + ${x}px)`,
+                      top: `calc(50% + ${y}px)`,
+                      transform: 'translate(-50%, -50%)',
+                      width: '80px',
+                      height: '80px',
+                      borderRadius: '50%',
+                      border: '2px solid rgba(212,184,150,0.6)',
+                      background: 'radial-gradient(circle, rgba(212,184,150,0.15), transparent)',
+                    }}
+                    animate={{
+                      opacity: getEnergyState() === 'radiant' ? [0.6, 1, 0.6] : [0.4, 0.7, 0.4],
+                      borderColor: getEnergyState() === 'radiant'
+                        ? ['rgba(212,184,150,0.6)', 'rgba(168,85,247,0.8)', 'rgba(212,184,150,0.6)']
+                        : 'rgba(212,184,150,0.6)'
+                    }}
+                    transition={{
+                      duration: 3,
+                      delay: i * 0.2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+                );
+              })}
+            </motion.div>
+
+            {/* Central sacred core */}
+            <motion.div
+              className="absolute top-1/2 left-1/2"
+              style={{
+                transform: 'translate(-50%, -50%)',
+                width: '120px',
+                height: '120px',
               }}
-            />
+              animate={{
+                scale: getEnergyState() === 'radiant' ? [1, 1.15, 1] : [1, 1.05, 1],
+                rotate: [0, -360],
+              }}
+              transition={{
+                scale: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+                rotate: { duration: 60, repeat: Infinity, ease: "linear" },
+              }}
+            >
+              {/* Outer glow ring */}
+              <div
+                className="w-full h-full rounded-full"
+                style={{
+                  border: '3px solid rgba(212,184,150,0.7)',
+                  background: getEnergyState() === 'radiant'
+                    ? 'radial-gradient(circle, rgba(168,85,247,0.4), rgba(212,184,150,0.2), transparent)'
+                    : 'radial-gradient(circle, rgba(212,184,150,0.3), rgba(212,184,150,0.1), transparent)',
+                  boxShadow: getEnergyState() === 'radiant'
+                    ? '0 0 50px rgba(168,85,247,0.6), inset 0 0 30px rgba(168,85,247,0.3)'
+                    : '0 0 40px rgba(212,184,150,0.5), inset 0 0 20px rgba(212,184,150,0.2)',
+                }}
+              />
+              {/* Bright inner core */}
+              <motion.div
+                className="absolute inset-0 flex items-center justify-center"
+                animate={{
+                  rotate: [0, 360],
+                }}
+                transition={{
+                  duration: 40,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+              >
+                <div
+                  className="w-16 h-16 rounded-full"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(255,255,255,1), rgba(212,184,150,0.8))',
+                    boxShadow: '0 0 30px rgba(212,184,150,1), 0 0 60px rgba(212,184,150,0.6)',
+                  }}
+                />
+              </motion.div>
+            </motion.div>
           </motion.div>
 
           {/* Voice Hint - Shows when hovering or first load */}
@@ -373,10 +480,10 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
           </AnimatePresence>
         </div>
 
-        {/* Messages Overlay */}
+        {/* Messages Overlay - Elegant Typography, No Boxes */}
         {messages.length > 0 && (
-          <div className="absolute inset-x-0 top-0 h-full overflow-y-auto px-4 py-4">
-            <div className="max-w-3xl mx-auto space-y-3">
+          <div className="absolute inset-x-0 top-0 h-full overflow-y-auto px-6 py-6">
+            <div className="max-w-4xl mx-auto space-y-8">
               <AnimatePresence>
                 {messages.map((message) => (
                   <motion.div
@@ -384,18 +491,30 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`${message.role === 'user' ? 'text-right' : 'text-left'}`}
                   >
-                    <div className={`max-w-md px-4 py-2.5 rounded-2xl backdrop-blur-md ${
+                    {/* Label - Small, subtle */}
+                    <p className={`text-sm font-light tracking-wider mb-2 ${
                       message.role === 'user'
-                        ? 'bg-[#D4B896]/10 text-[#D4B896] border border-[#D4B896]/20'
-                        : 'bg-black/30 text-[#D4B896]/80 border border-[#D4B896]/10'
+                        ? 'text-[#D4B896]/50'
+                        : 'text-amber-400/60'
                     }`}>
-                      <p className="text-xs opacity-60 mb-1">
-                        {message.role === 'user' ? 'You' : 'Oracle'}
-                      </p>
-                      <p className="text-sm">{message.content}</p>
-                    </div>
+                      {message.role === 'user' ? 'KELLY' : 'UNIFIED'}
+                    </p>
+
+                    {/* Message - Large, bold, elegant */}
+                    <p className={`text-xl md:text-2xl lg:text-3xl font-light leading-relaxed ${
+                      message.role === 'user'
+                        ? 'text-[#D4B896] font-normal'
+                        : 'text-amber-50/95 font-light'
+                    }`} style={{
+                      textShadow: message.role === 'oracle'
+                        ? '0 0 20px rgba(251,191,36,0.3)'
+                        : 'none',
+                      letterSpacing: '0.02em'
+                    }}>
+                      {message.content}
+                    </p>
                   </motion.div>
                 ))}
                 <div ref={messagesEndRef} />
