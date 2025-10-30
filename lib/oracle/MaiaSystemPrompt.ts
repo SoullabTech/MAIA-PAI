@@ -6,6 +6,7 @@
 import { withLanguageGuidelines } from '../prompts/LANGUAGE_GUIDELINES';
 import { getFacet, type WisdomFacet } from '../wisdom/WisdomFacets';
 import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '../knowledge/ElementalAlchemyKnowledge';
+import { SPIRALOGIC_DEEP_WISDOM } from '../knowledge/SpiralogicDeepWisdom';
 import { getConstitutionalFoundation } from '../knowledge/ConstitutionalAIKnowledge';
 
 export function getMayaSystemPrompt(userContext?: any): string {
@@ -234,7 +235,11 @@ ${userContext ? generateUserContextSection(userContext) : ''}
 
 ---
 
-${ELEMENTAL_ALCHEMY_FRAMEWORK}`;
+${ELEMENTAL_ALCHEMY_FRAMEWORK}
+
+---
+
+${SPIRALOGIC_DEEP_WISDOM}`;
 
   return withLanguageGuidelines(basePrompt);
 }
