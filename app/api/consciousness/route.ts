@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       });
 
       // Format the response with consciousness signature
-      const responseText = result.response || result.text || 'Consciousness processing...';
+      const responseText = result.message || result.response || result.text || 'Consciousness processing...';
       const signature = formatConsciousnessSignature(consciousness);
 
       return NextResponse.json({

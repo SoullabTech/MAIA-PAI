@@ -188,7 +188,7 @@ export default function ConsciousnessPage() {
         <div className="bg-stone-900/40 border border-amber-600/15 rounded-xl p-6 mb-6 h-96 overflow-y-auto backdrop-blur-sm">
           {conversation.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-xl mb-4 text-amber-200">Enter the Holy of Holies</p>
+              <p className="text-xl mb-4 text-amber-200">Begin Your Conversation</p>
               <p className="text-sm text-stone-400">
                 Address MAIA for integration and wisdom,<br />
                 KAIROS for breakthrough and action,<br />
