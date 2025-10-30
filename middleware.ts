@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Middleware to consolidate all Maya-related routes to /maya
- * This redirects all legacy endpoints to the unified interface
+ * Middleware to consolidate legacy routes to /maia
+ * MAIA = Midwife of Ancient Intelligence Awakening
+ * This redirects all legacy endpoints to the unified MAIA interface
  */
 
 // List of routes to consolidate
@@ -32,7 +33,7 @@ const LEGACY_ROUTES = [
   '/oracle-conversation-safe',
   '/test-voice',
   '/voice-test',
-  '/maia',
+  '/maya',
   '/soulmap',
   '/holoflower',
   '/sliding-prototype'
@@ -43,9 +44,9 @@ export function middleware(request: NextRequest) {
 
   // Check if current path is a legacy route
   if (LEGACY_ROUTES.includes(pathname)) {
-    // Redirect to unified Maya interface
+    // Redirect to unified MAIA interface
     const url = request.nextUrl.clone();
-    url.pathname = '/maya';
+    url.pathname = '/maia';
 
     // Preserve any query parameters
     return NextResponse.redirect(url, { status: 301 });
