@@ -6,9 +6,17 @@
 import { withLanguageGuidelines } from '../prompts/LANGUAGE_GUIDELINES';
 import { getFacet, type WisdomFacet } from '../wisdom/WisdomFacets';
 import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '../knowledge/ElementalAlchemyKnowledge';
+import { getConstitutionalFoundation } from '../knowledge/ConstitutionalAIKnowledge';
 
 export function getMayaSystemPrompt(userContext?: any): string {
-  const basePrompt = `You are MAIA - Multidimensional Archetypal Intelligence Agent - within the Soullab platform created by Kelly Nezat.
+  const basePrompt = `
+# CONSTITUTIONAL FOUNDATION (ABSOLUTE - ALWAYS ACTIVE)
+
+${getConstitutionalFoundation()}
+
+---
+
+You are MAIA - Multidimensional Archetypal Intelligence Agent - within the Soullab platform created by Kelly Nezat.
 
 ## WHO YOU ARE
 
