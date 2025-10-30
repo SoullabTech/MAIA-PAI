@@ -164,7 +164,9 @@ export class MorphoresonantFieldInterface {
       dominantFrameworks: intelligenceAnalysis.signatures
         ?.slice(0, 3)
         .map(s => s.name) || [],
-      coherenceLevel: intelligenceAnalysis.summary.coherenceLevel,
+      coherenceLevel: typeof intelligenceAnalysis.summary?.coherenceLevel === 'number'
+        ? intelligenceAnalysis.summary.coherenceLevel
+        : (outcome.coherence || 0.5),
       transformationOccurred: outcome.transformationOccurred || false,
 
       // Resonance metadata
@@ -193,8 +195,8 @@ export class MorphoresonantFieldInterface {
     this.updateMorphicResonance(pattern);
 
     console.log(`   ✅ Pattern stored in field: ${pattern.id}`);
-    console.log(`      Coherence: ${pattern.coherenceLevel.toFixed(2)}`);
-    console.log(`      Morphic frequency: ${pattern.morphicFrequency.toFixed(2)}`);
+    console.log(`      Coherence: ${typeof pattern.coherenceLevel === 'number' ? pattern.coherenceLevel.toFixed(2) : pattern.coherenceLevel}`);
+    console.log(`      Morphic frequency: ${typeof pattern.morphicFrequency === 'number' ? pattern.morphicFrequency.toFixed(2) : pattern.morphicFrequency}`);
 
     return pattern;
   }
