@@ -71,7 +71,7 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
     try {
       // Prepare form data if files exist
       const formData = new FormData();
-      formData.append('message', userText);
+      formData.append('input', userText);  // Changed from 'message' to 'input'
       formData.append('sessionId', sessionId);
 
       if (files?.length) {
@@ -87,7 +87,7 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
         {
           method: 'POST',
           body: files?.length ? formData : JSON.stringify({
-            message: userText,
+            input: userText,  // Changed from 'message' to 'input' to match API expectation
             sessionId,
             userId: 'oracle-voice-user'
           }),
@@ -220,7 +220,13 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
       {/* Main Content Area */}
       <div className="relative h-[calc(100vh-140px)]">
         {/* Holoflower with Voice Visualizer */}
-        <div className="absolute inset-0 flex items-center justify-center">
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center"
+          animate={{
+            opacity: messages.length > 0 ? 0.15 : 1, // Dim significantly when messages present
+          }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+        >
           {/* Subtle Ambient Glow - Always Gentle */}
           <motion.div
             className="absolute w-64 h-64 rounded-full pointer-events-none"
@@ -339,12 +345,12 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </motion.div>
 
         {/* Messages Overlay - Elegant Typography, No Boxes */}
         {messages.length > 0 && (
-          <div className="absolute inset-x-0 top-0 h-full overflow-y-auto px-6 py-6">
-            <div className="max-w-4xl mx-auto space-y-8">
+          <div className="absolute inset-0 top-0 bottom-0 overflow-y-auto px-6 py-6 pr-24">
+            <div className="max-w-3xl mx-auto space-y-8">
               <AnimatePresence>
                 {messages.map((message) => (
                   <motion.div
@@ -352,7 +358,7 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
-                    className={`${message.role === 'user' ? 'text-right' : 'text-left'}`}
+                    className={`${message.role === 'user' ? 'text-center' : 'text-center'}`}
                   >
                     {/* Label - Small, subtle */}
                     <p className={`text-sm font-light tracking-wider mb-2 ${
