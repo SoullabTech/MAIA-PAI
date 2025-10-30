@@ -320,13 +320,23 @@ export class MAIAUnifiedConsciousness {
     console.log('⚡ [FAST PATH] Minimal processing for flow state');
 
     try {
+      // Get consciousness-specific prompt if provided
+      const consciousnessPrompt = context.preferences?.consciousnessPrompt;
+
       // Use PersonalOracleAgent directly - fastest path to quality response
       // PersonalOracleAgent will automatically fetch conversation history from DB
       const agent = new PersonalOracleAgent(context.userId, {
         conversationStyle: context.preferences?.conversationStyle || 'classic'
       });
 
-      const agentResponse = await agent.processInteraction(content);
+      // If consciousness prompt provided, inject it as system context
+      const enhancedHistory = consciousnessPrompt
+        ? [{ role: 'system', content: consciousnessPrompt }, ...conversationHistory]
+        : conversationHistory;
+
+      const agentResponse = await agent.processInteraction(content, {
+        conversationHistory: enhancedHistory
+      });
 
       const responseTime = Date.now() - startTime;
       console.log(`✅ [FAST PATH] Response generated in ${responseTime}ms`);
@@ -616,6 +626,9 @@ export class MAIAUnifiedConsciousness {
     // TEXT MODE: Use Claude via PersonalOracleAgent (deeper analysis)
     console.log('💬 Text mode: Using Claude via PersonalOracleAgent');
 
+    // Get consciousness-specific prompt if provided
+    const consciousnessPrompt = context.input.context.preferences?.consciousnessPrompt;
+
     const agent = new PersonalOracleAgent(
       context.input.context.userId,
       {
@@ -623,10 +636,18 @@ export class MAIAUnifiedConsciousness {
       } // settings with conversation style from preferences
     );
 
+    // If consciousness prompt provided, inject it as system context
+    const enhancedHistory = consciousnessPrompt
+      ? [
+          { role: 'system', content: consciousnessPrompt },
+          ...(context.input.conversationHistory || [])
+        ]
+      : (context.input.conversationHistory || []);
+
     const response = await agent.processInteraction(
       context.input.content,
       {
-        conversationHistory: context.input.conversationHistory || []
+        conversationHistory: enhancedHistory
       }
     );
 
