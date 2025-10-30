@@ -317,17 +317,7 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-            >
-              {/* Bright center point at exact geometric center */}
-              <div
-                className="absolute top-1/2 left-1/2 w-3 h-3 rounded-full"
-                style={{
-                  transform: 'translate(-50%, -50%)',
-                  background: 'radial-gradient(circle, rgba(255,255,255,1), rgba(251,191,36,0.9))',
-                  boxShadow: '0 0 15px rgba(251,191,36,0.9), 0 0 30px rgba(212,184,150,0.7)',
-                }}
-              />
-            </motion.div>
+            />
           </motion.div>
 
           {/* Voice Hint - Shows when hovering or first load */}

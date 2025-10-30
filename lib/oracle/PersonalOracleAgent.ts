@@ -433,7 +433,7 @@ export class PersonalOracleAgent {
   ): Promise<PersonalOracleResponse> {
     try {
       // Use Maya Orchestrator for all responses
-      const mayaResponse = await this.mayaOrchestrator.speak(query.input, query.userId);
+      const mayaResponse = await this.maiaOrchestrator.speak(query.input, query.userId);
 
       // Citations disabled for now
       const citations: any[] = [];
