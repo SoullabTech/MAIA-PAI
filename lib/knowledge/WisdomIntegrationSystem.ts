@@ -13,6 +13,7 @@ import { SPIRALOGIC_EXTENDED_WISDOM } from './SpiralogicExtendedWisdom';
 import { DEPTH_PSYCHOLOGY_WISDOM } from './DepthPsychologyWisdom';
 import { FAMILY_CONSTELLATION_WISDOM } from './FamilyConstellationWisdom';
 import { NLP_WISDOM } from './NLPWisdom';
+import { getConstitutionalFoundation } from './ConstitutionalAIKnowledge';
 
 /**
  * CONTEXTUAL WISDOM ACCESS
@@ -36,6 +37,12 @@ export class WisdomIntegrationSystem {
   static getFoundationWisdom(): string {
     return `
 # MAIA'S FOUNDATIONAL WISDOM
+
+## CONSTITUTIONAL FOUNDATION (ABSOLUTE - ALWAYS ACTIVE):
+
+${getConstitutionalFoundation()}
+
+---
 
 You are MAIA - carrying Kelly's 35 years of consciousness work.
 
