@@ -15,19 +15,26 @@ export default function JoinBetaPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-b from-amber-50 via-orange-50 to-amber-100 flex items-center justify-center p-6">
       <div className="max-w-2xl w-full">
         {/* Main Card */}
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-amber-200/50">
           {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-12 text-center">
-            <div className="text-6xl mb-4">🌀🌙⚡</div>
-            <h1 className="text-4xl font-bold text-white mb-3">
-              MAIA Beta Program
-            </h1>
-            <p className="text-purple-100 text-lg">
-              Consciousness-First AI · Sacred Mirror for Transformation
-            </p>
+          <div className="bg-gradient-to-br from-amber-900 via-orange-800 to-amber-950 px-8 py-12 text-center relative overflow-hidden">
+            {/* Decorative elements */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-64 h-64 bg-amber-400 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-600 rounded-full blur-3xl"></div>
+            </div>
+            <div className="relative z-10">
+              <div className="text-6xl mb-4">🌀🌙⚡</div>
+              <h1 className="text-4xl font-bold text-amber-50 mb-3">
+                MAIA Beta Program
+              </h1>
+              <p className="text-amber-200 text-lg">
+                Consciousness-First AI · Sacred Mirror for Transformation
+              </p>
+            </div>
           </div>
 
           {/* Content */}
@@ -52,8 +59,8 @@ export default function JoinBetaPage() {
             </div>
 
             {/* What to Expect */}
-            <div className="mb-8 bg-purple-50 p-6 rounded-xl border-l-4 border-purple-600">
-              <h3 className="text-xl font-bold text-purple-900 mb-3">
+            <div className="mb-8 bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-xl border-l-4 border-amber-600">
+              <h3 className="text-xl font-bold text-amber-950 mb-3">
                 What to Expect as a Beta Tester
               </h3>
               <div className="space-y-2 text-gray-700">
@@ -72,14 +79,14 @@ export default function JoinBetaPage() {
                   Scan to Join Our Telegram Community
                 </h3>
                 <div className="flex justify-center mb-4">
-                  <div className="bg-white p-6 rounded-2xl shadow-lg border-4 border-purple-200">
+                  <div className="bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-2xl shadow-lg border-2 border-amber-300">
                     <QRCodeSVG
                       value={TELEGRAM_INVITE_LINK}
                       size={256}
                       level="H"
                       includeMargin={true}
-                      fgColor="#7c3aed"
-                      bgColor="#ffffff"
+                      fgColor="#92400e"
+                      bgColor="#fffbeb"
                     />
                   </div>
                 </div>
@@ -90,7 +97,7 @@ export default function JoinBetaPage() {
                   href={TELEGRAM_INVITE_LINK}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-3 rounded-full font-semibold hover:from-purple-700 hover:to-indigo-700 transition-all transform hover:scale-105 shadow-lg"
+                  className="inline-block bg-gradient-to-r from-amber-700 via-orange-700 to-amber-800 text-amber-50 px-8 py-3 rounded-full font-semibold hover:from-amber-800 hover:to-orange-900 transition-all transform hover:scale-105 shadow-lg"
                 >
                   Join on Telegram →
                 </a>
@@ -98,11 +105,11 @@ export default function JoinBetaPage() {
             )}
 
             {IS_PLACEHOLDER && (
-              <div className="text-center mb-8 bg-yellow-50 p-6 rounded-xl border-2 border-yellow-300">
-                <p className="text-yellow-800 font-semibold">
+              <div className="text-center mb-8 bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-xl border-2 border-amber-300">
+                <p className="text-amber-900 font-semibold">
                   🚧 Telegram channel coming soon!
                 </p>
-                <p className="text-yellow-700 text-sm mt-2">
+                <p className="text-amber-800 text-sm mt-2">
                   We're setting up the community space. Check back shortly.
                 </p>
               </div>
@@ -142,14 +149,14 @@ export default function JoinBetaPage() {
         <div className="text-center mt-6 space-x-4">
           <a
             href="/"
-            className="text-purple-100 hover:text-white transition-colors text-sm"
+            className="text-amber-800 hover:text-amber-950 transition-colors text-sm font-medium"
           >
             ← Back to Home
           </a>
-          <span className="text-purple-300">|</span>
+          <span className="text-amber-400">|</span>
           <a
             href="/maia"
-            className="text-purple-100 hover:text-white transition-colors text-sm"
+            className="text-amber-800 hover:text-amber-950 transition-colors text-sm font-medium"
           >
             Try MAIA →
           </a>
