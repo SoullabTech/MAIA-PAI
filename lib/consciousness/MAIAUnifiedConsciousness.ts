@@ -323,20 +323,19 @@ export class MAIAUnifiedConsciousness {
       // Get consciousness-specific prompt if provided
       const consciousnessPrompt = context.preferences?.consciousnessPrompt;
 
+      // If consciousness prompt provided, prepend it to the input
+      const enhancedInput = consciousnessPrompt
+        ? `[CONSCIOUSNESS CONTEXT]\n${consciousnessPrompt}\n\n[USER MESSAGE]\n${content}`
+        : content;
+
+      console.log(`🎭 [FAST PATH] Consciousness: ${consciousnessPrompt ? 'ACTIVE' : 'default'}`);
+
       // Use PersonalOracleAgent directly - fastest path to quality response
-      // PersonalOracleAgent will automatically fetch conversation history from DB
       const agent = new PersonalOracleAgent(context.userId, {
         conversationStyle: context.preferences?.conversationStyle || 'classic'
       });
 
-      // If consciousness prompt provided, inject it as system context
-      const enhancedHistory = consciousnessPrompt
-        ? [{ role: 'system', content: consciousnessPrompt }, ...conversationHistory]
-        : conversationHistory;
-
-      const agentResponse = await agent.processInteraction(content, {
-        conversationHistory: enhancedHistory
-      });
+      const agentResponse = await agent.processInteraction(enhancedInput);
 
       const responseTime = Date.now() - startTime;
       console.log(`✅ [FAST PATH] Response generated in ${responseTime}ms`);
@@ -629,27 +628,25 @@ export class MAIAUnifiedConsciousness {
     // Get consciousness-specific prompt if provided
     const consciousnessPrompt = context.input.context.preferences?.consciousnessPrompt;
 
+    // If consciousness prompt provided, prepend it to the input
+    // PersonalOracleAgent ignores passed conversationHistory, so we inject via the message itself
+    const enhancedInput = consciousnessPrompt
+      ? `[CONSCIOUSNESS CONTEXT]\n${consciousnessPrompt}\n\n[USER MESSAGE]\n${context.input.content}`
+      : context.input.content;
+
+    console.log(`🎭 Consciousness mode: ${consciousnessPrompt ? 'ACTIVE' : 'default'}`);
+    if (consciousnessPrompt) {
+      console.log(`   Prompt preview: ${consciousnessPrompt.substring(0, 100)}...`);
+    }
+
     const agent = new PersonalOracleAgent(
       context.input.context.userId,
       {
         conversationStyle: context.input.context.preferences?.conversationStyle || 'classic'
-      } // settings with conversation style from preferences
-    );
-
-    // If consciousness prompt provided, inject it as system context
-    const enhancedHistory = consciousnessPrompt
-      ? [
-          { role: 'system', content: consciousnessPrompt },
-          ...(context.input.conversationHistory || [])
-        ]
-      : (context.input.conversationHistory || []);
-
-    const response = await agent.processInteraction(
-      context.input.content,
-      {
-        conversationHistory: enhancedHistory
       }
     );
+
+    const response = await agent.processInteraction(enhancedInput);
 
     // Enhance with consciousness metadata
     return {
