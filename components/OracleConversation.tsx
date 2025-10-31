@@ -43,6 +43,8 @@ import { detectJournalCommand, detectBreakthroughPotential } from '@/lib/service
 import { useFieldProtocolIntegration } from '@/hooks/useFieldProtocolIntegration';
 import { BookPlus } from 'lucide-react';
 import { TransformationalPresence, type PresenceState } from './nlp/TransformationalPresence';
+import { MaiaResponseFeedback } from './feedback/MaiaResponseFeedback';
+import { ConversationExport } from './conversation/ConversationExport';
 
 interface OracleConversationProps {
   userId?: string;
@@ -2303,6 +2305,16 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           message.text
                         )}
                       </div>
+
+                      {/* 📊 Feedback Component - Quality Metrics */}
+                      {message.role === 'oracle' && userId && (
+                        <MaiaResponseFeedback
+                          responseId={message.id}
+                          userId={userId}
+                          element={message.element}
+                          voiceTone={message.voiceTone}
+                        />
+                      )}
                     </motion.div>
                     );
                   })}
@@ -2320,9 +2332,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         <>
           {/* Old Mode Toggle removed - Now using ModeSwitcher at top-left */}
 
-          {/* Text Display Toggle for Voice Mode */}
+          {/* Text Display Toggle & Export for Voice Mode */}
           {!showChatInterface && (
-            <div className="fixed top-20 md:top-20 right-4 md:right-8 z-50">
+            <div className="fixed top-20 md:top-20 right-4 md:right-8 z-50 flex gap-2">
               <button
                 onClick={() => setShowVoiceText(!showVoiceText)}
                 className="px-3 py-1.5 rounded-full text-xs font-medium bg-black/20 backdrop-blur-md
@@ -2330,6 +2342,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               >
                 {showVoiceText ? 'Hide Text' : 'Show Text'}
               </button>
+
+              {userId && (
+                <ConversationExport userId={userId} sessionId={sessionId} />
+              )}
             </div>
           )}
 
@@ -2374,8 +2390,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 </motion.div>
               </div>
 
-              {/* Voice toggle for chat mode - HIDDEN on mobile, visible on desktop */}
-              <div className="hidden md:block fixed top-20 right-20 z-50">
+              {/* Voice toggle & Export for chat mode - HIDDEN on mobile, visible on desktop */}
+              <div className="hidden md:flex fixed top-20 right-4 md:right-8 z-50 gap-2">
                 <button
                   onClick={() => setEnableVoiceInChat(!enableVoiceInChat)}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
@@ -2391,6 +2407,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                   </svg>
                   <span>{enableVoiceInChat ? 'Voice On' : 'Voice Off'}</span>
                 </button>
+
+                {userId && (
+                  <ConversationExport userId={userId} sessionId={sessionId} />
+                )}
               </div>
 
               {/* Compact text input area - mobile-first, fixed at bottom */}
