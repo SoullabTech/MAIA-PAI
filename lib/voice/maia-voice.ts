@@ -83,6 +83,12 @@ export class MaiaVoiceSystem {
       } catch (error) {
         console.warn('AudioContext not available:', error);
       }
+
+      // 🛑 Listen for interrupt events (when user starts speaking)
+      window.addEventListener('maya-voice-interrupted', () => {
+        console.log('🛑 [MaiaVoiceSystem] Received interrupt signal - stopping immediately');
+        this.stop();
+      });
     }
   }
 
@@ -235,7 +241,7 @@ export class MaiaVoiceSystem {
   }
 
   // OpenAI TTS with Alloy voice - PRIMARY METHOD
-  private async speakWithOpenAI(text: string): Promise<void> {
+  private async speakWithOpenAI(text: string, voiceTone?: any): Promise<void> {
     console.log('🎯 [speakWithOpenAI] Starting...');
 
     // iOS Fix: Ensure audio context is active before speaking
@@ -249,15 +255,23 @@ export class MaiaVoiceSystem {
 
     try {
       console.log('   → Calling /api/voice/openai-tts...');
+      const requestBody: any = {
+        text: this.enhanceTextForSpeech(text),
+        agentVoice: this.config.agentConfig?.voice || 'maya',
+        speed: 0.95,        // Slightly slower for natural conversational pace
+        model: 'tts-1-hd'   // Higher quality for better clarity
+      };
+
+      // 🔥 ELEMENTAL PROSODY: Pass voiceTone if available
+      if (voiceTone) {
+        requestBody.voiceTone = voiceTone;
+        console.log('   🌀 Passing elemental voiceTone:', voiceTone);
+      }
+
       const response = await fetch('/api/voice/openai-tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: this.enhanceTextForSpeech(text),
-          agentVoice: this.config.agentConfig?.voice || 'maya',
-          speed: 0.95,        // Slightly slower for natural conversational pace
-          model: 'tts-1-hd'   // Higher quality for better clarity
-        })
+        body: JSON.stringify(requestBody)
       });
 
       console.log('   ← API response status:', response.status);
@@ -358,7 +372,7 @@ export class MaiaVoiceSystem {
           setTimeout(() => {
             console.log('🔇 Web Speech promise resolving after cooldown');
             resolve();
-          }, 800); // 800ms delay for speaker buffer to clear
+          }, 400); // 400ms delay for speaker buffer to clear (reduced from 800ms for faster responses)
         };
 
         utterance.onerror = (event) => {
@@ -532,12 +546,12 @@ export class MaiaVoiceSystem {
           console.log('🎵 Maia audio finished playing');
           URL.revokeObjectURL(audioUrl); // Clean up blob URL
 
-          // CRITICAL: Longer delay to ensure audio has fully stopped in speakers
+          // CRITICAL: Delay to ensure audio has fully stopped in speakers
           // Audio can linger in the output buffer even after file ends
           setTimeout(() => {
             console.log('🔇 Audio promise resolving after cooldown');
             resolve();
-          }, 800); // 800ms delay for speaker buffer to clear
+          }, 400); // 400ms delay for speaker buffer to clear (reduced from 800ms for faster responses)
         };
 
         audio.onerror = (error) => {
@@ -590,10 +604,16 @@ export class MaiaVoiceSystem {
       // Reset error state
       this.updateState({ error: undefined });
 
+      // Extract voiceTone from context if available (from oracle response)
+      const voiceTone = context?.voiceTone;
+      if (voiceTone) {
+        console.log('🌀 Voice context includes elemental tone:', voiceTone.style);
+      }
+
       // Try OpenAI TTS first (PRIMARY)
       try {
         console.log('🎙️ Trying OpenAI TTS first...');
-        await this.speakWithOpenAI(text);
+        await this.speakWithOpenAI(text, voiceTone);
         console.log('✅ OpenAI TTS succeeded!');
         return;
       } catch (error) {

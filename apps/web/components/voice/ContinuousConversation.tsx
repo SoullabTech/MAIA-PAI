@@ -190,6 +190,12 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       }
     };
 
+    // 🛑 INTERRUPT: Stop MAIA when actual speech is detected
+    recognition.onspeechstart = () => {
+      console.log('🗣️ User speech detected - interrupting MAIA');
+      feedbackPrevention.interruptMaya();
+    };
+
     recognition.onerror = (event: any) => {
       // Only log critical errors (not no-speech or aborted, which are common)
       if (event.error !== 'no-speech' && event.error !== 'aborted') {

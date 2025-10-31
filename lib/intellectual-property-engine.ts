@@ -59,21 +59,76 @@ export interface IPWisdomResponse {
 }
 
 /**
+ * Global singleton storage that persists across Next.js hot reloads
+ * ⚡ CRITICAL: Using globalThis prevents re-initialization on every hot reload
+ */
+declare global {
+  var __ipEngineInstance: IntellectualPropertyEngine | undefined;
+  var __ipEngineInitPromise: Promise<void> | undefined;
+}
+
+/**
  * Main IP Engine - Makes your complete book knowledge available to MAIA
+ *
+ * ⚡ SINGLETON PATTERN: Global instance caches 1000 knowledge chunks across requests
+ * This eliminates the 20+ second database loading bottleneck on every request
  */
 export class IntellectualPropertyEngine {
+
   private vectorService: VectorEmbeddingService;
   private repository: DatabaseRepository;
   private knowledgeBase: Map<string, IPKnowledgeBase> = new Map();
   private conceptGraph: Map<string, string[]> = new Map();
   private isInitialized: boolean = false;
 
-  constructor() {
+  private constructor() {
     this.vectorService = new VectorEmbeddingService({
       openaiApiKey: process.env.OPENAI_API_KEY!,
       dimension: 1536 // Higher dimension for richer book content
     });
     this.repository = new DatabaseRepository();
+  }
+
+  /**
+   * Get singleton instance (creates on first call, reuses thereafter)
+   * ⚡ PERFORMANCE: Subsequent calls return cached instance with loaded knowledge
+   * Uses globalThis to persist across Next.js hot reloads
+   */
+  static getInstance(): IntellectualPropertyEngine {
+    if (!globalThis.__ipEngineInstance) {
+      console.log('[IPEngine] Creating singleton instance (will persist across hot reloads)...');
+      globalThis.__ipEngineInstance = new IntellectualPropertyEngine();
+    }
+    return globalThis.__ipEngineInstance;
+  }
+
+  /**
+   * Get initialized instance (ensures initialization completes exactly once)
+   * ⚡ PERFORMANCE: Uses shared initialization promise to prevent duplicate loads
+   * Cached in globalThis to survive Next.js hot reloads
+   */
+  static async getInitializedInstance(): Promise<IntellectualPropertyEngine> {
+    const instance = IntellectualPropertyEngine.getInstance();
+
+    if (instance.isInitialized) {
+      console.log('[IPEngine] ⚡ Using cached instance (already initialized)');
+      return instance;
+    }
+
+    // If initialization is in progress, wait for it
+    if (globalThis.__ipEngineInitPromise) {
+      console.log('[IPEngine] ⏳ Waiting for in-progress initialization...');
+      await globalThis.__ipEngineInitPromise;
+      return instance;
+    }
+
+    // Start initialization (only happens once)
+    console.log('[IPEngine] 🔄 Starting initialization (will load 1000 chunks)...');
+    globalThis.__ipEngineInitPromise = instance.initialize();
+    await globalThis.__ipEngineInitPromise;
+    globalThis.__ipEngineInitPromise = undefined;
+
+    return instance;
   }
 
   /**
@@ -99,11 +154,11 @@ export class IntellectualPropertyEngine {
   /**
    * Main method: Retrieve relevant IP for consciousness response
    * This is called during MAIA's processing to access your book wisdom
+   * ⚡ PERFORMANCE: Uses static method to ensure single global initialization
    */
   async retrieveRelevantWisdom(context: IPRetrievalContext): Promise<IPWisdomResponse> {
-    if (!this.isInitialized) {
-      await this.initialize();
-    }
+    // Ensure initialization happens exactly once globally
+    await IntellectualPropertyEngine.getInitializedInstance();
 
     try {
       // 1. Semantic search through your book content
@@ -729,16 +784,19 @@ export class IntellectualPropertyEngine {
 
 /**
  * Integration bridge for MAIA/Soullab to access IP Engine
+ * ⚡ SINGLETON PATTERN: Uses global cached IP Engine instance
  */
 export class MAIAIPIntegration {
   private ipEngine: IntellectualPropertyEngine;
 
   constructor() {
-    this.ipEngine = new IntellectualPropertyEngine();
+    // Use singleton instead of creating new instance
+    this.ipEngine = IntellectualPropertyEngine.getInstance();
   }
 
   async initialize(): Promise<void> {
-    await this.ipEngine.initialize();
+    // Use singleton initialization method
+    this.ipEngine = await IntellectualPropertyEngine.getInitializedInstance();
   }
 
   /**

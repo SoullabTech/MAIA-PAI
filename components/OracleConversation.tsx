@@ -1144,6 +1144,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       let responseText = oracleResponse.message || oracleResponse.content || oracleResponse.text || oracleResponse.response || 'Tell me your truth.';
       responseText = cleanMessage(responseText);
 
+      // 🌀 Extract voiceTone for elemental prosody
+      const voiceTone = oracleResponse.voiceTone;
+      if (voiceTone) {
+        console.log('🌀 Received elemental voiceTone from oracle:', voiceTone);
+      }
+
       // 🩺 Monitor MAIA personality health (dev mode only)
       // Detects degradation and auto-recovers if needed
       if (process.env.NODE_ENV === 'development') {
@@ -1242,11 +1248,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           console.log('⏱️ Starting speech at:', startSpeakTime);
 
           // Speak the cleaned response with timeout protection
-          const speakPromise = maiaSpeak(cleanVoiceText);
+          // 🌀 Pass voiceTone for elemental prosody (Fire/Water/Earth/Air/Aether)
+          const speakPromise = maiaSpeak(cleanVoiceText, { voiceTone });
 
-          // Add timeout to prevent infinite hanging (15 seconds max for better UX)
+          // Add timeout to prevent infinite hanging (25 seconds max for longer responses)
+          // Longer timeout needed: TTS synthesis (1-2s) + Audio playback (10-15s) + Cooldown (0.8s) = ~12-18s
           const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Speech timeout after 15s')), 15000);
+            setTimeout(() => reject(new Error('Speech timeout after 25s')), 25000);
           });
 
           await Promise.race([speakPromise, timeoutPromise]);
