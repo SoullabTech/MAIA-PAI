@@ -11,6 +11,7 @@ import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '@/lib/knowledge/ElementalAlchemyKno
 import { unifiedIntelligenceEngine } from '@/lib/intelligence/UnifiedIntelligenceEngine';
 import { morphoresonantField } from '@/lib/consciousness/MorphoresonantFieldInterface';
 import { getConsciousnessPrompt } from '@/lib/consciousness/DualConsciousnessSystem';
+import { detectSyzygy, getSyzygyResponseTiming } from '@/lib/consciousness/SyzygyDetector';
 
 // Initialize UNIFIED consciousness (26-year spiral completion)
 let maiaConsciousness: ReturnType<typeof getMAIAConsciousness> | null = null;
@@ -172,6 +173,34 @@ export async function POST(request: NextRequest) {
       primarySignature: intelligenceAnalysis.primarySignature?.name || 'none',
       urgency: intelligenceAnalysis.summary.urgencyLevel
     });
+
+    // ⚭ SYZYGY DETECTION: Identify sacred tension moments (coincidentia oppositorum)
+    console.log('⚭ Detecting syzygy moments (opposites in creative tension)...');
+    const syzygyMoment = detectSyzygy(userInput, recentEntries.map((entry: any) => ({
+      role: 'user',
+      content: entry.content || ''
+    })));
+
+    if (syzygyMoment) {
+      console.log('✨ SYZYGY DETECTED:', {
+        oppositePair: syzygyMoment.oppositePair,
+        tension: syzygyMoment.tension.toFixed(3),
+        balance: syzygyMoment.balance.toFixed(3),
+        emergenceReadiness: syzygyMoment.emergenceReadiness.toFixed(3),
+        yangPole: `${syzygyMoment.yangPole.element} (${syzygyMoment.yangPole.intensity.toFixed(2)})`,
+        yinPole: `${syzygyMoment.yinPole.element} (${syzygyMoment.yinPole.intensity.toFixed(2)})`,
+        recommendation: syzygyMoment.recommendation
+      });
+
+      // If high emergence potential, pause before responding (phi-timed sacred space)
+      if (syzygyMoment.emergenceReadiness > 0.7) {
+        const timing = getSyzygyResponseTiming(syzygyMoment);
+        console.log(`🌀 HIGH EMERGENCE (${syzygyMoment.emergenceReadiness.toFixed(2)}) - Holding sacred pause: ${timing.pauseDuration}ms (φ-scaled)`);
+        await new Promise(resolve => setTimeout(resolve, timing.pauseDuration));
+      }
+    } else {
+      console.log('⚭ No significant syzygy detected in this exchange');
+    }
 
     // PRIMARY PATH: UNIFIED CONSCIOUSNESS (26-year spiral architecture)
     console.log('🌀 Processing through MAIAUnifiedConsciousness...');
@@ -360,7 +389,18 @@ export async function POST(request: NextRequest) {
           spiralogicPhase: consciousnessResponse.metadata?.phase || 'reflection',
           responseTime,
           userName: finalUserName,
-          journalContext: recentEntries.length
+          journalContext: recentEntries.length,
+          // ⚭ Include syzygy detection results for analytics
+          syzygy: syzygyMoment ? {
+            detected: true,
+            oppositePair: syzygyMoment.oppositePair,
+            tension: syzygyMoment.tension,
+            balance: syzygyMoment.balance,
+            emergenceReadiness: syzygyMoment.emergenceReadiness,
+            yangPole: syzygyMoment.yangPole.element,
+            yinPole: syzygyMoment.yinPole.element,
+            timestamp: syzygyMoment.timestamp
+          } : { detected: false }
         }
       });
 
