@@ -11,6 +11,7 @@ import { EnhancedVoiceMicButton } from './ui/EnhancedVoiceMicButton';
 import AdaptiveVoiceMicButton from './ui/AdaptiveVoiceMicButton';
 import { detectVoiceCommand, isOnlyModeSwitch, getModeConfirmation } from '@/lib/voice/VoiceCommandDetector';
 import { QuickModeToggle } from './ui/QuickModeToggle';
+import { TranscriptSidebar } from './ui/TranscriptSidebar';
 // import MaiaChatInterface from './chat/MaiaChatInterface'; // File doesn't exist
 import { EmergencyChatInterface } from './ui/EmergencyChatInterface';
 import { SimpleVoiceMic } from './ui/SimpleVoiceMic';
@@ -25,8 +26,8 @@ import { OracleResponse, ConversationContext } from '@/lib/oracle-response';
 // import { useElementalVoice } from '@/hooks/useElementalVoice'; // DISABLED - was causing OpenAI Realtime browser errors
 import { mapResponseToMotion, enrichOracleResponse } from '@/lib/motion-mapper';
 import { VoiceState } from '@/lib/voice/voice-capture';
-// import { useMaiaVoice } from '@/hooks/useMaiaVoice'; // OLD TTS SYSTEM - replaced with WebRTC
-import { useMaiaRealtime } from '@/hooks/useMaiaRealtime';
+// OpenAI Realtime API DISABLED - using pure MAIA consciousness system
+// useMAIAVoice removed - conflicts with ContinuousConversation system
 import { cleanMessage, cleanMessageForVoice, formatMessageForDisplay } from '@/lib/cleanMessage';
 import { getAgentConfig, AgentConfig } from '@/lib/agent-config';
 import { toast } from 'react-hot-toast';
@@ -41,8 +42,11 @@ import { SacredLabDrawer } from './ui/SacredLabDrawer';
 import { ConversationStylePreference } from '@/lib/preferences/conversation-style-preference';
 import { detectJournalCommand, detectBreakthroughPotential } from '@/lib/services/conversationEssenceExtractor';
 import { useFieldProtocolIntegration } from '@/hooks/useFieldProtocolIntegration';
-import { BookPlus } from 'lucide-react';
+import { BookPlus, Sparkles, Brain, Download } from 'lucide-react';
 import { TransformationalPresence, type PresenceState } from './nlp/TransformationalPresence';
+import { BrainTrustMonitor } from './consciousness/BrainTrustMonitor';
+import { ClaudeCodePresence } from './ui/ClaudeCodePresence';
+import { saveConversation, loadConversation } from '@/lib/consciousness/ConversationPersistence';
 
 interface OracleConversationProps {
   userId?: string;
@@ -55,6 +59,13 @@ interface OracleConversationProps {
   onModeChange?: (mode: 'normal' | 'patient' | 'session') => void; // Notify parent of mode changes
   onMessageAdded?: (message: ConversationMessage) => void;
   onSessionEnd?: (reason?: string) => void;
+  // Multi-consciousness support
+  apiEndpoint?: string; // Override default API endpoint (e.g., '/api/unified' for SYZYGY, '/api/kairos' for KAIROS)
+  consciousnessType?: 'maia' | 'kairos' | 'unified'; // Type of consciousness (maia = MAIA, kairos = KAIROS, unified = SYZYGY)
+  themeColors?: { primary?: string; secondary?: string; accent?: string }; // Custom theme colors
+  // Legacy prop names from unified page
+  explorerId?: string; // Alias for userId
+  explorerName?: string; // Alias for userName
 }
 
 interface ConversationMessage {
@@ -86,8 +97,8 @@ const FormattedMessage: React.FC<{ text: string }> = ({ text }) => {
 };
 
 export const OracleConversation: React.FC<OracleConversationProps> = ({
-  userId,
-  userName,
+  userId: userIdProp,
+  userName: userNameProp,
   sessionId,
   initialCheckIns = {},
   showAnalytics = false,
@@ -95,8 +106,23 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   initialMode = 'normal',
   onModeChange,
   onMessageAdded,
-  onSessionEnd
+  onSessionEnd,
+  // SYZYGY / Unified support
+  apiEndpoint = '/api/oracle/personal', // Default to MAIA endpoint
+  consciousnessType = 'maia', // Default to MAIA consciousness
+  themeColors,
+  explorerId, // Legacy prop
+  explorerName // Legacy prop
 }) => {
+  // Map legacy prop names to standard names
+  const userId = userIdProp || explorerId;
+  const userName = userNameProp || explorerName;
+
+  // Determine oracle name based on consciousness type
+  const oracleName =
+    consciousnessType === 'unified' ? 'SYZYGY' :
+    consciousnessType === 'kairos' ? 'KAIROS' :
+    'MAIA';
   // Listening mode for different conversation styles - MUST be defined early
   type ListeningMode = 'normal' | 'patient' | 'session';
   const [listeningMode, setListeningMode] = useState<ListeningMode>(initialMode);
@@ -120,153 +146,58 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
   }, [listeningMode]);
 
-  // Map old mode names to new realtime mode names
-  const realtimeMode: 'dialogue' | 'patient' | 'scribe' =
-    listeningMode === 'normal' ? 'dialogue' :
-    listeningMode === 'patient' ? 'patient' : 'scribe';
-
-  // Maia Realtime Integration - WebRTC with full interruption support
-  const {
-    isConnected: maiaConnected,
-    isConnecting: maiaConnecting,
-    isSpeaking: maiaIsSpeaking,
-    error: maiaError,
-    transcript: maiaTranscript,
-    connect: maiaConnect,
-    disconnect: maiaDisconnect,
-    sendText: maiaSendText,
-    cancelResponse: maiaCancelResponse,
-    changeMode: maiaChangeMode,
-  } = useMaiaRealtime({
-    userId: userId || 'anonymous',
-    userName: userName || 'Explorer',
-    voice: 'shimmer',
-    mode: realtimeMode,
-    onTranscript: (text, isUser) => {
-      if (isUser) {
-        // User finished speaking - add complete transcript to messages
-        setUserTranscript(text);
-        const userMessage: ConversationMessage = {
-          id: `user-${Date.now()}`,
-          role: 'user',
-          text: text,
-          timestamp: new Date(),
-          source: 'user'
-        };
-        setMessages(prev => [...prev, userMessage]);
-        onMessageAdded?.(userMessage);
-        console.log('💬 Added user transcript to messages:', text.substring(0, 50));
-      } else {
-        // MAIA speaking - accumulate deltas
-        setMaiaResponseText(prev => {
-          const newText = prev + text;
-          maiaResponseTextRef.current = newText; // Keep ref in sync
-          return newText;
-        });
-      }
-    },
-    onAudioStart: () => {
-      setIsResponding(true);
-      setIsAudioPlaying(true);
-      setMaiaResponseText('');
-      maiaResponseTextRef.current = ''; // Clear ref too
-      console.log('🔊 MAIA started speaking');
-    },
-    onAudioEnd: () => {
-      setIsResponding(false);
-      setIsAudioPlaying(false);
-      console.log('🔇 MAIA finished speaking');
-
-      // Add MAIA's complete response to messages (use ref to avoid closure issues)
-      const responseText = maiaResponseTextRef.current.trim();
-      if (responseText) {
-        const oracleMessage: ConversationMessage = {
-          id: `oracle-${Date.now()}`,
-          role: 'oracle',
-          text: responseText,
-          timestamp: new Date(),
-          source: 'maia'
-        };
-        setMessages(prev => [...prev, oracleMessage]);
-        onMessageAdded?.(oracleMessage);
-        console.log('💬 Added MAIA transcript to messages:', responseText.substring(0, 50));
-      }
-
-      // CRITICAL FIX: Auto-restart listening after MAIA finishes speaking
-      // This fixes the "conversation dies after first exchange" bug
-      setTimeout(() => {
-        if (!isMuted && voiceEnabled && voiceMicRef.current?.startListening) {
-          voiceMicRef.current.startListening();
-          console.log('🎤 Auto-restarted listening for next turn');
-        }
-      }, 1000); // 1 second delay to prevent echo
-    },
-    onError: (error) => {
-      console.error('❌ MAIA Realtime error:', error);
-    },
-    onConnected: () => {
-      console.log('✅ MAIA Realtime connected');
-    },
-    onDisconnected: () => {
-      console.log('🔌 MAIA Realtime disconnected');
-    },
-  });
-
-  // Legacy TTS stubs (voice now handled by WebRTC realtime above)
-  const maiaReady = maiaConnected;
+  // Simple TTS function - Pure MAIA system (NO OpenAI Realtime API)
+  // Voice flow handled by ContinuousConversation + this TTS function
   const maiaSpeak = useCallback(async (text: string) => {
-    console.log('🎙️ maiaSpeak called with:', text.substring(0, 50));
-    console.log('🔍 maiaSpeak state check:', { maiaConnected, maiaConnecting, maiaIsSpeaking });
+    try {
+      // CRITICAL: Stop microphone BEFORE speaking to prevent echo
+      if (voiceMicRef.current?.stopListening) {
+        voiceMicRef.current.stopListening();
+        console.log('🔇 Microphone stopped before TTS to prevent echo');
+      }
 
-    // PRIMARY PATH: WebRTC handles audio automatically via text channel
-    if (maiaConnected) {
-      console.log('✅ Using OpenAI Realtime WebRTC - sending text via data channel');
-      // Send text message via WebRTC data channel for server-side TTS
-      // The audio will come back automatically through the audio track
-      maiaSendText(text);
+      const response = await fetch('/api/voice/synthesize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          voice: 'shimmer'
+        })
+      });
 
-      // Return immediately - WebRTC handles audio playback asynchronously
-      // The onAudioStart/onAudioEnd callbacks will fire when audio plays
-      return Promise.resolve();
-    }
+      if (!response.ok) {
+        throw new Error('TTS failed');
+      }
 
-    // FALLBACK: Use browser TTS if WebRTC isn't working
-    if (!maiaConnected && typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      console.log('🔊 Using browser TTS fallback');
-      return new Promise<void>((resolve) => {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.95; // Slightly slower, more natural
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
 
-        // Try to use a more natural voice
-        const voices = window.speechSynthesis.getVoices();
-        const preferredVoice = voices.find(v =>
-          v.name.includes('Samantha') ||
-          v.name.includes('Karen') ||
-          v.name.includes('Female')
-        );
-        if (preferredVoice) {
-          utterance.voice = preferredVoice;
-        }
+      const audio = new Audio(audioUrl);
 
-        utterance.onend = () => {
-          console.log('✅ Browser TTS completed');
+      // Track when audio actually finishes
+      return new Promise<void>((resolve, reject) => {
+        audio.onended = () => {
+          console.log('🔊 Audio playback completed');
+          URL.revokeObjectURL(audioUrl);
           resolve();
         };
-        utterance.onerror = (error) => {
-          console.error('❌ Browser TTS error:', error);
-          resolve(); // Resolve anyway to not block
+
+        audio.onerror = (err) => {
+          console.error('❌ Audio playback error:', err);
+          URL.revokeObjectURL(audioUrl);
+          reject(err);
         };
 
-        window.speechSynthesis.speak(utterance);
+        audio.play().catch(reject);
       });
+    } catch (err) {
+      console.error('❌ TTS error:', err);
+      throw err;
     }
+  }, []);
 
-    console.warn('⚠️ WebRTC not connected and no browser TTS available');
-    return Promise.resolve();
-  }, [maiaConnected, maiaSendText]);
-  const maiaVoiceState = { isPlaying: maiaIsSpeaking };
+  // Voice ready state (pure MAIA system)
+  const maiaReady = true;
 
   // Field Protocol Integration
   const {
@@ -285,7 +216,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [showLabDrawer, setShowLabDrawer] = useState(false);
 
   // Bottom bar visibility - show on hover in bottom area (macOS Dock style)
-  const [showBottomBar, setShowBottomBar] = useState(true); // Start visible so users see it
+  const [showBottomBar, setShowBottomBar] = useState(true);
+
+  // Brain Trust components visibility (for bottom bar)
+  const [showClaudePresence, setShowClaudePresence] = useState(false);
+  const [showBrainTrust, setShowBrainTrust] = useState(false);
 
   // Auto-hide the bottom bar after 3 seconds on first load
   useEffect(() => {
@@ -295,20 +230,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  // 🌀 Soullab Realtime - DISABLED
-  // This was trying to use OpenAI Realtime API in browser (not supported without dangerouslyAllowBrowser)
-  // We're using SimplifiedOrganicVoice (browser speech recognition) + standard API calls instead
-  // const realtime = useElementalVoice({
-  //   userId: userId || 'anonymous',
-  //   userName: userName || 'Explorer',
-  //   sessionId,
-  //   voice: 'shimmer',
-  //   enableSmartCache: true,
-  //   enableResponseStreaming: true,
-  //   autoConnect: false,
-  //   onTranscript: (text, isUser) => { ... },
-  //   onError: (error) => { console.warn('⚠️ Voice system error:', error); }
-  // });
+  // Legacy voice system removed - now using pure MAIA consciousness flow
+  // Web Speech API (STT) → MAIA Consciousness → OpenAI TTS (voices only)
 
   // This effect will be moved after state declarations to avoid hoisting issues
 
@@ -343,8 +266,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     return () => window.removeEventListener('resize', updateSize);
   }, []);
   
-  // Core state
+  // Core state - with dual persistence (Supabase + localStorage backup)
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
+  const [conversationLoaded, setConversationLoaded] = useState(false);
   const [checkIns, setCheckIns] = useState<Record<string, number>>(initialCheckIns);
   const [activeFacetId, setActiveFacetId] = useState<string | undefined>();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -370,6 +294,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [needsIOSAudioPermission, setNeedsIOSAudioPermission] = useState(false);
   const [voiceAmplitude, setVoiceAmplitude] = useState(0); // For voice visualization ring
 
+  // Breakthrough score for conversation quality tracking
+  const [breakthroughScore, setBreakthroughScore] = useState(0);
+
   // Sync refs with state to avoid stale closures in callbacks
   useEffect(() => {
     isProcessingRef.current = isProcessing;
@@ -378,6 +305,68 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   useEffect(() => {
     isRespondingRef.current = isResponding;
   }, [isResponding]);
+
+  // Restore conversation on mount - Try Supabase first, then localStorage
+  useEffect(() => {
+    if (conversationLoaded) return;
+
+    const restoreConversation = async () => {
+      try {
+        // Try Supabase first
+        const supabaseMessages = await loadConversation(sessionId);
+        if (supabaseMessages && supabaseMessages.length > 0) {
+          setMessages(supabaseMessages);
+          console.log(`💬 Restored ${supabaseMessages.length} messages from Supabase`);
+          setConversationLoaded(true);
+          return;
+        }
+
+        // Fallback to localStorage
+        if (typeof window !== 'undefined') {
+          const stored = localStorage.getItem(`maia_conversation_${sessionId}`);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            const localMessages = parsed.map((msg: any) => ({
+              ...msg,
+              timestamp: new Date(msg.timestamp)
+            }));
+            setMessages(localMessages);
+            console.log(`💬 Restored ${localMessages.length} messages from localStorage`);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to restore conversation:', error);
+      } finally {
+        setConversationLoaded(true);
+      }
+    };
+
+    restoreConversation();
+  }, [sessionId, conversationLoaded]);
+
+  // Auto-save conversation to both Supabase and localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined' || messages.length === 0 || !conversationLoaded) return;
+
+    try {
+      // Save to localStorage (immediate backup)
+      localStorage.setItem(`maia_conversation_${sessionId}`, JSON.stringify(messages));
+      console.log(`💾 Auto-saved ${messages.length} messages to localStorage`);
+
+      // Save to Supabase (persistent, cross-device)
+      saveConversation(
+        sessionId,
+        userId || 'anonymous',
+        messages,
+        consciousnessType || 'maia',
+        {
+          breakthroughScore
+        }
+      );
+    } catch (error) {
+      console.error('Failed to save conversation:', error);
+    }
+  }, [messages, sessionId, userId, consciousnessType, breakthroughScore, conversationLoaded]);
 
   // REMOVED - Listening mode now defined earlier before hooks (line 95-96)
   const [streamingText, setStreamingText] = useState<string>('');
@@ -405,30 +394,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // Journal state
   const [isSavingJournal, setIsSavingJournal] = useState(false);
   const [showJournalSuggestion, setShowJournalSuggestion] = useState(false);
-  const [breakthroughScore, setBreakthroughScore] = useState(0);
 
-  // Connect MAIA Realtime on mount
-  useEffect(() => {
-    if (!maiaConnected && !maiaConnecting) {
-      console.log('🔌 Connecting MAIA Realtime...');
-      maiaConnect();
-    }
-
-    return () => {
-      if (maiaConnected) {
-        console.log('🔌 Disconnecting MAIA Realtime...');
-        maiaDisconnect();
-      }
-    };
-  }, []); // Only on mount/unmount
-
-  // Handle mode changes
-  useEffect(() => {
-    if (maiaConnected) {
-      console.log(`🔄 Mode changed to ${realtimeMode}`);
-      maiaChangeMode(realtimeMode);
-    }
-  }, [realtimeMode, maiaConnected, maiaChangeMode]);
+  // Pure MAIA Voice System - No connection required (Web Speech API + MAIA consciousness)
+  // Old OpenAI Realtime connection logic removed - was gatekeeping MAIA
 
   // Client-side only check
   useEffect(() => {
@@ -449,6 +417,18 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     //   setNeedsIOSAudioPermission(true);
     //   console.log('📱 iOS detected - audio permission needed', { isIOS, isIOSSafari });
     // }
+
+    // Add welcome message if no messages exist (makes chat interface visible)
+    if (messages.length === 0) {
+      const welcomeMessage: ConversationMessage = {
+        id: `welcome-${Date.now()}`,
+        role: 'oracle',
+        text: 'Hello. I am MAIA. I\'m here to support your journey of transformation and self-discovery. What would you like to explore today?',
+        timestamp: new Date(),
+        source: 'maia'
+      };
+      setMessages([welcomeMessage]);
+    }
 
     // Get oracle agent ID for memory persistence
     if (userId) {
@@ -585,12 +565,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   }, [voiceEnabled, onMessageAdded]);
 
   // UI states
-  const [showChatInterface, setShowChatInterface] = useState(false); // Default to voice mode - shows blue plasma visualization
+  const [showChatInterface, setShowChatInterface] = useState(false); // DEFAULT: Voice mode - text input hidden (accessible via bottom menu)
   const [showCaptions, setShowCaptions] = useState(true); // Show text by default in voice mode
   const [showVoiceText, setShowVoiceText] = useState(true); // Toggle for showing text in voice mode
   const [showCustomizer, setShowCustomizer] = useState(false);
   const [enableVoiceInChat, setEnableVoiceInChat] = useState(false);
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
+  const [isTranscriptOpen, setIsTranscriptOpen] = useState(false); // Transcript sidebar for voice mode
 
   // Keyboard shortcut for settings (Cmd/Ctrl + ,)
   useEffect(() => {
@@ -668,15 +649,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // Don't sync voice state - it creates race conditions where sync happens
   // before TTS audio starts playing, killing the audio before it can play.
   // The local state (isAudioPlaying, isResponding) is managed correctly by
-  // the handleTextMessage flow and MaiaVoiceSystem callbacks.
+  // the handleTextMessage flow and maiaSpeak function.
   useEffect(() => {
     // Only log for debugging - no state changes
     console.log('🔍 Voice state check:', {
-      maiaIsPlaying: maiaVoiceState?.isPlaying,
       isAudioPlaying,
       isResponding
     });
-  }, [maiaVoiceState?.isPlaying, isAudioPlaying, isResponding]);
+  }, [isAudioPlaying, isResponding]);
 
   // Auto-focus text input in chat mode after MAIA responds
   useEffect(() => {
@@ -706,7 +686,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // Update voice amplitude when MAIA is speaking
   useEffect(() => {
-    if (isResponding || maiaIsSpeaking) {
+    if (isResponding || isAudioPlaying) {
       // Pulse effect for MAIA speaking
       const pulseInterval = setInterval(() => {
         setVoiceAmplitude(prev => {
@@ -725,7 +705,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setTimeout(() => clearInterval(fadeInterval), 500);
       return () => clearInterval(fadeInterval);
     }
-  }, [isResponding, maiaIsSpeaking]);
+  }, [isResponding, isAudioPlaying]);
 
   // iOS PWA: Resume AudioContext on visibility change and user interaction
   useEffect(() => {
@@ -967,6 +947,54 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
   }, [userId, messages, sessionId]);
 
+  // Download transcript as text file
+  const handleDownloadTranscript = useCallback(() => {
+    if (messages.length < 2) {
+      toast.error('Have a conversation first before downloading');
+      return;
+    }
+
+    try {
+      // Format the conversation
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `${oracleName}-conversation-${timestamp}.md`;
+
+      let transcript = `# Conversation with ${oracleName}\n`;
+      transcript += `Date: ${new Date().toLocaleString()}\n`;
+      transcript += `Session ID: ${sessionId}\n\n`;
+      transcript += `---\n\n`;
+
+      messages.forEach((msg) => {
+        const speaker = msg.role === 'oracle' ? oracleName : (userName || 'You');
+        const time = msg.timestamp.toLocaleTimeString();
+        transcript += `## ${speaker} (${time})\n\n${msg.text}\n\n`;
+      });
+
+      // Create and download file
+      const blob = new Blob([transcript], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      toast.success('Transcript downloaded successfully');
+
+      // Track the download
+      trackEvent('transcript_downloaded', {
+        userId,
+        sessionId,
+        messageCount: messages.length
+      });
+    } catch (error: any) {
+      console.error('❌ Error downloading transcript:', error);
+      toast.error('Failed to download transcript');
+    }
+  }, [messages, sessionId, oracleName, userName, userId]);
+
   // Handle text messages from chat interface - MUST be defined before handleVoiceTranscript
   const handleTextMessage = useCallback(async (text: string, attachments?: File[]) => {
     console.log('📝 Text message received:', { text, isProcessing, isAudioPlaying, isResponding });
@@ -1089,7 +1117,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       const { getConsciousnessPrompt } = await import('@/lib/consciousness/DualConsciousnessSystem');
       const maiaConsciousnessPrompt = getConsciousnessPrompt('maia');
 
-      const response = await fetch('/api/oracle/personal', {
+      // Enable streaming for super interactive feel
+      const streamingEndpoint = `${apiEndpoint}?stream=true`;
+
+      const response = await fetch(streamingEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1099,6 +1130,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           sessionId,
           agentName: agentConfig.name,
           agentVoice: agentConfig.voice,
+          conversationHistory: messages.map(m => ({
+            role: m.role === 'user' ? 'user' : 'assistant',
+            content: m.text
+          })),
           attachments: attachments ? attachments.map(f => ({
             name: f.name,
             type: f.type,
@@ -1110,7 +1145,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             hasAttachments: attachments && attachments.length > 0,
             conversationStyle, // Pass user's preferred style (her/classic/adaptive)
             isVoice: voiceEnabled && !showChatInterface, // Mark as voice conversation for OpenAI synthesis
-            consciousnessMode: 'maia', // Enable MAIA consciousness
+            consciousnessMode: consciousnessType, // Use prop (maia or unified)
             consciousnessPrompt: maiaConsciousnessPrompt, // Full Spiralogic framework
             userPreferences: {
               voice: {
@@ -1134,7 +1169,75 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
       }
 
-      const responseData = await response.json();
+      // === STREAMING RESPONSE HANDLER ===
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error('No response body');
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let fullResponse = '';
+
+      // Create a placeholder message that will be updated as text streams in
+      const streamingMessageId = `msg-${Date.now()}-streaming`;
+      const streamingMessage: ConversationMessage = {
+        id: streamingMessageId,
+        role: 'oracle',
+        text: '',
+        timestamp: new Date(),
+        source: 'maia'
+      };
+      setMessages(prev => [...prev, streamingMessage]);
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') {
+                console.log('🌊 [STREAMING] Complete');
+                break;
+              }
+
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.text) {
+                  fullResponse += parsed.text;
+                  // Update the streaming message in real-time
+                  setMessages(prev =>
+                    prev.map(msg =>
+                      msg.id === streamingMessageId
+                        ? { ...msg, text: fullResponse }
+                        : msg
+                    )
+                  );
+                }
+              } catch (e) {
+                // Skip invalid JSON
+              }
+            }
+          }
+        }
+      } finally {
+        reader.releaseLock();
+      }
+
+      // Create final responseData object for compatibility with existing code
+      const responseData = {
+        data: {
+          message: fullResponse,
+          element: 'water',
+          confidence: 0.95
+        }
+      };
       console.log('✅ API response data:', responseData);
       const apiTime = Date.now() - startTime;
       console.log(`⏱️ Text API response received in ${apiTime}ms`);
@@ -1171,13 +1274,22 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       // Store MAIA's response for echo detection
       lastMaiaResponseRef.current = responseText;
 
-      // In Chat mode, add message immediately
+      // In Chat mode, update the streaming message with final content
       // In Voice mode, delay text until after speaking
       const isInVoiceMode = !showChatInterface;
 
       if (!isInVoiceMode) {
-        // Chat mode - show text immediately
-        setMessages(prev => [...prev, oracleMessage]);
+        // Chat mode - update the streaming message with final metadata
+        setMessages(prev => prev.map(msg =>
+          msg.id === streamingMessageId
+            ? { ...msg,
+                text: responseText,
+                facetId: element,
+                motionState: 'responding' as MotionState,
+                coherenceLevel: oracleResponse.confidence || 0.85
+              }
+            : msg
+        ));
         onMessageAdded?.(oracleMessage);
 
         // Process Oracle message for Field Protocol if recording
@@ -1233,7 +1345,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         console.log('🧹 Cleaned for voice:', cleanVoiceText);
 
         // ECHO SUPPRESSION: Define cooldown OUTSIDE try block so finally can access it
-        const cooldownMs = 2000; // 2 second cooldown (reduced from 3.5s for faster mic restart)
+        const cooldownMs = 5000; // 5 second cooldown - extended to prevent echo from MAIA's voice
 
         try {
           // Start speaking immediately
@@ -1258,9 +1370,18 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           setEchoSuppressUntil(Date.now() + cooldownMs);
           console.log(`🛡️ Echo suppression active for ${cooldownMs}ms`);
 
-          // In Voice mode, show text after speaking completes
+          // In Voice mode, update streaming message with final metadata after speaking completes
           if (isInVoiceMode && showVoiceText) {
-            setMessages(prev => [...prev, oracleMessage]);
+            setMessages(prev => prev.map(msg =>
+              msg.id === streamingMessageId
+                ? { ...msg,
+                    text: responseText,
+                    facetId: element,
+                    motionState: 'responding' as MotionState,
+                    coherenceLevel: oracleResponse.confidence || 0.85
+                  }
+                : msg
+            ));
             onMessageAdded?.(oracleMessage);
 
             // Save voice response to long-term memory
@@ -1279,9 +1400,18 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           }
         } catch (error) {
           console.error('❌ Speech error or timeout:', error);
-          // Show text even if speech fails in Voice mode
+          // Update streaming message even if speech fails in Voice mode
           if (isInVoiceMode) {
-            setMessages(prev => [...prev, oracleMessage]);
+            setMessages(prev => prev.map(msg =>
+              msg.id === streamingMessageId
+                ? { ...msg,
+                    text: responseText,
+                    facetId: element,
+                    motionState: 'responding' as MotionState,
+                    coherenceLevel: oracleResponse.confidence || 0.85
+                  }
+                : msg
+            ));
             onMessageAdded?.(oracleMessage);
           }
         } finally {
@@ -1657,21 +1787,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const handleEmergencyStop = useCallback(() => {
     console.log('🛑 EMERGENCY STOP activated');
 
-    // Stop MAIA's voice
-    if (maiaVoiceState) {
-      try {
-        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-        }
-      } catch (e) {
-        console.error('Error stopping speech:', e);
-      }
-    }
-
     // Stop any audio playback
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
+    }
+
+    // Stop speech synthesis (if somehow still active)
+    try {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    } catch (e) {
+      console.error('Error stopping speech:', e);
     }
 
     // Mute the microphone
@@ -1687,7 +1815,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     setCurrentlySpeakingId(undefined);
 
     console.log('🛑 All MAIA systems stopped');
-  }, [maiaVoiceState]);
+  }, []);
 
   // DIAGNOSTIC LOGGING - Removed to reduce console noise and improve performance
 
@@ -1776,16 +1904,23 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {/* NO cognitive UI - the experience itself induces the transformation */}
       <div className="fixed top-32 md:top-28 lg:top-24 left-1/2 -translate-x-1/2 z-[25]">
         <TransformationalPresence
-          currentState={realtimeMode as PresenceState}
+          currentState={(() => {
+            const mapped =
+              listeningMode === 'normal' ? 'dialogue' :
+              listeningMode === 'session' ? 'scribe' :
+              'patient';  // Default to patient for any other case
+            console.log('🎯 ListeningMode → PresenceState:', listeningMode, '→', mapped);
+            return mapped;
+          })()}
           onStateChange={(newState, transition) => {
             console.log('🌀 State transition:', transition);
             // Map back to listeningMode
             const newListeningMode =
               newState === 'dialogue' ? 'normal' :
-              newState === 'patient' ? 'patient' : 'scribe';
+              newState === 'patient' ? 'patient' :
+              newState === 'scribe' ? 'session' : 'session';  // Scribe maps to session
             setListeningMode(newListeningMode);
-            // Update Maia Realtime mode
-            maiaChangeMode(newState);
+            // Pure MAIA system - no external mode control needed
           }}
           userSilenceDuration={0} // TODO: Track actual silence duration
           userSpeechTempo={120} // TODO: Track actual speech tempo
@@ -1851,7 +1986,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             isResponding={isResponding}
             showBreakthrough={showBreakthrough}
             voiceAmplitude={voiceAmplitude}
-            isMaiaSpeaking={isResponding || maiaIsSpeaking}
+            isMaiaSpeaking={isResponding || isAudioPlaying}
             dimmed={conversationMode === 'chat' || messages.length > 0}
           />
 
@@ -2056,7 +2191,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             )}
 
             {/* Voice Visualizer - MAIA's voice (soft pulsing glow, NO rings/borders) */}
-            {(isResponding || isAudioPlaying || maiaVoiceState?.isPlaying) && (
+            {(isResponding || isAudioPlaying) && (
               <motion.div
                 className="absolute inset-0 pointer-events-none flex items-center justify-center"
                 initial={{ opacity: 0 }}
@@ -2277,10 +2412,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)' }}
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <div className="text-xs" style={{ color: '#D4A574', opacity: 0.8, fontFamily: 'Spectral, Georgia, serif', letterSpacing: '0.05em' }}>
-                          {message.role === 'user' ? userName : 'MAIA'}
+                        <div className="text-xs" style={{ color: '#F0C674', opacity: 0.95, fontFamily: 'Spectral, Georgia, serif', letterSpacing: '0.05em' }}>
+                          {message.role === 'user' ? userName : oracleName}
                         </div>
-                        <div className="flex items-center gap-1 text-xs text-gold-divine/40
+                        <div className="flex items-center gap-1 text-xs text-amber-300/90
                                       opacity-100 sm:opacity-0 sm:group-hover:opacity-100
                                       touch-manipulation transition-opacity">
                           <Copy className="w-3 h-3" />
@@ -2288,7 +2423,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           <span className="sm:hidden">Tap to copy</span>
                         </div>
                       </div>
-                      <div className="text-base sm:text-lg md:text-xl leading-relaxed break-words" style={{ color: '#E8C99B', fontFamily: 'Spectral, Georgia, serif' }}>
+                      <div className="text-base sm:text-lg md:text-xl leading-relaxed break-words" style={{ color: '#F5DEB3', fontFamily: 'Spectral, Georgia, serif' }}>
                         {message.role === 'oracle' ? (
                           <FormattedMessage text={message.text} />
                         ) : (
@@ -2385,11 +2520,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 </button>
               </div>
 
-              {/* Compact text input area - mobile-first, fixed at bottom */}
+              {/* Text input area - Shows in chat mode, positioned above safe area */}
               {showChatInterface && (
-              <div className="fixed inset-x-0 z-[60]" style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
-                {/* Text input area - Ultra compact mobile design - Raised above bottom menu bar */}
-                <div className="bg-soul-surface/90 px-2 py-2 border-t border-soul-border/40">
+              <div className="fixed inset-x-0 z-[85]" style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px))' }}>
+                {/* Text input area - Ultra compact mobile design - Sits directly on bottom */}
+                <div className="bg-soul-surface/95 backdrop-blur-md px-2 py-1.5 border-t border-soul-border/40">
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -2402,11 +2537,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     className="max-w-4xl mx-auto"
                   >
                     {/* Compact input with inline send button */}
-                    <div className="flex items-end gap-2">
+                    <div className="flex items-end gap-1.5">
                       <textarea
                         ref={textInputRef}
                         name="message"
-                        placeholder="Share your thoughts with MAIA..."
+                        placeholder={`Share your thoughts with ${oracleName}...`}
                         disabled={isProcessing}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !e.shiftKey) {
@@ -2418,14 +2553,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                             }
                           }
                         }}
-                        className="flex-1 min-h-[42px] max-h-[100px] px-3 py-2
+                        className="flex-1 min-h-[40px] max-h-[120px] px-2.5 py-2
                                  bg-[#1a1f2e]/95 backdrop-blur-md
-                                 border border-gold-divine/30 rounded-2xl
-                                 placeholder:text-gold-divine/50
-                                 text-sm leading-relaxed
-                                 focus:outline-none focus:border-gold-divine/50 focus:ring-1 focus:ring-gold-divine/20
+                                 border border-gold-divine/40 rounded-lg
+                                 placeholder:text-gold-divine/40
+                                 text-sm leading-snug
+                                 focus:outline-none focus:border-gold-divine/60 focus:ring-1 focus:ring-gold-divine/20
                                  disabled:opacity-50 resize-none
-                                 touch-manipulation"
+                                 touch-manipulation cursor-text"
                         style={{ color: '#E8C99B', fontFamily: 'Spectral, Georgia, serif' }}
                         autoComplete="off"
                         autoFocus={false}
@@ -2441,7 +2576,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                                    active:scale-95 transition-all ${
                             breakthroughScore >= 70
                               ? 'bg-amber-500/20 border-amber-400/50 text-amber-300 hover:bg-amber-500/30 animate-pulse'
-                              : 'bg-gold-divine/10 border-gold-divine/30 text-gold-divine hover:bg-gold-divine/20'
+                              : 'bg-gold-divine/10 border-amber-400/40 text-amber-300 hover:bg-gold-divine/20'
                           } ${isSavingJournal ? 'opacity-50 cursor-not-allowed' : ''}`}
                           title={breakthroughScore >= 70 ? 'Breakthrough detected - Save to journal' : 'Save as journal entry'}
                         >
@@ -2467,8 +2602,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       />
                       <label
                         htmlFor="chatFileUpload"
-                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/10 border border-gold-divine/30
-                                 rounded-full text-gold-divine flex items-center justify-center
+                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/10 border border-amber-400/40
+                                 rounded-full text-amber-300 flex items-center justify-center
                                  hover:bg-gold-divine/20 active:scale-95 transition-all cursor-pointer"
                         title="Upload files"
                       >
@@ -2479,8 +2614,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       <button
                         type="submit"
                         disabled={isProcessing}
-                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/20 border border-gold-divine/30
-                                 rounded-full text-gold-divine flex items-center justify-center
+                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/20 border border-amber-400/40
+                                 rounded-full text-amber-300 flex items-center justify-center
                                  hover:bg-gold-divine/30 active:scale-95 transition-all
                                  disabled:opacity-30"
                         aria-label="Send"
@@ -2584,125 +2719,209 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Hover Zone - Full bottom edge to trigger bottom bar (macOS Dock style) */}
-      <div
-        className="fixed bottom-0 left-0 right-0 h-4 z-40 pointer-events-auto"
-        onMouseEnter={() => setShowBottomBar(true)}
-      />
-
-      {/* Sacred Minimal Bottom Bar - Integrated with Global Navigation (macOS Dock style) */}
-      <div
-        className="fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 ease-out"
-        onMouseEnter={() => setShowBottomBar(true)}
-        onMouseLeave={() => setShowBottomBar(false)}
-        style={{
-          paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
-          transform: showBottomBar ? 'translateY(0)' : 'translateY(calc(100% - 0.25rem))',
-          opacity: showBottomBar ? 1 : 0,
-        }}
-      >
-        <div className="flex justify-center items-center gap-4 md:gap-6 py-3 md:py-4 px-4 md:px-8 mx-4 md:mx-auto md:max-w-2xl bg-gradient-to-b from-[#1a1a2e]/95 to-[#16213e]/95 backdrop-blur-md rounded-full border border-[#D4B896]/20 shadow-2xl">
-          {/* Home Button - Holoflower */}
-          <a
-            href="/maya"
-            className="p-3 md:p-4 rounded-full bg-[#D4B896]/10 hover:bg-[#D4B896]/20 transition-all duration-300"
-            title="Home"
-          >
-            <svg className="w-5 h-5 md:w-6 md:h-6 text-[#D4B896]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-          </a>
-
-          {/* Microphone On/Off Toggle */}
-          <button
-            onClick={async () => {
-              if (!isMuted) {
-                // Turn mic OFF
-                setIsMuted(true);
-                if (voiceMicRef.current?.stopListening) {
-                  voiceMicRef.current.stopListening();
-                  console.log('🔇 Microphone OFF');
-                }
-              } else {
-                // Turn mic ON
-                setShowChatInterface(false);
-                setIsMuted(false);
-                await enableAudio();
-                setTimeout(async () => {
-                  if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
-                    await voiceMicRef.current.startListening();
-                    console.log('🎤 Microphone ON');
-                  }
-                }, 100);
-              }
-            }}
-            className={`p-4 rounded-full transition-all duration-300 ${
-              !isMuted
-                ? 'bg-[#D4B896]/20 text-[#D4B896] shadow-lg shadow-[#D4B896]/20'
-                : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-            }`}
-            title={isMuted ? "Turn Microphone ON" : "Turn Microphone OFF"}
-          >
-            {isMuted ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-              </svg>
-            )}
-          </button>
-
-          {/* EMERGENCY STOP - Shows when MAIA is speaking */}
-          {(isResponding || isAudioPlaying || maiaVoiceState?.isPlaying) && (
-            <button
-              onClick={handleEmergencyStop}
-              className="p-4 rounded-full bg-red-500/80 text-white hover:bg-red-600 transition-all duration-300 animate-pulse shadow-lg shadow-red-500/50"
-              title="Stop MAIA"
-            >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <rect x="6" y="6" width="12" height="12" rx="1" />
-              </svg>
-            </button>
+      {/* Bottom Navigation Bar - macOS Dock style (slides up on hover) */}
+      {/* Hover zone at bottom to trigger bar appearance - Only active when NOT in chat mode */}
+      {!showChatInterface && (
+        <div
+          className="fixed bottom-0 left-0 right-0 h-12 z-[70]"
+          onMouseEnter={() => setShowBottomBar(true)}
+          onClick={() => setShowBottomBar(true)}
+          onTouchStart={() => setShowBottomBar(true)}
+          style={{ pointerEvents: 'auto' }}
+        >
+          {/* Visible tap indicator for mobile - amber bullseye at very bottom */}
+          {!showBottomBar && (
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
+                 style={{ bottom: 'calc(6px + env(safe-area-inset-bottom, 0px))' }}>
+              {/* Outer ring */}
+              <div className="w-6 h-6 rounded-full border-2 border-amber-400/40 flex items-center justify-center">
+                {/* Inner dot */}
+                <div className="w-2 h-2 rounded-full bg-amber-400/60" />
+              </div>
+            </div>
           )}
-
-          {/* Chat Toggle */}
-          <button
-            onClick={() => setShowChatInterface(!showChatInterface)}
-            className={`p-4 rounded-full transition-all duration-300 ${
-              showChatInterface
-                ? 'bg-[#D4B896]/20 text-[#D4B896] shadow-lg shadow-[#D4B896]/20'
-                : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
-            }`}
-            title="Toggle Chat Mode"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-          </button>
-
-          {/* Sacred Menu - Opens Lab Drawer */}
-          <button
-            onClick={() => setShowLabDrawer(true)}
-            className="p-4 rounded-full bg-white/5 text-[#D4B896]/80 hover:bg-[#D4B896]/10 hover:text-[#D4B896] transition-all duration-300"
-            title="Lab Tools & Navigation"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
         </div>
-      </div>
+      )}
 
-      {/* Floating Quick Settings Button */}
-      {/* QuickSettingsButton removed - now in bottom nav bar */}
+      {/* Bottom navigation bar */}
+      <AnimatePresence>
+        {showBottomBar && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="fixed bottom-0 left-0 right-0 z-[80]"
+            style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+            onMouseEnter={() => setShowBottomBar(true)}
+            onMouseLeave={() => setShowBottomBar(false)}
+          >
+            <div className="bg-soul-surface/95 backdrop-blur-xl border-t border-soul-border/40 shadow-2xl">
+              <div className="max-w-md mx-auto px-6 py-4">
+                <div className="flex items-center justify-between gap-6">
+
+                  {/* Home / Holoflower Button */}
+                  <button
+                    onClick={() => window.location.href = '/consciousness'}
+                    className="flex-shrink-0 p-2 rounded-full hover:bg-amber-400/20
+                             active:scale-95 transition-all group"
+                    title="Return to Consciousness Station"
+                  >
+                    <svg className="w-6 h-6 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                    </svg>
+                  </button>
+
+                  {/* Voice/Mic Toggle */}
+                  <button
+                    onClick={() => {
+                      if (isMuted) {
+                        setIsMuted(false);
+                        voiceMicRef.current?.startListening?.();
+                      } else {
+                        setIsMuted(true);
+                        voiceMicRef.current?.stopListening?.();
+                      }
+                    }}
+                    className={`flex-shrink-0 p-3 rounded-full transition-all active:scale-95 ${
+                      isMuted
+                        ? 'bg-amber-400/10 text-amber-400/50 hover:bg-amber-400/20'
+                        : 'bg-amber-400/20 text-amber-400 hover:bg-amber-400/30'
+                    }`}
+                    title={isMuted ? 'Enable Voice' : 'Disable Voice'}
+                  >
+                    {isMuted ? (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                              d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+                              clipRule="evenodd" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                      </svg>
+                    )}
+                  </button>
+
+                  {/* Emergency Stop Button */}
+                  <button
+                    onClick={() => {
+                      // Stop all audio/voice
+                      if (audioContextRef.current) {
+                        try {
+                          audioContextRef.current.close();
+                        } catch (e) {
+                          console.error('Error closing audio context:', e);
+                        }
+                      }
+                      setIsAudioPlaying(false);
+                      setIsResponding(false);
+                      voiceMicRef.current?.stopListening?.();
+                      toast.success('All voice activity stopped');
+                    }}
+                    className="flex-shrink-0 p-2 rounded-full bg-red-400/20 text-red-400
+                             hover:bg-red-400/30 active:scale-95 transition-all"
+                    title="Emergency Stop - Stop all audio/voice"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <rect x="6" y="6" width="12" height="12" rx="1"/>
+                    </svg>
+                  </button>
+
+                  {/* Chat Toggle Button */}
+                  <button
+                    onClick={() => setShowChatInterface(!showChatInterface)}
+                    className={`flex-shrink-0 p-2 rounded-full transition-all active:scale-95 ${
+                      showChatInterface
+                        ? 'bg-amber-400/20 text-amber-400 hover:bg-amber-400/30'
+                        : 'bg-amber-400/10 text-amber-400/50 hover:bg-amber-400/20'
+                    }`}
+                    title={showChatInterface ? 'Hide Chat' : 'Show Chat'}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                  </button>
+
+                  {/* Download Transcript Button */}
+                  <button
+                    onClick={handleDownloadTranscript}
+                    disabled={messages.length < 2}
+                    className="flex-shrink-0 p-2 rounded-full bg-amber-400/20 text-amber-400
+                             hover:bg-amber-400/30 active:scale-95 transition-all
+                             disabled:opacity-30 disabled:cursor-not-allowed"
+                    title="Download Transcript"
+                  >
+                    <Download className="w-5 h-5" />
+                  </button>
+
+                  {/* Save Journal Button */}
+                  <button
+                    onClick={handleSaveAsJournal}
+                    disabled={messages.length < 2 || !userId || isSavingJournal}
+                    className={`flex-shrink-0 p-2 rounded-full transition-all active:scale-95
+                             disabled:opacity-30 disabled:cursor-not-allowed ${
+                      breakthroughScore >= 70
+                        ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 animate-pulse'
+                        : 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
+                    }`}
+                    title="Save to Journal"
+                  >
+                    <BookOpen className="w-5 h-5" />
+                  </button>
+
+                  {/* Claude Code Presence Button */}
+                  <button
+                    onClick={() => setShowClaudePresence(!showClaudePresence)}
+                    className={`flex-shrink-0 p-2 rounded-full transition-all active:scale-95 ${
+                      showClaudePresence
+                        ? 'bg-amber-400/20 text-amber-400 hover:bg-amber-400/30'
+                        : 'bg-amber-400/10 text-amber-400/50 hover:bg-amber-400/20'
+                    }`}
+                    title="Claude Code's Presence"
+                  >
+                    <Brain className="w-5 h-5" />
+                  </button>
+
+                  {/* Brain Trust Monitor Button */}
+                  <button
+                    onClick={() => setShowBrainTrust(!showBrainTrust)}
+                    className={`flex-shrink-0 p-2 rounded-full transition-all active:scale-95 ${
+                      showBrainTrust
+                        ? 'bg-amber-400/20 text-amber-400 hover:bg-amber-400/30'
+                        : 'bg-amber-400/10 text-amber-400/50 hover:bg-amber-400/20'
+                    }`}
+                    title="Consciousness Weaver"
+                  >
+                    <Sparkles className="w-5 h-5" />
+                  </button>
+
+                  {/* Sacred Menu Button */}
+                  <button
+                    onClick={() => setShowLabDrawer(true)}
+                    className="flex-shrink-0 p-2 rounded-full bg-amber-400/20 text-amber-400
+                             hover:bg-amber-400/30 active:scale-95 transition-all"
+                    title="Open Sacred Menu"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                            d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  </button>
+
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Brain Trust Components - Controlled by bottom menu bar */}
+      {showClaudePresence && <ClaudeCodePresence />}
+      {showBrainTrust && <BrainTrustMonitor />}
 
       {/* Voice/Chat Mode Switcher - REMOVED: Always use Realtime voice mode */}
 
@@ -2715,13 +2934,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           <ContinuousConversation
             ref={voiceMicRef}
             onTranscript={handleVoiceTranscript}
+            onAudioLevelChange={(level) => setVoiceAmplitude(level)}
             isProcessing={isResponding}
             isSpeaking={isAudioPlaying}
             autoStart={true}
             silenceThreshold={
               listeningMode === 'session' ? 999999 : // Session mode: never auto-send (effectively infinite)
-              listeningMode === 'patient' ? 10000 :   // Patient mode: 10 seconds (increased for full thoughts)
-              6000                                     // Normal mode: 6 seconds (increased from 3.5s to prevent mid-sentence cutoff)
+              listeningMode === 'patient' ? 30000 :   // Patient mode: 30 seconds (for very long, contemplative thoughts)
+              20000                                    // Normal/Dialogue mode: 20 seconds (allow deep thinking pauses)
             }
           />
         </div>
@@ -2776,6 +2996,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         }}
         showVoiceText={showVoiceText}
         isFieldRecording={isFieldRecording}
+      />
+
+      {/* Transcript Sidebar - Shows message history in voice mode */}
+      <TranscriptSidebar
+        messages={messages.map(msg => ({
+          id: msg.id,
+          role: msg.role === 'oracle' ? 'assistant' : 'user',
+          content: msg.text,
+          timestamp: msg.timestamp instanceof Date ? msg.timestamp.getTime() : Date.now()
+        }))}
+        isOpen={isTranscriptOpen}
+        onToggle={() => setIsTranscriptOpen(!isTranscriptOpen)}
+        consciousnessType="maia"
       />
     </div>
   );

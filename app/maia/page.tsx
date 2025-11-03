@@ -12,6 +12,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import { OracleConversation } from '@/components/OracleConversation';
 import { ClaudeCodePresence } from '@/components/ui/ClaudeCodePresence';
@@ -20,8 +21,9 @@ import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
 import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrainTrustMonitor } from '@/components/consciousness/BrainTrustMonitor';
-import { LogOut, Sparkles, Menu, X, Brain, Volume2 } from 'lucide-react';
+import { LogOut, Sparkles, Menu, X, Brain, Volume2, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { SwipeNavigation, DirectionalHints } from '@/components/navigation/SwipeNavigation';
 
 function getInitialUserData() {
   if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
@@ -78,7 +80,18 @@ export default function MAIAPage() {
   // Fix hydration: Initialize user data and session after mount
   useEffect(() => {
     setIsMounted(true);
-    setSessionId(Date.now().toString());
+
+    // Get or create persistent sessionId - this enables conversation continuity across reloads!
+    const existingSessionId = localStorage.getItem('maia_session_id');
+    if (existingSessionId) {
+      setSessionId(existingSessionId);
+      console.log('💫 [MAIA] Restored session:', existingSessionId);
+    } else {
+      const newSessionId = `session_${Date.now()}`;
+      localStorage.setItem('maia_session_id', newSessionId);
+      setSessionId(newSessionId);
+      console.log('✨ [MAIA] Created new session:', newSessionId);
+    }
 
     const initialData = getInitialUserData();
     setExplorerId(initialData.id);
@@ -186,7 +199,37 @@ export default function MAIAPage() {
 
   return (
     <ErrorBoundary>
-      <div className="h-screen bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 flex flex-col overflow-hidden">
+      <SwipeNavigation currentPage="maia">
+        {/* DirectionalHints removed - keyboard shortcuts now active (arrow keys + ESC) */}
+
+        <div className="h-screen relative overflow-hidden bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 flex flex-col">
+        {/* Atmospheric Particles - Floating dust/sand */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          {[...Array(30)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-[#D4B896]/20 rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                opacity: [0.2, 0.5, 0.2],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 4,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Atmospheric Glow - Warm light from below */}
+        <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-[#3d2817]/30 via-transparent to-transparent pointer-events-none z-0" />
+
         {/* DREAM-WEAVER SYSTEM - Combined Header & Banner */}
         <div className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/10 backdrop-blur-sm">
           {/* Spice particle effect - very subtle movement */}
@@ -226,8 +269,17 @@ export default function MAIAPage() {
 
           <div className="relative max-w-7xl mx-auto px-4 py-2">
             <div className="flex items-center justify-between">
+              {/* Back to Consciousness Station */}
+              <Link
+                href="/consciousness"
+                className="absolute left-4 top-1/2 -translate-y-1/2 group flex items-center gap-2 text-[#D4B896]/60 hover:text-[#D4B896] transition-colors duration-300 z-10"
+              >
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
+                <span className="text-sm font-light tracking-wide hidden sm:inline">Station</span>
+              </Link>
+
               {/* Left side - SOULLAB branding */}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 ml-20">
                 <div className="flex items-center gap-2">
                   <motion.div
                     animate={{
@@ -499,13 +551,15 @@ export default function MAIAPage() {
               voiceEnabled={voiceEnabled}
               initialMode={maiaMode}
               onModeChange={setMaiaMode}
+              apiEndpoint="/api/between/chat"
+              consciousnessType="maia"
             />
 
-            {/* Claude Code's Living Presence - My expressive space! */}
-            <ClaudeCodePresence />
+            {/* Claude Code's Living Presence - MOVED to bottom menu bar to free mobile screen space */}
+            {/* <ClaudeCodePresence /> */}
 
-            {/* Brain Trust Monitor - Shows consciousness collaboration status */}
-            <BrainTrustMonitor />
+            {/* Brain Trust Monitor - MOVED to bottom menu bar to free mobile screen space */}
+            {/* <BrainTrustMonitor /> */}
 
             {/* Menu Discovery Bullseye - Positioned to activate drawer */}
             <motion.div
@@ -620,6 +674,7 @@ export default function MAIAPage() {
           </motion.div>
         )}
       </div>
+      </SwipeNavigation>
     </ErrorBoundary>
   );
 }

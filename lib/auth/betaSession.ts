@@ -54,6 +54,16 @@ class BetaSessionManager {
    * Restore session from localStorage on app load
    */
   public restoreSession(): SessionState {
+    // Guard: Only access localStorage on client side
+    if (typeof window === 'undefined') {
+      return {
+        isAuthenticated: false,
+        user: null,
+        needsOnboarding: false,
+        source: 'none'
+      };
+    }
+
     try {
       const betaUserStr = localStorage.getItem('beta_user');
 
@@ -91,6 +101,10 @@ class BetaSessionManager {
    */
   public setUser(user: BetaUser): void {
     this.currentUser = user;
+
+    // Guard: Only access localStorage on client side
+    if (typeof window === 'undefined') return;
+
     localStorage.setItem('beta_user', JSON.stringify(user));
 
     // Update lastVisit
@@ -108,6 +122,9 @@ class BetaSessionManager {
       console.warn('[BetaSession] No current user to update');
       return;
     }
+
+    // Guard: Only access localStorage on client side
+    if (typeof window === 'undefined') return;
 
     this.currentUser = {
       ...this.currentUser,
@@ -188,6 +205,10 @@ class BetaSessionManager {
    */
   public clearSession(): void {
     this.currentUser = null;
+
+    // Guard: Only access localStorage on client side
+    if (typeof window === 'undefined') return;
+
     localStorage.removeItem('beta_user');
     localStorage.removeItem('explorerId');
     localStorage.removeItem('explorerName');

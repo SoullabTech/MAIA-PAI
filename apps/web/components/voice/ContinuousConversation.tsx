@@ -9,6 +9,7 @@ interface ContinuousConversationProps {
   onTranscript: (text: string) => void;
   onInterimTranscript?: (text: string) => void;
   onRecordingStateChange?: (isRecording: boolean) => void;
+  onAudioLevelChange?: (level: number) => void; // Audio amplitude 0.0-1.0 for visualization
   isProcessing?: boolean;
   isSpeaking?: boolean; // When Maya is speaking
   autoStart?: boolean; // Start listening immediately
@@ -25,10 +26,11 @@ export interface ContinuousConversationRef {
 }
 
 export const ContinuousConversation = forwardRef<ContinuousConversationRef, ContinuousConversationProps>((props, ref) => {
-  const { 
-    onTranscript, 
-    onInterimTranscript, 
+  const {
+    onTranscript,
+    onInterimTranscript,
     onRecordingStateChange,
+    onAudioLevelChange,
     isProcessing = false,
     isSpeaking = false,
     autoStart = true,
@@ -349,16 +351,19 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       // Monitor audio levels
       const checkAudioLevel = () => {
         if (!analyserRef.current) return;
-        
+
         const bufferLength = analyserRef.current.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
         analyserRef.current.getByteFrequencyData(dataArray);
-        
+
         // Calculate average level
         const average = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
         const normalizedLevel = Math.min(average / 128, 1);
         setAudioLevel(normalizedLevel);
-        
+
+        // Send amplitude to parent for visualization
+        onAudioLevelChange?.(normalizedLevel);
+
         if (isListening) {
           requestAnimationFrame(checkAudioLevel);
         }
