@@ -86,6 +86,14 @@ export async function getRawBirthChartData(userId: string): Promise<any | null> 
       return HARDCODED_CHARTS[userId];
     }
 
+    // ⚡ PERFORMANCE: Skip database query for invalid UUID formats
+    // This prevents wasted time querying with user_1761386267477 style IDs
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
+      console.log('   ⏭️  Skipping DB query - userId is not a valid UUID format');
+      return null;
+    }
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { data: profile, error } = await supabase

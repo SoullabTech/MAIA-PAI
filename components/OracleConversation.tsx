@@ -47,6 +47,8 @@ import { TransformationalPresence, type PresenceState } from './nlp/Transformati
 import { BrainTrustMonitor } from './consciousness/BrainTrustMonitor';
 import { ClaudeCodePresence } from './ui/ClaudeCodePresence';
 import { saveConversation, loadConversation } from '@/lib/consciousness/ConversationPersistence';
+import { MaiaResponseFeedback } from './feedback/MaiaResponseFeedback';
+import { ConversationExport } from './conversation/ConversationExport';
 
 interface OracleConversationProps {
   userId?: string;
@@ -1247,6 +1249,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       let responseText = oracleResponse.message || oracleResponse.content || oracleResponse.text || oracleResponse.response || 'Tell me your truth.';
       responseText = cleanMessage(responseText);
 
+      // 🌀 Extract voiceTone for elemental prosody
+      const voiceTone = oracleResponse.voiceTone;
+      if (voiceTone) {
+        console.log('🌀 Received elemental voiceTone from oracle:', voiceTone);
+      }
+
       // 🩺 Monitor MAIA personality health (dev mode only)
       // Detects degradation and auto-recovers if needed
       if (process.env.NODE_ENV === 'development') {
@@ -1354,11 +1362,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           console.log('⏱️ Starting speech at:', startSpeakTime);
 
           // Speak the cleaned response with timeout protection
-          const speakPromise = maiaSpeak(cleanVoiceText);
+          // 🌀 Pass voiceTone for elemental prosody (Fire/Water/Earth/Air/Aether)
+          const speakPromise = maiaSpeak(cleanVoiceText, { voiceTone });
 
-          // Add timeout to prevent infinite hanging (15 seconds max for better UX)
+          // Add timeout to prevent infinite hanging (25 seconds max for longer responses)
+          // Longer timeout needed: TTS synthesis (1-2s) + Audio playback (10-15s) + Cooldown (0.8s) = ~12-18s
           const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Speech timeout after 15s')), 15000);
+            setTimeout(() => reject(new Error('Speech timeout after 25s')), 25000);
           });
 
           await Promise.race([speakPromise, timeoutPromise]);
@@ -2430,6 +2440,16 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           message.text
                         )}
                       </div>
+
+                      {/* 📊 Feedback Component - Quality Metrics */}
+                      {message.role === 'oracle' && userId && (
+                        <MaiaResponseFeedback
+                          responseId={message.id}
+                          userId={userId}
+                          element={message.element}
+                          voiceTone={message.voiceTone}
+                        />
+                      )}
                     </motion.div>
                     );
                   })}
@@ -2447,9 +2467,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         <>
           {/* Old Mode Toggle removed - Now using ModeSwitcher at top-left */}
 
-          {/* Text Display Toggle for Voice Mode */}
+          {/* Text Display Toggle & Export for Voice Mode */}
           {!showChatInterface && (
-            <div className="fixed top-20 md:top-20 right-4 md:right-8 z-50">
+            <div className="fixed top-20 md:top-20 right-4 md:right-8 z-50 flex gap-2">
               <button
                 onClick={() => setShowVoiceText(!showVoiceText)}
                 className="px-3 py-1.5 rounded-full text-xs font-medium bg-black/20 backdrop-blur-md
@@ -2457,6 +2477,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               >
                 {showVoiceText ? 'Hide Text' : 'Show Text'}
               </button>
+
+              {userId && (
+                <ConversationExport userId={userId} sessionId={sessionId} />
+              )}
             </div>
           )}
 
@@ -2501,8 +2525,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 </motion.div>
               </div>
 
-              {/* Voice toggle for chat mode - HIDDEN on mobile, visible on desktop */}
-              <div className="hidden md:block fixed top-20 right-20 z-50">
+              {/* Voice toggle & Export for chat mode - HIDDEN on mobile, visible on desktop */}
+              <div className="hidden md:flex fixed top-20 right-4 md:right-8 z-50 gap-2">
                 <button
                   onClick={() => setEnableVoiceInChat(!enableVoiceInChat)}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
@@ -2518,6 +2542,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                   </svg>
                   <span>{enableVoiceInChat ? 'Voice On' : 'Voice Off'}</span>
                 </button>
+
+                {userId && (
+                  <ConversationExport userId={userId} sessionId={sessionId} />
+                )}
               </div>
 
               {/* Text input area - Shows in chat mode, positioned above safe area */}

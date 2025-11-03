@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   const startTime = Date.now();
 
   try {
-    const { text, voice = 'shimmer', quality = 'standard', speed = 1.0 } = await req.json();
+    const { text, voice = 'shimmer', quality = 'standard', speed = 1.0, voiceTone } = await req.json();
 
     if (!text) {
       return NextResponse.json({
@@ -41,14 +41,37 @@ export async function POST(req: NextRequest) {
       }, { status: 400 });
     }
 
+    const selectedVoice = VOICE_MAP[voice] || 'shimmer';
+
+    // 🔥 ELEMENTAL PROSODY: Apply voiceTone from adaptive-tone-engine
+    // This gives Fire/Water/Earth/Air/Aether their unique voice characteristics
+    let finalSpeed = speed;
+
+    if (voiceTone) {
+      console.log(`🌀 Applying elemental prosody: ${voiceTone.style}`, {
+        pitch: voiceTone.pitch,
+        rate: voiceTone.rate
+      });
+
+      // Rate modulation (direct speed adjustment)
+      if (voiceTone.rate) {
+        finalSpeed = voiceTone.rate;
+      }
+
+      // Pitch modulation (OpenAI doesn't have pitch, so use speed as proxy)
+      // Higher pitch = slightly faster, lower pitch = slightly slower
+      if (voiceTone.pitch && voiceTone.pitch !== 1.0) {
+        finalSpeed *= (0.9 + (voiceTone.pitch * 0.1));
+      }
+    }
+
     console.log('🔊 Synthesizing with OpenAI TTS:', {
       text: text.substring(0, 50),
-      voice,
+      voice: selectedVoice,
       quality,
-      speed
+      speed: finalSpeed,
+      ...(voiceTone && { elementalStyle: voiceTone.style })
     });
-
-    const selectedVoice = VOICE_MAP[voice] || 'shimmer';
 
     // Call OpenAI TTS API
     const response = await fetch('https://api.openai.com/v1/audio/speech', {
@@ -61,7 +84,7 @@ export async function POST(req: NextRequest) {
         model: quality === 'hd' ? 'tts-1-hd' : 'tts-1', // tts-1 is faster (~200ms), tts-1-hd is higher quality
         voice: selectedVoice,
         input: text,
-        speed: speed, // 0.25 to 4.0
+        speed: finalSpeed, // 0.25 to 4.0 - now modulated by elemental prosody
         response_format: 'mp3' // mp3, opus, aac, flac
       })
     });

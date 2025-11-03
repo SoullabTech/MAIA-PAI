@@ -385,7 +385,13 @@ export const WakeWordVoiceInterface: React.FC<WakeWordVoiceInterfaceProps> = ({
       let responseText = result.content || result.response || '';
       responseText = VoicePreprocessor.extractSpokenContent(responseText);
 
-      // Generate voice audio
+      // 🔥 ELEMENTAL PROSODY: Extract voiceTone from oracle response
+      const voiceTone = result.voiceTone;
+      if (voiceTone) {
+        console.log('🌀 Received elemental voiceTone from oracle:', voiceTone);
+      }
+
+      // Generate voice audio with elemental prosody
       const voiceResponse = await fetch('/api/voice/synthesize', {
         method: 'POST',
         headers: {
@@ -394,7 +400,8 @@ export const WakeWordVoiceInterface: React.FC<WakeWordVoiceInterfaceProps> = ({
         body: JSON.stringify({
           text: responseText,
           voiceId,
-          userId
+          userId,
+          voiceTone  // 🌀 Pass elemental tone for Fire/Water/Earth/Air/Aether modulation
         }),
       });
 

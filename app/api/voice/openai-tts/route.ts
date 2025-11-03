@@ -52,7 +52,7 @@ function cleanTextForSpeech(text: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { text, speed, voice: customVoice, prosody, agentVoice } = await request.json();
+    const { text, speed, voice: customVoice, prosody, agentVoice, voiceTone } = await request.json();
 
     if (!text || typeof text !== 'string') {
       return NextResponse.json(
@@ -93,7 +93,27 @@ export async function POST(request: NextRequest) {
       ...(speed && { speed })
     };
 
-    // Apply prosody adjustments if provided
+    // 🔥 ELEMENTAL PROSODY: Apply voiceTone from adaptive-tone-engine
+    // This gives Fire/Water/Earth/Air/Aether their unique voice characteristics
+    if (voiceTone) {
+      console.log(`🌀 Applying elemental prosody: ${voiceTone.style}`, {
+        pitch: voiceTone.pitch,
+        rate: voiceTone.rate
+      });
+
+      // Rate modulation (direct speed adjustment)
+      if (voiceTone.rate) {
+        config.speed = voiceTone.rate;
+      }
+
+      // Pitch modulation (OpenAI doesn't have pitch, so use speed as proxy)
+      // Higher pitch = slightly faster, lower pitch = slightly slower
+      if (voiceTone.pitch && voiceTone.pitch !== 1.0) {
+        config.speed *= (0.9 + (voiceTone.pitch * 0.1));
+      }
+    }
+
+    // Apply prosody adjustments if provided (legacy support)
     // Adjust pacing based on content type
     if (prosody) {
       if (prosody.speed) config.speed *= prosody.speed;
@@ -104,29 +124,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Serene Oracle pacing - tranquil flow with thoughtful pauses
-    // Slower for reflection, gentle for comfort, measured for wisdom
-    if (text.toLowerCase().includes('breathe') ||
-        text.toLowerCase().includes('feel') ||
-        text.toLowerCase().includes('heart') ||
-        text.toLowerCase().includes('soul')) {
-      config.speed = 0.92; // Gentle but not too slow
-    } else if (text.toLowerCase().includes('choice') ||
-               text.toLowerCase().includes('path') ||
-               text.toLowerCase().includes('already know') ||
-               text.toLowerCase().includes('truth')) {
-      config.speed = 0.93; // Thoughtful but conversational
-    } else if (text.toLowerCase().includes('dear') ||
-               text.toLowerCase().includes('sweetheart') ||
-               text.toLowerCase().includes('child')) {
-      config.speed = 0.95; // Warm and natural
-    } else if (text.toLowerCase().includes('transition') ||
-               text.toLowerCase().includes('becoming') ||
-               text.toLowerCase().includes('transform')) {
-      config.speed = 0.94; // Clear and present
-    }
+    // 🔥 ELEMENTAL PROSODY: Legacy "Serene Oracle pacing" rules have been DISABLED
+    // They were overriding the elemental prosody system from adaptive-tone-engine.ts
+    // Now config.speed is controlled ONLY by voiceTone (Fire/Water/Earth/Air/Aether)
+    //
+    // OLD CODE (interfered with elemental prosody):
+    // if (text.includes('breathe') || text.includes('feel') || ...) {
+    //   config.speed = 0.92;  ← This was overriding voiceTone!
+    // }
 
-    console.log('Generating speech with OpenAI TTS:', {
+    console.log('🔊 Generating speech with OpenAI TTS:', {
       voice: config.voice,
       speed: config.speed,
       textLength: cleanedText.length

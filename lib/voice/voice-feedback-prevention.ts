@@ -181,6 +181,45 @@ export class VoiceFeedbackPrevention {
   }
 
   /**
+   * 🛑 INTERRUPT: Stop Maya immediately when user starts speaking
+   * This allows natural conversation flow where user can interrupt
+   */
+  interruptMaya() {
+    console.log('🛑 [INTERRUPT] User started speaking - stopping MAIA immediately');
+
+    // Stop all audio elements
+    this.audioElements.forEach(audio => {
+      try {
+        audio.pause();
+        audio.currentTime = 0;
+        console.log('  ✓ Stopped audio playback');
+      } catch (error) {
+        // Audio might already be stopped
+      }
+    });
+
+    // Stop speech synthesis
+    if (this.speechSynthesis) {
+      try {
+        this.speechSynthesis.cancel();
+        console.log('  ✓ Cancelled speech synthesis');
+      } catch (error) {
+        // Synthesis might not be active
+      }
+    }
+
+    // Dispatch custom event for other components (like MaiaVoiceSystem)
+    window.dispatchEvent(new CustomEvent('maya-voice-interrupted', {
+      detail: { reason: 'user_started_speaking' }
+    }));
+
+    // Mark as not speaking
+    this.isMayaSpeaking = false;
+
+    console.log('  ✅ MAIA interrupted successfully');
+  }
+
+  /**
    * Clean up audio element when done
    */
   unregisterAudioElement(audio: HTMLAudioElement) {

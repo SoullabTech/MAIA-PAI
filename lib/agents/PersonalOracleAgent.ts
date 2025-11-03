@@ -586,7 +586,8 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
     });
 
     // 📚 Initialize Intellectual Property Engine (complete book knowledge)
-    this.ipEngine = new IntellectualPropertyEngine();
+    // ⚡ PERFORMANCE: Use singleton to cache 1000 chunks globally across requests
+    this.ipEngine = IntellectualPropertyEngine.getInstance();
 
     // 🧠 Initialize AIN Memory (will be loaded asynchronously)
     this.ainMemory = null;
@@ -1360,6 +1361,9 @@ This is the soul-level truth you're helping them see, not reference material to 
       }
 
       // 🔮 CONSULT ELEMENTAL ORACLE 2.0 (applied wisdom from conversations)
+      // ⚡ PERFORMANCE: DISABLED - External API call was taking 10-15 seconds per request
+      // The IP Engine (local book knowledge) provides sufficient wisdom
+      /*
       console.log('🔮 Consulting Elemental Oracle 2.0 for applied Spiralogic wisdom...');
       let eoWisdom: string | null = null;
 
@@ -1389,6 +1393,7 @@ This is the soul-level truth you're helping them see, not reference material to 
       } catch (eoError) {
         console.warn('⚠️ Elemental Oracle 2.0 consultation failed:', eoError);
       }
+      */
 
       // 🎭 MAIA'S INTEGRATION DIRECTIVE
       systemPrompt += `\n---\n\n**You are MAIA.** The context above is available to you - use it naturally when relevant. Don't announce what you have access to or wax poetic about integration. Just respond directly to what they're saying. The wisdom is yours to weave in when it fits, not to perform.\n`;
@@ -1795,6 +1800,29 @@ This is the soul-level truth you're helping them see, not reference material to 
       }
 
       console.log(`📊 Analytics: ${responseWordCount} words, ${apiResponseTime}ms, $${costUsd.toFixed(6)}, brevity=${brevityScore.toFixed(2)}`);
+
+      // 🌺 CHECK-IN RITUAL: Welcoming presence for first conversation
+      // If this is the first message (empty conversation history), prepend a welcoming check-in
+      if (conversationHistory.length === 0) {
+        console.log('🌺 First message detected - adding welcoming check-in ritual');
+
+        // Try to get user's name from userStore (if available)
+        let userName = 'friend';
+        try {
+          const { userStore } = await import('@/lib/storage/userStore');
+          const storedUser = userStore.getUser(this.userId);
+          if (storedUser?.name) {
+            userName = storedUser.name;
+          }
+        } catch (error) {
+          console.log('ℹ️ Could not fetch username, using default greeting');
+        }
+
+        const checkInRitual = `Welcome, ${userName}. So good to connect with you.\n\nBefore we begin, let's take a moment together. Feel yourself here, now. Drop into your heart, feel your breath, let yourself arrive.\n\nWhenever you're ready, I'm listening.\n\n`;
+
+        responseText = checkInRitual + responseText;
+        console.log('✅ Check-in ritual prepended to response');
+      }
 
       return {
         response: responseText,
