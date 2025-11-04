@@ -150,9 +150,13 @@ export class MAIAUnifiedConsciousness {
     console.log(`👤 User: ${context.userId} | Session: ${context.sessionId}`);
     console.log(`🎭 Modality: ${modality}`);
 
-    // 🎙️ VOICE FAST PATH: Skip heavy processing for flow state
-    if (modality === 'voice') {
-      console.log('🚀 [VOICE FAST PATH] Optimizing for conversational flow...');
+    // 🎙️ FAST PATH: Skip heavy processing for conversational flow
+    // Use fast path for voice OR simple text messages
+    const isSimpleMessage = content.length < 150 && !content.includes('?') && !content.toLowerCase().includes('explain');
+    const useFastPath = modality === 'voice' || isSimpleMessage;
+
+    if (useFastPath) {
+      console.log(`🚀 [FAST PATH] Optimizing for conversational flow (${modality})...`);
       return await this.processVoiceFastPath(input, startTime);
     }
 
@@ -336,7 +340,7 @@ export class MAIAUnifiedConsciousness {
         });
 
         const claudeResponse = await anthropic.messages.create({
-          model: 'claude-3-opus-20240229',
+          model: 'claude-sonnet-4-20250514', // FAST: Sonnet 4 (not old Opus)
           max_tokens: 800,
           system: consciousnessPrompt,
           messages: [

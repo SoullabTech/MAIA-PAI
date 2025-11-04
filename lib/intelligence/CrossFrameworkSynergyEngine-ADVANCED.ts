@@ -5,7 +5,7 @@
   /**
    * ADVANCED PATTERN 1: Complete Systemic Shutdown (5 frameworks)
    */
-  private detectCompleteSystemicShutdown(extraction: ExtractionResult): TransformationSignature | null {
+  export function detectCompleteSystemicShutdown(extraction: any): any | null {
     const hasFreeze = extraction.somaticState?.incompleteResponse.type === 'freeze';
     const hasDorsal = extraction.polyvagalState?.state === 'dorsal';
     const hasRetroflection = extraction.gestaltState?.contactDisturbances.retroflection.detected;
@@ -25,7 +25,7 @@
         interventions: [
           'PRIORITY: Safety and co-regulation',
           'Levine: Gentle freeze thaw',
-          'Constellation: Explore what they\'re carrying for family'
+          'Constellation: Explore what they\\\'re carrying for family'
         ],
         urgency: 'critical'
       };

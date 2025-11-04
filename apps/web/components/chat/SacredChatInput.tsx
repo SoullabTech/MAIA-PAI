@@ -183,7 +183,7 @@ export default function SacredChatInput({
   };
 
   return (
-    <div className="p-4 sm:p-6 border-t border-amber-400/20 bg-neutral-900/80 backdrop-blur-xl">
+    <div className="fixed bottom-0 left-0 right-0 p-4 sm:p-6 border-t border-amber-400/20 bg-neutral-900/95 backdrop-blur-xl z-50 shadow-2xl">
       {/* Sacred Input Container - Mobile Optimized */}
       <motion.div
         ref={containerRef}

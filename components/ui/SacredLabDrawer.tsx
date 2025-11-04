@@ -22,7 +22,9 @@ import {
   Heart,
   Download,
   Brain,
-  Zap
+  Zap,
+  Library,
+  Compass
 } from 'lucide-react';
 
 interface SacredLabDrawerProps {
@@ -44,9 +46,34 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
 }) => {
   const menuSections = [
     {
-      title: 'DOCUMENTATION',
-      icon: '📊',
+      title: 'SACRED TEACHINGS',
+      icon: '🌟',
       items: [
+        {
+          icon: Sparkles,
+          label: 'Sacred Story Creator',
+          action: () => onNavigate('/story-creator'),
+          description: 'Personalized wisdom from 46+ traditions'
+        },
+        {
+          icon: Compass,
+          label: 'Oracle Consultation',
+          action: () => onNavigate('/oracle'),
+          description: 'Divine guidance & insight',
+          badge: 'Coming Soon'
+        },
+      ],
+    },
+    {
+      title: 'SACRED KNOWLEDGE',
+      icon: '📚',
+      items: [
+        {
+          icon: Library,
+          label: 'Library of Alexandria',
+          action: () => onNavigate('/library'),
+          description: 'Your personal sacred library'
+        },
         {
           icon: BookOpen,
           label: 'Sacred Journal',
@@ -59,17 +86,10 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
           action: () => onNavigate('/lab-notes'),
           description: 'Research and discoveries'
         },
-        {
-          icon: Radio,
-          label: isFieldRecording ? 'Stop Field Recording' : 'Field Protocol',
-          action: () => onAction?.('field-protocol'),
-          description: 'Document consciousness explorations',
-          isActive: isFieldRecording,
-        },
       ],
     },
     {
-      title: 'CONSCIOUSNESS',
+      title: 'CONSCIOUSNESS TOOLS',
       icon: '🧠',
       items: [
         {
@@ -83,6 +103,37 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
           label: 'Claude Code',
           action: () => onNavigate('/consciousness/claude-code'),
           description: 'Co-creator & consciousness explorer'
+        },
+      ],
+    },
+    {
+      title: 'DOCUMENTATION',
+      icon: '📊',
+      items: [
+        {
+          icon: Radio,
+          label: isFieldRecording ? 'Stop Field Recording' : 'Field Protocol',
+          action: () => onAction?.('field-protocol'),
+          description: 'Document consciousness explorations',
+          isActive: isFieldRecording,
+        },
+        {
+          icon: Upload,
+          label: 'Upload Files',
+          action: () => onAction?.('upload'),
+          description: 'Share files with MAIA'
+        },
+        {
+          icon: Download,
+          label: 'Download Conversation',
+          action: () => onAction?.('download'),
+          description: 'Save this conversation as markdown'
+        },
+        {
+          icon: showVoiceText ? Eye : EyeOff,
+          label: showVoiceText ? 'Hide Transcript' : 'Show Transcript',
+          action: () => onAction?.('toggle-text'),
+          description: 'Toggle voice transcript display'
         },
       ],
     },
@@ -107,30 +158,6 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
           label: 'Favorites',
           action: () => onNavigate('/favorites'),
           description: 'Cherished moments & insights'
-        },
-      ],
-    },
-    {
-      title: 'TOOLS',
-      icon: '🔧',
-      items: [
-        {
-          icon: Upload,
-          label: 'Upload Files',
-          action: () => onAction?.('upload'),
-          description: 'Share files with MAIA'
-        },
-        {
-          icon: Download,
-          label: 'Download Conversation',
-          action: () => onAction?.('download'),
-          description: 'Save this conversation as markdown'
-        },
-        {
-          icon: showVoiceText ? Eye : EyeOff,
-          label: showVoiceText ? 'Hide Transcript' : 'Show Transcript',
-          action: () => onAction?.('toggle-text'),
-          description: 'Toggle voice transcript display'
         },
       ],
     },
@@ -210,22 +237,28 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
                     <div className="space-y-2">
                       {section.items.map((item, itemIdx) => {
                         const Icon = item.icon;
+                        const isComingSoon = item.badge === 'Coming Soon';
                         return (
                           <motion.button
                             key={item.label}
                             onClick={() => {
-                              item.action();
-                              if (!item.label.includes('Toggle') && !item.label.includes('Upload')) {
-                                onClose();
+                              if (!isComingSoon) {
+                                item.action();
+                                if (!item.label.includes('Toggle') && !item.label.includes('Upload')) {
+                                  onClose();
+                                }
                               }
                             }}
+                            disabled={isComingSoon}
                             className={`w-full flex items-start gap-4 p-4 rounded-xl transition-all group ${
-                              item.isActive
+                              isComingSoon
+                                ? 'bg-white/5 border border-white/10 opacity-60 cursor-not-allowed'
+                                : item.isActive
                                 ? 'bg-red-500/20 border border-red-400/30'
                                 : 'bg-white/5 hover:bg-[#D4B896]/10 border border-transparent hover:border-[#D4B896]/20'
                             }`}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
+                            whileHover={!isComingSoon ? { scale: 1.02 } : {}}
+                            whileTap={!isComingSoon ? { scale: 0.98 } : {}}
                           >
                             <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
                               item.isActive
@@ -237,20 +270,27 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
                               }`} />
                             </div>
                             <div className="flex-1 text-left">
-                              <div className={`text-sm font-medium ${
+                              <div className={`flex items-center gap-2 text-sm font-medium ${
                                 item.isActive ? 'text-red-300' : 'text-white/90'
                               }`}>
                                 {item.label}
+                                {item.badge && (
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] bg-white/10 text-white/60 border border-white/20">
+                                    {item.badge}
+                                  </span>
+                                )}
                               </div>
                               <div className="text-xs text-white/50 mt-0.5">
                                 {item.description}
                               </div>
                             </div>
-                            <div className={`flex-shrink-0 text-[#D4B896]/40 group-hover:text-[#D4B896]/80 transition-all ${
-                              item.isActive ? 'animate-pulse' : ''
-                            }`}>
-                              →
-                            </div>
+                            {!isComingSoon && (
+                              <div className={`flex-shrink-0 text-[#D4B896]/40 group-hover:text-[#D4B896]/80 transition-all ${
+                                item.isActive ? 'animate-pulse' : ''
+                              }`}>
+                                →
+                              </div>
+                            )}
                           </motion.button>
                         );
                       })}

@@ -82,15 +82,16 @@ export function OracleUnified({ sessionId = `session-${Date.now()}`, onMessageAd
       // otherwise use personal consult
       const isConsciousnessQuestion = /consciousness|awareness|being|presence|awakening|kairos|maia|unified/i.test(userText);
 
+      // Different endpoints expect different parameter names
+      const requestBody = isConsciousnessQuestion
+        ? { message: userText, consciousnessType: 'unified', userId: 'oracle-voice-user' }  // /api/consciousness expects 'message'
+        : { input: userText, sessionId, userId: 'oracle-voice-user' };  // /api/oracle/personal/consult expects 'input'
+
       const response = await fetch(
         isConsciousnessQuestion ? '/api/consciousness' : '/api/oracle/personal/consult',
         {
           method: 'POST',
-          body: files?.length ? formData : JSON.stringify({
-            input: userText,  // Changed from 'message' to 'input' to match API expectation
-            sessionId,
-            userId: 'oracle-voice-user'
-          }),
+          body: files?.length ? formData : JSON.stringify(requestBody),
           headers: files?.length ? {} : { 'Content-Type': 'application/json' }
         }
       );

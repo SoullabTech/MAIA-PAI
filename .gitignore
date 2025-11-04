@@ -102,6 +102,10 @@ test-*.html
 *.m4a
 *.ogg
 
+# Large library files (store in Supabase/cloud storage instead)
+uploads/
+*.pdf
+
 # IDE and OS
 .DS_Store
 ._*

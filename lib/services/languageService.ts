@@ -1261,15 +1261,19 @@ class LanguageService {
       const stored = this.getStoredLanguage();
       if (stored && SUPPORTED_LANGUAGES[stored]?.available) {
         this.currentLanguage = stored;
+        console.log('[LanguageService] Loaded stored language:', stored);
         return;
       }
 
-      // Auto-detect from browser
-      const detected = this.detectBrowserLanguage();
-      if (detected && SUPPORTED_LANGUAGES[detected]?.available) {
-        this.currentLanguage = detected;
-        this.setLanguage(detected, false); // Don't persist auto-detected
-      }
+      // 🔒 MAIA DEFAULT: Force English on first initialization
+      // This prevents unwanted language switching when user exits/re-enters
+      // Users can still explicitly change language via settings
+      console.log('[LanguageService] No stored language - defaulting to English and persisting');
+      this.currentLanguage = 'en';
+      this.setLanguage('en', true); // Persist English as default
+
+      // Note: Auto-detection disabled to prevent Spanish switching issue
+      // Previously, navigator.language detection would switch to Spanish on re-entry
     } catch (error) {
       console.warn('Language initialization failed, using English:', error);
       this.currentLanguage = 'en';

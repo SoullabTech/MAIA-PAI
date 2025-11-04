@@ -13,11 +13,7 @@ import { SessionGuard } from "@/components/auth/SessionGuard";
 // import VoiceDebugOverlay from "@/components/debug/VoiceDebugOverlay"; // File doesn't exist
 // import { ToneDebugOverlay } from "@/components/voice/ToneDebugOverlay"; // Disabled for debugging
 import { Toaster } from 'react-hot-toast';
-// import "./globals.css"; // TEMP: Disabled - Next.js CSS loaders broken
-// import "../public/compiled.css"; // TEMP: Disabled - Next.js CSS loaders broken
-// import "./globals-mobile.css"; // TEMP: Disabled - Next.js CSS loaders broken
-// import "@/styles/typography-refresh.css"; // TEMP: Disabled - Next.js CSS loaders broken
-// import "@/styles/dune-theme.css"; // 🏜️ DUNE AESTHETIC SYSTEM - Available for future use
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -63,8 +59,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="stylesheet" href="/compiled.css" />
-        <link rel="stylesheet" href="/dune-compiled.css" />
+        {/* Old static CSS removed - Next.js handles compilation automatically */}
+        {/* <link rel="stylesheet" href="/compiled.css" /> */}
+        {/* <link rel="stylesheet" href="/dune-compiled.css" /> */}
       </head>
       <body className={`${inter.className}`} suppressHydrationWarning>
         <PWAProvider>

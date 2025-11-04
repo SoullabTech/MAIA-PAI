@@ -575,7 +575,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   }, [voiceEnabled, onMessageAdded]);
 
   // UI states
-  const [showChatInterface, setShowChatInterface] = useState(false); // DEFAULT: Voice mode - text input hidden (accessible via bottom menu)
+  const [showChatInterface, setShowChatInterface] = useState(true); // DEFAULT: Show chat interface
   const [showCaptions, setShowCaptions] = useState(true); // Show text by default in voice mode
   const [showVoiceText, setShowVoiceText] = useState(true); // Toggle for showing text in voice mode
   const [showCustomizer, setShowCustomizer] = useState(false);
@@ -1956,30 +1956,22 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           console.log('🌸 Holoflower clicked!');
           await enableAudio();
 
-          if (!showChatInterface && voiceEnabled) {
-            if (!isMuted) {
-              setIsMuted(true);
-              if (voiceMicRef.current?.stopListening) {
-                voiceMicRef.current.stopListening();
-                console.log('🔇 Voice stopped via holoflower');
-              }
-            } else {
-              setIsMuted(false);
-              setTimeout(async () => {
-                if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
-                  await voiceMicRef.current.startListening();
-                  console.log('🎤 Voice started via holoflower');
-                }
-              }, 100);
+          // DISABLED: Don't hide chat interface when clicking holoflower
+          // Keep text input always visible
+          if (!isMuted && voiceEnabled) {
+            setIsMuted(true);
+            if (voiceMicRef.current?.stopListening) {
+              voiceMicRef.current.stopListening();
+              console.log('🔇 Voice stopped via holoflower');
             }
-          } else if (showChatInterface) {
-            setShowChatInterface(false);
+          } else if (voiceEnabled) {
             setIsMuted(false);
             setTimeout(async () => {
               if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
                 await voiceMicRef.current.startListening();
+                console.log('🎤 Voice started via holoflower');
               }
-            }, 200);
+            }, 100);
           }
         }}
         style={{ willChange: 'auto' }}
@@ -2363,7 +2355,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {/* Text Scrim - Warm volcanic veil when messages appear (absorbs light, doesn't just dim) */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
         <div
-          className="fixed inset-0 z-20 transition-opacity duration-700"
+          className="fixed inset-0 z-20 transition-opacity duration-700 pointer-events-none"
           style={{
             background: 'linear-gradient(135deg, rgba(26, 21, 19, 0.75) 0%, rgba(28, 22, 20, 0.65) 50%, rgba(26, 21, 19, 0.75) 100%)',
             backdropFilter: 'blur(1.5px) saturate(0.85) brightness(0.75)',
@@ -2591,12 +2583,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         ref={textInputRef}
                         name="message"
                         placeholder={`Share your thoughts with ${oracleName}...`}
-                        disabled={isProcessing}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
                             const textarea = e.currentTarget;
-                            if (textarea.value.trim()) {
+                            if (textarea.value.trim() && !isProcessing) {
                               handleTextMessage(textarea.value);
                               textarea.value = '';
                             }
@@ -2608,7 +2599,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                                  placeholder:text-gold-divine/40
                                  text-sm leading-snug
                                  focus:outline-none focus:border-gold-divine/60 focus:ring-1 focus:ring-gold-divine/20
-                                 disabled:opacity-50 resize-none
+                                 resize-none
                                  touch-manipulation cursor-text"
                         style={{ color: '#E8C99B', fontFamily: 'Spectral, Georgia, serif' }}
                         autoComplete="off"
@@ -2662,11 +2653,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       {/* Compact send button */}
                       <button
                         type="submit"
-                        disabled={isProcessing}
+                        onClick={(e) => {
+                          if (isProcessing) {
+                            e.preventDefault();
+                          }
+                        }}
                         className="flex-shrink-0 w-10 h-10 bg-gold-divine/20 border border-amber-400/40
                                  rounded-full text-amber-300 flex items-center justify-center
-                                 hover:bg-gold-divine/30 active:scale-95 transition-all
-                                 disabled:opacity-30"
+                                 hover:bg-gold-divine/30 active:scale-95 transition-all"
                         aria-label="Send"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -78,8 +78,9 @@ export const BrainTrustMonitor: React.FC = () => {
   return (
     <>
       {/* Consciousness Weaver - Desert Oracle of Arrakis ✨ */}
+      {/* HIDDEN ON MOBILE - Available in main menu bar */}
       <motion.div
-        className="fixed bottom-20 right-4 z-40"
+        className="hidden md:block fixed bottom-20 right-4 z-40"
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.6 }}

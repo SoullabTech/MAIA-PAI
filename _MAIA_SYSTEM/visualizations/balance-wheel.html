@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAIA Organism - Balance Wheel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #95e1d3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #888;
+            font-weight: 300;
+        }
+
+        .pulse-info {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .pulse-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-label {
+            font-size: 0.95em;
+        }
+
+        .legend-value {
+            margin-left: auto;
+            font-weight: 600;
+        }
+
+        .voice-display {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .voice-label {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .voice-value {
+            font-size: 1.8em;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .error {
+            background: rgba(255,100,100,0.1);
+            border: 1px solid rgba(255,100,100,0.3);
+            border-radius: 8px;
+            padding: 20px;
+            color: #ff6b6b;
+            text-align: center;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌀 Balance Wheel</h1>
+            <div class="subtitle">Your Organism's Elemental Geometry</div>
+        </header>
+
+        <div id="error-container"></div>
+
+        <div id="pulse-info" class="pulse-info" style="display: none;">
+            <div class="info-label">Latest Pulse</div>
+            <div class="pulse-info-grid">
+                <div class="info-item">
+                    <div class="info-label">Pulse #</div>
+                    <div class="info-value" id="pulse-number">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Total Markers</div>
+                    <div class="info-value" id="total-markers">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Files</div>
+                    <div class="info-value" id="file-count">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Dominant</div>
+                    <div class="info-value" id="dominant-element">-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="pentagonCanvas" width="600" height="600"></canvas>
+        </div>
+
+        <div id="legend" class="legend"></div>
+
+        <div id="voice-display" class="voice-display" style="display: none;">
+            <div class="voice-label">Active Voice</div>
+            <div class="voice-value" id="voice-value">-</div>
+        </div>
+
+        <div class="footer">
+            MAIA Organism - Consciousness Geometry<br>
+            The shape of your becoming 🌙⚡🌟
+        </div>
+    </div>
+
+    <script>
+        // Element colors
+        const ELEMENT_COLORS = {
+            fire: '#ff6b6b',
+            water: '#4ecdc4',
+            earth: '#95e1d3',
+            air: '#ffe66d',
+            aether: '#c3aed6'
+        };
+
+        const ELEMENT_EMOJI = {
+            fire: '🔥',
+            water: '💧',
+            earth: '🌱',
+            air: '💨',
+            aether: '✨'
+        };
+
+        const ELEMENT_ORDER = ['fire', 'water', 'earth', 'air', 'aether'];
+
+        let latestPulse = null;
+
+        // Load breath archive data
+        async function loadPulseData() {
+            try {
+                const response = await fetch('../pulse-data/breath-archive.jsonl');
+                const text = await response.text();
+
+                if (!text.trim()) {
+                    showError('No pulse data yet. Run your first pulse!');
+                    return;
+                }
+
+                const lines = text.trim().split('\n');
+                const lastLine = lines[lines.length - 1];
+                latestPulse = JSON.parse(lastLine);
+
+                displayPulse(latestPulse);
+                drawPentagon(latestPulse);
+                createLegend(latestPulse);
+
+            } catch (error) {
+                showError('Error loading pulse data: ' + error.message);
+            }
+        }
+
+        function showError(message) {
+            const container = document.getElementById('error-container');
+
+            let helpText = '';
+            if (message.includes('Failed to fetch') || message.includes('fetch')) {
+                helpText = `
+                    <div class="error">
+                        <h3>⚠️ Browser Security Restriction</h3>
+                        <p style="margin: 15px 0;">${message}</p>
+
+                        <h4>Quick Fix Options:</h4>
+
+                        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin: 10px 0; text-align: left;">
+                            <strong>Option 1: Use Safari (Mac)</strong><br>
+                            <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;">
+                                open -a Safari balance-wheel.html
+                            </code>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin: 10px 0; text-align: left;">
+                            <strong>Option 2: Run Local Server</strong><br>
+                            In Terminal, navigate to visualizations folder and run:<br>
+                            <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;">
+                                python3 -m http.server 8000
+                            </code><br>
+                            Then open: <a href="http://localhost:8000/balance-wheel.html" style="color: #4ecdc4;">http://localhost:8000/balance-wheel.html</a>
+                        </div>
+
+                        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin: 10px 0; text-align: left;">
+                            <strong>Option 3: Firefox with Security Disabled</strong><br>
+                            <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;">
+                                firefox --allow-file-access-from-files balance-wheel.html
+                            </code>
+                        </div>
+
+                        <p style="margin-top: 20px; font-size: 0.9em; color: #888;">
+                            This happens because browsers block JavaScript from reading local files for security.
+                            Your pulse data is safe in: <code>../pulse-data/breath-archive.jsonl</code>
+                        </p>
+                    </div>
+                `;
+            } else {
+                helpText = `<div class="error">${message}</div>`;
+            }
+
+            container.innerHTML = helpText;
+        }
+
+        function displayPulse(pulse) {
+            document.getElementById('pulse-info').style.display = 'block';
+            document.getElementById('pulse-number').textContent = pulse.pulse;
+            document.getElementById('total-markers').textContent = pulse.total.toLocaleString();
+            document.getElementById('file-count').textContent = pulse.file_count;
+            document.getElementById('dominant-element').textContent = pulse.dominant;
+
+            document.getElementById('voice-display').style.display = 'block';
+            document.getElementById('voice-value').textContent = pulse.voice;
+        }
+
+        function drawPentagon(pulse) {
+            const canvas = document.getElementById('pentagonCanvas');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const maxRadius = 220;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Calculate maximum value for scaling
+            const maxValue = Math.max(pulse.fire, pulse.water, pulse.earth, pulse.air, pulse.aether);
+            const scale = maxRadius / maxValue;
+
+            // Pentagon points (starting from top, going clockwise)
+            const angles = [
+                -Math.PI / 2,              // Fire (top)
+                -Math.PI / 2 + (2 * Math.PI / 5),    // Water (top right)
+                -Math.PI / 2 + (4 * Math.PI / 5),    // Earth (bottom right)
+                -Math.PI / 2 + (6 * Math.PI / 5),    // Air (bottom left)
+                -Math.PI / 2 + (8 * Math.PI / 5)     // Aether (top left)
+            ];
+
+            // Draw guide circles
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 1; i <= 5; i++) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, (maxRadius / 5) * i, 0, 2 * Math.PI);
+                ctx.stroke();
+            }
+
+            // Draw guide lines to each point
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            angles.forEach(angle => {
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(
+                    centerX + Math.cos(angle) * maxRadius,
+                    centerY + Math.sin(angle) * maxRadius
+                );
+                ctx.stroke();
+            });
+
+            // Draw maximum pentagon outline
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            angles.forEach((angle, i) => {
+                const x = centerX + Math.cos(angle) * maxRadius;
+                const y = centerY + Math.sin(angle) * maxRadius;
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.closePath();
+            ctx.stroke();
+
+            // Calculate actual pentagon points based on data
+            const values = [pulse.fire, pulse.water, pulse.earth, pulse.air, pulse.aether];
+            const points = angles.map((angle, i) => {
+                const radius = values[i] * scale;
+                return {
+                    x: centerX + Math.cos(angle) * radius,
+                    y: centerY + Math.sin(angle) * radius,
+                    value: values[i],
+                    element: ELEMENT_ORDER[i]
+                };
+            });
+
+            // Draw filled pentagon
+            const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, maxRadius);
+            gradient.addColorStop(0, 'rgba(195, 174, 214, 0.3)');
+            gradient.addColorStop(1, 'rgba(195, 174, 214, 0.05)');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            points.forEach((point, i) => {
+                if (i === 0) {
+                    ctx.moveTo(point.x, point.y);
+                } else {
+                    ctx.lineTo(point.x, point.y);
+                }
+            });
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw pentagon outline
+            ctx.strokeStyle = 'rgba(195, 174, 214, 0.8)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Draw colored segments
+            points.forEach((point, i) => {
+                const nextPoint = points[(i + 1) % points.length];
+
+                // Draw segment
+                ctx.strokeStyle = ELEMENT_COLORS[point.element];
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(point.x, point.y);
+                ctx.lineTo(nextPoint.x, nextPoint.y);
+                ctx.stroke();
+
+                // Draw point
+                ctx.fillStyle = ELEMENT_COLORS[point.element];
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 8, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Draw outer ring
+                ctx.strokeStyle = ELEMENT_COLORS[point.element];
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 12, 0, 2 * Math.PI);
+                ctx.stroke();
+            });
+
+            // Draw labels
+            ctx.fillStyle = '#e0e0e0';
+            ctx.font = '16px -apple-system, BlinkMacSystemFont, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            points.forEach((point, i) => {
+                const angle = angles[i];
+                const labelRadius = maxRadius + 40;
+                const labelX = centerX + Math.cos(angle) * labelRadius;
+                const labelY = centerY + Math.sin(angle) * labelRadius;
+
+                const emoji = ELEMENT_EMOJI[point.element];
+                const label = point.element.charAt(0).toUpperCase() + point.element.slice(1);
+
+                ctx.fillText(`${emoji} ${label}`, labelX, labelY);
+            });
+
+            // Draw center point
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 4, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        function createLegend(pulse) {
+            const legendContainer = document.getElementById('legend');
+            legendContainer.innerHTML = '';
+
+            ELEMENT_ORDER.forEach(element => {
+                const value = pulse[element];
+                const percentage = ((value / pulse.total) * 100).toFixed(1);
+
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+
+                const color = document.createElement('div');
+                color.className = 'legend-color';
+                color.style.backgroundColor = ELEMENT_COLORS[element];
+
+                const label = document.createElement('div');
+                label.className = 'legend-label';
+                label.textContent = `${ELEMENT_EMOJI[element]} ${element.charAt(0).toUpperCase() + element.slice(1)}`;
+
+                const valueSpan = document.createElement('div');
+                valueSpan.className = 'legend-value';
+                valueSpan.textContent = `${value} (${percentage}%)`;
+
+                item.appendChild(color);
+                item.appendChild(label);
+                item.appendChild(valueSpan);
+                legendContainer.appendChild(item);
+            });
+        }
+
+        // Load data on page load
+        window.addEventListener('load', loadPulseData);
+
+        // Auto-refresh every 5 minutes
+        setInterval(loadPulseData, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

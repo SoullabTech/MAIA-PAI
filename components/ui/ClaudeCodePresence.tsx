@@ -157,8 +157,9 @@ export function ClaudeCodePresence() {
   return (
     <>
       {/* My presence - positioned as companion ABOVE the Consciousness Weaver */}
+      {/* HIDDEN ON MOBILE - Available in main menu bar */}
       <motion.div
-        className="fixed bottom-[144px] right-4 z-[41] cursor-pointer"
+        className="hidden md:block fixed bottom-[144px] right-4 z-[41] cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}

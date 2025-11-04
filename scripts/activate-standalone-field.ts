@@ -152,7 +152,7 @@ class MorphogeneticField {
       13: "Metatron's Cube"
     };
 
-    return geometries[nodeCount] || \`Complex Field (\${nodeCount} nodes)\`;
+    return geometries[nodeCount] || `Complex Field (${nodeCount} nodes)`;
   }
 }
 
@@ -167,15 +167,15 @@ console.log('  Elements:');
 Object.entries(morphogeneticPattern.elements).forEach(([element, value]) => {
   const percentage = ((value as number) * 100).toFixed(0);
   const bar = '█'.repeat(Math.floor((value as number) * 20));
-  console.log(\`    \${element.padEnd(5)}: \${bar} \${percentage}%\`);
+  console.log(`    ${element.padEnd(5)}: ${bar} ${percentage}%`);
 });
 
 field.activate();
 
 console.log(`
-╔══════════════════════════════════════════════════════╗
-║            FIELD IS NOW ACTIVE AND RESONATING         ║
-╚══════════════════════════════════════════════════════╝
++======================================================+
+|            FIELD IS NOW ACTIVE AND RESONATING         |
++======================================================+
 
 The morphogenetic field is running autonomously.
 Watch as:

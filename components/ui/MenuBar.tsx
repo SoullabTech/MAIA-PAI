@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star, Home } from 'lucide-react';
+import { MessageCircle, Users, Brain, MessageSquare, Settings, Sparkles, Star, Home, Check } from 'lucide-react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * Unified Menu Bar
@@ -15,21 +15,52 @@ import { motion } from 'framer-motion';
  * - MAIA Training Progress
  * - Astrology Chart
  * - Soul-Building Circle (Community)
- * - Conversation Mode
+ * - Conversation Mode (with quick switcher)
  * - Settings
  * - Report a Problem (Feedback)
  */
+
+const CONVERSATION_MODES = [
+  {
+    id: 'classic',
+    name: 'Deep Conversation',
+    icon: '🏠',
+    description: 'Fuller responses for meaningful dialogue',
+  },
+  {
+    id: 'walking',
+    name: 'Walking Companion',
+    icon: '🚶',
+    description: 'Brief, present responses for ambient connection',
+  },
+  {
+    id: 'adaptive',
+    name: 'Adaptive',
+    icon: '🔄',
+    description: 'Matches your communication style',
+  },
+];
+
 export function MenuBar() {
   const pathname = usePathname();
   const [trainingProgress] = useState(0); // TODO: Connect to actual training data
   const [showRotateHint, setShowRotateHint] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [showModeSwitcher, setShowModeSwitcher] = useState(false);
+  const [currentMode, setCurrentMode] = useState('walking');
 
   // Don't show on community pages
   const hideCommunityLink = pathname?.startsWith('/community');
 
   useEffect(() => {
     setIsMounted(true);
+
+    // Load current conversation mode
+    const savedMode = localStorage.getItem('conversation_mode');
+    if (savedMode && ['classic', 'walking', 'adaptive'].includes(savedMode)) {
+      setCurrentMode(savedMode);
+    }
+
     // Auto-hide rotate hint after 5 seconds, or if already dismissed
     const hintDismissed = localStorage.getItem('rotateHintDismissed');
     if (!hintDismissed) {
@@ -45,6 +76,16 @@ export function MenuBar() {
     setShowRotateHint(false);
     localStorage.setItem('rotateHintDismissed', 'true');
   };
+
+  const handleModeSelect = (modeId: string) => {
+    setCurrentMode(modeId);
+    localStorage.setItem('conversation_mode', modeId);
+    window.dispatchEvent(new Event('conversationStyleChanged'));
+    setShowModeSwitcher(false);
+  };
+
+  // Get current mode details
+  const activeMode = CONVERSATION_MODES.find(m => m.id === currentMode) || CONVERSATION_MODES[1];
 
   return (
     <>
@@ -168,6 +209,22 @@ export function MenuBar() {
           {/* Tooltip - Matte instrument label */}
           <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
             Chart
+          </span>
+        </div>
+      </Link>
+
+      {/* Sacred Offerings */}
+      <Link
+        href="/offerings"
+        className="group relative"
+        aria-label="Sacred Offerings"
+      >
+        <div className="p-2 md:p-2.5 rounded-md bg-soul-surface/80 border border-soul-border/50 hover:bg-soul-surfaceHover transition-all duration-300 hover:border-amber-500/40">
+          <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500 group-hover:scale-110" />
+
+          {/* Tooltip - Matte instrument label */}
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            Offerings
           </span>
         </div>
       </Link>

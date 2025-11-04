@@ -192,22 +192,7 @@ export default function ExtendedThinkingPanel({
       <>
         {/* Floating badge when minimized */}
         <AnimatePresence>
-          {!isOpen && steps.length > 0 && (
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              className="fixed bottom-20 right-4 z-40"
-            >
-              <button
-                onClick={() => onClose()}
-                className="bg-[#FFD700] text-black px-3 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm font-medium"
-              >
-                <Brain className="w-4 h-4" />
-                Extended Thinking Active
-              </button>
-            </motion.div>
-          )}
+          {/* Extended Thinking indicator removed - access via Brain button in MayaInputBar */}
         </AnimatePresence>
 
         {/* Bottom drawer */}

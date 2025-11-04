@@ -43,6 +43,24 @@ import { predictNextPhase } from '@/lib/memory/SymbolicPredictor';
 import { detectSpiralogicPhase } from '@/lib/spiralogic/PhaseDetector';
 import { inferMoodAndArchetype } from '@/lib/voice/conversation/AffectDetector';
 
+// 💫 Soul-Level Memory & Relationship Persistence
+import {
+  getRelationshipAnamnesis,
+  type RelationshipEssence
+} from '@/lib/consciousness/RelationshipAnamnesis';
+
+// Use direct database access to bypass REST API cache issues
+import {
+  saveRelationshipEssenceDirect,
+  loadRelationshipEssenceDirect
+} from '@/lib/consciousness/RelationshipAnamnesis_Direct';
+
+import {
+  saveConversation,
+  loadConversation,
+  type ConversationMessage
+} from '@/lib/consciousness/ConversationPersistence';
+
 export interface PersonalOracleQuery {
   input: string;
   userId: string;
@@ -741,6 +759,7 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
     const startTime = Date.now(); // Track response time for semantic memory
 
     console.log('🎯 PersonalOracleAgent.processInteraction called with input:', input?.substring(0, 50));
+    console.log('🟢🟢🟢 [VERSION CHECK] PersonalOracleAgent v2025-01-04-DIRECT - Using Direct DB functions 🟢🟢🟢');
 
     try {
       // Validate input
@@ -815,6 +834,30 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
       const breakthroughs = await this.getBreakthroughMoments();
       console.log(`💭 Retrieved ${conversationHistory.length} memories and ${breakthroughs.length} breakthroughs for ${this.userId}`);
 
+      // 💫 LOAD RELATIONSHIP ANAMNESIS - Soul Recognition
+      const anamnesis = getRelationshipAnamnesis();
+      const soulSignature = anamnesis.detectSoulSignature(trimmedInput, this.userId, {
+        conversationHistory,
+        userName: this.settings?.name
+      });
+
+      let existingEssence: RelationshipEssence | null = null;
+      let anamnesisPrompt = '';
+
+      try {
+        existingEssence = await loadRelationshipEssenceDirect(soulSignature);
+
+        if (existingEssence) {
+          anamnesisPrompt = anamnesis.generateAnamnesisPrompt(existingEssence);
+          console.log(`💫 [ANAMNESIS] Soul recognized - ${existingEssence.encounterCount} encounters`);
+        } else {
+          console.log(`💫 [ANAMNESIS] First encounter with soul: ${soulSignature}`);
+        }
+      } catch (error) {
+        console.error('❌ [ANAMNESIS] Failed to load essence:', error);
+        // Continue without anamnesis (graceful degradation)
+      }
+
       // 🔍 DEBUG: Show what memories we retrieved
       if (conversationHistory.length > 0) {
         console.log('🔍 DEBUG - Memory retrieval details:');
@@ -871,6 +914,12 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
       }
 
       let systemPrompt = getPromptForConversationStyle(conversationStyle);
+
+      // 💫 Prepend anamnesis prompt if soul was recognized
+      if (anamnesisPrompt) {
+        systemPrompt = anamnesisPrompt + "\n\n" + systemPrompt;
+        console.log('💫 [ANAMNESIS] Soul recognition prompt added to system context');
+      }
 
       console.log(`💬 FINAL conversation style: ${conversationStyle}`);
 
@@ -935,7 +984,7 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
       const modelMap: Record<string, { api: string, provider: 'openai' | 'anthropic' }> = {
         'gpt-4o': { api: 'gpt-4o', provider: 'openai' },
         'gpt-5': { api: 'gpt-5', provider: 'openai' }, // When released
-        'claude': { api: 'claude-3-5-sonnet-20241022', provider: 'anthropic' }
+        'claude': { api: 'claude-sonnet-4-20250514', provider: 'anthropic' } // Upgraded to Sonnet 4
       };
 
       const modelConfig = modelMap[selectedModel];
@@ -1824,11 +1873,83 @@ This is the soul-level truth you're helping them see, not reference material to 
         console.log('✅ Check-in ritual prepended to response');
       }
 
+      // Generate sessionId for memory persistence
+      const sessionId = `session_${Date.now()}`;
+
+      // 💾 CAPTURE & SAVE RELATIONSHIP ESSENCE
+      try {
+        const updatedEssence = anamnesis.captureEssence({
+          userId: this.userId,
+          userName: this.settings?.name,
+          userMessage: trimmedInput,
+          maiaResponse: responseText,
+          conversationHistory: conversationHistory,
+          spiralDynamics: {
+            currentStage: detectedPhaseResult.phase,
+            dynamics: ainMemory.currentPhase,
+          },
+          sessionThread: {
+            emergingAwareness: newSymbolicMotifs
+          },
+          archetypalResonance: {
+            primaryResonance: detectedArchetype,
+            sensing: mood
+          },
+          recalibrationEvent: null, // TODO: Detect from breakthrough moments
+          fieldState: {
+            depth: 0.7, // Can be calculated from conversation depth
+          },
+          existingEssence: existingEssence || undefined
+        });
+
+        await saveRelationshipEssenceDirect(updatedEssence);
+        console.log(`💾 [ANAMNESIS] Essence saved - encounter #${updatedEssence.encounterCount}`);
+      } catch (error) {
+        console.error('❌ [ANAMNESIS] Failed to save essence:', error);
+        // Don't fail the request if essence save fails
+      }
+
+      // 💾 SAVE CONVERSATION TO SUPABASE
+      try {
+        const conversationMessages: ConversationMessage[] = [
+          ...conversationHistory.map((msg: any) => ({
+            id: `msg_${Date.now()}_${Math.random()}`,
+            role: msg.role === 'user' ? 'user' as const : 'oracle' as const,
+            text: msg.content,
+            timestamp: new Date(msg.timestamp || Date.now()),
+            source: msg.role === 'user' ? 'user' as const : 'maia' as const
+          })),
+          {
+            id: `msg_${Date.now()}_response`,
+            role: 'oracle' as const,
+            text: responseText,
+            timestamp: new Date(),
+            source: 'maia' as const
+          }
+        ];
+
+        await saveConversation(
+          sessionId,
+          this.userId,
+          conversationMessages,
+          'maia',
+          {
+            conversationSummary: symbols.join(', '), // Quick summary
+            breakthroughScore: breakthroughs.length > 0 ? 0.8 : 0.3,
+            relationshipEssenceId: existingEssence?.soulSignature
+          }
+        );
+        console.log(`💾 [CONVERSATION] Saved ${conversationMessages.length} messages to Supabase`);
+      } catch (error) {
+        console.error('❌ [CONVERSATION] Failed to save conversation:', error);
+        // Don't fail the request if conversation save fails
+      }
+
       return {
         response: responseText,
         element: dominantElement,
         metadata: {
-          sessionId: `session_${Date.now()}`,
+          sessionId: sessionId,
           phase: detectedPhaseResult.phase || 'reflection',
           symbols,
           archetypes,

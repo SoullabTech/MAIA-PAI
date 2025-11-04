@@ -44,12 +44,21 @@ export const DEFAULT_AGENTS: Record<string, AgentConfig> = {
 
 /**
  * Get or create agent configuration from localStorage
+ * @param voicePreference - Optional voice preference from Settings (alloy, echo, fable, onyx, nova, shimmer)
  */
-export function getAgentConfig(): AgentConfig {
+export function getAgentConfig(voicePreference?: string): AgentConfig {
   if (typeof window === 'undefined') {
     return DEFAULT_AGENTS.maya;
   }
-  
+
+  // If voice preference is provided (from Settings), use it directly
+  if (voicePreference && ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'].includes(voicePreference)) {
+    return {
+      ...DEFAULT_AGENTS.maya,
+      voice: voicePreference as any  // Pass OpenAI voice directly
+    };
+  }
+
   const stored = localStorage.getItem('oracle-agent-config');
   if (stored) {
     try {
@@ -58,7 +67,7 @@ export function getAgentConfig(): AgentConfig {
       // Invalid stored config, return default
     }
   }
-  
+
   return DEFAULT_AGENTS.maya;
 }
 

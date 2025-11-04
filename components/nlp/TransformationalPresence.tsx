@@ -93,13 +93,15 @@ export const TransformationalPresence: React.FC<TransformationalPresenceProps> =
     setIsMounted(true);
   }, []);
 
-  const essence = STATE_ESSENCE[currentState];
+  // Defensive: ensure currentState maps to a valid essence, fallback to dialogue
+  const essence = STATE_ESSENCE[currentState] || STATE_ESSENCE['dialogue'];
 
   /**
    * BREATHING ANIMATION - Entrainment Device
    * The visual breathing unconsciously entrains user's actual breathing
    */
   useEffect(() => {
+    if (!essence) return; // Safety guard
     const halfCycle = essence.breathCycle / 2;
 
     const breathInterval = setInterval(() => {

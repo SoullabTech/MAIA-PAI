@@ -12,7 +12,7 @@
 @import url('../styles/sacred-animations.css');
 
 /* Bene Gesserit ceremonial theme */
-@import url('../styles/benegesserit-theme.css');
+/* @import url('../styles/benegesserit-theme.css'); */ /* TEMP: Disabled - @layer base error blocking Tailwind compilation */
 
 /* Custom animations for onboarding and voice interface */
 @layer utilities {

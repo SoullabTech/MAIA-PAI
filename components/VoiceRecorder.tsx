@@ -7,6 +7,7 @@ import { useMaiaStream } from '@/hooks/useMayaStream';
 import { OracleVoicePlayer } from './voice/OracleVoicePlayer';
 import { unlockAudio } from '@/lib/audio/audioUnlock';
 import { useToastContext } from '@/components/system/ToastProvider';
+import { useAudioCoordinator } from '@/lib/hooks/useAudioCoordinator';
 
 interface VoiceRecorderProps {
   userId: string;
@@ -36,6 +37,7 @@ export default function VoiceRecorder({
   onProsodyUpdate
 }: VoiceRecorderProps) {
   const { showToast } = useToastContext();
+  const audioCoordinator = useAudioCoordinator();
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
@@ -68,15 +70,48 @@ export default function VoiceRecorder({
   // Maya Stream integration
   const { isStreaming, stream: streamMayaMessage, stopStream } = useMayaStream();
 
-  // Silence detection constants (Adaptive + ChatGPT-style)
+  // 🎛️ Load user-configurable silence thresholds from localStorage
+  const [silenceThresholds, setSilenceThresholds] = useState({
+    short: 8000,   // 8s for short messages (default)
+    medium: 12000, // 12s for medium messages (default)
+    long: 15000,   // 15s for long messages (default)
+  });
+
+  // Load user preferences and check MAIA mode on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Check if in "patient" mode - if so, use longer thresholds
+      const currentMode = localStorage.getItem('maia_conversation_mode');
+      const isPatientMode = currentMode === 'patient';
+
+      // Load custom settings if they exist
+      const saved = localStorage.getItem('maia_voice_silence_thresholds');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          setSilenceThresholds(parsed);
+          console.log('[VoiceRecorder] Loaded custom silence thresholds:', parsed);
+        } catch (e) {
+          console.error('[VoiceRecorder] Failed to parse silence thresholds:', e);
+        }
+      } else if (isPatientMode) {
+        // If in patient mode and no custom settings, use longer thresholds
+        const patientThresholds = {
+          short: 12000,  // 12s for short messages (was 8s)
+          medium: 18000, // 18s for medium messages (was 12s)
+          long: 25000,   // 25s for long messages (was 15s)
+        };
+        setSilenceThresholds(patientThresholds);
+        console.log('[VoiceRecorder] Using patient mode thresholds:', patientThresholds);
+      }
+    }
+  }, []);
+
+  // Silence detection constants (MUCH more patient for real conversation)
   const SILENCE_THRESHOLD = 0.025; // Raised for background noise tolerance
   const MIN_RECORDING_TIME = minSpeechLength; // Configurable minimum speech length
-  const MAX_RECORDING_DURATION = 8000; // 8s hard cutoff
-  const SILENCE_THRESHOLDS = {
-    short: 2500,
-    medium: 4000,
-    long: 6000,
-  };
+  const MAX_RECORDING_DURATION = 60000; // 60s hard cutoff (was 8s - way too short!)
+  const SILENCE_THRESHOLDS = silenceThresholds;
   
   // 🧠 Adaptive Silence Detection Mode
   const detectSilenceMode = (transcriptLength: number): "short" | "medium" | "long" => {
@@ -425,7 +460,11 @@ export default function VoiceRecorder({
       mediaRecorder.start();
       setIsRecording(true);
       setRecordingTime(0);
-      
+
+      // 🔇 Interrupt any playing audio (MAIA's voice) when user starts speaking
+      audioCoordinator.startRecording('VoiceRecorder');
+      console.log('[VoiceRecorder] Recording started - interrupting playback');
+
       // Initialize speech detection and recording start time
       const now = Date.now();
       lastSpeechTimeRef.current = now;
@@ -439,10 +478,10 @@ export default function VoiceRecorder({
       drawOrganicBlob();
       startAudioAnalysis();
       
-      // Safety timer: 8s hard cutoff
+      // Safety timer: 60s hard cutoff (generous for full thoughts)
       safetyTimerRef.current = setTimeout(() => {
-        console.warn("[DEBUG] Safety cutoff at 8s reached");
-        setAutoStopReason("Stopped after 8s (safety cutoff)");
+        console.warn("[DEBUG] Safety cutoff at 60s reached");
+        setAutoStopReason("Stopped after 60s (safety cutoff)");
         if (stopRecordingRef.current) {
           stopRecordingRef.current();
         }
@@ -491,6 +530,10 @@ export default function VoiceRecorder({
     // ✅ Always reset recording state (prevents black button bug)
     setIsRecording(false);
     setMicScale(1);
+
+    // 🔊 Notify coordinator that recording has stopped
+    audioCoordinator.stopRecording('VoiceRecorder');
+    console.log('[VoiceRecorder] Recording stopped');
 
     // ✅ Stop audio tracks cleanly
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
@@ -838,8 +881,8 @@ export default function VoiceRecorder({
 
       {/* Mode indicator */}
       <div className="text-xs text-gray-500">
-        {autoSend 
-          ? 'Auto-stop: 2.5s (short) / 4s (medium) / 6s (long) / 8s (max)'
+        {autoSend
+          ? 'Auto-stop: 8s (short) / 12s (medium) / 15s (long) / 60s (max) - or tap to stop manually'
           : 'Manual send mode - tap ✅ to confirm'
         }
       </div>

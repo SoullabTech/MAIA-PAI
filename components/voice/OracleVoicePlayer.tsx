@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { useAudioCoordinator } from '@/lib/hooks/useAudioCoordinator';
 
 interface OracleVoicePlayerProps {
   text?: string;
@@ -25,6 +26,8 @@ export default function OracleVoicePlayer({
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrlRef = useRef<string | null>(null);
+  const audioCoordinator = useAudioCoordinator();
+  const playerIdRef = useRef(`oracle-voice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
 
   // Update muted state when prop changes
   useEffect(() => {
@@ -46,6 +49,20 @@ export default function OracleVoicePlayer({
       }
     };
   }, []);
+
+  // Register with audio coordinator for interrupt capability
+  useEffect(() => {
+    const stopFn = () => {
+      console.log(`[OracleVoicePlayer] Interrupted: ${playerIdRef.current}`);
+      stopAudio();
+    };
+
+    // Register this player
+    const unregister = audioCoordinator.registerPlayer(playerIdRef.current, stopFn);
+
+    // Cleanup: unregister on unmount
+    return unregister;
+  }, [audioCoordinator]);
 
   useEffect(() => {
     if (autoPlay && text) {
@@ -110,6 +127,9 @@ export default function OracleVoicePlayer({
       setIsLoading(false);
       await audioRef.current.play();
 
+      // Notify coordinator that playback started
+      audioCoordinator.notifyPlaybackStart(playerIdRef.current);
+
     } catch (error) {
       console.error('Voice synthesis error:', error);
       setIsPlaying(false);
@@ -126,6 +146,9 @@ export default function OracleVoicePlayer({
     setIsPlaying(false);
     setIsLoading(false);
     onPlayStateChange?.(false);
+
+    // Notify coordinator that playback stopped
+    audioCoordinator.notifyPlaybackStop(playerIdRef.current);
   };
 
   const toggleMute = () => {

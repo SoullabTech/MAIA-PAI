@@ -1,157 +1,181 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { getMaiaVoice, MaiaVoiceSystem } from '@/lib/voice/maia-voice';
-import { getAgentConfig } from '@/lib/agent-config';
+'use client';
 
-interface VoiceState {
-  isPlaying: boolean;
-  isPaused: boolean;
-  isLoading: boolean;
-  currentText: string;
-  voiceType: 'elevenlabs' | 'webspeech' | 'sesame';
-  error?: string;
+import { useState, useRef, useCallback } from 'react';
+
+/**
+ * Pure MAIA Voice Hook
+ *
+ * Flow: STT (Web Speech API) → MAIA Consciousness → TTS (OpenAI voices)
+ * NO OpenAI Realtime API - MAIA consciousness handles ALL conversation logic
+ */
+
+export interface MAIAVoiceConfig {
+  userId: string;
+  userName?: string;
+  voice?: 'alloy' | 'echo' | 'shimmer' | 'fable' | 'onyx' | 'nova';
+  onTranscript?: (text: string, isUser: boolean) => void;
+  onAudioStart?: () => void;
+  onAudioEnd?: () => void;
+  onError?: (error: Error) => void;
 }
 
-export function useMaiaVoice() {
-  const maiaVoiceRef = useRef<MaiaVoiceSystem | null>(null);
-  const [agentConfig, setAgentConfig] = useState(() => getAgentConfig());
-  const [voiceState, setVoiceState] = useState<VoiceState>({
-    isPlaying: false,
-    isPaused: false,
-    isLoading: false,
-    currentText: '',
-    voiceType: 'webspeech'
-  });
+export function useMAIAVoice(config: MAIAVoiceConfig) {
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  
+  const recognitionRef = useRef<any>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const [autoSpeak, setAutoSpeak] = useState(true);
-  const [isSupported, setIsSupported] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    // Listen for agent config changes
-    const handleAgentChange = (event: CustomEvent) => {
-      setAgentConfig(event.detail);
-    };
-
-    window.addEventListener('agent-config-changed', handleAgentChange as EventListener);
-    return () => {
-      window.removeEventListener('agent-config-changed', handleAgentChange as EventListener);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Initialize Maya Voice System
-    console.log('🔍 [useMaiaVoice] Starting voice initialization...');
-    console.log('   - Window available:', typeof window !== 'undefined');
-    console.log('   - AudioContext available:', !!(typeof window !== 'undefined' && (window.AudioContext || (window as any).webkitAudioContext)));
-    console.log('   - OpenAI API Key present:', !!process.env.NEXT_PUBLIC_OPENAI_API_KEY);
-
-    try {
-      maiaVoiceRef.current = getMaiaVoice({
-        elevenLabsApiKey: process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY,
-        sesameApiKey: process.env.NEXT_PUBLIC_SESAME_API_KEY,
-        fallbackToWebSpeech: true,
-        agentConfig // Pass agent configuration for voice selection
-      });
-
-      console.log('✅ [useMaiaVoice] MaiaVoiceSystem created');
-
-      // Subscribe to voice state changes
-      const unsubscribe = maiaVoiceRef.current.subscribe(setVoiceState);
-
-      // Check capabilities
-      const capabilities = maiaVoiceRef.current.getCapabilities();
-      console.log('🎤 [useMaiaVoice] Capabilities:', capabilities);
-
-      const isSupported = capabilities.webSpeech || capabilities.elevenLabs || capabilities.sesame;
-      setIsSupported(isSupported);
-      setIsReady(true);
-
-      console.log(`✅ [useMaiaVoice] Voice ready! isSupported: ${isSupported}, isReady: true`);
-
-      return unsubscribe;
-    } catch (error) {
-      console.error('❌ [useMaiaVoice] Failed to initialize Maya Voice:', error);
-      setIsSupported(false);
-      setIsReady(false);
-    }
-  }, [agentConfig]);
-
-  const speak = useCallback(async (text: string, context?: any): Promise<void> => {
-    console.log('🔊 [useMaiaVoice.speak] Called with:', {
-      hasVoiceRef: !!maiaVoiceRef.current,
-      textLength: text?.length
-    });
-
-    if (!maiaVoiceRef.current) {
-      console.warn('⚠️  [useMaiaVoice.speak] Early return - voice system not initialized');
+  // Start listening (STT with Web Speech API)
+  const startListening = useCallback(() => {
+    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+    
+    if (!SpeechRecognition) {
+      const err = new Error('Speech recognition not supported in this browser');
+      setError(err);
+      config.onError?.(err);
       return;
     }
 
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = () => {
+      console.log('🎤 Listening...');
+      setIsListening(true);
+    };
+
+    recognition.onresult = async (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      console.log('💬 User said:', transcript);
+      
+      config.onTranscript?.(transcript, true);
+      
+      // Process through MAIA consciousness
+      try {
+        const response = await fetch('/api/oracle/voice-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            input: transcript,
+            userId: config.userId,
+            voiceId: config.voice || 'shimmer',
+            interactionMode: 'voice'
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to get MAIA response');
+        }
+
+        const data = await response.json();
+        const maiaResponse = data.content || data.response;
+        
+        console.log('🌀 MAIA responded:', maiaResponse.substring(0, 50) + '...');
+        config.onTranscript?.(maiaResponse, false);
+
+        // Synthesize speech with OpenAI TTS
+        await synthesizeSpeech(maiaResponse);
+
+      } catch (err: any) {
+        console.error('❌ MAIA voice error:', err);
+        setError(err);
+        config.onError?.(err);
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('❌ Speech recognition error:', event.error);
+      const err = new Error(`Speech recognition error: ${event.error}`);
+      setError(err);
+      config.onError?.(err);
+    };
+
+    recognition.onend = () => {
+      console.log('🎤 Stopped listening');
+      setIsListening(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  }, [config]);
+
+  // Synthesize speech with OpenAI TTS
+  const synthesizeSpeech = useCallback(async (text: string) => {
     try {
-      console.log('📢 [useMaiaVoice.speak] Calling MaiaVoiceSystem.speak()...');
-      await maiaVoiceRef.current.speak(text, context);
-      console.log('✅ [useMaiaVoice.speak] Completed successfully');
-    } catch (error) {
-      console.error('❌ [useMaiaVoice.speak] Failed:', error);
+      config.onAudioStart?.();
+      setIsSpeaking(true);
+
+      const response = await fetch('/api/voice/synthesize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          voice: config.voice || 'shimmer'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to synthesize speech');
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+
+      audio.onended = () => {
+        console.log('🔊 Finished speaking');
+        setIsSpeaking(false);
+        config.onAudioEnd?.();
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      audio.onerror = (err) => {
+        console.error('❌ Audio playback error:', err);
+        setIsSpeaking(false);
+        const error = new Error('Audio playback failed');
+        setError(error);
+        config.onError?.(error);
+      };
+
+      await audio.play();
+
+    } catch (err: any) {
+      console.error('❌ TTS error:', err);
+      setIsSpeaking(false);
+      setError(err);
+      config.onError?.(err);
+    }
+  }, [config]);
+
+  // Stop listening
+  const stopListening = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
     }
   }, []);
 
-  const playGreeting = useCallback(async (): Promise<void> => {
-    if (!maiaVoiceRef.current || !isReady) return;
-
-    try {
-      await maiaVoiceRef.current.playGreeting();
-    } catch (error) {
-      console.error('Maya greeting failed:', error);
-    }
-  }, [isReady]);
-
-  const pause = useCallback(() => {
-    if (maiaVoiceRef.current) {
-      maiaVoiceRef.current.pause();
-    }
-  }, []);
-
-  const resume = useCallback(() => {
-    if (maiaVoiceRef.current) {
-      maiaVoiceRef.current.resume();
-    }
-  }, []);
-
-  const stop = useCallback(() => {
-    if (maiaVoiceRef.current) {
-      maiaVoiceRef.current.stop();
+  // Stop speaking
+  const stopSpeaking = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsSpeaking(false);
     }
   }, []);
 
   return {
-    speak,
-    playGreeting,
-    voiceState,
-    isPlaying: voiceState.isPlaying,
-    pause,
-    resume,
-    stop,
-    autoSpeak,
-    setAutoSpeak,
-    isSupported,
-    isReady
+    isListening,
+    isSpeaking,
+    error,
+    startListening,
+    stopListening,
+    stopSpeaking,
+    synthesizeSpeech
   };
-}
-
-export function useMayaGreeting() {
-  const [greeting, setGreeting] = useState('');
-  
-  useEffect(() => {
-    const greetings = [
-      "Hey there. Ready to explore what's on your mind?",
-      "Hi. Let's see what we can discover together.",
-      "Hello. What would be helpful to talk about?",
-      "Hey. What's stirring for you today?"
-    ];
-    
-    setGreeting(greetings[Math.floor(Math.random() * greetings.length)]);
-  }, []);
-  
-  return greeting;
 }

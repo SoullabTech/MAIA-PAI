@@ -44,6 +44,7 @@ export default function MaiaInputBar({
   const [journalTags, setJournalTags] = useState<Array<{id: string, label: string, color?: string}>>([]);
   const [showRecallDebug, setShowRecallDebug] = useState(false);
   const [recallMemories, setRecallMemories] = useState<any[]>([]);
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   const { stream, isStreaming, stopStream } = useMaiaStream();
@@ -319,15 +320,16 @@ export default function MaiaInputBar({
             )}
           </div>
 
-          {/* Maia&apos;s Welcome Ritual Trigger */}
-          <button
-            onClick={triggerWelcomeRitual}
-            className="text-amber-400 hover:text-amber-300 cursor-pointer transition-colors"
-            title="Start Maia's Welcome Ritual"
-            disabled={isStreaming}
-          >
-            <Sparkles size={20} />
-          </button>
+          {/* Maia's Welcome Ritual Trigger - Hidden when typing or streaming */}
+          {!isInputFocused && !message && !isStreaming && (
+            <button
+              onClick={triggerWelcomeRitual}
+              className="text-amber-400 hover:text-amber-300 cursor-pointer transition-colors"
+              title="Start Maia's Welcome Ritual"
+            >
+              <Sparkles size={20} />
+            </button>
+          )}
         </div>
 
         {/* Input field */}
@@ -337,6 +339,8 @@ export default function MaiaInputBar({
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
+            onFocus={() => setIsInputFocused(true)}
+            onBlur={() => setIsInputFocused(false)}
             placeholder="Message Elemental Oracle 2.0..."
             className="w-full bg-transparent outline-none resize-none text-white text-sm placeholder-gray-500 min-h-[40px] max-h-[120px] py-2"
             style={{ height: '40px' }}
@@ -373,8 +377,8 @@ export default function MaiaInputBar({
             <Waveform size={20} />
           </button>
 
-          {/* Recall Debug Toggle */}
-          {process.env.NODE_ENV === 'development' && (
+          {/* Semantic Recall - Braintrust Feature - Hidden when typing or streaming */}
+          {!isInputFocused && !message && !isStreaming && (
             <button
               onClick={() => setShowRecallDebug(!showRecallDebug)}
               className={`transition-colors ${
@@ -382,7 +386,7 @@ export default function MaiaInputBar({
                   ? 'text-amber-400 hover:text-amber-300'
                   : 'text-gray-400 hover:text-white'
               }`}
-              title="Toggle Semantic Recall Debug"
+              title="Toggle Semantic Recall"
             >
               <Brain size={20} />
             </button>

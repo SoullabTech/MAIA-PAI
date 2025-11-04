@@ -5,7 +5,7 @@
  * Enables cross-device continuity
  */
 
-import { supabase } from '../supabaseClient';
+import { supabase } from '../supabase';
 
 export interface ConversationMessage {
   id: string;
@@ -58,12 +58,16 @@ export async function saveConversation(
   }
 
   try {
-    // Check if conversation exists
-    const { data: existing } = await supabase
+    // Check if conversation exists - using maybeSingle() to avoid error on no rows
+    const { data: existing, error: selectError } = await supabase
       .from('maia_conversations')
       .select('id')
       .eq('session_id', sessionId)
-      .single();
+      .maybeSingle();
+
+    if (selectError && selectError.code !== 'PGRST116') {
+      throw selectError;
+    }
 
     const conversationData = {
       session_id: sessionId,
@@ -116,18 +120,16 @@ export async function loadConversation(sessionId: string): Promise<ConversationM
       .from('maia_conversations')
       .select('*')
       .eq('session_id', sessionId)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        // No conversation found
-        console.log('💬 [CONVERSATION] No conversation found for session');
-        return null;
-      }
       throw error;
     }
 
-    if (!data || !data.messages) return null;
+    if (!data || !data.messages) {
+      console.log('💬 [CONVERSATION] No conversation found for session');
+      return null;
+    }
 
     // Convert timestamps back to Date objects
     const messages = data.messages.map((msg: any) => ({

@@ -330,7 +330,7 @@ export function getRelationshipAnamnesis(): RelationshipAnamnesis {
  */
 
 // Supabase client import
-import { supabase } from '../supabaseClient';
+import { supabase } from '../supabase';
 
 export async function saveRelationshipEssence(essence: RelationshipEssence): Promise<void> {
   if (!supabase) {

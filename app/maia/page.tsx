@@ -269,13 +269,13 @@ export default function MAIAPage() {
 
           <div className="relative max-w-7xl mx-auto px-4 py-2">
             <div className="flex items-center justify-between">
-              {/* Back to Consciousness Station */}
+              {/* Back to Main Menu */}
               <Link
-                href="/consciousness"
-                className="absolute left-4 top-1/2 -translate-y-1/2 group flex items-center gap-2 text-[#D4B896]/60 hover:text-[#D4B896] transition-colors duration-300 z-10"
+                href="/maya"
+                className="absolute left-4 top-1/2 -translate-y-1/2 group flex items-center gap-2 text-[#D4B896]/90 hover:text-[#D4B896] transition-colors duration-300 z-10 bg-black/30 backdrop-blur-sm px-3 py-2 rounded-lg border border-[#D4B896]/20"
               >
                 <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
-                <span className="text-sm font-light tracking-wide hidden sm:inline">Station</span>
+                <span className="text-sm font-medium tracking-wide">Back</span>
               </Link>
 
               {/* Left side - SOULLAB branding */}

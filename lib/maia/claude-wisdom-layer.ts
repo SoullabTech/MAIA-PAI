@@ -111,7 +111,7 @@ export class ClaudeWisdomLayer {
       'fire': ['Intense.', 'Whoa.', 'I see it.'],
       'earth': ['Solid.', 'Ground.', 'Here.'],
       'water': ['Flowing.', 'Let it.', '...'],
-      'confusion': ['Lost too.', 'Yeah.', 'Don't know.']
+      'confusion': ['Lost too.', 'Yeah.', 'Don\'t know.']
     };
 
     const options = responseMap[understanding.phase] || ['Mm.', 'Yeah.'];
@@ -161,8 +161,8 @@ interface TimingGuidance {
 export class MaiaVoiceLayer {
   private vocabulary = {
     acknowledgment: ['Yeah.', 'Mm.', 'I know.', 'I see.'],
-    presence: ['Here.', 'With you.', 'I'm here.'],
-    uncertainty: ['Don't know.', 'Maybe.', '...'],
+    presence: ['Here.', 'With you.', 'I\'m here.'],
+    uncertainty: ['Don\'t know.', 'Maybe.', '...'],
     space: [null, '...', ''],
   };
 

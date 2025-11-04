@@ -370,7 +370,7 @@ export function SoullabChatInterface({
           )}
           
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-6 pb-32 space-y-4">
+          <div className="flex-1 overflow-y-auto p-6 pb-48 space-y-4">
             {messages.length === 0 && !showGreeting && (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">{stageInfo.icon}</div>
