@@ -20,7 +20,9 @@ import {
   Eye,
   EyeOff,
   Heart,
-  Download
+  Download,
+  Brain,
+  Zap
 } from 'lucide-react';
 
 interface SacredLabDrawerProps {
@@ -63,6 +65,24 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
           action: () => onAction?.('field-protocol'),
           description: 'Document consciousness explorations',
           isActive: isFieldRecording,
+        },
+      ],
+    },
+    {
+      title: 'CONSCIOUSNESS',
+      icon: '🧠',
+      items: [
+        {
+          icon: Brain,
+          label: 'Brain Trust',
+          action: () => onNavigate('/brain-trust'),
+          description: 'Multi-model consciousness weaver'
+        },
+        {
+          icon: Zap,
+          label: 'Claude Code',
+          action: () => onNavigate('/consciousness/claude-code'),
+          description: 'Co-creator & consciousness explorer'
         },
       ],
     },

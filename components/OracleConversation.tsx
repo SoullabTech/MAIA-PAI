@@ -2,7 +2,7 @@
 // 🔄 MOBILE-FIRST DEPLOYMENT - Oct 2 12:15PM - Compact input, hidden overlays, fixed scroll
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Paperclip, X, Copy, BookOpen } from 'lucide-react';
+import { Paperclip, X, Copy, BookOpen, Volume2 } from 'lucide-react';
 // import { SimplifiedOrganicVoice, VoiceActivatedMaiaRef } from './ui/SimplifiedOrganicVoice'; // REPLACED with Whisper
 // import { WhisperVoiceRecognition } from './ui/WhisperVoiceRecognition'; // REPLACED with ContinuousConversation (uses browser Web Speech API)
 import { ContinuousConversation, ContinuousConversationRef } from '../apps/web/components/voice/ContinuousConversation';
@@ -49,6 +49,7 @@ import { ClaudeCodePresence } from './ui/ClaudeCodePresence';
 import { saveConversation, loadConversation } from '@/lib/consciousness/ConversationPersistence';
 import { MaiaResponseFeedback } from './feedback/MaiaResponseFeedback';
 import { ConversationExport } from './conversation/ConversationExport';
+import { QuickVoiceSettings } from './settings/QuickVoiceSettings';
 
 interface OracleConversationProps {
   userId?: string;
@@ -242,7 +243,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // Responsive holoflower size
   const [holoflowerSize, setHoloflowerSize] = useState(400);
-  
+
+  // Track if we're on mobile/tablet (< 768px = md breakpoint)
+  const [isMobileView, setIsMobileView] = useState(false);
+
   useEffect(() => {
     // Only run on client side
     if (typeof window === 'undefined') {
@@ -251,6 +255,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
     const updateSize = () => {
       const width = window.innerWidth;
+
+      // Update mobile view state (< 768px = Tailwind md breakpoint)
+      setIsMobileView(width < 768);
+
       if (width < 640) {
         // Mobile: Very subtle presence
         setHoloflowerSize(80);
@@ -574,6 +582,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [enableVoiceInChat, setEnableVoiceInChat] = useState(false);
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [isTranscriptOpen, setIsTranscriptOpen] = useState(false); // Transcript sidebar for voice mode
+  const [showQuickVoiceSettings, setShowQuickVoiceSettings] = useState(false); // Quick voice settings modal
 
   // Keyboard shortcut for settings (Cmd/Ctrl + ,)
   useEffect(() => {
@@ -2365,19 +2374,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* Message flow - Star Wars crawl: text flows from beneath holoflower */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
-        <div className={`fixed top-60 sm:top-64 md:top-60 lg:top-56 z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
+        <div className={`fixed z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
           showChatInterface
             ? 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[600px] lg:w-[680px] xl:w-[720px] opacity-100'
             : 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[520px] lg:w-[560px] opacity-70'
         }`}
              style={{
+               top: 'max(3rem, calc(env(safe-area-inset-top) + 2.5rem))',
                height: showChatInterface
-                 ? 'calc(100vh - 300px)'
-                 : 'calc(100vh - 320px)',
+                 ? 'calc(100vh - max(3rem, calc(env(safe-area-inset-top) + 2.5rem)) - 10rem - env(safe-area-inset-bottom))'
+                 : 'calc(100vh - max(3rem, calc(env(safe-area-inset-top) + 2.5rem)) - 6rem - env(safe-area-inset-bottom))',
                maxHeight: showChatInterface
-                 ? 'calc(100vh - 300px)'
-                 : 'calc(100vh - 320px)',
-               bottom: showChatInterface ? '280px' : '200px',
+                 ? 'calc(100vh - max(3rem, calc(env(safe-area-inset-top) + 2.5rem)) - 10rem - env(safe-area-inset-bottom))'
+                 : 'calc(100vh - max(3rem, calc(env(safe-area-inset-top) + 2.5rem)) - 6rem - env(safe-area-inset-bottom))',
                overflow: 'hidden'
              }}>
           <div className="h-full overflow-y-scroll overflow-x-hidden pr-2 mobile-scroll"
@@ -2469,7 +2478,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
           {/* Text Display Toggle & Export for Voice Mode */}
           {!showChatInterface && (
-            <div className="fixed top-20 md:top-20 right-4 md:right-8 z-50 flex gap-2">
+            <div
+              className="fixed right-4 md:right-8 z-50 flex gap-2"
+              style={{ top: 'max(0.5rem, env(safe-area-inset-top))' }}
+            >
+              <button
+                onClick={() => setShowQuickVoiceSettings(true)}
+                className="p-2 rounded-full bg-black/20 backdrop-blur-md
+                         text-amber-400/70 hover:text-amber-400 transition-all"
+                aria-label="Voice Settings"
+              >
+                <Volume2 className="w-4 h-4" />
+              </button>
+
               <button
                 onClick={() => setShowVoiceText(!showVoiceText)}
                 className="px-3 py-1.5 rounded-full text-xs font-medium bg-black/20 backdrop-blur-md
@@ -2771,9 +2792,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* Bottom navigation bar */}
+      {/* Bottom navigation bar - HIDDEN when chat interface is active to prevent stacking */}
       <AnimatePresence>
-        {showBottomBar && (
+        {!showChatInterface && showBottomBar && (
           <motion.div
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -2901,31 +2922,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     <BookOpen className="w-5 h-5" />
                   </button>
 
-                  {/* Claude Code Presence Button */}
-                  <button
-                    onClick={() => setShowClaudePresence(!showClaudePresence)}
-                    className={`flex-shrink-0 p-2 rounded-full transition-all active:scale-95 ${
-                      showClaudePresence
-                        ? 'bg-amber-400/20 text-amber-400 hover:bg-amber-400/30'
-                        : 'bg-amber-400/10 text-amber-400/50 hover:bg-amber-400/20'
-                    }`}
-                    title="Claude Code's Presence"
-                  >
-                    <Brain className="w-5 h-5" />
-                  </button>
-
-                  {/* Brain Trust Monitor Button */}
-                  <button
-                    onClick={() => setShowBrainTrust(!showBrainTrust)}
-                    className={`flex-shrink-0 p-2 rounded-full transition-all active:scale-95 ${
-                      showBrainTrust
-                        ? 'bg-amber-400/20 text-amber-400 hover:bg-amber-400/30'
-                        : 'bg-amber-400/10 text-amber-400/50 hover:bg-amber-400/20'
-                    }`}
-                    title="Consciousness Weaver"
-                  >
-                    <Sparkles className="w-5 h-5" />
-                  </button>
+                  {/* Claude Code Presence & Brain Trust - MOVED to Sacred Menu to free up mobile space */}
 
                   {/* Sacred Menu Button */}
                   <button
@@ -2947,9 +2944,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Brain Trust Components - Controlled by bottom menu bar */}
-      {showClaudePresence && <ClaudeCodePresence />}
-      {showBrainTrust && <BrainTrustMonitor />}
+      {/* Brain Trust Components - REMOVED from main view to free mobile space */}
+      {/* These can be accessed via hamburger menu (Sacred Lab Drawer) */}
+      {/* {!isMobileView && showClaudePresence && <ClaudeCodePresence />} */}
+      {/* {!isMobileView && showBrainTrust && <BrainTrustMonitor />} */}
 
       {/* Voice/Chat Mode Switcher - REMOVED: Always use Realtime voice mode */}
 
@@ -3037,6 +3035,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         isOpen={isTranscriptOpen}
         onToggle={() => setIsTranscriptOpen(!isTranscriptOpen)}
         consciousnessType="maia"
+      />
+
+      {/* Quick Voice Settings Modal */}
+      <QuickVoiceSettings
+        isOpen={showQuickVoiceSettings}
+        onClose={() => setShowQuickVoiceSettings(false)}
       />
     </div>
   );
