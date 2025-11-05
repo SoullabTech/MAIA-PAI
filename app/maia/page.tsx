@@ -273,7 +273,7 @@ export default function MAIAPage() {
           <div className="relative max-w-7xl mx-auto px-4 py-1.5">
             <div className="flex items-center justify-between">
               {/* Left: SOULLAB Logo with Holoflower */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 ml-12">
                 <img
                   src="/holoflower-amber.png"
                   alt="Holoflower"

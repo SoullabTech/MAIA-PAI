@@ -101,7 +101,7 @@ export class GreetingService {
     const phrases = {
       morning: 'morning',
       afternoon: 'afternoon',
-      evening: 'the day's winding down beautifully',
+      evening: 'the day\'s winding down beautifully',
       night: 'the quiet hours have their own wisdom'
     };
     return phrases[timeOfDay as keyof typeof phrases] || '';
