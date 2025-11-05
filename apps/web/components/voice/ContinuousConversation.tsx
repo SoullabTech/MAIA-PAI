@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Mic, MicOff, Loader2, Activity, Wifi, WifiOff } from "lucide-react";
 import VoiceFeedbackPrevention from "@/lib/voice/voice-feedback-prevention";
+import { ConversationalRhythm, RhythmMetrics } from "@/lib/liquid/ConversationalRhythm";
 // import { Analytics } from "../../lib/analytics/supabaseAnalytics"; // Disabled for Vercel build
 
 interface ContinuousConversationProps {
@@ -10,6 +11,8 @@ interface ContinuousConversationProps {
   onInterimTranscript?: (text: string) => void;
   onRecordingStateChange?: (isRecording: boolean) => void;
   onAudioLevelChange?: (level: number) => void; // Audio amplitude 0.0-1.0 for visualization
+  onRhythmUpdate?: (metrics: RhythmMetrics) => void; // 🌊 LIQUID LAYER: Real-time rhythm metrics
+  onInterrupt?: () => void; // 🎙️ Called when user speaks while MAIA is speaking (interruption)
   isProcessing?: boolean;
   isSpeaking?: boolean; // When Maya is speaking
   autoStart?: boolean; // Start listening immediately
@@ -31,6 +34,8 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     onInterimTranscript,
     onRecordingStateChange,
     onAudioLevelChange,
+    onRhythmUpdate,
+    onInterrupt,
     isProcessing = false,
     isSpeaking = false,
     autoStart = true,
@@ -42,7 +47,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
-  
+
   const recognitionRef = useRef<any>(null);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -54,6 +59,33 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   const recognitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSentRef = useRef<string>("");
   const isRestartingRef = useRef(false);
+
+  // Ref to allow calling processAccumulatedTranscript from recognition handlers
+  const processTranscriptRef = useRef<(() => void) | null>(null);
+
+  // 🌊 LIQUID LAYER: Conversational rhythm tracking
+  const rhythmTrackerRef = useRef<ConversationalRhythm>(
+    new ConversationalRhythm((metrics) => {
+      console.log('🌊 [LIQUID] Rhythm update:', {
+        wpm: Math.round(metrics.wordsPerMinute),
+        tempo: metrics.conversationTempo,
+        coherence: metrics.rhythmCoherence.toFixed(2),
+        breathAlignment: metrics.breathAlignment.toFixed(2)
+      });
+      onRhythmUpdate?.(metrics);
+    })
+  );
+
+  // Component mount log
+  useEffect(() => {
+    console.log('🎤 [ContinuousConversation] Component mounted with props:', {
+      autoStart,
+      isProcessing,
+      isSpeaking,
+      silenceThreshold,
+      vadSensitivity
+    });
+  }, []);
 
   // Expose methods to parent
   useImperativeHandle(ref, () => ({
@@ -106,6 +138,10 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       setIsRecording(true);
       onRecordingStateChange?.(true);
       accumulatedTranscript.current = "";
+
+      // 🌊 LIQUID LAYER: Track speech start for rhythm analysis
+      rhythmTrackerRef.current.onSpeechStart();
+      console.log('🌊 [LIQUID] Speech started - tracking rhythm');
 
       // Clear conversation timeout when user starts speaking
       if (conversationTimeoutRef.current) {
@@ -163,6 +199,19 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
           console.log('✅ Got FINAL transcript:', finalTranscript);
           // Replace with final (don't add, since interim already set it)
           accumulatedTranscript.current = finalTranscript.trim();
+
+          // 🌊 LIQUID LAYER: Track speech end with transcript for rhythm analysis
+          rhythmTrackerRef.current.onSpeechEnd(finalTranscript.trim());
+          console.log('🌊 [LIQUID] Speech ended - analyzing rhythm patterns');
+
+          // 🔥 CRITICAL FIX: Stop recognition after final result to trigger onend
+          // which will process the transcript. Otherwise recognition keeps running
+          // and transcript sits unprocessed waiting for 20s silence timer
+          console.log('🛑 [onresult] Got final transcript - stopping recognition to trigger processing');
+          if (recognitionRef.current) {
+            recognitionRef.current.stop();
+          }
+          return; // Exit early - don't reset silence timer
         } else if (interimTranscript) {
           console.log('📝 Got INTERIM transcript:', interimTranscript);
           // Replace with latest interim (don't accumulate)
@@ -182,7 +231,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
           // CRITICAL FIX: Don't check isRecording - onend fires before this timer
           // Just check if we have a transcript to send
           if (!isProcessingRef.current && accumulatedTranscript.current.trim()) {
-            processAccumulatedTranscript();
+            processTranscriptRef.current?.();
           }
         }, silenceThreshold); // Use configurable threshold from props
       }
@@ -207,7 +256,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       if (event.error === 'no-speech') {
         // Process accumulated transcript before restarting
         if (accumulatedTranscript.current.trim()) {
-          processAccumulatedTranscript();
+          processTranscriptRef.current?.();
         }
         // No-speech is normal in continuous mode, auto-restart happens in onend
       } else if (event.error === 'network') {
@@ -234,6 +283,21 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       if (recognitionTimeoutRef.current) {
         clearTimeout(recognitionTimeoutRef.current);
         recognitionTimeoutRef.current = null;
+      }
+
+      // 🔥 CRITICAL FIX: Process any accumulated transcript before restarting
+      // This prevents losing transcripts when recognition ends before silence timer fires
+      if (accumulatedTranscript.current.trim() && !isProcessingRef.current) {
+        console.log('📝 [onend] Processing accumulated transcript before restart:', accumulatedTranscript.current);
+        // Clear silence timer since we're processing now
+        if (silenceTimerRef.current) {
+          clearTimeout(silenceTimerRef.current);
+          silenceTimerRef.current = null;
+        }
+        // Process the transcript immediately
+        processTranscriptRef.current?.();
+        // Don't restart yet - let processing complete
+        return;
       }
 
       // CRITICAL: Prevent infinite restart loop
@@ -287,7 +351,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     if (isProcessingRef.current) {
       console.log('⏳ [ContinuousConversation] Already processing, will retry in 500ms');
       setTimeout(() => {
-        processAccumulatedTranscript();
+        processTranscriptRef.current?.();
       }, 500);
       return;
     }
@@ -327,6 +391,9 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       isProcessingRef.current = false;
     }, 500);
   }, [onTranscript]);
+
+  // Assign to ref so it can be called from recognition handlers before this point in code
+  processTranscriptRef.current = processAccumulatedTranscript;
 
   // Initialize audio level monitoring
   const initializeAudioMonitoring = useCallback(async () => {
@@ -369,6 +436,13 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
 
         // Send amplitude to parent for visualization
         onAudioLevelChange?.(normalizedLevel);
+
+        // 🎙️ INTERRUPTION DETECTION: Trigger interrupt if user speaks while MAIA is speaking
+        // Higher threshold (0.35) to avoid false positives from background noise or MAIA's own voice
+        if (isSpeaking && normalizedLevel > 0.35) {
+          console.log('🛑 [Interrupt] User started speaking while MAIA is speaking');
+          onInterrupt?.();
+        }
 
         if (isListening) {
           requestAnimationFrame(checkAudioLevel);
@@ -504,8 +578,18 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
 
   // Auto-start if enabled
   useEffect(() => {
+    console.log('🔍 [ContinuousConversation] autoStart useEffect check:', {
+      autoStart,
+      isListening,
+      isSpeaking,
+      isProcessing,
+      shouldStart: autoStart && !isListening && !isSpeaking && !isProcessing
+    });
+
     if (autoStart && !isListening && !isSpeaking && !isProcessing) {
+      console.log('✅ [ContinuousConversation] Conditions met - scheduling startListening in 1s');
       const timer = setTimeout(() => {
+        console.log('⏰ [ContinuousConversation] Timer fired - calling startListening()');
         startListening();
       }, 1000);
       return () => clearTimeout(timer);

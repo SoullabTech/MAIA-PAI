@@ -74,6 +74,7 @@ export default function MAIAPage() {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'>('shimmer');
+  const [isHeaderHovered, setIsHeaderHovered] = useState(false);
 
   const hasCheckedAuth = useRef(false);
 
@@ -230,8 +231,19 @@ export default function MAIAPage() {
         {/* Atmospheric Glow - Warm light from below */}
         <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-[#3d2817]/30 via-transparent to-transparent pointer-events-none z-0" />
 
-        {/* DREAM-WEAVER SYSTEM - Combined Header & Banner */}
-        <div className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/10 backdrop-blur-sm">
+        {/* DREAM-WEAVER SYSTEM - Combined Header & Banner - Auto-hides when not hovered */}
+        <motion.div
+          className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/10 backdrop-blur-sm"
+          onMouseEnter={() => setIsHeaderHovered(true)}
+          onMouseLeave={() => setIsHeaderHovered(false)}
+          animate={{
+            y: isHeaderHovered ? 0 : -60
+          }}
+          transition={{
+            duration: 0.3,
+            ease: "easeInOut"
+          }}
+        >
           {/* Spice particle effect - very subtle movement */}
           <div className="absolute inset-0 opacity-5 pointer-events-none">
             <motion.div
@@ -538,7 +550,7 @@ export default function MAIAPage() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">

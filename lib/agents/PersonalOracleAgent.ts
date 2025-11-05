@@ -1873,10 +1873,8 @@ This is the soul-level truth you're helping them see, not reference material to 
         console.log('✅ Check-in ritual prepended to response');
       }
 
-      // Generate sessionId for memory persistence
-      const sessionId = `session_${Date.now()}`;
-
       // 💾 CAPTURE & SAVE RELATIONSHIP ESSENCE
+      // (sessionId already defined at line 785 for safety check)
       try {
         const updatedEssence = anamnesis.captureEssence({
           userId: this.userId,

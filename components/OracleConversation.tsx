@@ -1,12 +1,14 @@
 // Oracle Conversation - Voice-synchronized sacred dialogue
 // 🔄 MOBILE-FIRST DEPLOYMENT - Oct 2 12:15PM - Compact input, hidden overlays, fixed scroll
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Paperclip, X, Copy, BookOpen, Volume2 } from 'lucide-react';
 // import { SimplifiedOrganicVoice, VoiceActivatedMaiaRef } from './ui/SimplifiedOrganicVoice'; // REPLACED with Whisper
 // import { WhisperVoiceRecognition } from './ui/WhisperVoiceRecognition'; // REPLACED with ContinuousConversation (uses browser Web Speech API)
 import { ContinuousConversation, ContinuousConversationRef } from '../apps/web/components/voice/ContinuousConversation';
-import { SacredHoloflower } from './sacred/SacredHoloflower';
+import { RhythmMetrics } from '@/lib/liquid/ConversationalRhythm';
+import { RhythmHoloflower } from './liquid/RhythmHoloflower';
+import { RhythmDevOverlay } from './liquid/RhythmDevOverlay';
 import { EnhancedVoiceMicButton } from './ui/EnhancedVoiceMicButton';
 import AdaptiveVoiceMicButton from './ui/AdaptiveVoiceMicButton';
 import { detectVoiceCommand, isOnlyModeSwitch, getModeConfirmation } from '@/lib/voice/VoiceCommandDetector';
@@ -151,7 +153,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // Simple TTS function - Pure MAIA system (NO OpenAI Realtime API)
   // Voice flow handled by ContinuousConversation + this TTS function
-  const maiaSpeak = useCallback(async (text: string) => {
+  const maiaSpeak = useCallback(async (text: string, options?: { voiceTone?: string }) => {
     try {
       // CRITICAL: Stop microphone BEFORE speaking to prevent echo
       if (voiceMicRef.current?.stopListening) {
@@ -164,7 +166,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text,
-          voice: 'shimmer'
+          voice: 'shimmer',
+          voiceTone: options?.voiceTone // Pass elemental voice tone for prosody
         })
       });
 
@@ -177,17 +180,22 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       const audio = new Audio(audioUrl);
 
+      // Store audio ref for interruption capability
+      currentAudioRef.current = audio;
+
       // Track when audio actually finishes
       return new Promise<void>((resolve, reject) => {
         audio.onended = () => {
           console.log('🔊 Audio playback completed');
           URL.revokeObjectURL(audioUrl);
+          currentAudioRef.current = null;
           resolve();
         };
 
         audio.onerror = (err) => {
           console.error('❌ Audio playback error:', err);
           URL.revokeObjectURL(audioUrl);
+          currentAudioRef.current = null;
           reject(err);
         };
 
@@ -197,6 +205,22 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       console.error('❌ TTS error:', err);
       throw err;
     }
+  }, []);
+
+  // 🎙️ Voice interruption handler - stops TTS when user starts speaking
+  const handleVoiceInterrupt = useCallback(() => {
+    console.log('🛑 [Interrupt] User interrupted MAIA');
+
+    // Stop currently playing audio
+    if (currentAudioRef.current) {
+      currentAudioRef.current.pause();
+      currentAudioRef.current.currentTime = 0;
+      currentAudioRef.current = null;
+      console.log('🔇 Audio stopped due to interruption');
+    }
+
+    // Reset speaking state
+    setIsAudioPlaying(false);
   }, []);
 
   // Voice ready state (pure MAIA system)
@@ -384,6 +408,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [isMicrophonePaused, setIsMicrophonePaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false); // Start unmuted in voice mode for immediate use
   const voiceMicRef = useRef<ContinuousConversationRef>(null);
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null); // Track current TTS audio for interruption
   const textInputRef = useRef<HTMLTextAreaElement>(null);
   const [userTranscript, setUserTranscript] = useState('');
   const [maiaResponseText, setMaiaResponseText] = useState('');
@@ -393,6 +418,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const lastMaiaResponseRef = useRef<string>('');
   const lastVoiceErrorRef = useRef<number>(0);
   const lastProcessedTranscriptRef = useRef<{ text: string; timestamp: number } | null>(null);
+
+  // 🌊 LIQUID LAYER: Conversational rhythm metrics
+  const [rhythmMetrics, setRhythmMetrics] = useState<RhythmMetrics | null>(null);
 
   // Oracle Agent ID for memory persistence
   const [oracleAgentId, setOracleAgentId] = useState<string | null>(null);
@@ -575,7 +603,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   }, [voiceEnabled, onMessageAdded]);
 
   // UI states
-  const [showChatInterface, setShowChatInterface] = useState(true); // DEFAULT: Show chat interface
+  const [showChatInterface, setShowChatInterface] = useState(false); // DEFAULT: Voice mode (hide text input)
   const [showCaptions, setShowCaptions] = useState(true); // Show text by default in voice mode
   const [showVoiceText, setShowVoiceText] = useState(true); // Toggle for showing text in voice mode
   const [showCustomizer, setShowCustomizer] = useState(false);
@@ -1364,8 +1392,38 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         // ECHO SUPPRESSION: Define cooldown OUTSIDE try block so finally can access it
         const cooldownMs = 5000; // 5 second cooldown - extended to prevent echo from MAIA's voice
 
+        // 🎯 CRITICAL FIX: Show text BEFORE speech starts (not after)
+        // This makes the response feel instant while audio synthesizes
+        if (isInVoiceMode && showVoiceText) {
+          setMessages(prev => prev.map(msg =>
+            msg.id === streamingMessageId
+              ? { ...msg,
+                  text: responseText,
+                  facetId: element,
+                  motionState: 'responding' as MotionState,
+                  coherenceLevel: oracleResponse.confidence || 0.85
+                }
+              : msg
+          ));
+          onMessageAdded?.(oracleMessage);
+
+          // Save voice response to long-term memory
+          if (oracleAgentId) {
+            saveConversationMemory({
+              oracleAgentId,
+              content: responseText,
+              memoryType: 'conversation',
+              sourceType: 'voice',
+              emotionalTone: oracleResponse.emotionalResonance,
+              wisdomThemes: oracleResponse.themes,
+              elementalResonance: element,
+              sessionId
+            }).catch(err => console.error('Failed to save voice response:', err));
+          }
+        }
+
         try {
-          // Start speaking immediately
+          // Start speaking immediately (audio will play while text is already visible)
 
           const startSpeakTime = Date.now();
           console.log('⏱️ Starting speech at:', startSpeakTime);
@@ -1389,38 +1447,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           setEchoSuppressUntil(Date.now() + cooldownMs);
           console.log(`🛡️ Echo suppression active for ${cooldownMs}ms`);
 
-          // In Voice mode, update streaming message with final metadata after speaking completes
-          if (isInVoiceMode && showVoiceText) {
-            setMessages(prev => prev.map(msg =>
-              msg.id === streamingMessageId
-                ? { ...msg,
-                    text: responseText,
-                    facetId: element,
-                    motionState: 'responding' as MotionState,
-                    coherenceLevel: oracleResponse.confidence || 0.85
-                  }
-                : msg
-            ));
-            onMessageAdded?.(oracleMessage);
-
-            // Save voice response to long-term memory
-            if (oracleAgentId) {
-              saveConversationMemory({
-                oracleAgentId,
-                content: responseText,
-                memoryType: 'conversation',
-                sourceType: 'voice',
-                emotionalTone: oracleResponse.emotionalResonance,
-                wisdomThemes: oracleResponse.themes,
-                elementalResonance: element,
-                sessionId
-              }).catch(err => console.error('Failed to save voice response:', err));
-            }
-          }
         } catch (error) {
           console.error('❌ Speech error or timeout:', error);
-          // Update streaming message even if speech fails in Voice mode
-          if (isInVoiceMode) {
+          // Update streaming message even if speech fails in Voice mode (fallback if not already shown)
+          if (isInVoiceMode && !showVoiceText) {
             setMessages(prev => prev.map(msg =>
               msg.id === streamingMessageId
                 ? { ...msg,
@@ -1838,6 +1868,16 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // DIAGNOSTIC LOGGING - Removed to reduce console noise and improve performance
 
+  // 🎯 Memoize presence state mapping to prevent excessive re-renders
+  const mappedPresenceState = useMemo(() => {
+    const mapped =
+      listeningMode === 'normal' ? 'dialogue' :
+      listeningMode === 'session' ? 'scribe' :
+      'patient';  // Default to patient for any other case
+    console.log('🎯 ListeningMode → PresenceState:', listeningMode, '→', mapped);
+    return mapped;
+  }, [listeningMode]);
+
   return (
     <div className="oracle-conversation min-h-screen bg-soul-background overflow-hidden">
       {/* iOS Audio Enable Button - DISABLED - causing black screen */}
@@ -1923,14 +1963,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {/* NO cognitive UI - the experience itself induces the transformation */}
       <div className="fixed top-32 md:top-28 lg:top-24 left-1/2 -translate-x-1/2 z-[25]">
         <TransformationalPresence
-          currentState={(() => {
-            const mapped =
-              listeningMode === 'normal' ? 'dialogue' :
-              listeningMode === 'session' ? 'scribe' :
-              'patient';  // Default to patient for any other case
-            console.log('🎯 ListeningMode → PresenceState:', listeningMode, '→', mapped);
-            return mapped;
-          })()}
+          currentState={mappedPresenceState}
           onStateChange={(newState, transition) => {
             console.log('🌀 State transition:', transition);
             // Map back to listeningMode
@@ -1984,13 +2017,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                background: 'transparent',
                overflow: 'visible'
              }}>
-          {/* Non-interactive Sacred Holoflower with animations */}
-          <SacredHoloflower
+          {/* Rhythm-Enhanced Holoflower - Pulses with your speech patterns */}
+          <RhythmHoloflower
+            rhythmMetrics={rhythmMetrics}
             size={holoflowerSize}
             interactive={false}
             showLabels={false}
             motionState={currentMotionState}
-            coherenceLevel={coherenceLevel}
             coherenceShift={coherenceShift}
             isListening={isListening}
             isProcessing={isProcessing}
@@ -2352,21 +2385,21 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* REMOVED: Separate white circle button - holoflower itself is now clickable */}
 
-      {/* Text Scrim - Warm volcanic veil when messages appear (absorbs light, doesn't just dim) */}
+      {/* Text Scrim - Warm volcanic veil when messages appear (absorbs light, doesn't just dim) - LIGHTENED */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
         <div
           className="fixed inset-0 z-20 transition-opacity duration-700 pointer-events-none"
           style={{
-            background: 'linear-gradient(135deg, rgba(26, 21, 19, 0.75) 0%, rgba(28, 22, 20, 0.65) 50%, rgba(26, 21, 19, 0.75) 100%)',
-            backdropFilter: 'blur(1.5px) saturate(0.85) brightness(0.75)',
-            WebkitBackdropFilter: 'blur(1.5px) saturate(0.85) brightness(0.75)'
+            background: 'linear-gradient(135deg, rgba(26, 21, 19, 0.15) 0%, rgba(28, 22, 20, 0.10) 50%, rgba(26, 21, 19, 0.15) 100%)',
+            backdropFilter: 'blur(0.5px) saturate(0.95) brightness(0.95)',
+            WebkitBackdropFilter: 'blur(0.5px) saturate(0.95) brightness(0.95)'
           }}
         />
       )}
 
       {/* Message flow - Star Wars crawl: text flows from beneath holoflower */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
-        <div className={`fixed z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
+        <div className={`fixed z-30 transition-all duration-500 left-1/2 -translate-x-1/2 pointer-events-none ${
           showChatInterface
             ? 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[600px] lg:w-[680px] xl:w-[720px] opacity-100'
             : 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[520px] lg:w-[560px] opacity-70'
@@ -2381,7 +2414,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                  : 'calc(100vh - max(3rem, calc(env(safe-area-inset-top) + 2.5rem)) - 6rem - env(safe-area-inset-bottom))',
                overflow: 'hidden'
              }}>
-          <div className="h-full overflow-y-scroll overflow-x-hidden pr-2 mobile-scroll"
+          <div className="h-full overflow-y-scroll overflow-x-hidden pr-2 mobile-scroll pointer-events-auto"
                style={{
                  scrollBehavior: 'smooth',
                  WebkitOverflowScrolling: 'touch',
@@ -2468,17 +2501,18 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         <>
           {/* Old Mode Toggle removed - Now using ModeSwitcher at top-left */}
 
-          {/* Text Display Toggle & Export for Voice Mode */}
+          {/* Consolidated Top Menu Bar - All controls in one place */}
           {!showChatInterface && (
             <div
-              className="fixed right-4 md:right-8 z-50 flex gap-2"
-              style={{ top: 'max(0.5rem, env(safe-area-inset-top))' }}
+              className="fixed right-4 md:right-8 z-50 flex items-center gap-2"
+              style={{ top: 'calc(max(0.5rem, env(safe-area-inset-top)) + 0.5rem)' }}
             >
               <button
                 onClick={() => setShowQuickVoiceSettings(true)}
                 className="p-2 rounded-full bg-black/20 backdrop-blur-md
                          text-amber-400/70 hover:text-amber-400 transition-all"
                 aria-label="Voice Settings"
+                title="Voice Settings"
               >
                 <Volume2 className="w-4 h-4" />
               </button>
@@ -2538,8 +2572,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 </motion.div>
               </div>
 
-              {/* Voice toggle & Export for chat mode - HIDDEN on mobile, visible on desktop */}
-              <div className="hidden md:flex fixed top-20 right-4 md:right-8 z-50 gap-2">
+              {/* Voice toggle & Export for chat mode - Consolidated into main top menu */}
+              <div className="hidden md:flex fixed right-4 md:right-8 z-50 gap-2 items-center"
+                   style={{ top: 'calc(max(0.5rem, env(safe-area-inset-top)) + 0.5rem)' }}>
                 <button
                   onClick={() => setEnableVoiceInChat(!enableVoiceInChat)}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
@@ -2563,9 +2598,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
               {/* Text input area - Shows in chat mode, positioned above safe area */}
               {showChatInterface && (
-              <div className="fixed inset-x-0 z-[85]" style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px))' }}>
+              <div className="fixed inset-x-0 z-[999]" style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px))', pointerEvents: 'auto' }}>
                 {/* Text input area - Ultra compact mobile design - Sits directly on bottom */}
-                <div className="bg-soul-surface/95 backdrop-blur-md px-2 py-1.5 border-t border-soul-border/40">
+                <div className="bg-soul-surface/95 backdrop-blur-md px-2 py-1.5 border-t border-soul-border/40" style={{ pointerEvents: 'auto' }}>
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -2601,7 +2636,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                                  focus:outline-none focus:border-gold-divine/60 focus:ring-1 focus:ring-gold-divine/20
                                  resize-none
                                  touch-manipulation cursor-text"
-                        style={{ color: '#E8C99B', fontFamily: 'Spectral, Georgia, serif' }}
+                        style={{ color: '#E8C99B', fontFamily: 'Spectral, Georgia, serif', pointerEvents: 'auto' }}
                         autoComplete="off"
                         autoFocus={false}
                       />
@@ -2619,6 +2654,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                               : 'bg-gold-divine/10 border-amber-400/40 text-amber-300 hover:bg-gold-divine/20'
                           } ${isSavingJournal ? 'opacity-50 cursor-not-allowed' : ''}`}
                           title={breakthroughScore >= 70 ? 'Breakthrough detected - Save to journal' : 'Save as journal entry'}
+                          style={{ pointerEvents: 'auto' }}
                         >
                           <BookOpen className="w-5 h-5" />
                         </button>
@@ -2646,6 +2682,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                                  rounded-full text-amber-300 flex items-center justify-center
                                  hover:bg-gold-divine/20 active:scale-95 transition-all cursor-pointer"
                         title="Upload files"
+                        style={{ pointerEvents: 'auto' }}
                       >
                         <Paperclip className="w-5 h-5" />
                       </label>
@@ -2662,6 +2699,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                                  rounded-full text-amber-300 flex items-center justify-center
                                  hover:bg-gold-divine/30 active:scale-95 transition-all"
                         aria-label="Send"
+                        style={{ pointerEvents: 'auto' }}
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -2955,6 +2993,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             ref={voiceMicRef}
             onTranscript={handleVoiceTranscript}
             onAudioLevelChange={(level) => setVoiceAmplitude(level)}
+            onRhythmUpdate={(metrics) => setRhythmMetrics(metrics)}
+            onInterrupt={handleVoiceInterrupt}
             isProcessing={isResponding}
             isSpeaking={isAudioPlaying}
             autoStart={true}
@@ -3036,6 +3076,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         isOpen={showQuickVoiceSettings}
         onClose={() => setShowQuickVoiceSettings(false)}
       />
+
+      {/* Rhythm Dev Overlay - Toggle with Cmd/Ctrl+Shift+R */}
+      <RhythmDevOverlay rhythmMetrics={rhythmMetrics} />
     </div>
   );
 };
