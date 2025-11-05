@@ -3,16 +3,13 @@
 import React, { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Mic, MicOff, Loader2, Activity, Wifi, WifiOff } from "lucide-react";
 import VoiceFeedbackPrevention from "@/lib/voice/voice-feedback-prevention";
-import { ConversationalRhythm, RhythmMetrics } from "@/lib/liquid/ConversationalRhythm";
 // import { Analytics } from "../../lib/analytics/supabaseAnalytics"; // Disabled for Vercel build
 
 interface ContinuousConversationProps {
   onTranscript: (text: string) => void;
   onInterimTranscript?: (text: string) => void;
   onRecordingStateChange?: (isRecording: boolean) => void;
-  onAudioLevelChange?: (level: number) => void; // Audio amplitude 0.0-1.0 for visualization
-  onRhythmUpdate?: (metrics: RhythmMetrics) => void; // 🌊 LIQUID LAYER: Real-time rhythm metrics
-  onInterrupt?: () => void; // 🎙️ Called when user speaks while MAIA is speaking (interruption)
+  onAudioLevelChange?: (amplitude: number, isSpeaking: boolean) => void; // Audio amplitude callback for visualization
   isProcessing?: boolean;
   isSpeaking?: boolean; // When Maya is speaking
   autoStart?: boolean; // Start listening immediately
@@ -34,8 +31,6 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     onInterimTranscript,
     onRecordingStateChange,
     onAudioLevelChange,
-    onRhythmUpdate,
-    onInterrupt,
     isProcessing = false,
     isSpeaking = false,
     autoStart = true,
@@ -47,7 +42,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
-
+  
   const recognitionRef = useRef<any>(null);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -59,33 +54,8 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   const recognitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSentRef = useRef<string>("");
   const isRestartingRef = useRef(false);
-
-  // Ref to allow calling processAccumulatedTranscript from recognition handlers
-  const processTranscriptRef = useRef<(() => void) | null>(null);
-
-  // 🌊 LIQUID LAYER: Conversational rhythm tracking
-  const rhythmTrackerRef = useRef<ConversationalRhythm>(
-    new ConversationalRhythm((metrics) => {
-      console.log('🌊 [LIQUID] Rhythm update:', {
-        wpm: Math.round(metrics.wordsPerMinute),
-        tempo: metrics.conversationTempo,
-        coherence: metrics.rhythmCoherence.toFixed(2),
-        breathAlignment: metrics.breathAlignment.toFixed(2)
-      });
-      onRhythmUpdate?.(metrics);
-    })
-  );
-
-  // Component mount log
-  useEffect(() => {
-    console.log('🎤 [ContinuousConversation] Component mounted with props:', {
-      autoStart,
-      isProcessing,
-      isSpeaking,
-      silenceThreshold,
-      vadSensitivity
-    });
-  }, []);
+  const networkErrorCount = useRef<number>(0);
+  const lastNetworkErrorTime = useRef<number>(0);
 
   // Expose methods to parent
   useImperativeHandle(ref, () => ({
@@ -138,10 +108,6 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       setIsRecording(true);
       onRecordingStateChange?.(true);
       accumulatedTranscript.current = "";
-
-      // 🌊 LIQUID LAYER: Track speech start for rhythm analysis
-      rhythmTrackerRef.current.onSpeechStart();
-      console.log('🌊 [LIQUID] Speech started - tracking rhythm');
 
       // Clear conversation timeout when user starts speaking
       if (conversationTimeoutRef.current) {
@@ -199,19 +165,6 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
           console.log('✅ Got FINAL transcript:', finalTranscript);
           // Replace with final (don't add, since interim already set it)
           accumulatedTranscript.current = finalTranscript.trim();
-
-          // 🌊 LIQUID LAYER: Track speech end with transcript for rhythm analysis
-          rhythmTrackerRef.current.onSpeechEnd(finalTranscript.trim());
-          console.log('🌊 [LIQUID] Speech ended - analyzing rhythm patterns');
-
-          // 🔥 CRITICAL FIX: Stop recognition after final result to trigger onend
-          // which will process the transcript. Otherwise recognition keeps running
-          // and transcript sits unprocessed waiting for 20s silence timer
-          console.log('🛑 [onresult] Got final transcript - stopping recognition to trigger processing');
-          if (recognitionRef.current) {
-            recognitionRef.current.stop();
-          }
-          return; // Exit early - don't reset silence timer
         } else if (interimTranscript) {
           console.log('📝 Got INTERIM transcript:', interimTranscript);
           // Replace with latest interim (don't accumulate)
@@ -231,7 +184,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
           // CRITICAL FIX: Don't check isRecording - onend fires before this timer
           // Just check if we have a transcript to send
           if (!isProcessingRef.current && accumulatedTranscript.current.trim()) {
-            processTranscriptRef.current?.();
+            processAccumulatedTranscript();
           }
         }, silenceThreshold); // Use configurable threshold from props
       }
@@ -239,12 +192,6 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       if (interimTranscript) {
         onInterimTranscript?.(interimTranscript);
       }
-    };
-
-    // 🛑 INTERRUPT: Stop MAIA when actual speech is detected
-    recognition.onspeechstart = () => {
-      console.log('🗣️ User speech detected - interrupting MAIA');
-      feedbackPrevention.interruptMaya();
     };
 
     recognition.onerror = (event: any) => {
@@ -256,12 +203,22 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       if (event.error === 'no-speech') {
         // Process accumulated transcript before restarting
         if (accumulatedTranscript.current.trim()) {
-          processTranscriptRef.current?.();
+          processAccumulatedTranscript();
         }
         // No-speech is normal in continuous mode, auto-restart happens in onend
       } else if (event.error === 'network') {
-        console.warn('⚠️ Network error in speech recognition, will retry on restart');
-        // Network errors will be retried by the auto-restart mechanism
+        networkErrorCount.current++;
+        lastNetworkErrorTime.current = Date.now();
+
+        if (networkErrorCount.current >= 5) {
+          console.error('🚫 Too many network errors (5+), stopping recognition');
+          setIsListening(false);
+          // TODO: Show user-friendly toast message
+          return;
+        }
+
+        console.warn(`⚠️ Network error in speech recognition (${networkErrorCount.current}/5), will retry with backoff`);
+        // Network errors will be retried by the auto-restart mechanism with exponential backoff
       } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
         console.error('🚫 Microphone permission denied');
         // Stop listening permanently if permission denied
@@ -285,21 +242,6 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         recognitionTimeoutRef.current = null;
       }
 
-      // 🔥 CRITICAL FIX: Process any accumulated transcript before restarting
-      // This prevents losing transcripts when recognition ends before silence timer fires
-      if (accumulatedTranscript.current.trim() && !isProcessingRef.current) {
-        console.log('📝 [onend] Processing accumulated transcript before restart:', accumulatedTranscript.current);
-        // Clear silence timer since we're processing now
-        if (silenceTimerRef.current) {
-          clearTimeout(silenceTimerRef.current);
-          silenceTimerRef.current = null;
-        }
-        // Process the transcript immediately
-        processTranscriptRef.current?.();
-        // Don't restart yet - let processing complete
-        return;
-      }
-
       // CRITICAL: Prevent infinite restart loop
       // Check if already restarting to prevent multiple simultaneous attempts
       if (isRestartingRef.current) {
@@ -309,7 +251,20 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
 
       // Only restart if we're actively listening and not processing/speaking
       if (isListening && !isProcessingRef.current && !isSpeaking) {
-        console.log('🔄 [onend] Will restart recognition after delay...');
+        // Calculate backoff delay based on network error count
+        const timeSinceLastError = Date.now() - lastNetworkErrorTime.current;
+
+        // Reset error count if it's been more than 30 seconds since last error
+        if (timeSinceLastError > 30000) {
+          networkErrorCount.current = 0;
+        }
+
+        // Exponential backoff: 300ms, 600ms, 1200ms, 2400ms, 4800ms
+        const backoffDelay = networkErrorCount.current > 0
+          ? Math.min(300 * Math.pow(2, networkErrorCount.current - 1), 5000)
+          : 300;
+
+        console.log(`🔄 [onend] Will restart recognition after ${backoffDelay}ms delay (errors: ${networkErrorCount.current})...`);
         isRestartingRef.current = true;
 
         setTimeout(() => {
@@ -328,7 +283,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
           }
           // Clear the restarting flag
           isRestartingRef.current = false;
-        }, 300); // Increased from 50ms to 300ms for stability
+        }, backoffDelay);
       } else {
         console.log('🚫 [onend] Not restarting - conditions not met');
       }
@@ -336,6 +291,46 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
 
     return recognition;
   }, [isListening, isRecording, isSpeaking, silenceThreshold, onInterimTranscript, onRecordingStateChange]);
+
+  // 🔇 CRITICAL: Stop recognition when MAIA starts speaking to prevent voice feedback loop
+  useEffect(() => {
+    if (isSpeaking && recognitionRef.current) {
+      console.log('🔇 [Voice Feedback Prevention] MAIA started speaking - stopping STT');
+      try {
+        // Always stop recognition when MAIA speaks, regardless of isRecording state
+        recognitionRef.current.stop();
+        setIsRecording(false);
+        isProcessingRef.current = false; // Clear processing flag
+      } catch (err) {
+        console.warn('⚠️ [Voice Feedback Prevention] Error stopping recognition:', err);
+      }
+    }
+  }, [isSpeaking]);
+
+  // 🎤 CRITICAL: Restart recognition after MAIA finishes speaking
+  useEffect(() => {
+    if (!isSpeaking && !isRecording && isListening && recognitionRef.current) {
+      // Reset processing flag to allow restart
+      isProcessingRef.current = false;
+
+      const restartTimer = setTimeout(() => {
+        if (recognitionRef.current && !isRecording && !isSpeaking && isListening) {
+          try {
+            recognitionRef.current.start();
+            setIsRecording(true);
+            console.log('✅ [effect] Recognition restarted after Maya stopped speaking');
+          } catch (err: any) {
+            // Ignore if already started
+            if (!err?.message?.includes('already started')) {
+              console.warn('⚠️ [Voice Feedback Prevention] Error restarting recognition:', err);
+            }
+          }
+        }
+      }, 2000); // Increased delay to 2 seconds to ensure MAIA's voice has fully stopped
+
+      return () => clearTimeout(restartTimer);
+    }
+  }, [isSpeaking, isRecording, isListening]);
 
   // Process accumulated transcript
   const processAccumulatedTranscript = useCallback(() => {
@@ -351,7 +346,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     if (isProcessingRef.current) {
       console.log('⏳ [ContinuousConversation] Already processing, will retry in 500ms');
       setTimeout(() => {
-        processTranscriptRef.current?.();
+        processAccumulatedTranscript();
       }, 500);
       return;
     }
@@ -392,9 +387,6 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     }, 500);
   }, [onTranscript]);
 
-  // Assign to ref so it can be called from recognition handlers before this point in code
-  processTranscriptRef.current = processAccumulatedTranscript;
-
   // Initialize audio level monitoring
   const initializeAudioMonitoring = useCallback(async () => {
     try {
@@ -424,26 +416,16 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       // Monitor audio levels
       const checkAudioLevel = () => {
         if (!analyserRef.current) return;
-
+        
         const bufferLength = analyserRef.current.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
         analyserRef.current.getByteFrequencyData(dataArray);
-
+        
         // Calculate average level
         const average = dataArray.reduce((a, b) => a + b, 0) / bufferLength;
         const normalizedLevel = Math.min(average / 128, 1);
         setAudioLevel(normalizedLevel);
-
-        // Send amplitude to parent for visualization
-        onAudioLevelChange?.(normalizedLevel);
-
-        // 🎙️ INTERRUPTION DETECTION: Trigger interrupt if user speaks while MAIA is speaking
-        // Higher threshold (0.35) to avoid false positives from background noise or MAIA's own voice
-        if (isSpeaking && normalizedLevel > 0.35) {
-          console.log('🛑 [Interrupt] User started speaking while MAIA is speaking');
-          onInterrupt?.();
-        }
-
+        
         if (isListening) {
           requestAnimationFrame(checkAudioLevel);
         }
@@ -578,18 +560,8 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
 
   // Auto-start if enabled
   useEffect(() => {
-    console.log('🔍 [ContinuousConversation] autoStart useEffect check:', {
-      autoStart,
-      isListening,
-      isSpeaking,
-      isProcessing,
-      shouldStart: autoStart && !isListening && !isSpeaking && !isProcessing
-    });
-
     if (autoStart && !isListening && !isSpeaking && !isProcessing) {
-      console.log('✅ [ContinuousConversation] Conditions met - scheduling startListening in 1s');
       const timer = setTimeout(() => {
-        console.log('⏰ [ContinuousConversation] Timer fired - calling startListening()');
         startListening();
       }, 1000);
       return () => clearTimeout(timer);
@@ -621,12 +593,19 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     }
   }, [isSpeaking, isProcessing, isListening, isRecording]);
 
+  // Call audio level callback when amplitude changes
+  useEffect(() => {
+    if (onAudioLevelChange) {
+      onAudioLevelChange(audioLevel, isRecording);
+    }
+  }, [audioLevel, isRecording, onAudioLevelChange]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopListening();
     };
-  }, []);
+  }, [stopListening]);
 
   // Visual states
   const isActive = isListening && !isSpeaking && !isProcessing;
