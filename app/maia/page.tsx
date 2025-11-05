@@ -284,11 +284,51 @@ export default function MAIAPage() {
                 </h1>
               </div>
 
-              {/* Center: Voice mode indicator only */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-amber-400/60 font-light">
-                  {showChatInterface ? '💬 Text Mode' : '🎤 Voice Mode'}
-                </span>
+              {/* Center: Voice/Text toggle + Mode selector */}
+              <div className="flex items-center gap-3">
+                {/* Voice/Text Toggle - Clickable */}
+                <button
+                  onClick={() => setShowChatInterface(!showChatInterface)}
+                  className="px-3 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all"
+                >
+                  <span className="text-xs text-amber-300/90 font-light">
+                    {showChatInterface ? '💬 Text' : '🎤 Voice'}
+                  </span>
+                </button>
+
+                {/* Mode Selector: Dialogue / Patient / Scribe */}
+                <div className="flex items-center gap-1 bg-black/20 rounded-lg p-0.5">
+                  <button
+                    onClick={() => setMaiaMode('normal')}
+                    className={`px-2 py-1 rounded text-xs font-light transition-all ${
+                      maiaMode === 'normal'
+                        ? 'bg-amber-500/30 text-amber-200'
+                        : 'text-amber-400/60 hover:text-amber-300/80'
+                    }`}
+                  >
+                    Dialogue
+                  </button>
+                  <button
+                    onClick={() => setMaiaMode('patient')}
+                    className={`px-2 py-1 rounded text-xs font-light transition-all ${
+                      maiaMode === 'patient'
+                        ? 'bg-purple-500/30 text-purple-200'
+                        : 'text-amber-400/60 hover:text-amber-300/80'
+                    }`}
+                  >
+                    Patient
+                  </button>
+                  <button
+                    onClick={() => setMaiaMode('session')}
+                    className={`px-2 py-1 rounded text-xs font-light transition-all ${
+                      maiaMode === 'session'
+                        ? 'bg-blue-500/30 text-blue-200'
+                        : 'text-amber-400/60 hover:text-amber-300/80'
+                    }`}
+                  >
+                    Scribe
+                  </button>
+                </div>
               </div>
 
               {/* Right: Empty space for balance */}
