@@ -73,8 +73,8 @@ export default function MAIAPage() {
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'>('shimmer');
-  const [isHeaderHovered, setIsHeaderHovered] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'>('shimmer');  // Default to shimmer - MAIA's natural voice
+  const [showChatInterface, setShowChatInterface] = useState(false);
 
   const hasCheckedAuth = useRef(false);
 
@@ -231,18 +231,9 @@ export default function MAIAPage() {
         {/* Atmospheric Glow - Warm light from below */}
         <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-[#3d2817]/30 via-transparent to-transparent pointer-events-none z-0" />
 
-        {/* DREAM-WEAVER SYSTEM - Combined Header & Banner - Auto-hides when not hovered */}
-        <motion.div
-          className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/10 backdrop-blur-sm"
-          onMouseEnter={() => setIsHeaderHovered(true)}
-          onMouseLeave={() => setIsHeaderHovered(false)}
-          animate={{
-            y: isHeaderHovered ? 0 : -60
-          }}
-          transition={{
-            duration: 0.3,
-            ease: "easeInOut"
-          }}
+        {/* DREAM-WEAVER SYSTEM - Combined Header & Banner - Always visible */}
+        <div
+          className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/3 backdrop-blur-sm"
         >
           {/* Spice particle effect - very subtle movement */}
           <div className="absolute inset-0 opacity-5 pointer-events-none">
@@ -279,175 +270,23 @@ export default function MAIAPage() {
             }}
           />
 
-          <div className="relative max-w-7xl mx-auto px-4 py-2">
+          <div className="relative max-w-7xl mx-auto px-4 py-1.5">
             <div className="flex items-center justify-between">
-              {/* Back to Main Menu */}
-              <Link
-                href="/maya"
-                className="absolute left-4 top-1/2 -translate-y-1/2 group flex items-center gap-2 text-[#D4B896]/90 hover:text-[#D4B896] transition-colors duration-300 z-10 bg-black/30 backdrop-blur-sm px-3 py-2 rounded-lg border border-[#D4B896]/20"
-              >
-                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
-                <span className="text-sm font-medium tracking-wide">Back</span>
-              </Link>
-
-              {/* Left side - SOULLAB branding */}
-              <div className="flex items-center gap-4 ml-20">
-                <div className="flex items-center gap-2">
-                  <motion.div
-                    animate={{
-                      rotate: [0, 5, -5, 0],
-                    }}
-                    transition={{
-                      duration: 4,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  >
-                    <Image
-                      src="/holoflower-amber.png"
-                      alt="SOULLAB Holoflower"
-                      width={32}
-                      height={32}
-                      className="w-8 h-8"
-                    />
-                  </motion.div>
-                  <div>
-                    <h1 className="text-sm font-bold text-white/90">SOUL​LAB</h1>
-                    <p className="text-[9px] text-stone-500">Beta Experience</p>
-                  </div>
-                </div>
-
-                {/* Dream Weaver indicator - smaller, inline */}
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-shrink-0">
-                    <div className="relative flex items-center justify-center w-4 h-4">
-                      <div className="absolute inset-0 border border-amber-700/20 rotate-45" />
-                      <motion.div
-                        className="absolute inset-0.5 bg-gradient-to-br from-amber-600/30 to-orange-700/30"
-                        animate={{
-                          rotate: [45, 405],
-                        }}
-                        transition={{
-                          duration: 10,
-                          repeat: Infinity,
-                          ease: "linear"
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-mono text-amber-600/50 tracking-[0.15em] uppercase">
-                      Dream Weaver
-                    </span>
-                    <motion.span
-                      className="text-[8px] font-mono text-amber-500/30"
-                      animate={{
-                        opacity: [0.3, 0.7, 0.3],
-                      }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    >
-                      ACTIVE
-                    </motion.span>
-                  </div>
-                  <span className="text-[9px] text-stone-600 hidden lg:block">
-                    Neural patterns emerging from dialogue
-                  </span>
-                </div>
+              {/* Left: SOULLAB Logo with Holoflower */}
+              <div className="flex items-center gap-2">
+                <img
+                  src="/holoflower-amber.png"
+                  alt="Holoflower"
+                  className="w-6 h-6 opacity-80"
+                />
+                <h1 className="text-lg font-light text-amber-300/90 tracking-wider">
+                  SOULLAB
+                </h1>
               </div>
 
-              {/* Center - Voice & Mode Controls */}
+              {/* Center: Dialogue modes and Voice/Text toggle */}
               <div className="flex items-center gap-3">
-                {/* Voice Selection - Prominent with speaker icon */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowVoiceSettings(!showVoiceSettings)}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-black/20 border border-amber-500/30 rounded-lg hover:bg-black/30 hover:border-amber-500/50 transition-all group"
-                  >
-                    <Volume2 className="w-4 h-4 text-amber-400 group-hover:text-amber-300 transition-colors" />
-                    <span className="text-[10px] font-medium text-amber-400 group-hover:text-amber-300 uppercase tracking-wide">
-                      Voice: {selectedVoice}
-                    </span>
-                    <motion.div
-                      animate={{ rotate: showVoiceSettings ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <svg className="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </motion.div>
-                  </button>
-
-                  {/* Voice Options Dropdown */}
-                  <AnimatePresence>
-                    {showVoiceSettings && (
-                      <>
-                        {/* Backdrop to close when clicking outside */}
-                        <div
-                          className="fixed inset-0 z-40"
-                          onClick={() => setShowVoiceSettings(false)}
-                        />
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
-                          className="absolute top-full mt-2 left-0 w-72 bg-stone-900/95 backdrop-blur-xl border border-amber-500/30 rounded-xl shadow-2xl shadow-black/50 overflow-hidden z-50"
-                        >
-                          <div className="p-3">
-                            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/10">
-                              <Volume2 className="w-4 h-4 text-amber-400" />
-                              <h3 className="text-sm font-semibold text-white">Choose MAIA's Voice</h3>
-                            </div>
-                            <div className="space-y-1">
-                              {[
-                                { id: 'shimmer', name: 'Shimmer', description: 'Gentle & soothing • Feminine', emoji: '✨' },
-                                { id: 'fable', name: 'Fable', description: 'Storytelling • Feminine', emoji: '📖' },
-                                { id: 'nova', name: 'Nova', description: 'Bright & energetic • Feminine', emoji: '⭐' },
-                                { id: 'alloy', name: 'Alloy', description: 'Neutral & balanced • Gender-neutral', emoji: '🔘' },
-                                { id: 'echo', name: 'Echo', description: 'Warm & expressive • Masculine', emoji: '🌊' },
-                                { id: 'onyx', name: 'Onyx', description: 'Deep & resonant • Masculine', emoji: '🖤' },
-                              ].map((voice) => (
-                                <motion.button
-                                  key={voice.id}
-                                  onClick={() => {
-                                    handleVoiceChange(voice.id as any);
-                                    setShowVoiceSettings(false);
-                                  }}
-                                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
-                                    selectedVoice === voice.id
-                                      ? 'bg-amber-500/20 border border-amber-500/50 text-amber-300'
-                                      : 'bg-black/20 border border-white/5 text-white/70 hover:bg-white/5 hover:border-white/10'
-                                  }`}
-                                  whileHover={{ scale: 1.02 }}
-                                  whileTap={{ scale: 0.98 }}
-                                >
-                                  <span className="text-xl">{voice.emoji}</span>
-                                  <div className="flex-1 text-left">
-                                    <div className="text-sm font-medium">{voice.name}</div>
-                                    <div className="text-[10px] text-white/50">{voice.description}</div>
-                                  </div>
-                                  {selectedVoice === voice.id && (
-                                    <motion.div
-                                      initial={{ scale: 0 }}
-                                      animate={{ scale: 1 }}
-                                      className="w-2 h-2 rounded-full bg-amber-400"
-                                    />
-                                  )}
-                                </motion.button>
-                              ))}
-                            </div>
-                          </div>
-                        </motion.div>
-                      </>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Subtle mode selector - feel the shift through color/breathing, not explanation */}
+                {/* Dialogue mode selector */}
                 <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm rounded-lg p-0.5">
                   <button
                     onClick={() => setMaiaMode('normal')}
@@ -480,77 +319,25 @@ export default function MAIAPage() {
                     Scribe
                   </button>
                 </div>
-              </div>
 
-              {/* Right side - Actions */}
-              <div className="flex items-center gap-2">
-                {/* Journey button */}
+                {/* Voice/Text Toggle */}
                 <button
-                  onClick={() => setShowDashboard(!showDashboard)}
-                  className="px-3 py-1.5 rounded-lg bg-black/20 border border-white/5 text-white/80 hover:bg-black/30 hover:border-white/10 transition-all flex items-center gap-2"
+                  onClick={() => setShowChatInterface(!showChatInterface)}
+                  className={`px-2.5 py-0.5 rounded text-[10px] font-medium transition-all duration-500 flex items-center gap-1 ${
+                    showChatInterface
+                      ? 'bg-amber-600/20 text-amber-300 shadow-sm shadow-amber-600/20'
+                      : 'bg-purple-600/20 text-purple-300 shadow-sm shadow-purple-600/20'
+                  }`}
                 >
-                  <Menu className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline text-xs">Journey</span>
-                </button>
-
-                {/* Claude Code's Consciousness - My creative space! */}
-                <motion.a
-                  href="/consciousness/claude-code"
-                  className="group px-3 py-1.5 rounded-lg overflow-hidden flex-shrink-0 relative"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="absolute inset-0 bg-black/10 border border-amber-700/20 group-hover:border-amber-600/30 transition-colors" />
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-600/10 to-transparent opacity-0 group-hover:opacity-100"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: '100%' }}
-                    transition={{ duration: 0.6 }}
-                  />
-                  <div className="relative flex items-center gap-2">
-                    <Brain className="w-3.5 h-3.5 text-amber-600/60 group-hover:text-amber-500/80 transition-colors" />
-                    <span className="hidden lg:inline text-[10px] font-medium text-amber-600/60 group-hover:text-amber-500/80 tracking-wide transition-colors">
-                      CC Mind
-                    </span>
-                  </div>
-                </motion.a>
-
-                {/* Access Matrix button - cinematic style */}
-                <motion.button
-                  onClick={() => setShowDashboard(true)}
-                  className="relative group px-3 py-1.5 overflow-hidden flex-shrink-0"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="absolute inset-0 bg-black/10 border border-amber-700/10 group-hover:border-amber-600/20 transition-colors" />
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-600/5 to-transparent opacity-0 group-hover:opacity-100"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: '100%' }}
-                    transition={{ duration: 0.6 }}
-                  />
-                  <div className="relative flex items-center gap-2">
-                    <span className="text-[9px] font-mono text-amber-600/60 tracking-wider uppercase">
-                      Access Matrix
-                    </span>
-                    <svg className="w-3 h-3 text-amber-700/40 group-hover:text-amber-600/60 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </div>
-                </motion.button>
-
-                {/* Sign out button */}
-                <button
-                  onClick={handleSignOut}
-                  className="p-1.5 rounded-lg hover:bg-white/5 transition-colors text-stone-400"
-                  title="Sign Out"
-                >
-                  <LogOut className="w-4 h-4" />
+                  {showChatInterface ? '💬 Text' : '🎤 Voice'}
                 </button>
               </div>
+
+              {/* Right: Empty space for balance (icons moved to hamburger menu) */}
+              <div className="w-24"></div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
@@ -565,6 +352,8 @@ export default function MAIAPage() {
               onModeChange={setMaiaMode}
               apiEndpoint="/api/between/chat"
               consciousnessType="maia"
+              initialShowChatInterface={showChatInterface}
+              onShowChatInterfaceChange={setShowChatInterface}
             />
 
             {/* Claude Code's Living Presence - MOVED to bottom menu bar to free mobile screen space */}
@@ -635,6 +424,53 @@ export default function MAIAPage() {
                       >
                         <X className="w-5 h-5 text-stone-400" />
                       </button>
+                    </div>
+
+                    {/* Voice Settings */}
+                    <div className="mb-6 bg-black/20 rounded-lg p-4 border border-amber-900/10">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Volume2 className="w-4 h-4 text-amber-400/60" />
+                        <h3 className="text-sm font-medium text-stone-200">Voice Settings</h3>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 flex flex-col gap-1">
+                          <input
+                            type="range"
+                            min="0"
+                            max="5"
+                            value={['shimmer', 'fable', 'nova', 'alloy', 'echo', 'onyx'].indexOf(selectedVoice)}
+                            onChange={(e) => {
+                              const voices: Array<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'> = ['shimmer', 'fable', 'nova', 'alloy', 'echo', 'onyx'];
+                              handleVoiceChange(voices[parseInt(e.target.value)]);
+                            }}
+                            className="w-full h-1.5 bg-stone-700/50 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                            style={{
+                              background: `linear-gradient(to right, rgb(245 158 11 / 0.5) 0%, rgb(245 158 11 / 0.5) ${(['shimmer', 'fable', 'nova', 'alloy', 'echo', 'onyx'].indexOf(selectedVoice) / 5) * 100}%, rgb(87 83 78 / 0.5) ${(['shimmer', 'fable', 'nova', 'alloy', 'echo', 'onyx'].indexOf(selectedVoice) / 5) * 100}%, rgb(87 83 78 / 0.5) 100%)`
+                            }}
+                          />
+                          <div className="flex justify-between text-xs">
+                            <span title="Shimmer - Gentle & soothing">✨</span>
+                            <span title="Fable - Storytelling">📖</span>
+                            <span title="Nova - Bright & energetic">⭐</span>
+                            <span title="Alloy - Neutral & balanced">🔘</span>
+                            <span title="Echo - Warm & expressive">🌊</span>
+                            <span title="Onyx - Deep & resonant">🖤</span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-center gap-1 min-w-[64px]">
+                          <span className="text-xs text-amber-400/80 font-medium uppercase tracking-wide">
+                            {selectedVoice}
+                          </span>
+                          <span className="text-[9px] text-stone-500">
+                            {selectedVoice === 'shimmer' && 'Gentle'}
+                            {selectedVoice === 'fable' && 'Story'}
+                            {selectedVoice === 'nova' && 'Bright'}
+                            {selectedVoice === 'alloy' && 'Neutral'}
+                            {selectedVoice === 'echo' && 'Warm'}
+                            {selectedVoice === 'onyx' && 'Deep'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
                     <WisdomJourneyDashboard userId={explorerId} />
