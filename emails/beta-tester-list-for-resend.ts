@@ -4,6 +4,9 @@
  */
 
 export const betaTesters = [
+  // Recently Added (November 2025)
+  { name: 'Marie-Christine Dreyfus', firstName: 'Marie-Christine', email: 'dreyfus@dfpartners.swiss', code: 'SOULLAB-MARIECHRISTINE' },
+
   // Recently Added (October 2025)
   { name: 'Rebekah O\'Rourke', firstName: 'Rebekah', email: 'Rebekah@rebekahorourke.com', code: 'SOULLAB-REBEKAH' },
   { name: 'Ivan Woester', firstName: 'Ivan', email: 'Ivandreamthunder@yahoo.com', code: 'SOULLAB-IVAN' },
