@@ -32,7 +32,7 @@ const LEGACY_ROUTES = [
   '/oracle-conversation-dynamic',
   '/oracle-conversation-safe',
   '/test-voice',
-  '/voice-test',
+  // '/voice-test', // ACTIVE - New voice system test page
   '/maya',
   '/soulmap',
   '/holoflower',

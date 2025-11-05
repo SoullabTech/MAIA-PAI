@@ -48,7 +48,11 @@ export const DEFAULT_AGENTS: Record<string, AgentConfig> = {
  */
 export function getAgentConfig(voicePreference?: string): AgentConfig {
   if (typeof window === 'undefined') {
-    return DEFAULT_AGENTS.maya;
+    // Return shimmer as default for SSR
+    return {
+      ...DEFAULT_AGENTS.maya,
+      voice: 'shimmer' as any
+    };
   }
 
   // If voice preference is provided (from Settings), use it directly
@@ -64,11 +68,15 @@ export function getAgentConfig(voicePreference?: string): AgentConfig {
     try {
       return JSON.parse(stored);
     } catch {
-      // Invalid stored config, return default
+      // Invalid stored config, fall through to default
     }
   }
 
-  return DEFAULT_AGENTS.maya;
+  // 🌸 Default to shimmer voice (gentle & soothing) instead of alloy (robotic)
+  return {
+    ...DEFAULT_AGENTS.maya,
+    voice: 'shimmer' as any
+  };
 }
 
 /**

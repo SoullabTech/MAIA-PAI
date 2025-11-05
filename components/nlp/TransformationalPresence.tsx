@@ -77,7 +77,9 @@ export const TransformationalPresence: React.FC<TransformationalPresenceProps> =
   isListening = false,
   isSpeaking = false,
   children,
-  biometricEnabled = false
+  biometricEnabled = false,
+  showChatInterface = false,
+  onToggleVoiceText
 }) => {
   const [breathPhase, setBreathPhase] = useState<'inhale' | 'exhale'>('inhale');
   const [transitionProgress, setTransitionProgress] = useState(0);
@@ -418,49 +420,7 @@ export const TransformationalPresence: React.FC<TransformationalPresenceProps> =
         />
       )}
 
-      {/* MODE SWITCHER - Clickable UI for desktop */}
-      <div className="mode-switcher" style={{
-        position: 'absolute',
-        bottom: -100,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex',
-        gap: '8px',
-        zIndex: 20
-      }}>
-        {(['dialogue', 'patient', 'scribe'] as PresenceState[]).map(mode => (
-          <motion.button
-            key={mode}
-            onClick={() => {
-              if (mode !== currentState) {
-                onStateChange?.(mode, {
-                  from: currentState,
-                  to: mode,
-                  trigger: 'gesture'
-                });
-              }
-            }}
-            className="mode-button"
-            style={{
-              padding: '6px 12px',
-              borderRadius: '20px',
-              border: currentState === mode ? `2px solid ${STATE_ESSENCE[mode].colorTemp}` : '1px solid rgba(255,255,255,0.2)',
-              background: currentState === mode ? `${STATE_ESSENCE[mode].colorTemp}30` : 'rgba(0,0,0,0.3)',
-              color: currentState === mode ? STATE_ESSENCE[mode].colorTemp : 'rgba(255,255,255,0.6)',
-              fontSize: '11px',
-              fontWeight: currentState === mode ? 600 : 400,
-              cursor: 'pointer',
-              backdropFilter: 'blur(10px)',
-              textTransform: 'capitalize',
-              transition: 'all 0.3s ease'
-            }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {mode}
-          </motion.button>
-        ))}
-      </div>
+      {/* MODE SWITCHER REMOVED - Now controlled from top navigation bar in page.tsx */}
 
       {/* HOLOFLOWER CORE - Children rendered here inherit state transformations */}
       <div className="holoflower-core" style={{ position: 'relative', zIndex: 10 }}>

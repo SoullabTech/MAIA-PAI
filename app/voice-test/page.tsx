@@ -1,202 +1,124 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getMaiaVoiceEngine, type Element, voiceStateManager } from '@/lib/voice';
+import type { VoiceStateData } from '@/lib/voice';
 
 export default function VoiceTestPage() {
-  const [input, setInput] = useState('');
-  const [response, setResponse] = useState('');
-  const [audioUrl, setAudioUrl] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [persona, setPersona] = useState<'maya' | 'anthony'>('maya');
-  const [context, setContext] = useState<any>(null);
+  const [selectedElement, setSelectedElement] = useState<Element>('aether');
+  const [customText, setCustomText] = useState('hello beautiful world');
+  const [voiceState, setVoiceState] = useState<VoiceStateData | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
-  const testPrompts = [
-    "Who are you and what is your purpose?",
-    "Tell me about the elements that guide you",
-    "How do you witness without judgment?",
-    "What is the Sacred Intelligence Architecture?",
-    "Help me understand my transformation"
-  ];
+  useEffect(() => {
+    const unsubscribe = voiceStateManager.subscribe((state) => {
+      setVoiceState(state);
+      setIsSpeaking(state.state === 'exhale');
+    });
+    return unsubscribe;
+  }, []);
 
-  const handleSubmit = async () => {
-    if (!input) return;
-
-    setLoading(true);
-    setResponse('');
-    setAudioUrl('');
-    setContext(null);
-
+  const handleTest = async (element: Element) => {
     try {
-      const res = await fetch('/api/voice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: input,
-          personality: persona
-        })
-      });
-
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.details || 'Voice generation failed');
-      }
-
-      // Get audio as blob
-      const audioBlob = await res.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      setAudioUrl(audioUrl);
-
-      // Extract context from headers if available
-      const voiceProfile = res.headers.get('X-Voice-Profile');
-      const provider = res.headers.get('X-Voice-Provider');
-
-      setContext({
-        voiceProfile,
-        provider,
-        persona
-      });
-
-      // For now, show the input as response (since we get audio, not text back)
-      setResponse(`Generated audio response for: "${input}"`);
-
-    } catch (error: any) {
-      console.error('Error:', error);
-      setResponse(`Error: ${error.message}`);
-    } finally {
-      setLoading(false);
+      const engine = getMaiaVoiceEngine();
+      await engine.speak(customText, { element });
+    } catch (error) {
+      console.error('Voice test error:', error);
     }
   };
 
+  const elements: Array<{ id: Element; name: string; emoji: string }> = [
+    { id: 'fire', name: 'Fire', emoji: '🔥' },
+    { id: 'water', name: 'Water', emoji: '💧' },
+    { id: 'earth', name: 'Earth', emoji: '🌍' },
+    { id: 'air', name: 'Air', emoji: '🌬️' },
+    { id: 'aether', name: 'Aether', emoji: '✨' },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-black to-amber-900 text-white p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-amber-400 to-pink-400 bg-clip-text text-transparent">
-            🔮 Sacred Voice Test
-          </h1>
-          <p className="text-amber-200">
-            Testing Maya & Anthony with Sacred Intelligence Architecture
-          </p>
-          <div className="text-sm text-amber-300">
-            User Experience → Voice & Presence → PersonalOracleAgent → AI Intelligence → Elemental Systems → Fractal Memory
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-black via-stone-900 to-black p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-amber-400 mb-2">MAIA Voice Engine Test</h1>
+          <p className="text-stone-400">Test the Spiralogic voice synthesis system</p>
         </div>
 
-        {/* Persona Selector */}
-        <div className="bg-amber-800/20 rounded-lg p-6 backdrop-blur">
-          <h3 className="text-xl mb-4">Select Oracle Persona</h3>
-          <div className="flex gap-4">
-            <button
-              onClick={() => setPersona('maya')}
-              className={`px-6 py-3 rounded-lg transition-all ${
-                persona === 'maya'
-                  ? 'bg-amber-600 text-white'
-                  : 'bg-amber-900/50 hover:bg-amber-800/50'
-              }`}
-            >
-              🌟 Maya (Alloy Voice)
-            </button>
-            <button
-              onClick={() => setPersona('anthony')}
-              className={`px-6 py-3 rounded-lg transition-all ${
-                persona === 'anthony'
-                  ? 'bg-amber-600 text-white'
-                  : 'bg-amber-900/50 hover:bg-amber-800/50'
-              }`}
-            >
-              🌙 Anthony (Onyx Voice)
-            </button>
-          </div>
-        </div>
-
-        {/* Test Prompts */}
-        <div className="bg-amber-800/20 rounded-lg p-6 backdrop-blur">
-          <h3 className="text-xl mb-4">Sacred Intelligence Test Prompts</h3>
-          <div className="grid grid-cols-1 gap-2">
-            {testPrompts.map((prompt, i) => (
-              <button
-                key={i}
-                onClick={() => setInput(prompt)}
-                className="text-left px-4 py-2 rounded hover:bg-amber-700/30 transition-colors"
-              >
-                {i + 1}. {prompt}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Input Area */}
-        <div className="bg-amber-800/20 rounded-lg p-6 backdrop-blur space-y-4">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Enter your message for the Oracle..."
-            className="w-full p-4 bg-black/50 rounded-lg text-white placeholder-amber-400 h-32 resize-none"
-          />
-          <button
-            onClick={handleSubmit}
-            disabled={loading || !input}
-            className="px-8 py-3 bg-gradient-to-r from-amber-600 to-pink-600 rounded-lg hover:from-amber-700 hover:to-pink-700 disabled:opacity-50 transition-all"
-          >
-            {loading ? '🌀 Generating Sacred Response...' : `🔮 Speak as ${persona === 'maya' ? 'Maya' : 'Anthony'}`}
-          </button>
-        </div>
-
-        {/* Response Area */}
-        {response && (
-          <div className="bg-amber-800/20 rounded-lg p-6 backdrop-blur space-y-4">
-            <h3 className="text-xl">Oracle Response</h3>
-            <p className="text-amber-200">{response}</p>
-
-            {context && (
-              <div className="text-sm text-amber-300 space-y-1">
-                <div>Voice Profile: {context.voiceProfile}</div>
-                <div>Provider: {context.provider}</div>
-                <div>Persona: {context.persona}</div>
+        {voiceState && (
+          <div className="mb-8 p-6 bg-black/40 border border-amber-900/30 rounded-lg">
+            <h2 className="text-xl font-semibold text-amber-300 mb-4">Voice State</h2>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-stone-500">State:</span>
+                <span className={`ml-2 font-mono ${isSpeaking ? 'text-amber-400' : 'text-stone-300'}`}>
+                  {voiceState.state.toUpperCase()}
+                </span>
               </div>
-            )}
-
-            {audioUrl && (
-              <div className="space-y-4">
-                <audio controls autoPlay className="w-full">
-                  <source src={audioUrl} type="audio/mpeg" />
-                  Your browser does not support audio playback.
-                </audio>
-
-                {/* Sacred Intelligence Markers */}
-                <div className="bg-black/30 rounded p-4">
-                  <h4 className="text-sm font-bold mb-2">Sacred Intelligence Markers</h4>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div>🌟 Sacred Witnessing</div>
-                    <div>🔥 Elemental Wisdom</div>
-                    <div>🌀 Fractal Understanding</div>
-                    <div>💎 Mythic Presence</div>
-                    <div>🏛️ Ancient-Modern Bridge</div>
-                    <div>🔮 Non-Prescriptive Reflection</div>
-                  </div>
-                </div>
+              <div>
+                <span className="text-stone-500">Phase:</span>
+                <span className="ml-2 font-mono text-stone-300">{voiceState.phase}</span>
               </div>
-            )}
+              <div>
+                <span className="text-stone-500">Amplitude:</span>
+                <span className="ml-2 font-mono text-stone-300">{voiceState.amplitude.toFixed(3)}</span>
+              </div>
+              <div>
+                <span className="text-stone-500">Breath Progress:</span>
+                <span className="ml-2 font-mono text-stone-300">
+                  {(voiceState.breathProgress * 100).toFixed(1)}%
+                </span>
+              </div>
+            </div>
+            <div className="mt-4">
+              <div className="h-2 bg-stone-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-amber-500 transition-all duration-100"
+                  style={{ width: `${voiceState.amplitude * 100}%` }}
+                />
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Architecture Visualization */}
-        <div className="bg-amber-800/20 rounded-lg p-6 backdrop-blur">
-          <h3 className="text-xl mb-4">Sacred Intelligence Architecture Flow</h3>
-          <div className="space-y-2 text-center">
-            <div className="py-2 bg-amber-700/30 rounded">User Input</div>
-            <div className="text-amber-400">↓</div>
-            <div className="py-2 bg-amber-700/30 rounded">Maya/Anthony Voice & Presence</div>
-            <div className="text-amber-400">↓</div>
-            <div className="py-2 bg-amber-700/30 rounded">PersonalOracleAgent Orchestration</div>
-            <div className="text-amber-400">↓</div>
-            <div className="py-2 bg-amber-700/30 rounded">Claude/OpenAI Intelligence</div>
-            <div className="text-amber-400">↓</div>
-            <div className="py-2 bg-amber-700/30 rounded">Elemental Wisdom Patterns</div>
-            <div className="text-amber-400">↓</div>
-            <div className="py-2 bg-amber-700/30 rounded">Fractal Memory Storage</div>
-          </div>
+        <div className="mb-8 p-6 bg-black/40 border border-amber-900/30 rounded-lg">
+          <label className="block text-sm font-medium text-amber-300 mb-2">
+            Test Text
+          </label>
+          <input
+            type="text"
+            value={customText}
+            onChange={(e) => setCustomText(e.target.value)}
+            className="w-full px-4 py-2 bg-stone-900 border border-stone-700 rounded-lg text-stone-200 focus:border-amber-500 focus:outline-none"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+          {elements.map((elem) => (
+            <button
+              key={elem.id}
+              onClick={() => {
+                setSelectedElement(elem.id);
+                handleTest(elem.id);
+              }}
+              disabled={isSpeaking}
+              className={`p-6 rounded-lg border-2 transition-all ${
+                selectedElement === elem.id
+                  ? 'border-amber-500 bg-amber-500/10'
+                  : 'border-stone-700 bg-black/20'
+              } ${isSpeaking ? 'opacity-50 cursor-not-allowed' : 'hover:border-amber-400 cursor-pointer'}`}
+            >
+              <div className="text-4xl mb-2">{elem.emoji}</div>
+              <div className="text-sm font-semibold text-stone-200">{elem.name}</div>
+            </button>
+          ))}
+        </div>
+
+        <div className="text-center">
+          <a
+            href="/maia"
+            className="inline-block px-6 py-3 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg border border-stone-700 transition-colors"
+          >
+            ← Back to MAIA
+          </a>
         </div>
       </div>
     </div>

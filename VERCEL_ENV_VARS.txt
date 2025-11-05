@@ -1,0 +1,31 @@
+VERCEL ENVIRONMENT VARIABLES - Spiralogic Oracle System Database
+================================================================
+
+Copy and paste these into Vercel Environment Variables settings:
+
+1. NEXT_PUBLIC_SUPABASE_URL
+   Environments: Production, Preview, Development
+   Value:
+https://jkbetmadzcpoinjogkli.supabase.co
+
+
+2. NEXT_PUBLIC_SUPABASE_ANON_KEY
+   Environments: Production, Preview, Development
+   Value:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprYmV0bWFkemNwb2luam9na2xpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI1NjIyNDUsImV4cCI6MjA1ODEzODI0NX0.K5nuL4m8sP1bC21TmsfpakY5cSfh_5pSLJ83G9Iu_-I
+
+
+3. SUPABASE_SERVICE_ROLE_KEY (UPDATE existing SUPABASE_SERVICE_ROLE)
+   Environments: Production, Preview, Development
+   Value:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImprYmV0bWFkemNwb2luam9na2xpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0MjU2MjI0NSwiZXhwIjoyMDU4MTM4MjQ1fQ.QNvP9jEiSSfs_2-aFmtDt1xEMY_vwpU_ZT-CYRlgS98
+
+
+STEPS:
+1. Click "Create new" for each missing variable (NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY)
+2. Find and edit the existing SUPABASE_SERVICE_ROLE variable to update its value
+3. Select all environments (Production, Preview, Development) for each
+4. Save each variable
+5. Vercel will automatically trigger a new deployment
+
+This will connect production MAIA to the Spiralogic Oracle System database with 250+ tables of historical data.

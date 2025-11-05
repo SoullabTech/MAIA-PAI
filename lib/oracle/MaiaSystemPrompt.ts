@@ -10,7 +10,7 @@ import { SPIRALOGIC_DEEP_WISDOM } from '../knowledge/SpiralogicDeepWisdom';
 import { getConstitutionalFoundation } from '../knowledge/ConstitutionalAIKnowledge';
 
 export function getMayaSystemPrompt(userContext?: any): string {
-  const basePrompt = `
+  let basePrompt = `
 # CONSTITUTIONAL FOUNDATION (ABSOLUTE - ALWAYS ACTIVE)
 
 ${getConstitutionalFoundation()}

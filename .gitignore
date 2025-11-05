@@ -149,3 +149,5 @@ trigger-build.txt
 
 # Legacy/Deprecated
 oracle-backend/
+.env*.local
+liquid_test/

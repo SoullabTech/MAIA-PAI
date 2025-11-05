@@ -4,12 +4,12 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function HomePage() {
-  // Direct MAIA access - no onboarding required
+  // Beautiful intro experience with MAIA as Daimon
   const router = useRouter();
 
   useEffect(() => {
-    // Go directly to MAIA - skip all onboarding flows
-    router.replace('/maia');
+    // Show the beautiful intro with rotating quotes and mantras
+    router.replace('/intro');
   }, [router]);
 
   // Show loading while redirecting to MAIA
