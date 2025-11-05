@@ -150,4 +150,6 @@ trigger-build.txt
 # Legacy/Deprecated
 oracle-backend/
 .env*.local
+
+# Liquid AI - only ignore venv, keep source files
 liquid_test/
