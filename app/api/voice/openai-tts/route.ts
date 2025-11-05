@@ -52,7 +52,7 @@ function cleanTextForSpeech(text: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { text, speed, voice: customVoice, prosody, agentVoice, voiceTone } = await request.json();
+    const { text, speed, voice: customVoice, prosody, agentVoice, voiceTone, language } = await request.json();
 
     if (!text || typeof text !== 'string') {
       return NextResponse.json(
@@ -136,9 +136,14 @@ export async function POST(request: NextRequest) {
     console.log('🔊 Generating speech with OpenAI TTS:', {
       voice: config.voice,
       speed: config.speed,
+      language: language || 'en',
       textLength: cleanedText.length
     });
 
+    // 🌍 MULTILINGUAL SUPPORT: OpenAI TTS automatically detects and pronounces
+    // text in any language (50+ languages) without needing a language parameter.
+    // It handles Spanish, French, Arabic, Chinese, etc. natively with correct pronunciation.
+    // The 'language' parameter is tracked for logging but doesn't need to be passed to API.
     const response = await fetch('https://api.openai.com/v1/audio/speech', {
       method: 'POST',
       headers: {

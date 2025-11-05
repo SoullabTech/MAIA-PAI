@@ -24,8 +24,10 @@ import {
   Brain,
   Zap,
   Library,
-  Compass
+  Compass,
+  Globe
 } from 'lucide-react';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 interface SacredLabDrawerProps {
   isOpen: boolean;
@@ -92,6 +94,13 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
       title: 'CONSCIOUSNESS TOOLS',
       icon: '🧠',
       items: [
+        {
+          icon: Globe,
+          label: 'Language',
+          action: () => {}, // Handled by component itself
+          description: 'MAIA speaks 30+ languages',
+          isLanguageSelector: true
+        },
         {
           icon: Brain,
           label: 'Brain Trust',
@@ -236,6 +245,15 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
                     {/* Section Items */}
                     <div className="space-y-2">
                       {section.items.map((item, itemIdx) => {
+                        // Special handling for language selector
+                        if ((item as any).isLanguageSelector) {
+                          return (
+                            <div key={item.label}>
+                              <LanguageSelector compact showFlag />
+                            </div>
+                          );
+                        }
+
                         const Icon = item.icon;
                         const isComingSoon = item.badge === 'Coming Soon';
                         return (
