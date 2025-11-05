@@ -7,6 +7,8 @@ import { Paperclip, X, Copy, BookOpen } from 'lucide-react';
 // import { WhisperVoiceRecognition } from './ui/WhisperVoiceRecognition'; // REPLACED with ContinuousConversation (uses browser Web Speech API)
 import { ContinuousConversation, ContinuousConversationRef } from '../apps/web/components/voice/ContinuousConversation';
 import { SacredHoloflower } from './sacred/SacredHoloflower';
+import { RhythmHoloflower } from './liquid/RhythmHoloflower';
+import { ConversationalRhythm, type RhythmMetrics } from '@/lib/liquid/ConversationalRhythm';
 import { EnhancedVoiceMicButton } from './ui/EnhancedVoiceMicButton';
 import AdaptiveVoiceMicButton from './ui/AdaptiveVoiceMicButton';
 import { detectVoiceCommand, isOnlyModeSwitch, getModeConfirmation } from '@/lib/voice/VoiceCommandDetector';
@@ -203,6 +205,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [shadowPetals, setShadowPetals] = useState<string[]>([]);
   const [showBreakthrough, setShowBreakthrough] = useState(false);
 
+  // 🌊 LIQUID AI - Rhythm tracking state
+  const [rhythmMetrics, setRhythmMetrics] = useState<RhythmMetrics | null>(null);
+  const [showRhythmDebug, setShowRhythmDebug] = useState(false); // Dev overlay toggle
+
   // Refs for mutable values (must be before hooks that use them)
   const streamingMessageIdRef = useRef<string | null>(null);
   const streamingMessageTextRef = useRef<string>('');
@@ -218,6 +224,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const lastProcessedTranscriptRef = useRef<{ text: string; timestamp: number } | null>(null);
   const lastAudioCallbackUpdateRef = useRef<number>(0); // Throttle audio level callbacks
 
+  // 🌊 LIQUID AI - Rhythm tracker instance
+  const rhythmTrackerRef = useRef<ConversationalRhythm>(
+    new ConversationalRhythm((metrics) => {
+      setRhythmMetrics(metrics);
+      console.log('🌊 [RHYTHM UPDATE]', {
+        tempo: metrics.conversationTempo,
+        coherence: metrics.rhythmCoherence.toFixed(2),
+        breathAlignment: metrics.breathAlignment.toFixed(2),
+        optimalDelay: Math.round(metrics.conversationTempo === 'fast' ? 500 : metrics.conversationTempo === 'slow' ? 2500 : 1200)
+      });
+    })
+  );
+
   // ==================== AUDIO LEVEL CALLBACK (THROTTLED) ====================
   // Prevent infinite render loop by throttling setState calls
   const handleAudioLevelChange = useCallback((amplitude: number, isSpeaking: boolean) => {
@@ -228,6 +247,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setVoiceAudioLevel(amplitude);
       setUserVoiceState({ isSpeaking, amplitude });
       lastAudioCallbackUpdateRef.current = now;
+
+      // 🌊 LIQUID AI - Track speech start/end for rhythm sensing
+      if (isSpeaking && amplitude > 0.1) {
+        rhythmTrackerRef.current?.onSpeechStart();
+      }
     }
   }, []);
 
@@ -239,16 +263,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     try {
       console.log('🎵 Speaking with OpenAI Alloy:', text.substring(0, 100));
 
+      // 🌊 LIQUID AI - Track MAIA response for rhythm turn-taking latency
+      rhythmTrackerRef.current?.onMAIAResponse();
+
       setIsResponding(true);
       setIsAudioPlaying(true);
 
-      // Call OpenAI TTS with Alloy voice
+      // Call OpenAI TTS with selected voice (defaults to 'alloy')
       const response = await fetch('/api/voice/openai-tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: text,
-          voice: 'alloy',
+          voice: voice || 'alloy',  // Use the voice prop from parent
           speed: 0.95,
           model: 'tts-1-hd'
         })
@@ -401,24 +428,28 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     // Check if returning user
     setIsReturningUser(!isFirstVisit && daysSinceLastVisit > 0);
 
-    const greetingData = generateGreeting({
-      userName: userName || 'friend',
-      isFirstVisit,
-      daysSinceLastVisit,
-      daysActive: daysSinceLastVisit > 0 ? 7 : 1,
-    });
+    // Load soul-recognized greeting asynchronously
+    (async () => {
+      const greetingData = await generateGreeting({
+        userName: userName || 'friend',
+        userId: userId, // Pass userId for soul-level recognition
+        isFirstVisit,
+        daysSinceLastVisit,
+        daysActive: daysSinceLastVisit > 0 ? 7 : 1,
+      });
 
-    // Add greeting as first message
-    const greetingMessage: ConversationMessage = {
-      id: `greeting-${Date.now()}`,
-      role: 'oracle',
-      text: greetingData.greeting,
-      timestamp: new Date(),
-      source: 'maia'
-    };
+      // Add greeting as first message
+      const greetingMessage: ConversationMessage = {
+        id: `greeting-${Date.now()}`,
+        role: 'oracle',
+        text: greetingData.greeting,
+        timestamp: new Date(),
+        source: 'maia'
+      };
 
-    setMessages([greetingMessage]);
-    localStorage.setItem('lastSessionDate', new Date().toISOString());
+      setMessages([greetingMessage]);
+      localStorage.setItem('lastSessionDate', new Date().toISOString());
+    })();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
@@ -1309,6 +1340,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     // Mark this transcript as processed
     lastProcessedTranscriptRef.current = { text: t, timestamp: now };
 
+    // 🌊 LIQUID AI - Track speech end with transcript for rhythm analysis
+    rhythmTrackerRef.current?.onSpeechEnd(t);
+
     // 🎤 VOICE COMMAND DETECTION - Check for mode switching commands
     const commandResult = detectVoiceCommand(t);
     if (commandResult.detected && commandResult.mode) {
@@ -1784,13 +1818,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                background: 'transparent',
                overflow: 'visible'
              }}>
-          {/* Non-interactive Sacred Holoflower with animations */}
-          <SacredHoloflower
+          {/* 🌊 LIQUID AI - Rhythm-aware Holoflower pulses with conversational rhythm */}
+          <RhythmHoloflower
+            rhythmMetrics={rhythmMetrics}
             size={holoflowerSize}
             interactive={false}
             showLabels={false}
             motionState={currentMotionState}
-            coherenceLevel={coherenceLevel}
             coherenceShift={coherenceShift}
             isListening={isListening}
             isProcessing={isProcessing}
@@ -2113,20 +2147,40 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     </motion.div>
                   )}
                   {voiceMicRef.current?.isListening && !isResponding && !isAudioPlaying && !isProcessing && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{
-                        opacity: [0.8, 1, 0.8],
-                        y: 0
-                      }}
-                      transition={{
-                        opacity: { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
-                      }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="text-emerald-300/95 text-sm font-medium drop-shadow-[0_0_8px_rgba(110,231,183,0.5)]"
-                    >
-                      🎤 Listening...
-                    </motion.div>
+                    <div className="flex flex-col items-center gap-2">
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{
+                          opacity: [0.8, 1, 0.8],
+                          y: 0
+                        }}
+                        transition={{
+                          opacity: { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
+                        }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="text-emerald-300/95 text-sm font-medium drop-shadow-[0_0_8px_rgba(110,231,183,0.5)]"
+                      >
+                        🎤 Listening...
+                      </motion.div>
+                      {/* Keep Recording button - subtle, only when recording */}
+                      {voiceMicRef.current?.isRecording && (
+                        <motion.button
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 0.7, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.9 }}
+                          whileHover={{ opacity: 1, scale: 1.05 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            voiceMicRef.current?.extendRecording();
+                          }}
+                          className="px-3 py-1 text-xs bg-emerald-500/20 text-emerald-300/90 rounded-full backdrop-blur-sm
+                                   border border-emerald-400/30 hover:bg-emerald-500/30 hover:border-emerald-400/50
+                                   transition-all duration-200 drop-shadow-[0_0_6px_rgba(110,231,183,0.3)]"
+                        >
+                          ⏱️ Keep Recording
+                        </motion.button>
+                      )}
+                    </div>
                   )}
                   {!voiceMicRef.current?.isListening && !isResponding && !isAudioPlaying && !isProcessing && (
                     <motion.div
@@ -2756,6 +2810,44 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         showChatInterface={showChatInterface}
         voice={voice}
       />
+
+      {/* 🌊 LIQUID AI - Rhythm Metrics Debug Overlay */}
+      {rhythmMetrics && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: showRhythmDebug ? 0.9 : 0 }}
+          className="fixed top-4 right-4 bg-black/80 text-amber-300 p-4 rounded-lg font-mono text-xs z-50 pointer-events-none"
+          style={{ maxWidth: '300px' }}
+        >
+          <div className="flex justify-between items-center mb-2 pointer-events-auto">
+            <div className="text-amber-400 font-bold">🌊 RHYTHM METRICS</div>
+            <button
+              onClick={() => setShowRhythmDebug(!showRhythmDebug)}
+              className="text-amber-500 hover:text-amber-300 text-xs underline pointer-events-auto"
+            >
+              {showRhythmDebug ? 'hide' : 'show'}
+            </button>
+          </div>
+          <div className="space-y-1">
+            <div>Tempo: <span className="text-white">{rhythmMetrics.conversationTempo}</span></div>
+            <div>WPM: <span className="text-white">{Math.round(rhythmMetrics.wordsPerMinute)}</span></div>
+            <div>Coherence: <span className="text-white">{(rhythmMetrics.rhythmCoherence * 100).toFixed(0)}%</span></div>
+            <div>Breath Alignment: <span className="text-white">{(rhythmMetrics.breathAlignment * 100).toFixed(0)}%</span></div>
+            <div>Silence Comfort: <span className="text-white">{(rhythmMetrics.silenceComfort * 100).toFixed(0)}%</span></div>
+            <div>Avg Pause: <span className="text-white">{(rhythmMetrics.averagePauseDuration / 1000).toFixed(1)}s</span></div>
+            <div>Turn Latency: <span className="text-white">{(rhythmMetrics.turntakingLatency / 1000).toFixed(1)}s</span></div>
+            <div>Utterances: <span className="text-white">{rhythmMetrics.totalUtterances}</span></div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Toggle button for rhythm debug - always visible */}
+      <button
+        onClick={() => setShowRhythmDebug(!showRhythmDebug)}
+        className="fixed bottom-20 right-4 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 px-3 py-2 rounded-lg text-xs z-50"
+      >
+        🌊 {showRhythmDebug ? 'Hide' : 'Show'} Rhythm
+      </button>
     </div>
   );
 };

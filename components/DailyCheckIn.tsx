@@ -28,7 +28,7 @@ export const DailyCheckIn: React.FC<DailyCheckInProps> = ({
 
   useEffect(() => {
     calculateVisitContext();
-    generateDailyGreeting();
+    generateDailyGreeting(); // Already async, no need to await in useEffect
   }, [userName, lastVisit]);
 
   const calculateVisitContext = () => {
@@ -47,9 +47,10 @@ export const DailyCheckIn: React.FC<DailyCheckInProps> = ({
     setDaysSince(diffDays);
   };
 
-  const generateDailyGreeting = () => {
-    const greetingData = generateGreeting({
+  const generateDailyGreeting = async () => {
+    const greetingData = await generateGreeting({
       userName,
+      userId, // Pass userId for soul-level recognition
       isFirstVisit,
       daysSinceLastVisit: daysSince,
       lastConversationTheme,
