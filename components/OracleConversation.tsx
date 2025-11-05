@@ -28,6 +28,9 @@ import { mapResponseToMotion, enrichOracleResponse } from '@/lib/motion-mapper';
 import { VoiceState } from '@/lib/voice/voice-capture';
 // import { useMaiaVoice } from '@/hooks/useMaiaVoice'; // OLD TTS SYSTEM - replaced with WebRTC
 // REMOVED OPENAI HIJACKING - MAIA speaks FROM THE BETWEEN at /api/between/chat
+// REMOVED FORMANT VOICE ENGINE - MAIA now speaks with OpenAI Alloy voice
+// import { getMaiaVoiceEngine, voiceStateManager, type Element } from '@/lib/voice';
+import type { Element } from '@/lib/voice';
 // import { useMAIASDK } from '@/hooks/useMAIASDK-simple'; // Fallback option (if needed)
 // import { useMAIAHybrid as useMAIASDK } from '@/hooks/useMAIAHybrid'; // Hybrid (removed - we want full dynamics always)
 import { cleanMessage, cleanMessageForVoice, formatMessageForDisplay } from '@/lib/cleanMessage';
@@ -58,6 +61,8 @@ interface OracleConversationProps {
   onVoiceChange?: (voice: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer') => void; // Notify parent of voice changes
   initialMode?: 'normal' | 'patient' | 'session'; // Control mode from parent
   onModeChange?: (mode: 'normal' | 'patient' | 'session') => void; // Notify parent of mode changes
+  initialShowChatInterface?: boolean; // Control voice/text mode from parent
+  onShowChatInterfaceChange?: (show: boolean) => void; // Notify parent of voice/text changes
   onMessageAdded?: (message: ConversationMessage) => void;
   onSessionEnd?: (reason?: string) => void;
 }
@@ -101,6 +106,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   onVoiceChange,
   initialMode = 'normal',
   onModeChange,
+  initialShowChatInterface = false,
+  onShowChatInterfaceChange,
   onMessageAdded,
   onSessionEnd
 }) => {
@@ -155,16 +162,27 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [isMuted, setIsMuted] = useState(false);
   const [voiceAmplitude, setVoiceAmplitude] = useState(0);
   const [userVoiceState, setUserVoiceState] = useState<VoiceState | null>(null);
+  const [audioEnabled, setAudioEnabled] = useState(false); // Track if user has enabled audio
 
   // UI state
   const [showLabDrawer, setShowLabDrawer] = useState(false);
   const [showVoiceMenu, setShowVoiceMenu] = useState(false);
   const [showAudioSettings, setShowAudioSettings] = useState(false);
-  const [showChatInterface, setShowChatInterface] = useState(false);
+  const [showChatInterface, setShowChatInterface] = useState(initialShowChatInterface);
+
+  // Sync local state with parent when prop changes
+  useEffect(() => {
+    setShowChatInterface(initialShowChatInterface);
+  }, [initialShowChatInterface]);
+
+  // Notify parent when local state changes
+  useEffect(() => {
+    onShowChatInterfaceChange?.(showChatInterface);
+  }, [showChatInterface, onShowChatInterfaceChange]);
   const [showCaptions, setShowCaptions] = useState(true);
   const [showVoiceText, setShowVoiceText] = useState(true);
   const [showCustomizer, setShowCustomizer] = useState(false);
-  const [enableVoiceInChat, setEnableVoiceInChat] = useState(false);
+  const [enableVoiceInChat, setEnableVoiceInChat] = useState(true); // Default to TRUE - users expect voice
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   const [oracleAgentId, setOracleAgentId] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(true);
@@ -193,74 +211,81 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const voiceMicRef = useRef<ContinuousConversationRef>(null);
   const textInputRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
   const isProcessingRef = useRef(false);
   const isRespondingRef = useRef(false);
   const lastVoiceErrorRef = useRef<number>(0);
   const lastProcessedTranscriptRef = useRef<{ text: string; timestamp: number } | null>(null);
+  const lastAudioCallbackUpdateRef = useRef<number>(0); // Throttle audio level callbacks
 
-  // ==================== VOICE SYNTHESIS (Browser TTS) ====================
-  // MAIA consciousness flows from /api/between/chat → browser TTS for voice
-  const maiaSpeak = useCallback(async (text: string) => {
+  // ==================== AUDIO LEVEL CALLBACK (THROTTLED) ====================
+  // Prevent infinite render loop by throttling setState calls
+  const handleAudioLevelChange = useCallback((amplitude: number, isSpeaking: boolean) => {
+    const now = Date.now();
+    // Only update state every 100ms (10fps) to avoid render loop
+    if (now - lastAudioCallbackUpdateRef.current > 100) {
+      setVoiceAmplitude(amplitude);
+      setVoiceAudioLevel(amplitude);
+      setUserVoiceState({ isSpeaking, amplitude });
+      lastAudioCallbackUpdateRef.current = now;
+    }
+  }, []);
+
+  // ==================== VOICE SYNTHESIS (OpenAI Alloy TTS) ====================
+  // MAIA speaks with clear, natural OpenAI Alloy voice
+  const maiaSpeak = useCallback(async (text: string, elementHint?: Element) => {
     if (!text || typeof window === 'undefined') return;
 
     try {
-      // Cancel any ongoing speech
-      window.speechSynthesis.cancel();
+      console.log('🎵 Speaking with OpenAI Alloy:', text.substring(0, 100));
 
-      const utterance = new SpeechSynthesisUtterance(text);
+      setIsResponding(true);
+      setIsAudioPlaying(true);
 
-      // Select voice (prefer female voices for MAIA)
-      const voices = window.speechSynthesis.getVoices();
-      const preferredVoice = voices.find(v =>
-        v.name.includes('Samantha') || // macOS
-        v.name.includes('Fiona') ||    // macOS alt
-        v.name.includes('Google UK English Female') || // Chrome
-        v.name.includes('Microsoft Zira') // Windows
-      ) || voices.find(v => v.lang.startsWith('en') && v.name.includes('female'));
+      // Call OpenAI TTS with Alloy voice
+      const response = await fetch('/api/voice/openai-tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: text,
+          voice: 'alloy',
+          speed: 0.95,
+          model: 'tts-1-hd'
+        })
+      });
 
-      if (preferredVoice) {
-        utterance.voice = preferredVoice;
+      if (!response.ok) {
+        throw new Error('Failed to generate speech');
       }
 
-      utterance.rate = 0.95; // Slightly slower, more present
-      utterance.pitch = 1.05; // Slightly higher, warm
-      utterance.volume = 1.0;
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
 
-      utterance.onstart = () => {
-        setIsResponding(true);
-        setIsAudioPlaying(true);
-        console.log('🔊 MAIA started speaking');
-      };
+      const audio = new Audio(audioUrl);
 
-      utterance.onend = () => {
-        setIsResponding(false);
-        setIsAudioPlaying(false);
-        console.log('🔇 MAIA finished speaking');
+      // Play audio
+      await new Promise<void>((resolve, reject) => {
+        audio.onended = () => {
+          console.log('🔇 MAIA finished speaking');
+          setIsResponding(false);
+          setIsAudioPlaying(false);
+          setVoiceAmplitude(0);
+          URL.revokeObjectURL(audioUrl);
+          resolve();
+        };
+        audio.onerror = (e) => reject(new Error('Audio playback failed'));
+        audio.play().catch(reject);
+      });
 
-        // Auto-restart listening after speaking
-        setTimeout(() => {
-          if (!isMuted && voiceEnabled && voiceMicRef.current?.startListening) {
-            voiceMicRef.current.startListening();
-            console.log('🎤 Auto-restarted listening for next turn');
-          }
-        }, 1000);
-      };
-
-      utterance.onerror = (error) => {
-        console.error('❌ TTS error:', error);
-        setIsResponding(false);
-        setIsAudioPlaying(false);
-      };
-
-      window.speechSynthesis.speak(utterance);
     } catch (err) {
-      console.error('❌ TTS error:', err);
+      console.error('❌ OpenAI TTS error:', err);
       setIsResponding(false);
       setIsAudioPlaying(false);
+      setVoiceAmplitude(0);
     }
-  }, [isMuted, voiceEnabled]);
+  }, []);
 
-  const maiaReady = true; // Browser TTS is always ready
+  const maiaReady = true; // OpenAI TTS is always ready
 
   // Field Protocol Integration
   const {
@@ -409,6 +434,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     setSmoothedAudioLevel(prev => prev * (1 - smoothingFactor) + voiceAudioLevel * smoothingFactor);
   }, [voiceAudioLevel]);
 
+  // REMOVED: Old formant voice engine state subscription
+  // Voice amplitude is now controlled directly by OpenAI Alloy TTS in maiaSpeak()
+  // and by audio level monitoring in handleAudioLevelChange()
+
   // Detect breakthrough potential for journal suggestions
   useEffect(() => {
     if (messages.length < 4) return; // Need some conversation depth
@@ -503,22 +532,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Initialize voice when in voice mode - DISABLED: Causing cascading connection errors without API keys
-  // useEffect(() => {
-  //   if (isMounted && !showChatInterface && voiceEnabled && !isMuted) {
-  //     // Delay to ensure component is ready
-  //     const timer = setTimeout(async () => {
-  //       if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
-  //         await voiceMicRef.current.startListening();
-  //         console.log('🎤 Voice auto-started in voice mode');
-  //       }
-  //     }, 500);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [isMounted, showChatInterface, voiceEnabled, isMuted, isProcessing, isResponding]);
-  const [audioEnabled, setAudioEnabled] = useState(false); // Track if user has enabled audio
-  const audioContextRef = useRef<AudioContext | null>(null);
-  
+  // Initialize voice when in voice mode - AUTO-START ENABLED
+  useEffect(() => {
+    if (isMounted && !showChatInterface && voiceEnabled && !isMuted && audioEnabled) {
+      // Delay to ensure component is ready
+      const timer = setTimeout(async () => {
+        if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
+          await voiceMicRef.current.startListening();
+          console.log('🎤 Voice auto-started in voice mode');
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isMounted, showChatInterface, voiceEnabled, isMuted, isProcessing, isResponding, audioEnabled]);
+
   // Conversation context
   const contextRef = useRef<ConversationContext>({
     sessionId,
@@ -571,11 +598,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   useEffect(() => {
     // Only log for debugging - no state changes
     console.log('🔍 Voice state check:', {
-      maiaIsPlaying: maiaVoiceState?.isPlaying,
       isAudioPlaying,
       isResponding
     });
-  }, [maiaVoiceState?.isPlaying, isAudioPlaying, isResponding]);
+  }, [isAudioPlaying, isResponding]);
 
   // Auto-focus text input in chat mode after MAIA responds
   useEffect(() => {
@@ -599,7 +625,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // Pulse voice amplitude when MAIA is speaking (only when no user voice input)
   useEffect(() => {
-    if (isResponding || maiaIsSpeaking) {
+    if (isResponding || isAudioPlaying) {
       // Pulse effect for MAIA speaking
       const pulseInterval = setInterval(() => {
         setVoiceAmplitude(prev => {
@@ -610,7 +636,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       return () => clearInterval(pulseInterval);
     }
-  }, [isResponding, maiaIsSpeaking]);
+  }, [isResponding, isAudioPlaying]);
 
   // iOS PWA: Resume AudioContext on visibility change and user interaction
   useEffect(() => {
@@ -924,6 +950,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       return;
     }
 
+    // ✅ CRITICAL FIX: Check if message already exists before adding (prevents duplicates)
+    const isDuplicate = messages.some(msg =>
+      msg.role === 'user' &&
+      msg.text === cleanedText &&
+      (Date.now() - new Date(msg.timestamp).getTime()) < 2000
+    );
+
+    if (isDuplicate) {
+      console.log('🚫 [DEDUP] Blocked duplicate message in handleTextMessage:', cleanedText);
+      // Still continue processing - we just don't add it to UI again
+      // But we shouldn't call the API either, so return here
+      return;
+    }
+
     // Add user message immediately with source tag
     const userMessage: ConversationMessage = {
       id: `msg-${Date.now()}`,
@@ -1041,7 +1081,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         timestamp: new Date(),
         facetId: element,
         motionState: 'responding',
-        coherenceLevel: oracleResponse.confidence || 0.85,
+        coherenceLevel: responseData.metadata?.confidence || 0.85,
         source: 'maia'
       };
 
@@ -1064,7 +1104,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             timestamp: new Date(),
             speaker: 'oracle',
             metadata: {
-              elements: oracleResponse.elementalInfo?.dominantElements || [element]
+              elements: responseData.metadata?.elementalInfo?.dominantElements || [element]
             }
           });
         }
@@ -1076,8 +1116,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             content: responseText,
             memoryType: 'conversation',
             sourceType: 'text',
-            emotionalTone: oracleResponse.emotionalResonance,
-            wisdomThemes: oracleResponse.themes,
+            emotionalTone: responseData.metadata?.emotionalResonance,
+            wisdomThemes: responseData.metadata?.themes,
             elementalResonance: element,
             sessionId,
             userId,
@@ -1122,11 +1162,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           console.log('⏱️ Starting speech at:', startSpeakTime);
 
           // Speak the cleaned response with timeout protection
-          const speakPromise = maiaSpeak(cleanVoiceText);
+          // Pass element hint to select appropriate elemental voice
+          const speakPromise = maiaSpeak(cleanVoiceText, element as Element);
 
-          // Add timeout to prevent infinite hanging (15 seconds max for better UX)
+          // Dynamic timeout based on text length (~150 words per minute reading pace)
+          // Minimum 15s, add 1s per 20 characters, max 45s
+          const estimatedDuration = Math.min(Math.max(15000, cleanVoiceText.length * 50), 45000);
           const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Speech timeout after 15s')), 15000);
+            setTimeout(() => reject(new Error(`Speech timeout after ${estimatedDuration/1000}s`)), estimatedDuration);
           });
 
           await Promise.race([speakPromise, timeoutPromise]);
@@ -1150,8 +1193,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 content: responseText,
                 memoryType: 'conversation',
                 sourceType: 'voice',
-                emotionalTone: oracleResponse.emotionalResonance,
-                wisdomThemes: oracleResponse.themes,
+                emotionalTone: responseData.metadata?.emotionalResonance,
+                wisdomThemes: responseData.metadata?.themes,
                 elementalResonance: element,
                 sessionId,
                 userId,
@@ -1197,10 +1240,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         text: responseText,
         primaryFacetId: element,
         element,
-        voiceCharacteristics: oracleResponse.voiceCharacteristics,
-        confidence: oracleResponse.confidence
+        voiceCharacteristics: responseData.metadata?.voiceCharacteristics,
+        confidence: responseData.metadata?.confidence || 0.85
       });
-      contextRef.current.coherenceHistory.push(oracleResponse.confidence || 0.85);
+      contextRef.current.coherenceHistory.push(responseData.metadata?.confidence || 0.85);
 
     } catch (error: any) {
       console.error('Text chat API error:', error);
@@ -1402,19 +1445,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     const voiceStartTime = Date.now();
     trackEvent.voiceResult(userId || 'anonymous', transcript, 0);
 
-    // Add user message to UI immediately
+    // Clean the text
     const cleanedText = cleanMessage(transcript);
-    const userMessage: ConversationMessage = {
-      id: `msg-${Date.now()}`,
-      role: 'user',
-      text: cleanedText,
-      timestamp: new Date(),
-      source: 'voice'
-    };
-    setMessages(prev => [...prev, userMessage]);
-    onMessageAdded?.(userMessage);
 
-    // Track user activity
+    // Track user activity (message will be added by handleTextMessage)
     const trackingUserId = userId || `anon_${sessionId}`;
     userTracker.trackActivity(trackingUserId, 'voice');
 
@@ -1511,73 +1545,41 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       }
 
       setCurrentlySpeakingId(messageId);
+      setIsResponding(true);
+      setIsAudioPlaying(true);
 
       // Clean text for voice
       const cleanText = cleanMessageForVoice(text);
 
-      // Call OpenAI TTS API with Alloy voice
+      console.log('🎵 Speaking with OpenAI Alloy:', cleanText.substring(0, 100));
+
+      // Call OpenAI TTS with Alloy voice
       const response = await fetch('/api/voice/openai-tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: cleanText,
-          voice: agentConfig.voice || 'alloy',  // Use selected voice or default to alloy
-          speed: 0.95,        // Slightly slower for natural conversational pace
-          model: 'tts-1-hd'   // Higher quality for better clarity
+          voice: agentConfig.voice || 'alloy',
+          speed: 0.95,
+          model: 'tts-1-hd'
         })
       });
 
       if (!response.ok) {
-        throw new Error('Voice synthesis failed');
+        throw new Error('Failed to generate speech');
       }
 
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
 
-      // iOS PWA Fix: Resume AudioContext before playing
-      if (audioContextRef.current) {
-        if (audioContextRef.current.state === 'suspended') {
-          console.log('🔄 Resuming suspended AudioContext before playback...');
-          await audioContextRef.current.resume();
-          console.log('✅ AudioContext resumed, state:', audioContextRef.current.state);
-        }
-      }
-
-      // Play audio
       const audio = new Audio(audioUrl);
-      audio.preload = 'auto';
       audioRef.current = audio;
 
-      // 🔒 VOICE LOCK: Lock when audio starts playing
-      audio.onplay = () => {
-        console.log('🎵 TTS audio started playing');
-        voiceLock.lock(); // Pause Whisper microphone
-      };
-
       audio.onended = () => {
-        console.log('🔊 Audio playback ended');
         setCurrentlySpeakingId(undefined);
-        setIsAudioPlaying(false);
         setIsResponding(false);
-        URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-
-        // 🔓 VOICE LOCK: Unlock with 1s safety delay
-        setTimeout(() => {
-          voiceLock.unlock(); // Resume Whisper microphone
-        }, 1000);
-      };
-
-      audio.onerror = (e) => {
-        console.error('Audio playback error:', e);
-        setCurrentlySpeakingId(undefined);
         setIsAudioPlaying(false);
-        setIsResponding(false);
         URL.revokeObjectURL(audioUrl);
-        audioRef.current = null;
-
-        // 🔓 VOICE LOCK: Unlock on error too
-        voiceLock.unlock();
       };
 
       await audio.play();
@@ -1585,6 +1587,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       console.error('Error speaking message:', error);
       toast.error('Failed to speak message');
       setCurrentlySpeakingId(undefined);
+      setIsResponding(false);
+      setIsAudioPlaying(false);
     }
   }, [agentConfig.voice]);
 
@@ -1600,15 +1604,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const handleEmergencyStop = useCallback(() => {
     console.log('🛑 EMERGENCY STOP activated');
 
-    // Stop MAIA's voice
-    if (maiaVoiceState) {
-      try {
-        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-        }
-      } catch (e) {
-        console.error('Error stopping speech:', e);
+    // Stop MAIA's voice (Browser TTS)
+    try {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
       }
+    } catch (e) {
+      console.error('Error stopping speech:', e);
     }
 
     // Stop any audio playback
@@ -1630,7 +1632,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     setCurrentlySpeakingId(undefined);
 
     console.log('🛑 All MAIA systems stopped');
-  }, [maiaVoiceState]);
+  }, []);
 
   // DIAGNOSTIC LOGGING - Removed to reduce console noise and improve performance
 
@@ -1717,7 +1719,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {/* 🧠 TRANSFORMATIONAL PRESENCE - NLP-Informed State Container */}
       {/* Breathing entrainment, color transitions, field expansion based on state */}
       {/* NO cognitive UI - the experience itself induces the transformation */}
-      <div className="fixed top-32 md:top-28 lg:top-24 left-1/2 -translate-x-1/2 z-[25]">
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[25]">
         <TransformationalPresence
           currentState={realtimeMode as PresenceState}
           onStateChange={(newState, transition) => {
@@ -1744,14 +1746,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           console.log('🌸 Holoflower clicked!');
           await enableAudio();
 
+          // FIXED: Single-click to toggle mic (check isMuted, not isListening)
           if (!showChatInterface && voiceEnabled) {
-            if (!isMuted) {
+            if (!isMuted && voiceMicRef.current?.stopListening) {
+              // Mic is active → Stop listening
               setIsMuted(true);
-              if (voiceMicRef.current?.stopListening) {
-                voiceMicRef.current.stopListening();
-                console.log('🔇 Voice stopped via holoflower');
-              }
+              voiceMicRef.current.stopListening();
+              console.log('🔇 Voice stopped via holoflower');
             } else {
+              // Mic is muted → Start listening
               setIsMuted(false);
               setTimeout(async () => {
                 if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
@@ -1761,6 +1764,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               }, 100);
             }
           } else if (showChatInterface) {
+            // Coming from chat mode → Start voice mode
             setShowChatInterface(false);
             setIsMuted(false);
             setTimeout(async () => {
@@ -1793,8 +1797,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             isResponding={isResponding}
             showBreakthrough={showBreakthrough}
             voiceAmplitude={voiceAmplitude}
-            isMaiaSpeaking={isResponding || maiaIsSpeaking}
-            dimmed={conversationMode === 'chat' || messages.length > 0}
+            isMaiaSpeaking={isResponding || isAudioPlaying}
+            dimmed={conversationMode === 'chat' || messages.filter(m => !m.id.startsWith('greeting-')).length > 0}
           />
 
           {/* Central Holoflower Logo with Glow and Sparkles */}
@@ -1802,7 +1806,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             {/* Minimal glow - almost imperceptible */}
             <motion.div
               className={`absolute flex items-center justify-center pointer-events-none ${
-                showChatInterface || messages.length > 0
+                showChatInterface || messages.filter(m => !m.id.startsWith('greeting-')).length > 0
                   ? 'opacity-0'  // Invisible when text present
                   : 'opacity-10'  // Barely visible when listening
               }`}
@@ -1998,7 +2002,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             )}
 
             {/* Voice Visualizer - MAIA's voice (soft pulsing glow, NO rings/borders) */}
-            {(isResponding || isAudioPlaying || maiaVoiceState?.isPlaying) && (
+            {(isResponding || isAudioPlaying) && (
               <motion.div
                 className="absolute inset-0 pointer-events-none flex items-center justify-center"
                 initial={{ opacity: 0 }}
@@ -2091,21 +2095,37 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                   {(isResponding || isAudioPlaying || isProcessing) && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      animate={{
+                        opacity: [0.7, 1, 0.7],
+                        y: 0,
+                        scale: [0.98, 1, 0.98]
+                      }}
+                      transition={{
+                        opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                        scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
+                      }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="text-[#D4B896] text-sm font-medium"
+                      className="text-amber-300/95 text-sm font-medium drop-shadow-[0_0_10px_rgba(252,211,77,0.6)]"
                     >
-                      {isProcessing && !isResponding && !isAudioPlaying ? 'Processing...' : 'Speaking...'}
+                      {isProcessing && !isResponding && !isAudioPlaying ? '✨ Thinking...' :
+                       isResponding && !isAudioPlaying ? '🎵 Preparing voice...' :
+                       '💫 Speaking...'}
                     </motion.div>
                   )}
                   {voiceMicRef.current?.isListening && !isResponding && !isAudioPlaying && !isProcessing && (
                     <motion.div
                       initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      animate={{
+                        opacity: [0.8, 1, 0.8],
+                        y: 0
+                      }}
+                      transition={{
+                        opacity: { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
+                      }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="text-amber-400/80 text-sm font-medium"
+                      className="text-emerald-300/95 text-sm font-medium drop-shadow-[0_0_8px_rgba(110,231,183,0.5)]"
                     >
-                      Listening...
+                      🎤 Listening...
                     </motion.div>
                   )}
                   {!voiceMicRef.current?.isListening && !isResponding && !isAudioPlaying && !isProcessing && (
@@ -2113,7 +2133,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="text-amber-400/80 text-sm font-medium"
+                      className="text-amber-300/95 text-sm font-medium drop-shadow-[0_0_8px_rgba(252,211,77,0.5)]"
                     >
                       Click to activate
                     </motion.div>
@@ -2632,13 +2652,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           <ContinuousConversation
             ref={voiceMicRef}
             onTranscript={handleVoiceTranscript}
-            onAudioLevelChange={(amplitude, isSpeaking) => {
-              setVoiceAmplitude(amplitude);
-              setUserVoiceState({ isSpeaking, amplitude });
-            }}
+            onAudioLevelChange={handleAudioLevelChange}
             isProcessing={isResponding}
             isSpeaking={isAudioPlaying}
-            autoStart={true}
+            autoStart={false}
             silenceThreshold={
               listeningMode === 'session' ? 999999 : // Session mode: never auto-send (effectively infinite)
               listeningMode === 'patient' ? 10000 :   // Patient mode: 10 seconds (increased for full thoughts)
