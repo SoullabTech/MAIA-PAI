@@ -284,56 +284,14 @@ export default function MAIAPage() {
                 </h1>
               </div>
 
-              {/* Center: Dialogue modes and Voice/Text toggle */}
-              <div className="flex items-center gap-3">
-                {/* Dialogue mode selector */}
-                <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm rounded-lg p-0.5">
-                  <button
-                    onClick={() => setMaiaMode('normal')}
-                    className={`px-2.5 py-0.5 rounded text-[10px] font-medium transition-all duration-500 ${
-                      maiaMode === 'normal'
-                        ? 'bg-amber-600/20 text-amber-300 shadow-sm shadow-amber-600/20'
-                        : 'text-stone-500 hover:text-stone-400'
-                    }`}
-                  >
-                    Dialogue
-                  </button>
-                  <button
-                    onClick={() => setMaiaMode('patient')}
-                    className={`px-2.5 py-0.5 rounded text-[10px] font-medium transition-all duration-500 ${
-                      maiaMode === 'patient'
-                        ? 'bg-orange-700/20 text-orange-300 shadow-sm shadow-orange-700/20'
-                        : 'text-stone-500 hover:text-stone-400'
-                    }`}
-                  >
-                    Patient
-                  </button>
-                  <button
-                    onClick={() => setMaiaMode('session')}
-                    className={`px-2.5 py-0.5 rounded text-[10px] font-medium transition-all duration-500 ${
-                      maiaMode === 'session'
-                        ? 'bg-amber-900/30 text-amber-400 shadow-sm shadow-amber-900/20'
-                        : 'text-stone-500 hover:text-stone-400'
-                    }`}
-                  >
-                    Scribe
-                  </button>
-                </div>
-
-                {/* Voice/Text Toggle */}
-                <button
-                  onClick={() => setShowChatInterface(!showChatInterface)}
-                  className={`px-2.5 py-0.5 rounded text-[10px] font-medium transition-all duration-500 flex items-center gap-1 ${
-                    showChatInterface
-                      ? 'bg-amber-600/20 text-amber-300 shadow-sm shadow-amber-600/20'
-                      : 'bg-purple-600/20 text-purple-300 shadow-sm shadow-purple-600/20'
-                  }`}
-                >
-                  {showChatInterface ? '💬 Text' : '🎤 Voice'}
-                </button>
+              {/* Center: Voice mode indicator only */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-amber-400/60 font-light">
+                  {showChatInterface ? '💬 Text Mode' : '🎤 Voice Mode'}
+                </span>
               </div>
 
-              {/* Right: Empty space for balance (icons moved to hamburger menu) */}
+              {/* Right: Empty space for balance */}
               <div className="w-24"></div>
             </div>
           </div>

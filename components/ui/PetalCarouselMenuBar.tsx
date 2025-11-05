@@ -283,8 +283,8 @@ export function PetalCarouselMenuBar() {
     <>
       {/* Top bar removed - full immersion with gesture-based navigation only */}
 
-      {/* BOTTOM PETAL CAROUSEL MENU */}
-      <div className="fixed bottom-0 left-0 right-0 z-40" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      {/* BOTTOM PETAL CAROUSEL MENU - HIDDEN FOR BETA MOBILE CLEANUP */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 hidden" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {/* Carousel Content - Slides up when open */}
         <div
           className={`bg-neutral-900/98 backdrop-blur-md border-t border-amber-500/30 transition-all duration-300 ease-in-out ${
