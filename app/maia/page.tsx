@@ -33,12 +33,14 @@ function getInitialUserData() {
   if (betaUser) {
     try {
       const userData = JSON.parse(betaUser);
-      if (userData.onboarded === true && userData.id && userData.username) {
+      // Try multiple field names for username (username, name, displayName)
+      const userName = userData.username || userData.name || userData.displayName;
+      if (userData.onboarded === true && userData.id && userName) {
         // Also sync to old system for compatibility
-        localStorage.setItem('explorerName', userData.username);
+        localStorage.setItem('explorerName', userName);
         localStorage.setItem('explorerId', userData.id);
-        console.log('✅ [MAIA] User authenticated as:', userData.username);
-        return { id: userData.id, name: userData.username };
+        console.log('✅ [MAIA] User authenticated as:', userName);
+        return { id: userData.id, name: userName };
       }
     } catch (e) {
       console.error('❌ [MAIA] Error parsing beta_user:', e);
@@ -161,7 +163,8 @@ export default function MAIAPage() {
         }
 
         const newId = userData.id || 'guest';
-        const newName = userData.username || 'Explorer';
+        // Try multiple field names for username
+        const newName = userData.username || userData.name || userData.displayName || 'Explorer';
 
         // Sync to old system for compatibility
         localStorage.setItem('explorerName', newName);
