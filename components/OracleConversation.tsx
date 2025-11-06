@@ -2536,19 +2536,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* Message flow - Star Wars crawl: text flows from beneath holoflower */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
-        <div className={`fixed top-60 sm:top-64 md:top-60 lg:top-56 z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
+        <div className={`fixed top-32 sm:top-40 md:top-48 lg:top-56 z-30 transition-all duration-500 left-1/2 -translate-x-1/2 ${
           showChatInterface
             ? 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[600px] lg:w-[680px] xl:w-[720px] opacity-100'
             : 'w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] md:w-[520px] lg:w-[560px] opacity-70'
         }`}
              style={{
                height: showChatInterface
-                 ? 'calc(100vh - 300px)'
-                 : 'calc(100vh - 320px)',
+                 ? 'calc(100vh - 240px)'
+                 : 'calc(100vh - 280px)',
                maxHeight: showChatInterface
-                 ? 'calc(100vh - 300px)'
-                 : 'calc(100vh - 320px)',
-               bottom: showChatInterface ? '280px' : '200px',
+                 ? 'calc(100vh - 240px)'
+                 : 'calc(100vh - 280px)',
+               bottom: showChatInterface ? '220px' : '180px',
                overflow: 'hidden'
              }}>
           <div className="h-full overflow-y-scroll overflow-x-hidden pr-2 mobile-scroll"
