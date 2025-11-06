@@ -318,18 +318,60 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       const audio = new Audio(audioUrl);
 
-      // Play audio
+      // Play audio with proper loading and error handling
       await new Promise<void>((resolve, reject) => {
+        let hasStarted = false;
+        let timeoutId: NodeJS.Timeout | null = null;
+
+        // Safety timeout - if audio doesn't start within 5s, fail fast
+        timeoutId = setTimeout(() => {
+          if (!hasStarted) {
+            audio.pause();
+            URL.revokeObjectURL(audioUrl);
+            reject(new Error('Audio failed to start within 5s'));
+          }
+        }, 5000);
+
+        audio.onloadedmetadata = () => {
+          console.log('✅ Audio metadata loaded, duration:', audio.duration);
+        };
+
+        audio.oncanplaythrough = () => {
+          console.log('✅ Audio can play through');
+        };
+
+        audio.onplay = () => {
+          console.log('▶️ Audio started playing');
+          hasStarted = true;
+          if (timeoutId) clearTimeout(timeoutId);
+        };
+
         audio.onended = () => {
           console.log('🔇 MAIA finished speaking');
           setIsResponding(false);
           setIsAudioPlaying(false);
           setVoiceAmplitude(0);
           URL.revokeObjectURL(audioUrl);
+          if (timeoutId) clearTimeout(timeoutId);
           resolve();
         };
-        audio.onerror = (e) => reject(new Error('Audio playback failed'));
-        audio.play().catch(reject);
+
+        audio.onerror = (e) => {
+          console.error('❌ Audio playback error:', e);
+          setIsResponding(false);
+          setIsAudioPlaying(false);
+          setVoiceAmplitude(0);
+          URL.revokeObjectURL(audioUrl);
+          if (timeoutId) clearTimeout(timeoutId);
+          reject(new Error('Audio playback failed'));
+        };
+
+        // Start playback
+        audio.play().catch(err => {
+          console.error('❌ Audio.play() failed:', err);
+          if (timeoutId) clearTimeout(timeoutId);
+          reject(err);
+        });
       });
 
     } catch (err) {
@@ -593,15 +635,34 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // Initialize voice when in voice mode - AUTO-START ENABLED
   useEffect(() => {
+    console.log('🔍 Voice auto-start check:', {
+      isMounted,
+      showChatInterface,
+      voiceEnabled,
+      isMuted,
+      audioEnabled,
+      isProcessing,
+      isResponding,
+      hasVoiceMicRef: !!voiceMicRef.current
+    });
+
     if (isMounted && !showChatInterface && voiceEnabled && !isMuted && audioEnabled) {
       // Delay to ensure component is ready
       const timer = setTimeout(async () => {
         if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
-          await voiceMicRef.current.startListening();
-          console.log('🎤 Voice auto-started in voice mode');
+          try {
+            await voiceMicRef.current.startListening();
+            console.log('✅ 🎤 Voice auto-started successfully');
+          } catch (err) {
+            console.error('❌ Voice auto-start failed:', err);
+          }
+        } else {
+          console.log('⏸️ Voice auto-start skipped - conditions not met');
         }
       }, 500);
       return () => clearTimeout(timer);
+    } else {
+      console.log('⏸️ Voice auto-start blocked - checking all conditions...');
     }
   }, [isMounted, showChatInterface, voiceEnabled, isMuted, isProcessing, isResponding, audioEnabled]);
 
