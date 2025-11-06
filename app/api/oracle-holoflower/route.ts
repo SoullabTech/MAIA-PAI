@@ -286,6 +286,89 @@ Generate only the practice, nothing else:`
   }
 }
 
+/**
+ * Soul Synthesis: Generate gestalt interpretation of the entire reading
+ * This sees the whole pattern and synthesizes coherent wisdom
+ */
+async function generateSoulSynthesis(data: {
+  intention?: string;
+  strongPetals: { id: string; name: string; intensity: number; element: string }[];
+  weakPetals: { id: string; name: string; intensity: number; element: string }[];
+  dominantArchetype: string;
+  shadowArchetype: string;
+  spiralStage: { element: string; stage: string };
+}): Promise<string> {
+  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
+  if (!apiKey) {
+    return ''; // No synthesis if no API key
+  }
+
+  const anthropic = new Anthropic({ apiKey });
+
+  // Build context for Claude
+  const strongPetalsDesc = data.strongPetals
+    .map(p => `${p.name} (${p.element}, intensity ${p.intensity})`)
+    .join(', ');
+
+  const weakPetalsDesc = data.weakPetals
+    .map(p => `${p.name} (${p.element}, intensity ${p.intensity})`)
+    .join(', ');
+
+  const prompt = `You are MAIA, a wise oracle interpreting a holoflower reading. Your task is to synthesize the ENTIRE reading into a coherent soul-level interpretation.
+
+${data.intention ? `**User's Question:** "${data.intention}"` : '**This is a general life reading (no specific question)**'}
+
+**READING DATA:**
+
+Strong Petals (active capacities): ${strongPetalsDesc}
+Weak Petals (emerging opportunities): ${weakPetalsDesc}
+Dominant Archetype: ${data.dominantArchetype}
+Shadow Archetype: ${data.shadowArchetype}
+Spiral Stage: ${data.spiralStage.element} ${data.spiralStage.stage}
+
+**YOUR TASK:**
+
+Generate a 2-3 paragraph soul synthesis that:
+
+1. **Sees the WHOLE PATTERN** - Don't just list elements. What story do these pieces tell together?
+2. **Interprets at soul level** - Not psychological analysis. What is the deeper truth being revealed?
+3. **Connects to their intention** - If they asked a question, show how this reading speaks directly to it
+4. **Names the medicine** - What unique gift/capacity is this configuration showing?
+5. **Honors both light and shadow** - Strengths AND opportunities as invitations
+6. **Uses poetic precision** - Warm, direct language. Like Rumi meeting Carl Jung.
+
+**EXAMPLE SYNTHESIS (for reference, do NOT copy):**
+
+"You're not leading from knowing, but from holding space for emergence. Your Fire3/Water3/Earth3 configuration shows a profound capacity: you create conditions for others to find their gifts, rather than forcing direction. This is leadership that trusts mystery while staying grounded in purpose.
+
+Your shadow - The Quiet One - isn't a weakness. It's asking: what if your power comes not from the loudest voice in the room, but from creating the space where others can find theirs? The reading shows you have the energetic capacity for this kind of leadership. The question is whether you trust it enough to embody it fully.
+
+The Air and Water1/2 opportunities aren't failures - they're invitations. To speak your truth clearly. To feel at home in your emotional body. To integrate what the shadows are teaching. Your gifts want to be grounded in feeling, integrated with shadow, and expressed through authentic communication."
+
+**NOW GENERATE THE SYNTHESIS FOR THIS READING:**
+
+Write 2-3 paragraphs that synthesize this person's reading into coherent soul-level wisdom. Speak directly to them (use "you"). Be specific to their data, not generic.`;
+
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 800,
+      temperature: 0.7,
+      messages: [{
+        role: 'user',
+        content: prompt
+      }]
+    });
+
+    const textContent = response.content.find((c: any) => c.type === 'text');
+    return textContent?.text?.trim() || '';
+
+  } catch (error) {
+    console.error('Error generating soul synthesis:', error);
+    return ''; // Return empty string on error
+  }
+}
+
 async function generateElementalAnalysis(petals: Petal[], intention?: string): Promise<{ strengths: string[]; opportunities: string[] }> {
   // Calculate average intensity per element
   const elementIntensities: Record<string, number[]> = {
@@ -576,6 +659,21 @@ export async function POST(request: NextRequest) {
     // Generate practice - intention-aware (async)
     const practice = await generatePractice(petals, spiralStage, intention);
 
+    // Sort petals by intensity to identify strongest and weakest
+    const sortedPetals = [...petals].sort((a, b) => b.intensity - a.intensity);
+    const strongPetals = sortedPetals.slice(0, 3); // Top 3
+    const weakPetals = sortedPetals.slice(-3).reverse(); // Bottom 3
+
+    // Generate soul synthesis - gestalt interpretation of the whole reading
+    const soulSynthesis = await generateSoulSynthesis({
+      intention,
+      strongPetals,
+      weakPetals,
+      dominantArchetype: archetype,
+      shadowArchetype,
+      spiralStage
+    });
+
     // Generate petal-specific insights
     const petalInsights = petals.map(petal => ({
       petalId: petal.id,
@@ -587,6 +685,7 @@ export async function POST(request: NextRequest) {
 
     // Construct oracle reading
     const reading = {
+      soulSynthesis, // Add gestalt interpretation at the top
       spiralStage,
       elementalAlchemy: {
         strengths: elementalAnalysis.strengths,
