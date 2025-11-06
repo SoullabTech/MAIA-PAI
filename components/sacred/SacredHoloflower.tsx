@@ -183,7 +183,15 @@ export const SacredHoloflower: React.FC<SacredHoloflowerProps> = ({
           transition: 'opacity 0.3s ease'
         }}
       >
-        {/* Removed large holoflower image - keeping only animations and central logo */}
+        {/* Base Holoflower Image - Sacred Spiralogic mandala */}
+        <Image
+          src="/holoflower.png"
+          alt="Spiralogic Holoflower"
+          width={size}
+          height={size}
+          className="absolute inset-0 object-contain"
+          priority
+        />
 
       {/* Interactive Overlay */}
       <svg
