@@ -128,7 +128,7 @@ export default function SoulPatternsPage() {
         return `These energies appear repeatedly: ${archetypes.join(', ')}`;
 
       case 'shadow_integration':
-        return data.description || 'You're working with shadow integration';
+        return data.description || 'You are working with shadow integration';
 
       default:
         return JSON.stringify(data);

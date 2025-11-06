@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import Anthropic from '@anthropic-ai/sdk';
 
 /**
  * Oracle Holoflower API
@@ -198,7 +199,94 @@ function generateShadowArchetype(petals: Petal[]): string {
   return elementShadows[Math.floor(Math.random() * elementShadows.length)];
 }
 
-function generateElementalAnalysis(petals: Petal[], intention?: string): { strengths: string[]; opportunities: string[] } {
+/**
+ * Helper function: Use Claude to generate contextual interpretations
+ * This interprets the user's intention and weaves it naturally with elemental guidance
+ */
+async function generateContextualGuidance(
+  type: 'strength' | 'opportunity' | 'practice',
+  element: string,
+  intention: string,
+  elementDescription: string
+): Promise<string> {
+  const apiKey = process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_API_KEY;
+  if (!apiKey) {
+    // Fallback to generic if no API key
+    return elementDescription;
+  }
+
+  const anthropic = new Anthropic({ apiKey });
+
+  const prompts = {
+    strength: `You are MAIA, interpreting an oracle reading. The user's question is: "${intention}"
+
+The elemental reading shows ${element} as a current strength, which means: ${elementDescription}
+
+Generate a single sentence (1-2 lines max) that:
+1. Naturally interprets their question/intention
+2. Shows how their ${element} element strength supports this
+3. Uses warm, direct language (like a wise friend speaking)
+4. Does NOT paste their question verbatim - interpret and reframe it
+
+Example input: "How can I become a better father?" + Earth strength
+Good output: "Your grounding and consistent presence are gifts you can offer your children every day"
+Bad output: "Your grounding helps with How can I become a better father?"
+
+Generate only the interpretation, nothing else:`,
+
+    opportunity: `You are MAIA, interpreting an oracle reading. The user's question is: "${intention}"
+
+The elemental reading shows ${element} as an emerging opportunity, which means: ${elementDescription}
+
+Generate a single sentence (1-2 lines max) that:
+1. Naturally interprets their question/intention
+2. Shows how developing their ${element} element could open new paths
+3. Uses warm, invitational language
+4. Does NOT paste their question verbatim - interpret and reframe it
+
+Example input: "What do I need to understand about myself and my role?" + Water opportunity
+Good output: "Deepening your emotional awareness could reveal new dimensions of how you show up for others"
+Bad output: "Connecting with feelings might help with What do I need to understand about myself?"
+
+Generate only the interpretation, nothing else:`,
+
+    practice: `You are MAIA, generating a micro-practice for an oracle reading. The user's question is: "${intention}"
+
+The practice should embody the ${element} element, which means: ${elementDescription}
+
+Generate a short practice (2-3 sentences max) that:
+1. Is a concrete, doable micro-action
+2. Naturally weaves in their intention without quoting it verbatim
+3. Honors the ${element} element's quality
+4. Uses second person ("Place your hand on your heart...")
+
+Example input: "How can I become a better father?" + Water element
+Good output: "Place your hand on your heart. Take three breaths and ask: 'What does my child most need to feel from me right now?' Trust the first feeling that arises."
+Bad output: "Ask yourself: What am I feeling about How can I become a better father?"
+
+Generate only the practice, nothing else:`
+  };
+
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 150,
+      messages: [{
+        role: 'user',
+        content: prompts[type]
+      }]
+    });
+
+    const textContent = response.content.find((c: any) => c.type === 'text');
+    return textContent?.text?.trim() || elementDescription;
+
+  } catch (error) {
+    console.error(`Error generating contextual ${type}:`, error);
+    return elementDescription; // Fallback to generic description
+  }
+}
+
+async function generateElementalAnalysis(petals: Petal[], intention?: string): Promise<{ strengths: string[]; opportunities: string[] }> {
   // Calculate average intensity per element
   const elementIntensities: Record<string, number[]> = {
     fire: [],
@@ -228,7 +316,7 @@ function generateElementalAnalysis(petals: Petal[], intention?: string): { stren
   // Generate contextual descriptions based on whether intention is provided
   const hasIntention = intention && intention.trim().length > 0;
 
-  // If no intention, use generic descriptions
+  // Generic descriptions (used when no intention provided)
   const genericStrengthDescriptions: Record<string, string> = {
     fire: 'Your spiritual vision and creative power are flowing strongly',
     water: 'Your emotional wisdom and capacity for deep feeling are present',
@@ -243,39 +331,30 @@ function generateElementalAnalysis(petals: Petal[], intention?: string): { stren
     air: 'Mental clarity and conscious relating are seeking more space'
   };
 
-  // If intention provided, create contextual descriptions
-  const getContextualStrength = (element: string): string => {
-    if (!hasIntention) return genericStrengthDescriptions[element];
+  // Top 2 elements are strengths
+  const strengthElements = elementAverages.slice(0, 2);
+  // Bottom 2 elements are opportunities
+  const opportunityElements = elementAverages.slice(-2).reverse();
 
-    const contexts: Record<string, string> = {
-      fire: `Your vision and sense of purpose serve as guides for ${intention}`,
-      water: `Your emotional capacity and empathy support you in ${intention}`,
-      earth: `Your grounding and ability to show up consistently help with ${intention}`,
-      air: `Your clarity and ability to communicate authentically aid ${intention}`
-    };
-    return contexts[element];
-  };
+  // Generate contextual strengths
+  const strengths = await Promise.all(
+    strengthElements.map(async ({ element }) => {
+      const genericDesc = genericStrengthDescriptions[element];
+      if (!hasIntention) return genericDesc;
 
-  const getContextualOpportunity = (element: string): string => {
-    if (!hasIntention) return genericOpportunityDescriptions[element];
+      return await generateContextualGuidance('strength', element, intention, genericDesc);
+    })
+  );
 
-    const contexts: Record<string, string> = {
-      fire: `Bringing more vision and inspiration could deepen ${intention}`,
-      water: `Connecting more with feelings and empathy might open new paths in ${intention}`,
-      earth: `More consistent presence and grounding could strengthen ${intention}`,
-      air: `Clearer communication and authentic relating want to emerge in ${intention}`
-    };
-    return contexts[element];
-  };
+  // Generate contextual opportunities
+  const opportunities = await Promise.all(
+    opportunityElements.map(async ({ element }) => {
+      const genericDesc = genericOpportunityDescriptions[element];
+      if (!hasIntention) return genericDesc;
 
-  const strengths = elementAverages
-    .slice(0, 2)
-    .map(({ element }) => getContextualStrength(element));
-
-  const opportunities = elementAverages
-    .slice(-2)
-    .reverse()
-    .map(({ element }) => getContextualOpportunity(element));
+      return await generateContextualGuidance('opportunity', element, intention, genericDesc);
+    })
+  );
 
   return { strengths, opportunities };
 }
@@ -376,7 +455,7 @@ function generateReflection(petals: Petal[], spiralStage: { element: string; sta
   return primingQuestions[Math.floor(Math.random() * primingQuestions.length)];
 }
 
-function generatePractice(petals: Petal[], spiralStage: { element: string }, intention?: string): string {
+async function generatePractice(petals: Petal[], spiralStage: { element: string }, intention?: string): Promise<string> {
   const hasIntention = intention && intention.trim().length > 0;
 
   // Generic practices when no intention
@@ -403,40 +482,26 @@ function generatePractice(petals: Petal[], spiralStage: { element: string }, int
     ],
   };
 
-  // Contextual practices when intention is provided
-  const contextualPractices: Record<string, (intent: string) => string[]> = {
-    Fire: (intent) => [
-      `Close your eyes. Ask: "What vision wants to guide me in ${intent}?" Trust what arises.`,
-      `Imagine the highest version of yourself in relation to ${intent}. What do you see?`,
-      `Create something that expresses your vision for ${intent}. Draw, write, or build it.`
-    ],
-    Water: (intent) => [
-      `Place your hand on your heart. Ask: "What am I truly feeling about ${intent}?"`,
-      `Write down all the emotions that arise when you think about ${intent}. Let them flow without judgment.`,
-      `Sit quietly and ask: "What does ${intent} need from my emotional presence?"`
-    ],
-    Earth: (intent) => [
-      `Complete this: "I show up for ${intent} by..." Write 3 specific actions.`,
-      `Touch the earth. Ask: "What one grounded step can I take today toward ${intent}?"`,
-      `Do one small, tangible thing today that serves ${intent}. Notice how it feels.`
-    ],
-    Air: (intent) => [
-      `Speak aloud one truth about ${intent} that you have been avoiding. Say it to yourself first.`,
-      `Have an authentic conversation about ${intent} with someone you trust. Listen more than you speak.`,
-      `Journal: "What do I most need to communicate clearly about ${intent}?"`
-    ]
+  // Element descriptions for Claude
+  const elementDescriptions: Record<string, string> = {
+    Fire: 'spiritual vision, creative power, expansion',
+    Water: 'emotional wisdom, feeling deeply, healing',
+    Earth: 'grounded purpose, manifestation, service',
+    Air: 'mental clarity, authentic connection, communication'
   };
 
-  if (hasIntention) {
-    const contextual = contextualPractices[spiralStage.element];
-    if (contextual) {
-      const practices = contextual(intention);
-      return practices[Math.floor(Math.random() * practices.length)];
-    }
+  // If no intention, use generic practice
+  if (!hasIntention) {
+    const elementPractices = genericPractices[spiralStage.element] || genericPractices.Fire;
+    return elementPractices[Math.floor(Math.random() * elementPractices.length)];
   }
 
-  const elementPractices = genericPractices[spiralStage.element] || genericPractices.Fire;
-  return elementPractices[Math.floor(Math.random() * elementPractices.length)];
+  // If intention provided, generate contextual practice using Claude
+  const element = spiralStage.element;
+  const elementDesc = elementDescriptions[element] || 'spiritual awareness';
+  const genericPractice = genericPractices[element]?.[0] || 'Take a moment to breathe and center yourself.';
+
+  return await generateContextualGuidance('practice', element, intention, elementDesc);
 }
 
 function generatePetalFeeling(petalId: string, intensity: number): string {
@@ -498,8 +563,8 @@ export async function POST(request: NextRequest) {
     // Analyze spiral stage
     const spiralStage = analyzeSpiralStage(petals);
 
-    // Generate elemental analysis (strengths and opportunities) - intention-aware
-    const elementalAnalysis = generateElementalAnalysis(petals, intention);
+    // Generate elemental analysis (strengths and opportunities) - intention-aware (async)
+    const elementalAnalysis = await generateElementalAnalysis(petals, intention);
 
     // Generate archetypes (dominant and shadow)
     const archetype = generateArchetype(petals, spiralStage);
@@ -508,8 +573,8 @@ export async function POST(request: NextRequest) {
     // Generate reflection (with intention context if provided)
     const reflection = generateReflection(petals, spiralStage, intention);
 
-    // Generate practice - intention-aware
-    const practice = generatePractice(petals, spiralStage, intention);
+    // Generate practice - intention-aware (async)
+    const practice = await generatePractice(petals, spiralStage, intention);
 
     // Generate petal-specific insights
     const petalInsights = petals.map(petal => ({
