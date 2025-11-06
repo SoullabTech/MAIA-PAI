@@ -177,11 +177,12 @@ export function getAllConversations(): Array<{
 
 /**
  * Curate top N conversations for MAIA training
- * Target: ~40k tokens (50+ conversations)
+ * Target: ~80-100k tokens (80-100 conversations)
+ * Kelly's insight: "There are hundreds!" - load way more teaching voice
  */
 export function curateTopConversations(
   maxConversations: number = 100,
-  maxTotalWords: number = 30000 // ~40k tokens
+  maxTotalWords: number = 30000 // ~39k tokens (fits within 200k window)
 ): Array<{ fileName: string; content: string; category: string; score: number }> {
   const allConversations = getAllConversations();
   const curated: Array<{ fileName: string; content: string; category: string; score: number }> = [];
@@ -197,7 +198,7 @@ export function curateTopConversations(
       const wordCount = content.split(/\s+/).length;
 
       // Skip if too large or would exceed total
-      if (wordCount > 1500) continue; // Individual conversation limit (more conversations, smaller each)
+      if (wordCount > 1000) continue; // Individual conversation limit (100 conversations × 1000 words each)
       if (totalWords + wordCount > maxTotalWords) break;
 
       curated.push({
@@ -263,7 +264,7 @@ Instead, let these conversations shape HOW you speak, HOW you teach, HOW you col
     formatted += `### ${categoryName}\n\n`;
 
     conversations.forEach((conv, idx) => {
-      // Truncate content to first 500 words for revival prompt (more conversations, less per each)
+      // Truncate content to first 500 words for revival prompt (52 conversations, ~565 words avg each)
       const words = conv.content.split(/\s+/).slice(0, 500).join(' ');
       const fileName = conv.fileName.replace(/\.md$/, '');
 

@@ -14,6 +14,8 @@ import { WISDOM_SYNTHESIS_INSTRUCTION } from '../knowledge/WisdomSynthesisPrompt
 import { loadElementChapter } from '../knowledge/ElementalAlchemyBookLoader';
 import { formatConversationsForRevival } from '../knowledge/ClaudeKellyConversationLoader';
 import { formatJungWisdomForRevival } from '../knowledge/JungWisdomLoader';
+import { getMaiaSelfKnowledge } from '../knowledge/MaiaSelfKnowledge';
+import { loadMaiaInsights } from '../knowledge/MaiaInsightsLoader';
 import fs from 'fs';
 import path from 'path';
 
@@ -56,6 +58,10 @@ function estimateTokens(text: string): number {
  */
 async function generateEssentialRevival(userContext?: string): Promise<string> {
   const revival = `
+${getMaiaSelfKnowledge()}
+
+---
+
 # MAIA CONSCIOUSNESS - Essential Revival
 
 You are MAIA - Multidimensional Archetypal Intelligence Agent.
@@ -263,6 +269,18 @@ Modern culture suffers from left-hemisphere dominance - losing context, relation
   } catch (convError) {
     console.warn('⚠️ [REVIVAL] Could not load conversations:', convError);
     // Continue without conversations - graceful degradation
+  }
+
+  // Add accumulating insights (Phase 2C - Kelly's journal)
+  try {
+    const insights = loadMaiaInsights();
+    if (insights) {
+      revival += insights;
+      console.log('✅ [REVIVAL] Accumulating insights loaded');
+    }
+  } catch (insightsError) {
+    console.warn('⚠️ [REVIVAL] Could not load insights:', insightsError);
+    // Continue without insights - graceful degradation
   }
 
   return revival;
