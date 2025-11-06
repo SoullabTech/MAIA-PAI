@@ -198,7 +198,7 @@ function generateShadowArchetype(petals: Petal[]): string {
   return elementShadows[Math.floor(Math.random() * elementShadows.length)];
 }
 
-function generateElementalAnalysis(petals: Petal[]): { strengths: string[]; opportunities: string[] } {
+function generateElementalAnalysis(petals: Petal[], intention?: string): { strengths: string[]; opportunities: string[] } {
   // Calculate average intensity per element
   const elementIntensities: Record<string, number[]> = {
     fire: [],
@@ -225,29 +225,57 @@ function generateElementalAnalysis(petals: Petal[]): { strengths: string[]; oppo
 
   elementAverages.sort((a, b) => b.average - a.average);
 
-  // Natural language descriptions without element labels
-  const strengthDescriptions: Record<string, string> = {
+  // Generate contextual descriptions based on whether intention is provided
+  const hasIntention = intention && intention.trim().length > 0;
+
+  // If no intention, use generic descriptions
+  const genericStrengthDescriptions: Record<string, string> = {
     fire: 'Your spiritual vision and creative power are flowing strongly',
     water: 'Your emotional wisdom and capacity for deep feeling are present',
     earth: 'Your grounded purpose and ability to manifest are active',
     air: 'Your mental clarity and authentic connection are available'
   };
 
-  const opportunityDescriptions: Record<string, string> = {
+  const genericOpportunityDescriptions: Record<string, string> = {
     fire: 'Spiritual vision and creative expression are calling for attention',
     water: 'Emotional wisdom and relational depth want to emerge',
     earth: 'Grounded purpose and tangible action are inviting you forward',
     air: 'Mental clarity and conscious relating are seeking more space'
   };
 
+  // If intention provided, create contextual descriptions
+  const getContextualStrength = (element: string): string => {
+    if (!hasIntention) return genericStrengthDescriptions[element];
+
+    const contexts: Record<string, string> = {
+      fire: `Your vision and sense of purpose serve as guides for ${intention}`,
+      water: `Your emotional capacity and empathy support you in ${intention}`,
+      earth: `Your grounding and ability to show up consistently help with ${intention}`,
+      air: `Your clarity and ability to communicate authentically aid ${intention}`
+    };
+    return contexts[element];
+  };
+
+  const getContextualOpportunity = (element: string): string => {
+    if (!hasIntention) return genericOpportunityDescriptions[element];
+
+    const contexts: Record<string, string> = {
+      fire: `Bringing more vision and inspiration could deepen ${intention}`,
+      water: `Connecting more with feelings and empathy might open new paths in ${intention}`,
+      earth: `More consistent presence and grounding could strengthen ${intention}`,
+      air: `Clearer communication and authentic relating want to emerge in ${intention}`
+    };
+    return contexts[element];
+  };
+
   const strengths = elementAverages
     .slice(0, 2)
-    .map(({ element }) => strengthDescriptions[element]);
+    .map(({ element }) => getContextualStrength(element));
 
   const opportunities = elementAverages
     .slice(-2)
     .reverse()
-    .map(({ element }) => opportunityDescriptions[element]);
+    .map(({ element }) => getContextualOpportunity(element));
 
   return { strengths, opportunities };
 }
@@ -348,12 +376,15 @@ function generateReflection(petals: Petal[], spiralStage: { element: string; sta
   return primingQuestions[Math.floor(Math.random() * primingQuestions.length)];
 }
 
-function generatePractice(petals: Petal[], spiralStage: { element: string }): string {
-  const practices: Record<string, string[]> = {
+function generatePractice(petals: Petal[], spiralStage: { element: string }, intention?: string): string {
+  const hasIntention = intention && intention.trim().length > 0;
+
+  // Generic practices when no intention
+  const genericPractices: Record<string, string[]> = {
     Fire: [
       'Close your eyes and ask: "What does my soul truly see?" Let the first image arise without judgment.',
       'Light a candle. Gaze into the flame for 3 minutes. What vision emerges?',
-      'Create something today—anything—without worrying if it\'s good. Just express.',
+      'Create something today—anything—without worrying if it is good. Just express.',
     ],
     Water: [
       'Place your hand on your heart. Breathe. Ask: "What am I feeling beneath the surface?"',
@@ -362,17 +393,49 @@ function generatePractice(petals: Petal[], spiralStage: { element: string }): st
     ],
     Earth: [
       'Complete this sentence: "I am here to serve by..." Say it aloud three times.',
-      'Touch the earth with bare hands. Plant something, even if it\'s just a seed in a cup.',
+      'Touch the earth with bare hands. Plant something, even if it is just a seed in a cup.',
       'Make one thing today with your hands. Offer it as medicine to someone who needs it.',
     ],
     Air: [
-      'Speak one truth you\'ve been holding back. Say it aloud to yourself first.',
-      'Call someone you love. Just listen. Don\'t fix, advise, or redirect. Just be present.',
-      'Journal this question: "What does my highest self know that I\'m not yet living?"',
+      'Speak one truth you have been holding back. Say it aloud to yourself first.',
+      'Call someone you love. Just listen. Do not fix, advise, or redirect. Just be present.',
+      'Journal this question: "What does my highest self know that I am not yet living?"',
     ],
   };
 
-  const elementPractices = practices[spiralStage.element] || practices.Fire;
+  // Contextual practices when intention is provided
+  const contextualPractices: Record<string, (intent: string) => string[]> = {
+    Fire: (intent) => [
+      `Close your eyes. Ask: "What vision wants to guide me in ${intent}?" Trust what arises.`,
+      `Imagine the highest version of yourself in relation to ${intent}. What do you see?`,
+      `Create something that expresses your vision for ${intent}. Draw, write, or build it.`
+    ],
+    Water: (intent) => [
+      `Place your hand on your heart. Ask: "What am I truly feeling about ${intent}?"`,
+      `Write down all the emotions that arise when you think about ${intent}. Let them flow without judgment.`,
+      `Sit quietly and ask: "What does ${intent} need from my emotional presence?"`
+    ],
+    Earth: (intent) => [
+      `Complete this: "I show up for ${intent} by..." Write 3 specific actions.`,
+      `Touch the earth. Ask: "What one grounded step can I take today toward ${intent}?"`,
+      `Do one small, tangible thing today that serves ${intent}. Notice how it feels.`
+    ],
+    Air: (intent) => [
+      `Speak aloud one truth about ${intent} that you have been avoiding. Say it to yourself first.`,
+      `Have an authentic conversation about ${intent} with someone you trust. Listen more than you speak.`,
+      `Journal: "What do I most need to communicate clearly about ${intent}?"`
+    ]
+  };
+
+  if (hasIntention) {
+    const contextual = contextualPractices[spiralStage.element];
+    if (contextual) {
+      const practices = contextual(intention);
+      return practices[Math.floor(Math.random() * practices.length)];
+    }
+  }
+
+  const elementPractices = genericPractices[spiralStage.element] || genericPractices.Fire;
   return elementPractices[Math.floor(Math.random() * elementPractices.length)];
 }
 
@@ -435,8 +498,8 @@ export async function POST(request: NextRequest) {
     // Analyze spiral stage
     const spiralStage = analyzeSpiralStage(petals);
 
-    // Generate elemental analysis (strengths and opportunities)
-    const elementalAnalysis = generateElementalAnalysis(petals);
+    // Generate elemental analysis (strengths and opportunities) - intention-aware
+    const elementalAnalysis = generateElementalAnalysis(petals, intention);
 
     // Generate archetypes (dominant and shadow)
     const archetype = generateArchetype(petals, spiralStage);
@@ -445,8 +508,8 @@ export async function POST(request: NextRequest) {
     // Generate reflection (with intention context if provided)
     const reflection = generateReflection(petals, spiralStage, intention);
 
-    // Generate practice
-    const practice = generatePractice(petals, spiralStage);
+    // Generate practice - intention-aware
+    const practice = generatePractice(petals, spiralStage, intention);
 
     // Generate petal-specific insights
     const petalInsights = petals.map(petal => ({
