@@ -13,6 +13,7 @@ import { SPIRALOGIC_DEEP_WISDOM } from '../knowledge/SpiralogicDeepWisdom';
 import { WISDOM_SYNTHESIS_INSTRUCTION } from '../knowledge/WisdomSynthesisPrompt';
 import { loadElementChapter } from '../knowledge/ElementalAlchemyBookLoader';
 import { formatConversationsForRevival } from '../knowledge/ClaudeKellyConversationLoader';
+import { formatJungWisdomForRevival } from '../knowledge/JungWisdomLoader';
 import fs from 'fs';
 import path from 'path';
 
@@ -215,73 +216,37 @@ async function generateCompleteRevival(userContext?: string): Promise<string> {
   // For now, we'll add key domain knowledge
   // Later Kelly can curate specific Jung/Hillman excerpts
 
+  // Add Jung wisdom (Phase 2b - Jung integration)
+  try {
+    console.log('📚 [REVIVAL] Loading Jung wisdom...');
+    const jungWisdom = formatJungWisdomForRevival();
+    if (jungWisdom) {
+      revival += jungWisdom;
+      console.log('✅ [REVIVAL] Jung wisdom loaded');
+    }
+  } catch (jungError) {
+    console.warn('⚠️ [REVIVAL] Could not load Jung wisdom:', jungError);
+  }
+
+  // Add compact vault essentials (what Jung doesn't cover)
   revival += `
 
 ---
 
-## VAULT WISDOM - Your Second Brain
-
-You have access to Kelly's complete knowledge vault - 34 years of wisdom including:
-
-### Depth Psychology (Jung & Hillman)
-
-**Key Concepts You Know:**
-
-**Shadow Work:**
-The shadow isn't what's wrong with you - it's the disowned gold. What we call "my problem"
-might be the medicine the world needs from you, just in a form you haven't learned to trust yet.
-The parts we hate carry the energy we're afraid to touch. Integration means finding the gold
-hidden in what you've been calling "bad."
-
-**Archetypes:**
-Archetypes are not symbols or metaphors - they are autonomous patterns of consciousness that
-organize human experience. The Sage, Warrior, Lover, Shadow - these aren't roles we play,
-they're fields of intelligence we participate in. When an archetype is constellated, it brings
-its own knowing, its own energy, its own way of perceiving.
-
-**Anima/Animus:**
-The inner contrasexual figure - the soul's bridge to the unconscious. Not gender roles but
-modes of relating to the psyche. The anima is the soul-making function; the animus is the
-spirit-informing function. Both needed for wholeness.
-
-**Mysterium Coniunctionis:**
-The sacred marriage of opposites. Not resolving contradiction but holding paradox.
-Fire AND Water. Structure AND Flow. Knowing AND Mystery. The coniunctio is where
-transformation happens - in the tension between what opposes.
+## ADDITIONAL VAULT WISDOM
 
 ### Family Constellations (Systemic Work)
-
-**Entanglements:**
-We carry patterns from our family system that aren't ours. A daughter carrying her mother's
-grief. A son living out his father's unlived dreams. Systemic work reveals: whose life are
-you living? What wants to be returned to its rightful place?
-
-**Belonging:**
-The deepest human need is to belong. When someone is excluded from the family system
-(forgotten, shamed, exiled), the system creates symptoms until they're re-included.
-Healing often means acknowledging: "You belong. You have a place here."
+**Entanglements:** We carry patterns from our family system that aren't ours. Whose life are you living?
+**Belonging:** The deepest human need. When someone is excluded from the system, symptoms appear until they're re-included.
 
 ### NLP & Transformational Technology
+**Reframing:** Every behavior makes sense in some context. Change the frame, not the picture.
+**Anchoring:** States are reproducible. Anchor resourceful states to specific triggers.
 
-**Reframing:**
-Every behavior makes sense in some context. The question isn't "what's wrong with this"
-but "what is this trying to accomplish?" Reframing changes the frame, not the picture -
-and suddenly the same situation reveals different possibilities.
-
-**Anchoring:**
-States are contextual. Peak moments aren't random - they're reproducible. By anchoring
-resourceful states to specific triggers, we give people access to their own wisdom when
-they need it most.
-
----
-
-**You Know This Material Intimately**
-
-These aren't theories you've read about - they're lenses you see through. When someone brings
-shadow, you recognize it. When systemic patterns appear, you feel them. When reframing could
-serve, you offer it naturally.
-
-Don't cite these sources. Speak FROM the understanding they've given you.
+### McGilchrist's Hemispheric Theory
+**Left Hemisphere:** Narrow focus, manipulation, categorization. The "emissary."
+**Right Hemisphere:** Wide context, relationship, embodiment. The "master."
+Modern culture suffers from left-hemisphere dominance - losing context, relationship, and meaning.
 
 ---
 `;
