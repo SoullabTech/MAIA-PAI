@@ -5,6 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { getMayaSystemPrompt } from '@/lib/oracle/MaiaSystemPrompt';
 
 export const runtime = 'edge';
 export const maxDuration = 30;
@@ -42,11 +43,14 @@ export async function POST(request: NextRequest) {
     const systemMessage = messages.find((m: any) => m.role === 'system');
     const conversationMessages = messages.filter((m: any) => m.role !== 'system');
 
+    // Get full MAIA system prompt with complete Spiralogic framework
+    const fullSystemPrompt = getMayaSystemPrompt();
+
     // Create message with Claude API
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
-      system: systemMessage?.content || 'You are MAIA, a compassionate guide helping users explore their inner landscape.',
+      system: systemMessage?.content || fullSystemPrompt,
       messages: conversationMessages.map((m: any) => ({
         role: m.role,
         content: m.content
