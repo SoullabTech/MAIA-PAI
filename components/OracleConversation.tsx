@@ -2296,7 +2296,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                {/* Multiple amber plasma field layers with slow, thick fluidity - emanate far */}
+                {/* Multiple amber plasma field layers - ENHANCED VISIBILITY */}
                 {[...Array(3)].map((_, i) => (
                   <motion.div
                     key={`voice-field-${i}`}
@@ -2305,20 +2305,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       width: `${300 + i * 150}px`,
                       height: `${300 + i * 150}px`,
                       background: i === 0
-                        ? 'radial-gradient(circle, rgba(251, 191, 36, 0.25) 0%, rgba(251, 191, 36, 0.08) 50%, transparent 100%)'
+                        ? 'radial-gradient(circle, rgba(251, 191, 36, 0.6) 0%, rgba(251, 191, 36, 0.25) 50%, transparent 100%)'
                         : i === 1
-                        ? 'radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(245, 158, 11, 0.05) 50%, transparent 100%)'
-                        : 'radial-gradient(circle, rgba(217, 119, 6, 0.12) 0%, rgba(217, 119, 6, 0.03) 50%, transparent 100%)',
-                      filter: `blur(${20 + i * 8}px)`,
+                        ? 'radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, rgba(245, 158, 11, 0.15) 50%, transparent 100%)'
+                        : 'radial-gradient(circle, rgba(217, 119, 6, 0.3) 0%, rgba(217, 119, 6, 0.08) 50%, transparent 100%)',
+                      filter: `blur(${12 + i * 6}px)`,
                     }}
                     animate={{
-                      scale: [1, 1.06, 1],
-                      opacity: [0.6 - i * 0.12, 0.35, 0.6 - i * 0.12],
+                      scale: [1, 1.1, 1],
+                      opacity: [0.85 - i * 0.15, 0.6, 0.85 - i * 0.15],
                     }}
                     transition={{
-                      duration: 8 + i * 3,
+                      duration: 5 + i * 2,
                       repeat: Infinity,
-                      delay: i * 1.2,
+                      delay: i * 0.8,
                       ease: [0.42, 0, 0.58, 1]
                     }}
                   />
@@ -2348,7 +2348,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               </motion.div>
             )}
 
-            {/* Voice Visualizer - MAIA's voice (soft pulsing glow, NO rings/borders) */}
+            {/* Voice Visualizer - MAIA's voice - ENHANCED VISIBILITY */}
             {(isResponding || isAudioPlaying) && (
               <motion.div
                 className="absolute inset-0 pointer-events-none flex items-center justify-center"
@@ -2356,16 +2356,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                {/* Soft golden pulsing glow layers - NO BORDERS */}
-                {[...Array(2)].map((_, i) => (
+                {/* Golden pulsing glow layers - MUCH MORE VISIBLE */}
+                {[...Array(3)].map((_, i) => (
                   <motion.div
                     key={`maya-glow-${i}`}
                     className="absolute rounded-full"
                     style={{
-                      width: `${250 + i * 100}px`,
-                      height: `${250 + i * 100}px`,
-                      background: `radial-gradient(circle, rgba(212, 184, 150, ${0.15 - i * 0.05}) 0%, transparent 70%)`,
-                      filter: 'blur(40px)',
+                      width: `${280 + i * 120}px`,
+                      height: `${280 + i * 120}px`,
+                      background: i === 0
+                        ? 'radial-gradient(circle, rgba(212, 184, 150, 0.55) 0%, rgba(212, 184, 150, 0.2) 60%, transparent 100%)'
+                        : i === 1
+                        ? 'radial-gradient(circle, rgba(196, 168, 134, 0.4) 0%, rgba(196, 168, 134, 0.12) 60%, transparent 100%)'
+                        : 'radial-gradient(circle, rgba(180, 152, 118, 0.25) 0%, rgba(180, 152, 118, 0.06) 60%, transparent 100%)',
+                      filter: `blur(${18 + i * 8}px)`,
                     }}
                     animate={{
                       scale: [1, 1.15, 1],
