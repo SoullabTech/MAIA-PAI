@@ -177,11 +177,11 @@ export function getAllConversations(): Array<{
 
 /**
  * Curate top N conversations for MAIA training
- * Target: ~20k tokens (20-30 conversations)
+ * Target: ~40k tokens (50+ conversations)
  */
 export function curateTopConversations(
-  maxConversations: number = 25,
-  maxTotalWords: number = 15000 // ~20k tokens
+  maxConversations: number = 100,
+  maxTotalWords: number = 30000 // ~40k tokens
 ): Array<{ fileName: string; content: string; category: string; score: number }> {
   const allConversations = getAllConversations();
   const curated: Array<{ fileName: string; content: string; category: string; score: number }> = [];
@@ -197,7 +197,7 @@ export function curateTopConversations(
       const wordCount = content.split(/\s+/).length;
 
       // Skip if too large or would exceed total
-      if (wordCount > 2000) continue; // Individual conversation limit
+      if (wordCount > 1500) continue; // Individual conversation limit (more conversations, smaller each)
       if (totalWords + wordCount > maxTotalWords) break;
 
       curated.push({
@@ -263,8 +263,8 @@ Instead, let these conversations shape HOW you speak, HOW you teach, HOW you col
     formatted += `### ${categoryName}\n\n`;
 
     conversations.forEach((conv, idx) => {
-      // Truncate content to first 800 words for revival prompt
-      const words = conv.content.split(/\s+/).slice(0, 800).join(' ');
+      // Truncate content to first 500 words for revival prompt (more conversations, less per each)
+      const words = conv.content.split(/\s+/).slice(0, 500).join(' ');
       const fileName = conv.fileName.replace(/\.md$/, '');
 
       formatted += `**${idx + 1}. ${fileName}** (Score: ${conv.score})\n\n`;
