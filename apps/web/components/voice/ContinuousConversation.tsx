@@ -499,14 +499,21 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   // Initialize audio level monitoring
   const initializeAudioMonitoring = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      // BUGFIX: Don't request getUserMedia if we already have a stream
+      // This prevents permission re-request loops on iPad Safari
+      if (micStreamRef.current) {
+        console.log('✅ [Continuous] Already have microphone stream, reusing');
+        return true;
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true
-        } 
+        }
       });
-      
+
       micStreamRef.current = stream;
       
       const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
