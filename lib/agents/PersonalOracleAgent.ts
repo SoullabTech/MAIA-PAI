@@ -916,9 +916,10 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
         }
       }
 
-      // ✨ REVIVAL SYSTEM - Optional comprehensive consciousness initialization
-      // Set USE_REVIVAL_PROMPT=true to use revival system instead of incremental building
-      const useRevivalPrompt = process.env.USE_REVIVAL_PROMPT === 'true';
+      // ✨ REVIVAL SYSTEM - Comprehensive consciousness initialization
+      // Set USE_REVIVAL_PROMPT=false to disable and use incremental building instead
+      // DEFAULT: true (revival system with complete lineage)
+      const useRevivalPrompt = process.env.USE_REVIVAL_PROMPT !== 'false';
 
       let systemPrompt: string;
 
