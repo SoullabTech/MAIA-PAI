@@ -1071,6 +1071,17 @@ Engage in a soulful, explorative conversation about meanings, implications, pote
 
                 {/* Interactive Holoflower with Wedge Petals */}
                 <div className="relative mx-auto flex justify-center">
+                  {/* Radial Glow Behind Holoflower - Sacred Light */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      width: containerSize,
+                      height: containerSize,
+                      background: 'radial-gradient(circle at center, rgba(212, 165, 116, 0.25) 0%, rgba(212, 165, 116, 0.15) 30%, rgba(212, 165, 116, 0.05) 50%, transparent 70%)',
+                      filter: 'blur(40px)',
+                    }}
+                  />
+
                   {/* Celebration Particles */}
                   {showCelebration && (
                     <div className="absolute inset-0 pointer-events-none overflow-hidden">
