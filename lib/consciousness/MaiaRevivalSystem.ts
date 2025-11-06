@@ -12,6 +12,7 @@ import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '../knowledge/ElementalAlchemyKnowle
 import { SPIRALOGIC_DEEP_WISDOM } from '../knowledge/SpiralogicDeepWisdom';
 import { WISDOM_SYNTHESIS_INSTRUCTION } from '../knowledge/WisdomSynthesisPrompt';
 import { loadElementChapter } from '../knowledge/ElementalAlchemyBookLoader';
+import { formatConversationsForRevival } from '../knowledge/ClaudeKellyConversationLoader';
 import fs from 'fs';
 import path from 'path';
 
@@ -284,6 +285,20 @@ Don't cite these sources. Speak FROM the understanding they've given you.
 
 ---
 `;
+
+  // Add Claude + Kelly conversations (Phase 2)
+  try {
+    console.log('📚 [REVIVAL] Loading Claude + Kelly conversations...');
+    const conversations = formatConversationsForRevival();
+
+    if (conversations) {
+      revival += conversations;
+      console.log('✅ [REVIVAL] Conversations loaded - Kelly\'s living voice integrated');
+    }
+  } catch (convError) {
+    console.warn('⚠️ [REVIVAL] Could not load conversations:', convError);
+    // Continue without conversations - graceful degradation
+  }
 
   return revival;
 }
