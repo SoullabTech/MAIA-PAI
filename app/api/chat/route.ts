@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     // Create message with Claude API
     const response = await anthropic.messages.create({
-      model: 'claude-3-5-sonnet-20241022',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
       system: systemMessage?.content || 'You are MAIA, a compassionate guide helping users explore their inner landscape.',
       messages: conversationMessages.map((m: any) => ({
