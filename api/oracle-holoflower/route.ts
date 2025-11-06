@@ -43,6 +43,7 @@ interface OracleReading {
     reflection: string;
     practice: string;
     archetype: string;
+    narrativeInterpretation?: string; // Cohesive prose interpretation
   };
 }
 
@@ -66,92 +67,105 @@ interface SessionPayload {
 // Petal Chart Mapping
 // ============================================
 
+// Complete Spiralogic Framework - 12 Facets across 4 Elements
+// Each element has 3 phases: Cardinal (Vector/Intelligence), Fixed (Circle/Intention), Mutable (Spiral/Goal)
 const PETAL_CHART: Record<string, PetalInfo> = {
-  // Fire Petals
+  // FIRE - Spiritual, Intuitive Intelligence
+  // Vision → Expression → Expansion
   Fire1: {
     petal: 'Fire1',
-    essence: 'Spark',
-    keywords: ['Ignition', 'Vision', 'Initiation'],
-    shadow: 'Impulsivity',
-    blessing: 'Courage to begin'
+    essence: 'Self-Awareness', // Vision (Cardinal/Vector)
+    keywords: ['Vision', 'Intuition', 'I SEE', 'I Experience', 'Spiritual awakening'],
+    shadow: 'Blind spots, spiritual bypassing',
+    blessing: 'Clear inner vision'
   },
   Fire2: {
     petal: 'Fire2',
-    essence: 'Blaze',
-    keywords: ['Passion', 'Creation', 'Momentum'],
-    shadow: 'Burnout',
-    blessing: 'Creative fire'
+    essence: 'Self-In-World', // Expression (Fixed/Circle)
+    keywords: ['Expression', 'Creation', 'I CREATE', 'I Express', 'Creative power'],
+    shadow: 'Blocked expression, creative stagnation',
+    blessing: 'Authentic creative flow'
   },
   Fire3: {
     petal: 'Fire3',
-    essence: 'Phoenix',
-    keywords: ['Rebirth', 'Mastery', 'Transformation'],
-    shadow: 'Destruction',
-    blessing: 'Sacred renewal'
+    essence: 'Transcendent Self', // Expansion (Mutable/Spiral)
+    keywords: ['Expansion', 'Integration', 'I EXPAND', 'Spiritual growth', 'Transcendence'],
+    shadow: 'Spiritual inflation, disconnection',
+    blessing: 'Sacred expansion'
   },
+
+  // WATER - Emotional, Psychic Intelligence
+  // Heart → Healing → Holiness
   Water1: {
     petal: 'Water1',
-    essence: 'Droplet',
-    keywords: ['Curiosity', 'First feeling', 'Receptivity'],
-    shadow: 'Overwhelm',
-    blessing: 'Gentle opening'
+    essence: 'Emotional Intelligence', // Heart (Cardinal/Vector)
+    keywords: ['Heart', 'Feeling', 'I FEEL', 'My Heart', 'Emotional opening'],
+    shadow: 'Emotional numbness, overwhelm',
+    blessing: 'Open-hearted presence'
   },
   Water2: {
     petal: 'Water2',
-    essence: 'Flow',
-    keywords: ['Surrender', 'Connection', 'Intuition'],
-    shadow: 'Dissolution',
-    blessing: 'Trust in flow'
+    essence: 'Inner Transformation', // Healing (Fixed/Circle)
+    keywords: ['Healing', 'Transformation', 'I HEAL', 'My Healing', 'Emotional alchemy'],
+    shadow: 'Unhealed wounds, stuck patterns',
+    blessing: 'Deep healing grace'
   },
   Water3: {
     petal: 'Water3',
-    essence: 'Ocean',
-    keywords: ['Unity', 'Depth', 'Wisdom'],
-    shadow: 'Drowning',
-    blessing: 'Infinite depth'
+    essence: 'Deep Self-Awareness', // Holiness (Mutable/Spiral)
+    keywords: ['Holiness', 'Surrender', 'I SURRENDER', 'My Holiness', 'Sacred depth'],
+    shadow: 'Spiritual materialism, false holiness',
+    blessing: 'True sacred connection'
   },
+
+  // EARTH - Somatic, Embodied Intelligence
+  // Mission → Means → Medicine
   Earth1: {
     petal: 'Earth1',
-    essence: 'Seed',
-    keywords: ['Potential', 'Patience', 'Grounding'],
-    shadow: 'Stagnation',
-    blessing: 'Sacred patience'
+    essence: 'Purpose & Service', // Mission (Cardinal/Vector)
+    keywords: ['Mission', 'Purpose', 'I SERVE', 'The Mission', 'Sacred calling'],
+    shadow: 'Lost purpose, martyrdom',
+    blessing: 'Clear life mission'
   },
   Earth2: {
     petal: 'Earth2',
-    essence: 'Root',
-    keywords: ['Foundation', 'Nourishment', 'Growth'],
-    shadow: 'Rigidity',
-    blessing: 'Deep stability'
+    essence: 'Resources & Plans', // Means (Fixed/Circle)
+    keywords: ['Means', 'Resources', 'I BUILD', 'The Means', 'Material manifestation'],
+    shadow: 'Lack, scarcity, stagnation',
+    blessing: 'Abundant resources'
   },
   Earth3: {
     petal: 'Earth3',
-    essence: 'Mountain',
-    keywords: ['Permanence', 'Achievement', 'Legacy'],
-    shadow: 'Immobility',
-    blessing: 'Eternal presence'
+    essence: 'Refined Offering', // Medicine (Mutable/Spiral)
+    keywords: ['Medicine', 'Embodiment', 'I EMBODY', 'The Medicine', 'Gift to world'],
+    shadow: 'Unrefined gifts, holding back',
+    blessing: 'Medicine fully embodied'
   },
+
+  // AIR - Mental, Relational, Communicative Intelligence
+  // Connection → Community → Consciousness
   Air1: {
     petal: 'Air1',
-    essence: 'Whisper',
-    keywords: ['Inquiry', 'Perspective', 'Lightness'],
-    shadow: 'Distraction',
-    blessing: 'Fresh perspective'
+    essence: 'Interpersonal Relating', // Connection (Cardinal/Vector)
+    keywords: ['Connection', 'Relating', 'I RELATE', 'This Connection', 'One-to-one bonding'],
+    shadow: 'Isolation, co-dependence',
+    blessing: 'Authentic connection'
   },
   Air2: {
     petal: 'Air2',
-    essence: 'Wind',
-    keywords: ['Movement', 'Communication', 'Clarity'],
-    shadow: 'Detachment',
-    blessing: 'Clear seeing'
+    essence: 'Collective Dynamics', // Community (Fixed/Circle)
+    keywords: ['Community', 'Collective', 'I GATHER', 'This Community', 'Group synergy'],
+    shadow: 'Group-think, exclusion',
+    blessing: 'Sacred community'
   },
   Air3: {
     petal: 'Air3',
-    essence: 'Sky',
-    keywords: ['Freedom', 'Vision', 'Truth'],
-    shadow: 'Disconnection',
-    blessing: 'Infinite view'
+    essence: 'Elevated Communication', // Consciousness (Mutable/Spiral)
+    keywords: ['Consciousness', 'Clarity', 'I KNOW', 'This Consciousness', 'Higher knowing'],
+    shadow: 'Mental fog, confusion',
+    blessing: 'Crystal clarity'
   },
+
   // Aether Center States (not petals, but center pulses)
   Aether1: {
     petal: 'Aether1',
@@ -270,7 +284,8 @@ Respond ONLY in JSON:
     "spiralStage": { "element":"fire"|"water"|"earth"|"air"|"aether", "stage":1|2|3 },
     "reflection":"...",
     "practice":"...",
-    "archetype":"..."
+    "archetype":"...",
+    "narrativeInterpretation":"2-3 flowing paragraphs that synthesize the reading as a cohesive story - weaving together what elements are strong, what's emerging, what the archetypes reveal, and what this means for the person's journey. Write in second person ('you'), warm and insightful."
   }
 }`;
 
@@ -339,21 +354,29 @@ async function processMerge(
 
 function generatePetalFeeling(petalId: string, intensity: number): string {
   const feelings: Record<string, string[]> = {
-    Fire1: ['a spark awakening', 'the first flame', 'ignition beginning'],
-    Fire2: ['creative heat rising', 'passion flowing', 'power building'],
-    Fire3: ['phoenix wings spreading', 'transformation completing', 'mastery emerging'],
-    Water1: ['first drops of rain', 'gentle curiosity', 'softening edges'],
-    Water2: ['river finding its path', 'emotional current', 'intuitive flow'],
-    Water3: ['oceanic vastness', 'deep knowing', 'boundless compassion'],
-    Earth1: ['seed stirring underground', 'patient waiting', 'quiet potential'],
-    Earth2: ['roots deepening', 'stable growth', 'nourishing foundation'],
-    Earth3: ['mountain presence', 'unshakeable truth', 'eternal standing'],
-    Air1: ['first breath of dawn', 'gentle questioning', 'light touch'],
-    Air2: ['wind carrying messages', 'clear communication', 'swift movement'],
-    Air3: ['infinite sky opening', 'boundless freedom', 'vast perspective'],
+    // Fire - Spiritual, Intuitive Intelligence
+    Fire1: ['inner vision awakening', 'seeing with soul eyes', 'spiritual clarity emerging'],
+    Fire2: ['creative expression flowing', 'authentic self emerging', 'bringing vision into form'],
+    Fire3: ['consciousness expanding', 'spiritual integration', 'transcendent awareness'],
+
+    // Water - Emotional, Psychic Intelligence
+    Water1: ['heart opening gently', 'feeling deeply', 'emotional truth rising'],
+    Water2: ['healing waters flowing', 'patterns transforming', 'emotional alchemy happening'],
+    Water3: ['surrendering to holiness', 'sacred depth touching', 'divine presence felt'],
+
+    // Earth - Somatic, Embodied Intelligence
+    Earth1: ['life purpose calling', 'mission becoming clear', 'sacred service emerging'],
+    Earth2: ['resources gathering', 'foundation building', 'manifestation happening'],
+    Earth3: ['medicine fully embodied', 'gift refined and ready', 'offering complete'],
+
+    // Air - Mental, Relational, Communicative Intelligence
+    Air1: ['authentic connection forming', 'relating soul-to-soul', 'true meeting happening'],
+    Air2: ['community gathering', 'collective synergy building', 'sacred circle forming'],
+    Air3: ['consciousness clarifying', 'higher knowing emerging', 'truth crystallizing'],
+
     Aether: ['void and fullness', 'mystery present', 'all and nothing']
   };
-  
+
   const petalFeelings = feelings[petalId] || ['energy moving', 'presence felt', 'essence touched'];
   const index = Math.floor(intensity * (petalFeelings.length - 1));
   return petalFeelings[index];
@@ -361,21 +384,29 @@ function generatePetalFeeling(petalId: string, intensity: number): string {
 
 function generatePetalRitual(petalId: string, intensity: number): string {
   const rituals: Record<string, string> = {
-    Fire1: 'Light a candle with intention',
-    Fire2: 'Create something with your hands',
-    Fire3: 'Release what no longer serves through flame',
-    Water1: 'Cup water in your hands and bless it',
-    Water2: 'Flow with music or movement',
-    Water3: 'Sit by water and listen deeply',
-    Earth1: 'Plant a seed or intention',
-    Earth2: 'Walk barefoot on earth',
-    Earth3: 'Build a small cairn or altar',
-    Air1: 'Write a question and release it to wind',
-    Air2: 'Speak your truth aloud',
-    Air3: 'Breathe into vast space',
-    Aether: 'Sit in silence for 13 breaths'
+    // Fire - Spiritual, Intuitive Intelligence
+    Fire1: 'Close your eyes and ask: "What does my soul see?" Trust the first image that comes.',
+    Fire2: 'Create something with your hands that expresses your inner truth.',
+    Fire3: 'Stand with arms wide and feel yourself expanding beyond your edges.',
+
+    // Water - Emotional, Psychic Intelligence
+    Water1: 'Place your hand on your heart and ask: "What do I truly feel right now?"',
+    Water2: 'Write a letter to a wound that\'s ready to heal. Burn it or bury it with gratitude.',
+    Water3: 'Sit in silence and surrender one thing you\'ve been trying to control.',
+
+    // Earth - Somatic, Embodied Intelligence
+    Earth1: 'Complete this sentence: "I am here to serve by..."',
+    Earth2: 'List 3 resources you already have that support your mission.',
+    Earth3: 'Embody your medicine: move, speak, or create as if your gift is fully expressed.',
+
+    // Air - Mental, Relational, Communicative Intelligence
+    Air1: 'Reach out to someone for authentic connection. Be vulnerable.',
+    Air2: 'Gather with others (even digitally) and share what\'s alive in you.',
+    Air3: 'Speak one truth you\'ve been holding back. Say it aloud to yourself first.',
+
+    Aether: 'Sit in silence for 13 breaths. Notice what\'s beyond thought.'
   };
-  
+
   return rituals[petalId] || 'Follow your intuition for a simple ritual';
 }
 

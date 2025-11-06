@@ -277,6 +277,7 @@ interface OracleReading {
   reflection: string;
   practice: string;
   archetype: string;
+  narrativeInterpretation?: string;
   archetypes?: {
     dominant: string;
     shadow: string;
@@ -1708,6 +1709,17 @@ Engage in a soulful, explorative conversation about meanings, implications, pote
                   </div>
 
                   <div className="space-y-6">
+                    {/* Narrative Interpretation - Cohesive Overview */}
+                    {reading?.narrativeInterpretation && (
+                      <div className="bg-amber-950/30 border border-amber-600/20 rounded-xl p-6">
+                        <div className="prose prose-amber max-w-none">
+                          <p className="text-amber-200/95 text-base leading-relaxed whitespace-pre-line">
+                            {reading.narrativeInterpretation}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Elemental Alchemy - Strengths and Opportunities */}
                     <div>
                       <h4 className="text-amber-300/90 font-semibold mb-3">Elemental Alchemy</h4>

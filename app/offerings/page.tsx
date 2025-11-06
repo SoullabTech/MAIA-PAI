@@ -58,8 +58,7 @@ const OFFERINGS: Offering[] = [
     gradient: 'from-purple-500/10 to-pink-500/10',
     borderColor: 'border-purple-500/30',
     glowColor: 'shadow-purple-500/20',
-    path: '/oracle',
-    badge: 'Coming Soon'
+    path: '/oracle'
   },
   {
     id: 'holoflower',

@@ -127,37 +127,76 @@ export default function LibraryUploadPage() {
   const errorCount = files.filter(f => f.status === 'error').length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-indigo-900/20 p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-[#1a1410] relative overflow-hidden p-8">
+      {/* DUNE desert atmosphere */}
+      <div className="fixed inset-0">
+        {/* Deep desert sand gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#3d2817] via-[#1a1410] to-[#0a0604]" />
 
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-            📚 Library of Alexandria
+        {/* Subtle sand texture */}
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' /%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E")`,
+            backgroundSize: '200px 200px'
+          }}
+        />
+
+        {/* Warm desert sun glow */}
+        <div className="absolute inset-0 bg-gradient-radial from-orange-950/10 via-transparent to-transparent" />
+
+        {/* Atmospheric haze */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30" />
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
+
+        {/* Header - Minimalist DUNE style */}
+        <div className="mb-12">
+          <h1 className="text-5xl font-light text-amber-200/95 mb-3 tracking-wider" style={{
+            textShadow: '0 2px 8px rgba(0, 0, 0, 0.5)',
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            letterSpacing: '0.05em'
+          }}>
+            LIBRARY OF ALEXANDRIA
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Upload wisdom files - PDFs, Markdown, Text. Just drag, drop, and go! 🔥
+          <div className="h-px w-96 bg-gradient-to-r from-amber-700/50 via-amber-600/30 to-transparent mb-4" />
+          <p className="text-amber-300/60 text-sm tracking-wide uppercase" style={{ letterSpacing: '0.15em' }}>
+            Archive of Sacred Knowledge
           </p>
         </div>
 
-        {/* Quick Settings */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-            ⚡ Quick Settings
-            <span className="text-sm font-normal text-gray-500">(applied to all uploads)</span>
+        {/* Quick Settings - DUNE minimalist panels */}
+        <div
+          className="rounded-lg p-8 mb-8"
+          style={{
+            background: 'linear-gradient(135deg, rgba(61, 40, 23, 0.4) 0%, rgba(26, 20, 16, 0.6) 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(217, 119, 6, 0.15)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+          }}
+        >
+          <h2 className="text-sm uppercase tracking-widest text-amber-400/80 mb-6" style={{ letterSpacing: '0.2em' }}>
+            Archive Parameters
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium mb-2">Category</label>
+              <label className="block text-xs uppercase tracking-wider text-amber-300/60 mb-3" style={{ letterSpacing: '0.15em' }}>
+                Classification
+              </label>
               <select
                 value={quickCategory}
                 onChange={(e) => setQuickCategory(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-violet-500"
+                className="w-full px-4 py-3 rounded bg-black/30 border border-amber-900/30 text-amber-200/90 focus:outline-none focus:border-amber-700/50 transition-all"
+                style={{
+                  backdropFilter: 'blur(10px)',
+                  fontFamily: 'system-ui, -apple-system, sans-serif'
+                }}
               >
                 {categories.map(cat => (
-                  <option key={cat.value} value={cat.value}>
+                  <option key={cat.value} value={cat.value} className="bg-[#1a1410]">
                     {cat.emoji} {cat.label}
                   </option>
                 ))}
@@ -166,131 +205,214 @@ export default function LibraryUploadPage() {
 
             {/* Author */}
             <div>
-              <label className="block text-sm font-medium mb-2">Author</label>
+              <label className="block text-xs uppercase tracking-wider text-amber-300/60 mb-3" style={{ letterSpacing: '0.15em' }}>
+                Archivist
+              </label>
               <input
                 type="text"
                 value={quickAuthor}
                 onChange={(e) => setQuickAuthor(e.target.value)}
                 placeholder="Kelly, Jung, etc."
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-violet-500"
+                className="w-full px-4 py-3 rounded bg-black/30 border border-amber-900/30 text-amber-200/90 placeholder-amber-900/40 focus:outline-none focus:border-amber-700/50 transition-all"
+                style={{
+                  backdropFilter: 'blur(10px)',
+                  fontFamily: 'system-ui, -apple-system, sans-serif'
+                }}
               />
             </div>
 
             {/* Topics */}
             <div>
-              <label className="block text-sm font-medium mb-2">Topics (comma-separated)</label>
+              <label className="block text-xs uppercase tracking-wider text-amber-300/60 mb-3" style={{ letterSpacing: '0.15em' }}>
+                Keywords
+              </label>
               <input
                 type="text"
                 value={quickTopics}
                 onChange={(e) => setQuickTopics(e.target.value)}
                 placeholder="shadow work, integration"
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-violet-500"
+                className="w-full px-4 py-3 rounded bg-black/30 border border-amber-900/30 text-amber-200/90 placeholder-amber-900/40 focus:outline-none focus:border-amber-700/50 transition-all"
+                style={{
+                  backdropFilter: 'blur(10px)',
+                  fontFamily: 'system-ui, -apple-system, sans-serif'
+                }}
               />
             </div>
           </div>
         </div>
 
-        {/* Drop Zone */}
+        {/* Drop Zone - DUNE desert landing pad */}
         <div
           {...getRootProps()}
-          className={`
-            relative border-4 border-dashed rounded-2xl p-12 mb-6 text-center cursor-pointer
-            transition-all duration-200
-            ${isDragActive
-              ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20 scale-105'
-              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:border-violet-400'
-            }
-          `}
+          className="relative mb-8 text-center cursor-pointer transition-all duration-300"
+          style={{
+            border: isDragActive
+              ? '2px solid rgba(217, 119, 6, 0.5)'
+              : '2px dashed rgba(217, 119, 6, 0.2)',
+            background: isDragActive
+              ? 'linear-gradient(135deg, rgba(217, 119, 6, 0.1) 0%, rgba(180, 83, 9, 0.05) 100%)'
+              : 'linear-gradient(135deg, rgba(26, 20, 16, 0.4) 0%, rgba(15, 10, 8, 0.6) 100%)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: '4px',
+            padding: '4rem',
+            boxShadow: isDragActive
+              ? '0 0 40px rgba(217, 119, 6, 0.2), inset 0 0 60px rgba(217, 119, 6, 0.05)'
+              : '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+            transform: isDragActive ? 'scale(1.02)' : 'scale(1)'
+          }}
         >
           <input {...getInputProps()} />
 
-          <div className="text-6xl mb-4">
-            {isDragActive ? '🎯' : '📚'}
+          <div className="mb-6">
+            <svg width="80" height="80" viewBox="0 0 80 80" className="mx-auto" style={{ opacity: 0.6 }}>
+              <circle cx="40" cy="40" r="35" fill="none" stroke="rgba(217, 119, 6, 0.3)" strokeWidth="2" strokeDasharray="5,5" />
+              <path d="M40 20 L40 60 M20 40 L60 40" stroke="rgba(217, 119, 6, 0.5)" strokeWidth="2" strokeLinecap="round" />
+            </svg>
           </div>
 
-          <h3 className="text-2xl font-semibold mb-2">
-            {isDragActive ? 'Drop files here!' : 'Drag & Drop Wisdom Files'}
+          <h3 className="text-2xl font-light text-amber-200/90 mb-3 tracking-wide" style={{
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
+            letterSpacing: '0.05em'
+          }}>
+            {isDragActive ? 'RELEASE TO ARCHIVE' : 'TRANSFER PROTOCOLS'}
           </h3>
 
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            PDFs, Markdown (.md), Text (.txt), Word (.docx)
+          <p className="text-amber-300/50 text-sm mb-6 tracking-wider uppercase" style={{ letterSpacing: '0.15em' }}>
+            PDF • Markdown • Text • Word
           </p>
 
-          <button className="px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all">
-            Or Click to Browse Files
+          <button
+            className="px-8 py-3 rounded text-amber-200/90 text-sm tracking-widest uppercase transition-all hover:bg-amber-900/30"
+            style={{
+              background: 'linear-gradient(135deg, rgba(217, 119, 6, 0.2) 0%, rgba(180, 83, 9, 0.15) 100%)',
+              border: '1px solid rgba(217, 119, 6, 0.3)',
+              letterSpacing: '0.2em',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)'
+            }}
+          >
+            Select Files
           </button>
         </div>
 
-        {/* Stats */}
+        {/* Stats - DUNE minimalist data panels */}
         {files.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-yellow-600">⏳ {pendingCount}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Pending</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div
+              className="rounded p-5 text-center"
+              style={{
+                background: 'linear-gradient(135deg, rgba(161, 98, 7, 0.15) 0%, rgba(120, 53, 15, 0.1) 100%)',
+                border: '1px solid rgba(161, 98, 7, 0.2)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              <div className="text-3xl font-light text-amber-400/90 mb-1">{pendingCount}</div>
+              <div className="text-xs uppercase tracking-widest text-amber-300/50" style={{ letterSpacing: '0.15em' }}>Queued</div>
             </div>
-            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-blue-600">🔄 {processingCount}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Processing</div>
+            <div
+              className="rounded p-5 text-center"
+              style={{
+                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%)',
+                border: '1px solid rgba(59, 130, 246, 0.2)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              <div className="text-3xl font-light text-blue-400/90 mb-1">{processingCount}</div>
+              <div className="text-xs uppercase tracking-widest text-blue-300/50" style={{ letterSpacing: '0.15em' }}>Active</div>
             </div>
-            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-green-600">✅ {completeCount}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Complete</div>
+            <div
+              className="rounded p-5 text-center"
+              style={{
+                background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.1) 100%)',
+                border: '1px solid rgba(34, 197, 94, 0.2)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              <div className="text-3xl font-light text-green-400/90 mb-1">{completeCount}</div>
+              <div className="text-xs uppercase tracking-widest text-green-300/50" style={{ letterSpacing: '0.15em' }}>Archived</div>
             </div>
-            <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold text-red-600">❌ {errorCount}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">Errors</div>
+            <div
+              className="rounded p-5 text-center"
+              style={{
+                background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.1) 100%)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                backdropFilter: 'blur(10px)'
+              }}
+            >
+              <div className="text-3xl font-light text-red-400/90 mb-1">{errorCount}</div>
+              <div className="text-xs uppercase tracking-widest text-red-300/50" style={{ letterSpacing: '0.15em' }}>Failed</div>
             </div>
           </div>
         )}
 
-        {/* File List */}
+        {/* File List - DUNE data manifest */}
         {files.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Files ({files.length})</h2>
+          <div
+            className="rounded p-6 mb-8"
+            style={{
+              background: 'linear-gradient(135deg, rgba(26, 20, 16, 0.6) 0%, rgba(15, 10, 8, 0.8) 100%)',
+              border: '1px solid rgba(217, 119, 6, 0.15)',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+            }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-sm uppercase tracking-widest text-amber-400/80" style={{ letterSpacing: '0.2em' }}>
+                Transfer Manifest ({files.length})
+              </h2>
               <button
                 onClick={clearCompleted}
-                className="text-sm text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                className="text-xs uppercase tracking-wider text-amber-300/50 hover:text-amber-300/80 transition-colors"
+                style={{ letterSpacing: '0.15em' }}
               >
-                Clear Completed
+                Purge Archived
               </button>
             </div>
 
-            <div className="space-y-3 max-h-96 overflow-y-auto">
+            <div className="space-y-2 max-h-96 overflow-y-auto">
               {files.map((fileData, index) => (
                 <div
                   key={index}
-                  className={`
-                    flex items-center gap-4 p-4 rounded-lg border-2
-                    ${fileData.status === 'complete' ? 'border-green-200 bg-green-50 dark:bg-green-900/10' : ''}
-                    ${fileData.status === 'processing' ? 'border-blue-200 bg-blue-50 dark:bg-blue-900/10' : ''}
-                    ${fileData.status === 'error' ? 'border-red-200 bg-red-50 dark:bg-red-900/10' : ''}
-                    ${fileData.status === 'pending' ? 'border-gray-200 dark:border-gray-700' : ''}
-                  `}
+                  className="flex items-center gap-4 p-4 rounded transition-all"
+                  style={{
+                    background: fileData.status === 'complete'
+                      ? 'linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.05) 100%)'
+                      : fileData.status === 'processing'
+                      ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)'
+                      : fileData.status === 'error'
+                      ? 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)'
+                      : 'rgba(0, 0, 0, 0.2)',
+                    border: `1px solid ${
+                      fileData.status === 'complete' ? 'rgba(34, 197, 94, 0.2)' :
+                      fileData.status === 'processing' ? 'rgba(59, 130, 246, 0.2)' :
+                      fileData.status === 'error' ? 'rgba(239, 68, 68, 0.2)' :
+                      'rgba(217, 119, 6, 0.1)'
+                    }`
+                  }}
                 >
-                  {/* Status Icon */}
-                  <div className="text-2xl">
-                    {fileData.status === 'pending' && '⏳'}
-                    {fileData.status === 'processing' && '🔄'}
-                    {fileData.status === 'complete' && '✅'}
-                    {fileData.status === 'error' && '❌'}
+                  {/* Status Indicator */}
+                  <div className="flex-shrink-0">
+                    <div className={`w-2 h-2 rounded-full ${
+                      fileData.status === 'pending' ? 'bg-amber-400/50 animate-pulse' :
+                      fileData.status === 'processing' ? 'bg-blue-400/90 animate-pulse' :
+                      fileData.status === 'complete' ? 'bg-green-400/90' :
+                      'bg-red-400/90'
+                    }`} />
                   </div>
 
                   {/* File Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate">{fileData.file.name}</div>
-                    <div className="text-sm text-gray-500">
-                      {categories.find(c => c.value === fileData.category)?.emoji}{' '}
+                    <div className="text-amber-200/90 text-sm truncate mb-1">{fileData.file.name}</div>
+                    <div className="text-xs text-amber-300/50">
                       {categories.find(c => c.value === fileData.category)?.label}
                       {fileData.author && ` • ${fileData.author}`}
                     </div>
                     {fileData.error && (
-                      <div className="text-sm text-red-600 mt-1">{fileData.error}</div>
+                      <div className="text-xs text-red-400/80 mt-1">{fileData.error}</div>
                     )}
                   </div>
 
                   {/* File Size */}
-                  <div className="text-sm text-gray-500">
+                  <div className="text-xs text-amber-300/40 tracking-wider">
                     {(fileData.file.size / 1024 / 1024).toFixed(2)} MB
                   </div>
 
@@ -298,9 +420,9 @@ export default function LibraryUploadPage() {
                   {fileData.status === 'pending' && (
                     <button
                       onClick={() => removeFile(index)}
-                      className="text-red-500 hover:text-red-700 p-2"
+                      className="text-red-400/60 hover:text-red-400/90 p-2 transition-colors"
                     >
-                      🗑️
+                      ×
                     </button>
                   )}
                 </div>
@@ -309,37 +431,73 @@ export default function LibraryUploadPage() {
           </div>
         )}
 
-        {/* Upload Button */}
+        {/* Upload Button - DUNE command interface */}
         {pendingCount > 0 && (
           <div className="flex gap-4">
             <button
               onClick={uploadFiles}
               disabled={isUploading}
-              className="flex-1 py-4 px-8 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-semibold text-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-4 px-8 rounded text-amber-200/95 text-sm uppercase tracking-widest transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{
+                background: isUploading
+                  ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.2) 100%)'
+                  : 'linear-gradient(135deg, rgba(217, 119, 6, 0.4) 0%, rgba(180, 83, 9, 0.3) 100%)',
+                border: '1px solid rgba(217, 119, 6, 0.4)',
+                letterSpacing: '0.2em',
+                boxShadow: '0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+                textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)'
+              }}
             >
-              {isUploading ? '🔄 Processing...' : `🚀 Upload & Process ${pendingCount} File${pendingCount > 1 ? 's' : ''}`}
+              {isUploading ? 'Processing Transfer' : `Initiate Archive • ${pendingCount} File${pendingCount > 1 ? 's' : ''}`}
             </button>
 
             <button
               onClick={() => setFiles([])}
-              className="px-8 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
+              className="px-8 py-4 rounded text-amber-300/60 text-sm uppercase tracking-widest hover:bg-red-900/20 hover:text-red-400/80 transition-all"
+              style={{
+                border: '1px solid rgba(217, 119, 6, 0.2)',
+                letterSpacing: '0.2em',
+                backdropFilter: 'blur(10px)'
+              }}
             >
-              Clear All
+              Abort
             </button>
           </div>
         )}
 
-        {/* Help Text */}
-        <div className="mt-8 bg-violet-50 dark:bg-violet-900/20 rounded-xl p-6">
-          <h3 className="font-semibold mb-2 flex items-center gap-2">
-            💡 Tips for ADHD-Friendly Uploading
+        {/* Help Text - DUNE protocol guide */}
+        <div
+          className="mt-8 rounded p-6"
+          style={{
+            background: 'linear-gradient(135deg, rgba(61, 40, 23, 0.2) 0%, rgba(26, 20, 16, 0.3) 100%)',
+            border: '1px solid rgba(217, 119, 6, 0.1)',
+            backdropFilter: 'blur(10px)'
+          }}
+        >
+          <h3 className="text-xs uppercase tracking-widest text-amber-400/70 mb-4" style={{ letterSpacing: '0.2em' }}>
+            Transfer Protocols
           </h3>
-          <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-            <li>• <strong>Just drop and go!</strong> Set category once, drag multiple files</li>
-            <li>• <strong>Batch upload</strong> - Add 10-20 files, then hit upload</li>
-            <li>• <strong>Don't overthink topics</strong> - System auto-extracts keywords too</li>
-            <li>• <strong>Can't decide category?</strong> Pick "Other Wisdom" and we'll sort it later</li>
-            <li>• <strong>Files process in background</strong> - You can close and come back</li>
+          <ul className="space-y-2 text-sm text-amber-300/60 leading-relaxed">
+            <li className="flex gap-3">
+              <span className="text-amber-500/50">→</span>
+              <span>Set classification parameters once, then transfer multiple files in sequence</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-amber-500/50">→</span>
+              <span>Optimal batch size: 10-20 files per transfer operation</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-amber-500/50">→</span>
+              <span>System will auto-extract metadata and keywords from content</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-amber-500/50">→</span>
+              <span>Uncertain classification? Select "Other Wisdom" for later sorting</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-amber-500/50">→</span>
+              <span>Background processing enabled — session persistence maintained</span>
+            </li>
           </ul>
         </div>
 

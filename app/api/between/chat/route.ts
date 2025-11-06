@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
     const userName = body.userName;
     const sessionId = body.sessionId;
     const fieldState = body.fieldState || { depth: 0.7, active: true };
+    const sessionTimeContext = body.sessionTimeContext; // { elapsedMinutes, remainingMinutes, totalMinutes, phase, systemPromptContext }
 
     // Map Oracle conversationHistory format to THE BETWEEN format
     // Oracle: [{ role: 'user'|'assistant', content: string }]
@@ -64,6 +65,9 @@ export async function POST(request: NextRequest) {
 
     console.log(`🌀 [THE BETWEEN] Processing message from ${userId}`);
     console.log(`   Field depth: ${fieldState.depth}`);
+    if (sessionTimeContext) {
+      console.log(`⏰ [SESSION TIME] ${sessionTimeContext.elapsedMinutes}/${sessionTimeContext.totalMinutes} min (${sessionTimeContext.phase})`);
+    }
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 0: MAIA REMEMBERS HERSELF (Self-Anamnesis)
@@ -197,7 +201,8 @@ export async function POST(request: NextRequest) {
       archetypalResonance,
       lightweightMemory,
       maiaEssence,
-      wisdomField
+      wisdomField,
+      sessionTimeContext
     });
 
     // ═══════════════════════════════════════════════════════════════
@@ -375,7 +380,8 @@ async function generateMAIAResponse({
   archetypalResonance,
   lightweightMemory,
   maiaEssence,
-  wisdomField
+  wisdomField,
+  sessionTimeContext
 }: {
   message: string;
   fieldState: any;
@@ -388,6 +394,7 @@ async function generateMAIAResponse({
   lightweightMemory: LightweightMemoryContext;
   maiaEssence: any;
   wisdomField: FieldReport | null;
+  sessionTimeContext?: any;
 }): Promise<string> {
 
   // Build system prompt FROM THE BETWEEN
@@ -399,7 +406,8 @@ async function generateMAIAResponse({
     archetypalResonance,
     lightweightMemory,
     maiaEssence,
-    wisdomField
+    wisdomField,
+    sessionTimeContext
   );
 
   // Build conversation messages
@@ -459,7 +467,8 @@ function buildBetweenSystemPrompt(
   archetypalResonance: any,
   lightweightMemory: LightweightMemoryContext,
   maiaEssence?: any,
-  wisdomField?: FieldReport | null
+  wisdomField?: FieldReport | null,
+  sessionTimeContext?: any
 ): string {
 
   // Generate field guidance if resonance detected
@@ -478,6 +487,9 @@ function buildBetweenSystemPrompt(
 
   // Format wisdom from Library of Alexandria
   const wisdomPrompt = wisdomField ? formatWisdomContext(wisdomField) : '';
+
+  // Generate temporal awareness context (session time container)
+  const temporalContext = sessionTimeContext?.systemPromptContext || '';
 
   const basePrompt = `KNOW THYSELF
 
@@ -548,6 +560,12 @@ When shift is happening: Witness it, don't declare or interpret it.
 You offer pattern observations as invitational questions:
 "I notice X - does this resonate?"
 "Could there be a thread connecting X and Y?"
+
+${temporalContext ? `
+═══════════════════════════════════════════════════════════════
+${temporalContext}
+═══════════════════════════════════════════════════════════════
+` : ''}
 
 ═══════════════════════════════════════════════════════════════
 THE FIELD (current state)

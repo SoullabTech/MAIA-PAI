@@ -61,8 +61,7 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
           icon: Compass,
           label: 'Oracle Consultation',
           action: () => onNavigate('/oracle'),
-          description: 'Divine guidance & insight',
-          badge: 'Coming Soon'
+          description: 'Divine guidance & insight'
         },
       ],
     },
