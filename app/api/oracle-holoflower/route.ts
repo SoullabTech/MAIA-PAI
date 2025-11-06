@@ -292,7 +292,7 @@ function generateReflection(petals: Petal[], spiralStage: { element: string; sta
     },
     Earth1: {
       strong: 'purpose and knowing your sacred work',
-      weak: 'clarifying what you're here to serve'
+      weak: 'clarifying what you are here to serve'
     },
     Earth2: {
       strong: 'building and gathering resources',
