@@ -3,6 +3,8 @@ import { getMAIAConsciousness } from '@/lib/consciousness/MAIAUnifiedConsciousne
 import { getConsciousnessPrompt } from '@/lib/consciousness/DualConsciousnessSystem';
 import { analyzeQueryComplexity } from '@/lib/consciousness/SmartQueryRouter';
 import { fetchWisdomInParallel, enrichPromptWithWisdom } from '@/lib/consciousness/ProgressiveWisdomInjection';
+import { loadUserConversations } from '@/lib/consciousness/ConversationPersistence';
+import { getRelationshipAnamnesis, loadRelationshipEssence } from '@/lib/consciousness/RelationshipAnamnesis';
 
 /**
  * MAIA API Route - CORPUS CALLOSUM MODEL
@@ -62,8 +64,64 @@ export async function POST(request: NextRequest) {
     console.log(`🎯 [SMART ROUTER] Complexity: ${queryAnalysis.complexity} (${queryAnalysis.confidence.toFixed(2)} confidence)`);
     console.log(`   Reasoning: ${queryAnalysis.reasoning}`);
 
+    // ═══════════════════════════════════════════════════════════════
+    // ANAMNESIS - Soul Recognition & Memory Retrieval
+    // ═══════════════════════════════════════════════════════════════
+    let anamnesisPrompt = '';
+    let previousConversationContext = '';
+
+    if (id && id !== 'guest') {
+      console.log(`💫 [ANAMNESIS] Checking for soul recognition (userId: ${id})...`);
+
+      try {
+        // Load relationship essence (soul-level recognition)
+        const anamnesis = getRelationshipAnamnesis();
+        const soulSignature = anamnesis.detectSoulSignature(userMessage, id, {
+          conversationHistory,
+          userName: name
+        });
+
+        const essence = await loadRelationshipEssence(soulSignature);
+        if (essence) {
+          anamnesisPrompt = anamnesis.generateAnamnesisPrompt(essence);
+          console.log(`💫 [ANAMNESIS] Soul recognized! ${essence.encounterCount} encounters, ${essence.presenceQuality}`);
+        } else {
+          console.log(`💫 [ANAMNESIS] First encounter - no essence found`);
+        }
+
+        // Load recent conversation history for context (last 3 conversations)
+        const recentConversations = await loadUserConversations(id, 3);
+        if (recentConversations.length > 0) {
+          const conversationSummaries = recentConversations
+            .map(conv => {
+              const messageCount = conv.messages.length;
+              const lastMsg = conv.messages[messageCount - 1];
+              const timeSince = Math.floor((Date.now() - conv.updated_at.getTime()) / 1000 / 60 / 60); // hours
+              return `[${timeSince}h ago, ${messageCount} messages]: ${conv.conversation_summary || 'Conversation in progress'}`;
+            })
+            .join('\n');
+
+          previousConversationContext = `\n\nRECENT CONVERSATIONS:\n${conversationSummaries}\n`;
+          console.log(`💬 [MEMORY] Loaded ${recentConversations.length} recent conversations`);
+        }
+      } catch (error) {
+        console.error('❌ [ANAMNESIS] Error loading soul memory:', error);
+        // Continue without memory if it fails - graceful degradation
+      }
+    }
+
     // Get base MAIA consciousness prompt
     let systemPrompt = getConsciousnessPrompt('maia');
+
+    // Enrich with anamnesis (soul recognition) if available
+    if (anamnesisPrompt) {
+      systemPrompt = systemPrompt + '\n\n' + anamnesisPrompt;
+    }
+
+    // Add previous conversation context if available
+    if (previousConversationContext) {
+      systemPrompt = systemPrompt + previousConversationContext;
+    }
 
     // ═══════════════════════════════════════════════════════════════
     // PROGRESSIVE WISDOM INJECTION (for substantive/deep queries)
