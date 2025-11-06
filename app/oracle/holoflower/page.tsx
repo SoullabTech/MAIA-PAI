@@ -642,6 +642,29 @@ export default function HoloflowerOraclePage() {
     }]);
   };
 
+  // Helper function to translate petals into natural language for MAIA's context
+  const translatePetalForMAIA = (petal: typeof petals[0]): string => {
+    const interpretations: Record<string, string> = {
+      'Fire1': 'inner vision and spiritual seeing',
+      'Fire2': 'creative expression and bringing ideas into form',
+      'Fire3': 'expansion and exploring new possibilities',
+      'Water1': 'feeling deeply and emotional truth',
+      'Water2': 'healing and integrating past wounds',
+      'Water3': 'surrender and trusting the mystery',
+      'Earth1': 'purpose and sacred work',
+      'Earth2': 'building and gathering resources',
+      'Earth3': 'offering unique medicine to the world',
+      'Air1': 'authentic connection and relating deeply',
+      'Air2': 'community and gathering with others',
+      'Air3': 'witnessing consciousness and clear knowing',
+    };
+
+    const interpretation = interpretations[petal.id] || petal.name.toLowerCase();
+    const strength = petal.intensity >= 7 ? 'strong' : petal.intensity >= 5 ? 'moderate' : petal.intensity >= 3 ? 'emerging' : 'quiet';
+
+    return `${interpretation} (${strength})`;
+  };
+
   const handleSendMessage = async () => {
     if (!conversationInput.trim() || !reading) return;
 
@@ -656,6 +679,12 @@ export default function HoloflowerOraclePage() {
     setIsMAIATyping(true);
 
     try {
+      // Translate petals into natural language
+      const petalContext = petals
+        .filter(p => p.intensity !== 10)
+        .map(p => translatePetalForMAIA(p))
+        .join(', ');
+
       // Call MAIA API with holoflower context
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -671,7 +700,14 @@ The user's reading shows:
 - Reflection: ${reading.reflection}
 - Practice: ${reading.practice}
 
-Their adjusted petals were: ${petals.filter(p => p.intensity !== 10).map(p => `${p.name} (${p.affirmation}) at ${p.intensity}/10`).join(', ')}
+Their energetic pattern shows: ${petalContext}
+
+IMPORTANT: When referring to aspects of their reading, use natural, interpretive language. Never use technical labels like "I SURRENDER", "I RELATE", "Holiness", or numerical ratings like "3/10" or "8/10". Instead, speak naturally about qualities:
+- Instead of "Holiness (I SURRENDER) at 3/10" → "your capacity for surrender and trust"
+- Instead of "Connection (I RELATE) at 3/10" → "authentic relating and connection"
+- Instead of "Vision (I SEE) at 9/10" → "your powerful inner vision"
+
+Use descriptive language: strong, emerging, quiet, present, calling for attention, etc.
 
 Engage in a soulful, explorative conversation about meanings, implications, potential, and how this reading relates to their life${intention.trim() ? ' and their stated intention' : ''}. Be warm, insightful, and help them discover what the reading is revealing.`
             },
