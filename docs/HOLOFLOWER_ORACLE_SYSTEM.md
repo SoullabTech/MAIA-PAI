@@ -11,17 +11,27 @@ The Holoflower Oracle is MAIA's signature divination method - a 12-petal interac
 
 ---
 
-## Three Sacred Paths to Configuration
+## Four Sacred Paths to Configuration
 
-Users can configure their holoflower in three ways, honoring different modes of knowing:
+Users can configure their holoflower in four ways (three implemented, one future), honoring Jung's four psychological functions and the four classical elements:
 
-### 1. **Somatic/Intuitive** (Manual)
+| Path | Element | Jung Function | Mode of Knowing | Status |
+|------|---------|---------------|-----------------|--------|
+| Manual | 🌍 Earth | Sensation | Somatic, body-based | ✅ Live |
+| I Ching | 🔥 Fire | Intuition | Immediate, visionary | ✅ Live |
+| Survey | 💨 Air | Thinking | Cognitive, articulate | ✅ Live |
+| Future | 💧 Water | Feeling | Emotional, heart-centered | 🚧 Planned |
+
+Each path provides a different epistemology - a unique way of accessing what the soul already knows (anamnesis).
+
+### 1. **Somatic** (Manual) - 🌍 Earth
 - Drag 12 wedge-shaped petals inward/outward (intensity 1-10)
 - Feel into your body - where is energy low? Where is it flowing?
 - **Philosophy**: "Your body knows"
+- **Element**: Earth (sensation, grounding, embodied process)
 - **Configuration Method**: `'manual'`
 
-### 2. **Divinatory** (I Ching)
+### 2. **Intuitive** (I Ching) - 🔥 Fire
 - "Ask the Field" button triggers authentic I Ching divination
 - **Traditional 3-coin toss** with proper probabilities:
   - 6 = old yin (changing, transforming)
@@ -34,16 +44,26 @@ Users can configure their holoflower in three ways, honoring different modes of 
   - Water stronger at night
   - Earth stronger in spring/autumn
   - Air stronger in summer
+- **Philosophy**: "The field knows before you think"
+- **Element**: Fire (vision, intuition, spark, immediate knowing)
 - **Configuration Method**: `'iching'`
 
-### 3. **Cognitive/Reflective** (Survey)
+### 3. **Cognitive/Reflective** (Survey) - 💨 Air
 - 36 questions from original Spiralogic survey (2018)
 - 3 questions per petal across all 12 facets
 - 12 shadow questions (tracked separately)
 - 0-3 scale: "Not at all true" → "Very true for me"
 - Auto-converts to 1-10 petal intensities
 - **Randomized order** except Q1 (Fire1a) and Q48 (Air3c)
+- **Philosophy**: "You can articulate what you know"
+- **Element**: Air (thought, communication, mental clarity)
 - **Configuration Method**: `'survey'`
+
+### 4. **Emotional/Heart** (Future) - 💧 Water
+- *To be implemented*
+- **Philosophy**: "The heart knows through feeling"
+- **Element**: Water (emotion, empathy, felt sense, depth)
+- **Potential approaches**: Heart check-in, emotional resonance, dream interpretation, relational memory
 
 ---
 
@@ -279,10 +299,26 @@ MAIA automatically detecting:
 - **Right hemisphere**: Felt sense, synchronicity, pattern recognition, soul memory
 
 ### Jungian Integration
-- **Conscious** (high petals): What's activated, flowing
-- **Shadow** (low petals): What needs attention, integration
-- **Archetype**: Current energetic signature
-- **Individuation**: Journal timeline shows progression
+
+**Four Functions → Four Paths:**
+The configuration paths map directly to Jung's psychological types:
+- **Sensation** (Earth) → Manual path: Body-based, grounded in present reality
+- **Intuition** (Fire) → I Ching path: Immediate knowing, vision, the unconscious speaking
+- **Thinking** (Air) → Survey path: Rational, articulate, logical assessment
+- **Feeling** (Water) → Future path: Emotional valuation, heart-centered knowing
+
+**MBTI Made Observable:**
+Rather than taking a personality test, users reveal their dominant and inferior functions through **which paths they choose**:
+- Someone who always uses Survey (T) but avoids I Ching (N) has strong Thinking, underdeveloped Intuition
+- Someone drawn to Manual (S) but never Survey (T) leads with Sensation, weaker in Thinking
+- MAIA can observe these patterns and gently encourage function development
+- "I notice you always use your mind (Survey). Would you trust your body (Manual) for this one?"
+
+**Shadow Work:**
+- **Conscious** (high petals): What's activated, flowing, available
+- **Shadow** (low petals): What needs attention, integration, reclaiming
+- **Archetype**: Current energetic signature at this moment
+- **Individuation**: Journal timeline shows progression toward wholeness
 
 ### Spiralogic Core
 - **12 Facets**: Fire/Water/Earth/Air × Cardinal/Fixed/Mutable
