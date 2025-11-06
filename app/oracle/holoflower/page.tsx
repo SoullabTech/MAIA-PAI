@@ -2004,9 +2004,20 @@ Engage in a soulful, explorative conversation about meanings, implications, pote
 
                   {/* Save to Journal Button */}
                   {currentJournalEntryId ? (
-                    <div className="px-6 py-3 bg-amber-900/30 border border-amber-600/40 rounded-lg flex items-center justify-center gap-2 text-amber-200/80">
-                      <Heart className="w-4 h-4 fill-amber-300 text-amber-300" />
-                      <span className="text-sm font-medium">Saved to your soul journal</span>
+                    <div className="space-y-3">
+                      <div className="px-6 py-3 bg-amber-900/30 border border-amber-600/40 rounded-lg flex items-center justify-center gap-2 text-amber-200/80">
+                        <Heart className="w-4 h-4 fill-amber-300 text-amber-300" />
+                        <span className="text-sm font-medium">Saved to your soul journal</span>
+                      </div>
+                      {encounterCount >= 3 && (
+                        <a
+                          href="/soul-patterns"
+                          className="w-full px-6 py-3 bg-gradient-to-r from-purple-900/40 to-pink-900/40 hover:from-purple-800/50 hover:to-pink-800/50 border border-purple-600/30 hover:border-purple-500/50 text-purple-200 font-semibold rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          View Your Soul Patterns
+                        </a>
+                      )}
                     </div>
                   ) : (
                     <button
