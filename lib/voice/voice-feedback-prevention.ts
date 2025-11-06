@@ -74,8 +74,13 @@ export class VoiceFeedbackPrevention {
     // Track when recognition is actually running
     recognition.addEventListener('start', () => {
       if (this.isMayaSpeaking) {
-        console.log('⚠️ Recognition started while Maya speaking - stopping');
-        recognition.stop();
+        console.log('⚠️ Recognition started while Maya speaking - ABORTING immediately');
+        // Use abort() instead of stop() for immediate termination
+        if (recognition.abort) {
+          recognition.abort();
+        } else {
+          recognition.stop();
+        }
       }
     });
 

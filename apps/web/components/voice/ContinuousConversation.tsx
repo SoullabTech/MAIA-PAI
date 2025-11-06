@@ -146,6 +146,14 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     recognition.onresult = (event: any) => {
       console.log('🎤 [onresult] FIRED - event:', event.results.length, 'results');
 
+      // 🛑 INTERRUPT: If user starts speaking while MAIA is talking, interrupt MAIA immediately
+      if (isSpeakingRef.current) {
+        console.log('🛑 [INTERRUPT] User speaking while MAIA talks - interrupting MAIA');
+        const feedbackPrevention = VoiceFeedbackPrevention.getInstance();
+        feedbackPrevention.interruptMaya();
+        isSpeakingRef.current = false; // Update ref immediately
+      }
+
       let interimTranscript = '';
       let finalTranscript = '';
 
@@ -429,8 +437,29 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
       if (similarity > 0.9) {
         console.log('🚫 [DEDUP] Blocked similar transcript (similarity:', similarity, '):', transcript);
         accumulatedTranscript.current = ""; // Clear duplicate
+        isCallingProcessRef.current = false;
         return;
       }
+    }
+
+    // Check 3: Echo/Feedback Prevention - Block MAIA's own voice patterns
+    // Common MAIA response patterns that indicate echo/feedback loop
+    const maiaPatterns = [
+      'mmm', 'yes', 'there\'s something', 'i can feel', 'what\'s alive',
+      'i notice', 'i\'m curious', 'what does', 'how does that feel',
+      'where do you feel', 'in your body', 'that sensation', 'pause',
+      'what\'s it like', 'like...', 'suspension', 'quality of'
+    ];
+
+    const looksLikeMaiaVoice = maiaPatterns.some(pattern =>
+      normalizedTranscript.includes(pattern.toLowerCase())
+    );
+
+    if (looksLikeMaiaVoice && normalizedTranscript.split(' ').length < 15) {
+      console.log('🔇 [ECHO BLOCK] Transcript looks like MAIA\'s voice:', transcript);
+      accumulatedTranscript.current = ""; // Clear echo
+      isCallingProcessRef.current = false;
+      return;
     }
 
     lastSentRef.current = transcript;
