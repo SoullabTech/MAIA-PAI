@@ -413,9 +413,6 @@ feat: Add neuro-archetypal mapping system and fix journal authentication
 - Removed oracle_agent_id lookup (table schema uses user_id)
 - Enhanced error logging for debugging
 - Prevents userId spoofing in request body
-
-🌀 Generated with Claude Code
-Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 ---

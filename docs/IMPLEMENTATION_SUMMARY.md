@@ -455,7 +455,3 @@ All while **preserving 100% of Spiralogic IP** and maintaining human-pace latenc
 **Built with sovereignty over dependency** 🌀
 **No synthetic friends** 🎭
 **You are not here to be guided** 🪞
-
-🎬 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
