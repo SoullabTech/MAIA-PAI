@@ -2,7 +2,7 @@
 // 🔄 MOBILE-FIRST DEPLOYMENT - Oct 2 12:15PM - Compact input, hidden overlays, fixed scroll
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Paperclip, X, Copy, BookOpen } from 'lucide-react';
+import { Paperclip, X, Copy, BookOpen, Clock } from 'lucide-react';
 // import { SimplifiedOrganicVoice, VoiceActivatedMaiaRef } from './ui/SimplifiedOrganicVoice'; // REPLACED with Whisper
 // import { WhisperVoiceRecognition } from './ui/WhisperVoiceRecognition'; // REPLACED with ContinuousConversation (uses browser Web Speech API)
 import { ContinuousConversation, ContinuousConversationRef } from '../apps/web/components/voice/ContinuousConversation';
@@ -51,6 +51,22 @@ import { detectJournalCommand, detectBreakthroughPotential } from '@/lib/service
 import { useFieldProtocolIntegration } from '@/hooks/useFieldProtocolIntegration';
 import { BookPlus } from 'lucide-react';
 import { TransformationalPresence, type PresenceState } from './nlp/TransformationalPresence';
+import { SessionTimer, SESSION_PRESETS } from '@/lib/session/SessionTimer';
+import { SessionTimeAwareness } from '@/components/session/SessionTimeAwareness';
+import { SessionDurationSelector } from '@/components/session/SessionDurationSelector';
+import { ResumeSessionPrompt } from '@/components/session/ResumeSessionPrompt';
+import { SessionRitualOpening } from '@/components/session/SessionRitualOpening';
+import { SessionRitualClosing } from '@/components/session/SessionRitualClosing';
+import { getSessionGong } from '@/lib/session/SessionGong';
+import {
+  loadSession,
+  saveSession,
+  clearSession,
+  getSavedSessionTimeRemaining,
+  getSavedSessionPhase,
+  startAutoSave,
+  type PersistedSessionData
+} from '@/lib/session/SessionPersistence';
 
 interface OracleConversationProps {
   userId?: string;
@@ -192,6 +208,18 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [isSavingJournal, setIsSavingJournal] = useState(false);
   const [showJournalSuggestion, setShowJournalSuggestion] = useState(false);
   const [breakthroughScore, setBreakthroughScore] = useState(0);
+
+  // Session time container state
+  const [sessionTimer, setSessionTimer] = useState<SessionTimer | null>(null);
+  const [showDurationSelector, setShowDurationSelector] = useState(false);
+  const [showResumePrompt, setShowResumePrompt] = useState(false);
+  const [savedSessionData, setSavedSessionData] = useState<PersistedSessionData | null>(null);
+  const autoSaveCleanupRef = useRef<(() => void) | null>(null);
+
+  // Ritual state
+  const [showOpeningRitual, setShowOpeningRitual] = useState(false);
+  const [showClosingRitual, setShowClosingRitual] = useState(false);
+  const [pendingSessionDuration, setPendingSessionDuration] = useState<number | null>(null);
 
   // Holoflower/visualization state
   const [holoflowerSize, setHoloflowerSize] = useState(400);
@@ -1066,7 +1094,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           conversationHistory: messages.map(msg => ({
             role: msg.role === 'oracle' ? 'assistant' : 'user',
             content: msg.text
-          }))
+          })),
+          sessionTimeContext: sessionTimer?.getTimeContext() // ⏰ Temporal awareness for MAIA
         }),
         signal: controller.signal
       });
@@ -1668,6 +1697,199 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     console.log('🛑 All MAIA systems stopped');
   }, []);
 
+  // ⏰ Session Timer Handlers
+  const handleStartSession = useCallback((durationMinutes: number) => {
+    console.log(`⏰ Starting ${durationMinutes}-minute session with temporal container`);
+
+    const timer = new SessionTimer({
+      durationMinutes,
+      onPhaseChange: (phase) => {
+        console.log(`⏰ Session phase: ${phase}`);
+        // Could trigger subtle UI transitions based on phase
+      },
+      onTimeWarning: (minutesRemaining) => {
+        console.log(`⏰ ${minutesRemaining} minutes remaining in session`);
+        // Gentle notification already handled by SessionTimeAwareness component
+      },
+      onComplete: () => {
+        console.log('⏰ Session time complete - beginning closing ritual');
+        // Show closing ritual modal
+        setShowClosingRitual(true);
+        // Note: Gong will play during ritual sequence, not here
+      }
+    });
+
+    timer.start(); // Begin tracking time
+    setSessionTimer(timer);
+    setShowDurationSelector(false);
+
+    // Play opening gong - single grounding tone for beginning
+    const gong = getSessionGong(0.3);
+    gong.playOpeningGong().catch(err =>
+      console.warn('Could not play opening gong:', err)
+    );
+
+    // 💾 Start auto-save (every 30 seconds)
+    const cleanup = startAutoSave(() => ({
+      startTime: timer.getStartTime().toISOString(),
+      durationMinutes: timer.getDurationMinutes(),
+      userId: userId || 'anonymous',
+      userName: userName || 'Explorer',
+      sessionId,
+      lastSavedAt: new Date().toISOString(),
+      wasExtended: false,
+      totalExtensionMinutes: 0
+    }));
+    autoSaveCleanupRef.current = cleanup;
+
+    console.log(`✅ Session timer initialized - MAIA will be temporally aware`);
+  }, [userId, userName, sessionId]);
+
+  const handleExtendSession = useCallback((additionalMinutes: number) => {
+    if (sessionTimer) {
+      sessionTimer.extend(additionalMinutes);
+      console.log(`⏰ Session extended by ${additionalMinutes} minutes`);
+      toast.success(`Session extended by ${additionalMinutes} minutes`, {
+        duration: 2000,
+        position: 'top-center'
+      });
+    }
+  }, [sessionTimer]);
+
+  // 💾 Session Persistence Handlers
+  const handleResumeSession = useCallback(() => {
+    if (!savedSessionData) return;
+
+    console.log('💾 Resuming saved session:', savedSessionData.sessionId);
+
+    // Restore timer from saved data
+    const timer = SessionTimer.fromSavedData(
+      new Date(savedSessionData.startTime),
+      savedSessionData.durationMinutes,
+      savedSessionData.totalExtensionMinutes,
+      {
+        onPhaseChange: (phase) => {
+          console.log(`⏰ Session phase: ${phase}`);
+        },
+        onTimeWarning: (minutesRemaining) => {
+          console.log(`⏰ ${minutesRemaining} minutes remaining in session`);
+        },
+        onComplete: () => {
+          console.log('⏰ Session time complete - offering graceful closure');
+          const gong = getSessionGong(0.3);
+          gong.playClosingGong().catch(err =>
+            console.warn('Could not play closing gong:', err)
+          );
+          // Clear from localStorage on natural completion
+          clearSession();
+        }
+      }
+    );
+
+    timer.start();
+    setSessionTimer(timer);
+    setShowResumePrompt(false);
+    setSavedSessionData(null);
+
+    // Start auto-save for restored session
+    const cleanup = startAutoSave(() => ({
+      startTime: timer.getStartTime().toISOString(),
+      durationMinutes: timer.getDurationMinutes(),
+      userId: userId || 'anonymous',
+      userName: userName || 'Explorer',
+      sessionId,
+      lastSavedAt: new Date().toISOString(),
+      wasExtended: savedSessionData.wasExtended,
+      totalExtensionMinutes: savedSessionData.totalExtensionMinutes
+    }));
+    autoSaveCleanupRef.current = cleanup;
+
+    console.log('✅ Session resumed successfully');
+  }, [savedSessionData, userId, userName, sessionId]);
+
+  const handleStartNewSession = useCallback(() => {
+    console.log('🗑️ Clearing saved session and starting fresh');
+    clearSession();
+    setShowResumePrompt(false);
+    setSavedSessionData(null);
+    setShowDurationSelector(true); // Open duration selector for new session
+  }, []);
+
+  // 🕯️ Ritual Handlers
+  const handleDurationSelected = useCallback((durationMinutes: number) => {
+    // Store duration and show opening ritual
+    setPendingSessionDuration(durationMinutes);
+    setShowDurationSelector(false);
+    setShowOpeningRitual(true);
+    console.log(`🕯️ Opening ritual beginning for ${durationMinutes}-minute session`);
+  }, []);
+
+  const handleOpeningRitualComplete = useCallback(() => {
+    setShowOpeningRitual(false);
+    if (pendingSessionDuration) {
+      handleStartSession(pendingSessionDuration);
+      setPendingSessionDuration(null);
+    }
+  }, [pendingSessionDuration]);
+
+  const handleOpeningRitualSkip = useCallback(() => {
+    setShowOpeningRitual(false);
+    if (pendingSessionDuration) {
+      handleStartSession(pendingSessionDuration);
+      setPendingSessionDuration(null);
+    }
+  }, [pendingSessionDuration]);
+
+  const handleClosingRitualComplete = useCallback(() => {
+    setShowClosingRitual(false);
+    console.log('🕯️ Closing ritual complete - session ended');
+
+    // Play closing gong
+    const gong = getSessionGong(0.3);
+    gong.playClosingGong().catch(err =>
+      console.warn('Could not play closing gong:', err)
+    );
+
+    // Clean up session
+    clearSession();
+    autoSaveCleanupRef.current?.();
+    autoSaveCleanupRef.current = null;
+    setSessionTimer(null);
+
+    // Could trigger post-session actions here (analytics, journaling prompt, etc.)
+  }, []);
+
+  const handleClosingRitualSkip = useCallback(() => {
+    setShowClosingRitual(false);
+    console.log('🕯️ Closing ritual skipped');
+  }, []);
+
+  // Check for saved session on mount
+  useEffect(() => {
+    const saved = loadSession();
+    if (saved) {
+      const remainingTime = getSavedSessionTimeRemaining();
+      const phase = getSavedSessionPhase();
+
+      console.log('📂 Found saved session:', {
+        sessionId: saved.sessionId,
+        remainingTime,
+        phase
+      });
+
+      setSavedSessionData(saved);
+      setShowResumePrompt(true);
+    }
+  }, []); // Only run on mount
+
+  // Clean up timer and auto-save on unmount
+  useEffect(() => {
+    return () => {
+      sessionTimer?.stop();
+      autoSaveCleanupRef.current?.();
+    };
+  }, [sessionTimer]);
+
   // DIAGNOSTIC LOGGING - Removed to reduce console noise and improve performance
 
   return (
@@ -1748,6 +1970,23 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             />
           </div>
         </div>
+      )}
+
+      {/* ⏰ Start Session Button - Only show when no timer is running */}
+      {!sessionTimer && (
+        <motion.button
+          onClick={() => setShowDurationSelector(true)}
+          className="fixed top-4 left-4 z-[30] flex items-center gap-2 px-4 py-2 rounded-xl
+                     bg-[#D4B896]/10 hover:bg-[#D4B896]/20 border border-[#D4B896]/20 hover:border-[#D4B896]/40
+                     text-[#D4B896] transition-all backdrop-blur-sm"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Clock className="w-4 h-4" />
+          <span className="text-sm font-light">Begin Session</span>
+        </motion.button>
       )}
 
       {/* 🧠 TRANSFORMATIONAL PRESENCE - NLP-Informed State Container */}
@@ -2840,6 +3079,51 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           </div>
         </motion.div>
       )}
+
+      {/* ⏰ Session Time Container UI */}
+      {sessionTimer && (
+        <SessionTimeAwareness
+          timer={sessionTimer}
+          onExtend={handleExtendSession}
+        />
+      )}
+
+      {/* ⏰ Session Duration Selector Modal */}
+      <SessionDurationSelector
+        isOpen={showDurationSelector}
+        onClose={() => setShowDurationSelector(false)}
+        onSelect={handleDurationSelected}
+        defaultDuration={50}
+      />
+
+      {/* 💾 Resume Session Prompt Modal */}
+      {savedSessionData && (
+        <ResumeSessionPrompt
+          isOpen={showResumePrompt}
+          remainingTime={getSavedSessionTimeRemaining() || '0 minutes'}
+          phase={getSavedSessionPhase() || 'opening'}
+          onResume={handleResumeSession}
+          onStartNew={handleStartNewSession}
+          onDismiss={() => setShowResumePrompt(false)}
+        />
+      )}
+
+      {/* 🕯️ Opening Ritual */}
+      <SessionRitualOpening
+        isOpen={showOpeningRitual}
+        sessionDuration={pendingSessionDuration || 50}
+        isReturningUser={isReturningUser}
+        onComplete={handleOpeningRitualComplete}
+        onSkip={handleOpeningRitualSkip}
+      />
+
+      {/* 🕯️ Closing Ritual */}
+      <SessionRitualClosing
+        isOpen={showClosingRitual}
+        isReturningUser={isReturningUser}
+        onComplete={handleClosingRitualComplete}
+        onSkip={handleClosingRitualSkip}
+      />
 
       {/* Toggle button for rhythm debug - always visible */}
       <button
