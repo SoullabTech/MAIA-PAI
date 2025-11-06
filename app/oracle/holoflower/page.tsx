@@ -30,6 +30,8 @@ import {
 } from 'lucide-react';
 import { HoloflowerSurvey } from '@/components/oracle/HoloflowerSurvey';
 import { journalService } from '@/lib/services/journalService';
+import { holoflowerMemoryIntegration } from '@/lib/services/holoflowerMemoryIntegration';
+import { createClient } from '@/utils/supabase/client';
 import type { ConfigurationMethod } from '@/types/journal';
 
 type Phase = 'intro' | 'intention' | 'checkin' | 'survey' | 'processing' | 'reading' | 'conversation' | 'merge';
@@ -275,6 +277,14 @@ interface OracleReading {
   reflection: string;
   practice: string;
   archetype: string;
+  archetypes?: {
+    dominant: string;
+    shadow: string;
+  };
+  elementalAlchemy?: {
+    strengths: string[];
+    opportunities: string[];
+  };
 }
 
 interface MergedInsight {
@@ -310,6 +320,10 @@ export default function HoloflowerOraclePage() {
   const [configurationMethod, setConfigurationMethod] = useState<'manual' | 'iching' | 'survey'>('manual');
   const [currentJournalEntryId, setCurrentJournalEntryId] = useState<string | null>(null);
   const [isSavingToJournal, setIsSavingToJournal] = useState(false);
+
+  // Memory integration state
+  const [encounterCount, setEncounterCount] = useState<number>(0);
+  const [isFirstEncounter, setIsFirstEncounter] = useState<boolean>(true);
 
   // Haptic feedback helper
   const triggerHaptic = (style: 'light' | 'medium' | 'heavy' = 'light') => {
@@ -718,41 +732,72 @@ Engage in a soulful, explorative conversation about meanings, implications, pote
     setCurrentJournalEntryId(null); // Reset journal entry ID
   };
 
-  // Save reading to journal
+  // Save reading to journal WITH MEMORY INTEGRATION
+  // This is where the circle completes: Reading → Journal → Essence → Patterns
   const handleSaveToJournal = async () => {
     if (!reading || isSavingToJournal) return;
 
     setIsSavingToJournal(true);
 
     try {
-      const journalEntry = await journalService.saveJournalEntry({
+      // Get current user
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        console.error('❌ [Holoflower] No authenticated user - cannot save');
+        setIsSavingToJournal(false);
+        return;
+      }
+
+      // Call the MEMORY INTEGRATION service
+      // This will:
+      // 1. Save journal entry
+      // 2. Update relationship essence (anamnesis)
+      // 3. Detect soul patterns (if 3+ entries exist)
+      const result = await holoflowerMemoryIntegration.saveHoloflowerReading({
+        userId: user.id,
+        userName: user.email || undefined,
         intention: intention || undefined,
-        configuration_method: configurationMethod,
-        petal_intensities: petals,
-        spiral_stage: reading.spiralStage,
+        configurationMethod: configurationMethod,
+        petalIntensities: petals,
+        spiralStage: {
+          element: reading.spiralStage.element,
+          stage: reading.spiralStage.stage.toString(),
+          description: `${reading.spiralStage.element.toUpperCase()} ${reading.spiralStage.stage}`
+        },
         archetype: reading.archetype,
-        shadow_archetype: reading.archetypes?.shadow,
-        elemental_alchemy: reading.elementalAlchemy,
+        shadowArchetype: reading.archetypes?.shadow,
+        elementalAlchemy: reading.elementalAlchemy,
         reflection: reading.reflection,
         practice: reading.practice,
-        conversation_messages: conversationMessages.map(m => ({
+        conversationMessages: conversationMessages.map(m => ({
           role: m.role,
           content: m.content,
           timestamp: m.timestamp
-        })),
-        tags: [],
-        is_favorite: false,
-        visibility: 'private'
+        }))
       });
 
-      if (journalEntry) {
-        setCurrentJournalEntryId(journalEntry.id);
-        console.log('✅ [Holoflower] Saved to journal:', journalEntry.id);
+      if (result.journalEntry) {
+        setCurrentJournalEntryId(result.journalEntry.id);
+        setEncounterCount(result.previousEncounterCount + 1);
+        setIsFirstEncounter(result.isFirstEncounter);
+
+        console.log('✨ [Holoflower] Memory integration complete!');
+        console.log(`   📖 Journal: ${result.journalEntry.id}`);
+        console.log(`   💫 Encounter #${result.previousEncounterCount + 1}`);
+        console.log(`   🌀 Morphic Resonance: ${result.relationshipEssence?.morphicResonance || 'N/A'}`);
+
+        if (result.isFirstEncounter) {
+          console.log('   ✨ First time - soul signature created');
+        } else {
+          console.log('   🔮 Soul recognized - anamnesis will activate on return');
+        }
       } else {
-        console.error('❌ [Holoflower] Failed to save journal entry');
+        console.error('❌ [Holoflower] Failed to save - integration returned null');
       }
     } catch (error) {
-      console.error('❌ [Holoflower] Error saving to journal:', error);
+      console.error('❌ [Holoflower] Error in memory integration:', error);
     } finally {
       setIsSavingToJournal(false);
     }
