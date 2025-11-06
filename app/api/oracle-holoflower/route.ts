@@ -225,24 +225,29 @@ function generateElementalAnalysis(petals: Petal[]): { strengths: string[]; oppo
 
   elementAverages.sort((a, b) => b.average - a.average);
 
-  const elementDescriptions: Record<string, string> = {
-    fire: 'Spiritual vision and creative power',
-    water: 'Emotional wisdom and relational depth',
-    earth: 'Grounded purpose and tangible manifestation',
-    air: 'Mental clarity and conscious connection'
+  // Natural language descriptions without element labels
+  const strengthDescriptions: Record<string, string> = {
+    fire: 'Your spiritual vision and creative power are flowing strongly',
+    water: 'Your emotional wisdom and capacity for deep feeling are present',
+    earth: 'Your grounded purpose and ability to manifest are active',
+    air: 'Your mental clarity and authentic connection are available'
   };
 
-  // Capitalize first letter for display
-  const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+  const opportunityDescriptions: Record<string, string> = {
+    fire: 'Spiritual vision and creative expression are calling for attention',
+    water: 'Emotional wisdom and relational depth want to emerge',
+    earth: 'Grounded purpose and tangible action are inviting you forward',
+    air: 'Mental clarity and conscious relating are seeking more space'
+  };
 
   const strengths = elementAverages
     .slice(0, 2)
-    .map(({ element }) => `${capitalize(element)}: ${elementDescriptions[element]}`);
+    .map(({ element }) => strengthDescriptions[element]);
 
   const opportunities = elementAverages
     .slice(-2)
     .reverse()
-    .map(({ element }) => `${capitalize(element)}: ${elementDescriptions[element]}`);
+    .map(({ element }) => opportunityDescriptions[element]);
 
   return { strengths, opportunities };
 }
@@ -256,19 +261,74 @@ function generateReflection(petals: Petal[], spiralStage: { element: string; sta
   const highestInfo = PETAL_CHART[highest.id];
   const lowestInfo = PETAL_CHART[lowest.id];
 
-  // Generate priming questions for conversation with MAIA
-  // These help the user think about what to explore when talking to MAIA
+  // Generate interpretive, personalized questions without technical labels
+  // Describe what the petals mean in plain, evocative language
+
+  // Map petal IDs to natural language descriptions
+  const petalDescriptions: Record<string, { strong: string; weak: string }> = {
+    Fire1: {
+      strong: 'your inner vision and spiritual seeing',
+      weak: 'seeing clearly what wants to emerge'
+    },
+    Fire2: {
+      strong: 'creative expression and bringing ideas into form',
+      weak: 'expressing what lives inside you'
+    },
+    Fire3: {
+      strong: 'expansion and exploring new possibilities',
+      weak: 'expanding beyond your current edges'
+    },
+    Water1: {
+      strong: 'feeling deeply and trusting your emotional truth',
+      weak: 'connecting with your feelings'
+    },
+    Water2: {
+      strong: 'healing and integrating past wounds',
+      weak: 'making space for healing'
+    },
+    Water3: {
+      strong: 'surrender and trusting the mystery',
+      weak: 'letting go and trusting what you cannot control'
+    },
+    Earth1: {
+      strong: 'purpose and knowing your sacred work',
+      weak: 'clarifying what you're here to serve'
+    },
+    Earth2: {
+      strong: 'building and gathering resources',
+      weak: 'creating solid foundations'
+    },
+    Earth3: {
+      strong: 'offering your unique medicine to the world',
+      weak: 'sharing your gifts with others'
+    },
+    Air1: {
+      strong: 'authentic connection and relating deeply',
+      weak: 'connecting authentically with others'
+    },
+    Air2: {
+      strong: 'community and gathering with others',
+      weak: 'finding your people and belonging'
+    },
+    Air3: {
+      strong: 'witnessing consciousness and clear knowing',
+      weak: 'seeing from a higher perspective'
+    },
+  };
+
+  const highDesc = petalDescriptions[highest.id] || { strong: 'this aspect', weak: 'this quality' };
+  const lowDesc = petalDescriptions[lowest.id] || { strong: 'this aspect', weak: 'this quality' };
 
   if (intention && intention.trim()) {
-    // Context-aware priming questions based on their stated intention
+    // Context-aware questions based on their stated intention
     const primingQuestions = [
-      `• When you think about your son and school, where does "${highest.affirmation}" show up?\n• What would it look like to bring more "${lowest.affirmation}" into this situation?\n• What's one small step you could take today?`,
+      `• Where do you feel ${highDesc.strong} showing up as you think about this?\n• What might shift if you brought more attention to ${lowDesc.weak}?\n• What's one small step you could take today?`,
 
-      `• How is "${highest.affirmation}" serving you right now with this situation?\n• What might shift if you explored "${lowest.affirmation}" more?\n• What are you most curious about?`,
+      `• How is ${highDesc.strong} serving you right now?\n• What would it look like to explore ${lowDesc.weak} more fully?\n• What are you most curious about?`,
 
-      `• What does "${highest.affirmation}" feel like in your body when you think about this?\n• Where might "${lowest.affirmation}" want to emerge?\n• What support do you need?`,
+      `• What does ${highDesc.strong} feel like in your body when you consider this question?\n• Where might ${lowDesc.weak} want to emerge?\n• What support do you need?`,
 
-      `• What's the gift of having "${highest.affirmation}" so present right now?\n• What might "${lowest.affirmation}" be trying to tell you?\n• What matters most to you here?`,
+      `• What's the gift of having ${highDesc.strong} so present for you right now?\n• What might ${lowDesc.weak} be trying to tell you?\n• What matters most to you here?`,
     ];
 
     return primingQuestions[Math.floor(Math.random() * primingQuestions.length)];
@@ -276,13 +336,13 @@ function generateReflection(petals: Petal[], spiralStage: { element: string; sta
 
   // General priming questions (no specific intention)
   const primingQuestions = [
-    `• What does "${highest.affirmation}" feel like right now in your life?\n• Where might "${lowest.affirmation}" want more attention?\n• What are you noticing?`,
+    `• Where do you feel ${highDesc.strong} most alive in your life right now?\n• What would it look like to bring more attention to ${lowDesc.weak}?\n• What are you noticing?`,
 
-    `• How is "${highest.affirmation}" showing up for you today?\n• What would it be like to lean into "${lowest.affirmation}"?\n• What's alive in you right now?`,
+    `• How is ${highDesc.strong} showing up for you these days?\n• What would it be like to lean into ${lowDesc.weak}?\n• What's alive in you right now?`,
 
-    `• When you sense "${highest.affirmation}", what's present?\n• What does "${lowest.affirmation}" need from you?\n• What wants to be explored?`,
+    `• When you sense ${highDesc.strong}, what's present?\n• What does ${lowDesc.weak} need from you right now?\n• What wants to be explored?`,
 
-    `• Where do you feel "${highest.affirmation}" most strongly?\n• How might "${lowest.affirmation}" support you?\n• What's calling for attention?`,
+    `• Where do you feel ${highDesc.strong} most strongly?\n• How might ${lowDesc.weak} support your journey?\n• What's calling for attention?`,
   ];
 
   return primingQuestions[Math.floor(Math.random() * primingQuestions.length)];
