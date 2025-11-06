@@ -34,6 +34,8 @@ import { suggestElementalPhrase } from '@/lib/voice/ElementalPhrasebook';
 import { getBirthChartContext, formatChartContextForMAIA, synthesizeAspectForMAIA, getRawBirthChartData } from '@/lib/services/birthChartContextService';
 import { collectiveBreakthroughService } from '@/lib/services/collectiveBreakthroughService';
 import { ClaudeCodeBrain } from './ClaudeCodeBrain';
+import { loadRelevantTeachings } from '@/lib/knowledge/ElementalAlchemyBookLoader';
+import { loadVaultWisdom } from '@/lib/knowledge/VaultWisdomLoader';
 
 // 🧠 Advanced Memory & Intelligence Modules
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
@@ -1406,7 +1408,34 @@ This is the soul-level truth you're helping them see, not reference material to 
         }
       } catch (ipError) {
         console.warn('⚠️ Book knowledge retrieval failed:', ipError);
-        // Continue without book wisdom
+
+        // 📖 FALLBACK: Use simple keyword-based book loader
+        try {
+          console.log('📖 Attempting fallback book loader...');
+          const fallbackWisdom = await loadRelevantTeachings(trimmedInput);
+
+          if (fallbackWisdom) {
+            systemPrompt += fallbackWisdom;
+            console.log('✅ Fallback book loader succeeded - teachings loaded');
+          }
+        } catch (fallbackError) {
+          console.warn('⚠️ Fallback book loader also failed:', fallbackError);
+          // Continue without book wisdom - graceful degradation
+        }
+      }
+
+      // 🧠 LOAD VAULT WISDOM - Second Brain Access (Jung, Hillman, NLP, etc.)
+      try {
+        console.log('🧠 Searching vault for relevant wisdom...');
+        const vaultWisdom = await loadVaultWisdom(trimmedInput);
+
+        if (vaultWisdom) {
+          systemPrompt += vaultWisdom;
+          console.log('✅ Vault wisdom loaded - Kelly\'s second brain accessed');
+        }
+      } catch (vaultError) {
+        console.warn('⚠️ Vault wisdom loading failed:', vaultError);
+        // Continue without vault - graceful degradation
       }
 
       // 🔮 CONSULT ELEMENTAL ORACLE 2.0 (applied wisdom from conversations)

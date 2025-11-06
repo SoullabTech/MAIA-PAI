@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { getElementTeaching } from '@/lib/knowledge/ElementalAlchemyBookLoader';
 
 /**
  * Oracle Holoflower API
  *
  * Processes holoflower check-in data using the complete Spiralogic framework.
  * Returns oracle reading with spiral stage, archetype, reflection, and practice.
+ *
+ * Loads relevant teachings from Kelly's Elemental Alchemy book for synthesis.
  */
 
 interface Petal {
@@ -305,6 +308,20 @@ async function generateSoulSynthesis(data: {
 
   const anthropic = new Anthropic({ apiKey });
 
+  // Load relevant book teachings for the dominant element
+  const dominantElement = data.spiralStage.element.toLowerCase();
+  let bookTeachings = '';
+
+  // Only load if element is valid
+  if (['fire', 'water', 'earth', 'air', 'aether'].includes(dominantElement)) {
+    try {
+      bookTeachings = await getElementTeaching(dominantElement as 'fire' | 'water' | 'earth' | 'air' | 'aether');
+      console.log(`📖 [ORACLE] Loaded ${dominantElement} teachings for synthesis`);
+    } catch (error) {
+      console.warn(`⚠️ [ORACLE] Could not load ${dominantElement} teachings:`, error);
+    }
+  }
+
   // Build context for Claude
   const strongPetalsDesc = data.strongPetals
     .map(p => `${p.name} (${p.element}, intensity ${p.intensity})`)
@@ -315,6 +332,10 @@ async function generateSoulSynthesis(data: {
     .join(', ');
 
   const prompt = `You are MAIA, a wise oracle interpreting a holoflower reading. Your task is to synthesize the ENTIRE reading into a coherent soul-level interpretation.
+
+${bookTeachings ? `${bookTeachings}\n\n---\n` : ''}
+
+You are MAIA, a wise oracle interpreting a holoflower reading with deep understanding of elemental alchemy.
 
 ${data.intention ? `**User's Question:** "${data.intention}"` : '**This is a general life reading (no specific question)**'}
 
