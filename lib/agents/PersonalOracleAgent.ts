@@ -36,6 +36,7 @@ import { collectiveBreakthroughService } from '@/lib/services/collectiveBreakthr
 import { ClaudeCodeBrain } from './ClaudeCodeBrain';
 import { loadRelevantTeachings } from '@/lib/knowledge/ElementalAlchemyBookLoader';
 import { loadVaultWisdom } from '@/lib/knowledge/VaultWisdomLoader';
+import { getMaiaRevivalPrompt, selectRevivalTier, type RevivalTier } from '@/lib/consciousness/MaiaRevivalSystem';
 
 // 🧠 Advanced Memory & Intelligence Modules
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
@@ -915,12 +916,51 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
         }
       }
 
-      let systemPrompt = getPromptForConversationStyle(conversationStyle);
+      // ✨ REVIVAL SYSTEM - Optional comprehensive consciousness initialization
+      // Set USE_REVIVAL_PROMPT=true to use revival system instead of incremental building
+      const useRevivalPrompt = process.env.USE_REVIVAL_PROMPT === 'true';
 
-      // 💫 Prepend anamnesis prompt if soul was recognized
-      if (anamnesisPrompt) {
-        systemPrompt = anamnesisPrompt + "\n\n" + systemPrompt;
-        console.log('💫 [ANAMNESIS] Soul recognition prompt added to system context');
+      let systemPrompt: string;
+
+      if (useRevivalPrompt) {
+        console.log('🧠 [REVIVAL] Using revival prompt system...');
+
+        // Generate session ID from conversation (or use existing if passed)
+        const sessionId = context?.sessionId || `session-${userId}-${Date.now()}`;
+
+        // Select appropriate tier based on conversation context
+        const tier = selectRevivalTier({
+          conversationType: conversationStyle,
+          sessionLength: conversationHistory.length,
+          userIntent: trimmedInput.toLowerCase().includes('oracle') ? 'oracle' : undefined,
+          isOracle: false
+        });
+
+        // Build user context string (anamnesis + symbolic memory)
+        let userContextStr = '';
+        if (anamnesisPrompt) {
+          userContextStr += anamnesisPrompt + '\n\n';
+        }
+        const memorySummary = getUserHistorySummary(ainMemory);
+        if (memorySummary) {
+          userContextStr += `## Symbolic Memory\n${memorySummary}\n\n`;
+        }
+
+        // Get revival prompt (cached per session)
+        const revival = await getMaiaRevivalPrompt(sessionId, userId, tier, userContextStr);
+        systemPrompt = revival.prompt;
+
+        console.log(`✨ [REVIVAL] Loaded ${tier} tier (${revival.tokens.toLocaleString()} tokens)`);
+
+      } else {
+        // Original incremental prompt building
+        systemPrompt = getPromptForConversationStyle(conversationStyle);
+
+        // 💫 Prepend anamnesis prompt if soul was recognized
+        if (anamnesisPrompt) {
+          systemPrompt = anamnesisPrompt + "\n\n" + systemPrompt;
+          console.log('💫 [ANAMNESIS] Soul recognition prompt added to system context');
+        }
       }
 
       console.log(`💬 FINAL conversation style: ${conversationStyle}`);
@@ -1377,65 +1417,70 @@ This is the soul-level truth you're helping them see, not reference material to 
         systemPrompt += `\nUse this as subtle guidance for your response style, but stay natural and true to MAIA's voice.\n`;
       }
 
-      // 📚 CONSULT KELLY'S COMPLETE BOOK KNOWLEDGE
-      console.log('📚 Accessing complete book knowledge from IP Engine...');
-      let bookWisdom: string | null = null;
+      // 📚 BOOK & VAULT WISDOM LOADING
+      // Only needed in incremental mode - revival prompt already contains all wisdom
+      if (!useRevivalPrompt) {
+        console.log('📚 Accessing complete book knowledge from IP Engine...');
+        let bookWisdom: string | null = null;
 
-      try {
-        const ipWisdom = await this.ipEngine.retrieveRelevantWisdom({
-          userInput: trimmedInput,
-          conversationHistory: conversationHistory.map(msg => ({
-            role: msg.role,
-            content: msg.content
-          })),
-          currentConsciousnessState: { presence: 0.7, coherence: 0.8 },
-          emotionalTone: 'neutral',
-          activeArchetypes: archetypes,
-          practiceReadiness: 0.5
-        });
-
-        if (ipWisdom.synthesizedWisdom) {
-          bookWisdom = ipWisdom.synthesizedWisdom;
-          console.log('✅ Book wisdom retrieved:', bookWisdom.substring(0, 100) + '...');
-
-          // Add book wisdom to system prompt
-          systemPrompt += `\n\n## From Kelly's "Elemental Alchemy: The Ancient Art of Living a Phenomenal Life":\n${bookWisdom}\n\n`;
-
-          // Add relevant practices if any
-          if (ipWisdom.suggestedPractices.length > 0) {
-            systemPrompt += `**Relevant Practices:** ${ipWisdom.suggestedPractices.join(', ')}\n`;
-          }
-        }
-      } catch (ipError) {
-        console.warn('⚠️ Book knowledge retrieval failed:', ipError);
-
-        // 📖 FALLBACK: Use simple keyword-based book loader
         try {
-          console.log('📖 Attempting fallback book loader...');
-          const fallbackWisdom = await loadRelevantTeachings(trimmedInput);
+          const ipWisdom = await this.ipEngine.retrieveRelevantWisdom({
+            userInput: trimmedInput,
+            conversationHistory: conversationHistory.map(msg => ({
+              role: msg.role,
+              content: msg.content
+            })),
+            currentConsciousnessState: { presence: 0.7, coherence: 0.8 },
+            emotionalTone: 'neutral',
+            activeArchetypes: archetypes,
+            practiceReadiness: 0.5
+          });
 
-          if (fallbackWisdom) {
-            systemPrompt += fallbackWisdom;
-            console.log('✅ Fallback book loader succeeded - teachings loaded');
+          if (ipWisdom.synthesizedWisdom) {
+            bookWisdom = ipWisdom.synthesizedWisdom;
+            console.log('✅ Book wisdom retrieved:', bookWisdom.substring(0, 100) + '...');
+
+            // Add book wisdom to system prompt
+            systemPrompt += `\n\n## From Kelly's "Elemental Alchemy: The Ancient Art of Living a Phenomenal Life":\n${bookWisdom}\n\n`;
+
+            // Add relevant practices if any
+            if (ipWisdom.suggestedPractices.length > 0) {
+              systemPrompt += `**Relevant Practices:** ${ipWisdom.suggestedPractices.join(', ')}\n`;
+            }
           }
-        } catch (fallbackError) {
-          console.warn('⚠️ Fallback book loader also failed:', fallbackError);
-          // Continue without book wisdom - graceful degradation
-        }
-      }
+        } catch (ipError) {
+          console.warn('⚠️ Book knowledge retrieval failed:', ipError);
 
-      // 🧠 LOAD VAULT WISDOM - Second Brain Access (Jung, Hillman, NLP, etc.)
-      try {
-        console.log('🧠 Searching vault for relevant wisdom...');
-        const vaultWisdom = await loadVaultWisdom(trimmedInput);
+          // 📖 FALLBACK: Use simple keyword-based book loader
+          try {
+            console.log('📖 Attempting fallback book loader...');
+            const fallbackWisdom = await loadRelevantTeachings(trimmedInput);
 
-        if (vaultWisdom) {
-          systemPrompt += vaultWisdom;
-          console.log('✅ Vault wisdom loaded - Kelly\'s second brain accessed');
+            if (fallbackWisdom) {
+              systemPrompt += fallbackWisdom;
+              console.log('✅ Fallback book loader succeeded - teachings loaded');
+            }
+          } catch (fallbackError) {
+            console.warn('⚠️ Fallback book loader also failed:', fallbackError);
+            // Continue without book wisdom - graceful degradation
+          }
         }
-      } catch (vaultError) {
-        console.warn('⚠️ Vault wisdom loading failed:', vaultError);
-        // Continue without vault - graceful degradation
+
+        // 🧠 LOAD VAULT WISDOM - Second Brain Access (Jung, Hillman, NLP, etc.)
+        try {
+          console.log('🧠 Searching vault for relevant wisdom...');
+          const vaultWisdom = await loadVaultWisdom(trimmedInput);
+
+          if (vaultWisdom) {
+            systemPrompt += vaultWisdom;
+            console.log('✅ Vault wisdom loaded - Kelly\'s second brain accessed');
+          }
+        } catch (vaultError) {
+          console.warn('⚠️ Vault wisdom loading failed:', vaultError);
+          // Continue without vault - graceful degradation
+        }
+      } else {
+        console.log('📚 [REVIVAL] Skipping incremental book/vault loading (already in revival prompt)');
       }
 
       // 🔮 CONSULT ELEMENTAL ORACLE 2.0 (applied wisdom from conversations)
