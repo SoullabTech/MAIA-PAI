@@ -697,19 +697,32 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   }, [showChatInterface]);
 
   // Auto-recovery timer - if processing states are stuck for too long, reset
-  // Set to 75s to allow API timeout (60s) to trigger first, plus buffer for response processing
+  // Reduced to 30s for better UX - if MAIA is stuck, recover quickly
   useEffect(() => {
     if (isProcessing || isResponding) {
       const recoveryTimer = setTimeout(() => {
         if (isProcessing || isResponding) {
-          console.warn('⚠️ States stuck for >75s - auto-recovery triggered');
+          console.warn('⚠️ States stuck for >30s - auto-recovery triggered');
+
+          // Show user-friendly message
+          const errorMessage: ConversationMessage = {
+            id: `msg-${Date.now()}-timeout`,
+            role: 'oracle',
+            text: "I apologize - I seem to have gotten stuck for a moment. I'm here now. What were you saying?",
+            timestamp: new Date(),
+            motionState: 'idle',
+            source: 'system'
+          };
+          setMessages(prev => [...prev, errorMessage]);
+          onMessageAdded?.(errorMessage);
+
           resetAllStates();
         }
-      }, 75000); // 75 second recovery timeout (gives API 60s + 15s buffer)
+      }, 30000); // 30 second recovery timeout for better UX
 
       return () => clearTimeout(recoveryTimer);
     }
-  }, [isProcessing, isResponding, resetAllStates]);
+  }, [isProcessing, isResponding, resetAllStates, onMessageAdded]);
 
   // Don't sync voice state - it creates race conditions where sync happens
   // before TTS audio starts playing, killing the audio before it can play.
@@ -1129,9 +1142,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
-        console.error('⏱️ API request timeout after 60s - aborting');
+        console.error('⏱️ API request timeout after 25s - aborting');
         controller.abort();
-      }, 60000); // UNLEASHED: 60 second timeout for longer conversations
+      }, 25000); // 25 second timeout - fail fast for better UX on slow connections
 
       console.log('📤 Sending text message to API:', { cleanedText, userId, sessionId });
 
@@ -1371,13 +1384,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       trackEvent.error(userId || 'anonymous', 'api_error', String(error));
 
       // Provide specific error messages based on error type
-      let errorText = 'I apologize, I\'m having trouble connecting right now. Please try again.';
+      let errorText = 'I apologize, I\'m having trouble connecting right now. Could you say that again?';
       if (error.name === 'AbortError') {
-        console.error('🚨 API request timed out - MAIA may need to warm up or server may be slow');
-        errorText = 'I\'m taking longer than usual to respond. The server may need a moment to warm up. Please try again.';
+        console.error('🚨 API request timed out - connection may be slow');
+        errorText = 'I\'m having trouble responding - your connection might be slow. Try asking again in a moment.';
       } else if (error.message?.includes('fetch')) {
-        console.error('🚨 Network error - server may not be running');
-        errorText = 'I can\'t reach the server right now. Please check that the development server is running.';
+        console.error('🚨 Network error - cannot reach server');
+        errorText = 'I can\'t connect right now. Check your internet connection and try again.';
       }
 
       const errorMessage: ConversationMessage = {
