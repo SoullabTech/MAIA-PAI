@@ -23,7 +23,9 @@
 // NOTE: MAIAConsciousnessLattice has initialization issues in production
 // Using PersonalOracleAgent directly for synthesis (simpler, more stable)
 // import { MAIAConsciousnessLattice } from '../maia-consciousness-lattice';
-import { PersonalOracleAgent } from '../agents/PersonalOracleAgent';
+
+// 🌍 EARTH PHASE: Using simplified coordinator (pure orchestration)
+import { PersonalOracleAgent } from '../agents/PersonalOracleAgent.Simplified';
 import { synthesizeVoiceResponse } from './OpenAIVoiceSynthesis';
 import { IntellectualPropertyEngine } from '../intellectual-property-engine';
 import { ElementalOracle2Bridge } from '../elemental-oracle-2-bridge';

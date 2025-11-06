@@ -97,7 +97,7 @@ export const ICHING_ARCHETYPE_PATTERNS: IChingTrigramArchetype[] = [
       },
       whenDark: {
         qualities: ['Reckless disruption', 'Shock without purpose', 'Chaotic initiation'],
-        shadows: ['Destroying for destruction's sake', 'Addiction to novelty', 'Unable to sustain'],
+        shadows: ['Destroying for destruction\'s sake', 'Addiction to novelty', 'Unable to sustain'],
         manifestsAs: ['Starting everything, finishing nothing', 'Traumatizing rather than awakening', 'Chaos without creation'],
         warningSign: 'Thunder that destroys rather than awakens'
       },
@@ -180,7 +180,7 @@ export const ICHING_ARCHETYPE_PATTERNS: IChingTrigramArchetype[] = [
         reflectionQuestions: [
           'Am I influencing or manipulating?',
           'Where do I need gentle persistence instead of force?',
-          'What's trying to grow through me gradually?'
+          'What\'s trying to grow through me gradually?'
         ],
         integrationPractices: [
           'Breath meditation - following the natural flow',

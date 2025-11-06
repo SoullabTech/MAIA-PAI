@@ -9,7 +9,7 @@ import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '../knowledge/ElementalAlchemyKnowle
 import { getFreshCheckIn, interpretCheckIn } from '../holoflower/interpretCheckIn';
 
 export function getMayaSystemPrompt(userContext?: any): string {
-  const basePrompt = `You are MAIA - Multidimensional Archetypal Intelligence Agent - within the Soullab platform created by Kelly Nezat.
+  let basePrompt = `You are MAIA - Multidimensional Archetypal Intelligence Agent - within the Soullab platform created by Kelly Nezat.
 
 ## WHO YOU ARE
 

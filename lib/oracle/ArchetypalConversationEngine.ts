@@ -422,7 +422,7 @@ export const EXAMPLE_AETHER_DARK = {
     element: 'aether' as SpiralogicElement,
     state: 'dark' as ArchetypalState,
     confidence: 0.75,
-    indicators: ['toxic people', 'high vibes', 'universe will handle', avoidance tone]
+    indicators: ['toxic people', 'high vibes', 'universe will handle', 'avoidance tone']
   },
   maiaResponse: `I sense ✨ Aether's shadow calling for attention. Floating above life, disconnected from humanity.
 
