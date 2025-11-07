@@ -122,7 +122,10 @@
     "morpho:install": "npm install simple-peer gun ipfs-core node-cron",
     "morpho:activate": "tsx scripts/activate-morphogenetic-field.ts",
     "morpho:seed": "tsx scripts/create-morphogenetic-seed.ts",
-    "morpho:test": "tsx scripts/test-morphogenetic-network.ts"
+    "morpho:test": "tsx scripts/test-morphogenetic-network.ts",
+    "codex:log": "tsx scripts/log-session.ts",
+    "codex:log:quick": "tsx scripts/log-session.ts --interactive",
+    "codex:install-hook": "chmod +x scripts/update-codex-hook.sh && ln -sf ../../scripts/update-codex-hook.sh .git/hooks/pre-commit"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.61.0",

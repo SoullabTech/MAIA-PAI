@@ -308,15 +308,80 @@ async def list_voices():
         "model_loaded": MODEL_LOADED
     }
 
+@app.post("/v1/audio/speech")
+async def openai_compatible_speech(request: TTSRequest):
+    """OpenAI-compatible TTS endpoint - returns raw audio bytes"""
+    try:
+        if not request.text.strip():
+            raise HTTPException(status_code=400, detail="Text cannot be empty")
+
+        # Apply conversational shaping
+        shaped_text = apply_conversational_shaping(
+            request.text,
+            request.element,
+            request.context
+        )
+
+        logger.info(f"OpenAI-compatible TTS request: {request.text[:50]}... (voice: {request.voice})")
+
+        # Get voice configuration
+        voice_config = VOICE_PERSONALITIES.get(
+            request.voice,
+            VOICE_PERSONALITIES["maya"]
+        )
+
+        # Generate audio using gTTS
+        tts = gTTS(
+            text=shaped_text,
+            lang=voice_config["lang"],
+            slow=voice_config["slow"],
+            tld=voice_config.get("tld", "com")
+        )
+
+        # Save to temporary file
+        with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as tmp_file:
+            try:
+                tts.save(tmp_file.name)
+
+                # Read the generated audio
+                with open(tmp_file.name, 'rb') as f:
+                    audio_data = f.read()
+
+                logger.info(f"Generated {len(audio_data)} bytes of audio")
+
+                # Return raw audio bytes with proper headers
+                return Response(
+                    content=audio_data,
+                    media_type="audio/mpeg",
+                    headers={
+                        "Content-Type": "audio/mpeg",
+                        "Content-Length": str(len(audio_data)),
+                        "X-Voice-Provider": "sesame-csm",
+                        "X-Voice-Personality": request.voice,
+                        "X-Voice-Element": request.element or "neutral",
+                        "X-Shaped-Text-Length": str(len(shaped_text)),
+                        "Cache-Control": "public, max-age=3600"
+                    }
+                )
+
+            finally:
+                # Clean up temp file
+                if os.path.exists(tmp_file.name):
+                    os.unlink(tmp_file.name)
+
+    except Exception as e:
+        logger.error(f"OpenAI-compatible TTS generation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/audio/{filename}")
 async def serve_audio(filename: str):
     """Serve audio files (mock endpoint for URL compatibility)"""
     # Generate a simple audio response
     logger.info(f"Audio request for: {filename}")
-    
+
     # Return a minimal MP3 header as placeholder
     mp3_header = b'ID3\x04\x00\x00\x00\x00\x00\x00'
-    
+
     return Response(
         content=mp3_header,
         media_type="audio/mpeg",

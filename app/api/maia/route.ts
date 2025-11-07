@@ -5,6 +5,8 @@ import { analyzeQueryComplexity } from '@/lib/consciousness/SmartQueryRouter';
 import { fetchWisdomInParallel, enrichPromptWithWisdom } from '@/lib/consciousness/ProgressiveWisdomInjection';
 import { loadUserConversations } from '@/lib/consciousness/ConversationPersistence';
 import { getRelationshipAnamnesis, loadRelationshipEssence } from '@/lib/consciousness/RelationshipAnamnesis';
+import { timeIt } from '@/lib/observability/timer';
+import { recordVoiceTiming, recordVoiceError } from '@/lib/observability/voiceMetrics';
 
 /**
  * MAIA API Route - CORPUS CALLOSUM MODEL
@@ -247,20 +249,32 @@ export async function POST(request: NextRequest) {
     // NON-STREAMING MODE - Full consciousness processing
     // ═══════════════════════════════════════════════════════════════
     console.log('🌀 [NON-STREAMING] Using full consciousness processing...');
-    const result = await consciousness.process({
-      content: userMessage,
-      context: {
-        userId: id,
-        userName: name,
-        sessionId: sessionId || Date.now().toString(),
-        conversationHistory: conversationHistory || [],
-        preferences: {
-          consciousnessMode: 'maia'
-        }
-      },
-      modality: 'text',
-      systemPromptOverride: systemPrompt, // ← ENRICHED with wisdom!
-    });
+
+    let result;
+    try {
+      const { ms, value } = await timeIt('voice.oracle', async () => {
+        return await consciousness.process({
+          content: userMessage,
+          context: {
+            userId: id,
+            userName: name,
+            sessionId: sessionId || Date.now().toString(),
+            conversationHistory: conversationHistory || [],
+            preferences: {
+              consciousnessMode: 'maia'
+            }
+          },
+          modality: 'text',
+          systemPromptOverride: systemPrompt, // ← ENRICHED with wisdom!
+        });
+      });
+
+      result = value;
+      recordVoiceTiming('voice.oracle', ms, true, { mode: 'voice' });
+    } catch (err) {
+      recordVoiceError('voice.oracle', err instanceof Error ? err.message : String(err), { mode: 'voice' });
+      throw err;
+    }
 
     const response = result.message;
 

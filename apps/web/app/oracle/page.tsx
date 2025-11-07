@@ -5,10 +5,13 @@ import { Send, Mic, MicOff, Sparkles, User, BookOpen, LogOut, Library, Settings,
 import { useRouter } from "next/navigation";
 import { cleanMessage } from "@/lib/cleanMessage";
 import { MicrophoneCapture, MicrophoneCaptureRef } from "@/components/voice/MicrophoneCapture";
-// WebRTC version - natural voice quality
-import { MaiaWebRTCConversation, MaiaWebRTCConversationRef } from "@/components/voice/MaiaWebRTCConversation";
-// Web Speech API fallback (disabled - "robo voice")
+// SOVEREIGN PIPELINE: Whisper STT (self-hosted) + OpenAI TTS (primary) + Sesame TTS (fallback)
+import { WhisperContinuousConversation, WhisperContinuousConversationRef } from "@/components/voice/WhisperContinuousConversation";
+// FALLBACK: Web Speech API (browser-based STT)
 // import { ContinuousConversation, ContinuousConversationRef } from "@/components/voice/ContinuousConversation";
+// DISABLED: OpenAI Realtime API (vendor-controlled turn-taking)
+// import { MaiaConsciousConversation, MaiaConsciousConversationRef } from "@/components/voice/MaiaConsciousConversation";
+// import { MaiaWebRTCConversation, MaiaWebRTCConversationRef } from "@/components/voice/MaiaWebRTCConversation";
 import { OracleVoicePlayer } from "@/components/voice/OracleVoicePlayer";
 import TranscriptPreview from "@/app/components/TranscriptPreview";
 import { unlockAudio, addAutoUnlockListeners } from "@/lib/audio/audioUnlock";
@@ -71,7 +74,7 @@ function OraclePageInner() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const microphoneRef = useRef<MicrophoneCaptureRef>(null);
-  const continuousRef = useRef<MaiaWebRTCConversationRef>(null);
+  const continuousRef = useRef<WhisperContinuousConversationRef>(null);
   const router = useRouter();
 
   // Tap lock for debouncing holoflower clicks
@@ -1030,17 +1033,17 @@ function OraclePageInner() {
         {/* Input Area */}
         <div className="border-t border-gray-800 p-2 sm:p-4 bg-[#0A0D16]/80 backdrop-blur-sm">
           <div className="flex items-center gap-2 sm:gap-3 relative">
-            {/* Continuous Conversation Mode - WebRTC with natural voice */}
+            {/* Continuous Conversation Mode - SOVEREIGN Whisper STT (self-hosted, port 8001) */}
             {useContinuousMode && (
               <div className="hidden">
-                <MaiaWebRTCConversation
+                <WhisperContinuousConversation
                   ref={continuousRef}
                   onTranscript={handleVoiceTranscript}
-                  onInterimTranscript={setInterimTranscript}
                   onRecordingStateChange={setIsRecording}
+                  autoStart={true}
                   isProcessing={isLoading}
                   isSpeaking={isSpeaking}
-                  autoStart={true}
+                  whisperEndpoint="http://localhost:8001/transcribe"
                 />
               </div>
             )}

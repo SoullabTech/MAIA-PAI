@@ -25,7 +25,8 @@ import {
   Zap,
   Library,
   Compass,
-  Globe
+  Globe,
+  Volume2
 } from 'lucide-react';
 import { LanguageSelector } from '@/components/LanguageSelector';
 
@@ -36,6 +37,7 @@ interface SacredLabDrawerProps {
   onAction?: (action: string) => void;
   showVoiceText?: boolean;
   isFieldRecording?: boolean;
+  onOpenVoiceSettings?: () => void;
 }
 
 export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
@@ -45,6 +47,7 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
   onAction,
   showVoiceText,
   isFieldRecording,
+  onOpenVoiceSettings,
 }) => {
   const menuSections = [
     {
@@ -93,6 +96,12 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
       title: 'CONSCIOUSNESS TOOLS',
       icon: '🧠',
       items: [
+        {
+          icon: Volume2,
+          label: 'Voice Settings',
+          action: () => onOpenVoiceSettings?.(),
+          description: 'Customize MAIA\'s voice & style'
+        },
         {
           icon: Globe,
           label: 'Language',

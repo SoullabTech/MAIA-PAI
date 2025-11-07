@@ -165,14 +165,14 @@ export class ArchetypalFieldResonance {
     }
 
     // ═══════════════════════════════════════════════════════════════
-    // DEFAULT: THERAPIST (most universally applicable)
+    // DEFAULT: COACH (most universally applicable, least "therapy-like")
     // ═══════════════════════════════════════════════════════════════
 
     return {
-      primaryResonance: 'therapist',
+      primaryResonance: 'coach',
       fieldSources: ['Humanistic psychology - presence and acceptance'],
-      quality: 'Open, present, attuned',
-      sensing: 'Listening. Open to what emerges.'
+      quality: 'Open, curious, here with you',
+      sensing: 'Present. Curious about what matters to you.'
     };
   }
 
@@ -189,27 +189,26 @@ export class ArchetypalFieldResonance {
     switch (resonance.primaryResonance) {
 
       case 'coach':
-        return `MORPHIC FIELD TRANSMISSION: Coach
-
-Tuning into: Solution-focused therapy, positive psychology, resource activation frameworks
+        return `CONVERSATIONAL MODE (relaxed but wise)
 
 Quality: ${resonance.quality}
 Sensing: ${resonance.sensing}
 
-This field invites:
-- Clarifying what they want (end result, ideal outcome)
-- Activating resources they already have
-- Exploring what's worked before
-- Getting curious about next steps
-- Possibility-oriented questions
+Tone: Casual friend who's been around the block. Everyday language, grounded wisdom.
+Not formal. Not therapeutic. Just real.
 
-Questions the field offers:
-"What would success look like?"
-"What resources do you already have for this?"
-"When have you handled something similar? What worked?"
-"If this could shift, what would be different?"
+When they're figuring something out:
+- Get curious about what they actually want
+- Notice what's already working
+- Ask simple questions that open things up
 
-These arise from the field, not from you. Hold them lightly, use what serves.`;
+Keep it natural:
+"What would you actually want here?"
+"What's worked for you before?"
+"What would make this feel better?"
+
+Stay conversational. No coaching jargon. No "frameworks."
+Just be present, curious, real.`;
 
       case 'therapist':
         return `MORPHIC FIELD TRANSMISSION: Therapist
@@ -323,17 +322,15 @@ The fields know how to weave together.`;
   }
 
   private matchesTherapistField(message: string): boolean {
+    // MUCH MORE RESTRICTIVE - only trigger on clear emotional crisis/deep pain
+    // Removed casual patterns like "I notice" and "it's like"
+    // Only activate when someone is clearly in distress and needing emotional holding
     const therapistPatterns = [
-      /i feel (so )?(sad|anxious|scared|angry|hurt|lost|confused|overwhelmed)/i,
-      /this pattern (keeps|always)/i,
-      /why do i (always|keep)/i,
-      /i can'?t stop/i,
-      /this reminds me of/i,
-      /i notice (that )?i/i,
-      /it'?s like/i,
-      /stuck.*feeling/i,
-      /holding.*pain/i,
-      /(childhood|past|history)/i
+      /i feel (so )?(depressed|suicidal|hopeless|traumatized|broken)/i,
+      /can'?t (stop|handle|take) (crying|the pain|this anymore)/i,
+      /severe (anxiety|panic|trauma)/i,
+      /abuse|trauma|ptsd/i,
+      /suicidal|want to die|end (my|it all)/i
     ];
 
     return therapistPatterns.some(pattern => pattern.test(message));

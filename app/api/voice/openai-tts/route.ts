@@ -15,6 +15,59 @@ interface MayaVoiceConfig {
   model: 'tts-1' | 'tts-1-hd';
 }
 
+interface VoiceTone {
+  element?: 'fire' | 'water' | 'earth' | 'air' | 'aether';
+  context?: 'guidance' | 'exploration' | 'reassurance';
+  intensity?: number;
+  style?: string;
+  pitch?: number;
+  rate?: number;
+}
+
+/**
+ * PALLAS CSM Integration: Apply consciousness-aware prosody
+ */
+async function applyPallasProsody(text: string, voiceTone?: VoiceTone): Promise<string> {
+  try {
+    const pallasEndpoint = process.env.PALLAS_CSM_ENDPOINT || 'http://localhost:8000';
+    const element = voiceTone?.element || voiceTone?.style;
+    const context = voiceTone?.context;
+
+    if (!element) {
+      return text; // No elemental modulation requested
+    }
+
+    console.log('🌀 [PALLAS] Applying consciousness-aware prosody...');
+    console.log('   Element:', element);
+    console.log('   Context:', context || 'none');
+
+    const response = await fetch(`${pallasEndpoint}/ci/shape`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text,
+        style: element,
+        archetype: context || 'guide',
+        meta: { intensity: voiceTone?.intensity || 0.7 }
+      }),
+      signal: AbortSignal.timeout(2000) // 2s timeout
+    });
+
+    if (!response.ok) {
+      console.warn('⚠️ PALLAS CSM unavailable, using original text');
+      return text;
+    }
+
+    const result = await response.json();
+    console.log('✨ [PALLAS] Prosody applied:', result.tags?.join(', '));
+    return result.shaped || text;
+
+  } catch (error) {
+    console.warn('⚠️ PALLAS CSM error, using original text:', error);
+    return text;
+  }
+}
+
 // Maya's Serene Oracle Configuration - Tranquil wisdom meets knowing presence
 // Voice Affect: Soft, gentle, soothing with Oracle-like knowing - embody peaceful wisdom
 // Tone: Calm, reassuring, peaceful - genuine warmth without excessive sweetness
@@ -73,8 +126,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Clean the text for natural speech
-    const cleanedText = cleanTextForSpeech(text);
+    // 🌀 STEP 1: Apply PALLAS CSM consciousness-aware prosody (if element specified)
+    const shapedText = await applyPallasProsody(text, voiceTone);
+
+    // STEP 2: Clean the shaped text for natural speech
+    const cleanedText = cleanTextForSpeech(shapedText);
 
     // Voice selection: custom voice takes priority, then agent-based mapping
     // Updated default for Maya: shimmer (soft, gentle, nurturing) instead of alloy

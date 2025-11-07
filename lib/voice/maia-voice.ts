@@ -240,9 +240,90 @@ export class MaiaVoiceSystem {
     }
   }
 
-  // OpenAI TTS with Alloy voice - PRIMARY METHOD
+  // Sesame CSM TTS - PRIMARY METHOD with consciousness-aware voice synthesis
+  private async speakWithSesameCsm(text: string, voiceTone?: any): Promise<void> {
+    console.log('🌀 [speakWithSesameCsm] Starting consciousness-aware synthesis...');
+
+    // iOS Fix: Ensure audio context is active before speaking
+    await this.ensureAudioContextActive();
+    console.log('   ✓ AudioContext active');
+
+    const isAnthony = this.config.agentConfig?.voice === 'anthony';
+    console.log(`   ✓ Using Sesame CSM for ${isAnthony ? 'Anthony' : 'Maya'}`);
+    this.updateState({ isLoading: true, currentText: text, voiceType: 'sesame' });
+
+    try {
+      console.log('   → Calling /api/voice/sesame-csm-tts...');
+
+      // Extract elemental alignment from voiceTone if available
+      const element = voiceTone?.element || voiceTone?.style || 'aether';
+
+      const requestBody: any = {
+        text: this.enhanceTextForSpeech(text),
+        agentVoice: this.config.agentConfig?.voice || 'maya',
+        speed: 0.85, // Slower for mystical/oracle effect
+        element: element
+      };
+
+      // 🌀 CONSCIOUSNESS INTEGRATION: Pass emotional state if available
+      if (voiceTone?.emotionalState) {
+        requestBody.emotionalState = voiceTone.emotionalState;
+        console.log('   💫 Passing emotional state:', voiceTone.emotionalState);
+      }
+
+      // 🧠 CONVERSATIONAL CONTEXT: Pass thread/user context if available
+      if (voiceTone?.conversationContext) {
+        requestBody.conversationContext = voiceTone.conversationContext;
+        console.log('   🔮 Passing conversation context');
+      }
+
+      console.log('   🌀 Elemental modulation:', element);
+
+      const response = await fetch('/api/voice/sesame-csm-tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
+
+      console.log('   ← API response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Sesame CSM TTS API error:', response.status, errorText);
+        throw new Error(`Sesame CSM TTS error: ${response.status}`);
+      }
+
+      console.log('   ✓ Converting to blob...');
+      const audioBlob = await response.blob();
+      console.log('   ✓ Blob size:', audioBlob.size, 'bytes');
+
+      // Get metadata from response headers
+      const voiceProvider = response.headers.get('X-Voice-Provider');
+      const voiceElement = response.headers.get('X-Voice-Element');
+      const synthesisDuration = response.headers.get('X-Synthesis-Duration-Ms');
+
+      console.log('   ✨ Voice metadata:', {
+        provider: voiceProvider,
+        element: voiceElement,
+        synthesis_ms: synthesisDuration
+      });
+
+      const audioUrl = URL.createObjectURL(audioBlob);
+      console.log('   ✓ Created blob URL, attempting playback...');
+
+      return this.playAudioUrl(audioUrl);
+    } catch (error) {
+      console.error('❌ Sesame CSM TTS failed:', error);
+      this.updateState({ error: error.message });
+      throw error;
+    } finally {
+      this.updateState({ isLoading: false });
+    }
+  }
+
+  // OpenAI TTS with Alloy voice - PRIMARY METHOD (most sophisticated prosody)
   private async speakWithOpenAI(text: string, voiceTone?: any): Promise<void> {
-    console.log('🎯 [speakWithOpenAI] Starting...');
+    console.log('🎯 [speakWithOpenAI] Starting (primary TTS)...');
 
     // iOS Fix: Ensure audio context is active before speaking
     await this.ensureAudioContextActive();
@@ -593,7 +674,7 @@ export class MaiaVoiceSystem {
     });
   }
 
-  // Main speak method with intelligent fallback
+  // Main speak method with intelligent fallback - Sesame CSM PRIMARY
   async speak(text: string, context?: any): Promise<void> {
     console.log('🔊 MaiaVoiceSystem.speak called with text:', text.substring(0, 50) + '...');
 
@@ -607,20 +688,20 @@ export class MaiaVoiceSystem {
       // Extract voiceTone from context if available (from oracle response)
       const voiceTone = context?.voiceTone;
       if (voiceTone) {
-        console.log('🌀 Voice context includes elemental tone:', voiceTone.style);
+        console.log('🌀 Voice context includes elemental tone:', voiceTone.style || voiceTone.element);
       }
 
-      // Try OpenAI TTS first (PRIMARY)
+      // 🎯 Try OpenAI TTS "alloy" first (PRIMARY) - Most sophisticated prosody, production-ready
       try {
-        console.log('🎙️ Trying OpenAI TTS first...');
+        console.log('🎯 Trying OpenAI TTS "alloy" (primary)...');
         await this.speakWithOpenAI(text, voiceTone);
         console.log('✅ OpenAI TTS succeeded!');
         return;
       } catch (error) {
-        console.warn('⚠️ OpenAI TTS failed, trying ElevenLabs:', error);
+        console.warn('⚠️ OpenAI TTS failed, trying ElevenLabs fallback:', error);
       }
 
-      // Try ElevenLabs second (if configured)
+      // Try ElevenLabs second (FALLBACK) - if configured
       if (this.config.elevenLabsApiKey) {
         try {
           console.log('🎙️ Trying ElevenLabs as fallback...');
@@ -628,19 +709,17 @@ export class MaiaVoiceSystem {
           console.log('✅ ElevenLabs succeeded!');
           return;
         } catch (error) {
-          console.warn('⚠️ ElevenLabs failed, falling back to Web Speech:', error);
+          console.warn('⚠️ ElevenLabs failed:', error);
         }
       }
 
-      // DISABLED: Don't fall back to robotic Web Speech API
-      // Users report it's jarring and breaks immersion
-      // Better to fail silently than use robotic voice
-      console.warn('🚫 All premium voice services failed. NOT falling back to robotic Web Speech API.');
+      // All services failed
+      console.warn('🚫 All voice services failed.');
       console.warn('   → OpenAI TTS failed');
       if (this.config.elevenLabsApiKey) {
         console.warn('   → ElevenLabs failed');
       }
-      console.warn('   → Skipping Web Speech API to avoid robotic voice');
+      console.warn('Future: PALIS (Pallas Athena) neural TTS will be available');
 
       throw new Error('Premium voice services unavailable');
     } catch (error) {

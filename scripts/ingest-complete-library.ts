@@ -24,7 +24,7 @@ dotenv.config({ path: '.env.local' });
 // ═══════════════════════════════════════════════════════════════
 
 const LIBRARY_ROOT = '/Users/soullab/MAIA-PAI/uploads/library';
-const CHUNK_SIZE = 2000; // Characters per chunk
+const CHUNK_SIZE = 1500; // Characters per chunk (safe for 8192 token limit)
 const BATCH_SIZE = 10; // Process 10 files at a time (rate limiting)
 
 const supabase = createClient(
@@ -136,14 +136,25 @@ function chunkText(text: string): string[] {
 // EMBEDDING GENERATION
 // ═══════════════════════════════════════════════════════════════
 
-async function generateEmbedding(text: string): Promise<number[]> {
+async function generateEmbedding(text: string): Promise<number[] | null> {
+  // Safety check: rough token estimate (1 token ≈ 4 chars)
+  const estimatedTokens = text.length / 4;
+  if (estimatedTokens > 8000) {
+    console.error(`   ⚠️  Chunk too large (${estimatedTokens.toFixed(0)} estimated tokens), skipping...`);
+    return null;
+  }
+
   try {
     const response = await openai.embeddings.create({
       model: 'text-embedding-3-small',
       input: text
     });
     return response.data[0].embedding;
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.status === 400 && error?.message?.includes('maximum context length')) {
+      console.error(`   ⚠️  Chunk exceeded token limit, skipping...`);
+      return null;
+    }
     console.error('❌ Embedding generation failed:', error);
     throw error;
   }
@@ -188,6 +199,19 @@ async function processFile(filePath: string): Promise<FileChunk[]> {
     return [];
   }
 
+  // Check if file already processed (resume support)
+  const { data: existing } = await supabase
+    .from('file_chunks')
+    .select('id')
+    .eq('file_path', filePath)
+    .limit(1);
+
+  if (existing && existing.length > 0) {
+    console.log(`📄 ${fileName}`);
+    console.log(`   ⏭️  Already processed, skipping`);
+    return [];
+  }
+
   console.log(`📄 Processing: ${fileName}`);
 
   // Read file
@@ -225,6 +249,12 @@ async function processFile(filePath: string): Promise<FileChunk[]> {
     try {
       const embedding = await generateEmbedding(chunkContent);
 
+      // Skip chunks that are too large
+      if (embedding === null) {
+        console.log(`   ⏭️  Skipped chunk ${i} (too large for embedding)`);
+        continue;
+      }
+
       fileChunks.push({
         file_path: filePath,
         file_name: fileName,
@@ -257,13 +287,24 @@ async function processFile(filePath: string): Promise<FileChunk[]> {
 async function insertChunks(chunks: FileChunk[]): Promise<void> {
   if (chunks.length === 0) return;
 
-  const { error } = await supabase
-    .from('file_chunks')
-    .insert(chunks);
+  // Insert in smaller batches to avoid statement timeout
+  const DB_BATCH_SIZE = 500; // Max 500 chunks per insert
 
-  if (error) {
-    console.error('❌ Database insert error:', error);
-    throw error;
+  for (let i = 0; i < chunks.length; i += DB_BATCH_SIZE) {
+    const batch = chunks.slice(i, i + DB_BATCH_SIZE);
+
+    const { error } = await supabase
+      .from('file_chunks')
+      .insert(batch);
+
+    if (error) {
+      console.error(`❌ Database insert error (batch ${Math.floor(i/DB_BATCH_SIZE) + 1}/${Math.ceil(chunks.length/DB_BATCH_SIZE)}):`, error);
+      throw error;
+    }
+
+    if (chunks.length > DB_BATCH_SIZE) {
+      console.log(`   💾 Inserted batch ${Math.floor(i/DB_BATCH_SIZE) + 1}/${Math.ceil(chunks.length/DB_BATCH_SIZE)} (${batch.length} chunks)`);
+    }
   }
 }
 

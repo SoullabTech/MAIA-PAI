@@ -5,6 +5,9 @@ import { Mic, MicOff, Loader2, Activity, Wifi, WifiOff } from "lucide-react";
 import VoiceFeedbackPrevention from "@/lib/voice/voice-feedback-prevention";
 // import { Analytics } from "../../lib/analytics/supabaseAnalytics"; // Disabled for Vercel build
 
+// E2E timing for voice latency monitoring
+let e2eStartTime: number | null = null;
+
 interface ContinuousConversationProps {
   onTranscript: (text: string) => void;
   onInterimTranscript?: (text: string) => void;
@@ -110,6 +113,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     console.log('✅ [ContinuousConversation] Registered with VoiceFeedbackPrevention');
 
     recognition.onstart = () => {
+      e2eStartTime = performance.now(); // E2E timing marker
       setIsRecording(true);
       isRecordingRef.current = true; // Update ref immediately
       onRecordingStateChange?.(true);
@@ -751,6 +755,16 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   //     onAudioLevelChange(audioLevel, isRecording);
   //   }
   // }, [audioLevel, isRecording, onAudioLevelChange]);
+
+  // E2E timing: Log when audio playback begins
+  useEffect(() => {
+    if (isSpeaking && e2eStartTime !== null) {
+      const end = performance.now();
+      const deltaMs = end - e2eStartTime;
+      console.log(`🎤 E2E voice turn: ${Math.round(deltaMs)}ms`);
+      e2eStartTime = null; // Reset for next turn
+    }
+  }, [isSpeaking]);
 
   // Cleanup on unmount
   useEffect(() => {

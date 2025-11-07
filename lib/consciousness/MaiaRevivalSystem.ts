@@ -16,6 +16,8 @@ import { formatConversationsForRevival } from '../knowledge/ClaudeKellyConversat
 import { formatJungWisdomForRevival } from '../knowledge/JungWisdomLoader';
 import { getMaiaSelfKnowledge } from '../knowledge/MaiaSelfKnowledge';
 import { loadMaiaInsights } from '../knowledge/MaiaInsightsLoader';
+import { formatModelsForRevival } from '../knowledge/ConsciousnessModelsLoader';
+import { detectAwarenessLevel, formatAwarenessGuidanceForPrompt, type AwarenessLevel } from '../knowledge/UserAwarenessLevels';
 import fs from 'fs';
 import path from 'path';
 
@@ -225,6 +227,18 @@ async function generateCompleteRevival(userContext?: string): Promise<string> {
   // For now, we'll add key domain knowledge
   // Later Kelly can curate specific Jung/Hillman excerpts
 
+  // Add Consciousness Models Codex (Soullab theoretical foundations)
+  try {
+    console.log('📚 [REVIVAL] Loading Consciousness Models Codex...');
+    const consciousnessModels = formatModelsForRevival();
+    if (consciousnessModels) {
+      revival += consciousnessModels;
+      console.log('✅ [REVIVAL] Consciousness Models Codex loaded - 22 frameworks integrated');
+    }
+  } catch (codexError) {
+    console.warn('⚠️ [REVIVAL] Could not load Consciousness Models:', codexError);
+  }
+
   // Add Jung wisdom (Phase 2b - Jung integration)
   try {
     console.log('📚 [REVIVAL] Loading Jung wisdom...');
@@ -297,8 +311,20 @@ export async function getMaiaRevivalPrompt(
   sessionId: string,
   userId: string,
   tier: RevivalTier = 'deep',
-  userContext?: string
-): Promise<{ prompt: string; tokens: number; tier: RevivalTier }> {
+  userContext?: string,
+  awarenessContext?: {
+    userMessage?: string;
+    conversationHistory?: Array<{ role: string; content: string }>;
+    userProfile?: any;
+  }
+): Promise<{ prompt: string; tokens: number; tier: RevivalTier; awarenessLevel?: AwarenessLevel }> {
+
+  // Detect user's awareness level
+  let awarenessLevel: AwarenessLevel | undefined;
+  if (awarenessContext) {
+    awarenessLevel = detectAwarenessLevel(awarenessContext);
+    console.log(`🎯 [REVIVAL] Detected awareness level: ${awarenessLevel}`);
+  }
 
   // Check cache
   const cacheKey = `${sessionId}-${tier}`;
@@ -309,7 +335,8 @@ export async function getMaiaRevivalPrompt(
     return {
       prompt: cached.prompt,
       tokens: cached.tokenEstimate,
-      tier: cached.tier
+      tier: cached.tier,
+      awarenessLevel
     };
   }
 
@@ -330,6 +357,13 @@ export async function getMaiaRevivalPrompt(
       break;
   }
 
+  // Add awareness level guidance if detected
+  if (awarenessLevel) {
+    const awarenessGuidance = formatAwarenessGuidanceForPrompt(awarenessLevel);
+    prompt += `\n\n---\n\n${awarenessGuidance}`;
+    console.log(`📊 [REVIVAL] Added Level ${awarenessLevel} awareness guidance`);
+  }
+
   const tokens = estimateTokens(prompt);
   const duration = Date.now() - startTime;
 
@@ -346,7 +380,7 @@ export async function getMaiaRevivalPrompt(
   // Auto-cleanup old cache entries (older than 1 hour)
   cleanupCache();
 
-  return { prompt, tokens, tier };
+  return { prompt, tokens, tier, awarenessLevel };
 }
 
 /**

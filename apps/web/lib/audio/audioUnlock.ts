@@ -3,8 +3,6 @@
  * Unlocks audio context on first user interaction
  */
 
-import { trackAudioUnlock } from '@/lib/analytics/eventTracking';
-
 let audioUnlocked = false;
 let toastShown = false;
 
@@ -25,13 +23,7 @@ export async function unlockAudio(showToast?: (message: string, options?: { type
     const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioContext) {
       console.warn('AudioContext not supported');
-      
-      // Track unsupported browser
-      await trackAudioUnlock(false, {
-        error: 'AudioContext not supported',
-        timestamp: Date.now()
-      });
-      
+
       if (showToast) {
         showToast('⚠️ Audio not supported in this browser', { type: 'warning' });
       }
@@ -61,14 +53,7 @@ export async function unlockAudio(showToast?: (message: string, options?: { type
           }
           toastShown = true;
         }
-        
-        // Track resume failure
-        await trackAudioUnlock(false, {
-          error: 'Context resume failed',
-          contextState: ctx.state,
-          timestamp: Date.now()
-        });
-        
+
         return false;
       }
     }
@@ -93,14 +78,7 @@ export async function unlockAudio(showToast?: (message: string, options?: { type
     console.log('🔓 [Audio] Context unlocked successfully');
     console.log(`   State: ${ctx.state}`);
     console.log(`   Sample Rate: ${ctx.sampleRate}`);
-    
-    // Track successful audio unlock with detailed info
-    await trackAudioUnlock(true, {
-      contextState: ctx.state,
-      sampleRate: ctx.sampleRate,
-      timestamp: Date.now()
-    });
-    
+
     // Show graceful toast notification (only once per session)
     if (showToast && !toastShown) {
       showToast("🔓 Maia's voice unlocked — you'll now hear her replies", { type: 'success' });
@@ -110,14 +88,7 @@ export async function unlockAudio(showToast?: (message: string, options?: { type
     return true;
   } catch (error) {
     console.warn('❌ [Audio] Unlock failed:', error);
-    
-    // Track failed audio unlock with detailed error
-    await trackAudioUnlock(false, {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      errorStack: error instanceof Error ? error.stack : undefined,
-      timestamp: Date.now()
-    });
-    
+
     // Show appropriate error message
     if (showToast && !toastShown) {
       const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);

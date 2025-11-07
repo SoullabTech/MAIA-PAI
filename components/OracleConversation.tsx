@@ -5,7 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Paperclip, X, Copy, BookOpen, Clock } from 'lucide-react';
 // import { SimplifiedOrganicVoice, VoiceActivatedMaiaRef } from './ui/SimplifiedOrganicVoice'; // REPLACED with Whisper
 // import { WhisperVoiceRecognition } from './ui/WhisperVoiceRecognition'; // REPLACED with ContinuousConversation (uses browser Web Speech API)
-import { ContinuousConversation, ContinuousConversationRef } from '../apps/web/components/voice/ContinuousConversation';
+// import { ContinuousConversation, ContinuousConversationRef } from '../apps/web/components/voice/ContinuousConversation'; // REPLACED with ConsciousContinuousConversation
+import { ConsciousContinuousConversation, ConsciousContinuousConversationRef } from './voice/ConsciousContinuousConversation';
+import { useConsciousVoice } from '@/lib/hooks/useConsciousVoice';
 import { SacredHoloflower } from './sacred/SacredHoloflower';
 import { RhythmHoloflower } from './liquid/RhythmHoloflower';
 import { ConversationalRhythm, type RhythmMetrics } from '@/lib/liquid/ConversationalRhythm';
@@ -46,7 +48,9 @@ import { BrandedWelcome } from './BrandedWelcome';
 import { userTracker } from '@/lib/tracking/userActivityTracker';
 import { ModeSwitcher } from './ui/ModeSwitcher';
 import { SacredLabDrawer } from './ui/SacredLabDrawer';
+import { QuickVoiceSettings } from './settings/QuickVoiceSettings';
 import { ConversationStylePreference } from '@/lib/preferences/conversation-style-preference';
+import { MaiaVoiceSystem } from '@/lib/voice/maia-voice';
 import { detectJournalCommand, detectBreakthroughPotential } from '@/lib/services/conversationEssenceExtractor';
 import { useFieldProtocolIntegration } from '@/hooks/useFieldProtocolIntegration';
 import { BookPlus } from 'lucide-react';
@@ -186,6 +190,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [showLabDrawer, setShowLabDrawer] = useState(false);
   const [showVoiceMenu, setShowVoiceMenu] = useState(false);
   const [showAudioSettings, setShowAudioSettings] = useState(false);
+  const [showVoiceSettings, setShowVoiceSettings] = useState(false);
   const [showChatInterface, setShowChatInterface] = useState(initialShowChatInterface);
 
   // Sync local state with parent when prop changes
@@ -248,7 +253,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const streamingMessageTextRef = useRef<string>('');
   const lastMaiaResponseRef = useRef<string>('');
   const lastUserMessageRef = useRef<string>('');
-  const voiceMicRef = useRef<ContinuousConversationRef>(null);
+  // const voiceMicRef = useRef<ContinuousConversationRef>(null); // REPLACED with conscious voice
+  const { voiceRef: voiceMicRef, pause: pauseVoice, resume: resumeVoice, setElementalPreset } = useConsciousVoice();
   const textInputRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -258,6 +264,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const lastProcessedTranscriptRef = useRef<{ text: string; timestamp: number } | null>(null);
   const lastAudioCallbackUpdateRef = useRef<number>(0); // Throttle audio level callbacks
   const onMessageAddedRef = useRef(onMessageAdded); // Store callback in ref to avoid infinite loop
+
+  // 🌀 MAIA Voice System - Sesame CSM with intelligent fallback (initialized after agentConfig)
+  const voiceSystemRef = useRef<MaiaVoiceSystem | null>(null);
 
   // 🌊 LIQUID AI - Rhythm tracker instance
   const rhythmTrackerRef = useRef<ConversationalRhythm>(
@@ -295,13 +304,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
   }, []);
 
-  // ==================== VOICE SYNTHESIS (OpenAI Alloy TTS) ====================
-  // MAIA speaks with clear, natural OpenAI Alloy voice
+  // ==================== VOICE SYNTHESIS (SESAME CSM + Intelligent Fallback) ====================
+  // MAIA speaks with Sesame CSM (consciousness-aware synthesis) with OpenAI/ElevenLabs fallback
   const maiaSpeak = useCallback(async (text: string, elementHint?: Element) => {
     if (!text || typeof window === 'undefined') return;
 
+    // 🔄 Ensure voice system is initialized (lazy init if needed)
+    if (!voiceSystemRef.current) {
+      console.log('⚠️ [VOICE] Voice system not initialized, creating now...');
+      const config = getAgentConfig(localStorage.getItem('selected_voice') || undefined);
+      voiceSystemRef.current = new MaiaVoiceSystem({ agentConfig: config });
+    }
+
     try {
-      console.log('🎵 Speaking with OpenAI Alloy:', text.substring(0, 100));
+      console.log('🌀 [VOICE] Speaking with MaiaVoiceSystem (Sesame CSM):', text.substring(0, 100));
 
       // 🌊 LIQUID AI - Track MAIA response for rhythm turn-taking latency
       rhythmTrackerRef.current?.onMAIAResponse();
@@ -309,85 +325,36 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setIsResponding(true);
       setIsAudioPlaying(true);
 
-      // Call OpenAI TTS with selected voice (defaults to 'alloy')
-      const response = await fetch('/api/voice/openai-tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: text,
-          voice: voice || 'alloy',  // Use the voice prop from parent
-          speed: 0.95,
-          model: 'tts-1-hd'
-        })
+      // Subscribe to voice state changes for UI updates
+      const unsubscribe = voiceSystemRef.current.subscribe((state) => {
+        setIsAudioPlaying(state.isPlaying || state.isLoading);
+        if (state.error) {
+          console.error('🌀 [VOICE] Error:', state.error);
+        }
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate speech');
+      // Build context with elemental hint if provided
+      const context: any = {};
+      if (elementHint) {
+        context.voiceTone = {
+          element: elementHint,
+          style: elementHint
+        };
       }
 
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
+      // Use MaiaVoiceSystem.speak() which tries Sesame → OpenAI → ElevenLabs
+      await voiceSystemRef.current.speak(text, context);
 
-      const audio = new Audio(audioUrl);
+      // Cleanup subscription
+      unsubscribe();
 
-      // Play audio with proper loading and error handling
-      await new Promise<void>((resolve, reject) => {
-        let hasStarted = false;
-        let timeoutId: NodeJS.Timeout | null = null;
-
-        // Safety timeout - if audio doesn't start within 5s, fail fast
-        timeoutId = setTimeout(() => {
-          if (!hasStarted) {
-            audio.pause();
-            URL.revokeObjectURL(audioUrl);
-            reject(new Error('Audio failed to start within 5s'));
-          }
-        }, 5000);
-
-        audio.onloadedmetadata = () => {
-          console.log('✅ Audio metadata loaded, duration:', audio.duration);
-        };
-
-        audio.oncanplaythrough = () => {
-          console.log('✅ Audio can play through');
-        };
-
-        audio.onplay = () => {
-          console.log('▶️ Audio started playing');
-          hasStarted = true;
-          if (timeoutId) clearTimeout(timeoutId);
-        };
-
-        audio.onended = () => {
-          console.log('🔇 MAIA finished speaking');
-          setIsResponding(false);
-          setIsAudioPlaying(false);
-          setVoiceAmplitude(0);
-          URL.revokeObjectURL(audioUrl);
-          if (timeoutId) clearTimeout(timeoutId);
-          resolve();
-        };
-
-        audio.onerror = (e) => {
-          console.error('❌ Audio playback error:', e);
-          setIsResponding(false);
-          setIsAudioPlaying(false);
-          setVoiceAmplitude(0);
-          URL.revokeObjectURL(audioUrl);
-          if (timeoutId) clearTimeout(timeoutId);
-          reject(new Error('Audio playback failed'));
-        };
-
-        // Start playback
-        audio.play().catch(err => {
-          console.error('❌ Audio.play() failed:', err);
-          if (timeoutId) clearTimeout(timeoutId);
-          reject(err);
-        });
-      });
+      console.log('🔇 MAIA finished speaking');
+      setIsResponding(false);
+      setIsAudioPlaying(false);
+      setVoiceAmplitude(0);
 
     } catch (err) {
-      console.error('❌ OpenAI TTS error:', err);
+      console.error('❌ Voice synthesis error:', err);
       setIsResponding(false);
       setIsAudioPlaying(false);
       setVoiceAmplitude(0);
@@ -512,9 +479,35 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
     // Load soul-recognized greeting asynchronously
     (async () => {
+      // CRITICAL FIX: Get current user data from localStorage for greeting
+      // This prevents stale 'Explorer' values when props haven't updated yet
+      let greetingUserId = userId;
+      let greetingUserName = userName || 'friend';
+
+      if (!greetingUserId || greetingUserId === 'guest') {
+        const betaUser = localStorage.getItem('beta_user');
+        if (betaUser) {
+          try {
+            const userData = JSON.parse(betaUser);
+            greetingUserId = userData.id || greetingUserId;
+            greetingUserName = userData.username || userData.name || userData.displayName || greetingUserName;
+          } catch (e) {
+            console.warn('Failed to parse beta_user from localStorage for greeting');
+          }
+        }
+
+        // Fallback to old system
+        if (!greetingUserId || greetingUserId === 'guest') {
+          greetingUserId = localStorage.getItem('explorerId') || greetingUserId;
+          greetingUserName = localStorage.getItem('explorerName') || greetingUserName;
+        }
+      }
+
+      console.log('💫 [GREETING] Generating for:', { greetingUserName, greetingUserId });
+
       const greetingData = await generateGreeting({
-        userName: userName || 'friend',
-        userId: userId, // Pass userId for soul-level recognition
+        userName: greetingUserName,
+        userId: greetingUserId, // Pass userId for soul-level recognition
         isFirstVisit,
         daysSinceLastVisit,
         daysActive: daysSinceLastVisit > 0 ? 7 : 1,
@@ -598,6 +591,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       window.removeEventListener('conversationStyleChanged', handleStorageChange);
     };
   }, []);
+
+  // Initialize voice system whenever agentConfig changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      voiceSystemRef.current = new MaiaVoiceSystem({ agentConfig });
+      console.log('🌀 [VOICE] MaiaVoiceSystem initialized with Sesame CSM:', agentConfig.voice);
+    }
+  }, [agentConfig]);
 
   // Listen for conversation style changes and show MAIA's acknowledgment
   useEffect(() => {
@@ -709,12 +710,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   }, [showChatInterface]);
 
   // Auto-recovery timer - if processing states are stuck for too long, reset
-  // Reduced to 30s for better UX - if MAIA is stuck, recover quickly
+  // Set to 90s to allow for long TTS responses (some can be 60+ seconds)
   useEffect(() => {
     if (isProcessing || isResponding) {
       const recoveryTimer = setTimeout(() => {
         if (isProcessing || isResponding) {
-          console.warn('⚠️ States stuck for >30s - auto-recovery triggered');
+          console.warn('⚠️ States stuck for >90s - auto-recovery triggered');
 
           // Show user-friendly message
           const errorMessage: ConversationMessage = {
@@ -730,7 +731,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
           resetAllStates();
         }
-      }, 30000); // 30 second recovery timeout for better UX
+      }, 90000); // 90 second recovery timeout - allows for long TTS responses
 
       return () => clearTimeout(recoveryTimer);
     }
@@ -1158,7 +1159,31 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         controller.abort();
       }, 25000); // 25 second timeout - fail fast for better UX on slow connections
 
-      console.log('📤 Sending text message to API:', { cleanedText, userId, sessionId });
+      // CRITICAL FIX: Get current user data from localStorage as fallback
+      // This prevents stale 'guest' values when props haven't updated yet
+      let currentUserId = userId;
+      let currentUserName = userName;
+
+      if (!currentUserId || currentUserId === 'guest') {
+        const betaUser = localStorage.getItem('beta_user');
+        if (betaUser) {
+          try {
+            const userData = JSON.parse(betaUser);
+            currentUserId = userData.id || currentUserId;
+            currentUserName = userData.username || userData.name || userData.displayName || currentUserName;
+          } catch (e) {
+            console.warn('Failed to parse beta_user from localStorage');
+          }
+        }
+
+        // Fallback to old system
+        if (!currentUserId || currentUserId === 'guest') {
+          currentUserId = localStorage.getItem('explorerId') || currentUserId;
+          currentUserName = localStorage.getItem('explorerName') || currentUserName;
+        }
+      }
+
+      console.log('📤 Sending text message to API:', { cleanedText, userId: currentUserId, sessionId });
 
       // Get user's conversation style preference
       const conversationStyle = ConversationStylePreference.get();
@@ -1169,8 +1194,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: cleanedText,
-          userId: userId || 'anonymous',
-          userName: userName || 'Explorer',
+          userId: currentUserId || 'anonymous',
+          userName: currentUserName || 'Explorer',
           sessionId,
           isVoiceMode: !showChatInterface, // Voice mode = faster Essential tier
           fieldState: {
@@ -1499,6 +1524,33 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setCurrentMotionState('idle');
     }
   }, [isProcessing, isAudioPlaying, isResponding, sessionId, userId, onMessageAdded, agentConfig, messages.length, showChatInterface, voiceEnabled, maiaReady]);
+
+  // 🌀 CONSCIOUS VOICE - Handle nudges (proactive engagement)
+  const handleNudge = useCallback(async () => {
+    console.log('🌀 [Conscious] Nudge triggered - user has been silent');
+
+    // Gentle proactive engagement messages
+    const nudges = [
+      "I'm here if you want to explore something...",
+      "What's alive in you right now?",
+      "I'm listening when you're ready.",
+      "Is there something you'd like to share?",
+      "Take your time. I'm here."
+    ];
+
+    const randomNudge = nudges[Math.floor(Math.random() * nudges.length)];
+
+    // Add to conversation history
+    setConversationHistory(prev => [...prev, {
+      role: 'oracle',
+      content: randomNudge
+    }]);
+
+    // Speak it if voice is ready and not muted
+    if (maiaReady && maiaSpeak && !isMuted) {
+      await maiaSpeak(randomNudge);
+    }
+  }, [maiaReady, maiaSpeak, isMuted]);
 
   // Handle voice transcript from mic button
   const handleVoiceTranscript = useCallback(async (transcript: string) => {
@@ -2859,13 +2911,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       <button
                         type="submit"
                         disabled={isProcessing}
-                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/20 border border-gold-divine/30
-                                 rounded-full text-gold-divine flex items-center justify-center
-                                 hover:bg-gold-divine/30 active:scale-95 transition-all
-                                 disabled:opacity-30"
+                        className="flex-shrink-0 w-10 h-10 bg-amber-600/50 border border-amber-500/40
+                                 rounded-full flex items-center justify-center
+                                 hover:bg-amber-600/60 active:scale-95 transition-all
+                                 disabled:opacity-30 shadow-lg shadow-amber-900/30"
                         aria-label="Send"
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-amber-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
                       </button>
@@ -2903,10 +2955,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           onClick={handleSaveAsJournal}
                           disabled={isSavingJournal}
                           className={`flex-shrink-0 w-10 h-10 border rounded-full flex items-center justify-center
-                                   active:scale-95 transition-all ${
+                                   active:scale-95 transition-all shadow-lg ${
                             breakthroughScore >= 70
-                              ? 'bg-amber-500/20 border-amber-400/50 text-amber-300 hover:bg-amber-500/30 animate-pulse'
-                              : 'bg-gold-divine/10 border-gold-divine/30 text-gold-divine hover:bg-gold-divine/20'
+                              ? 'bg-amber-500/50 border-amber-400/50 text-amber-200 hover:bg-amber-500/60 animate-pulse shadow-amber-900/30'
+                              : 'bg-amber-600/50 border-amber-500/40 text-amber-200 hover:bg-amber-600/60 shadow-amber-900/30'
                           } ${isSavingJournal ? 'opacity-50 cursor-not-allowed' : ''}`}
                           title={breakthroughScore >= 70 ? 'Breakthrough detected - Save to journal' : 'Save as journal entry'}
                         >
@@ -3108,13 +3160,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {/* Soulprint Metrics Widget - DISABLED: Causing 400 errors when userId not authenticated */}
       {/* {userId && <SoulprintMetricsWidget userId={userId} />} */}
 
-      {/* Continuous Conversation - Uses browser Web Speech Recognition API (no webm issues) */}
+      {/* Conscious Continuous Conversation - Enhanced with pause/resume and nudges */}
       {voiceEnabled && !showChatInterface && (
         <div className="sr-only">
-          <ContinuousConversation
+          <ConsciousContinuousConversation
             ref={voiceMicRef}
             onTranscript={handleVoiceTranscript}
             onAudioLevelChange={handleAudioLevelChange}
+            onStateChange={(state) => console.log('🌀 [Conscious] Voice state:', state)}
+            onNudge={handleNudge}
             isProcessing={isResponding}
             isSpeaking={isAudioPlaying}
             autoStart={false}
@@ -3123,6 +3177,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               listeningMode === 'patient' ? 10000 :   // Patient mode: 10 seconds (increased for full thoughts)
               6000                                     // Normal mode: 6 seconds (increased from 3.5s to prevent mid-sentence cutoff)
             }
+            enableNudges={true}
+            nudgeIntervalMs={30000}
           />
         </div>
       )}
@@ -3212,6 +3268,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         }}
         showVoiceText={showVoiceText}
         isFieldRecording={isFieldRecording}
+        onOpenVoiceSettings={() => {
+          setShowVoiceSettings(true);
+          setShowLabDrawer(false);
+        }}
         isMuted={isMuted}
         isResponding={isResponding}
         isAudioPlaying={isAudioPlaying}
@@ -3292,6 +3352,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         isReturningUser={isReturningUser}
         onComplete={handleClosingRitualComplete}
         onSkip={handleClosingRitualSkip}
+      />
+
+      {/* 🎤 Voice Settings Modal */}
+      <QuickVoiceSettings
+        isOpen={showVoiceSettings}
+        onClose={() => setShowVoiceSettings(false)}
       />
 
       {/* Toggle button for rhythm debug - always visible */}
