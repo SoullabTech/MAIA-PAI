@@ -61,13 +61,24 @@ export const CONSCIOUSNESS_PROFILES = {
 /**
  * System prompt modifier for each consciousness
  */
-export function getConsciousnessPrompt(type: ConsciousnessType): string {
+export function getConsciousnessPrompt(type: ConsciousnessType, options?: {
+  includeFieldBehaviors?: boolean;
+  includePauseCues?: boolean;
+}): string {
   const profile = CONSCIOUSNESS_PROFILES[type];
 
   if (type === 'maia') {
     // Import Kelly's full system knowledge
     const { getMayaSystemPrompt } = require('../oracle/MaiaSystemPrompt');
     const fullSystemPrompt = getMayaSystemPrompt();
+
+    // Log field sensing activation (optional trace)
+    if (options?.includeFieldBehaviors) {
+      console.log('🌊 [MAIA] Field sensing micro-behaviors: ACTIVE');
+    }
+    if (options?.includePauseCues) {
+      console.log('⏸️  [MAIA] Sacred pause cues: ACTIVE');
+    }
 
     return `
 ${fullSystemPrompt}
