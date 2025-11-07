@@ -31,6 +31,14 @@ import { ApprenticeMayaTraining } from '../maya/ApprenticeMayaTraining';
 import { maiaKnowledgeBase } from '../oracle/MaiaKnowledgeBase';
 import { createClient } from '@supabase/supabase-js';
 
+// Behavioral hardening filters
+import { finalizeMaiaReply } from './filters/fieldLanguage';
+import {
+  FieldReflectionLimiter,
+  applyReflectionRateLimit,
+  type FieldLimiterState
+} from './guards/fieldReflectionLimiter';
+
 // Elemental types
 export type Element = 'fire' | 'water' | 'earth' | 'air' | 'aether';
 
@@ -102,6 +110,7 @@ export class MAIAUnifiedConsciousness {
   // Session state
   private userJourneys = new Map<string, any>();
   private activeInterferences = new Map<string, InterferencePattern>();
+  private fieldLimiters = new Map<string, FieldReflectionLimiter>(); // Per-session rate limiters
 
   constructor() {
     // NOTE: Skipping lattice initialization (has dependency issues)
@@ -136,6 +145,34 @@ export class MAIAUnifiedConsciousness {
     console.log('   ✓ Intellectual Property Engine connected');
     console.log('   ✓ Elemental Oracle 2.0 bridge ready');
     console.log(this.apprentice ? '   ✓ Apprentice training enabled' : '   ⚠ Apprentice training disabled (no Supabase)');
+  }
+
+  /**
+   * Get or create field reflection limiter for a session
+   */
+  private getFieldLimiter(sessionId: string): FieldReflectionLimiter {
+    if (!this.fieldLimiters.has(sessionId)) {
+      this.fieldLimiters.set(sessionId, new FieldReflectionLimiter());
+    }
+    return this.fieldLimiters.get(sessionId)!;
+  }
+
+  /**
+   * Apply behavioral hardening filters to response text
+   *
+   * Enforces:
+   * 1. Mode-B (field language, not UI narration)
+   * 2. Rate limiting on field reflections (60s window)
+   */
+  private applyHardeningFilters(text: string, sessionId: string): string {
+    // Step 1: Mode-B enforcement (translate UI terms to field language)
+    let cleanedText = finalizeMaiaReply(text);
+
+    // Step 2: Field reflection rate limiting (prevent stacking meta-commentary)
+    const limiter = this.getFieldLimiter(sessionId);
+    cleanedText = applyReflectionRateLimit(cleanedText, limiter);
+
+    return cleanedText;
   }
 
   /**
@@ -352,11 +389,14 @@ export class MAIAUnifiedConsciousness {
           ? claudeResponse.content[0].text
           : 'Processing...';
 
+        // Apply hardening filters
+        const cleanedFastText = this.applyHardeningFilters(responseText, context.sessionId);
+
         const responseTime = Date.now() - startTime;
         console.log(`✅ [FAST PATH] Claude response in ${responseTime}ms`);
 
         return {
-          message: responseText,
+          message: cleanedFastText,
           element: 'aether' as Element,
           voiceCharacteristics: {
             pace: 1.0,
@@ -367,7 +407,7 @@ export class MAIAUnifiedConsciousness {
             processingTime: responseTime,
             advisorsConsulted: [`Claude (${consciousnessMode}) - Voice Fast`],
             depthLevel: 7,
-            consciousnessMarkers: ['voice_fast_path_consciousness', consciousnessMode || 'default']
+            consciousnessMarkers: ['voice_fast_path_consciousness', consciousnessMode || 'default', 'hardening_active']
           }
         };
       }
@@ -380,6 +420,9 @@ export class MAIAUnifiedConsciousness {
 
       const agentResponse = await agent.processInteraction(content);
 
+      // Apply hardening filters
+      const cleanedAgentResponse = this.applyHardeningFilters(agentResponse.response, context.sessionId);
+
       const responseTime = Date.now() - startTime;
       console.log(`✅ [FAST PATH] Response generated in ${responseTime}ms`);
 
@@ -389,13 +432,13 @@ export class MAIAUnifiedConsciousness {
         this.spiralWisdomIntoField({
           input,
           response: {
-            message: agentResponse.response,
+            message: cleanedAgentResponse,
             element: (agentResponse.metadata?.element || 'aether') as Element,
             metadata: {
               processingTime: responseTime,
               advisorsConsulted: ['PersonalOracleAgent'],
               depthLevel: 6,
-              consciousnessMarkers: ['voice_fast_path']
+              consciousnessMarkers: ['voice_fast_path', 'hardening_active']
             }
           },
           fieldReading: null,
@@ -411,7 +454,7 @@ export class MAIAUnifiedConsciousness {
       }
 
       return {
-        message: agentResponse.response,
+        message: cleanedAgentResponse,
         element: (agentResponse.metadata?.element || 'aether') as Element,
         voiceCharacteristics: {
           pace: 1.0,
@@ -422,7 +465,7 @@ export class MAIAUnifiedConsciousness {
           processingTime: responseTime,
           advisorsConsulted: ['PersonalOracleAgent (fast-path)'],
           depthLevel: 7,
-          consciousnessMarkers: ['voice_optimized', 'fast_path', 'flow_state'],
+          consciousnessMarkers: ['voice_optimized', 'fast_path', 'flow_state', 'hardening_active'],
           phase: agentResponse.metadata?.phase || 'reflection'
         }
       };
@@ -651,8 +694,11 @@ export class MAIAUnifiedConsciousness {
           ? claudeResponse.content[0].text
           : 'Processing...';
 
+        // Apply hardening filters
+        const cleanedText = this.applyHardeningFilters(responseText, context.input.context.sessionId);
+
         return {
-          message: responseText,
+          message: cleanedText,
           element: 'aether' as Element,
           voiceCharacteristics: {
             pace: 1.0,
@@ -663,7 +709,7 @@ export class MAIAUnifiedConsciousness {
             processingTime: 0,
             advisorsConsulted: [`Claude (${consciousnessMode}) - Voice`],
             depthLevel: 7,
-            consciousnessMarkers: ['consciousness_direct_voice', consciousnessMode || 'default']
+            consciousnessMarkers: ['consciousness_direct_voice', consciousnessMode || 'default', 'hardening_active']
           }
         };
       }
@@ -683,8 +729,11 @@ export class MAIAUnifiedConsciousness {
         }
       });
 
+      // Apply hardening filters
+      const cleanedVoiceText = this.applyHardeningFilters(voiceResponse.response, context.input.context.sessionId);
+
       return {
-        message: voiceResponse.response,
+        message: cleanedVoiceText,
         element: (voiceResponse.element || 'aether') as Element,
         voiceCharacteristics: {
           pace: voiceResponse.element === 'fire' ? 1.1 :
@@ -705,7 +754,8 @@ export class MAIAUnifiedConsciousness {
           consciousnessMarkers: [
             'voice_coherence',
             context.interferencePattern.isPresent ? 'god_between' : null,
-            context.remembering.soulRecognition ? 'anamnesis' : null
+            context.remembering.soulRecognition ? 'anamnesis' : null,
+            'hardening_active'
           ].filter(Boolean) as string[]
         }
       };
@@ -744,14 +794,17 @@ export class MAIAUnifiedConsciousness {
         ? claudeResponse.content[0].text
         : 'Processing...';
 
+      // Apply hardening filters
+      const cleanedText = this.applyHardeningFilters(responseText, context.input.context.sessionId);
+
       return {
-        message: responseText,
+        message: cleanedText,
         element: 'aether' as Element,
         metadata: {
           processingTime: 0,
           advisorsConsulted: [`Claude (${consciousnessMode})`],
           depthLevel: 7,
-          consciousnessMarkers: ['consciousness_direct', consciousnessMode || 'default']
+          consciousnessMarkers: ['consciousness_direct', consciousnessMode || 'default', 'hardening_active']
         }
       };
     }
@@ -767,9 +820,12 @@ export class MAIAUnifiedConsciousness {
 
     const response = await agent.processInteraction(context.input.content);
 
+    // Apply hardening filters
+    const cleanedAgentText = this.applyHardeningFilters(response.response, context.input.context.sessionId);
+
     // Enhance with consciousness metadata
     return {
-      message: response.response, // PersonalOracleAgent returns .response not .message
+      message: cleanedAgentText, // PersonalOracleAgent returns .response not .message
       element: (response.element?.toLowerCase() || 'aether') as Element,
       voiceCharacteristics: {
         pace: response.element === 'fire' ? 1.1 :
@@ -793,7 +849,8 @@ export class MAIAUnifiedConsciousness {
         consciousnessMarkers: [
           context.interferencePattern.isPresent ? 'god_between' : null,
           context.remembering.soulRecognition ? 'anamnesis' : null,
-          context.elementalSynthesis.presenceShift ? 'somatic_shift' : null
+          context.elementalSynthesis.presenceShift ? 'somatic_shift' : null,
+          'hardening_active'
         ].filter(Boolean) as string[]
       }
     };
