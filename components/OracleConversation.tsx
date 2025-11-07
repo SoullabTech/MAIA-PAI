@@ -41,6 +41,7 @@ import { toast } from 'react-hot-toast';
 import { voiceLock } from '@/lib/services/VoiceLock';
 import { trackEvent } from '@/lib/analytics/track';
 import { saveConversationMemory, getOracleAgentId } from '@/lib/services/memoryService';
+import { saveMessages as saveMessagesToSupabase, getMessagesBySession } from '@/lib/services/conversationStorageService';
 import { generateGreeting } from '@/lib/services/greetingService';
 import { BrandedWelcome } from './BrandedWelcome';
 import { userTracker } from '@/lib/tracking/userActivityTracker';
@@ -471,44 +472,71 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  // 💾 CONVERSATION PERSISTENCE: Restore messages from localStorage on mount
+  // 💾 HYBRID CONVERSATION PERSISTENCE: Restore from localStorage + Supabase
   useEffect(() => {
-    if (typeof window === 'undefined' || !sessionId) return;
+    if (typeof window === 'undefined' || !sessionId || !userId) return;
 
-    const storageKey = `maia_conversation_${sessionId}`;
-    const stored = localStorage.getItem(storageKey);
+    const restoreConversation = async () => {
+      const storageKey = `maia_conversation_${sessionId}`;
 
-    if (stored) {
+      // Step 1: Try localStorage first (instant restore for same device)
+      const localStored = localStorage.getItem(storageKey);
+      if (localStored) {
+        try {
+          const parsedMessages = JSON.parse(localStored);
+          if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
+            console.log(`💾 [localStorage] Restored ${parsedMessages.length} messages instantly`);
+            setMessages(parsedMessages);
+          }
+        } catch (error) {
+          console.error('💾 [localStorage] Failed to parse stored messages:', error);
+          localStorage.removeItem(storageKey);
+        }
+      }
+
+      // Step 2: Check Supabase for cross-device sync (async, non-blocking)
       try {
-        const parsedMessages = JSON.parse(stored);
-        if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
-          console.log(`💾 [Conversation Persistence] Restored ${parsedMessages.length} messages for session ${sessionId}`);
-          setMessages(parsedMessages);
+        const { success, messages: supabaseMessages } = await getMessagesBySession(sessionId, 100);
+
+        if (success && supabaseMessages.length > 0) {
+          // Only use Supabase messages if:
+          // 1. localStorage was empty, OR
+          // 2. Supabase has MORE messages than localStorage
+          if (!localStored || supabaseMessages.length > (JSON.parse(localStored || '[]').length)) {
+            console.log(`💾 [Supabase] Restored ${supabaseMessages.length} messages (cross-device sync)`);
+            setMessages(supabaseMessages);
+
+            // Update localStorage with Supabase data for faster next load
+            localStorage.setItem(storageKey, JSON.stringify(supabaseMessages.slice(-50)));
+          }
         }
       } catch (error) {
-        console.error('💾 [Conversation Persistence] Failed to parse stored messages:', error);
-        localStorage.removeItem(storageKey);
+        console.error('💾 [Supabase] Failed to retrieve messages:', error);
+        // Don't block - localStorage restore already happened if available
       }
-    }
-  }, [sessionId]);
+    };
 
-  // 💾 CONVERSATION PERSISTENCE: Save messages to localStorage whenever they change
+    restoreConversation();
+  }, [sessionId, userId]);
+
+  // 💾 HYBRID PERSISTENCE: Save to localStorage (instant) + Supabase (async sync)
   useEffect(() => {
-    if (typeof window === 'undefined' || !sessionId || messages.length === 0) return;
+    if (typeof window === 'undefined' || !sessionId || !userId || messages.length === 0) return;
 
     const storageKey = `maia_conversation_${sessionId}`;
 
     // Keep only the most recent 50 messages to avoid localStorage bloat
     const messagesToStore = messages.slice(-50);
 
+    // STEP 1: Save to localStorage immediately (sync, instant)
     try {
       localStorage.setItem(storageKey, JSON.stringify(messagesToStore));
-      console.log(`💾 [Conversation Persistence] Saved ${messagesToStore.length} messages for session ${sessionId}`);
+      console.log(`💾 [localStorage] Saved ${messagesToStore.length} messages`);
     } catch (error) {
-      console.error('💾 [Conversation Persistence] Failed to save messages:', error);
+      console.error('💾 [localStorage] Failed to save messages:', error);
       // If localStorage is full, try clearing old sessions
       if (error instanceof DOMException && error.name === 'QuotaExceededError') {
-        console.log('💾 [Conversation Persistence] localStorage full, clearing old sessions...');
+        console.log('💾 [localStorage] Full, clearing old sessions...');
         try {
           // Clear all old conversation storage except current session
           Object.keys(localStorage)
@@ -517,13 +545,35 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
           // Try saving again
           localStorage.setItem(storageKey, JSON.stringify(messagesToStore));
-          console.log('💾 [Conversation Persistence] Retry successful after cleanup');
+          console.log('💾 [localStorage] Retry successful after cleanup');
         } catch (retryError) {
-          console.error('💾 [Conversation Persistence] Retry failed:', retryError);
+          console.error('💾 [localStorage] Retry failed:', retryError);
         }
       }
     }
-  }, [messages, sessionId]);
+
+    // STEP 2: Save to Supabase asynchronously (for cross-device sync)
+    // Debounce: only save to Supabase every 5 messages or 10 seconds
+    const messageCount = messages.length;
+    const shouldSyncToSupabase = messageCount % 5 === 0; // Every 5 messages
+
+    if (shouldSyncToSupabase) {
+      // Use setTimeout to make this truly async (non-blocking)
+      const syncTimer = setTimeout(async () => {
+        try {
+          const { success, count } = await saveMessagesToSupabase(sessionId, userId, messagesToStore);
+          if (success) {
+            console.log(`💾 [Supabase] Synced ${count} messages (cross-device backup)`);
+          }
+        } catch (error) {
+          console.error('💾 [Supabase] Sync failed (non-blocking):', error);
+          // Don't block - localStorage save already succeeded
+        }
+      }, 100); // Small delay to avoid blocking UI
+
+      return () => clearTimeout(syncTimer);
+    }
+  }, [messages, sessionId, userId]);
 
   // All state declarations moved earlier (lines 138-189) to avoid hook ordering issues
 
