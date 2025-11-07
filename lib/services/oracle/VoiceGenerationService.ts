@@ -7,9 +7,12 @@
  * - Elemental voice characteristics
  *
  * Earth Phase Service Extraction - Following Spiralogic Principles
+ * Fire Phase - Voice telemetry added
  */
 
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
+import { timeIt } from '@/lib/observability/timer';
+import { recordVoiceTiming, recordVoiceError } from '@/lib/observability/voiceMetrics';
 
 /**
  * Voice modulation parameters
@@ -31,45 +34,60 @@ export class VoiceGenerationService {
     text: string,
     options?: { element?: string; voiceMaskId?: string }
   ): Promise<{ audioData?: Buffer; audioUrl?: string }> {
-    try {
-      if (!process.env.OPENAI_API_KEY) {
-        throw new Error('OpenAI API key not configured');
+    const { ms, value } = await timeIt('voice.tts.openai', async () => {
+      try {
+        if (!process.env.OPENAI_API_KEY) {
+          throw new Error('OpenAI API key not configured');
+        }
+
+        const ttsResponse = await fetch('https://api.openai.com/v1/audio/speech', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'tts-1-hd',
+            input: text,
+            voice: 'alloy',
+            response_format: 'mp3',
+            speed: 1.0,
+          }),
+        });
+
+        if (!ttsResponse.ok) {
+          throw new Error(`TTS API error: ${ttsResponse.status}`);
+        }
+
+        const audioBuffer = await ttsResponse.arrayBuffer();
+        const audioData = Buffer.from(audioBuffer);
+        const audioUrl = `data:audio/mp3;base64,${audioData.toString('base64')}`;
+
+        return {
+          audioData,
+          audioUrl,
+          success: true,
+        };
+      } catch (error: any) {
+        console.error('Voice generation error:', error);
+        recordVoiceError('voice.tts.openai', error, { element: options?.element });
+        return {
+          audioData: undefined,
+          audioUrl: undefined,
+          success: false,
+        };
       }
+    });
 
-      const ttsResponse = await fetch('https://api.openai.com/v1/audio/speech', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'tts-1-hd',
-          input: text,
-          voice: 'alloy',
-          response_format: 'mp3',
-          speed: 1.0,
-        }),
-      });
+    recordVoiceTiming('voice.tts.openai', ms, value.success, {
+      element: options?.element,
+      textLength: text.length,
+    });
 
-      if (!ttsResponse.ok) {
-        throw new Error(`TTS API error: ${ttsResponse.status}`);
-      }
-
-      const audioBuffer = await ttsResponse.arrayBuffer();
-      const audioData = Buffer.from(audioBuffer);
-      const audioUrl = `data:audio/mp3;base64,${audioData.toString('base64')}`;
-
-      return {
-        audioData,
-        audioUrl,
-      };
-    } catch (error: any) {
-      console.error('Voice generation error:', error);
-      return {
-        audioData: undefined,
-        audioUrl: undefined,
-      };
-    }
+    return {
+      audioData: value.audioData,
+      audioUrl: value.audioUrl,
+    };
   }
 
   /**

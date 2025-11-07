@@ -5,9 +5,11 @@
  * Target latency: ~200ms (faster & cheaper than ElevenLabs)
  *
  * Philosophy: MAIA's soul, OpenAI's voice
+ * Fire Phase - Voice telemetry added
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { recordVoiceTiming, recordVoiceError } from '@/lib/observability/voiceMetrics';
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
 
@@ -78,6 +80,13 @@ export async function POST(req: NextRequest) {
     const audioBuffer = await response.arrayBuffer();
     const processingTime = Date.now() - startTime;
 
+    recordVoiceTiming('voice.tts.openai', processingTime, true, {
+      voice: selectedVoice,
+      model: quality === 'hd' ? 'tts-1-hd' : 'tts-1',
+      textLength: text.length,
+      cost: (text.length / 1000 * 0.015).toFixed(4),
+    });
+
     console.log(`⚡ OpenAI TTS complete: ${processingTime}ms (cost: ~$${(text.length / 1000 * 0.015).toFixed(4)})`);
 
     // Return audio as blob
@@ -92,6 +101,8 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    recordVoiceError('voice.tts.openai', errorMsg, { voice, quality });
     console.error('❌ Synthesis error:', error);
     return NextResponse.json({
       success: false,

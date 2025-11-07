@@ -8,6 +8,8 @@ import { recordToneMetric } from '@/lib/metrics/toneMetrics';
 import { saveMaiaConversationPair } from '@/lib/services/maia-memory-service';
 import { simpleMemoryCapture } from '@/lib/services/simple-memory-capture';
 import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '@/lib/knowledge/ElementalAlchemyKnowledge';
+import { timeIt } from '@/lib/observability/timer';
+import { recordVoiceTiming, recordVoiceError } from '@/lib/observability/voiceMetrics';
 
 // Initialize UNIFIED consciousness (26-year spiral completion)
 let maiaConsciousness: ReturnType<typeof getMAIAConsciousness> | null = null;
@@ -180,19 +182,28 @@ export async function POST(request: NextRequest) {
 
     try {
       console.log(`🚀 Calling maiaConsciousness.process() in ${modality} mode...`);
-      const consciousnessResponse = await maiaConsciousness!.process({
-        content: userInput,
-        context: {
-          userId: requestUserId,
-          sessionId: sessionId || requestUserId,
-          userName: userName,
-          preferences: preferences
-        },
-        modality: modality as 'voice' | 'text',
-        conversationHistory: recentEntries.map((entry: any) => ({
-          role: 'user',
-          content: entry.content || ''
-        }))
+
+      // Instrument Oracle timing
+      const { ms: oracleMs, value: consciousnessResponse } = await timeIt('voice.oracle', async () => {
+        return await maiaConsciousness!.process({
+          content: userInput,
+          context: {
+            userId: requestUserId,
+            sessionId: sessionId || requestUserId,
+            userName: userName,
+            preferences: preferences
+          },
+          modality: modality as 'voice' | 'text',
+          conversationHistory: recentEntries.map((entry: any) => ({
+            role: 'user',
+            content: entry.content || ''
+          }))
+        });
+      });
+
+      recordVoiceTiming('voice.oracle', oracleMs, true, {
+        mode: modality,
+        provider: 'unified-consciousness'
       });
 
       const responseText = consciousnessResponse.message || "I hear you. Tell me more about what's on your mind.";
@@ -286,6 +297,12 @@ export async function POST(request: NextRequest) {
         cause: agentError.cause,
         fullError: JSON.stringify(agentError, Object.getOwnPropertyNames(agentError))
       });
+
+      recordVoiceError('voice.oracle', agentError instanceof Error ? agentError.message : String(agentError), {
+        mode: modality,
+        provider: 'unified-consciousness'
+      });
+
       console.log('🔄 Falling back to OpenAI...');
     }
 
@@ -301,27 +318,35 @@ export async function POST(request: NextRequest) {
           sessionId: sessionId || 'session-' + Date.now()
         });
 
-        const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: 'gpt-4',
-            messages: [
-              { role: 'system', content: comprehensiveSystemPrompt },
-              { role: 'user', content: userInput }
-            ],
-            temperature: 0.7,
-            max_tokens: 200
-          })
+        // Instrument OpenAI fallback timing
+        const { ms: openaiMs, value: openaiResponse } = await timeIt('voice.oracle', async () => {
+          return await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+            },
+            body: JSON.stringify({
+              model: 'gpt-4',
+              messages: [
+                { role: 'system', content: comprehensiveSystemPrompt },
+                { role: 'user', content: userInput }
+              ],
+              temperature: 0.7,
+              max_tokens: 200
+            })
+          });
         });
 
         if (openaiResponse.ok) {
           const data = await openaiResponse.json();
           const responseText = data.choices[0].message.content.trim();
           const responseTime = Date.now() - startTime;
+
+          recordVoiceTiming('voice.oracle', openaiMs, true, {
+            mode: modality,
+            provider: 'openai-fallback'
+          });
 
           console.log('✅ OpenAI fallback response successful:', responseTime + 'ms');
 
@@ -359,10 +384,19 @@ export async function POST(request: NextRequest) {
             }
           });
         } else {
-          console.error('❌ OpenAI API error:', openaiResponse.status, await openaiResponse.text());
+          const errorText = await openaiResponse.text();
+          console.error('❌ OpenAI API error:', openaiResponse.status, errorText);
+          recordVoiceError('voice.oracle', `OpenAI API ${openaiResponse.status}: ${errorText}`, {
+            mode: modality,
+            provider: 'openai-fallback'
+          });
         }
       } catch (openaiError: any) {
         console.error('❌ OpenAI fallback failed:', openaiError.message || openaiError);
+        recordVoiceError('voice.oracle', openaiError instanceof Error ? openaiError.message : String(openaiError), {
+          mode: modality,
+          provider: 'openai-fallback'
+        });
       }
     }
 

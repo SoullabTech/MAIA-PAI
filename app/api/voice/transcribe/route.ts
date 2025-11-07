@@ -7,6 +7,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { timeIt } from '@/lib/observability/timer';
+import { recordVoiceTiming, recordVoiceError } from '@/lib/observability/voiceMetrics';
 
 const WHISPER_API_URL = process.env.WHISPER_API_URL || 'http://localhost:8001';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
@@ -153,18 +155,20 @@ export async function POST(req: NextRequest) {
       if (USE_WHISPER_SELF_HOSTED) {
         // Try self-hosted Whisper first ($0 cost, sovereignty)
         console.log('🔥 Trying self-hosted Whisper...');
-        const result = await transcribeWithSelfHostedWhisper(audioFile);
+        const { ms, value: result } = await timeIt('voice.transcribe', () => transcribeWithSelfHostedWhisper(audioFile));
         transcript = result.transcript;
         confidence = result.confidence;
         provider = 'whisper-self-hosted';
+        recordVoiceTiming('voice.transcribe', ms, true, { provider });
         console.log(`✅ Self-hosted Whisper success: ${result.processingTime}ms`);
       } else {
         // Use OpenAI Whisper API (cloud, reliable)
         console.log('☁️  Using OpenAI Whisper API...');
-        const result = await transcribeWithOpenAI(audioFile);
+        const { ms, value: result } = await timeIt('voice.transcribe', () => transcribeWithOpenAI(audioFile));
         transcript = result.transcript;
         confidence = result.confidence;
         provider = 'openai-whisper';
+        recordVoiceTiming('voice.transcribe', ms, true, { provider });
       }
     } catch (primaryError) {
       const primaryErrMsg = primaryError instanceof Error ? primaryError.message : String(primaryError);
@@ -174,21 +178,24 @@ export async function POST(req: NextRequest) {
         stack: primaryErrStack,
         error: primaryError
       });
+      recordVoiceError('voice.transcribe', primaryErrMsg, { provider: USE_WHISPER_SELF_HOSTED ? 'whisper-self-hosted' : 'openai-whisper' });
 
       // Fallback to secondary provider
       try {
         if (USE_WHISPER_SELF_HOSTED) {
           console.log('☁️  Falling back to OpenAI Whisper...');
-          const result = await transcribeWithOpenAI(audioFile);
+          const { ms, value: result } = await timeIt('voice.transcribe', () => transcribeWithOpenAI(audioFile));
           transcript = result.transcript;
           confidence = result.confidence;
           provider = 'openai-whisper-fallback';
+          recordVoiceTiming('voice.transcribe', ms, true, { provider, fallback: true });
         } else {
           console.log('🔥 Falling back to self-hosted Whisper...');
-          const result = await transcribeWithSelfHostedWhisper(audioFile);
+          const { ms, value: result } = await timeIt('voice.transcribe', () => transcribeWithSelfHostedWhisper(audioFile));
           transcript = result.transcript;
           confidence = result.confidence;
           provider = 'whisper-self-hosted-fallback';
+          recordVoiceTiming('voice.transcribe', ms, true, { provider, fallback: true });
         }
       } catch (fallbackError) {
         const fallbackErrMsg = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
@@ -199,6 +206,7 @@ export async function POST(req: NextRequest) {
           fallbackStack: fallbackErrStack,
           error: fallbackError
         });
+        recordVoiceError('voice.transcribe', `Both providers failed: ${fallbackErrMsg}`, { primary: primaryErrMsg, fallback: fallbackErrMsg });
 
         // Instead of throwing, return empty transcript gracefully
         // This prevents the voice interface from breaking when transcription fails
@@ -206,6 +214,7 @@ export async function POST(req: NextRequest) {
         transcript = '';
         confidence = 0;
         provider = 'failed-gracefully';
+        recordVoiceTiming('voice.transcribe', Date.now() - startTime, false, { provider });
       }
     }
 

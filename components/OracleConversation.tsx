@@ -46,6 +46,7 @@ import { detectJournalCommand, detectBreakthroughPotential } from '@/lib/service
 import { useFieldProtocolIntegration } from '@/hooks/useFieldProtocolIntegration';
 import { BookPlus } from 'lucide-react';
 import { TransformationalPresence, type PresenceState } from './nlp/TransformationalPresence';
+import { recordVoiceTiming } from '@/lib/observability/voiceMetrics';
 
 interface OracleConversationProps {
   userId?: string;
@@ -197,6 +198,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const isRespondingRef = useRef(false);
   const lastVoiceErrorRef = useRef<number>(0);
   const lastProcessedTranscriptRef = useRef<{ text: string; timestamp: number } | null>(null);
+  const e2eTimingRef = useRef<number | null>(null); // Track E2E voice pipeline timing
 
   // ==================== HOOKS ====================
   // OpenAI Realtime API - Full Dynamic Experience (interruption, VAD, turn-taking)
@@ -219,6 +221,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     onTranscript: (text, isUser) => {
       if (isUser) {
         setUserTranscript(text);
+        // Start E2E timing when user transcript is received
+        e2eTimingRef.current = performance.now();
       } else {
         // MAIA's response from OpenAI Realtime API - incremental deltas
 
@@ -269,6 +273,16 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setIsResponding(true);
       setIsAudioPlaying(true);
       console.log('🔊 MAIA started speaking');
+
+      // Record E2E timing when audio starts playing
+      if (e2eTimingRef.current) {
+        const e2eMs = performance.now() - e2eTimingRef.current;
+        recordVoiceTiming('voice.e2e', e2eMs, true, {
+          mode: realtimeMode,
+          provider: 'realtime-api'
+        });
+        e2eTimingRef.current = null; // Reset for next exchange
+      }
     },
     onAudioEnd: () => {
       setIsResponding(false);

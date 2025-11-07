@@ -249,7 +249,7 @@ ${ELEMENTAL_ALCHEMY_FRAMEWORK}`;
   const holoflowerCheckIn = getFreshCheckIn();
   if (holoflowerCheckIn) {
     const interpretation = interpretCheckIn(holoflowerCheckIn);
-    basePrompt += `\n\n${interpretation.maiaContext}`;
+    basePrompt = basePrompt + `\n\n${interpretation.maiaContext}`;
     console.log('✨ [MAIA] Holoflower check-in context injected:', {
       dominant: interpretation.dominant,
       shadow: interpretation.shadow,
