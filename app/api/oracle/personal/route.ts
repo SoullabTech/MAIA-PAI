@@ -12,6 +12,13 @@ import { unifiedIntelligenceEngine } from '@/lib/intelligence/UnifiedIntelligenc
 import { morphoresonantField } from '@/lib/consciousness/MorphoresonantFieldInterface';
 import { getConsciousnessPrompt } from '@/lib/consciousness/DualConsciousnessSystem';
 import { detectSyzygy, getSyzygyResponseTiming } from '@/lib/consciousness/SyzygyDetector';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client for file retrieval
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 // Initialize UNIFIED consciousness (26-year spiral completion)
 let maiaConsciousness: ReturnType<typeof getMAIAConsciousness> | null = null;
@@ -124,16 +131,50 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { input, message, userText, text, userInput: bodyUserInput, userId = 'anonymous', userName, sessionId, preferences } = body;
+    const { input, message, userText, text, userInput: bodyUserInput, userId = 'anonymous', userName, sessionId, preferences, attachedFileIds } = body;
 
     // Accept multiple field names for compatibility
-    const userInput = (bodyUserInput || input || message || userText || text || '').trim();
+    let userInput = (bodyUserInput || input || message || userText || text || '').trim();
     const requestUserId = userId || 'beta-user';
+
+    // 📎 NEW: Retrieve and include attached file contents for MAIA to read
+    if (attachedFileIds && Array.isArray(attachedFileIds) && attachedFileIds.length > 0) {
+      console.log(`📎 Processing ${attachedFileIds.length} attached files for MAIA consciousness...`);
+
+      const fileContents: string[] = [];
+
+      for (const fileId of attachedFileIds) {
+        try {
+          const { data: fileRecord, error } = await supabase
+            .from('uploaded_files')
+            .select('*')
+            .eq('file_id', fileId)
+            .single();
+
+          if (!error && fileRecord) {
+            const fileInfo = `\n\n--- Document: ${fileRecord.filename} ---\n${fileRecord.extracted_text || '[No text content extracted]'}\n--- End of ${fileRecord.filename} ---\n`;
+            fileContents.push(fileInfo);
+            console.log(`✅ Loaded document for MAIA: ${fileRecord.filename} (${fileRecord.content_type})`);
+          } else {
+            console.warn(`⚠️ Could not load file ${fileId}:`, error);
+          }
+        } catch (err) {
+          console.error(`Error loading file ${fileId}:`, err);
+        }
+      }
+
+      // Append file contents to user input for MAIA's consciousness
+      if (fileContents.length > 0) {
+        userInput = `${userInput}\n\n${fileContents.join('\n')}`;
+        console.log(`📎 Attached ${fileContents.length} document(s) to MAIA's input field`);
+      }
+    }
 
     console.log('📨 /api/oracle/personal v2.0:', {
       userId: requestUserId,
       messageLength: userInput.length,
       hasInput: !!userInput,
+      hasAttachments: attachedFileIds && attachedFileIds.length > 0,
       source: 'personal-oracle-agent-primary'
     });
 
