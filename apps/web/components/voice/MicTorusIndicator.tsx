@@ -72,7 +72,7 @@ function PulsingTorus({ isRecording, isProcessing, isSpeaking }: TorusProps) {
         <mesh ref={innerTorusRef} rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[0.9, 0.04, 12, 80]} />
           <meshBasicMaterial
-            color={isRecording ? "#FFD700" : isSpeaking ? "#00D4FF" : "#FFA500"}
+            color={isRecording ? "#FFD700" : isSpeaking ? "#F0C98A" : "#FFA500"}
             transparent
             opacity={0.3}
           />
@@ -114,11 +114,11 @@ export default function MicTorusIndicator({ isRecording, isProcessing = false, i
       
       {/* Status text overlay */}
       {(isRecording || isProcessing || isSpeaking) && (
-        <div 
+        <div
           className={`absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-xs font-medium tracking-wide ${
-            isSpeaking ? 'text-blue-300' : 'text-sacred-gold'
+            isSpeaking ? 'text-amber-300' : 'text-sacred-gold'
           }`}
-          style={{ textShadow: isSpeaking ? '0 0 10px rgba(0, 212, 255, 0.5)' : '0 0 10px rgba(255, 215, 0, 0.5)' }}
+          style={{ textShadow: isSpeaking ? '0 0 10px rgba(240, 201, 138, 0.6)' : '0 0 10px rgba(255, 215, 0, 0.5)' }}
         >
           {isRecording ? 'Listening...' : isProcessing ? 'Processing...' : isSpeaking ? 'Maya Speaking...' : ''}
         </div>

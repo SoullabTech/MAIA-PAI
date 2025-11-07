@@ -53,6 +53,9 @@ export const MaiaWebRTCConversation = forwardRef<MaiaWebRTCConversationRef, Maia
       voice = 'shimmer',
     } = props;
 
+    // One-shot guard for autoStart to prevent double-connecting
+    const hasAutoStartedRef = React.useRef(false);
+
     // Generate MAIA's full consciousness system prompt
     const systemPrompt = getMaiaSystemPrompt({
       conversationStyle,
@@ -110,16 +113,28 @@ export const MaiaWebRTCConversation = forwardRef<MaiaWebRTCConversationRef, Maia
       isRecording: isListening,
     }));
 
-    // Auto-start if enabled
+    // Auto-start if enabled (one-shot, safe)
     useEffect(() => {
-      if (autoStart && !isConnected && !isSpeaking && !isProcessing) {
-        const timer = setTimeout(() => {
-          console.log('🎙️ [MaiaWebRTCConversation] Auto-starting voice connection');
+      if (!autoStart || hasAutoStartedRef.current) return;
+      if (isConnected || isSpeaking || isProcessing) return;
+
+      // Mark as attempted to prevent re-runs
+      hasAutoStartedRef.current = true;
+
+      const timer = setTimeout(() => {
+        console.log('🎙️ [MaiaWebRTCConversation] Auto-starting voice connection (one-shot)');
+        try {
           connect();
-        }, 1000);
-        return () => clearTimeout(timer);
-      }
-    }, [autoStart, isConnected, isSpeaking, isProcessing, connect]);
+        } catch (err) {
+          console.error('Auto-start failed:', err);
+          // Reset flag on error so user can manually retry
+          hasAutoStartedRef.current = false;
+        }
+      }, 1000);
+
+      return () => clearTimeout(timer);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [autoStart]);
 
     // Notify parent of recording state changes
     useEffect(() => {

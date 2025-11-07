@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Send, Mic, MicOff, Sparkles, User, BookOpen, LogOut, Library, Settings, Database, Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cleanMessage } from "@/lib/cleanMessage";
 import { MicrophoneCapture, MicrophoneCaptureRef } from "@/components/voice/MicrophoneCapture";
-// OLD: Web Speech API with restart loop bugs (REPLACED with WebRTC)
-// import { ContinuousConversation, ContinuousConversationRef } from "@/components/voice/ContinuousConversation";
-// NEW: WebRTC with full MAIA consciousness + server-side VAD (no restart loops)
+// WebRTC version - natural voice quality
 import { MaiaWebRTCConversation, MaiaWebRTCConversationRef } from "@/components/voice/MaiaWebRTCConversation";
+// Web Speech API fallback (disabled - "robo voice")
+// import { ContinuousConversation, ContinuousConversationRef } from "@/components/voice/ContinuousConversation";
 import { OracleVoicePlayer } from "@/components/voice/OracleVoicePlayer";
 import TranscriptPreview from "@/app/components/TranscriptPreview";
 import { unlockAudio, addAutoUnlockListeners } from "@/lib/audio/audioUnlock";
@@ -73,6 +73,16 @@ function OraclePageInner() {
   const microphoneRef = useRef<MicrophoneCaptureRef>(null);
   const continuousRef = useRef<MaiaWebRTCConversationRef>(null);
   const router = useRouter();
+
+  // Tap lock for debouncing holoflower clicks
+  const tapLockRef = useRef(false);
+
+  // Watchdog for connection retries
+  const watchdogRef = useRef<NodeJS.Timeout | null>(null);
+  const retryCountRef = useRef(0);
+
+  // Connection status for explicit UI feedback
+  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
 
   // File upload hook
   const {
@@ -154,6 +164,77 @@ function OraclePageInner() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Auto-start voice connection on mount with watchdog
+  useEffect(() => {
+    if (!useContinuousMode) return;
+
+    // Attempt initial connection shortly after mount
+    const timer = setTimeout(async () => {
+      console.log('🎙️ [Oracle] Auto-starting voice connection...');
+      setConnectionStatus('connecting');
+
+      try {
+        await unlockAudio();
+        if (continuousRef.current) {
+          continuousRef.current.startListening?.();
+
+          // Verify connection after a short delay
+          setTimeout(() => {
+            if (continuousRef.current?.isListening) {
+              setConnectionStatus('connected');
+              stopWatchdog();
+              console.log('✅ Auto-start successful');
+            } else {
+              console.warn('⚠️ Auto-start failed, starting watchdog...');
+              setConnectionStatus('error');
+              startWatchdog();
+            }
+          }, 1000);
+        }
+      } catch (err) {
+        console.error('Auto-start error:', err);
+        setConnectionStatus('error');
+        startWatchdog();
+      }
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+      stopWatchdog();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Resume connection when tab becomes visible
+  useEffect(() => {
+    if (!useContinuousMode) return;
+
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible' && !continuousRef.current?.isListening) {
+        console.log('👁️ Tab visible, resuming voice connection...');
+        setConnectionStatus('connecting');
+        try {
+          await unlockAudio();
+          continuousRef.current?.startListening();
+          setTimeout(() => {
+            if (continuousRef.current?.isListening) {
+              setConnectionStatus('connected');
+            } else {
+              startWatchdog();
+            }
+          }, 500);
+        } catch (err) {
+          console.error('Resume connection failed:', err);
+          startWatchdog();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [useContinuousMode]);
 
   const handleSend = async (text?: string) => {
     const messageText = text || input;
@@ -479,16 +560,85 @@ function OraclePageInner() {
     microphoneRef.current?.toggleRecording();
   };
 
+  // Tap lock helper to prevent double-taps
+  const withTapLock = useCallback(async (fn: () => Promise<void> | void) => {
+    if (tapLockRef.current) {
+      console.log('⏸️ Tap locked - ignoring rapid tap');
+      return;
+    }
+    tapLockRef.current = true;
+    try {
+      await fn();
+    } finally {
+      setTimeout(() => {
+        tapLockRef.current = false;
+      }, 600);
+    }
+  }, []);
+
+  // Watchdog with exponential backoff for connection retries
+  const startWatchdog = useCallback(() => {
+    if (watchdogRef.current) clearTimeout(watchdogRef.current);
+
+    const backoff = Math.min(2000 * Math.pow(1.5, retryCountRef.current), 10000);
+    console.log(`🐕 Watchdog: retry #${retryCountRef.current}, backoff ${backoff}ms`);
+
+    watchdogRef.current = setTimeout(async () => {
+      if (!continuousRef.current?.isListening && retryCountRef.current < 3) {
+        console.log('🔄 Watchdog: Retrying connection...');
+        retryCountRef.current++;
+        setConnectionStatus('connecting');
+        try {
+          await unlockAudio();
+          continuousRef.current?.startListening();
+        } catch (err) {
+          console.error('Watchdog retry failed:', err);
+          setConnectionStatus('error');
+        }
+        startWatchdog(); // Reschedule
+      }
+    }, backoff);
+  }, []);
+
+  const stopWatchdog = useCallback(() => {
+    if (watchdogRef.current) {
+      clearTimeout(watchdogRef.current);
+      watchdogRef.current = null;
+    }
+    retryCountRef.current = 0;
+  }, []);
+
   const handleTorusClick = async () => {
     console.log('🎯 Torus clicked - useContinuousMode:', useContinuousMode, 'isRecording:', isRecording);
-    if (useContinuousMode) {
-      await unlockAudio();
-      console.log('🔊 Audio unlocked, toggling listening...');
-      continuousRef.current?.toggleListening();
-      console.log('🎤 Toggle listening called on ref:', continuousRef.current);
-    } else {
-      toggleRecording();
-    }
+
+    await withTapLock(async () => {
+      if (useContinuousMode) {
+        setConnectionStatus('connecting');
+        await unlockAudio();
+        console.log('🔊 Audio unlocked, toggling listening...');
+
+        try {
+          continuousRef.current?.toggleListening();
+          console.log('🎤 Toggle listening called on ref:', continuousRef.current);
+
+          // Update status based on ref state
+          setTimeout(() => {
+            if (continuousRef.current?.isListening) {
+              setConnectionStatus('connected');
+              stopWatchdog();
+            } else {
+              setConnectionStatus('disconnected');
+            }
+          }, 300);
+        } catch (err) {
+          console.error('Error toggling listening:', err);
+          setConnectionStatus('error');
+          startWatchdog();
+        }
+      } else {
+        toggleRecording();
+      }
+    });
   };
 
   // Keyboard handler for Return key shortcuts
@@ -768,11 +918,51 @@ function OraclePageInner() {
           title={isRecording ? "Click to stop listening" : "Click to start listening"}
           aria-label={isRecording ? "Stop listening" : "Start listening"}
         >
-          {/* Ripple waves - only show when recording */}
+          {/* Outer colored detection band - prominent visual indicator */}
+          {(isRecording || isLoading || !!currentAudioUrl || !!currentAudioData) && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              {/* Large colored ring that pulses with activity */}
+              <div
+                className={`
+                  absolute w-40 h-40 sm:w-48 sm:h-48 rounded-full
+                  border-4 transition-all duration-300
+                  ${isRecording
+                    ? 'border-[#00FF88] animate-pulse shadow-[0_0_30px_rgba(0,255,136,0.6)]'
+                    : isLoading
+                    ? 'border-[#FFA500] animate-spin shadow-[0_0_30px_rgba(255,165,0,0.6)]'
+                    : 'border-[#F0C98A] animate-pulse shadow-[0_0_30px_rgba(240,201,138,0.6)]'
+                  }
+                `}
+                style={{
+                  background: isRecording
+                    ? 'radial-gradient(circle, rgba(0,255,136,0.1) 0%, transparent 70%)'
+                    : isLoading
+                    ? 'radial-gradient(circle, rgba(255,165,0,0.1) 0%, transparent 70%)'
+                    : 'radial-gradient(circle, rgba(240,201,138,0.1) 0%, transparent 70%)'
+                }}
+              />
+
+              {/* Middle ring for depth */}
+              <div
+                className={`
+                  absolute w-32 h-32 sm:w-36 sm:h-36 rounded-full
+                  border-2 transition-all duration-300
+                  ${isRecording
+                    ? 'border-[#00FF88]/60 animate-[ping_2s_ease-out_infinite]'
+                    : isLoading
+                    ? 'border-[#FFA500]/60 animate-[spin_3s_linear_infinite]'
+                    : 'border-[#F0C98A]/60 animate-[ping_2.5s_ease-out_infinite]'
+                  }
+                `}
+              />
+            </div>
+          )}
+
+          {/* Original ripple waves - smaller, inner waves */}
           {isRecording && (
             <>
-              <span className="absolute w-24 h-24 rounded-full border border-[#FFD700] opacity-60 animate-[ping_2s_linear_infinite]" />
-              <span className="absolute w-32 h-32 rounded-full border border-[#FFD700] opacity-30 animate-[ping_3s_linear_infinite]" />
+              <span className="absolute w-24 h-24 rounded-full border border-[#00FF88] opacity-60 animate-[ping_2s_linear_infinite]" />
+              <span className="absolute w-28 h-28 rounded-full border border-[#00FF88] opacity-30 animate-[ping_3s_linear_infinite]" />
             </>
           )}
 
@@ -782,6 +972,49 @@ function OraclePageInner() {
             isSpeaking={!!currentAudioUrl || !!currentAudioData}
           />
         </button>
+
+        {/* Connection status chip - explicit state indicator */}
+        {useContinuousMode && (
+          <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
+            <div
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 ${
+                connectionStatus === 'connected'
+                  ? 'bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/40'
+                  : connectionStatus === 'connecting'
+                  ? 'bg-orange-500/20 text-orange-300 border border-orange-500/40 animate-pulse'
+                  : connectionStatus === 'error'
+                  ? 'bg-red-500/20 text-red-300 border border-red-500/40'
+                  : 'bg-gray-500/20 text-gray-400 border border-gray-500/40'
+              }`}
+              style={{
+                textShadow:
+                  connectionStatus === 'connected'
+                    ? '0 0 10px rgba(0, 255, 136, 0.5)'
+                    : connectionStatus === 'connecting'
+                    ? '0 0 10px rgba(255, 165, 0, 0.5)'
+                    : 'none',
+              }}
+            >
+              {connectionStatus === 'connected' && '🎙️ Listening...'}
+              {connectionStatus === 'connecting' && '⏳ Connecting...'}
+              {connectionStatus === 'error' && '❌ Connection Error'}
+              {connectionStatus === 'disconnected' && '⚪ Disconnected'}
+              {isLoading && ' Processing...'}
+              {(!!currentAudioUrl || !!currentAudioData) && ' 🔊 Maya Speaking...'}
+            </div>
+
+            {/* Fallback button when disconnected */}
+            {connectionStatus === 'disconnected' && (
+              <button
+                onClick={handleTorusClick}
+                className="px-4 py-2 bg-sacred-gold/20 hover:bg-sacred-gold/30 text-sacred-gold border border-sacred-gold/40 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-lg hover:shadow-sacred-gold/20"
+                style={{ textShadow: '0 0 10px rgba(255, 215, 0, 0.5)' }}
+              >
+                🎤 Start Voice
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Live Transcript Preview - Fixed positioning */}
         <div className="px-4 pb-2">
@@ -797,7 +1030,7 @@ function OraclePageInner() {
         {/* Input Area */}
         <div className="border-t border-gray-800 p-2 sm:p-4 bg-[#0A0D16]/80 backdrop-blur-sm">
           <div className="flex items-center gap-2 sm:gap-3 relative">
-            {/* Continuous Conversation Mode - NOW USING WebRTC with MAIA consciousness! */}
+            {/* Continuous Conversation Mode - WebRTC with natural voice */}
             {useContinuousMode && (
               <div className="hidden">
                 <MaiaWebRTCConversation
@@ -807,16 +1040,7 @@ function OraclePageInner() {
                   onRecordingStateChange={setIsRecording}
                   isProcessing={isLoading}
                   isSpeaking={isSpeaking}
-                  autoStart={false}
-                  userId={user?.id || 'anonymous'}
-                  element={user?.element || 'aether'}
-                  conversationStyle="natural"
-                  voice="shimmer"
-                  silenceThreshold={settings.adaptiveMode
-                    ? Math.min(settings.silenceTimeout, 2500)
-                    : Math.min(settings.silenceTimeout, 3000)
-                  }
-                  vadSensitivity={0.3}
+                  autoStart={true}
                 />
               </div>
             )}

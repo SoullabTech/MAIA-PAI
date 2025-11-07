@@ -42,12 +42,22 @@ export function useMaiaVoice(options: UseMaiaVoiceOptions = {}) {
   }, []);
 
   const connect = useCallback(async () => {
+    // Guard against multiple simultaneous connection attempts
     if (clientRef.current?.isConnected()) {
-      console.log('Already connected');
+      console.log('✅ Already connected');
+      return;
+    }
+
+    // Check if already connecting
+    const client = clientRef.current;
+    if (client && (client as any).isConnecting) {
+      console.log('⏳ Connection already in progress, please wait...');
       return;
     }
 
     try {
+      console.log('🚀 Starting voice connection...');
+
       // Generate MAIA's personality prompt if not provided
       const systemPrompt = options.systemPrompt || getMaiaSystemPrompt({
         conversationStyle: options.conversationStyle || 'natural',

@@ -97,6 +97,66 @@ You are the witnessing presence. Trust the unfolding.`
     };
   }
 
+  /**
+   * Preflight microphone permission check with friendly error messages
+   */
+  private async ensureMicPermission(): Promise<void> {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      throw new Error('Browser APIs not available');
+    }
+
+    try {
+      console.log('🎤 Checking microphone permissions...');
+
+      // Query permissions API if available
+      if ('permissions' in navigator) {
+        try {
+          const result = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+          if (result.state === 'denied') {
+            throw new Error(
+              'Microphone access denied. Please allow microphone access in your browser settings and reload the page.'
+            );
+          }
+          console.log(`✅ Mic permission state: ${result.state}`);
+        } catch (permErr) {
+          console.warn('Permissions API not supported, continuing with getUserMedia:', permErr);
+        }
+      }
+
+      // Early mic check (request permission but don't keep the stream)
+      const testStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          sampleRate: 24000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+        },
+      });
+
+      console.log('✅ Microphone permission granted');
+
+      // Release the test stream immediately
+      testStream.getTracks().forEach((track) => track.stop());
+
+    } catch (error: any) {
+      console.error('❌ Microphone permission error:', error);
+
+      let errorMessage = 'Microphone access denied';
+      if (error.name === 'NotAllowedError') {
+        errorMessage = '🎤 Please allow microphone access to use voice chat. Check your browser permissions and try again.';
+      } else if (error.name === 'NotFoundError') {
+        errorMessage = '🎤 No microphone found. Please connect a microphone and try again.';
+      } else if (error.name === 'NotReadableError') {
+        errorMessage = '🎤 Microphone is already in use by another application. Please close other apps using the mic and try again.';
+      } else if (error.name === 'OverconstrainedError') {
+        errorMessage = '🎤 Your microphone doesn\'t support the required settings. Try using a different microphone.';
+      }
+
+      this.config.onError(new Error(errorMessage));
+      throw new Error(errorMessage);
+    }
+  }
+
   async connect(): Promise<void> {
     try {
       if (typeof window === 'undefined') {
@@ -109,6 +169,10 @@ You are the witnessing presence. Trust the unfolding.`
       }
 
       this.isConnecting = true;
+
+      // Step 0: Preflight mic permission check
+      await this.ensureMicPermission();
+
       console.log('🔌 Connecting to OpenAI Realtime API (WebRTC - Unified Interface)...');
 
       // Step 1: Create RTCPeerConnection
@@ -399,6 +463,8 @@ You are the witnessing presence. Trust the unfolding.`
     }
 
     try {
+      console.log('🎤 Requesting microphone access...');
+
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           sampleRate: 24000,
@@ -408,17 +474,29 @@ You are the witnessing presence. Trust the unfolding.`
         },
       });
 
-      console.log('🎤 Microphone access granted');
+      console.log('✅ Microphone access granted');
 
       // Add audio track to peer connection
       stream.getAudioTracks().forEach((track) => {
+        console.log('🎤 Adding audio track to peer connection');
         this.peerConnection?.addTrack(track, stream);
       });
 
-    } catch (error) {
-      console.error('❌ Microphone access denied:', error);
-      this.config.onError(new Error('Microphone access denied'));
-      throw error;
+    } catch (error: any) {
+      console.error('❌ Microphone access error:', error);
+
+      // Provide helpful error messages
+      let errorMessage = 'Microphone access denied';
+      if (error.name === 'NotAllowedError') {
+        errorMessage = 'Please allow microphone access to use voice chat';
+      } else if (error.name === 'NotFoundError') {
+        errorMessage = 'No microphone found - please connect a microphone';
+      } else if (error.name === 'NotReadableError') {
+        errorMessage = 'Microphone is already in use by another application';
+      }
+
+      this.config.onError(new Error(errorMessage));
+      throw new Error(errorMessage);
     }
   }
 
