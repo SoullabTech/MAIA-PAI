@@ -49,6 +49,7 @@ import { SacredLabDrawer } from './ui/SacredLabDrawer';
 import { ConversationStylePreference } from '@/lib/preferences/conversation-style-preference';
 import { detectJournalCommand, detectBreakthroughPotential } from '@/lib/services/conversationEssenceExtractor';
 import { useFieldProtocolIntegration } from '@/hooks/useFieldProtocolIntegration';
+import { useScribeMode } from '@/hooks/useScribeMode';
 import { BookPlus } from 'lucide-react';
 import { TransformationalPresence, type PresenceState } from './nlp/TransformationalPresence';
 import { SessionTimer, SESSION_PRESETS } from '@/lib/session/SessionTimer';
@@ -408,6 +409,19 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     autoCapture: true,
     captureThreshold: 5
   });
+
+  // Scribe Mode Integration - Passive recording with active consultation
+  const {
+    isScribing,
+    currentSession: scribeSession,
+    startScribing,
+    stopScribing,
+    recordVoiceTranscript,
+    recordConsultation,
+    generateSynopsis,
+    downloadTranscript: downloadScribeTranscript,
+    getTranscriptForReview
+  } = useScribeMode();
 
   // Sacred Lab Drawer and Voice Menu states now declared earlier (lines 159-160)
 
@@ -1129,6 +1143,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       });
     }
 
+    // 📝 SCRIBE MODE: Record text consultations (practitioner asking MAIA for help)
+    if (isScribing) {
+      console.log('📝 [Scribe Mode] Recording practitioner consultation:', cleanedText.substring(0, 50) + '...');
+      recordConsultation('user', cleanedText);
+      // Continue to process and get MAIA response (unlike voice, text chat is active)
+    }
+
     // Save user message to long-term memory (dual-save to memories + Akashic Records)
     if (oracleAgentId) {
       saveConversationMemory({
@@ -1329,6 +1350,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               elements: responseData.metadata?.elementalInfo?.dominantElements || [element]
             }
           });
+        }
+
+        // 📝 SCRIBE MODE: Record MAIA's consultation responses
+        if (isScribing) {
+          console.log('📝 [Scribe Mode] Recording MAIA consultation response:', responseText.substring(0, 50) + '...');
+          recordConsultation('oracle', responseText);
         }
 
         // Save chat response to long-term memory (dual-save to memories + Akashic Records)
@@ -1689,6 +1716,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         role: 'user',
         conversationMode: realtimeMode
       }).catch(err => console.error('Failed to save voice user message:', err));
+    }
+
+    // 📝 SCRIBE MODE: Record passively without MAIA response
+    if (isScribing) {
+      console.log('📝 [Scribe Mode] Recording voice transcript passively:', cleanedText.substring(0, 50) + '...');
+      recordVoiceTranscript(cleanedText, 'client');
+      return; // Don't trigger MAIA response
     }
 
     try {
@@ -3209,9 +3243,42 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             setShowAudioSettings(true);
             setShowLabDrawer(false);
           }
+
+          // 📝 SCRIBE MODE: Start/Stop recording and download
+          if (action === 'scribe-mode') {
+            if (isScribing) {
+              // Stop scribing and download
+              const result = stopScribing();
+              if (result) {
+                toast.success('Scribe session completed');
+                downloadScribeTranscript();
+                setShowLabDrawer(false);
+              }
+            } else {
+              // Start scribing
+              startScribing();
+              toast.success('Scribe Mode activated - Recording session passively');
+              setShowLabDrawer(false);
+            }
+          }
+
+          // 📝 SCRIBE MODE: Review session with MAIA for supervision
+          if (action === 'review-with-maia') {
+            const transcript = getTranscriptForReview();
+            if (transcript) {
+              // Send transcript to MAIA for review
+              handleTextMessage(`Please review this session transcript and provide supervision insights:\n\n${transcript}`);
+              toast.success('Sending session to MAIA for review');
+              setShowLabDrawer(false);
+            } else {
+              toast.error('No session transcript available');
+            }
+          }
         }}
         showVoiceText={showVoiceText}
         isFieldRecording={isFieldRecording}
+        isScribing={isScribing}
+        hasScribeSession={!!scribeSession}
         isMuted={isMuted}
         isResponding={isResponding}
         isAudioPlaying={isAudioPlaying}

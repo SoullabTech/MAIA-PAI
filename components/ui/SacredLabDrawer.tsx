@@ -25,7 +25,10 @@ import {
   Zap,
   Library,
   Compass,
-  Globe
+  Globe,
+  Mic,
+  MicOff,
+  MessageSquare
 } from 'lucide-react';
 import { LanguageSelector } from '@/components/LanguageSelector';
 
@@ -36,6 +39,8 @@ interface SacredLabDrawerProps {
   onAction?: (action: string) => void;
   showVoiceText?: boolean;
   isFieldRecording?: boolean;
+  isScribing?: boolean;
+  hasScribeSession?: boolean;
 }
 
 export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
@@ -45,6 +50,8 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
   onAction,
   showVoiceText,
   isFieldRecording,
+  isScribing,
+  hasScribeSession,
 }) => {
   const menuSections = [
     {
@@ -125,6 +132,21 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
           description: 'Document consciousness explorations',
           isActive: isFieldRecording,
         },
+        {
+          icon: isScribing ? MicOff : Mic,
+          label: isScribing ? 'Stop Scribe & Download' : 'Start Scribe Mode',
+          action: () => onAction?.('scribe-mode'),
+          description: isScribing
+            ? 'Complete session and download transcript'
+            : 'Record client session passively with MAIA consultation',
+          isActive: isScribing,
+        },
+        ...(hasScribeSession && !isScribing ? [{
+          icon: MessageSquare,
+          label: 'Review Session with MAIA',
+          action: () => onAction?.('review-with-maia'),
+          description: 'Get MAIA supervision on completed session'
+        }] : []),
         {
           icon: Upload,
           label: 'Upload Files',
