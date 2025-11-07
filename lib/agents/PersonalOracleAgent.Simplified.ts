@@ -12,6 +12,8 @@ import type { SymbolicContext } from '@/lib/memory/soulprint';
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
 import { ServiceContainer } from '@/lib/services/oracle/ServiceContainer';
 import { SemanticMemoryService } from '@/lib/memory/SemanticMemoryService';
+// 🌊 Water Phase: Unified Memory System
+import { UnifiedMemoryService } from '@/lib/memory/unified/UnifiedMemoryService';
 import { ElementalOracle2Bridge } from '@/lib/elemental-oracle-2-bridge';
 import { IntellectualPropertyEngine } from '@/lib/intellectual-property-engine';
 import { ActiveListeningCore } from '@/lib/oracle/ActiveListeningCore';
@@ -43,7 +45,8 @@ export class PersonalOracleAgent {
   private services: ServiceContainer;
 
   // Specialized modules that remain in coordinator
-  private semanticMemory: SemanticMemoryService;
+  private semanticMemory: SemanticMemoryService; // 🔜 Being replaced by unifiedMemory
+  private unifiedMemory: UnifiedMemoryService; // 🌊 Water Phase: Unified memory system
   private elementalOracle: ElementalOracle2Bridge;
   private ipEngine: IntellectualPropertyEngine;
   private activeListening: ActiveListeningCore;
@@ -75,7 +78,8 @@ export class PersonalOracleAgent {
     this.services = ServiceContainer.getInstance();
 
     // Initialize specialized modules
-    this.semanticMemory = new SemanticMemoryService();
+    this.semanticMemory = new SemanticMemoryService(); // 🔜 Keeping for rollback
+    this.unifiedMemory = new UnifiedMemoryService(); // 🌊 Water Phase: Single memory coordinator
     this.elementalOracle = new ElementalOracle2Bridge({
       openaiApiKey: process.env.OPENAI_API_KEY || '',
       model: 'gpt-4-turbo',
@@ -156,10 +160,12 @@ export class PersonalOracleAgent {
       console.log('   ✅ Safety check passed');
 
       // 3️⃣ MEMORY LOAD - Get user context and history
-      console.log('   [3/7] MemoryPersistenceService loading context...');
-      const memory = await this.services.getMemoryService().ensureMemoryLoaded(this.userId);
-      const history = await this.services.getMemoryService().getConversationHistory(this.userId, 10);
-      const breakthroughs = await this.services.getMemoryService().getBreakthroughMoments(this.userId, 3);
+      console.log('   [3/7] UnifiedMemoryService loading context...');
+      // 🌊 Water Phase: Using unified memory system
+      const memory = await this.unifiedMemory.ensureMemoryLoaded(this.userId);
+      const history = await this.unifiedMemory.getConversationHistory(this.userId, 10);
+      const breakthroughs = await this.unifiedMemory.getBreakthroughMoments(this.userId, 3);
+      // 🔜 OLD (for rollback): this.services.getMemoryService()...
       console.log(`   ✅ Memory loaded (${history.length} messages, ${breakthroughs.length} breakthroughs)`);
 
       // 4️⃣ SYMBOLIC ANALYSIS - Extract patterns and meaning
@@ -177,8 +183,10 @@ export class PersonalOracleAgent {
       console.log('   [5/7] SystemPromptBuilder constructing prompt...');
       const transformation = await this.getTransformationEnhancement(memory, entries);
       const listening = this.activeListening.processUserInput(trimmedInput, { phase: dominantElement });
-      const patterns = await this.semanticMemory.getUserPatterns(this.userId);
-      const affinity = await this.semanticMemory.getElementalAffinity(this.userId);
+      // 🌊 Water Phase: Using unified memory for semantic patterns
+      const patterns = await this.unifiedMemory.getUserPatterns(this.userId);
+      const affinity = await this.unifiedMemory.getElementalAffinity(this.userId);
+      // 🔜 OLD (for rollback): this.semanticMemory.getUserPatterns/getElementalAffinity
 
       const systemPrompt = await this.services.getPromptBuilder().buildPrompt({
         userId: this.userId,
@@ -210,7 +218,7 @@ export class PersonalOracleAgent {
       console.log(`   ✅ LLM response received (${rawResponse.length} chars)`);
 
       // 7️⃣ ENGAGEMENT ANALYSIS & MEMORY UPDATE
-      console.log('   [7/7] EngagementAnalyzer + MemoryPersistenceService finalizing...');
+      console.log('   [7/7] EngagementAnalyzer + UnifiedMemoryService finalizing...');
       const engagement = this.services.getEngagementAnalyzer();
       const emotionalTone = engagement.detectEmotionalTone(trimmedInput);
       const engagementLevel = engagement.assessEngagementLevel(trimmedInput, rawResponse);
@@ -218,7 +226,8 @@ export class PersonalOracleAgent {
       const isSacred = engagement.detectSacredMoment(trimmedInput, rawResponse);
 
       // Update memory with this exchange
-      const updatedMemory = await this.services.getMemoryService().updateMemoryAfterExchange(
+      // 🌊 Water Phase: Using unified memory system (archetypal memory update)
+      const updatedMemory = await this.unifiedMemory.updateMemoryAfterExchange(
         this.userId,
         memory,
         {
@@ -232,6 +241,7 @@ export class PersonalOracleAgent {
           safetyAction: safetyCheck.action,
         }
       );
+      // 🔜 OLD (for rollback): this.services.getMemoryService().updateMemoryAfterExchange
       console.log('   ✅ Engagement analyzed, memory updated');
 
       // Enhance response with flow awareness
@@ -346,16 +356,34 @@ export class PersonalOracleAgent {
     responseTime: number;
   }): Promise<void> {
     try {
-      await this.semanticMemory.recordInteraction({
+      // 🌊 Water Phase: Using unified memory (semantic interaction recording)
+      // Map engagementLevel to PatternObservation.userEngagement enum
+      const userEngagement: 'high' | 'medium' | 'low' =
+        data.engagementLevel === 'deep' || data.engagementLevel === 'high' ? 'high' :
+        data.engagementLevel === 'medium' || data.engagementLevel === 'moderate' ? 'medium' :
+        'low';
+
+      // Map emotionalTone to PatternObservation.emotionalShift enum
+      const emotionalShift: 'positive' | 'neutral' | 'negative' | 'crisis' =
+        data.emotionalTone === 'crisis' ? 'crisis' :
+        data.emotionalTone === 'negative' || data.emotionalTone === 'distress' ? 'negative' :
+        data.emotionalTone === 'positive' || data.emotionalTone === 'hopeful' || data.emotionalTone === 'joyful' ? 'positive' :
+        'neutral';
+
+      await this.unifiedMemory.recordInteraction({
         userId: data.userId,
-        userInput: data.input,
-        mayaResponse: data.response,
+        sessionId: `session_${Date.now()}`, // Generate session ID
+        input: data.input,
+        response: data.response,
         detectedElement: data.element,
-        emotionalTone: data.emotionalTone,
-        engagementLevel: data.engagementLevel,
+        appliedPatterns: [], // Can be enhanced later
+        userEngagement,
+        breakthroughDetected: false, // Can be enhanced with actual detection
+        emotionalShift,
+        sessionContinued: true, // Assume continued unless indicated otherwise
         responseTimeMs: data.responseTime,
-        timestamp: new Date().toISOString(),
       });
+      // 🔜 OLD (for rollback): this.semanticMemory.recordInteraction
     } catch (error) {
       console.warn('Failed to record analytics:', error);
     }
