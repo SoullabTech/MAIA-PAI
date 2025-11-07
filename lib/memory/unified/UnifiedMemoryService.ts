@@ -1,128 +1,77 @@
 /**
  * Unified Memory Service
- *
- * Water Phase - Memory Unification
- * Single facade coordinating three specialized memory sub-services:
- * - ConversationMemory: maia_messages table (chat history, breakthroughs)
- * - ArchetypalMemory: ain_memory table (AIN payload, symbolic threading)
- * - SemanticMemory: pattern learning and collective wisdom
- *
- * This replaces MemoryPersistenceService + SemanticMemoryService
- * Following Earth Phase pattern: pure orchestration, clear boundaries
+ * Fire Phase - Strong typing with backwards compatibility
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
+import { ConversationMemory } from "./modules/ConversationMemory";
+import { ArchetypalMemory } from "./modules/ArchetypalMemory";
+import { SemanticMemory } from "./modules/SemanticMemory";
+import type { AINMemoryPayload, ConversationMessage, PatternObservation } from "./types";
 
-import { getSharedSupabase } from '@/lib/db/sharedSupabaseClient';
-import { ConversationMemory } from './modules/ConversationMemory';
-import { ArchetypalMemory, type ExchangeData } from './modules/ArchetypalMemory';
-import { SemanticMemory, type PatternObservation, type LearnedPattern } from './modules/SemanticMemory';
-
-// ================================================================
-// UNIFIED MEMORY SERVICE
-// ================================================================
+// Legacy types for backwards compatibility (to be removed after coordinator update)
+import type { AINMemoryPayload as LegacyAINPayload } from "@/lib/memory/AINMemoryPayload";
 
 export class UnifiedMemoryService {
-  private supabase: SupabaseClient;
-  private conversation: ConversationMemory;
-  private archetypal: ArchetypalMemory;
-  private semantic: SemanticMemory;
-
-  constructor(deps?: { now?: () => number }) {
-    // Single shared Supabase client (singleton)
-    this.supabase = getSharedSupabase();
-
-    // Initialize three specialized sub-services
-    this.conversation = new ConversationMemory(this.supabase, deps);
-    this.archetypal = new ArchetypalMemory(this.supabase, deps);
-    this.semantic = new SemanticMemory(this.supabase, deps);
-
-    console.log('✅ UnifiedMemoryService initialized (Water Phase)');
+  constructor(
+    private readonly conv = new ConversationMemory(),
+    private readonly arch = new ArchetypalMemory(),
+    private readonly sem = new SemanticMemory()
+  ) {
+    console.log("✅ UnifiedMemoryService initialized (Fire Phase - typed)");
   }
 
   // ================================================================
   // CONVERSATION MEMORY (maia_messages table)
   // ================================================================
 
-  /**
-   * Retrieve recent conversation history
-   */
-  async getConversationHistory(userId: string, limit: number = 10): Promise<any[]> {
-    return this.conversation.getConversationHistory(userId, limit);
+  getConversationHistory(userId: string, limit?: number): Promise<ConversationMessage[]> {
+    return this.conv.getConversationHistory(userId, limit);
   }
 
-  /**
-   * Find breakthrough moments for explicit callbacks
-   */
-  async getBreakthroughMoments(userId: string, limit: number = 5): Promise<any[]> {
-    return this.conversation.getBreakthroughMoments(userId, limit);
+  getBreakthroughMoments(userId: string, limit?: number): Promise<ConversationMessage[]> {
+    return this.conv.getBreakthroughMoments(userId, limit);
   }
 
   // ================================================================
   // ARCHETYPAL MEMORY (ain_memory table - AIN payload)
   // ================================================================
 
-  /**
-   * Load user's AIN Memory (Archetypal Intelligence Network)
-   */
-  async loadUserMemory(userId: string): Promise<AINMemoryPayload> {
-    return this.archetypal.loadUserMemory(userId);
+  async loadAINMemory(userId: string): Promise<AINMemoryPayload | null> {
+    return this.arch.loadUserMemory(userId);
   }
 
-  /**
-   * Save user's AIN Memory
-   */
-  async saveUserMemory(userId: string, memory: AINMemoryPayload): Promise<void> {
-    return this.archetypal.saveUserMemory(userId, memory);
+  async saveAINMemory(payload: AINMemoryPayload): Promise<boolean> {
+    return this.arch.saveUserMemory(payload);
   }
 
-  /**
-   * Ensure AIN Memory is loaded (lazy load with caching)
-   */
-  async ensureMemoryLoaded(userId: string, cache?: AINMemoryPayload | null): Promise<AINMemoryPayload> {
-    return this.archetypal.ensureMemoryLoaded(userId, cache);
+  async updateAfterExchange(userId: string, threadSummary: string): Promise<boolean> {
+    return this.arch.updateAfterExchange(userId, threadSummary);
   }
 
-  /**
-   * Update AIN Memory after an exchange
-   */
-  async updateMemoryAfterExchange(
-    userId: string,
-    memory: AINMemoryPayload,
-    exchange: ExchangeData
-  ): Promise<AINMemoryPayload> {
-    return this.archetypal.updateAfterExchange(userId, memory, exchange);
+  // Legacy compatibility (to be removed after coordinator update)
+  async ensureMemoryLoaded(userId: string, cache?: any): Promise<any> {
+    if (cache) return cache;
+    const memory = await this.loadAINMemory(userId);
+    // Return legacy format for now
+    return memory ?? { userId, lastUpdated: new Date().toISOString(), threads: [] };
   }
 
   // ================================================================
   // SEMANTIC MEMORY (pattern learning & collective wisdom)
   // ================================================================
 
-  /**
-   * Get learned patterns for a user
-   */
-  async getUserPatterns(userId: string): Promise<LearnedPattern[]> {
-    return this.semantic.getUserPatterns(userId);
+  getUserPatterns(userId: string): Promise<PatternObservation[]> {
+    return this.sem.getUserPatterns(userId);
   }
 
-  /**
-   * Get user's elemental affinities
-   */
-  async getElementalAffinity(userId: string): Promise<Record<string, number>> {
-    return this.semantic.getElementalAffinity(userId);
+  getElementalAffinity(userId: string): Promise<Record<string, number> | null> {
+    return this.sem.getElementalAffinity(userId);
   }
 
-  /**
-   * Record an interaction for pattern learning
-   */
-  async recordInteraction(observation: PatternObservation): Promise<void> {
-    return this.semantic.recordInteraction(observation);
+  recordInteraction(obs: PatternObservation): Promise<boolean> {
+    return this.sem.recordInteraction(obs);
   }
 }
 
-// ================================================================
-// RE-EXPORTS (for convenience)
-// ================================================================
-
-export type { ExchangeData, PatternObservation, LearnedPattern };
+// Re-exports
+export type { AINMemoryPayload, ConversationMessage, PatternObservation };

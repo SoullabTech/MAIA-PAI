@@ -14,12 +14,14 @@ import { motion } from 'framer-motion';
 /**
  * Petal Carousel Menu Bar
  *
- * Top: MAIA home + Logout only (minimal & clean!)
- * Bottom: Horizontal scrolling "petal carousel" with all navigation
- *
- * Innovation: Like sliding through flower petals - swipe to explore
+ * DISABLED: Functionality moved to SacredLabDrawer (hamburger menu in lower right)
+ * All navigation items are now accessible via the folder icon menu
  */
 export function PetalCarouselMenuBar() {
+  // Component disabled - all functionality moved to SacredLabDrawer
+  console.log('⚠️ PetalCarouselMenuBar rendered but disabled - use SacredLabDrawer instead');
+  return null;
+
   const pathname = usePathname();
   const router = useRouter();
   const [trainingProgress] = useState(0);

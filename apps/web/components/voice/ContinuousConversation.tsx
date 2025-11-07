@@ -9,6 +9,7 @@ interface ContinuousConversationProps {
   onTranscript: (text: string) => void;
   onInterimTranscript?: (text: string) => void;
   onRecordingStateChange?: (isRecording: boolean) => void;
+  onAudioLevelChange?: (amplitude: number, isSpeaking: boolean) => void; // Audio amplitude callback for visualization
   isProcessing?: boolean;
   isSpeaking?: boolean; // When Maya is speaking
   autoStart?: boolean; // Start listening immediately
@@ -25,10 +26,11 @@ export interface ContinuousConversationRef {
 }
 
 export const ContinuousConversation = forwardRef<ContinuousConversationRef, ContinuousConversationProps>((props, ref) => {
-  const { 
-    onTranscript, 
-    onInterimTranscript, 
+  const {
+    onTranscript,
+    onInterimTranscript,
     onRecordingStateChange,
+    onAudioLevelChange,
     isProcessing = false,
     isSpeaking = false,
     autoStart = true,
@@ -49,6 +51,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   const lastSpeechTime = useRef<number>(Date.now());
   const accumulatedTranscript = useRef<string>("");
   const isProcessingRef = useRef(false);
+  const isSpeakingRef = useRef(false); // Track isSpeaking via ref to avoid stale closures
   const recognitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastSentRef = useRef<string>("");
   const isRestartingRef = useRef(false);
@@ -292,38 +295,45 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
 
   // 🔇 CRITICAL: Stop recognition when MAIA starts speaking to prevent voice feedback loop
   useEffect(() => {
-    if (isSpeaking && recognitionRef.current && isRecording) {
+    if (isSpeaking && recognitionRef.current) {
       console.log('🔇 [Voice Feedback Prevention] MAIA started speaking - stopping STT');
       try {
+        // Always stop recognition when MAIA speaks, regardless of isRecording state
         recognitionRef.current.stop();
         setIsRecording(false);
+        isProcessingRef.current = false; // Clear processing flag
       } catch (err) {
         console.warn('⚠️ [Voice Feedback Prevention] Error stopping recognition:', err);
       }
     }
-  }, [isSpeaking, isRecording]);
+  }, [isSpeaking]);
 
-  // 🎤 CRITICAL: Restart recognition after MAIA finishes speaking
-  useEffect(() => {
-    if (!isSpeaking && !isRecording && isListening && recognitionRef.current) {
-      console.log('✅ [effect] Recognition restarted after Maya stopped speaking');
-      const restartTimer = setTimeout(() => {
-        if (recognitionRef.current && !isRecording && !isSpeaking && isListening) {
-          try {
-            recognitionRef.current.start();
-            setIsRecording(true);
-          } catch (err) {
-            // Ignore if already started
-            if (!err.message?.includes('already started')) {
-              console.warn('⚠️ [Voice Feedback Prevention] Error restarting recognition:', err);
-            }
-          }
-        }
-      }, 500); // Small delay to ensure audio has stopped
-
-      return () => clearTimeout(restartTimer);
-    }
-  }, [isSpeaking, isRecording, isListening]);
+  // 🎤 DISABLED: This useEffect was causing infinite loops
+  // The recognition.onend handler already handles auto-restart
+  // Removing this prevents duplicate restart attempts
+  // useEffect(() => {
+  //   if (!isSpeaking && !isRecording && isListening && recognitionRef.current) {
+  //     // Reset processing flag to allow restart
+  //     isProcessingRef.current = false;
+  //
+  //     const restartTimer = setTimeout(() => {
+  //       if (recognitionRef.current && !isRecording && !isSpeaking && isListening) {
+  //         try {
+  //           recognitionRef.current.start();
+  //           setIsRecording(true);
+  //           console.log('✅ [effect] Recognition restarted after Maya stopped speaking');
+  //         } catch (err: any) {
+  //           // Ignore if already started
+  //           if (!err?.message?.includes('already started')) {
+  //             console.warn('⚠️ [Voice Feedback Prevention] Error restarting recognition:', err);
+  //           }
+  //         }
+  //       }
+  //     }, 2000); // Increased delay to 2 seconds to ensure MAIA's voice has fully stopped
+  //
+  //     return () => clearTimeout(restartTimer);
+  //   }
+  // }, [isSpeaking, isRecording, isListening]);
 
   // Process accumulated transcript
   const processAccumulatedTranscript = useCallback(() => {
@@ -561,37 +571,46 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
     }
   }, [autoStart, isListening, isSpeaking, isProcessing, startListening]);
 
-  // Restart listening when Maya stops speaking
+  // 🎤 DISABLED: This useEffect was causing infinite loops
+  // The recognition.onend handler already handles auto-restart after Maya stops speaking
+  // Removing this prevents duplicate restart attempts and the maximum update depth warning
+  // useEffect(() => {
+  //   if (isListening && !isSpeaking && !isProcessing && !isRecording && !isRestartingRef.current) {
+  //     // Restart recognition after Maya finishes - LONGER DELAY to prevent echo
+  //     const timer = setTimeout(() => {
+  //       if (recognitionRef.current && isListening && !isRecording && !isRestartingRef.current) {
+  //         try {
+  //           isRestartingRef.current = true;
+  //           recognitionRef.current.start();
+  //           console.log('✅ [effect] Recognition restarted after Maya stopped speaking');
+  //           // Clear flag after a short delay
+  //           setTimeout(() => {
+  //             isRestartingRef.current = false;
+  //           }, 500);
+  //         } catch (err) {
+  //           // Already started or other error, ignore
+  //           console.log('⚠️ [effect] Could not restart recognition:', err);
+  //           isRestartingRef.current = false;
+  //         }
+  //       }
+  //     }, 1500); // Increased from 500ms to 1.5s to prevent picking up MAIA's voice echo
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [isSpeaking, isProcessing, isListening, isRecording]);
+
+  // Call audio level callback when amplitude changes
   useEffect(() => {
-    if (isListening && !isSpeaking && !isProcessing && !isRecording && !isRestartingRef.current) {
-      // Restart recognition after Maya finishes - LONGER DELAY to prevent echo
-      const timer = setTimeout(() => {
-        if (recognitionRef.current && isListening && !isRecording && !isRestartingRef.current) {
-          try {
-            isRestartingRef.current = true;
-            recognitionRef.current.start();
-            console.log('✅ [effect] Recognition restarted after Maya stopped speaking');
-            // Clear flag after a short delay
-            setTimeout(() => {
-              isRestartingRef.current = false;
-            }, 500);
-          } catch (err) {
-            // Already started or other error, ignore
-            console.log('⚠️ [effect] Could not restart recognition:', err);
-            isRestartingRef.current = false;
-          }
-        }
-      }, 1500); // Increased from 500ms to 1.5s to prevent picking up MAIA's voice echo
-      return () => clearTimeout(timer);
+    if (onAudioLevelChange) {
+      onAudioLevelChange(audioLevel, isRecording);
     }
-  }, [isSpeaking, isProcessing, isListening, isRecording]);
+  }, [audioLevel, isRecording, onAudioLevelChange]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       stopListening();
     };
-  }, []);
+  }, [stopListening]);
 
   // Visual states
   const isActive = isListening && !isSpeaking && !isProcessing;

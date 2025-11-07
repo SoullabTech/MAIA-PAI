@@ -19,6 +19,7 @@ import { OrganicVoiceMaia } from './ui/OrganicVoiceMaia';
 import { AgentCustomizer } from './oracle/AgentCustomizer';
 import { MaiaSettingsPanel } from './MaiaSettingsPanel';
 // import { QuickSettingsButton } from './QuickSettingsButton'; // Moved to bottom nav
+import { QuickSettingsSheet } from './QuickSettingsSheet';
 import { SoulprintMetricsWidget } from './SoulprintMetricsWidget';
 import { MotionState, CoherenceShift } from './motion/MotionOrchestrator';
 import { OracleResponse, ConversationContext } from '@/lib/oracle-response';
@@ -54,6 +55,7 @@ interface OracleConversationProps {
   showAnalytics?: boolean;
   voiceEnabled?: boolean;
   voice?: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'; // Voice selection for TTS
+  onVoiceChange?: (voice: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer') => void; // Notify parent of voice changes
   initialMode?: 'normal' | 'patient' | 'session'; // Control mode from parent
   onModeChange?: (mode: 'normal' | 'patient' | 'session') => void; // Notify parent of mode changes
   onMessageAdded?: (message: ConversationMessage) => void;
@@ -96,6 +98,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   showAnalytics = false,
   voiceEnabled = true,
   voice = 'alloy',
+  onVoiceChange,
   initialMode = 'normal',
   onModeChange,
   onMessageAdded,
@@ -129,6 +132,73 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     listeningMode === 'normal' ? 'dialogue' :
     listeningMode === 'patient' ? 'patient' : 'scribe';
 
+  // ==================== STATE DECLARATIONS (BEFORE HOOKS) ====================
+  // These must be declared BEFORE useMaiaRealtime because they're used in its callbacks
+
+  // Core conversation state
+  const [messages, setMessages] = useState<ConversationMessage[]>([]);
+  const [userTranscript, setUserTranscript] = useState('');
+  const [maiaResponseText, setMaiaResponseText] = useState('');
+  const [streamingText, setStreamingText] = useState<string>('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [echoSuppressUntil, setEchoSuppressUntil] = useState<number>(0);
+
+  // Voice/audio state
+  const [isListening, setIsListening] = useState(false);
+  const [isResponding, setIsResponding] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const [isIOSAudioEnabled, setIsIOSAudioEnabled] = useState(false);
+  const [needsIOSAudioPermission, setNeedsIOSAudioPermission] = useState(false);
+  const [isMicrophonePaused, setIsMicrophonePaused] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [voiceAmplitude, setVoiceAmplitude] = useState(0);
+  const [userVoiceState, setUserVoiceState] = useState<VoiceState | null>(null);
+
+  // UI state
+  const [showLabDrawer, setShowLabDrawer] = useState(false);
+  const [showVoiceMenu, setShowVoiceMenu] = useState(false);
+  const [showAudioSettings, setShowAudioSettings] = useState(false);
+  const [showChatInterface, setShowChatInterface] = useState(false);
+  const [showCaptions, setShowCaptions] = useState(true);
+  const [showVoiceText, setShowVoiceText] = useState(true);
+  const [showCustomizer, setShowCustomizer] = useState(false);
+  const [enableVoiceInChat, setEnableVoiceInChat] = useState(false);
+  const [showSettingsPanel, setShowSettingsPanel] = useState(false);
+  const [oracleAgentId, setOracleAgentId] = useState<string | null>(null);
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [isReturningUser, setIsReturningUser] = useState(false);
+  const [isSavingJournal, setIsSavingJournal] = useState(false);
+  const [showJournalSuggestion, setShowJournalSuggestion] = useState(false);
+  const [breakthroughScore, setBreakthroughScore] = useState(0);
+
+  // Holoflower/visualization state
+  const [holoflowerSize, setHoloflowerSize] = useState(400);
+  const [checkIns, setCheckIns] = useState<Record<string, number>>(initialCheckIns);
+  const [activeFacetId, setActiveFacetId] = useState<string | undefined>();
+  const [currentMotionState, setCurrentMotionState] = useState<MotionState>('idle');
+  const [voiceAudioLevel, setVoiceAudioLevel] = useState(0);
+  const [smoothedAudioLevel, setSmoothedAudioLevel] = useState(0);
+  const [coherenceLevel, setCoherenceLevel] = useState(0.5);
+  const [coherenceShift, setCoherenceShift] = useState<CoherenceShift>('stable');
+  const [shadowPetals, setShadowPetals] = useState<string[]>([]);
+  const [showBreakthrough, setShowBreakthrough] = useState(false);
+
+  // Refs for mutable values (must be before hooks that use them)
+  const streamingMessageIdRef = useRef<string | null>(null);
+  const streamingMessageTextRef = useRef<string>('');
+  const lastMaiaResponseRef = useRef<string>('');
+  const lastUserMessageRef = useRef<string>('');
+  const voiceMicRef = useRef<ContinuousConversationRef>(null);
+  const textInputRef = useRef<HTMLTextAreaElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isProcessingRef = useRef(false);
+  const isRespondingRef = useRef(false);
+  const lastVoiceErrorRef = useRef<number>(0);
+  const lastProcessedTranscriptRef = useRef<{ text: string; timestamp: number } | null>(null);
+
+  // ==================== HOOKS ====================
   // OpenAI Realtime API - Full Dynamic Experience (interruption, VAD, turn-taking)
   const {
     isConnected: maiaConnected,
@@ -151,6 +221,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         setUserTranscript(text);
       } else {
         // MAIA's response from OpenAI Realtime API - incremental deltas
+
+        // If this is the first delta, reset refs for new message
+        if (!streamingMessageIdRef.current) {
+          // CRITICAL FIX: Reset text ref at START of new response (not just at end)
+          // This prevents appending to previous responses
+          streamingMessageTextRef.current = '';
+        }
+
         // Accumulate the delta text instead of creating new messages
         streamingMessageTextRef.current += text;
         const accumulatedText = streamingMessageTextRef.current;
@@ -305,19 +383,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     captureThreshold: 5
   });
 
-  // Sacred Lab Drawer state
-  const [showLabDrawer, setShowLabDrawer] = useState(false);
-
-  // Bottom bar visibility - show on hover in bottom area (macOS Dock style)
-  const [showBottomBar, setShowBottomBar] = useState(true); // Start visible so users see it
-
-  // Auto-hide the bottom bar after 3 seconds on first load
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowBottomBar(false);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
+  // Sacred Lab Drawer and Voice Menu states now declared earlier (lines 159-160)
 
   // 🌀 Soullab Realtime - DISABLED
   // This was trying to use OpenAI Realtime API in browser (not supported without dangerouslyAllowBrowser)
@@ -339,9 +405,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // Voice mode always enabled (Realtime only)
   const conversationMode = 'voice'; // Locked to voice mode - no chat toggle
 
-  // Responsive holoflower size
-  const [holoflowerSize, setHoloflowerSize] = useState(400);
-  
+  // Responsive holoflower size (state declared earlier at line 169)
   useEffect(() => {
     // Only run on client side
     if (typeof window === 'undefined') {
@@ -366,33 +430,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     window.addEventListener('resize', updateSize);
     return () => window.removeEventListener('resize', updateSize);
   }, []);
-  
-  // Core state
-  const [messages, setMessages] = useState<ConversationMessage[]>([]);
-  const [checkIns, setCheckIns] = useState<Record<string, number>>(initialCheckIns);
-  const [activeFacetId, setActiveFacetId] = useState<string | undefined>();
-  const [isProcessing, setIsProcessing] = useState(false);
-  const isProcessingRef = useRef(false); // Track processing state without stale closures
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  // Motion states
-  const [currentMotionState, setCurrentMotionState] = useState<MotionState>('idle');
-  const [voiceAudioLevel, setVoiceAudioLevel] = useState(0);
-  const [smoothedAudioLevel, setSmoothedAudioLevel] = useState(0); // Exponentially smoothed for accessibility
-  const [coherenceLevel, setCoherenceLevel] = useState(0.5);
-  const [coherenceShift, setCoherenceShift] = useState<CoherenceShift>('stable');
-  const [shadowPetals, setShadowPetals] = useState<string[]>([]);
-  const [showBreakthrough, setShowBreakthrough] = useState(false);
-  
-  // Voice states
-  const [userVoiceState, setUserVoiceState] = useState<VoiceState | null>(null);
-  const [isListening, setIsListening] = useState(false);
-  const [isResponding, setIsResponding] = useState(false);
-  const isRespondingRef = useRef(false); // Track responding state without stale closures
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const [isIOSAudioEnabled, setIsIOSAudioEnabled] = useState(false);
-  const [needsIOSAudioPermission, setNeedsIOSAudioPermission] = useState(false);
-  const [voiceAmplitude, setVoiceAmplitude] = useState(0); // For voice visualization ring
+
+  // All state declarations moved earlier (lines 138-189) to avoid hook ordering issues
 
   // Sync refs with state to avoid stale closures in callbacks
   useEffect(() => {
@@ -403,36 +442,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     isRespondingRef.current = isResponding;
   }, [isResponding]);
 
-  // REMOVED - Listening mode now defined earlier before hooks (line 95-96)
-  const [streamingText, setStreamingText] = useState<string>('');
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [isMicrophonePaused, setIsMicrophonePaused] = useState(false);
-  const [isMuted, setIsMuted] = useState(false); // Start unmuted in voice mode for immediate use
-  const voiceMicRef = useRef<ContinuousConversationRef>(null);
-  const textInputRef = useRef<HTMLTextAreaElement>(null);
-  const [userTranscript, setUserTranscript] = useState('');
-  const [maiaResponseText, setMaiaResponseText] = useState('');
-  const [isMounted, setIsMounted] = useState(false);
-  const [echoSuppressUntil, setEchoSuppressUntil] = useState<number>(0);
-  const lastMaiaResponseRef = useRef<string>('');
-  const lastVoiceErrorRef = useRef<number>(0);
-  const lastProcessedTranscriptRef = useRef<{ text: string; timestamp: number } | null>(null);
-
-  // Track streaming message for incremental transcript updates
-  const streamingMessageIdRef = useRef<string | null>(null);
-  const streamingMessageTextRef = useRef<string>('');
-
-  // Oracle Agent ID for memory persistence
-  const [oracleAgentId, setOracleAgentId] = useState<string | null>(null);
-
-  // Welcome message state
-  const [showWelcome, setShowWelcome] = useState(true);
-  const [isReturningUser, setIsReturningUser] = useState(false);
-
-  // Journal state
-  const [isSavingJournal, setIsSavingJournal] = useState(false);
-  const [showJournalSuggestion, setShowJournalSuggestion] = useState(false);
-  const [breakthroughScore, setBreakthroughScore] = useState(0);
+  // All state declarations and refs moved earlier (lines 138-197) to avoid hook ordering issues
 
   // Connect MAIA Realtime on mount
   useEffect(() => {
@@ -611,14 +621,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     };
   }, [voiceEnabled, onMessageAdded]);
 
-  // UI states
-  const [showChatInterface, setShowChatInterface] = useState(false); // Default to voice mode - shows blue plasma visualization
-  const [showCaptions, setShowCaptions] = useState(true); // Show text by default in voice mode
-  const [showVoiceText, setShowVoiceText] = useState(true); // Toggle for showing text in voice mode
-  const [showCustomizer, setShowCustomizer] = useState(false);
-  const [enableVoiceInChat, setEnableVoiceInChat] = useState(false);
-  const [showSettingsPanel, setShowSettingsPanel] = useState(false);
-
   // Keyboard shortcut for settings (Cmd/Ctrl + ,)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -716,42 +718,28 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
   }, [showChatInterface, isProcessing, messages.length]);
 
-  // Update motion state and voice amplitude based on voice activity
+  // Update motion state based on voice activity
   useEffect(() => {
     if (userVoiceState?.isSpeaking) {
       setCurrentMotionState('listening');
       setIsListening(true);
-
-      // Update voice visualization ring amplitude
-      const amplitude = userVoiceState.amplitude || 0;
-      setVoiceAmplitude(Math.min(1, amplitude * 2)); // Amplify for better visualization
     } else {
       setIsListening(false);
-      // Fade out voice ring when not speaking
-      setVoiceAmplitude(prev => Math.max(0, prev * 0.8));
     }
   }, [userVoiceState]);
 
-  // Update voice amplitude when MAIA is speaking
+  // Pulse voice amplitude when MAIA is speaking (only when no user voice input)
   useEffect(() => {
     if (isResponding || maiaIsSpeaking) {
       // Pulse effect for MAIA speaking
       const pulseInterval = setInterval(() => {
         setVoiceAmplitude(prev => {
           const target = 0.5 + Math.sin(Date.now() / 200) * 0.3;
-          return prev * 0.7 + target * 0.3; // Smooth lerp
+          return prev * 0.7 + target * 0.3; // Smooth lerp to pulsing target
         });
       }, 50);
 
       return () => clearInterval(pulseInterval);
-    } else {
-      // Fade out when MAIA stops
-      const fadeInterval = setInterval(() => {
-        setVoiceAmplitude(prev => Math.max(0, prev * 0.9));
-      }, 50);
-
-      setTimeout(() => clearInterval(fadeInterval), 500);
-      return () => clearInterval(fadeInterval);
     }
   }, [isResponding, maiaIsSpeaking]);
 
@@ -1394,6 +1382,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     const t = transcript?.trim();
     if (!t) {
       console.log('⚠️ Empty transcript, returning');
+      return;
+    }
+
+    // 🔇 CRITICAL: Reject ALL transcripts when MAIA is speaking or processing
+    if (isAudioPlaying || isResponding || isMicrophonePaused) {
+      console.warn('🔇 [Voice Feedback Prevention] Rejecting transcript - MAIA is speaking:', t);
       return;
     }
 
@@ -2370,12 +2364,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         <div className="text-xs" style={{ color: '#D4A574', opacity: 0.8, fontFamily: 'Spectral, Georgia, serif', letterSpacing: '0.05em' }}>
                           {message.role === 'user' ? userName : 'MAIA'}
                         </div>
-                        <div className="flex items-center gap-1 text-xs text-gold-divine/40
+                        <div className="flex items-center gap-1 text-xs
                                       opacity-100 sm:opacity-0 sm:group-hover:opacity-100
-                                      touch-manipulation transition-opacity">
-                          <Copy className="w-3 h-3" />
-                          <span className="hidden sm:inline">Click to copy</span>
-                          <span className="sm:hidden">Tap to copy</span>
+                                      touch-manipulation transition-opacity"
+                             style={{ color: '#E8C99B' }}>
+                          <Copy className="w-3 h-3" style={{ color: '#E8C99B', stroke: '#E8C99B', strokeWidth: '2', fill: 'none' }} />
+                          <span style={{ color: '#E8C99B' }} className="hidden sm:inline">Click to copy</span>
+                          <span style={{ color: '#E8C99B' }} className="sm:hidden">Tap to copy</span>
                         </div>
                       </div>
                       <div className="text-base sm:text-lg md:text-xl leading-relaxed break-words" style={{ color: '#E8C99B', fontFamily: 'Spectral, Georgia, serif' }}>
@@ -2596,8 +2591,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               className="fixed left-1/2 transform -translate-x-1/2 z-50"
               style={{ bottom: 'calc(6rem + env(safe-area-inset-bottom))' }}
             >
-              <div className="bg-soul-surface/90 backdrop-blur-md rounded-lg px-4 py-2 border border-soul-border/40">
-                <p className="text-soul-textSecondary text-sm">Click the holoflower to activate voice</p>
+              <div style={{ background: 'rgba(0, 0, 0, 0.9)', backdropFilter: 'blur(12px)', borderRadius: '8px', padding: '8px 16px', border: '1px solid rgba(232, 201, 155, 0.3)' }}>
+                <span style={{ color: 'rgb(232, 201, 155)', fontSize: '0.875rem', fontWeight: '600', display: 'block', WebkitTextFillColor: 'rgb(232, 201, 155)' }}>Click the holoflower to activate voice</span>
               </div>
             </motion.div>
           )}
@@ -2668,131 +2663,103 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       {/* Voice state visualization (development) */}
       {process.env.NODE_ENV === 'development' && userVoiceState && (
-        <div className="fixed top-[calc(env(safe-area-inset-top,0px)+2rem)] left-8 bg-black/80 text-white text-xs p-3 rounded-lg">
-          <div className="font-bold mb-2">Voice State</div>
-          <div>Amplitude: {(userVoiceState.amplitude * 100).toFixed(0)}%</div>
-          <div>Emotion: {userVoiceState.emotion}</div>
-          <div>Breath: {(userVoiceState.breathDepth * 100).toFixed(0)}%</div>
-          <div>Speaking: {userVoiceState.isSpeaking ? 'Yes' : 'No'}</div>
+        <div className="fixed top-[calc(env(safe-area-inset-top,0px)+2rem)] left-8 bg-black/90 backdrop-blur-md border border-amber-600/30 text-xs p-3 rounded-lg shadow-lg">
+          <div className="font-bold mb-2" style={{ color: '#E8C99B' }}>Voice State</div>
+          <div style={{ color: '#E8C99B' }}>Amplitude: {(userVoiceState.amplitude * 100).toFixed(0)}%</div>
+          <div style={{ color: '#E8C99B' }}>Emotion: {userVoiceState.emotion}</div>
+          <div style={{ color: '#E8C99B' }}>Breath: {(userVoiceState.breathDepth * 100).toFixed(0)}%</div>
+          <div style={{ color: '#E8C99B' }}>Speaking: {userVoiceState.isSpeaking ? 'Yes' : 'No'}</div>
         </div>
       )}
 
-      {/* Hover Zone - Extended bottom edge to trigger bottom bar (macOS Dock style) */}
-      <div
-        className="fixed bottom-0 left-0 right-0 h-20 z-40 pointer-events-auto"
-        onMouseEnter={() => setShowBottomBar(true)}
-      />
-
-      {/* Sacred Minimal Bottom Bar - Integrated with Global Navigation (macOS Dock style) */}
-      <div
-        className="fixed bottom-0 left-0 right-0 z-50 transition-all duration-300 ease-out"
-        onMouseEnter={() => setShowBottomBar(true)}
-        onMouseLeave={() => setShowBottomBar(false)}
+      {/* Bottom right floating menu button - Always visible */}
+      <button
+        onClick={() => setShowLabDrawer(true)}
+        className="fixed bottom-6 right-6 z-50 p-4 rounded-full bg-gradient-to-br from-[#D4B896]/90 to-[#D4B896]/70 hover:from-[#D4B896] hover:to-[#D4B896]/80 transition-all duration-300 shadow-2xl shadow-black/50 hover:scale-110 active:scale-95"
         style={{
-          paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
-          transform: showBottomBar ? 'translateY(0)' : 'translateY(calc(100% - 0.25rem))',
-          opacity: showBottomBar ? 1 : 0,
+          paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))',
         }}
+        title="Open Menu"
       >
-        <div className="flex justify-center items-center gap-4 md:gap-6 py-3 md:py-4 px-4 md:px-8 mx-4 md:mx-auto md:max-w-2xl bg-gradient-to-b from-[#1a1a2e]/95 to-[#16213e]/95 backdrop-blur-md rounded-full border border-[#D4B896]/20 shadow-2xl">
-          {/* Home Button - Holoflower */}
-          <a
-            href="/maya"
-            className="p-3 md:p-4 rounded-full bg-[#D4B896]/10 hover:bg-[#D4B896]/20 transition-all duration-300"
-            title="Home"
-          >
-            <svg className="w-5 h-5 md:w-6 md:h-6 text-[#D4B896]" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-          </a>
+        <svg className="w-6 h-6 text-[#1a1a2e]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
 
-          {/* Microphone On/Off Toggle */}
-          <button
-            onClick={async () => {
-              if (!isMuted) {
-                // Turn mic OFF
-                setIsMuted(true);
-                if (voiceMicRef.current?.stopListening) {
-                  voiceMicRef.current.stopListening();
-                  console.log('🔇 Microphone OFF');
-                }
-              } else {
-                // Turn mic ON
-                setShowChatInterface(false);
-                setIsMuted(false);
-                await enableAudio();
-                setTimeout(async () => {
-                  if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
-                    await voiceMicRef.current.startListening();
-                    console.log('🎤 Microphone ON');
-                  }
-                }, 100);
-              }
-            }}
-            className={`p-4 rounded-full transition-all duration-300 ${
-              !isMuted
-                ? 'bg-[#D4B896]/20 text-[#D4B896] shadow-lg shadow-[#D4B896]/20'
-                : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-            }`}
-            title={isMuted ? "Turn Microphone ON" : "Turn Microphone OFF"}
+      {/* Voice Selection Menu - Popup from bottom */}
+      {showVoiceMenu && (
+        <>
+          {/* Backdrop to close when clicking outside */}
+          <div
+            className="fixed inset-0 z-[90] bg-black/20 backdrop-blur-sm"
+            onClick={() => setShowVoiceMenu(false)}
+          />
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="fixed bottom-24 left-1/2 transform -translate-x-1/2 w-[90%] max-w-md bg-gradient-to-b from-[#1a1a2e]/98 to-[#16213e]/98 backdrop-blur-xl border border-[#D4B896]/30 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden z-[100]"
           >
-            {isMuted ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-              </svg>
-            )}
-          </button>
+            <div className="p-4">
+              <div className="flex items-center gap-3 mb-4 pb-3 border-b border-[#D4B896]/20">
+                <svg className="w-5 h-5 text-[#D4B896]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+                <h3 className="text-base font-semibold text-[#D4B896]">Choose MAIA's Voice</h3>
+              </div>
+              <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+                {[
+                  { id: 'shimmer', name: 'Shimmer', description: 'Gentle & soothing • Feminine', emoji: '✨' },
+                  { id: 'fable', name: 'Fable', description: 'Storytelling • Feminine', emoji: '📖' },
+                  { id: 'nova', name: 'Nova', description: 'Bright & energetic • Feminine', emoji: '⭐' },
+                  { id: 'alloy', name: 'Alloy', description: 'Neutral & balanced • Gender-neutral', emoji: '🔘' },
+                  { id: 'echo', name: 'Echo', description: 'Warm & expressive • Masculine', emoji: '🌊' },
+                  { id: 'onyx', name: 'Onyx', description: 'Deep & resonant • Masculine', emoji: '🖤' },
+                ].map((voiceOption) => (
+                  <motion.button
+                    key={voiceOption.id}
+                    onClick={() => {
+                      if (onVoiceChange) {
+                        onVoiceChange(voiceOption.id as any);
+                      }
+                      setShowVoiceMenu(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                      voice === voiceOption.id
+                        ? 'bg-[#D4B896]/20 border border-[#D4B896]/50 text-[#D4B896]'
+                        : 'bg-black/20 border border-white/5 text-white/70 hover:bg-[#D4B896]/10 hover:border-[#D4B896]/30'
+                    }`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span className="text-2xl">{voiceOption.emoji}</span>
+                    <div className="flex-1 text-left">
+                      <div className="text-sm font-medium">{voiceOption.name}</div>
+                      <div className="text-xs opacity-70">{voiceOption.description}</div>
+                    </div>
+                    {voice === voiceOption.id && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="w-2.5 h-2.5 rounded-full bg-[#D4B896] shadow-lg shadow-[#D4B896]/50"
+                      />
+                    )}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
 
-          {/* EMERGENCY STOP - Shows when MAIA is speaking */}
-          {(isResponding || isAudioPlaying || maiaVoiceState?.isPlaying) && (
-            <button
-              onClick={handleEmergencyStop}
-              className="p-4 rounded-full bg-red-500/80 text-white hover:bg-red-600 transition-all duration-300 animate-pulse shadow-lg shadow-red-500/50"
-              title="Stop MAIA"
-            >
-              <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                <rect x="6" y="6" width="12" height="12" rx="1" />
-              </svg>
-            </button>
-          )}
-
-          {/* Chat Toggle */}
-          <button
-            onClick={() => setShowChatInterface(!showChatInterface)}
-            className={`p-4 rounded-full transition-all duration-300 ${
-              showChatInterface
-                ? 'bg-[#D4B896]/20 text-[#D4B896] shadow-lg shadow-[#D4B896]/20'
-                : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
-            }`}
-            title="Toggle Chat Mode"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-          </button>
-
-          {/* Sacred Menu - Opens Lab Drawer */}
-          <button
-            onClick={() => setShowLabDrawer(true)}
-            className="p-4 rounded-full bg-white/5 text-[#D4B896]/80 hover:bg-[#D4B896]/10 hover:text-[#D4B896] transition-all duration-300"
-            title="Lab Tools & Navigation"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
-      </div>
+      {/* Quick Settings Sheet - Advanced voice and personality controls */}
+      <QuickSettingsSheet
+        isOpen={showAudioSettings}
+        onClose={() => setShowAudioSettings(false)}
+      />
 
       {/* Floating Quick Settings Button */}
       {/* QuickSettingsButton removed - now in bottom nav bar */}
@@ -2808,6 +2775,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           <ContinuousConversation
             ref={voiceMicRef}
             onTranscript={handleVoiceTranscript}
+            onAudioLevelChange={(amplitude, isSpeaking) => {
+              setVoiceAmplitude(amplitude);
+              setUserVoiceState({ isSpeaking, amplitude });
+            }}
             isProcessing={isResponding}
             isSpeaking={isAudioPlaying}
             autoStart={true}
@@ -2866,9 +2837,50 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               toast.success('Field Recording started');
             }
           }
+          if (action === 'toggle-microphone') {
+            if (!isMuted) {
+              // Turn mic OFF
+              setIsMuted(true);
+              if (voiceMicRef.current?.stopListening) {
+                voiceMicRef.current.stopListening();
+                console.log('🔇 Microphone OFF');
+              }
+            } else {
+              // Turn mic ON
+              setShowChatInterface(false);
+              setIsMuted(false);
+              enableAudio().then(() => {
+                setTimeout(async () => {
+                  if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
+                    await voiceMicRef.current.startListening();
+                    console.log('🎤 Microphone ON');
+                  }
+                }, 100);
+              });
+            }
+          }
+          if (action === 'emergency-stop') {
+            handleEmergencyStop();
+          }
+          if (action === 'toggle-chat') {
+            setShowChatInterface(!showChatInterface);
+          }
+          if (action === 'open-voice-menu') {
+            setShowVoiceMenu(true);
+            setShowLabDrawer(false);
+          }
+          if (action === 'open-audio-settings') {
+            setShowAudioSettings(true);
+            setShowLabDrawer(false);
+          }
         }}
         showVoiceText={showVoiceText}
         isFieldRecording={isFieldRecording}
+        isMuted={isMuted}
+        isResponding={isResponding}
+        isAudioPlaying={isAudioPlaying}
+        showChatInterface={showChatInterface}
+        voice={voice}
       />
     </div>
   );

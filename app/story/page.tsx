@@ -19,7 +19,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, Edit3, History, Sparkles, Plus, CheckCircle, MessageCircle, HelpCircle } from 'lucide-react';
-import { StoryAPI } from '@/lib/story/storyAPI';
+// import { StoryAPI } from '@/lib/story/storyAPI'; // Commented out - not used in mock version
 
 // Mock data for development - will connect to real data
 const mockStory = {

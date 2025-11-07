@@ -8,7 +8,7 @@
  */
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { MemoryPersistenceService } from './MemoryPersistenceService';
+// 🔥 Fire Phase: MemoryPersistenceService replaced by UnifiedMemoryService
 import { SubscriptionGatekeeper } from './SubscriptionGatekeeper';
 import { SafetyOrchestrator } from './SafetyOrchestrator';
 import { SystemPromptBuilder } from './SystemPromptBuilder';
@@ -23,7 +23,7 @@ import { MAIASafetyPipeline } from '@/lib/safety-pipeline';
 export class ServiceContainer {
   private static instance: ServiceContainer;
 
-  private memoryService?: MemoryPersistenceService;
+  // 🔥 Fire Phase: memoryService removed - use UnifiedMemoryService directly
   private subscriptionGate?: SubscriptionGatekeeper;
   private safetyOrchestrator?: SafetyOrchestrator;
   private promptBuilder?: SystemPromptBuilder;
@@ -59,7 +59,7 @@ export class ServiceContainer {
     );
 
     // Initialize all services
-    this.memoryService = new MemoryPersistenceService(this.supabase);
+    // 🔥 Fire Phase: Memory service removed - use UnifiedMemoryService directly
     this.subscriptionGate = new SubscriptionGatekeeper();
     this.safetyOrchestrator = new SafetyOrchestrator(new MAIASafetyPipeline());
     this.promptBuilder = new SystemPromptBuilder();
@@ -74,17 +74,13 @@ export class ServiceContainer {
    * Ensure services are initialized
    */
   private ensureInitialized(): void {
-    if (!this.memoryService) {
+    if (!this.subscriptionGate) {
       this.initializeServices();
     }
   }
 
   // ========== Service Getters ==========
-
-  getMemoryService(): MemoryPersistenceService {
-    this.ensureInitialized();
-    return this.memoryService!;
-  }
+  // 🔥 Fire Phase: getMemoryService() removed - use UnifiedMemoryService directly
 
   getSubscriptionGate(): SubscriptionGatekeeper {
     this.ensureInitialized();

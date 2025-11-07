@@ -1,129 +1,70 @@
 /**
  * Archetypal Memory Sub-Service
- *
- * Water Phase - Memory Unification
- * Handles AIN Memory (Archetypal Intelligence Network) from ain_memory table
+ * Fire Phase - Typed with Zod validation
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
-import { createEmptyMemoryPayload, updateMemoryAfterExchange as updateAINPayload } from '@/lib/memory/AINMemoryPayload';
-
-/**
- * Exchange data for memory updates
- */
-export interface ExchangeData {
-  userMessage: string;
-  mayaResponse: string;
-  element: string;
-  phase: string;
-  motifs: string[];
-  themes: string[];
-  emotionalTone: string;
-  safetyAction?: string;
-}
+import { getSharedSupabase } from "@/lib/db/sharedSupabaseClient";
+import type { AINMemoryPayload } from "../types";
+import { AINMemoryPayloadZ } from "../schemas";
 
 export class ArchetypalMemory {
-  constructor(
-    private supabase: SupabaseClient,
-    private deps?: { now?: () => number }
-  ) {}
+  constructor(private readonly supabase = getSharedSupabase()) {}
 
-  /**
-   * Load user's AIN Memory from Supabase
-   */
-  async loadUserMemory(userId: string): Promise<AINMemoryPayload> {
-    try {
-      const { data, error } = await this.supabase
-        .from('ain_memory')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
+  async loadUserMemory(userId: string): Promise<AINMemoryPayload | null> {
+    const { data, error } = await this.supabase
+      .from("ain_memory")
+      .select("payload,last_updated,user_id")
+      .eq("user_id", userId)
+      .single();
 
-      if (error) {
-        // Check if table doesn't exist or other error
-        if (error.message?.includes('relation') || error.message?.includes('does not exist')) {
-          console.warn('⚠️ ain_memory table does not exist yet. Using in-memory state.');
-        } else if (error.code !== 'PGRST116') { // not found is OK
-          console.warn('⚠️ Could not load AIN memory:', error.message);
-        }
-        // Return new memory without saving (non-blocking)
-        return createEmptyMemoryPayload(userId, 'User');
-      }
+    if (error || !data) return null;
 
-      if (!data) {
-        // No existing memory - create new (but don't save yet to avoid errors)
-        console.log('🆕 Creating new AIN memory for user:', userId.substring(0, 8) + '...');
-        return createEmptyMemoryPayload(userId, 'User');
-      }
-
-      // Parse stored memory (stored as JSONB)
-      console.log('✅ Loaded existing AIN memory for user:', userId.substring(0, 8) + '...');
-      return data.memory_data as AINMemoryPayload;
-    } catch (err: any) {
-      console.error('❌ Error loading AIN memory:', err?.message || err);
-      return createEmptyMemoryPayload(userId, 'User');
-    }
-  }
-
-  /**
-   * Save user's AIN Memory to Supabase
-   */
-  async saveUserMemory(userId: string, memory: AINMemoryPayload): Promise<void> {
-    try {
-      const { error } = await this.supabase
-        .from('ain_memory')
-        .upsert({
-          user_id: userId,
-          memory_data: memory,
-          updated_at: new Date().toISOString()
-        });
-
-      if (error) {
-        // Check if table doesn't exist - gracefully degrade
-        if (error.message?.includes('relation') || error.message?.includes('does not exist')) {
-          console.warn('⚠️ ain_memory table does not exist yet. Memory will not persist.');
-        } else {
-          console.error('❌ Error saving AIN memory:', error.message);
-        }
-      } else {
-        console.log('✅ AIN memory saved successfully');
-      }
-    } catch (err: any) {
-      console.error('❌ Error saving AIN memory:', err?.message || err);
-    }
-  }
-
-  /**
-   * Ensure AIN Memory is loaded (lazy load with caching)
-   */
-  async ensureMemoryLoaded(userId: string, cache?: AINMemoryPayload | null): Promise<AINMemoryPayload> {
-    if (!cache) {
-      return await this.loadUserMemory(userId);
-    }
-    return cache;
-  }
-
-  /**
-   * Update AIN Memory after an exchange
-   */
-  async updateAfterExchange(
-    userId: string,
-    memory: AINMemoryPayload,
-    exchange: ExchangeData
-  ): Promise<AINMemoryPayload> {
-    // Map ExchangeData to the format expected by updateAINPayload
-    const exchangeForUpdate = {
-      newArchetype: memory.currentArchetype, // Keep current if not specified
-      newPhase: exchange.phase,
-      userInput: exchange.userMessage,
-      maiaResponse: exchange.mayaResponse,
-      symbolicMotifs: exchange.motifs,
-      emotionalTone: exchange.emotionalTone,
+    const candidate = {
+      userId: data.user_id,
+      lastUpdated: data.last_updated ?? new Date().toISOString(),
+      ...data.payload,
     };
 
-    const updatedMemory = updateAINPayload(memory, exchangeForUpdate);
-    await this.saveUserMemory(userId, updatedMemory);
-    return updatedMemory;
+    const parsed = AINMemoryPayloadZ.safeParse(candidate);
+    return parsed.success ? parsed.data : null;
+  }
+
+  async saveUserMemory(payload: AINMemoryPayload): Promise<boolean> {
+    const parsed = AINMemoryPayloadZ.safeParse(payload);
+    if (!parsed.success) return false;
+
+    const { error } = await this.supabase
+      .from("ain_memory")
+      .upsert(
+        {
+          user_id: payload.userId,
+          last_updated: payload.lastUpdated,
+          payload: {
+            threads: payload.threads,
+            elementalProfile: payload.elementalProfile ?? undefined,
+          },
+        },
+        { onConflict: "user_id" }
+      );
+
+    return !error;
+  }
+
+  async updateAfterExchange(userId: string, threadSummary: string): Promise<boolean> {
+    const current = await this.loadUserMemory(userId);
+    const next: AINMemoryPayload = {
+      userId: userId as any, // Brand cast
+      lastUpdated: new Date().toISOString(),
+      threads: [
+        ...(current?.threads ?? []).slice(0, 99),
+        {
+          id: `t-${Date.now()}`,
+          summary: threadSummary,
+          lastSeenAt: new Date().toISOString(),
+        },
+      ],
+      elementalProfile: current?.elementalProfile,
+    };
+    return this.saveUserMemory(next);
   }
 }

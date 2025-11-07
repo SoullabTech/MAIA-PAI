@@ -20,7 +20,17 @@ import {
   Eye,
   EyeOff,
   Heart,
-  Download
+  Download,
+  Home,
+  Mic,
+  MicOff,
+  Square,
+  MessageSquare,
+  Volume2,
+  Sliders,
+  Clock,
+  Brain,
+  Zap
 } from 'lucide-react';
 
 interface SacredLabDrawerProps {
@@ -30,6 +40,12 @@ interface SacredLabDrawerProps {
   onAction?: (action: string) => void;
   showVoiceText?: boolean;
   isFieldRecording?: boolean;
+  isMuted?: boolean;
+  isResponding?: boolean;
+  isAudioPlaying?: boolean;
+  showChatInterface?: boolean;
+  voice?: string;
+  listeningMode?: 'normal' | 'patient' | 'session';
 }
 
 export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
@@ -39,8 +55,59 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
   onAction,
   showVoiceText,
   isFieldRecording,
+  isMuted,
+  isResponding,
+  isAudioPlaying,
+  showChatInterface,
+  voice,
+  listeningMode,
 }) => {
   const menuSections = [
+    {
+      title: 'INTERFACE CONTROLS',
+      icon: '🎛️',
+      items: [
+        {
+          icon: Home,
+          label: 'Home',
+          action: () => onNavigate('/maya'),
+          description: 'Return to main interface'
+        },
+        {
+          icon: isMuted ? MicOff : Mic,
+          label: isMuted ? 'Turn Microphone ON' : 'Turn Microphone OFF',
+          action: () => onAction?.('toggle-microphone'),
+          description: isMuted ? 'Enable voice input' : 'Disable voice input',
+          isActive: !isMuted,
+        },
+        ...(isResponding || isAudioPlaying ? [{
+          icon: Square,
+          label: 'Stop MAIA',
+          action: () => onAction?.('emergency-stop'),
+          description: 'Interrupt current response',
+          isActive: true,
+        }] : []),
+        {
+          icon: MessageSquare,
+          label: showChatInterface ? 'Voice Mode' : 'Chat Mode',
+          action: () => onAction?.('toggle-chat'),
+          description: showChatInterface ? 'Switch to voice input' : 'Switch to text chat',
+          isActive: showChatInterface,
+        },
+        {
+          icon: Volume2,
+          label: 'Change Voice',
+          action: () => onAction?.('open-voice-menu'),
+          description: `Current: ${voice || 'alloy'}`
+        },
+        {
+          icon: Sliders,
+          label: 'Voice Settings',
+          action: () => onAction?.('open-audio-settings'),
+          description: 'Speed, warmth, prosody'
+        },
+      ],
+    },
     {
       title: 'DOCUMENTATION',
       icon: '📊',
@@ -157,7 +224,7 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
                   <h2 className="text-xl font-light text-[#D4B896] tracking-wide">
                     Lab Tools
                   </h2>
-                  <p className="text-xs text-white/50 mt-0.5">
+                  <p className="text-xs mt-0.5" style={{ color: '#E8C99B', opacity: 0.8 }}>
                     Your sacred workspace
                   </p>
                 </div>
@@ -217,12 +284,12 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
                               }`} />
                             </div>
                             <div className="flex-1 text-left">
-                              <div className={`text-sm font-medium ${
-                                item.isActive ? 'text-red-300' : 'text-white/90'
-                              }`}>
+                              <div className="text-sm font-medium" style={{
+                                color: item.isActive ? 'rgb(252 165 165)' : '#E8C99B'
+                              }}>
                                 {item.label}
                               </div>
-                              <div className="text-xs text-white/50 mt-0.5">
+                              <div className="text-xs mt-0.5" style={{ color: '#E8C99B', opacity: 0.7 }}>
                                 {item.description}
                               </div>
                             </div>

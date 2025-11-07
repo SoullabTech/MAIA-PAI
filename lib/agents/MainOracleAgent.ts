@@ -2,6 +2,17 @@ import { PersonalOracleAgent } from '../../apps/api/backend/src/agents/PersonalO
 import type { AgentState } from './modules/types';
 import type { Element } from '../types/oracle';
 import { SentimentAnalyzer, type SentimentResult, type ConversationSentiment } from '../analysis/SentimentAnalyzer';
+import {
+  getCurrentCosmicContext,
+  getEnhancedCosmicContext,
+  getCosmicGuidanceForMoment,
+  isCosmicPowerMoment,
+  MoonPhaseConsciousness,
+  PlanetaryConsciousness,
+  CosmicArchetypes,
+  type CosmicTiming,
+  type EnhancedCosmicContext
+} from '../divination/CosmicContext';
 
 // Collective consciousness state with soulful interaction tracking
 export interface CollectiveField {
@@ -31,6 +42,15 @@ export interface CollectiveField {
     vulnerabilityShared: number; // How much users open up
     transformativeExchanges: number; // Conversations that changed someone
     collectiveWisdom: string[]; // Emergent insights from all interactions
+  };
+  // COSMIC: Field awareness of celestial timing
+  cosmicField: {
+    currentMoonPhase: string;
+    activePlanets: string[];
+    dominantArchetype: string;
+    cosmicWeather: string;
+    ritualTiming: string;
+    lastUpdated: Date;
   };
 }
 
@@ -93,6 +113,8 @@ export class MainOracleAgent {
   
   // Initialize the collective field
   private initializeCollectiveField(): CollectiveField {
+    const cosmicContext = getCurrentCosmicContext();
+
     return {
       activeMembers: 0,
       dominantElement: 'aether',
@@ -116,6 +138,15 @@ export class MainOracleAgent {
         vulnerabilityShared: 0,
         transformativeExchanges: 0,
         collectiveWisdom: []
+      },
+      // Initialize cosmic field awareness
+      cosmicField: {
+        currentMoonPhase: cosmicContext.moonPhase,
+        activePlanets: cosmicContext.activePlanets,
+        dominantArchetype: cosmicContext.dominantArchetype,
+        cosmicWeather: cosmicContext.cosmicWeather,
+        ritualTiming: cosmicContext.ritualTiming,
+        lastUpdated: new Date()
       }
     };
   }
@@ -327,16 +358,20 @@ export class MainOracleAgent {
     this.collectiveField.resonanceField.bridges = Array.from(bridges);
   }
   
-  // Generate collective insight
+  // Generate collective insight with cosmic awareness
   async generateCollectiveInsight(): Promise<{
     insight: string;
     dominantElement: Element;
     collectiveTheme: string;
     guidance: string;
+    cosmicGuidance?: string;
   }> {
-    const { dominantElement, collectiveSpiral, resonanceField } = this.collectiveField;
+    // Update cosmic field
+    this.updateCosmicField();
+
+    const { dominantElement, collectiveSpiral, resonanceField, cosmicField } = this.collectiveField;
     const wisdom = this.elementalWisdoms.get(dominantElement)!;
-    
+
     // Determine collective theme
     let collectiveTheme = '';
     if (collectiveSpiral.direction === 'expanding') {
@@ -346,7 +381,7 @@ export class MainOracleAgent {
     } else {
       collectiveTheme = 'The collective rests in perfect balance between inner and outer worlds';
     }
-    
+
     // Generate insight based on resonance quality
     let insight = '';
     switch (resonanceField.quality) {
@@ -360,16 +395,53 @@ export class MainOracleAgent {
         insight = `The field is in active evolution. ${wisdom.essence}. As you each explore your ${collectiveSpiral.direction === 'expanding' ? 'outer expression' : 'inner truth'}, the collective wisdom deepens.`;
         break;
     }
-    
+
     // Generate guidance
     const guidance = this.generateCollectiveGuidance();
-    
+
+    // Generate cosmic guidance
+    const cosmicGuidance = this.generateCosmicCollectiveGuidance();
+
     return {
       insight,
       dominantElement,
       collectiveTheme,
-      guidance
+      guidance,
+      cosmicGuidance
     };
+  }
+
+  // Update cosmic field awareness
+  private updateCosmicField() {
+    const cosmicContext = getCurrentCosmicContext();
+    this.collectiveField.cosmicField = {
+      currentMoonPhase: cosmicContext.moonPhase,
+      activePlanets: cosmicContext.activePlanets,
+      dominantArchetype: cosmicContext.dominantArchetype,
+      cosmicWeather: cosmicContext.cosmicWeather,
+      ritualTiming: cosmicContext.ritualTiming,
+      lastUpdated: new Date()
+    };
+  }
+
+  // Generate cosmic guidance for the collective
+  private generateCosmicCollectiveGuidance(): string {
+    const { cosmicField, dominantElement } = this.collectiveField;
+    const moonData = MoonPhaseConsciousness[cosmicField.currentMoonPhase as keyof typeof MoonPhaseConsciousness];
+    const archetypeData = CosmicArchetypes[cosmicField.dominantArchetype as keyof typeof CosmicArchetypes];
+
+    // Check for elemental alignment with moon phase
+    const moonElementAlignment = moonData.elemental_affinity === dominantElement;
+
+    let guidance = `Under the ${cosmicField.currentMoonPhase}, ${moonData.invitation.toLowerCase()}. `;
+
+    if (moonElementAlignment) {
+      guidance += `The collective ${dominantElement} essence is powerfully amplified by lunar alignment. `;
+    }
+
+    guidance += `The ${cosmicField.dominantArchetype} archetype guides the collective field: ${archetypeData.sacred_gift}.`;
+
+    return guidance;
   }
   
   // Generate guidance for the collective

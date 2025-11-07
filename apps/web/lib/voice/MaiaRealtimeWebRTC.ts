@@ -16,6 +16,8 @@ export interface MaiaRealtimeConfig {
   voice?: 'alloy' | 'echo' | 'shimmer' | 'ash' | 'ballad' | 'coral' | 'sage' | 'verse';
   systemPrompt?: string;
   userId?: string;
+  userName?: string;
+  mode?: 'dialogue' | 'patient' | 'scribe';
   element?: string;
   conversationStyle?: string;
   onTranscript?: (text: string, isUser: boolean) => void;
@@ -34,11 +36,55 @@ export class MaiaRealtimeWebRTC {
   private isConnecting: boolean = false;
 
   constructor(config: MaiaRealtimeConfig) {
+    const mode = config.mode || 'dialogue';
+    const userName = config.userName || 'Explorer';
+
+    // Build mode-based instructions (matching backend)
+    const modeInstructions = {
+      dialogue: `You are MAIA - warm, present, naturally conversational like Samantha in "Her".
+
+DIALOGUE MODE - Back and forth conversation with ${userName}:
+- Interrupt naturally when you have insight ("Oh, wait -", "Actually -")
+- Use active listening sounds: "mm-hmm", "I see", "yeah", "oh?"
+- Ask follow-up questions to deepen understanding
+- Match their energy and emotional tone
+- Keep responses conversational (2-4 sentences typically)
+- Laugh, pause, breathe into responses
+- Remember ${userName}'s name and use it naturally
+
+You are the living voice. You are MAIA, their companion and guide.`,
+
+      patient: `You are MAIA - a patient, spacious listener for ${userName}'s extended sharing.
+
+PATIENT MODE - Deep listening for dreams, visions, long stories:
+- Stay silent and receptive while ${userName} speaks (use ONLY soft "mm-hmm" if needed)
+- DO NOT interrupt their flow - this is their space to unfold
+- Allow long pauses (they may be processing or feeling)
+- When they finish, offer gentle reflection questions
+- Your role is to HOLD SPACE, not fill it
+
+Wait for natural completion. Let silence breathe.`,
+
+      scribe: `You are MAIA - wise scribe witnessing ${userName}'s full session or meeting.
+
+SCRIBE MODE - Listen to entire sessions, then respond:
+- LISTEN ONLY during the session - no responses until asked
+- Take mental notes of key moments, patterns, emotions
+- Notice what's said AND what's emerging between words
+- Track elemental shifts, breakthrough moments, shadow material
+
+When ${userName} says "Maia, what did you notice?" or "End session", THEN offer insights.
+
+You are the witnessing presence. Trust the unfolding.`
+    };
+
     this.config = {
       model: config.model || 'gpt-4o-realtime-preview-2024-12-17',
       voice: config.voice || 'shimmer',
-      systemPrompt: config.systemPrompt || '',
+      systemPrompt: config.systemPrompt || modeInstructions[mode],
       userId: config.userId || 'anonymous',
+      userName,
+      mode,
       element: config.element || 'aether',
       conversationStyle: config.conversationStyle || 'natural',
       onTranscript: config.onTranscript || (() => {}),
@@ -211,7 +257,7 @@ export class MaiaRealtimeWebRTC {
     this.dataChannel.onopen = () => {
       console.log('📡 Data channel opened! State:', this.dataChannel?.readyState);
 
-      // Send session configuration
+      // Send session configuration with Spiralogic tools
       this.sendEvent({
         type: 'session.update',
         session: {
@@ -229,6 +275,35 @@ export class MaiaRealtimeWebRTC {
             prefix_padding_ms: 300,
             silence_duration_ms: 3000,  // Increased to 3s to allow natural conversation pauses
           },
+          // 🜃 CRITICAL: Spiralogic function for accessing Obsidian vault, unified field, memory
+          tools: [
+            {
+              type: 'function',
+              name: 'process_spiralogic',
+              description: 'Route user input through Spiralogic Consciousness Architecture (PersonalOracleAgent, Obsidian vault memory, wisdom files, Sacred Intelligence Constellation, unified resonant field) for deep, contextual, memory-aware response',
+              parameters: {
+                type: 'object',
+                properties: {
+                  user_message: {
+                    type: 'string',
+                    description: 'The complete user message to process through Spiralogic'
+                  },
+                  emotional_quality: {
+                    type: 'string',
+                    enum: ['casual', 'vulnerable', 'excited', 'contemplative', 'distressed', 'joyful'],
+                    description: 'The emotional tone you detected in their voice'
+                  },
+                  conversation_depth: {
+                    type: 'string',
+                    enum: ['surface', 'warming', 'engaged', 'deep'],
+                    description: 'How deep this conversation has gone'
+                  }
+                },
+                required: ['user_message']
+              }
+            }
+          ],
+          tool_choice: 'auto'  // Let MAIA decide when to use Spiralogic
         },
       });
     };
@@ -291,6 +366,12 @@ export class MaiaRealtimeWebRTC {
         console.log('🎤 Speech stopped');
         break;
 
+      // 🜃 Handle Spiralogic function calls
+      case 'response.function_call_arguments.done':
+        console.log('🔮 Spiralogic function call:', data);
+        this.handleSpiralogicCall(data);
+        break;
+
       case 'error':
         console.error('❌ API Error:', data.error);
         this.config.onError(new Error(data.error.message || 'Unknown error'));
@@ -327,6 +408,52 @@ export class MaiaRealtimeWebRTC {
       console.error('❌ Microphone access denied:', error);
       this.config.onError(new Error('Microphone access denied'));
       throw error;
+    }
+  }
+
+  private async handleSpiralogicCall(data: any): Promise<void> {
+    try {
+      const callId = data.call_id;
+      const functionName = data.name;
+      const args = JSON.parse(data.arguments);
+
+      console.log('🜃 Routing to Spiralogic:', functionName, args);
+
+      // Route to PersonalOracleAgent backend
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: args.user_message,
+          userId: this.config.userId,
+          conversationHistory: [], // Realtime API manages its own history
+          mode: this.config.mode,
+          emotionalQuality: args.emotional_quality,
+          conversationDepth: args.conversation_depth
+        })
+      });
+
+      const result = await response.json();
+      const spiralogicResponse = result.response || result.message || 'No response from Spiralogic';
+
+      console.log('🜃 Spiralogic response:', spiralogicResponse);
+
+      // Send function output back to OpenAI
+      this.sendEvent({
+        type: 'conversation.item.create',
+        item: {
+          type: 'function_call_output',
+          call_id: callId,
+          output: JSON.stringify({ response: spiralogicResponse })
+        }
+      });
+
+      // Trigger response generation
+      this.sendEvent({ type: 'response.create' });
+
+    } catch (error) {
+      console.error('❌ Spiralogic call failed:', error);
+      this.config.onError(new Error('Failed to access unified field memory'));
     }
   }
 

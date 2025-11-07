@@ -15,6 +15,10 @@ interface NavItem {
 }
 
 export function HoloflowerBottomNav() {
+  // DISABLED: Functionality moved to SacredLabDrawer (hamburger menu)
+  console.log('⚠️ HoloflowerBottomNav disabled - use SacredLabDrawer instead');
+  return null;
+
   const router = useRouter();
   const pathname = usePathname();
 

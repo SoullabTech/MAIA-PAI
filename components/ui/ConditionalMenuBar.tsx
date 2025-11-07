@@ -27,7 +27,15 @@ export function ConditionalMenuBar() {
     '/onboarding'  // Sign-in ritual: Name, astrology, intention
   ];
 
-  const shouldHide = hideOnPages.some(page => pathname?.startsWith(page));
+  // If no pathname yet (SSR), don't render to avoid flash
+  if (!pathname) {
+    return null;
+  }
+
+  const shouldHide = hideOnPages.some(page => pathname.startsWith(page));
+
+  // Debug logging
+  console.log('📍 ConditionalMenuBar - pathname:', pathname, 'shouldHide:', shouldHide);
 
   if (shouldHide) {
     return null;

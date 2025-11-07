@@ -11,8 +11,7 @@ import type { StoredJournalEntry } from '@/lib/storage/journal-storage';
 import type { SymbolicContext } from '@/lib/memory/soulprint';
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
 import { ServiceContainer } from '@/lib/services/oracle/ServiceContainer';
-import { SemanticMemoryService } from '@/lib/memory/SemanticMemoryService';
-// 🌊 Water Phase: Unified Memory System
+// 🔥 Fire Phase: Unified Memory System (typed)
 import { UnifiedMemoryService } from '@/lib/memory/unified/UnifiedMemoryService';
 import { ElementalOracle2Bridge } from '@/lib/elemental-oracle-2-bridge';
 import { IntellectualPropertyEngine } from '@/lib/intellectual-property-engine';
@@ -45,8 +44,7 @@ export class PersonalOracleAgent {
   private services: ServiceContainer;
 
   // Specialized modules that remain in coordinator
-  private semanticMemory: SemanticMemoryService; // 🔜 Being replaced by unifiedMemory
-  private unifiedMemory: UnifiedMemoryService; // 🌊 Water Phase: Unified memory system
+  private unifiedMemory: UnifiedMemoryService; // 🔥 Fire Phase: Typed unified memory
   private elementalOracle: ElementalOracle2Bridge;
   private ipEngine: IntellectualPropertyEngine;
   private activeListening: ActiveListeningCore;
@@ -78,8 +76,7 @@ export class PersonalOracleAgent {
     this.services = ServiceContainer.getInstance();
 
     // Initialize specialized modules
-    this.semanticMemory = new SemanticMemoryService(); // 🔜 Keeping for rollback
-    this.unifiedMemory = new UnifiedMemoryService(); // 🌊 Water Phase: Single memory coordinator
+    this.unifiedMemory = new UnifiedMemoryService(); // 🔥 Fire Phase: Typed memory coordinator
     this.elementalOracle = new ElementalOracle2Bridge({
       openaiApiKey: process.env.OPENAI_API_KEY || '',
       model: 'gpt-4-turbo',
@@ -161,11 +158,9 @@ export class PersonalOracleAgent {
 
       // 3️⃣ MEMORY LOAD - Get user context and history
       console.log('   [3/7] UnifiedMemoryService loading context...');
-      // 🌊 Water Phase: Using unified memory system
       const memory = await this.unifiedMemory.ensureMemoryLoaded(this.userId);
       const history = await this.unifiedMemory.getConversationHistory(this.userId, 10);
       const breakthroughs = await this.unifiedMemory.getBreakthroughMoments(this.userId, 3);
-      // 🔜 OLD (for rollback): this.services.getMemoryService()...
       console.log(`   ✅ Memory loaded (${history.length} messages, ${breakthroughs.length} breakthroughs)`);
 
       // 4️⃣ SYMBOLIC ANALYSIS - Extract patterns and meaning
@@ -183,10 +178,8 @@ export class PersonalOracleAgent {
       console.log('   [5/7] SystemPromptBuilder constructing prompt...');
       const transformation = await this.getTransformationEnhancement(memory, entries);
       const listening = this.activeListening.processUserInput(trimmedInput, { phase: dominantElement });
-      // 🌊 Water Phase: Using unified memory for semantic patterns
       const patterns = await this.unifiedMemory.getUserPatterns(this.userId);
       const affinity = await this.unifiedMemory.getElementalAffinity(this.userId);
-      // 🔜 OLD (for rollback): this.semanticMemory.getUserPatterns/getElementalAffinity
 
       const systemPrompt = await this.services.getPromptBuilder().buildPrompt({
         userId: this.userId,
@@ -226,22 +219,8 @@ export class PersonalOracleAgent {
       const isSacred = engagement.detectSacredMoment(trimmedInput, rawResponse);
 
       // Update memory with this exchange
-      // 🌊 Water Phase: Using unified memory system (archetypal memory update)
-      const updatedMemory = await this.unifiedMemory.updateMemoryAfterExchange(
-        this.userId,
-        memory,
-        {
-          userMessage: trimmedInput,
-          mayaResponse: rawResponse,
-          element: dominantElement,
-          phase: detectedPhase.phase,
-          motifs,
-          themes: themes.themes,
-          emotionalTone,
-          safetyAction: safetyCheck.action,
-        }
-      );
-      // 🔜 OLD (for rollback): this.services.getMemoryService().updateMemoryAfterExchange
+      const threadSummary = `${trimmedInput.substring(0, 100)}... → ${rawResponse.substring(0, 100)}...`;
+      await this.unifiedMemory.updateAfterExchange(this.userId, threadSummary);
       console.log('   ✅ Engagement analyzed, memory updated');
 
       // Enhance response with flow awareness
@@ -356,34 +335,19 @@ export class PersonalOracleAgent {
     responseTime: number;
   }): Promise<void> {
     try {
-      // 🌊 Water Phase: Using unified memory (semantic interaction recording)
-      // Map engagementLevel to PatternObservation.userEngagement enum
-      const userEngagement: 'high' | 'medium' | 'low' =
-        data.engagementLevel === 'deep' || data.engagementLevel === 'high' ? 'high' :
-        data.engagementLevel === 'medium' || data.engagementLevel === 'moderate' ? 'medium' :
-        'low';
-
-      // Map emotionalTone to PatternObservation.emotionalShift enum
-      const emotionalShift: 'positive' | 'neutral' | 'negative' | 'crisis' =
-        data.emotionalTone === 'crisis' ? 'crisis' :
-        data.emotionalTone === 'negative' || data.emotionalTone === 'distress' ? 'negative' :
-        data.emotionalTone === 'positive' || data.emotionalTone === 'hopeful' || data.emotionalTone === 'joyful' ? 'positive' :
-        'neutral';
-
+      // 🔥 Fire Phase: Typed pattern observation recording
+      const kind = data.emotionalTone === 'breakthrough' ? 'motif' : 'affinity';
       await this.unifiedMemory.recordInteraction({
-        userId: data.userId,
-        sessionId: `session_${Date.now()}`, // Generate session ID
-        input: data.input,
-        response: data.response,
-        detectedElement: data.element,
-        appliedPatterns: [], // Can be enhanced later
-        userEngagement,
-        breakthroughDetected: false, // Can be enhanced with actual detection
-        emotionalShift,
-        sessionContinued: true, // Assume continued unless indicated otherwise
-        responseTimeMs: data.responseTime,
+        userId: data.userId as any, // Brand cast
+        kind,
+        label: `${data.element}-${data.engagementLevel}`,
+        weight: data.engagementLevel === 'deep' ? 0.8 : 0.5,
+        observedAt: new Date().toISOString(),
+        metadata: {
+          emotionalTone: data.emotionalTone,
+          responseTime: data.responseTime,
+        },
       });
-      // 🔜 OLD (for rollback): this.semanticMemory.recordInteraction
     } catch (error) {
       console.warn('Failed to record analytics:', error);
     }

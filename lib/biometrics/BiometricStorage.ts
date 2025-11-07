@@ -73,7 +73,7 @@ export class BiometricStorage {
   }
 
   /**
-   * Store parsed health data
+   * Store parsed health data with elemental coherence calculation
    */
   async storeHealthData(data: ParsedHealthData): Promise<void> {
     if (!this.db) await this.init();
@@ -82,11 +82,34 @@ export class BiometricStorage {
     const transaction = this.db.transaction([STORE_NAME], 'readwrite');
     const store = transaction.objectStore(STORE_NAME);
 
-    // Store metadata
+    // Calculate elemental coherence if possible
+    let elementalCoherence = null;
+    try {
+      const { coherenceDetector } = await import('./CoherenceDetector');
+      const { elementalCoherenceCalculator } = await import('./ElementalCoherenceCalculator');
+
+      coherenceDetector.loadHistory(data, 60);
+      const coherence = coherenceDetector.analyzeCoherence();
+      elementalCoherence = elementalCoherenceCalculator.calculateFromHealthData(data, coherence);
+
+      console.log('✨ Elemental coherence calculated:', {
+        unified: Math.round(elementalCoherence.unified * 100) + '%',
+        air: Math.round(elementalCoherence.air * 100) + '%',
+        fire: Math.round(elementalCoherence.fire * 100) + '%',
+        water: Math.round(elementalCoherence.water * 100) + '%',
+        earth: Math.round(elementalCoherence.earth * 100) + '%',
+        aether: Math.round(elementalCoherence.aether * 100) + '%'
+      });
+    } catch (error) {
+      console.warn('Could not calculate elemental coherence:', error);
+    }
+
+    // Store metadata + elemental data
     const entry = {
       timestamp: new Date(),
       type: 'apple_health_import',
       data: data,
+      elemental: elementalCoherence,
       recordCount: {
         hrv: data.hrv.length,
         heartRate: data.heartRate.length,

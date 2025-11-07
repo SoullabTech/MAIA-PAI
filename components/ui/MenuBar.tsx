@@ -20,6 +20,11 @@ import { motion } from 'framer-motion';
  * - Report a Problem (Feedback)
  */
 export function MenuBar() {
+  // DISABLED: MenuBar functionality moved to SacredLabDrawer in OracleConversation
+  // This component is being phased out in favor of the contextual drawer menu
+  console.log('⚠️ MenuBar rendered but disabled - functionality moved to SacredLabDrawer');
+  return null;
+
   const pathname = usePathname();
   const [trainingProgress] = useState(0); // TODO: Connect to actual training data
   const [showRotateHint, setShowRotateHint] = useState(false);
@@ -48,45 +53,9 @@ export function MenuBar() {
 
   return (
     <>
-      {/* Rotate Device Hint - Only on Mobile Portrait */}
-      {showRotateHint && (
-        <div className="md:hidden fixed right-4 z-40 animate-fade-in" style={{ top: 'calc(max(1rem, env(safe-area-inset-top)) + 3.5rem)' }}>
-          <div className="bg-gradient-to-r from-cyan-500/90 to-indigo-500/90 backdrop-blur-md text-white text-xs px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 border border-white/20">
-            <span className="text-base">📱</span>
-            <span>Rotate for full menu</span>
-            <button
-              onClick={dismissRotateHint}
-              className="ml-1 text-white/80 hover:text-white"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
+      {/* REMOVED: Rotate Device Hint - no longer needed since bottom navigation is disabled */}
 
-      {/* Drawer handle indicator - shows users the menu is interactive */}
-      <div className="fixed left-1/2 -translate-x-1/2 bottom-[82px] z-30 pointer-events-none">
-        <motion.div
-          className="flex flex-col items-center gap-1.5"
-          initial={{ opacity: 0.6 }}
-          animate={{
-            opacity: [0.6, 1, 0.6],
-            y: [0, -3, 0]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        >
-          {/* Three-dot drawer handle with enhanced visibility */}
-          <div className="flex gap-2 px-3 py-1.5 rounded-full bg-gradient-to-b from-white/20 to-white/10 backdrop-blur-sm border border-white/30 shadow-lg">
-            <div className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.6)]"></div>
-            <div className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.6)]"></div>
-            <div className="w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.6)]"></div>
-          </div>
-        </motion.div>
-      </div>
+      {/* REMOVED: Drawer handle indicator - no longer needed since bottom navigation components are disabled */}
 
       {/* INSTRUMENT PANEL: Ancient-future navigation - Bottom menu bar */}
       <div className="flex fixed left-1/2 -translate-x-1/2 bottom-0 z-40 items-center gap-1.5 md:gap-3 bg-soul-surface/95 backdrop-blur-md border-t border-soul-border/50 px-4 md:px-6 py-3 md:py-4 rounded-t-2xl shadow-lg" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
@@ -109,7 +78,7 @@ export function MenuBar() {
           </div>
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none" style={{ color: '#E8C99B' }}>
             Home
           </span>
         </div>
@@ -149,7 +118,7 @@ export function MenuBar() {
           </svg>
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none" style={{ color: '#E8C99B' }}>
             Training {Math.round(trainingProgress * 100)}%
           </span>
         </div>
@@ -166,7 +135,7 @@ export function MenuBar() {
           <Star className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500" />
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none" style={{ color: '#E8C99B' }}>
             Chart
           </span>
         </div>
@@ -182,7 +151,7 @@ export function MenuBar() {
           <Gem className="w-3.5 h-3.5 md:w-4 md:h-4 text-cyan-500/70 transition-all group-hover:text-cyan-500" />
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none" style={{ color: '#E8C99B' }}>
             Records
           </span>
         </div>
@@ -199,7 +168,7 @@ export function MenuBar() {
             <Users className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500" />
 
             {/* Tooltip - Matte instrument label */}
-            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none" style={{ color: '#E8C99B' }}>
               Circle
             </span>
           </div>
@@ -216,7 +185,7 @@ export function MenuBar() {
           <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500" />
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none" style={{ color: '#E8C99B' }}>
             Mode
           </span>
         </div>
@@ -242,7 +211,7 @@ export function MenuBar() {
             <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-500 border-2 border-soul-surface" />
 
             {/* Tooltip - Matte instrument label */}
-            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none" style={{ color: '#E8C99B' }}>
               Settings
             </span>
           </div>
@@ -326,7 +295,7 @@ export function MenuBar() {
           <MessageCircle className="w-3.5 h-3.5 md:w-4 md:h-4 text-amber-500/70 transition-all group-hover:text-amber-500" />
 
           {/* Tooltip - Matte instrument label */}
-          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-soul-textTertiary text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-soul-surface/95 text-[10px] tracking-archive px-2 py-1 rounded border border-soul-borderSubtle/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none" style={{ color: '#E8C99B' }}>
             Feedback
           </span>
         </div>

@@ -20,6 +20,7 @@ import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
 import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrainTrustMonitor } from '@/components/consciousness/BrainTrustMonitor';
+import { WelcomeScreen } from '@/components/maia/WelcomeScreen';
 import { LogOut, Sparkles, Menu, X, Brain, Volume2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -70,7 +71,6 @@ export default function MAIAPage() {
   const [maiaMode, setMaiaMode] = useState<'normal' | 'patient' | 'session'>('normal');
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [showWelcome, setShowWelcome] = useState(false);
-  const [showVoiceSettings, setShowVoiceSettings] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'>('alloy'); // Default: Neutral & balanced
 
   const hasCheckedAuth = useRef(false);
@@ -253,169 +253,40 @@ export default function MAIAPage() {
                   </div>
                 </div>
 
-                {/* Dream Weaver indicator - smaller, inline */}
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-shrink-0">
-                    <div className="relative flex items-center justify-center w-4 h-4">
-                      <div className="absolute inset-0 border border-amber-700/20 rotate-45" />
-                      <motion.div
-                        className="absolute inset-0.5 bg-gradient-to-br from-amber-600/30 to-orange-700/30"
-                        animate={{
-                          rotate: [45, 405],
-                        }}
-                        transition={{
-                          duration: 10,
-                          repeat: Infinity,
-                          ease: "linear"
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-mono text-amber-600/50 tracking-[0.15em] uppercase">
-                      Dream Weaver
-                    </span>
-                    <motion.span
-                      className="text-[8px] font-mono text-amber-500/30"
-                      animate={{
-                        opacity: [0.3, 0.7, 0.3],
-                      }}
-                      transition={{
-                        duration: 1.5,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    >
-                      ACTIVE
-                    </motion.span>
-                  </div>
-                  <span className="text-[9px] text-stone-600 hidden lg:block">
-                    Neural patterns emerging from dialogue
-                  </span>
-                </div>
               </div>
 
-              {/* Center - Voice & Mode Controls */}
-              <div className="flex items-center gap-3">
-                {/* Voice Selection - Prominent with speaker icon */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowVoiceSettings(!showVoiceSettings)}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-black/20 border border-amber-500/30 rounded-lg hover:bg-black/30 hover:border-amber-500/50 transition-all group"
-                  >
-                    <Volume2 className="w-4 h-4 text-amber-400 group-hover:text-amber-300 transition-colors" />
-                    <span className="text-[10px] font-medium text-amber-400 group-hover:text-amber-300 uppercase tracking-wide">
-                      Voice: {selectedVoice}
-                    </span>
-                    <motion.div
-                      animate={{ rotate: showVoiceSettings ? 180 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <svg className="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </motion.div>
-                  </button>
-
-                  {/* Voice Options Dropdown */}
-                  <AnimatePresence>
-                    {showVoiceSettings && (
-                      <>
-                        {/* Backdrop to close when clicking outside */}
-                        <div
-                          className="fixed inset-0 z-[90]"
-                          onClick={() => setShowVoiceSettings(false)}
-                        />
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.2 }}
-                          className="absolute top-full mt-2 left-0 w-72 bg-stone-900/95 backdrop-blur-xl border border-amber-500/30 rounded-xl shadow-2xl shadow-black/50 overflow-hidden z-[100]"
-                        >
-                          <div className="p-3">
-                            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-white/10">
-                              <Volume2 className="w-4 h-4 text-amber-400" />
-                              <h3 className="text-sm font-semibold text-white">Choose MAIA's Voice</h3>
-                            </div>
-                            <div className="space-y-1">
-                              {[
-                                { id: 'shimmer', name: 'Shimmer', description: 'Gentle & soothing • Feminine', emoji: '✨' },
-                                { id: 'fable', name: 'Fable', description: 'Storytelling • Feminine', emoji: '📖' },
-                                { id: 'nova', name: 'Nova', description: 'Bright & energetic • Feminine', emoji: '⭐' },
-                                { id: 'alloy', name: 'Alloy', description: 'Neutral & balanced • Gender-neutral', emoji: '🔘' },
-                                { id: 'echo', name: 'Echo', description: 'Warm & expressive • Masculine', emoji: '🌊' },
-                                { id: 'onyx', name: 'Onyx', description: 'Deep & resonant • Masculine', emoji: '🖤' },
-                              ].map((voice) => (
-                                <motion.button
-                                  key={voice.id}
-                                  onClick={() => {
-                                    handleVoiceChange(voice.id as any);
-                                    setShowVoiceSettings(false);
-                                  }}
-                                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
-                                    selectedVoice === voice.id
-                                      ? 'bg-amber-500/20 border border-amber-500/50 text-amber-300'
-                                      : 'bg-black/20 border border-white/5 text-white/70 hover:bg-white/5 hover:border-white/10'
-                                  }`}
-                                  whileHover={{ scale: 1.02 }}
-                                  whileTap={{ scale: 0.98 }}
-                                >
-                                  <span className="text-xl">{voice.emoji}</span>
-                                  <div className="flex-1 text-left">
-                                    <div className="text-sm font-medium">{voice.name}</div>
-                                    <div className="text-[10px] text-white/50">{voice.description}</div>
-                                  </div>
-                                  {selectedVoice === voice.id && (
-                                    <motion.div
-                                      initial={{ scale: 0 }}
-                                      animate={{ scale: 1 }}
-                                      className="w-2 h-2 rounded-full bg-amber-400"
-                                    />
-                                  )}
-                                </motion.button>
-                              ))}
-                            </div>
-                          </div>
-                        </motion.div>
-                      </>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* Subtle mode selector - feel the shift through color/breathing, not explanation */}
-                <div className="flex items-center gap-1 bg-black/10 backdrop-blur-sm rounded-lg p-0.5">
-                  <button
-                    onClick={() => setMaiaMode('normal')}
-                    className={`px-2.5 py-0.5 rounded text-[10px] font-medium transition-all duration-500 ${
-                      maiaMode === 'normal'
-                        ? 'bg-amber-600/20 text-amber-300 shadow-sm shadow-amber-600/20'
-                        : 'text-stone-500 hover:text-stone-400'
-                    }`}
-                  >
-                    Dialogue
-                  </button>
-                  <button
-                    onClick={() => setMaiaMode('patient')}
-                    className={`px-2.5 py-0.5 rounded text-[10px] font-medium transition-all duration-500 ${
-                      maiaMode === 'patient'
-                        ? 'bg-orange-700/20 text-orange-300 shadow-sm shadow-orange-700/20'
-                        : 'text-stone-500 hover:text-stone-400'
-                    }`}
-                  >
-                    Patient
-                  </button>
-                  <button
-                    onClick={() => setMaiaMode('session')}
-                    className={`px-2.5 py-0.5 rounded text-[10px] font-medium transition-all duration-500 ${
-                      maiaMode === 'session'
-                        ? 'bg-amber-900/30 text-amber-400 shadow-sm shadow-amber-900/20'
-                        : 'text-stone-500 hover:text-stone-400'
-                    }`}
-                  >
-                    Scribe
-                  </button>
-                </div>
+              {/* Center - Mode Controls (Dialogue/Patient/Scribe moved to center) */}
+              <div className="flex items-center justify-center gap-1 bg-black/10 backdrop-blur-sm rounded-lg p-0.5">
+                <button
+                  onClick={() => setMaiaMode('normal')}
+                  className={`px-3 py-1 rounded text-xs font-medium transition-all duration-500 ${
+                    maiaMode === 'normal'
+                      ? 'bg-amber-600/20 text-amber-300 shadow-sm shadow-amber-600/20'
+                      : 'text-stone-500 hover:text-stone-400'
+                  }`}
+                >
+                  Dialogue
+                </button>
+                <button
+                  onClick={() => setMaiaMode('patient')}
+                  className={`px-3 py-1 rounded text-xs font-medium transition-all duration-500 ${
+                    maiaMode === 'patient'
+                      ? 'bg-orange-700/20 text-orange-300 shadow-sm shadow-orange-700/20'
+                      : 'text-stone-500 hover:text-stone-400'
+                  }`}
+                >
+                  Patient
+                </button>
+                <button
+                  onClick={() => setMaiaMode('session')}
+                  className={`px-3 py-1 rounded text-xs font-medium transition-all duration-500 ${
+                    maiaMode === 'session'
+                      ? 'bg-amber-900/30 text-amber-400 shadow-sm shadow-amber-900/20'
+                      : 'text-stone-500 hover:text-stone-400'
+                  }`}
+                >
+                  Scribe
+                </button>
               </div>
 
               {/* Right side - Actions */}
@@ -498,6 +369,7 @@ export default function MAIAPage() {
               sessionId={sessionId}
               voiceEnabled={voiceEnabled}
               voice={selectedVoice}
+              onVoiceChange={handleVoiceChange}
               initialMode={maiaMode}
               onModeChange={setMaiaMode}
             />
@@ -564,34 +436,18 @@ export default function MAIAPage() {
           </AnimatePresence>
         </div>
 
-        {/* Welcome Message for First-Time Users */}
-        {isMounted && showWelcome && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="absolute bottom-20 left-1/2 -translate-x-1/2 max-w-md w-full mx-4 bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/40 rounded-2xl p-6 backdrop-blur-xl"
-          >
-            <div className="text-center">
-              <Sparkles className="w-10 h-10 text-amber-400 mx-auto mb-3" />
-              <h3 className="text-lg font-semibold text-white mb-2">
-                Welcome, {explorerName}
-              </h3>
-              <p className="text-sm text-stone-300 mb-4">
-                Share your story. MAIA will help you discover the wisdom within it.
-                Your journey begins now.
-              </p>
-              <button
-                onClick={() => {
-                  localStorage.setItem('maia_welcome_seen', 'true');
-                  window.location.reload();
-                }}
-                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium transition-colors"
-              >
-                Begin
-              </button>
-            </div>
-          </motion.div>
-        )}
+        {/* Sacred Welcome Screen for First-Time Users */}
+        <AnimatePresence>
+          {isMounted && showWelcome && (
+            <WelcomeScreen
+              explorerName={explorerName}
+              onComplete={() => {
+                localStorage.setItem('maia_welcome_seen', 'true');
+                setShowWelcome(false);
+              }}
+            />
+          )}
+        </AnimatePresence>
       </div>
     </ErrorBoundary>
   );

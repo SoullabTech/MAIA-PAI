@@ -1,63 +1,63 @@
 /**
  * Conversation Memory Sub-Service
- *
- * Water Phase - Memory Unification
- * Handles conversation history and breakthrough moments from maia_messages table
+ * Fire Phase - Typed with Zod validation
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js';
-
-const DEFAULT_LIMIT = 10;
+import { getSharedSupabase } from "@/lib/db/sharedSupabaseClient";
+import type { ConversationMessage } from "../types";
+import { ConversationMessageZ } from "../schemas";
 
 export class ConversationMemory {
-  constructor(
-    private supabase: SupabaseClient,
-    private deps?: { now?: () => number }
-  ) {}
+  constructor(private readonly supabase = getSharedSupabase()) {}
 
-  /**
-   * Retrieve conversation history from maia_messages table
-   * This gives MAIA memory continuity across sessions
-   */
-  async getConversationHistory(userId: string, limit: number = DEFAULT_LIMIT): Promise<any[]> {
-    try {
-      const { data, error } = await this.supabase
-        .from('maia_messages')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(limit * 2); // x2 because we have user + maia messages
+  async getConversationHistory(userId: string, limit = 10): Promise<ConversationMessage[]> {
+    const { data, error } = await this.supabase
+      .from("maia_messages")
+      .select("id,user_id,role,content,created_at,tags")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(limit);
 
-      if (error) {
-        console.warn('⚠️ Could not retrieve conversation history:', error.message);
-        return [];
-      }
+    if (error || !data) return [];
 
-      return data || [];
-    } catch (err) {
-      console.error('❌ Error retrieving conversation history:', err);
-      return [];
-    }
+    return data
+      .map((row) =>
+        ConversationMessageZ.safeParse({
+          id: row.id,
+          userId: row.user_id,
+          role: row.role,
+          content: row.content,
+          createdAt: row.created_at,
+          tags: row.tags ?? undefined,
+        })
+      )
+      .filter((r) => r.success)
+      .map((r) => r.data);
   }
 
-  /**
-   * Find breakthrough moments for explicit callbacks
-   */
-  async getBreakthroughMoments(userId: string, limit: number = 5): Promise<any[]> {
-    try {
-      const { data, error } = await this.supabase
-        .from('maia_messages')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('is_breakthrough', true)
-        .order('created_at', { ascending: false })
-        .limit(limit);
+  async getBreakthroughMoments(userId: string, limit = 3): Promise<ConversationMessage[]> {
+    const { data, error } = await this.supabase
+      .from("maia_messages")
+      .select("id,user_id,role,content,created_at,tags")
+      .eq("user_id", userId)
+      .contains("tags", ["breakthrough"])
+      .order("created_at", { ascending: false })
+      .limit(limit);
 
-      if (error) return [];
-      return data || [];
-    } catch (err) {
-      console.error('❌ Error retrieving breakthroughs:', err);
-      return [];
-    }
+    if (error || !data) return [];
+
+    return data
+      .map((row) =>
+        ConversationMessageZ.safeParse({
+          id: row.id,
+          userId: row.user_id,
+          role: row.role,
+          content: row.content,
+          createdAt: row.created_at,
+          tags: row.tags ?? undefined,
+        })
+      )
+      .filter((r) => r.success)
+      .map((r) => r.data);
   }
 }
