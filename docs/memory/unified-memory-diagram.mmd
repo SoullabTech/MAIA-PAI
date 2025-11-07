@@ -1,0 +1,22 @@
+flowchart TD
+    U[User] --> P[PersonalOracleAgent.Simplified]
+    P --> UM[UnifiedMemoryService]
+
+    subgraph UnifiedMemoryService
+      UM --> CM[ConversationMemory\n(maia_messages)]
+      UM --> AM[ArchetypalMemory\n(ain_memory)]
+      UM --> SM[SemanticMemory\n(semantic_observations,\nlearned_patterns)]
+    end
+
+    subgraph SharedSupabaseClient
+      SSC[getSharedSupabase()]
+    end
+
+    CM --> SSC
+    AM --> SSC
+    SM --> SSC
+
+    classDef svc fill:#eef,stroke:#99f,stroke-width:1px
+    classDef db fill:#efe,stroke:#9c9,stroke-width:1px
+    class UM,CM,AM,SM svc
+    class SSC db
