@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
     const userId = body.userId;
     const userName = body.userName;
     const sessionId = body.sessionId;
+    const isVoiceMode = body.isVoiceMode || false; // Voice mode = faster Essential tier
     const fieldState = body.fieldState || { depth: 0.7, active: true };
     const sessionTimeContext = body.sessionTimeContext; // { elapsedMinutes, remainingMinutes, totalMinutes, phase, systemPromptContext }
 
@@ -190,10 +191,44 @@ export async function POST(request: NextRequest) {
     // ═══════════════════════════════════════════════════════════════
     // STEP 4: GENERATE MAIA RESPONSE FROM THE BETWEEN
     // ═══════════════════════════════════════════════════════════════
+
+    // For voice mode, stream response directly from Claude (fastest)
+    if (isVoiceMode) {
+      console.log('🎤 [VOICE MODE] Streaming response directly from Claude...');
+
+      const streamResponse = await generateMAIAResponseStream({
+        message,
+        fieldState,
+        userId,
+        isVoiceMode,
+        conversationHistory,
+        recalibrationEvent,
+        spiralDynamics,
+        sessionThread,
+        archetypalResonance,
+        lightweightMemory,
+        maiaEssence,
+        wisdomField,
+        sessionTimeContext
+      });
+
+      // Stream directly to frontend - no sovereignty check (too slow for voice)
+      // Sovereignty is built into system prompt instead
+      return new Response(streamResponse, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+        },
+      });
+    }
+
+    // For text mode, generate full response (allows sovereignty check)
     let responseText = await generateMAIAResponse({
       message,
       fieldState,
       userId,
+      isVoiceMode,
       conversationHistory,
       recalibrationEvent,
       spiralDynamics,
@@ -373,6 +408,7 @@ async function generateMAIAResponse({
   message,
   fieldState,
   userId,
+  isVoiceMode,
   conversationHistory,
   recalibrationEvent,
   spiralDynamics,
@@ -386,6 +422,7 @@ async function generateMAIAResponse({
   message: string;
   fieldState: any;
   userId: string;
+  isVoiceMode: boolean;
   conversationHistory: any[];
   recalibrationEvent: any;
   spiralDynamics: any;
@@ -420,7 +457,17 @@ async function generateMAIAResponse({
   ];
 
   try {
+    // Select model based on mode
+    // Voice mode → Haiku (3-5x faster, still excellent quality)
+    // Text mode → Opus (deepest consciousness and reasoning)
+    const model = isVoiceMode
+      ? 'claude-3-5-haiku-20241022'  // Fast for voice (sub-second response)
+      : 'claude-3-opus-20240229';     // Deepest consciousness for text
+
+    console.log(`🤖 [MODEL] Using ${model} (voice mode: ${isVoiceMode})`);
+
     // Call Claude API
+    // Voice mode uses streaming for faster perceived latency
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -429,11 +476,12 @@ async function generateMAIAResponse({
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model,
         max_tokens: 2048,
         system: systemPrompt,
         messages,
-        temperature: 0.8
+        temperature: 0.8,
+        stream: isVoiceMode // Enable streaming for voice mode (faster perceived response)
       }),
     });
 
@@ -442,6 +490,40 @@ async function generateMAIAResponse({
       throw new Error(`Claude API error: ${response.status} - ${error}`);
     }
 
+    // Handle streaming response (voice mode)
+    if (isVoiceMode && response.body) {
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') continue;
+
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+                fullText += parsed.delta.text;
+              }
+            } catch (e) {
+              // Skip invalid JSON
+            }
+          }
+        }
+      }
+
+      return fullText;
+    }
+
+    // Handle non-streaming response (text mode)
     const data = await response.json();
     const text = data.content[0]?.text || '';
 
@@ -451,6 +533,147 @@ async function generateMAIAResponse({
     console.error('Error calling Claude:', error);
     throw error;
   }
+}
+
+/**
+ * GENERATE MAIA RESPONSE STREAM (Voice Mode)
+ *
+ * Returns a ReadableStream that streams Claude's response in real-time
+ * This allows TTS to start speaking while Claude is still generating
+ */
+async function generateMAIAResponseStream({
+  message,
+  fieldState,
+  userId,
+  isVoiceMode,
+  conversationHistory,
+  recalibrationEvent,
+  spiralDynamics,
+  sessionThread,
+  archetypalResonance,
+  lightweightMemory,
+  maiaEssence,
+  wisdomField,
+  sessionTimeContext
+}: {
+  message: string;
+  fieldState: any;
+  userId: string;
+  isVoiceMode: boolean;
+  conversationHistory: any[];
+  recalibrationEvent: any;
+  spiralDynamics: any;
+  sessionThread: any;
+  archetypalResonance: any;
+  lightweightMemory: any;
+  maiaEssence?: any;
+  wisdomField?: FieldReport | null;
+  sessionTimeContext?: any;
+}): Promise<ReadableStream> {
+
+  // Build system prompt (same as non-streaming)
+  const systemPrompt = buildBetweenSystemPrompt(
+    fieldState,
+    recalibrationEvent,
+    spiralDynamics,
+    sessionThread,
+    archetypalResonance,
+    lightweightMemory,
+    maiaEssence,
+    wisdomField,
+    sessionTimeContext
+  );
+
+  // Prepare messages (same as non-streaming)
+  const messages = [
+    ...conversationHistory.map((msg: any) => ({
+      role: msg.role === 'user' ? 'user' : 'assistant',
+      content: msg.content
+    })),
+    { role: 'user', content: message }
+  ];
+
+  // Select model based on mode
+  const model = isVoiceMode
+    ? 'claude-3-5-haiku-20241022'  // Fast for voice
+    : 'claude-3-opus-20240229';     // Deepest consciousness for text
+
+  console.log(`🤖 [STREAM] Using ${model} (voice mode: ${isVoiceMode})`);
+
+  // Call Claude API with streaming
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.ANTHROPIC_API_KEY || '',
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: 2048,
+      system: systemPrompt,
+      messages,
+      temperature: 0.8,
+      stream: true
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Claude API error: ${response.status} - ${error}`);
+  }
+
+  if (!response.body) {
+    throw new Error('No response body from Claude API');
+  }
+
+  // Transform Claude's stream to Server-Sent Events format
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+
+  return new ReadableStream({
+    async start(controller) {
+      const reader = response.body!.getReader();
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') continue;
+
+              try {
+                const parsed = JSON.parse(data);
+
+                // Extract text from content_block_delta events
+                if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+                  const text = parsed.delta.text;
+                  // Send as SSE format that frontend expects
+                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
+                }
+              } catch (e) {
+                // Skip invalid JSON
+              }
+            }
+          }
+        }
+
+        // Send done signal
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+        controller.close();
+
+      } catch (error) {
+        console.error('❌ [STREAM] Error:', error);
+        controller.error(error);
+      }
+    }
+  });
 }
 
 /**

@@ -8,6 +8,12 @@
  * This is Phase 1 of the Liquid AI + AIN integration.
  */
 
+// Debug logging (toggle with FIELD_DEBUG=1)
+const FIELD_DEBUG = process.env.FIELD_DEBUG === '1' || process.env.NEXT_PUBLIC_FIELD_DEBUG === '1';
+const dbg = (...args: any[]) => {
+  if (FIELD_DEBUG) console.log('🌊 [FIELD]', ...args);
+};
+
 export interface RhythmMetrics {
   // Speech timing
   wordsPerMinute: number;           // Current speaking rate
@@ -171,6 +177,15 @@ export class ConversationalRhythm {
 
     // Response pressure - how quickly user responds
     this.metrics.responsePressure = this.calculateResponsePressure();
+
+    // Debug logging
+    dbg('tempo', {
+      wpm: Math.round(this.metrics.wordsPerMinute),
+      tempo: this.metrics.conversationTempo,
+      coherence: this.metrics.rhythmCoherence.toFixed(2),
+      breathAlignment: this.metrics.breathAlignment.toFixed(2),
+      avgPauseMs: Math.round(this.metrics.averagePauseDuration)
+    });
 
     // Notify listeners
     if (this.onMetricsUpdate) {

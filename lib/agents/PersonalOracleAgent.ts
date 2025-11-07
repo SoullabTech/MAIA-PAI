@@ -934,7 +934,8 @@ You speak with **phenomenological presence** - grounded in lived experience, sen
           conversationType: conversationStyle,
           sessionLength: conversationHistory.length,
           userIntent: trimmedInput.toLowerCase().includes('oracle') ? 'oracle' : undefined,
-          isOracle: false
+          isOracle: false,
+          isVoiceMode: (context as any)?.isVoiceMode || false
         });
 
         // Build user context string (anamnesis + symbolic memory)

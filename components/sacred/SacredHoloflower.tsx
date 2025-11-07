@@ -293,12 +293,12 @@ export const SacredHoloflower: React.FC<SacredHoloflowerProps> = ({
           r={size * 0.42}
           fill="none"
           stroke={isMaiaSpeaking ? 'url(#maia-voice-gradient)' : 'url(#user-voice-gradient)'}
-          strokeWidth={2 + voiceAmplitude * 4}
-          opacity={0.3 + voiceAmplitude * 0.7}
+          strokeWidth={6 + voiceAmplitude * 12}
+          opacity={0.6 + voiceAmplitude * 0.9}
           className="voice-ring"
           style={{
-            filter: `blur(${voiceAmplitude * 2}px) drop-shadow(0 0 ${voiceAmplitude * 10}px ${isMaiaSpeaking ? 'rgba(147, 51, 234, 0.8)' : 'rgba(59, 130, 246, 0.8)'})`,
-            transform: `scale(${1 + voiceAmplitude * 0.1})`,
+            filter: `blur(${voiceAmplitude * 3}px) drop-shadow(0 0 ${voiceAmplitude * 20}px ${isMaiaSpeaking ? 'rgba(147, 51, 234, 1)' : 'rgba(59, 130, 246, 1)'})`,
+            transform: `scale(${1 + voiceAmplitude * 0.15})`,
             transformOrigin: 'center',
             transition: 'all 0.1s ease-out'
           }}
@@ -309,16 +309,16 @@ export const SacredHoloflower: React.FC<SacredHoloflowerProps> = ({
         <defs>
           {/* MAIA speaking - purple/violet gradient */}
           <linearGradient id="maia-voice-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#9333ea" stopOpacity="1" />
-            <stop offset="50%" stopColor="#c084fc" stopOpacity="1" />
-            <stop offset="100%" stopColor="#e879f9" stopOpacity="1" />
+            <stop offset="0%" stopColor="#a855f7" stopOpacity="1" />
+            <stop offset="50%" stopColor="#d946ef" stopOpacity="1" />
+            <stop offset="100%" stopColor="#f0abfc" stopOpacity="1" />
           </linearGradient>
 
           {/* User speaking - blue/cyan gradient */}
           <linearGradient id="user-voice-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#3b82f6" stopOpacity="1" />
-            <stop offset="50%" stopColor="#60a5fa" stopOpacity="1" />
-            <stop offset="100%" stopColor="#93c5fd" stopOpacity="1" />
+            <stop offset="0%" stopColor="#60a5fa" stopOpacity="1" />
+            <stop offset="50%" stopColor="#93c5fd" stopOpacity="1" />
+            <stop offset="100%" stopColor="#dbeafe" stopOpacity="1" />
           </linearGradient>
         </defs>
       </svg>

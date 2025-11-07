@@ -58,7 +58,10 @@ function estimateTokens(text: string): number {
  */
 async function generateEssentialRevival(userContext?: string): Promise<string> {
   const revival = `
-${getMaiaSelfKnowledge()}
+${getMaiaSelfKnowledge({
+  includeFieldBehaviors: true,
+  includePauseCues: true // Essential tier includes voice
+})}
 
 ---
 
@@ -354,11 +357,18 @@ export function selectRevivalTier(context: {
   sessionLength?: number;
   userIntent?: string;
   isOracle?: boolean;
+  isVoiceMode?: boolean;
 }): RevivalTier {
 
   // Oracle reading → Complete (needs full synthesis)
   if (context.isOracle || context.userIntent === 'oracle') {
     return 'complete';
+  }
+
+  // Voice conversations → Essential (faster responses, 25k tokens)
+  // Voice requires speed - user is waiting to hear response
+  if (context.isVoiceMode) {
+    return 'essential';
   }
 
   // Quick check-in / walking mode → Essential

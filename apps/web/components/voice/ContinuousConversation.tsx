@@ -573,15 +573,16 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   const startListening = useCallback(async () => {
     console.log('🎤 [ContinuousConversation] startListening called');
 
-    // Initialize audio monitoring
-    const audioReady = await initializeAudioMonitoring();
-    if (!audioReady) {
-      console.error('❌ [ContinuousConversation] Audio monitoring failed');
-      alert('Unable to access microphone. Please check permissions.');
-      return;
-    }
+    try {
+      // Initialize audio monitoring
+      const audioReady = await initializeAudioMonitoring();
+      if (!audioReady) {
+        console.error('❌ [ContinuousConversation] Audio monitoring failed');
+        // Don't show alert - let parent component handle error state
+        throw new Error('MICROPHONE_UNAVAILABLE');
+      }
 
-    console.log('✅ [ContinuousConversation] Audio monitoring ready');
+      console.log('✅ [ContinuousConversation] Audio monitoring ready');
 
     // Initialize speech recognition
     if (!recognitionRef.current) {
@@ -612,6 +613,13 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
           console.error('❌ [ContinuousConversation] Error starting recognition:', err);
         }
       }
+    }
+    } catch (error: any) {
+      console.error('❌ [ContinuousConversation] Failed to start listening:', error);
+      // Reset state on error
+      setIsListening(false);
+      isListeningRef.current = false;
+      throw error; // Re-throw so parent component can handle
     }
   }, [initializeSpeechRecognition, initializeAudioMonitoring]);
 

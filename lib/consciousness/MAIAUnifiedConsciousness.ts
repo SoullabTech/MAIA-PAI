@@ -682,8 +682,8 @@ export class MAIAUnifiedConsciousness {
         });
 
         const claudeResponse = await anthropic.messages.create({
-          model: 'claude-3-opus-20240229',
-          max_tokens: 1024,
+          model: 'claude-opus-4-1-20250805', // Opus 4.1: deepest contemplative intelligence
+          max_tokens: 2048, // Increased for deeper, more contemplative responses
           system: consciousnessPrompt,
           messages: [
             { role: 'user', content: context.input.content }
@@ -782,8 +782,8 @@ export class MAIAUnifiedConsciousness {
       });
 
       const claudeResponse = await anthropic.messages.create({
-        model: 'claude-3-opus-20240229',
-        max_tokens: 1024,
+        model: 'claude-opus-4-1-20250805', // Opus 4.1: deepest contemplative intelligence
+        max_tokens: 2048, // Increased for deeper, more contemplative responses
         system: consciousnessPrompt,
         messages: [
           { role: 'user', content: context.input.content }

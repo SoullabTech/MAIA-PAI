@@ -194,9 +194,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   }, [initialShowChatInterface]);
 
   // Notify parent when local state changes
+  // Use ref to avoid infinite loop from callback recreation
+  const onShowChatInterfaceChangeRef = useRef(onShowChatInterfaceChange);
   useEffect(() => {
-    onShowChatInterfaceChange?.(showChatInterface);
-  }, [showChatInterface, onShowChatInterfaceChange]);
+    onShowChatInterfaceChangeRef.current = onShowChatInterfaceChange;
+  }, [onShowChatInterfaceChange]);
+
+  useEffect(() => {
+    onShowChatInterfaceChangeRef.current?.(showChatInterface);
+  }, [showChatInterface]);
   const [showCaptions, setShowCaptions] = useState(true);
   const [showVoiceText, setShowVoiceText] = useState(true);
   const [showCustomizer, setShowCustomizer] = useState(false);
@@ -251,6 +257,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const lastVoiceErrorRef = useRef<number>(0);
   const lastProcessedTranscriptRef = useRef<{ text: string; timestamp: number } | null>(null);
   const lastAudioCallbackUpdateRef = useRef<number>(0); // Throttle audio level callbacks
+  const onMessageAddedRef = useRef(onMessageAdded); // Store callback in ref to avoid infinite loop
 
   // 🌊 LIQUID AI - Rhythm tracker instance
   const rhythmTrackerRef = useRef<ConversationalRhythm>(
@@ -264,6 +271,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       });
     })
   );
+
+  // Keep onMessageAdded ref updated
+  useEffect(() => {
+    onMessageAddedRef.current = onMessageAdded;
+  }, [onMessageAdded]);
 
   // ==================== AUDIO LEVEL CALLBACK (THROTTLED) ====================
   // Prevent infinite render loop by throttling setState calls
@@ -603,7 +615,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       };
 
       setMessages(prev => [...prev, acknowledgmentMessage]);
-      onMessageAdded?.(acknowledgmentMessage);
+      onMessageAddedRef.current?.(acknowledgmentMessage);
 
       // Optionally speak the acknowledgment if voice is enabled
       // NOTE: Speech now handled automatically by WebRTC realtime voice system
@@ -618,7 +630,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     return () => {
       window.removeEventListener('maya-style-changed', handleStyleChange as EventListener);
     };
-  }, [voiceEnabled, onMessageAdded]);
+  }, [voiceEnabled]);
 
   // Keyboard shortcut for settings (Cmd/Ctrl + ,)
   useEffect(() => {
@@ -714,7 +726,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             source: 'system'
           };
           setMessages(prev => [...prev, errorMessage]);
-          onMessageAdded?.(errorMessage);
+          onMessageAddedRef.current?.(errorMessage);
 
           resetAllStates();
         }
@@ -722,7 +734,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       return () => clearTimeout(recoveryTimer);
     }
-  }, [isProcessing, isResponding, resetAllStates, onMessageAdded]);
+  }, [isProcessing, isResponding, resetAllStates]);
 
   // Don't sync voice state - it creates race conditions where sync happens
   // before TTS audio starts playing, killing the audio before it can play.
@@ -1106,7 +1118,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       source: 'user'
     };
     setMessages(prev => [...prev, userMessage]);
-    onMessageAdded?.(userMessage);
+    onMessageAddedRef.current?.(userMessage);
 
     // Process message for Field Protocol if recording
     if (isFieldRecording) {
@@ -1160,6 +1172,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           userId: userId || 'anonymous',
           userName: userName || 'Explorer',
           sessionId,
+          isVoiceMode: !showChatInterface, // Voice mode = faster Essential tier
           fieldState: {
             active: true,
             depth: 0.7,
@@ -1184,15 +1197,90 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
       }
 
-      const responseData = await response.json();
-      console.log('✅ THE BETWEEN response data:', responseData);
+      // Check if streaming response (voice mode)
+      const isVoiceMode = !showChatInterface;
+      const contentType = response.headers.get('content-type');
+      const isStreaming = contentType?.includes('text/event-stream');
+
+      console.log('📡 Response type:', { isVoiceMode, contentType, isStreaming });
+
+      let responseText: string;
+      let responseData: any = {};
+
+      if (isStreaming) {
+        // Handle streaming response (voice mode - fastest)
+        console.log('🎤 [STREAM] Receiving streaming response...');
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let fullText = '';
+        let firstChunkReceived = false;
+
+        try {
+          if (!reader) {
+            throw new Error('No response body reader available');
+          }
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              console.log('🏁 [STREAM] Stream complete');
+              break;
+            }
+
+            const chunk = decoder.decode(value);
+            console.log('📦 [STREAM] Received chunk:', chunk.substring(0, 100));
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') {
+                  console.log('✅ [STREAM] Done signal received');
+                  continue;
+                }
+
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.text) {
+                    const text = parsed.text;
+                    fullText += text;
+
+                    if (!firstChunkReceived) {
+                      firstChunkReceived = true;
+                      const firstChunkTime = Date.now() - startTime;
+                      console.log(`⚡ [STREAM] First chunk received in ${firstChunkTime}ms`);
+                    }
+                  }
+                } catch (e) {
+                  console.warn('⚠️ [STREAM] Failed to parse JSON:', data.substring(0, 50));
+                }
+              }
+            }
+          }
+
+          if (!fullText) {
+            throw new Error('Stream completed but no text received');
+          }
+
+          responseText = cleanMessage(fullText);
+          console.log(`✅ [STREAM] Complete response received (${fullText.length} chars)`);
+
+        } catch (streamError) {
+          console.error('❌ [STREAM] Error reading stream:', streamError);
+          // Fall back to error message
+          throw streamError;
+        }
+
+      } else {
+        // Handle JSON response (text mode - includes metadata)
+        responseData = await response.json();
+        console.log('✅ THE BETWEEN response data:', responseData);
+        responseText = cleanMessage(responseData.response || 'I\'m here. What wants your attention?');
+      }
+
       const apiTime = Date.now() - startTime;
       console.log(`⏱️ Response FROM THE BETWEEN received in ${apiTime}ms`);
       trackEvent.apiCall('/api/between/chat', apiTime, true);
-
-      // THE BETWEEN returns { response, metadata }
-      let responseText = responseData.response || 'I\'m here. What wants your attention?';
-      responseText = cleanMessage(responseText);
 
       // 🩺 Monitor MAIA personality health (dev mode only)
       // Detects degradation and auto-recovers if needed
@@ -1229,7 +1317,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       if (!isInVoiceMode) {
         // Chat mode - show text immediately
         setMessages(prev => [...prev, oracleMessage]);
-        onMessageAdded?.(oracleMessage);
+        onMessageAddedRef.current?.(oracleMessage);
 
         // Process Oracle message for Field Protocol if recording
         if (isFieldRecording) {
@@ -1318,7 +1406,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           // In Voice mode, show text after speaking completes
           if (isInVoiceMode && showVoiceText) {
             setMessages(prev => [...prev, oracleMessage]);
-            onMessageAdded?.(oracleMessage);
+            onMessageAddedRef.current?.(oracleMessage);
 
             // Save voice response to long-term memory (dual-save to memories + Akashic Records)
             if (oracleAgentId) {
@@ -1342,7 +1430,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           // Show text even if speech fails in Voice mode
           if (isInVoiceMode) {
             setMessages(prev => [...prev, oracleMessage]);
-            onMessageAdded?.(oracleMessage);
+            onMessageAddedRef.current?.(oracleMessage);
           }
         } finally {
           // Always reset states to prevent getting stuck
@@ -1402,7 +1490,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         source: 'system'
       };
       setMessages(prev => [...prev, errorMessage]);
-      onMessageAdded?.(errorMessage);
+      onMessageAddedRef.current?.(errorMessage);
     } finally {
       // Always reset processing state for text chat
       console.log('📝 Text processing complete - resetting states');
@@ -1625,7 +1713,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         source: 'system'
       };
       setMessages(prev => [...prev, errorMessage]);
-      onMessageAdded?.(errorMessage);
+      onMessageAddedRef.current?.(errorMessage);
 
       // Reset states on error
       setIsProcessing(false);
@@ -2091,34 +2179,37 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           e.preventDefault();
           e.stopPropagation();
           console.log('🌸 Holoflower clicked!');
+
+          // Enable audio context first
           await enableAudio();
 
-          // FIXED: Single-click to toggle mic (check isMuted, not isListening)
-          if (!showChatInterface && voiceEnabled) {
-            if (!isMuted && voiceMicRef.current?.stopListening) {
-              // Mic is active → Stop listening
+          // Simple toggle logic - no complex conditions
+          if (voiceMicRef.current) {
+            if (isMuted) {
+              // Start listening
+              console.log('🎤 Starting voice via holoflower...');
+              setIsMuted(false);
+              try {
+                await voiceMicRef.current.startListening();
+                console.log('✅ Voice started successfully');
+              } catch (error: any) {
+                console.error('❌ Failed to start microphone:', error);
+                setIsMuted(true); // Reset on error
+                if (error.message === 'MICROPHONE_UNAVAILABLE') {
+                  toast.error('Microphone not available. Please check permissions in your browser settings.');
+                } else {
+                  toast.error('Unable to access microphone. Please try again.');
+                }
+              }
+            } else {
+              // Stop listening
+              console.log('🔇 Stopping voice via holoflower...');
               setIsMuted(true);
               voiceMicRef.current.stopListening();
-              console.log('🔇 Voice stopped via holoflower');
-            } else {
-              // Mic is muted → Start listening
-              setIsMuted(false);
-              setTimeout(async () => {
-                if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
-                  await voiceMicRef.current.startListening();
-                  console.log('🎤 Voice started via holoflower');
-                }
-              }, 100);
+              console.log('✅ Voice stopped successfully');
             }
-          } else if (showChatInterface) {
-            // Coming from chat mode → Start voice mode
-            setShowChatInterface(false);
-            setIsMuted(false);
-            setTimeout(async () => {
-              if (voiceMicRef.current?.startListening && !isProcessing && !isResponding) {
-                await voiceMicRef.current.startListening();
-              }
-            }, 200);
+          } else {
+            console.warn('⚠️ Voice ref not available');
           }
         }}
         style={{ willChange: 'auto' }}
