@@ -471,6 +471,60 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
+  // 💾 CONVERSATION PERSISTENCE: Restore messages from localStorage on mount
+  useEffect(() => {
+    if (typeof window === 'undefined' || !sessionId) return;
+
+    const storageKey = `maia_conversation_${sessionId}`;
+    const stored = localStorage.getItem(storageKey);
+
+    if (stored) {
+      try {
+        const parsedMessages = JSON.parse(stored);
+        if (Array.isArray(parsedMessages) && parsedMessages.length > 0) {
+          console.log(`💾 [Conversation Persistence] Restored ${parsedMessages.length} messages for session ${sessionId}`);
+          setMessages(parsedMessages);
+        }
+      } catch (error) {
+        console.error('💾 [Conversation Persistence] Failed to parse stored messages:', error);
+        localStorage.removeItem(storageKey);
+      }
+    }
+  }, [sessionId]);
+
+  // 💾 CONVERSATION PERSISTENCE: Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (typeof window === 'undefined' || !sessionId || messages.length === 0) return;
+
+    const storageKey = `maia_conversation_${sessionId}`;
+
+    // Keep only the most recent 50 messages to avoid localStorage bloat
+    const messagesToStore = messages.slice(-50);
+
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(messagesToStore));
+      console.log(`💾 [Conversation Persistence] Saved ${messagesToStore.length} messages for session ${sessionId}`);
+    } catch (error) {
+      console.error('💾 [Conversation Persistence] Failed to save messages:', error);
+      // If localStorage is full, try clearing old sessions
+      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        console.log('💾 [Conversation Persistence] localStorage full, clearing old sessions...');
+        try {
+          // Clear all old conversation storage except current session
+          Object.keys(localStorage)
+            .filter(key => key.startsWith('maia_conversation_') && key !== storageKey)
+            .forEach(key => localStorage.removeItem(key));
+
+          // Try saving again
+          localStorage.setItem(storageKey, JSON.stringify(messagesToStore));
+          console.log('💾 [Conversation Persistence] Retry successful after cleanup');
+        } catch (retryError) {
+          console.error('💾 [Conversation Persistence] Retry failed:', retryError);
+        }
+      }
+    }
+  }, [messages, sessionId]);
+
   // All state declarations moved earlier (lines 138-189) to avoid hook ordering issues
 
   // Sync refs with state to avoid stale closures in callbacks
