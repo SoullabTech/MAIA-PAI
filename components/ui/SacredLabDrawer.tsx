@@ -124,6 +124,19 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
       ],
     },
     {
+      title: 'LAB TOOLS',
+      icon: '🐘',
+      items: [
+        {
+          icon: Brain,
+          label: 'GANESHA',
+          action: () => onNavigate('/ganesha'),
+          description: 'ADHD/ADD support - Divine Harmonics recognition',
+          emoji: '🐘'
+        },
+      ],
+    },
+    {
       title: 'DOCUMENTATION',
       icon: '📊',
       items: [
