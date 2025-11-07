@@ -280,7 +280,8 @@ export default function MAIAPage() {
                 <img
                   src="/holoflower-amber.png"
                   alt="Holoflower"
-                  className="w-6 h-6 opacity-80"
+                  className="w-6 h-6 opacity-100 drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]"
+                  style={{ filter: 'brightness(1.2)' }}
                 />
                 <h1 className="text-lg font-light text-amber-300/90 tracking-wider">
                   SOULLAB

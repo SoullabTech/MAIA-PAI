@@ -2302,16 +2302,16 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
               />
             </motion.div>
 
-            {/* Holoflower Image - Subtle presence */}
+            {/* Holoflower Image - Amber radiance */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
               <img
                 src="/holoflower-amber.png"
                 alt="Holoflower"
-                className="object-contain opacity-50"
+                className="object-contain opacity-80 drop-shadow-[0_0_15px_rgba(251,146,60,0.7)]"
                 style={{
                   width: `${holoflowerSize * 0.85}px`,
                   height: `${holoflowerSize * 0.85}px`,
-                  filter: 'none',
+                  filter: 'brightness(1.3)',
                 }}
               />
             </div>
