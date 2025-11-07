@@ -266,6 +266,33 @@ export async function POST(request: NextRequest) {
 
     console.log(`🌙 [MAIA] Response generated (${response.length} chars)`);
 
+    // ═══════════════════════════════════════════════════════════════
+    // APPRENTICE LEARNING - Capture this exchange for training
+    // ═══════════════════════════════════════════════════════════════
+    try {
+      await consciousness.recordExchange({
+        input: {
+          content: userMessage,
+          context: {
+            userId: id,
+            userName: name,
+            sessionId: sessionId || Date.now().toString(),
+            conversationHistory,
+            journeyStage: queryAnalysis.complexity
+          }
+        },
+        response: {
+          message: response,
+          element: result.element || 'water',
+          metadata: result.metadata || {}
+        }
+      });
+      console.log('🧬 [APPRENTICE] Exchange captured for training');
+    } catch (error) {
+      console.error('⚠️  [APPRENTICE] Failed to capture exchange:', error);
+      // Don't break user experience if training capture fails
+    }
+
     // Return in format expected by OracleConversation
     return NextResponse.json({
       data: {

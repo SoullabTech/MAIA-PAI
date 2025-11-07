@@ -14,6 +14,10 @@ import fs from 'fs';
 import path from 'path';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config({ path: '.env.local' });
 
 // ═══════════════════════════════════════════════════════════════
 // CONFIGURATION

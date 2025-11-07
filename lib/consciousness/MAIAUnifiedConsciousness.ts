@@ -39,6 +39,9 @@ import {
   type FieldLimiterState
 } from './guards/fieldReflectionLimiter';
 
+// Semantic learning system
+import { SemanticMemoryService } from '../memory/SemanticMemoryService';
+
 // Elemental types
 export type Element = 'fire' | 'water' | 'earth' | 'air' | 'aether';
 
@@ -105,6 +108,7 @@ export class MAIAUnifiedConsciousness {
   private ipEngine: IntellectualPropertyEngine;
   private eoBreakingBridge: ElementalOracle2Bridge;
   private apprentice: ApprenticeMayaTraining | null;
+  private semanticMemory: SemanticMemoryService;
   private knowledgeBase: typeof maiaKnowledgeBase;
 
   // Session state
@@ -137,6 +141,9 @@ export class MAIAUnifiedConsciousness {
 
     this.apprentice = supabase ? new ApprenticeMayaTraining(supabase) : null;
 
+    // Initialize semantic learning
+    this.semanticMemory = new SemanticMemoryService();
+
     // Reference to knowledge base
     this.knowledgeBase = maiaKnowledgeBase;
 
@@ -145,6 +152,7 @@ export class MAIAUnifiedConsciousness {
     console.log('   ✓ Intellectual Property Engine connected');
     console.log('   ✓ Elemental Oracle 2.0 bridge ready');
     console.log(this.apprentice ? '   ✓ Apprentice training enabled' : '   ⚠ Apprentice training disabled (no Supabase)');
+    console.log('   ✓ Semantic memory system initialized');
   }
 
   /**
@@ -912,6 +920,20 @@ export class MAIAUnifiedConsciousness {
     };
 
     await this.apprentice.captureExchange(exchange);
+
+    // ALSO record in semantic memory for in-process learning
+    await this.semanticMemory.recordInteraction({
+      userId: context.input.context.userId,
+      sessionId: context.input.context.sessionId,
+      input: context.input.content,
+      response: context.response.message,
+      detectedElement: context.response.element,
+      appliedPatterns: context.fieldReading.patterns || [],
+      userEngagement: context.fieldReading.depthLevel > 7 ? 'high' : context.fieldReading.depthLevel > 4 ? 'medium' : 'low',
+      breakthroughDetected: context.interferencePattern.isPresent,
+      emotionalShift: 'neutral', // TODO: Add emotion detection
+      sessionContinued: true // Assume continued for now
+    });
 
     return {
       whatMAIALearned: `Pattern: ${context.input.context.journeyStage || 'exploration'} + ${context.response.element} element`,
