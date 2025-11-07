@@ -8,6 +8,7 @@
  *
  * Earth Phase Service Extraction - Following Spiralogic Principles
  * Fire Phase - Voice telemetry added
+ * Water Phase - Streaming + early-TTS preview
  */
 
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
@@ -24,9 +25,46 @@ export interface VoiceModulation {
 }
 
 /**
+ * Helper to synthesize audio with OpenAI TTS
+ */
+async function synthesizeWithOpenAI(text: string, voiceId: string): Promise<ArrayBuffer> {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OpenAI API key not configured');
+  }
+
+  const response = await fetch('https://api.openai.com/v1/audio/speech', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'tts-1', // Use fast model for preview chunks
+      input: text,
+      voice: voiceId || 'alloy',
+      response_format: 'mp3',
+      speed: 1.0,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`TTS API error: ${response.status}`);
+  }
+
+  return await response.arrayBuffer();
+}
+
+/**
  * Service for voice generation and modulation
  */
 export class VoiceGenerationService {
+  private buffer = '';
+  private readonly sentenceRegex = /(.+?[\.!\?])(\s|$)/g;
+  private voiceId: string;
+
+  constructor(voiceId?: string) {
+    this.voiceId = voiceId || 'alloy';
+  }
   /**
    * Generate voice response using OpenAI TTS
    */
@@ -134,11 +172,76 @@ export class VoiceGenerationService {
       };
     }
   }
+
+  /**
+   * Water Phase: Handle streaming text chunk and trigger early-TTS for complete sentences
+   */
+  async handleChunk(text: string, onAudio: (audio: ArrayBuffer) => Promise<void>) {
+    this.buffer += text;
+
+    // Find complete sentences to "preview speak"
+    let match: RegExpExecArray | null;
+    while ((match = this.sentenceRegex.exec(this.buffer)) !== null) {
+      const sentence = match[1].trim();
+      // Fire-and-forget preview TTS
+      try {
+        const { ms, value: audio } = await timeIt('voice.tts.openai', () =>
+          synthesizeWithOpenAI(sentence, this.voiceId)
+        );
+        recordVoiceTiming('voice.tts.openai', ms, true, {
+          provider: 'openai-tts',
+          kind: 'preview',
+          textLength: sentence.length
+        });
+        await onAudio(audio);
+      } catch (err) {
+        recordVoiceError('voice.tts.openai', err instanceof Error ? err.message : String(err), {
+          kind: 'preview'
+        });
+      }
+    }
+
+    // Keep only the trailing incomplete fragment in buffer
+    const lastTerminator = Math.max(
+      this.buffer.lastIndexOf('.'),
+      this.buffer.lastIndexOf('!'),
+      this.buffer.lastIndexOf('?')
+    );
+    if (lastTerminator >= 0) {
+      this.buffer = this.buffer.slice(lastTerminator + 1);
+    }
+  }
+
+  /**
+   * Water Phase: Flush remaining text buffer as final TTS
+   */
+  async flushRemainder(onAudio: (audio: ArrayBuffer) => Promise<void>) {
+    const tail = this.buffer.trim();
+    if (!tail) return;
+
+    try {
+      const { ms, value: audio } = await timeIt('voice.tts.openai', () =>
+        synthesizeWithOpenAI(tail, this.voiceId)
+      );
+      recordVoiceTiming('voice.tts.openai', ms, true, {
+        provider: 'openai-tts',
+        kind: 'final',
+        textLength: tail.length
+      });
+      await onAudio(audio);
+    } catch (err) {
+      recordVoiceError('voice.tts.openai', err instanceof Error ? err.message : String(err), {
+        kind: 'final'
+      });
+    } finally {
+      this.buffer = '';
+    }
+  }
 }
 
 /**
  * Create service instance
  */
-export function createVoiceGenerationService(): VoiceGenerationService {
-  return new VoiceGenerationService();
+export function createVoiceGenerationService(voiceId?: string): VoiceGenerationService {
+  return new VoiceGenerationService(voiceId);
 }

@@ -10,6 +10,7 @@ import { simpleMemoryCapture } from '@/lib/services/simple-memory-capture';
 import { ELEMENTAL_ALCHEMY_FRAMEWORK } from '@/lib/knowledge/ElementalAlchemyKnowledge';
 import { timeIt } from '@/lib/observability/timer';
 import { recordVoiceTiming, recordVoiceError } from '@/lib/observability/voiceMetrics';
+import { streamOracleText } from '@/lib/oracle/StreamingOracle';
 
 // Initialize UNIFIED consciousness (26-year spiral completion)
 let maiaConsciousness: ReturnType<typeof getMAIAConsciousness> | null = null;
@@ -152,6 +153,44 @@ export async function POST(request: NextRequest) {
           responseTime: 0
         }
       });
+    }
+
+    // STREAMING PATH (Water Phase) - Early exit if streaming requested
+    const { stream } = body;
+    if (process.env.ORACLE_STREAMING_ENABLED === '1' && stream) {
+      try {
+        const encoder = new TextEncoder();
+        const { ms, value: streamGen } = await timeIt('voice.oracle', async () =>
+          streamOracleText(userInput)
+        );
+        recordVoiceTiming('voice.oracle', ms, true, { mode: 'voice', streaming: true });
+
+        const readableStream = new ReadableStream({
+          async start(controller) {
+            try {
+              for await (const chunk of streamGen) {
+                controller.enqueue(encoder.encode(chunk.text));
+              }
+              controller.close();
+            } catch (err) {
+              recordVoiceError('voice.oracle', err instanceof Error ? err.message : String(err), { phase: 'stream' });
+              controller.error(err);
+            }
+          },
+        });
+
+        return new Response(readableStream, {
+          status: 200,
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Transfer-Encoding': 'chunked',
+            'Cache-Control': 'no-store',
+          },
+        });
+      } catch (err) {
+        recordVoiceError('voice.oracle', err instanceof Error ? err.message : String(err), { phase: 'setup' });
+        return new Response('Streaming failed', { status: 500 });
+      }
     }
 
     // Load user data for context

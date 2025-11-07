@@ -180,7 +180,7 @@ export const ICHING_ARCHETYPE_PATTERNS: IChingTrigramArchetype[] = [
         reflectionQuestions: [
           'Am I influencing or manipulating?',
           'Where do I need gentle persistence instead of force?',
-          'What\'s trying to grow through me gradually?'
+          "What's trying to grow through me gradually?"
         ],
         integrationPractices: [
           'Breath meditation - following the natural flow',
