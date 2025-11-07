@@ -2792,12 +2792,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         <div className="text-xs" style={{ color: '#D4A574', opacity: 0.8, fontFamily: 'Spectral, Georgia, serif', letterSpacing: '0.05em' }}>
                           {message.role === 'user' ? userName : 'MAIA'}
                         </div>
-                        <div className="flex items-center gap-1 text-xs text-gold-divine/40
+                        <div className="flex items-center gap-1 text-xs text-amber-400
                                       opacity-100 sm:opacity-0 sm:group-hover:opacity-100
                                       touch-manipulation transition-opacity">
-                          <Copy className="w-3 h-3" />
-                          <span className="hidden sm:inline">Click to copy</span>
-                          <span className="sm:hidden">Tap to copy</span>
+                          <Copy className="w-3 h-3 text-amber-400" />
+                          <span className="hidden sm:inline text-amber-400">Click to copy</span>
+                          <span className="sm:hidden text-amber-400">Tap to copy</span>
                         </div>
                       </div>
                       <div className="text-base sm:text-lg md:text-xl leading-relaxed break-words" style={{ color: '#E8C99B', fontFamily: 'Spectral, Georgia, serif' }}>
@@ -2976,12 +2976,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       />
                       <label
                         htmlFor="chatFileUpload"
-                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/10 border border-gold-divine/30
-                                 rounded-full text-gold-divine flex items-center justify-center
-                                 hover:bg-gold-divine/20 active:scale-95 transition-all cursor-pointer"
+                        className="flex-shrink-0 w-10 h-10 bg-amber-500/10 border border-amber-500/30
+                                 rounded-full text-amber-400 flex items-center justify-center
+                                 hover:bg-amber-500/20 active:scale-95 transition-all cursor-pointer"
                         title="Upload files"
                       >
-                        <Paperclip className="w-5 h-5" />
+                        <Paperclip className="w-5 h-5 text-amber-400" />
                       </label>
 
                       {/* Journal button - shows when conversation has substance */}
@@ -3418,7 +3418,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {/* Toggle button for rhythm debug - always visible */}
       <button
         onClick={() => setShowRhythmDebug(!showRhythmDebug)}
-        className="fixed bottom-20 right-4 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 px-3 py-2 rounded-lg text-xs z-50"
+        className="fixed bottom-20 right-4 bg-amber-500/20 hover:bg-amber-500/40 text-amber-400 px-3 py-2 rounded-lg text-xs z-50"
       >
         🌊 {showRhythmDebug ? 'Hide' : 'Show'} Rhythm
       </button>
