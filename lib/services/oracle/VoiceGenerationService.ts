@@ -14,6 +14,9 @@
 import type { AINMemoryPayload } from '@/lib/memory/AINMemoryPayload';
 import { timeIt } from '@/lib/observability/timer';
 import { recordVoiceTiming, recordVoiceError } from '@/lib/observability/voiceMetrics';
+import { ProsodyEngine } from '@/lib/voice/prosody/ProsodyEngine';
+import { TextPostProcessor } from '@/lib/voice/prosody/TextPostProcessor';
+import type { Element, SpeechAct } from '@/lib/voice/prosody/ProsodyEngine';
 
 /**
  * Voice modulation parameters
@@ -67,16 +70,47 @@ export class VoiceGenerationService {
   }
   /**
    * Generate voice response using OpenAI TTS
+   * Now with prosody shaping for more natural, present delivery
    */
   async generateVoiceResponse(
     text: string,
-    options?: { element?: string; voiceMaskId?: string }
+    options?: {
+      element?: Element;
+      speechAct?: SpeechAct;
+      arousal?: number;
+      valence?: number;
+      voiceMaskId?: string;
+    }
   ): Promise<{ audioData?: Buffer; audioUrl?: string }> {
     const { ms, value } = await timeIt('voice.tts.openai', async () => {
       try {
         if (!process.env.OPENAI_API_KEY) {
           throw new Error('OpenAI API key not configured');
         }
+
+        // IMMEDIATE WIN: Shape text for better prosody
+        const element = (options?.element as Element) || 'Water';
+        const speechAct = options?.speechAct || 'reflect';
+        const arousal = options?.arousal ?? 0.5;
+        const valence = options?.valence ?? 0.5;
+
+        // Generate prosody parameters
+        const prosody = ProsodyEngine.generateParameters(
+          element,
+          speechAct,
+          { valence, arousal },
+          text
+        );
+
+        // Shape text (adds pauses, breath cues, emphasis)
+        const shapedText = TextPostProcessor.shape(text, {
+          element,
+          arousal,
+          valence,
+          intent: speechAct
+        }, prosody);
+
+        console.log(`🎵 [Prosody] ${element}/${speechAct} - Shaped: "${shapedText.slice(0, 60)}..."`);
 
         const ttsResponse = await fetch('https://api.openai.com/v1/audio/speech', {
           method: 'POST',
@@ -86,10 +120,10 @@ export class VoiceGenerationService {
           },
           body: JSON.stringify({
             model: 'tts-1-hd',
-            input: text,
+            input: shapedText,  // Use shaped text
             voice: 'alloy',
             response_format: 'mp3',
-            speed: 1.0,
+            speed: prosody.rate / 150,  // Adjust speed based on element
           }),
         });
 

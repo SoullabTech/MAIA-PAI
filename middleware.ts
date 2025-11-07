@@ -64,7 +64,8 @@ export const config = {
      * - _next (Next.js internals)
      * - static files
      * - /maia (our main route - don't intercept it!)
+     * - /dev (dev tools and testing pages)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|maia).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|maia|dev).*)',
   ],
 };
