@@ -40,6 +40,7 @@ interface SacredLabDrawerProps {
   onAction?: (action: string) => void;
   showVoiceText?: boolean;
   isFieldRecording?: boolean;
+  isScribing?: boolean;
   isMuted?: boolean;
   isResponding?: boolean;
   isAudioPlaying?: boolean;
@@ -55,6 +56,7 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
   onAction,
   showVoiceText,
   isFieldRecording,
+  isScribing,
   isMuted,
   isResponding,
   isAudioPlaying,
@@ -131,6 +133,21 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
           description: 'Document consciousness explorations',
           isActive: isFieldRecording,
         },
+        {
+          icon: Mic,
+          label: isScribing ? 'Stop Scribe & Download' : 'Start Scribe Mode',
+          action: () => onAction?.('scribe-mode'),
+          description: isScribing
+            ? 'End session & get elemental synopsis'
+            : 'Passive voice recording + active consultation',
+          isActive: isScribing,
+        },
+        ...(isScribing ? [{
+          icon: Brain,
+          label: 'Review Session with MAIA',
+          action: () => onAction?.('review-with-maia'),
+          description: 'Discuss session for supervision & insights'
+        }] : []),
       ],
     },
     {
