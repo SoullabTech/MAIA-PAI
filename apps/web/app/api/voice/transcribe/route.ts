@@ -5,6 +5,7 @@ import { join } from "path";
 // import { memoryStore } from "@/backend/src/services/memory/MemoryStore";
 // import { llamaService } from "@/backend/src/services/memory/LlamaService";
 import OpenAI from "openai";
+import { PrivacyAwareCognitiveVoiceProcessor } from "@/lib/maia/privacyAwareCognitiveVoice";
 
 
 // Stub memory store
@@ -66,16 +67,60 @@ export async function POST(request: NextRequest) {
     await writeFile(tempFile, buffer);
 
     try {
-      // Transcribe with Whisper
+      // Transcribe with Whisper with word-level timestamps for cognitive analysis
       const { createReadStream } = await import("fs");
       const transcription = await openai.audio.transcriptions.create({
         file: createReadStream(tempFile),
         model: "whisper-1",
         language: language, // Use selected language
-        response_format: "json"
+        response_format: "verbose_json",
+        timestamp_granularities: ["word"]
       });
 
       const transcribedText = transcription.text;
+      const duration = transcription.duration;
+      const words = transcription.words || [];
+      const segments = transcription.segments || [];
+
+      console.log('📊 Whisper Analysis:', {
+        text: transcribedText.substring(0, 50) + '...',
+        duration: duration,
+        wordCount: words.length,
+        segmentCount: segments.length,
+        hasWordTimings: words.length > 0
+      });
+
+      // 🔒 Privacy-Aware Cognitive Voice Analysis
+      let cognitiveAnalysis = null;
+      let memberFriendlyInsights = null;
+
+      try {
+        const cognitiveProcessor = new PrivacyAwareCognitiveVoiceProcessor(userId);
+
+        // Perform privacy-aware cognitive analysis
+        cognitiveAnalysis = await cognitiveProcessor.analyzeWithPrivacy(
+          words,
+          duration,
+          transcribedText,
+          segments,
+          [] // TODO: Pass voice history from journal entries
+        );
+
+        // Generate member-friendly insights if permitted
+        if (cognitiveAnalysis) {
+          memberFriendlyInsights = await cognitiveProcessor.generateMemberFriendlySummary(cognitiveAnalysis);
+        }
+
+        console.log('🧠 Cognitive Analysis:', {
+          hasAnalysis: !!cognitiveAnalysis,
+          hasMemberInsights: !!memberFriendlyInsights,
+          insightKeys: memberFriendlyInsights ? Object.keys(memberFriendlyInsights) : []
+        });
+
+      } catch (cognitiveError) {
+        console.warn('⚠️  Cognitive analysis failed (continuing without):', cognitiveError.message);
+        // Continue without cognitive analysis - privacy is preserved
+      }
 
       // Memory store temporarily disabled - SQLite issues in Next.js context
       const memoryContent = `Voice Note Transcription:\n${transcribedText}\n\n[Recorded: ${new Date().toISOString()}]`;
@@ -98,8 +143,16 @@ export async function POST(request: NextRequest) {
         success: true,
         transcription: transcribedText,
         entryId,
-        duration: file.size / 16000, // Rough estimate
-        timestamp: new Date().toISOString()
+        duration: duration || (file.size / 16000), // Use actual duration or rough estimate
+        timestamp: new Date().toISOString(),
+        // 🔒 Privacy-aware cognitive insights
+        cognitiveAnalysis: cognitiveAnalysis,
+        memberInsights: memberFriendlyInsights,
+        voiceMetrics: {
+          wordCount: words.length,
+          hasWordTimings: words.length > 0,
+          segmentCount: segments.length
+        }
       });
 
     } catch (transcriptionError: any) {

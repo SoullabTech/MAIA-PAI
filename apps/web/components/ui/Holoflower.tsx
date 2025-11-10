@@ -7,6 +7,7 @@ interface HoloflowerProps {
   animate?: boolean;
   glowIntensity?: 'low' | 'medium' | 'high';
   variant?: 'single' | 'spectrum';
+  theme?: 'light' | 'dark'; // for light or dark backgrounds
   className?: string;
 }
 
@@ -18,9 +19,9 @@ const sizeMap = {
 };
 
 const glowMap = {
-  low: { opacity: [0.3, 0.5, 0.3], color: 'rgba(212, 184, 150, 0.3)' },
-  medium: { opacity: [0.4, 0.6, 0.4], color: 'rgba(212, 184, 150, 0.5)' },
-  high: { opacity: [0.5, 0.7, 0.5], color: 'rgba(212, 184, 150, 0.6)' }
+  low: { opacity: [0.15, 0.2, 0.15], color: 'rgba(212, 184, 150, 0.2)' },
+  medium: { opacity: [0.2, 0.25, 0.2], color: 'rgba(212, 184, 150, 0.25)' },
+  high: { opacity: [0.25, 0.3, 0.25], color: 'rgba(212, 184, 150, 0.3)' }
 };
 
 export function Holoflower({
@@ -28,6 +29,7 @@ export function Holoflower({
   animate = true,
   glowIntensity = 'medium',
   variant = 'single',
+  theme = 'dark',
   className = ''
 }: HoloflowerProps) {
   const sizes = sizeMap[size];
@@ -36,7 +38,19 @@ export function Holoflower({
 
   return (
     <div className={`${sizes.container} relative flex items-center justify-center ${className}`} style={{ background: 'transparent', boxShadow: 'none', border: 'none', outline: 'none', overflow: 'visible' }}>
-      {/* Radiant glow */}
+
+      {/* Very subtle background for contrast - more diffused */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div
+          className={`${sizes.glow} rounded-full bg-gradient-to-br from-gray-800/10 to-gray-700/15`}
+          style={{
+            filter: `blur(${parseInt(sizes.blur) * 3}px)`,
+            opacity: 0.15
+          }}
+        />
+      </div>
+
+      {/* Radiant glow - enhanced */}
       {animate ? (
         <motion.div
           className="absolute inset-0 flex items-center justify-center"
@@ -53,7 +67,7 @@ export function Holoflower({
           <div
             className={`${sizes.glow} rounded-full`}
             style={{
-              background: `radial-gradient(circle, ${glow.color} 0%, rgba(212, 184, 150, 0.2) 50%, transparent 80%)`,
+              background: `radial-gradient(circle, ${glow.color} 0%, rgba(212, 184, 150, 0.15) 30%, rgba(212, 184, 150, 0.1) 60%, rgba(212, 184, 150, 0.05) 80%, transparent 95%)`,
               filter: `blur(${sizes.blur})`,
             }}
           />
@@ -63,7 +77,7 @@ export function Holoflower({
           <div
             className={`${sizes.glow} rounded-full`}
             style={{
-              background: `radial-gradient(circle, ${glow.color} 0%, rgba(212, 184, 150, 0.2) 50%, transparent 80%)`,
+              background: `radial-gradient(circle, ${glow.color} 0%, rgba(212, 184, 150, 0.15) 30%, rgba(212, 184, 150, 0.1) 60%, rgba(212, 184, 150, 0.05) 80%, transparent 95%)`,
               filter: `blur(${sizes.blur})`,
               opacity: glow.opacity[1]
             }}
@@ -71,7 +85,7 @@ export function Holoflower({
         </div>
       )}
 
-      {/* Holoflower SVG */}
+      {/* Holoflower SVG - enhanced visibility */}
       {animate ? (
         <motion.div
           className="relative z-10"
@@ -85,35 +99,73 @@ export function Holoflower({
             ease: "easeInOut"
           }}
         >
+          {/* Subtle dark background to make white pattern visible */}
+          <div
+            className={`${sizes.image} absolute inset-0 bg-gradient-to-br from-gray-800/20 via-gray-700/25 to-gray-600/30 rounded-full opacity-60`}
+            style={{ zIndex: 1 }}
+          />
+
+          {/* Subtle white overlay layer */}
+          <img
+            src={svgPath}
+            alt=""
+            aria-hidden="true"
+            className={`${sizes.image} object-contain absolute inset-0`}
+            style={{
+              filter: `brightness(1.5) contrast(80) drop-shadow(0 0 2px rgba(255, 255, 255, 0.3))`,
+              background: 'transparent',
+              zIndex: 2,
+              mixBlendMode: 'screen',
+              opacity: 0.3
+            }}
+          />
+          {/* Main SVG with luminous white pattern */}
           <img
             src={svgPath}
             alt="Soullab"
-            className={`${sizes.image} object-contain`}
+            className={`${sizes.image} object-contain relative z-10`}
             style={{
-              filter: `drop-shadow(0 0 ${parseInt(sizes.blur) * 0.75}px ${glow.color})`,
+              filter: `brightness(2) contrast(120) drop-shadow(0 0 4px rgba(255, 255, 255, 0.5))`,
               background: 'transparent',
-              mixBlendMode: 'normal',
-              WebkitMaskImage: '-webkit-radial-gradient(white, white)',
-              boxShadow: 'none',
-              border: 'none',
-              outline: 'none'
+              mixBlendMode: 'screen',
+              opacity: 0.8,
+              zIndex: 4
             }}
           />
         </motion.div>
       ) : (
         <div className="relative z-10">
+          {/* Subtle dark background to make white pattern visible */}
+          <div
+            className={`${sizes.image} absolute inset-0 bg-gradient-to-br from-gray-800/20 via-gray-700/25 to-gray-600/30 rounded-full opacity-60`}
+            style={{ zIndex: 1 }}
+          />
+
+          {/* Subtle white overlay layer */}
+          <img
+            src={svgPath}
+            alt=""
+            aria-hidden="true"
+            className={`${sizes.image} object-contain absolute inset-0`}
+            style={{
+              filter: `brightness(1.5) contrast(80) drop-shadow(0 0 2px rgba(255, 255, 255, 0.3))`,
+              background: 'transparent',
+              zIndex: 2,
+              mixBlendMode: 'screen',
+              opacity: 0.3
+            }}
+          />
+          {/* Main SVG with luminous white pattern */}
           <img
             src={svgPath}
             alt="Soullab"
-            className={`${sizes.image} object-contain`}
+            className={`${sizes.image} object-contain relative z-10`}
             style={{
-              filter: `drop-shadow(0 0 ${parseInt(sizes.blur) * 0.75}px ${glow.color})`,
+              filter: `brightness(2) contrast(120) drop-shadow(0 0 4px rgba(255, 255, 255, 0.5))`,
               background: 'transparent',
-              mixBlendMode: 'normal',
-              WebkitMaskImage: '-webkit-radial-gradient(white, white)',
-              boxShadow: 'none',
-              border: 'none',
-              outline: 'none'
+              mixBlendMode: 'screen',
+              opacity: 0.8,
+              zIndex: 4
             }}
           />
         </div>

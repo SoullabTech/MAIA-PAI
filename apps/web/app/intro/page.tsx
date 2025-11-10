@@ -96,100 +96,230 @@ export default function IntroPage() {
       }, 3000);
       return () => clearTimeout(timer);
     }
-
-    // After final message - no auto-advance, user clicks to continue
-    // (Removed auto-timer to give users full control)
   }, [currentMantra, showFinal, router, shuffledMantras]);
 
   return (
-    <div className="min-h-screen bg-soul-background flex items-center justify-center px-4 overflow-hidden">
-      {/* Sacred Geometry Background - Warm glow */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
-        <svg viewBox="0 0 1000 1000" className="w-full h-full">
-          <circle cx="500" cy="500" r="400" fill="none" stroke="#E3B778" strokeWidth="0.5" strokeDasharray="4 4" />
-          <circle cx="500" cy="500" r="300" fill="none" stroke="#E3B778" strokeWidth="0.5" strokeDasharray="2 6" />
-          <circle cx="500" cy="500" r="200" fill="none" stroke="#E3B778" strokeWidth="0.5" />
-        </svg>
+    <div className="min-h-screen bg-gradient-to-br from-soul-background via-soul-background to-soul-surface flex items-center justify-center px-4 overflow-hidden relative">
+      {/* Rich cinematic atmosphere */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Primary cosmic background */}
+        <div className="absolute inset-0 bg-gradient-radial from-soul-accent/[0.08] via-transparent to-soul-fireWarm/[0.04]" />
+
+        {/* Layered sacred geometry - multiple rotating rings */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-20">
+          <svg viewBox="0 0 1000 1000" className="w-full h-full animate-sacred-rotate" style={{ animationDuration: '60s' }}>
+            <defs>
+              <radialGradient id="cosmicGlow" cx="50%" cy="50%">
+                <stop offset="0%" stopColor="#E3B778" stopOpacity="0.3"/>
+                <stop offset="50%" stopColor="#D4A574" stopOpacity="0.1"/>
+                <stop offset="100%" stopColor="#8C6A4A" stopOpacity="0.05"/>
+              </radialGradient>
+            </defs>
+            {/* Outer cosmic ring */}
+            <circle cx="500" cy="500" r="420" fill="none" stroke="url(#cosmicGlow)" strokeWidth="1" strokeDasharray="8 12" />
+            <circle cx="500" cy="500" r="380" fill="none" stroke="#E3B778" strokeWidth="0.5" strokeOpacity="0.4" strokeDasharray="4 8" />
+            <circle cx="500" cy="500" r="340" fill="none" stroke="#D4A574" strokeWidth="0.8" strokeOpacity="0.3" strokeDasharray="2 6" />
+            <circle cx="500" cy="500" r="300" fill="none" stroke="#E3B778" strokeWidth="1.2" strokeOpacity="0.6" />
+            <circle cx="500" cy="500" r="260" fill="none" stroke="#F0C98A" strokeWidth="0.6" strokeOpacity="0.4" strokeDasharray="1 4" />
+            <circle cx="500" cy="500" r="220" fill="none" stroke="#8C6A4A" strokeWidth="0.8" strokeOpacity="0.3" />
+
+            {/* Sacred geometric patterns */}
+            <g opacity="0.15">
+              <path d="M 500 180 L 680 390 L 570 640 L 430 640 L 320 390 Z" fill="none" stroke="#E3B778" strokeWidth="0.5"/>
+              <path d="M 500 280 L 620 430 L 540 580 L 460 580 L 380 430 Z" fill="none" stroke="#D4A574" strokeWidth="0.8" strokeOpacity="0.5"/>
+            </g>
+          </svg>
+        </div>
+
+        {/* Counter-rotating inner geometry */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-15">
+          <svg viewBox="0 0 1000 1000" className="w-3/4 h-3/4" style={{ animation: 'sacred-rotate 120s linear infinite reverse' }}>
+            <circle cx="500" cy="500" r="150" fill="none" stroke="#E3B778" strokeWidth="1" strokeOpacity="0.6" strokeDasharray="3 6" />
+            <circle cx="500" cy="500" r="100" fill="none" stroke="#F0C98A" strokeWidth="1.5" strokeOpacity="0.8" strokeDasharray="2 4" />
+            <circle cx="500" cy="500" r="50" fill="none" stroke="#D4A574" strokeWidth="2" strokeOpacity="0.9" />
+          </svg>
+        </div>
+
+        {/* Atmospheric particles/stars */}
+        <div className="absolute inset-0">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-soul-accent rounded-full animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 4}s`,
+                animationDuration: `${2 + Math.random() * 3}s`,
+                opacity: 0.3 + Math.random() * 0.4
+              }}
+            />
+          ))}
+        </div>
       </div>
 
-      <div className="relative z-10 w-full max-w-3xl text-center">
+      {/* Elegant header with sacred geometry */}
+      <header className="absolute top-8 left-8 z-50">
+        <div className="flex items-center gap-4 backdrop-blur-sm bg-soul-surface/10 px-4 py-2 rounded-full border border-soul-accent/20">
+          <div className="w-10 h-10 relative">
+            <Holoflower size="sm" glowIntensity="medium" animate={true} />
+            <div className="absolute inset-0 bg-soul-accent/20 rounded-full animate-pulse" style={{ animationDuration: '3s' }} />
+          </div>
+          <h1 className="text-xl font-light tracking-etched text-soul-textPrimary drop-shadow-lg">
+            Soullab
+          </h1>
+        </div>
+      </header>
+
+      <div className="relative z-10 w-full max-w-4xl text-center">
         {!showFinal ? (
           <>
-            {/* Holoflower */}
+            {/* Sacred Holoflower - Central Consciousness Pattern */}
             <motion.div
-              initial={{ scale: 0.9, opacity: 0.3 }}
+              initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-              className="mb-16 flex justify-center"
+              transition={{ duration: 2, ease: "easeOut" }}
+              className="mb-20 flex justify-center relative"
             >
-              <Holoflower size="xl" glowIntensity="high" />
+              <div className="relative">
+                {/* Multiple layered holoflowers for depth */}
+                <div className="absolute inset-0 scale-125 opacity-30">
+                  <Holoflower size="xl" glowIntensity="high" animate={true} />
+                </div>
+                <div className="absolute inset-0 scale-110 opacity-40">
+                  <Holoflower size="xl" glowIntensity="medium" animate={true} />
+                </div>
+                <div className="relative z-10">
+                  <Holoflower size="xl" glowIntensity="high" />
+                </div>
+
+                {/* Sacred emanation rings */}
+                <div className="absolute inset-0 -m-8">
+                  <div className="w-full h-full border border-soul-accent/20 rounded-full animate-pulse" style={{ animationDuration: '4s' }} />
+                </div>
+                <div className="absolute inset-0 -m-16">
+                  <div className="w-full h-full border border-soul-accent/10 rounded-full animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+                </div>
+              </div>
             </motion.div>
 
-            {/* Cycling Mantras */}
+            {/* Sacred Mantras with enhanced typography */}
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentMantra}
-                initial={{ opacity: 0.2, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.6 }}
-                className="h-24 flex items-center justify-center"
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -20, scale: 1.05 }}
+                transition={{ duration: 0.8, ease: "easeInOut" }}
+                className="h-32 flex items-center justify-center relative"
               >
-                <h2 className="text-3xl md:text-4xl font-extralight text-soul-textPrimary tracking-etched leading-relaxed px-8">
-                  {shuffledMantras[currentMantra]}
+                {/* Subtle background glow behind text */}
+                <div className="absolute inset-0 bg-soul-accent/[0.02] rounded-2xl backdrop-blur-sm" />
+
+                <h2 className="relative text-4xl md:text-5xl font-extralight text-soul-textPrimary tracking-etched leading-relaxed px-12 drop-shadow-lg">
+                  <span className="bg-gradient-to-br from-soul-textPrimary via-soul-textPrimary to-soul-accent/90 bg-clip-text text-transparent">
+                    {shuffledMantras[currentMantra]}
+                  </span>
                 </h2>
               </motion.div>
             </AnimatePresence>
 
-            {/* Progress Dots */}
-            <div className="flex justify-center gap-2 mt-12">
+            {/* Enhanced Progress Visualization - Sacred Geometry */}
+            <div className="flex justify-center items-center gap-3 mt-16">
               {shuffledMantras.map((_, index) => (
-                <div
+                <motion.div
                   key={index}
-                  className={`h-2 rounded-full transition-all duration-500 ${
-                    index === currentMantra
-                      ? 'w-8 bg-soul-accent'
-                      : index < currentMantra
-                      ? 'w-2 bg-soul-accent/50'
-                      : 'w-2 bg-soul-accent/20'
-                  }`}
-                />
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  className="relative"
+                >
+                  {index === currentMantra ? (
+                    // Active mantra - glowing sacred shape
+                    <div className="relative">
+                      <div className="w-4 h-4 rotate-45 bg-soul-accent rounded-sm shadow-lg shadow-soul-accent/50 animate-pulse" />
+                      <div className="absolute inset-0 w-4 h-4 rotate-45 bg-soul-accent/30 rounded-sm scale-150 animate-pulse" />
+                    </div>
+                  ) : index < currentMantra ? (
+                    // Completed mantras - sacred diamonds
+                    <div className="w-3 h-3 rotate-45 bg-soul-accent/60 rounded-sm shadow-md" />
+                  ) : (
+                    // Future mantras - subtle presence
+                    <div className="w-2 h-2 rotate-45 bg-soul-accent/20 rounded-sm" />
+                  )}
+                </motion.div>
               ))}
             </div>
           </>
         ) : (
-          /* Final Anchor Statement */
+          /* Sacred Revelation - MAIA Introduction */
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            className="space-y-8"
+            transition={{ duration: 2, ease: "easeOut" }}
+            className="space-y-10"
           >
+            {/* Enhanced Sacred Holoflower Centerpiece */}
             <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
+              initial={{ scale: 0.4, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 1.2, delay: 0.3 }}
-              className="mb-12 flex justify-center"
+              transition={{ duration: 2, delay: 0.3, ease: "easeOut" }}
+              className="mb-16 flex justify-center relative"
             >
-              <Holoflower size="xl" glowIntensity="high" />
+              <div className="relative">
+                {/* Cosmic emanation layers */}
+                <div className="absolute inset-0 -m-20">
+                  <div className="w-full h-full border border-soul-accent/10 rounded-full animate-pulse" style={{ animationDuration: '8s' }} />
+                </div>
+                <div className="absolute inset-0 -m-12">
+                  <div className="w-full h-full border border-soul-accent/20 rounded-full animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+                </div>
+                <div className="absolute inset-0 -m-6">
+                  <div className="w-full h-full border border-soul-accent/30 rounded-full animate-pulse" style={{ animationDuration: '4s', animationDelay: '2s' }} />
+                </div>
+
+                {/* Layered holoflower with sacred depth */}
+                <div className="absolute inset-0 scale-150 opacity-20">
+                  <Holoflower size="xl" glowIntensity="high" animate={true} />
+                </div>
+                <div className="absolute inset-0 scale-125 opacity-30">
+                  <Holoflower size="xl" glowIntensity="medium" animate={true} />
+                </div>
+                <div className="relative z-10">
+                  <Holoflower size="xl" glowIntensity="high" />
+                </div>
+
+                {/* Sacred emanations */}
+                <div className="absolute inset-0 bg-soul-accent/[0.05] rounded-full animate-pulse" style={{ animationDuration: '5s' }} />
+              </div>
             </motion.div>
 
+            {/* Sacred Title with Cinematic Typography */}
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.6 }}
-              className="text-5xl md:text-6xl font-extralight text-soul-textPrimary tracking-etched mb-6 font-sacred-accent"
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 1.5, delay: 0.8, ease: "easeOut" }}
+              className="relative mb-8"
             >
-              Meet MAIA
+              <div className="absolute inset-0 bg-soul-accent/[0.03] rounded-3xl backdrop-blur-sm" />
+              <div className="relative text-6xl md:text-7xl font-extralight tracking-etched px-8 py-4">
+                <span className="bg-gradient-to-br from-soul-textPrimary via-soul-accent to-soul-accentGlow bg-clip-text text-transparent drop-shadow-2xl">
+                  Meet MAIA
+                </span>
+              </div>
             </motion.h1>
 
+            {/* Sacred Subtitle - The Daimon */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.9 }}
-              className="text-xl md:text-2xl font-light text-soul-accent tracking-archive italic"
+              transition={{ duration: 1.2, delay: 1.2 }}
+              className="text-2xl md:text-3xl font-light text-soul-accent tracking-archive italic mb-4 drop-shadow-lg"
             >
-              Your Daimon
+              <span className="relative">
+                <span className="absolute inset-0 bg-soul-accent/10 rounded-xl backdrop-blur-sm transform -skew-x-3" />
+                <span className="relative px-4">Your Daimon</span>
+              </span>
             </motion.p>
 
             <motion.div
@@ -275,63 +405,101 @@ export default function IntroPage() {
               </AnimatePresence>
             </motion.div>
 
-            {/* Continue Button */}
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 2 }}
-              onClick={() => {
-                console.log(`🎬 Continue button clicked`);
-                const storedUser = localStorage.getItem('beta_user');
-                if (storedUser) {
-                  const userData = JSON.parse(storedUser);
-                  console.log(`🎬 User data:`, userData);
-                  if (userData.onboarded === true) {
-                    console.log(`🎬 Navigating to /maya (onboarded user)`);
-                    router.push('/maia');
+            {/* Sacred Passage Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 1, delay: 2.2, ease: "easeOut" }}
+              className="mt-16 flex justify-center"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  console.log(`🎬 Sacred passage initiated`);
+                  const storedUser = localStorage.getItem('beta_user');
+                  if (storedUser) {
+                    const userData = JSON.parse(storedUser);
+                    console.log(`🎬 User data:`, userData);
+                    if (userData.onboarded === true) {
+                      console.log(`🎬 Navigating to /maia (awakened user)`);
+                      router.push('/maia');
+                    } else {
+                      console.log(`🎬 Navigating to /onboarding (initiation)`);
+                      router.push('/onboarding');
+                    }
                   } else {
-                    console.log(`🎬 Navigating to /onboarding (not onboarded)`);
+                    console.log(`🎬 Navigating to /onboarding (first contact)`);
                     router.push('/onboarding');
                   }
-                } else {
-                  console.log(`🎬 Navigating to /onboarding (no stored user)`);
-                  router.push('/onboarding');
-                }
-              }}
-              className="mt-12 px-12 py-4 bg-gradient-to-r from-soul-accent/90 to-soul-highlight/80 text-soul-background rounded-full font-medium hover:from-soul-accentHover hover:to-soul-highlight transition-all shadow-lg shadow-soul-accent/30"
-            >
-              Continue to MAIA →
-            </motion.button>
+                }}
+                className="relative group"
+              >
+                {/* Sacred button background with layers */}
+                <div className="absolute inset-0 bg-gradient-to-r from-soul-accent via-soul-accentGlow to-soul-highlight rounded-full shadow-xl shadow-soul-accent/40 group-hover:shadow-2xl group-hover:shadow-soul-accent/60 transition-all duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-r from-soul-accent/90 to-soul-highlight/90 rounded-full animate-pulse" style={{ animationDuration: '3s' }} />
+
+                {/* Sacred emanations around button */}
+                <div className="absolute -inset-4 border border-soul-accent/30 rounded-full opacity-0 group-hover:opacity-100 animate-pulse transition-opacity duration-500" />
+                <div className="absolute -inset-8 border border-soul-accent/20 rounded-full opacity-0 group-hover:opacity-100 animate-pulse transition-opacity duration-700" style={{ animationDelay: '0.5s' }} />
+
+                {/* Button content */}
+                <div className="relative px-16 py-5 text-soul-background font-light tracking-etched text-lg">
+                  <span className="relative z-10 flex items-center gap-3">
+                    Enter the Sacred Mirror
+                    <motion.span
+                      animate={{ x: [0, 4, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      className="text-xl"
+                    >
+                      →
+                    </motion.span>
+                  </span>
+                </div>
+              </motion.button>
+            </motion.div>
           </motion.div>
         )}
 
-        {/* Skip button */}
+        {/* Sacred Passage - Skip Option */}
         <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.5 }}
-          whileHover={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 2 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 0.4, y: 0 }}
+          whileHover={{ opacity: 0.8, scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ duration: 1.2, delay: 3 }}
           onClick={() => {
-            console.log(`🎬 Skip button clicked`);
+            console.log(`🎬 Direct passage taken`);
             const storedUser = localStorage.getItem('beta_user');
             if (storedUser) {
               const userData = JSON.parse(storedUser);
               console.log(`🎬 User data:`, userData);
               if (userData.onboarded === true) {
-                console.log(`🎬 Navigating to /maya (onboarded user)`);
+                console.log(`🎬 Direct passage to /maia`);
                 router.push('/maia');
               } else {
-                console.log(`🎬 Navigating to /onboarding (not onboarded)`);
+                console.log(`🎬 Direct passage to initiation`);
                 router.push('/onboarding');
               }
             } else {
-              console.log(`🎬 Navigating to /onboarding (no stored user)`);
+              console.log(`🎬 Direct passage to first contact`);
               router.push('/onboarding');
             }
           }}
-          className="absolute bottom-8 right-8 text-sm text-soul-textTertiary hover:text-soul-textSecondary transition-colors"
+          className="absolute bottom-10 right-10 group"
         >
-          Skip →
+          <div className="relative px-4 py-2 backdrop-blur-sm bg-soul-surface/20 border border-soul-accent/20 rounded-full hover:bg-soul-surface/30 hover:border-soul-accent/40 transition-all duration-300">
+            <span className="text-sm text-soul-textTertiary group-hover:text-soul-textSecondary tracking-archive transition-colors duration-300 flex items-center gap-2">
+              Direct Passage
+              <motion.span
+                animate={{ x: [0, 2, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                className="text-xs opacity-70"
+              >
+                →
+              </motion.span>
+            </span>
+          </div>
         </motion.button>
       </div>
     </div>

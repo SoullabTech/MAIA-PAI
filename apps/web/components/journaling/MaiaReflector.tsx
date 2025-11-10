@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { JournalingMode } from '@/lib/journaling/JournalingPrompts';
-import { Sparkles, Hash, Users, Heart, Lightbulb } from 'lucide-react';
+import { Sparkles, Hash, Users, Heart, Lightbulb, Eye, Moon, Flame } from 'lucide-react';
+import ConsciousnessVessel from '@/components/consciousness/ConsciousnessVessel';
+import ConsciousnessRipple from '@/components/consciousness/ConsciousnessRipple';
 
 interface MaiaReflectorProps {
   reflection: {
@@ -20,6 +22,14 @@ interface MaiaReflectorProps {
 }
 
 export default function MaiaReflector({ reflection, mode, isProcessing }: MaiaReflectorProps) {
+  const [consciousnessRipples, setConsciousnessRipples] = useState<Array<{
+    id: string;
+    x: number;
+    y: number;
+    variant: 'jade' | 'neural' | 'mystical' | 'transcendent';
+    timestamp: number;
+  }>>([]);
+
   const modeColors = {
     free: 'from-cyan-500 to-blue-500',
     dream: 'from-purple-500 to-fuchsia-500',
@@ -35,6 +45,39 @@ export default function MaiaReflector({ reflection, mode, isProcessing }: MaiaRe
     shadow: '🌓',
     direction: '🧭'
   };
+
+  // Get consciousness variant based on journaling mode
+  const getModeVariant = (mode: JournalingMode) => {
+    switch (mode) {
+      case 'shadow': return 'neural';
+      case 'dream': return 'mystical';
+      case 'emotional': return 'jade';
+      case 'direction': return 'transcendent';
+      default: return 'jade';
+    }
+  };
+
+  // Create consciousness ripples for archetypal interaction
+  const createArchetypalRipple = useCallback((x: number, y: number, archetype: string) => {
+    const variant = archetype.toLowerCase().includes('shadow') ? 'neural' :
+                   archetype.toLowerCase().includes('wise') || archetype.toLowerCase().includes('sage') ? 'transcendent' :
+                   archetype.toLowerCase().includes('child') || archetype.toLowerCase().includes('innocent') ? 'jade' :
+                   'mystical';
+
+    const ripple = {
+      id: `archetype-${Date.now()}-${Math.random()}`,
+      x,
+      y,
+      variant,
+      timestamp: Date.now()
+    };
+
+    setConsciousnessRipples(prev => [...prev, ripple]);
+
+    setTimeout(() => {
+      setConsciousnessRipples(prev => prev.filter(r => r.id !== ripple.id));
+    }, 2500);
+  }, []);
 
   return (
     <motion.div
@@ -59,56 +102,112 @@ export default function MaiaReflector({ reflection, mode, isProcessing }: MaiaRe
           <span className="text-xl ml-auto">{modeIcons[mode]}</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="flex items-start gap-2">
-            <Hash className="w-4 h-4 text-neutral-500 dark:text-neutral-400 mt-0.5" />
-            <div>
-              <div className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1">
-                Symbols
+        {/* Consciousness Vessels for Archetypal Data */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* Symbols Vessel */}
+          <ConsciousnessVessel
+            title="Sacred Symbols"
+            value={reflection.symbols.length.toString()}
+            subtitle="archetypal resonance"
+            variant={getModeVariant(mode)}
+            depth="moderate"
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              createArchetypalRipple(rect.left + rect.width/2, rect.top + rect.height/2, 'symbols');
+            }}
+            className="cursor-pointer"
+          >
+            <div className="text-center space-y-3">
+              <div className="w-10 h-10 mx-auto bg-jade-shadow/20 rounded-full flex items-center justify-center">
+                <Hash className="w-5 h-5 text-jade-sage" />
               </div>
-              <div className="flex flex-wrap gap-1">
-                {reflection.symbols.map((symbol, i) => (
-                  <span
-                    key={i}
-                    className="text-xs px-2 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300"
-                  >
-                    {symbol}
-                  </span>
-                ))}
+              <div className="space-y-2">
+                <div className="text-xs text-jade-mineral uppercase tracking-wide">Symbols Emerging</div>
+                <div className="space-y-1">
+                  {reflection.symbols.slice(0, 3).map((symbol, i) => (
+                    <div key={i} className="text-xs text-jade-jade font-light px-2 py-1 rounded bg-jade-shadow/10 border border-jade-sage/20">
+                      {symbol}
+                    </div>
+                  ))}
+                  {reflection.symbols.length > 3 && (
+                    <div className="text-xs text-jade-mineral">+{reflection.symbols.length - 3} more</div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          </ConsciousnessVessel>
 
-          <div className="flex items-start gap-2">
-            <Users className="w-4 h-4 text-neutral-500 dark:text-neutral-400 mt-0.5" />
-            <div>
-              <div className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1">
-                Archetypes
+          {/* Archetypes Vessel */}
+          <ConsciousnessVessel
+            title="Living Archetypes"
+            value={reflection.archetypes.length.toString()}
+            subtitle="consciousness patterns"
+            variant={getModeVariant(mode)}
+            depth="profound"
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              createArchetypalRipple(rect.left + rect.width/2, rect.top + rect.height/2, reflection.archetypes[0] || 'archetype');
+            }}
+            className="cursor-pointer"
+          >
+            <div className="text-center space-y-3">
+              <div className="w-10 h-10 mx-auto bg-jade-shadow/20 rounded-full flex items-center justify-center">
+                <Users className="w-5 h-5 text-jade-sage" />
               </div>
-              <div className="flex flex-wrap gap-1">
-                {reflection.archetypes.map((archetype, i) => (
-                  <span
-                    key={i}
-                    className="text-xs px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300"
-                  >
-                    {archetype}
-                  </span>
-                ))}
+              <div className="space-y-2">
+                <div className="text-xs text-jade-mineral uppercase tracking-wide">Archetypal Presence</div>
+                <div className="space-y-1">
+                  {reflection.archetypes.slice(0, 2).map((archetype, i) => (
+                    <div key={i} className="text-xs text-jade-jade font-medium px-2 py-1 rounded bg-jade-jade/10 border border-jade-jade/30">
+                      {archetype}
+                    </div>
+                  ))}
+                  {reflection.archetypes.length > 2 && (
+                    <div className="text-xs text-jade-mineral">+{reflection.archetypes.length - 2} more</div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          </ConsciousnessVessel>
 
-          <div className="flex items-start gap-2">
-            <Heart className="w-4 h-4 text-neutral-500 dark:text-neutral-400 mt-0.5" />
-            <div>
-              <div className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1">
-                Emotional Tone
+          {/* Emotional Tone Vessel */}
+          <ConsciousnessVessel
+            title="Emotional Field"
+            value="∞"
+            subtitle="feeling resonance"
+            variant={getModeVariant(mode)}
+            depth="transcendent"
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              createArchetypalRipple(rect.left + rect.width/2, rect.top + rect.height/2, reflection.emotionalTone);
+            }}
+            className="cursor-pointer"
+          >
+            <div className="text-center space-y-3">
+              <div className="w-10 h-10 mx-auto bg-jade-shadow/20 rounded-full flex items-center justify-center">
+                <Heart className="w-5 h-5 text-jade-sage" />
               </div>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300">
-                {reflection.emotionalTone}
-              </span>
+              <div className="space-y-2">
+                <div className="text-xs text-jade-mineral uppercase tracking-wide">Emotional Resonance</div>
+                <div className="text-sm text-jade-jade font-medium px-3 py-2 rounded-full bg-jade-jade/10 border border-jade-jade/30">
+                  {reflection.emotionalTone}
+                </div>
+                <motion.div
+                  className="w-full h-1 bg-jade-shadow/30 rounded-full overflow-hidden"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <motion.div
+                    className="h-full bg-jade-jade/60 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: '75%' }}
+                    transition={{ delay: 0.8, duration: 1 }}
+                  />
+                </motion.div>
+              </div>
             </div>
-          </div>
+          </ConsciousnessVessel>
         </div>
 
         <div className="space-y-4">
@@ -167,6 +266,20 @@ export default function MaiaReflector({ reflection, mode, isProcessing }: MaiaRe
         transition={{ duration: 0.8, ease: "easeOut" }}
         className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r ${modeColors[mode]} rounded-full`}
       />
+
+      {/* Archetypal Consciousness Ripples */}
+      <AnimatePresence>
+        {consciousnessRipples.map(ripple => (
+          <div key={ripple.id} className="fixed inset-0 pointer-events-none z-50">
+            <ConsciousnessRipple
+              x={ripple.x}
+              y={ripple.y}
+              variant={ripple.variant}
+              intensity="profound"
+            />
+          </div>
+        ))}
+      </AnimatePresence>
     </motion.div>
   );
 }

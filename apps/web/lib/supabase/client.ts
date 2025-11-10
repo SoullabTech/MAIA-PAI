@@ -3,9 +3,9 @@ import { createBrowserClient } from '@supabase/ssr';
 // Check if we're in mock mode
 const MOCK_MODE = process.env.NEXT_PUBLIC_MOCK_SUPABASE === 'true' || process.env.MOCK_SUPABASE === 'true';
 
-export function createClient() {
+export function createClient(forceMock = false) {
   // In mock mode, return a stub client that doesn't make real requests
-  if (MOCK_MODE) {
+  if (MOCK_MODE || forceMock) {
     console.log('⚡ [SUPABASE] Frontend in MOCK mode - no real DB calls');
     return {
       from: (table: string) => ({
@@ -47,7 +47,7 @@ export function createClient() {
   
   if (!url || !key || url.includes('localhost:54321')) {
     console.warn('[SUPABASE] Invalid configuration, using mock mode');
-    return createClient(); // Recursive call will hit mock mode
+    return createClient(true); // Force mock mode to avoid recursion
   }
   
   console.log('[SUPABASE] Frontend using real Supabase at:', url);

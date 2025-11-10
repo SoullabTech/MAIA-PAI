@@ -2,14 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, TrendingUp, Hash, Users, Heart, Flame, Droplet, Mountain, Wind, Sparkles as SparklesIcon } from 'lucide-react';
+import { User, TrendingUp, Hash, Users, Heart, Flame, Droplet, Mountain, Wind, Sparkles as SparklesIcon, Mic, Shield, Eye, EyeOff } from 'lucide-react';
 import { ainClient } from '@/lib/ain/AINClient';
 import { useMaiaStore } from '@/lib/maia/state';
+import { PrivacyAwareCognitiveVoiceProcessor } from '@/lib/maia/privacyAwareCognitiveVoice';
 
 export default function SoulprintSnapshot() {
   const { entries } = useMaiaStore();
   const [guidance, setGuidance] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [cognitiveInsights, setCognitiveInsights] = useState<any>(null);
+  const [showCognitiveInsights, setShowCognitiveInsights] = useState(false);
+  const [userId] = useState('demo-user'); // TODO: Get from auth context
 
   useEffect(() => {
     async function loadGuidance() {
@@ -23,8 +27,34 @@ export default function SoulprintSnapshot() {
       }
     }
 
+    async function loadCognitiveInsights() {
+      try {
+        // Find voice entries with cognitive analysis
+        const voiceEntries = entries.filter(entry =>
+          entry.isVoice && entry.cognitiveAnalysis
+        );
+
+        if (voiceEntries.length > 0 && userId) {
+          const cognitiveProcessor = new PrivacyAwareCognitiveVoiceProcessor(userId);
+          const recentVoiceEntry = voiceEntries[0]; // Most recent
+
+          if (recentVoiceEntry.cognitiveAnalysis) {
+            const memberInsights = await cognitiveProcessor.generateMemberFriendlySummary(
+              recentVoiceEntry.cognitiveAnalysis
+            );
+            setCognitiveInsights(memberInsights);
+            console.log('🧠 Loaded privacy-aware cognitive insights for soulprint dashboard');
+          }
+        }
+      } catch (error) {
+        console.warn('⚠️ Privacy-aware cognitive insights failed to load (continuing without):', error.message);
+        setCognitiveInsights(null);
+      }
+    }
+
     loadGuidance();
-  }, [entries.length]);
+    loadCognitiveInsights();
+  }, [entries.length, userId]);
 
   if (loading) {
     return (
@@ -68,19 +98,124 @@ export default function SoulprintSnapshot() {
       className="space-y-6"
     >
       <div>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 rounded-full bg-gradient-to-br from-violet-500 to-purple-600">
-            <User className="w-6 h-6 text-white" />
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-full bg-gradient-to-br from-violet-500 to-purple-600">
+              <User className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
+                Your Soulprint
+              </h3>
+              <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                Based on {entries.length} journal {entries.length === 1 ? 'entry' : 'entries'}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xl font-bold text-neutral-900 dark:text-neutral-100">
-              Your Soulprint
-            </h3>
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">
-              Based on {entries.length} journal {entries.length === 1 ? 'entry' : 'entries'}
-            </p>
-          </div>
+
+          {/* Privacy-Aware Cognitive Insights Toggle */}
+          {cognitiveInsights && (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowCognitiveInsights(!showCognitiveInsights)}
+                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-medium hover:shadow-lg hover:shadow-emerald-500/25 transition-all"
+              >
+                <Shield className="w-4 h-4" />
+                Voice Insights
+                {showCognitiveInsights ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Privacy-Aware Cognitive Insights Panel */}
+        {cognitiveInsights && showCognitiveInsights && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-6 p-6 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-800"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Mic className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <h4 className="font-semibold text-emerald-900 dark:text-emerald-100">
+                Voice Essence Insights
+              </h4>
+              <div className="ml-auto text-xs text-emerald-600 dark:text-emerald-400">
+                Privacy-aware · Only visible to you
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {cognitiveInsights.energyPatterns?.dominant && (
+                <div className="flex items-center gap-3">
+                  <Flame className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <div>
+                    <span className="font-medium text-emerald-900 dark:text-emerald-100">
+                      Energy Flow:
+                    </span>
+                    <span className="ml-2 text-emerald-800 dark:text-emerald-300">
+                      Your voice carries {cognitiveInsights.energyPatterns.dominant} energy patterns
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {cognitiveInsights.breathPattern?.quality && (
+                <div className="flex items-center gap-3">
+                  <Wind className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <div>
+                    <span className="font-medium text-emerald-900 dark:text-emerald-100">
+                      Breath Wisdom:
+                    </span>
+                    <span className="ml-2 text-emerald-800 dark:text-emerald-300">
+                      {cognitiveInsights.breathPattern.quality === 'deep'
+                        ? 'Grounded and present breathing patterns'
+                        : 'Energy moving through transition'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {cognitiveInsights.coherenceProfile?.trend && (
+                <div className="flex items-center gap-3">
+                  <SparklesIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <div>
+                    <span className="font-medium text-emerald-900 dark:text-emerald-100">
+                      Clarity Evolution:
+                    </span>
+                    <span className="ml-2 text-emerald-800 dark:text-emerald-300">
+                      {cognitiveInsights.coherenceProfile.trend === 'emerging'
+                        ? 'Beautiful clarity emerging in your expression'
+                        : 'Voice coherence reflecting your inner landscape'}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {cognitiveInsights.wisdomDirection && (
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <div>
+                    <span className="font-medium text-emerald-900 dark:text-emerald-100">
+                      Growth Edge:
+                    </span>
+                    <span className="ml-2 text-emerald-800 dark:text-emerald-300">
+                      {cognitiveInsights.wisdomDirection}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-emerald-200 dark:border-emerald-700">
+              <p className="text-xs text-emerald-600 dark:text-emerald-400 italic">
+                These insights come from your voice patterns and are only shown to you.
+                You control your privacy settings in the Privacy & Permissions panel.
+              </p>
+            </div>
+          </motion.div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

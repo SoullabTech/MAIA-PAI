@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { JournalingMode, JournalingResponse } from '../journaling/JournalingPrompts';
+import { VoiceMetrics } from './voicePatterns';
+import { CognitiveVoiceAnalysis } from './cognitiveVoiceAnalysis';
 
 export interface JournalEntry {
   id: string;
@@ -12,6 +14,9 @@ export interface JournalEntry {
   wordCount: number;
   duration?: number;
   isVoice: boolean;
+  // Voice analysis data
+  voiceMetrics?: VoiceMetrics;
+  cognitiveAnalysis?: CognitiveVoiceAnalysis;
 }
 
 export interface MaiaState {

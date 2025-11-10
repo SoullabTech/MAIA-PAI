@@ -9,9 +9,9 @@ export function AudioUnlockBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Check if banner is disabled in development
-    if (process.env.NEXT_PUBLIC_DISABLE_AUDIO_BANNER === 'true') {
-      return; // Skip banner setup in dev mode
+    // Check if banner is disabled in development or by default
+    if (process.env.NEXT_PUBLIC_DISABLE_AUDIO_BANNER === 'true' || process.env.NODE_ENV === 'development') {
+      return; // Skip banner setup - disabled by default
     }
     // Check if audio is already unlocked
     const checkStatus = () => {
@@ -68,19 +68,19 @@ export function AudioUnlockBanner() {
     }
   };
 
-  // Check if banner is disabled in development
-  if (process.env.NEXT_PUBLIC_DISABLE_AUDIO_BANNER === 'true' || !isVisible) {
+  // Check if banner is disabled in development or by default
+  if (process.env.NEXT_PUBLIC_DISABLE_AUDIO_BANNER === 'true' || process.env.NODE_ENV === 'development' || !isVisible) {
     return null;
   }
 
   return (
-    <div 
+    <div
       className={`
         fixed top-4 left-1/2 -translate-x-1/2 z-[8000]
-        bg-gradient-to-r from-blue-600 to-amber-600
-        text-white px-6 py-3 rounded-full shadow-2xl
+        bg-soul-surface/80 backdrop-blur-md border border-soul-accent/30
+        text-soul-textPrimary px-6 py-3 rounded-lg shadow-lg
         flex items-center gap-3 cursor-pointer
-        hover:scale-105 transition-all duration-300
+        hover:bg-soul-surface/90 hover:border-soul-accent/50 transition-all duration-300
         animate-in slide-in-from-top duration-500
         ${isUnlocked ? 'opacity-0 pointer-events-none' : 'opacity-100'}
       `}
@@ -90,11 +90,11 @@ export function AudioUnlockBanner() {
         {isUnlocked ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
       </div>
       <div>
-        <div className="font-semibold text-sm">
-          {isUnlocked ? '✅ Voice Enabled' : '🔊 Enable Maya\'s Voice'}
+        <div className="font-medium text-sm">
+          {isUnlocked ? '✨ Voice Awakened' : '🎧 Awaken Voice'}
         </div>
-        <div className="text-xs opacity-90">
-          {isUnlocked ? 'Ready for voice responses' : 'Click to hear audio responses'}
+        <div className="text-xs text-soul-textSecondary">
+          {isUnlocked ? 'Sacred dialogue enabled' : 'Click to enable audio responses'}
         </div>
       </div>
     </div>

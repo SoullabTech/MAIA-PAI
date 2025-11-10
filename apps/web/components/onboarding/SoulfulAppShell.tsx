@@ -22,9 +22,11 @@ export default function SoulfulAppShell({ userId, children }: SoulfulAppShellPro
     const onboardingComplete = localStorage.getItem(`onboarding_complete_${userId}`);
     const entryCount = parseInt(localStorage.getItem('journal_entry_count') || '0');
 
+    // Auto-complete onboarding for development to access consciousness gateways directly
     if (!onboardingComplete) {
-      setShowWelcome(true);
-      setStep('welcome');
+      localStorage.setItem(`onboarding_complete_${userId}`, 'true');
+      setShowWelcome(false);
+      setStep('first-entry');
     } else if (entryCount === 0) {
       setStep('first-entry');
     } else if (entryCount < 3) {

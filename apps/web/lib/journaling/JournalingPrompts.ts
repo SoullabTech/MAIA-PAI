@@ -204,31 +204,26 @@ Please respond with a valid JSON object following the structure above. Be warm, 
 export const JOURNALING_MODE_DESCRIPTIONS = {
   free: {
     name: 'Free Expression',
-    icon: '🌀',
     description: 'Stream of consciousness. No structure—just what wants to emerge.',
     prompt: 'What part of your story wants to be spoken today?'
   },
   dream: {
     name: 'Dream Integration',
-    icon: '🔮',
     description: 'Explore the symbolic language of your dreams and unconscious.',
     prompt: 'Tell me about the dream that is lingering with you...'
   },
   emotional: {
     name: 'Emotional Processing',
-    icon: '💓',
     description: 'Name, hold, and process emotions with compassion.',
     prompt: 'What emotion is asking for your attention right now?'
   },
   shadow: {
     name: 'Shadow Work',
-    icon: '🌓',
     description: 'Explore hidden aspects, tensions, or uncomfortable truths gently.',
     prompt: 'What part of yourself are you ready to look at more honestly?'
   },
   direction: {
     name: 'Life Direction',
-    icon: '🧭',
     description: 'Clarify next steps, purpose, and alignment with your deeper path.',
     prompt: 'What question about your path is calling for clarity?'
   }

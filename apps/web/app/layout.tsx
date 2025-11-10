@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import Link from "next/link";
 import IOSFixInitializer from "@/components/system/IOSFixInitializer";
+import { HeaderWrapper } from "@/components/layout/HeaderWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -42,38 +43,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-white dark:bg-black text-neutral-900 dark:text-amber-50 transition-colors duration-200 overflow-x-hidden`}>
+      <body className={`${inter.className} bg-soul-background text-soul-textPrimary transition-colors duration-200 overflow-x-hidden`}>
         <ThemeProvider>
           <IOSFixInitializer />
           <ToastProvider>
-            {/* Global Header with Theme Toggle */}
-            <header className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 border-b border-amber-900/20 dark:border-amber-500/20 bg-gradient-to-r from-slate-900 via-amber-900/10 to-slate-900">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
-                  <span className="text-white font-bold text-xs sm:text-sm">✺</span>
-                </div>
-                <h1 className="text-base sm:text-lg font-semibold tracking-wide text-amber-50 dark:text-amber-100">
-                  MAIA
-                </h1>
-              </Link>
-
-              <nav className="flex items-center gap-3 sm:gap-6">
-                <Link
-                  href="/"
-                  className="text-xs sm:text-sm text-amber-200/70 hover:text-amber-100 transition-colors"
-                >
-                  Mirror
-                </Link>
-                <Link
-                  href="/dashboard"
-                  className="text-xs sm:text-sm text-amber-200/70 hover:text-amber-100 transition-colors hidden sm:inline"
-                >
-                  Analytics
-                </Link>
-                <div className="w-px h-4 sm:h-5 bg-amber-500/20" />
-                <ThemeToggle />
-              </nav>
-            </header>
+            {/* Conditional Header */}
+            <HeaderWrapper />
             
             {/* Main Content */}
             <main className="min-h-[calc(100vh-73px)]">

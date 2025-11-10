@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, Loader2 } from 'lucide-react';
+import { Mic, MicOff, Loader2, Shield, Settings, Eye, EyeOff } from 'lucide-react';
 import { showError } from '@/components/system/ErrorOverlay';
 import { useMaiaStream } from '@/hooks/useMayaStream';
 import { OracleVoicePlayer } from './voice/OracleVoicePlayer';
 import { unlockAudio } from '@/lib/audio/audioUnlock';
 import { useToastContext } from '@/components/system/ToastProvider';
+import PrivacySettingsPanel from './PrivacySettingsPanel';
 
 interface VoiceRecorderProps {
   userId: string;
@@ -51,6 +52,12 @@ export default function VoiceRecorder({
   const [hasTriggeredWelcome, setHasTriggeredWelcome] = useState(false); // Track if we&apos;ve auto-triggered Maya&apos;s welcome
   const [mayaWelcomeMessage, setMayaWelcomeMessage] = useState<string>(''); // Store Maya&apos;s welcome message
   const [isPlayingWelcome, setIsPlayingWelcome] = useState(false); // Track welcome audio playback
+
+  // 🔒 Privacy Controls State
+  const [showPrivacySettings, setShowPrivacySettings] = useState(false);
+  const [cognitiveAnalysis, setCognitiveAnalysis] = useState<any>(null);
+  const [memberInsights, setMemberInsights] = useState<any>(null);
+  const [showInsights, setShowInsights] = useState(false);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -572,12 +579,30 @@ export default function VoiceRecorder({
       if (data.success) {
         const transcript = data.transcription;
         const audioUrl = URL.createObjectURL(audioBlob);
-        
+
+        // 🔒 Handle Privacy-Aware Cognitive Analysis
+        if (data.cognitiveAnalysis) {
+          setCognitiveAnalysis(data.cognitiveAnalysis);
+          console.log('🧠 Received cognitive analysis with privacy filtering applied');
+        }
+
+        if (data.memberInsights) {
+          setMemberInsights(data.memberInsights);
+          console.log('✨ Received member-friendly insights:', Object.keys(data.memberInsights));
+        }
+
         // Log the final transcript
-        
+        console.log('📝 Transcription complete:', {
+          transcript: transcript.substring(0, 50) + '...',
+          duration: data.duration + 's',
+          hasCoordinates: data.voiceMetrics?.hasWordTimings || false,
+          hasCognitiveAnalysis: !!data.cognitiveAnalysis,
+          hasMemberInsights: !!data.memberInsights
+        });
+
         // Check if we recorded long enough
         const recordingDuration = Date.now() - recordingStartTime;
-        
+
         if (autoSend && recordingDuration >= MIN_RECORDING_TIME) {
           // Auto-send mode: send immediately
           console.log('Auto-sending transcript:', {
@@ -585,12 +610,12 @@ export default function VoiceRecorder({
             audioUrl: audioUrl ? 'Has URL' : 'No URL',
             duration: recordingDuration + 'ms'
           });
-          
+
           onTranscribed?.({
             transcript,
             audioUrl
           });
-          
+
         } else if (!autoSend) {
           // Manual mode: store for manual confirmation
           setPendingTranscript(transcript);
@@ -729,6 +754,82 @@ export default function VoiceRecorder({
 
   return (
     <div className="relative flex flex-col items-center gap-3">
+      {/* 🔒 Privacy Controls - Prominent at Top */}
+      <div className="flex items-center gap-2 mb-2">
+        <button
+          onClick={() => setShowPrivacySettings(true)}
+          className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-xl font-medium text-sm hover:shadow-lg hover:shadow-violet-500/25 transition-all"
+          title="Manage what cognitive insights you want to see"
+        >
+          <Shield className="w-4 h-4" />
+          Privacy Controls
+        </button>
+
+        {memberInsights && (
+          <button
+            onClick={() => setShowInsights(!showInsights)}
+            className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-medium text-sm hover:shadow-lg hover:shadow-amber-500/25 transition-all"
+            title={showInsights ? "Hide your voice insights" : "Show your voice insights"}
+          >
+            {showInsights ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            {showInsights ? "Hide" : "Show"} Insights
+          </button>
+        )}
+      </div>
+
+      {/* Member-Friendly Cognitive Insights */}
+      {showInsights && memberInsights && (
+        <div className="w-full max-w-lg mb-4 p-4 bg-gradient-to-br from-amber-50 to-violet-50 dark:from-amber-900/20 dark:to-violet-900/20 rounded-xl border border-amber-200 dark:border-amber-700">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+            <h3 className="text-sm font-semibold text-amber-800 dark:text-amber-300">Your Voice Essence</h3>
+          </div>
+
+          <div className="space-y-3 text-sm">
+            {memberInsights.essenceInsights && (
+              <div>
+                <div className="text-violet-700 dark:text-violet-300 font-medium mb-1">Voice Clarity</div>
+                <div className="text-gray-700 dark:text-gray-300">{memberInsights.essenceInsights}</div>
+              </div>
+            )}
+
+            {memberInsights.energyFlow && (
+              <div>
+                <div className="text-violet-700 dark:text-violet-300 font-medium mb-1">Energy Flow</div>
+                <div className="text-gray-700 dark:text-gray-300">{memberInsights.energyFlow}</div>
+              </div>
+            )}
+
+            {memberInsights.wisdomEmergence && (
+              <div>
+                <div className="text-violet-700 dark:text-violet-300 font-medium mb-1">Wisdom Emergence</div>
+                <div className="text-gray-700 dark:text-gray-300">{memberInsights.wisdomEmergence}</div>
+              </div>
+            )}
+
+            {memberInsights.breathworkGuidance && (
+              <div>
+                <div className="text-violet-700 dark:text-violet-300 font-medium mb-1">Breathwork Guidance</div>
+                <div className="text-gray-700 dark:text-gray-300">{memberInsights.breathworkGuidance}</div>
+              </div>
+            )}
+
+            {memberInsights.integrationInvitation && (
+              <div>
+                <div className="text-violet-700 dark:text-violet-300 font-medium mb-1">Integration Invitation</div>
+                <div className="text-gray-700 dark:text-gray-300">{memberInsights.integrationInvitation}</div>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-3 pt-3 border-t border-amber-200 dark:border-amber-700">
+            <div className="text-xs text-amber-600 dark:text-amber-400">
+              These insights respect your privacy settings and are only shown to you.
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Recording button with pulsing effect */}
       <div className="relative">
         <button
@@ -1222,6 +1323,11 @@ export default function VoiceRecorder({
           to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
+
+      {/* 🔒 Privacy Settings Modal */}
+      {showPrivacySettings && (
+        <PrivacySettingsPanel onClose={() => setShowPrivacySettings(false)} />
+      )}
     </div>
   );
 }

@@ -16,7 +16,6 @@ import TimelineView from '@/components/maia/TimelineView';
 import SemanticSearch from '@/components/maia/SemanticSearch';
 import Analytics from '@/components/maia/Analytics';
 import Settings from '@/components/maia/Settings';
-import CoherencePulse from '@/components/maia/CoherencePulse';
 import SoulprintSnapshot from '@/components/maia/SoulprintSnapshot';
 import SoulprintDashboard from '@/components/maia/SoulprintDashboard';
 
@@ -92,11 +91,7 @@ export default function MaiaPage() {
           {/* Consciousness Header Info */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              {entries.length > 0 && (
-                <div className="hidden md:block">
-                  <CoherencePulse />
-                </div>
-              )}
+              {/* Coherence metrics moved to Analytics page */}
             </div>
 
             <nav className="flex items-center gap-2">

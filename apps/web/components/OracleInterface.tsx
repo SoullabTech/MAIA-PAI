@@ -35,16 +35,15 @@ export default function OracleInterface() {
     conversationCount: 0
   });
   const [consciousnessState, setConsciousnessState] = useState('receptive'); // receptive, processing, integrating, breakthrough
+  const [userId] = useState('demo-user'); // TODO: Get from auth context
 
-  // Generate journal-aware greeting
-  const journalGreeting = generateJournalAwareGreeting(entries);
-
+  // Initialize with default greeting
   const [messages, setMessages] = useState<Array<ConsciousnessMessage>>([
     {
       role: "assistant",
-      content: journalGreeting.message,
-      wisdomDepth: journalGreeting.wisdomDepth,
-      archetypalSignatures: journalGreeting.archetypalSignatures
+      content: "Hey there. I'm MAIA, getting to know the patterns that make you unique. What's on your mind today?",
+      wisdomDepth: 'archetypal',
+      archetypalSignatures: []
     }
   ]);
   
@@ -122,15 +121,23 @@ export default function OracleInterface() {
   // Update greeting when journal entries change
   useEffect(() => {
     if (entries.length > 0 && messages.length === 1 && messages[0].role === 'assistant') {
-      const updatedGreeting = generateJournalAwareGreeting(entries);
-      setMessages([{
-        role: "assistant",
-        content: updatedGreeting.message,
-        wisdomDepth: updatedGreeting.wisdomDepth,
-        archetypalSignatures: updatedGreeting.archetypalSignatures
-      }]);
+      const updateGreeting = async () => {
+        try {
+          const updatedGreeting = await generateJournalAwareGreeting(entries, userId);
+          setMessages([{
+            role: "assistant",
+            content: updatedGreeting.message,
+            wisdomDepth: updatedGreeting.wisdomDepth,
+            archetypalSignatures: updatedGreeting.archetypalSignatures
+          }]);
+        } catch (error) {
+          console.warn('Failed to generate journal-aware greeting:', error);
+          // Keep the default greeting if privacy-aware analysis fails
+        }
+      };
+      updateGreeting();
     }
-  }, [entries.length]); // Only trigger when entry count changes
+  }, [entries.length, userId]); // Trigger when entry count or userId changes
 
   // Archetypal detection simulation
   const detectArchetypalPatterns = (userMessage: string) => {

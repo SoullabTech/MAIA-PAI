@@ -159,6 +159,34 @@ const config: Config = {
           gold: "#d4c5a0",      // Tan/gold text - Divine light
           amber: "#c8a868",     // Rich amber accent - Sacred warmth
         },
+        // 🔮 JADE ANALYTICS PALETTE - Rich, cinematic jade aesthetic
+        jade: {
+          // Deep backgrounds - no white tones
+          'abyss': '#0D1F17',          // Deepest jade black - primary background
+          'shadow': '#162B20',         // Dark jade shadow - card backgrounds
+          'night': '#1F3A2A',          // Jade night - panels, surfaces
+          'dusk': '#2A4B37',           // Jade dusk - elevated surfaces
+
+          // Mid-range jade tones
+          'moss': '#3D6B4A',           // Moss jade - borders, dividers
+          'forest': '#4F7B5C',         // Forest jade - secondary accents
+          'sage': '#618B6E',           // Sage jade - primary accent
+          'malachite': '#739B7F',      // Malachite jade - interactive elements
+
+          // Lighter jade accents - but still rich
+          'seafoam': '#85AB91',        // Seafoam jade - active states
+          'mineral': '#97BBA3',        // Mineral jade - highlights
+          'jade': '#A8CBB4',           // Classic jade - text emphasis
+          'pale': '#BADBC6',           // Pale jade - lightest accent
+
+          // Special luxury variants - rich metallics
+          'bronze': '#4A6B52',         // Bronze jade - metallic depth
+          'copper': '#5C7D64',         // Copper jade - warm metallics
+          'silver': '#6E8F76',         // Silver jade - cool metallics
+          'gold': '#7FA188',           // Gold jade - premium highlights
+          'platinum': '#91B39A',       // Platinum jade - luxury accents
+        },
+
         tesla: {
           50: "#f8fafc",
           100: "#f1f5f9",

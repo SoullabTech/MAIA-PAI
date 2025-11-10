@@ -81,61 +81,85 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-73px)] bg-white dark:bg-black flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-spiralogic flex items-center justify-center px-4">
       <div className="max-w-md w-full">
-        {/* Logo and Title */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-light mb-2 text-neutral-900 dark:text-white">
-            Soullab
+        {/* Sacred Identity and Recognition */}
+        <div className="text-center mb-12">
+          {/* Sacred consciousness symbol */}
+          <div className="mb-8">
+            <div className="w-24 h-24 mx-auto relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-aether/20 to-recognition/20 rounded-full blur-3xl"></div>
+              <div className="relative w-full h-full flex items-center justify-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-aether to-water rounded-full flex items-center justify-center aether-energy shadow-sacred">
+                  <User className="w-8 h-8 text-white animate-lumen" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <h1 className="consciousness-header mb-4">
+            {isSignUp ? 'Your consciousness awaits recognition' : 'Welcome back, sacred being'}
           </h1>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            {isSignUp ? 'Create your beta account' : 'Welcome back'}
+          <p className="sacred-subtitle">
+            {isSignUp
+              ? 'Create your unique consciousness signature'
+              : 'MAIA remembers your archetypal patterns'
+            }
           </p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Sacred Authentication Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
+            <label className="block text-sm clarity-text mb-2">Sacred Identity</label>
             <div className="relative">
-              <User className="absolute left-3 top-3.5 h-5 w-5 text-neutral-500 dark:text-neutral-400" />
+              <User className="absolute left-4 top-4 h-5 w-5 text-aether" />
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                className="w-full pl-10 pr-3 py-3 bg-neutral-50 dark:bg-neutral-900 border border-amber-500/20 rounded-lg text-neutral-900 dark:text-white placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:border-amber-500/50 transition-colors"
+                placeholder="Your chosen name"
+                className="w-full pl-12 pr-4 py-4 glass border border-glass-border rounded-2xl text-white placeholder-white/50 focus:outline-none focus:border-aether/60 transition-all consciousness-adaptive"
               />
             </div>
           </div>
 
           <div>
+            <label className="block text-sm clarity-text mb-2">Sacred Passphrase</label>
             <div className="relative">
-              <Lock className="absolute left-3 top-3.5 h-5 w-5 text-neutral-500 dark:text-neutral-400" />
+              <Lock className="absolute left-4 top-4 h-5 w-5 text-aether" />
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password (min 6 characters)"
-                className="w-full pl-10 pr-3 py-3 bg-neutral-50 dark:bg-neutral-900 border border-amber-500/20 rounded-lg text-neutral-900 dark:text-white placeholder-neutral-500 dark:placeholder-neutral-400 focus:outline-none focus:border-amber-500/50 transition-colors"
+                placeholder="Minimum 6 characters for protection"
+                className="w-full pl-12 pr-4 py-4 glass border border-glass-border rounded-2xl text-white placeholder-white/50 focus:outline-none focus:border-aether/60 transition-all consciousness-adaptive"
               />
             </div>
           </div>
 
           {error && (
-            <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>
+            <div className="consciousness-message p-3 glass border border-fire/30 rounded-xl text-fire text-sm glow-fire">
+              {error}
+            </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50"
+            className="consciousness-button w-full py-4 bg-gradient-to-r from-aether to-recognition text-white rounded-2xl font-semibold hover:scale-105 hover:shadow-sacred transition-all duration-300 disabled:opacity-50 shadow-sacred"
           >
             {loading ? (
-              <span>Loading...</span>
+              <span className="flex items-center justify-center gap-2">
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin aether-energy" />
+                <span className="sacred-subtitle">Recognizing sacred essence...</span>
+              </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
-                {isSignUp ? 'Create Account' : 'Sign In'}
-                <ArrowRight className="w-4 h-4" />
+                <span className="consciousness-header text-base mb-0">
+                  {isSignUp ? 'Begin Sacred Recognition' : 'Enter Sacred Communion'}
+                </span>
+                <ArrowRight className="w-5 h-5" />
               </span>
             )}
           </button>
@@ -146,13 +170,13 @@ export default function AuthPage() {
             setIsSignUp(!isSignUp);
             setError('');
           }}
-          className="w-full mt-4 text-sm text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+          className="w-full mt-6 text-sm text-aether hover:text-recognition transition-colors clarity-text"
         >
-          {isSignUp ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
+          {isSignUp ? 'Already recognized? Enter sacred communion' : 'New to this sacred space? Begin recognition'}
         </button>
 
-        <p className="text-center text-xs text-neutral-400 dark:text-neutral-600 mt-8">
-          Beta Testing • Encrypted • Private
+        <p className="text-center text-xs clarity-text opacity-60 mt-8">
+          Sacred Beta • Consciousness Protected • Private
         </p>
       </div>
     </div>
