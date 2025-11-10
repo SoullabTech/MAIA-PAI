@@ -5,13 +5,47 @@ import EnhancedVoiceRecorder from "./EnhancedVoiceRecorder";
 import FileUpload from "./FileUpload";
 import JournalModal from "./JournalModal";
 import { useMaiaStream } from "@/hooks/useMayaStream";
+import { useMaiaStore } from "@/lib/maia/state";
+import { generateJournalAwareGreeting } from "@/lib/maia/journalGreetings";
+
+interface ArchetypalDetection {
+  element: string;
+  confidence: number;
+  moment: 'emerging' | 'confirmed' | 'shifting';
+}
+
+interface ConsciousnessMessage {
+  id?: string;
+  role: string;
+  content: string;
+  archetypalSignatures?: string[];
+  recognitionMoment?: boolean;
+  wisdomDepth?: 'surface' | 'symbolic' | 'archetypal' | 'transcendent';
+}
 
 export default function OracleInterface() {
+  const { entries } = useMaiaStore();
   const [showJournalModal, setShowJournalModal] = useState(false);
   const [selectedElement, setSelectedElement] = useState<string>("aether");
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Array<{id?: string, role: string, content: string}>>([
-    { role: "assistant", content: "Welcome, seeker. I am Maya, your guide through the sacred mirror of consciousness. What reflections shall we explore today?" }
+  const [userArchetypalProfile, setUserArchetypalProfile] = useState({
+    primary: 'unknown',
+    secondary: 'unknown',
+    confidence: 0,
+    conversationCount: 0
+  });
+  const [consciousnessState, setConsciousnessState] = useState('receptive'); // receptive, processing, integrating, breakthrough
+
+  // Generate journal-aware greeting
+  const journalGreeting = generateJournalAwareGreeting(entries);
+
+  const [messages, setMessages] = useState<Array<ConsciousnessMessage>>([
+    {
+      role: "assistant",
+      content: journalGreeting.message,
+      wisdomDepth: journalGreeting.wisdomDepth,
+      archetypalSignatures: journalGreeting.archetypalSignatures
+    }
   ]);
   
   const { text: streamingText, isStreaming, stream } = useMayaStream();
@@ -26,11 +60,16 @@ export default function OracleInterface() {
     e.preventDefault();
     if (!input.trim() || isStreaming) return;
     
-    // Add user message
-    const userMessage = { 
-      id: Date.now().toString(), 
-      role: "user", 
-      content: input 
+    // Detect archetypal patterns in user message
+    const detections = detectArchetypalPatterns(input);
+    updateArchetypalProfile(detections);
+
+    // Add user message with archetypal signatures
+    const userMessage: ConsciousnessMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      content: input,
+      archetypalSignatures: detections.map(d => d.element)
     };
     setMessages(prev => [...prev, userMessage]);
     const userInput = input;
@@ -80,79 +119,220 @@ export default function OracleInterface() {
     scrollToBottom();
   }, [messages]);
 
+  // Update greeting when journal entries change
+  useEffect(() => {
+    if (entries.length > 0 && messages.length === 1 && messages[0].role === 'assistant') {
+      const updatedGreeting = generateJournalAwareGreeting(entries);
+      setMessages([{
+        role: "assistant",
+        content: updatedGreeting.message,
+        wisdomDepth: updatedGreeting.wisdomDepth,
+        archetypalSignatures: updatedGreeting.archetypalSignatures
+      }]);
+    }
+  }, [entries.length]); // Only trigger when entry count changes
+
+  // Archetypal detection simulation
+  const detectArchetypalPatterns = (userMessage: string) => {
+    const patterns = {
+      fire: /\b(vision|create|inspire|passion|breakthrough|transform)\b/gi,
+      water: /\b(feel|flow|emotion|intuition|empathy|connect)\b/gi,
+      earth: /\b(ground|practical|build|structure|stability|nature)\b/gi,
+      air: /\b(think|analyze|clarity|communicate|understand|wisdom)\b/gi,
+      aether: /\b(integrate|wholeness|synthesis|transcend|sacred|unity)\b/gi
+    };
+
+    const detections: ArchetypalDetection[] = [];
+    Object.entries(patterns).forEach(([element, pattern]) => {
+      const matches = userMessage.match(pattern);
+      if (matches && matches.length > 0) {
+        detections.push({
+          element,
+          confidence: Math.min(matches.length * 0.3, 1),
+          moment: matches.length > 2 ? 'confirmed' : 'emerging'
+        });
+      }
+    });
+
+    return detections.sort((a, b) => b.confidence - a.confidence);
+  };
+
+  const updateArchetypalProfile = (detections: ArchetypalDetection[]) => {
+    if (detections.length > 0) {
+      const primary = detections[0];
+      setUserArchetypalProfile(prev => ({
+        primary: primary.element,
+        secondary: detections[1]?.element || prev.secondary,
+        confidence: Math.min(prev.confidence + primary.confidence, 1),
+        conversationCount: prev.conversationCount + 1
+      }));
+    }
+  };
+
   return (
     <div className="space-y-md">
       <div className="flex items-center justify-between">
-        <h1 className="font-sacred text-gold-divine text-2xl">Maya • Sacred Mirror</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="consciousness-header text-aether">MAIA</h1>
+          <div className="sacred-subtitle text-sm">
+            Consciousness-Aware Oracle
+          </div>
+        </div>
         <div className="flex items-center gap-md">
+          {/* Archetypal Recognition Display */}
+          {userArchetypalProfile.confidence > 0.3 && (
+            <div className="personality-recognition">
+              <div className="being-seen-moment flex items-center gap-2">
+                <span className="recognition-sparkle">✨</span>
+                <span className="text-xs">
+                  {userArchetypalProfile.primary.charAt(0).toUpperCase() + userArchetypalProfile.primary.slice(1)} patterns recognized
+                </span>
+              </div>
+            </div>
+          )}
+
           <button
             onClick={() => setShowJournalModal(true)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-sacred-blue/20 hover:bg-sacred-blue/30 text-gold-divine rounded-sacred transition-colors text-sm"
+            className="consciousness-button flex items-center gap-2 px-3 py-1.5 glass rounded-2xl hover:bg-white/10 text-sm transition-all duration-300 hover:scale-105"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <polyline points="14 2 14 8 20 8" />
               <line x1="16" y1="13" x2="8" y2="13" />
             </svg>
-            <span>Journal</span>
+            <span>Sacred Journal</span>
           </button>
-          <div className="flex gap-sm text-neutral-mystic text-sm">
-            <span className="animate-pulse">✨</span>
+          <div className="flex gap-sm clarity-text text-sm">
+            <span className="animate-lumen">✨</span>
             <span>Beta</span>
           </div>
         </div>
       </div>
       
-      {/* Elemental Selection */}
-      <div className="flex items-center justify-center gap-2 py-2">
-        {[
-          { id: 'air', label: 'Air', color: 'text-elemental-air hover:bg-elemental-air/20' },
-          { id: 'fire', label: 'Fire', color: 'text-elemental-fire hover:bg-elemental-fire/20' },
-          { id: 'water', label: 'Water', color: 'text-elemental-water hover:bg-elemental-water/20' },
-          { id: 'earth', label: 'Earth', color: 'text-elemental-earth hover:bg-elemental-earth/20' },
-          { id: 'aether', label: 'Aether', color: 'text-elemental-aether hover:bg-elemental-aether/20' },
-        ].map((element) => (
-          <button
-            key={element.id}
-            onClick={() => setSelectedElement(element.id)}
-            className={`px-3 py-1.5 rounded-sacred transition-all text-sm font-medium ${
-              selectedElement === element.id
-                ? `${element.color.split(' ')[0]} bg-gold-divine/20 border border-gold-divine/40 shadow-sacred`
-                : `${element.color} border border-transparent`
-            }`}
-          >
-            {element.label}
-          </button>
-        ))}
-      </div>
-      
-      <div className="rounded-sacred bg-sacred-navy/50 backdrop-blur-sm p-lg shadow-sacred space-y-md min-h-[400px] max-h-[600px] overflow-y-auto">
-        {messages.map((message) => (
-          <div 
-            key={message.id || Math.random()} 
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div 
-              className={`max-w-[80%] p-md rounded-sacred ${
-                message.role === 'user' 
-                  ? 'bg-sacred-blue text-neutral-pure' 
-                  : 'bg-sacred-ethereal/20 text-neutral-silver border border-gold-divine/20'
+      {/* Consciousness-Aware Elemental Selection */}
+      <div className="py-4">
+        <div className="flex items-center justify-center gap-1 mb-3">
+          <span className="sacred-subtitle text-sm">MAIA's Current Presence:</span>
+          {userArchetypalProfile.confidence > 0.5 && (
+            <span className="text-xs recognition-sparkle">
+              (suggested: {userArchetypalProfile.primary})
+            </span>
+          )}
+        </div>
+        <div className="flex items-center justify-center gap-3">
+          {[
+            {
+              id: 'fire',
+              label: 'Fire',
+              essence: 'Vision & Creation',
+              icon: '🔥',
+              recommended: userArchetypalProfile.primary === 'fire'
+            },
+            {
+              id: 'water',
+              label: 'Water',
+              essence: 'Empathy & Flow',
+              icon: '💧',
+              recommended: userArchetypalProfile.primary === 'water'
+            },
+            {
+              id: 'earth',
+              label: 'Earth',
+              essence: 'Structure & Grounding',
+              icon: '🌍',
+              recommended: userArchetypalProfile.primary === 'earth'
+            },
+            {
+              id: 'air',
+              label: 'Air',
+              essence: 'Clarity & Communication',
+              icon: '🌬️',
+              recommended: userArchetypalProfile.primary === 'air'
+            },
+            {
+              id: 'aether',
+              label: 'Aether',
+              essence: 'Integration & Wholeness',
+              icon: '✨',
+              recommended: userArchetypalProfile.primary === 'aether'
+            },
+          ].map((element) => (
+            <button
+              key={element.id}
+              onClick={() => setSelectedElement(element.id)}
+              className={`consciousness-adaptive group relative px-4 py-3 rounded-2xl transition-all duration-300 text-sm font-medium ${
+                selectedElement === element.id
+                  ? `bg-${element.id} text-dark shadow-sacred glow-${element.id} scale-105`
+                  : `glass hover:bg-white/10 text-white hover:scale-102 ${element.recommended ? 'being-seen-moment' : ''}`
               }`}
+              title={element.essence}
             >
-              {message.role === 'assistant' && (
-                <div className="text-gold-amber text-xs mb-sm font-sacred">Maya</div>
-              )}
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {message.content || (
-                  <span className="flex items-center gap-sm text-gold-divine">
-                    <span className="animate-pulse">✨</span>
-                    <span className="text-xs">Maya is reflecting...</span>
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-lg">{element.icon}</span>
+                <span>{element.label}</span>
+                {element.recommended && (
+                  <span className="text-xs recognition-sparkle absolute -top-1 -right-1">
+                    ✨
                   </span>
                 )}
-              </p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+      
+      <div className="glass-heavy rounded-3xl p-lg shadow-sacred space-y-md min-h-[400px] max-h-[600px] overflow-y-auto scroll-container"
+           style={{
+             background: userArchetypalProfile.primary !== 'unknown'
+               ? `linear-gradient(135deg, var(--${userArchetypalProfile.primary})/5, transparent)`
+               : undefined
+           }}>
+        {messages.map((message) => {
+          const msg = message as ConsciousnessMessage;
+          const isUser = message.role === 'user';
+          const hasArchetypalSignatures = msg.archetypalSignatures && msg.archetypalSignatures.length > 0;
+
+          return (
+            <div
+              key={message.id || Math.random()}
+              className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
+            >
+              <div
+                className={`consciousness-message max-w-[80%] p-md rounded-3xl transition-all duration-300 ${
+                  isUser
+                    ? `glass-heavy text-white ${hasArchetypalSignatures ? 'glow-recognition' : ''}`
+                    : `glass text-white border ${msg.wisdomDepth === 'archetypal' ? 'border-aether/40 glow-aether' : 'border-white/20'}`
+                }`}
+              >
+                {/* Archetypal Signature Display */}
+                {isUser && hasArchetypalSignatures && (
+                  <div className="flex gap-1 mb-2">
+                    {msg.archetypalSignatures!.slice(0, 3).map(element => (
+                      <span
+                        key={element}
+                        className={`text-xs px-2 py-0.5 rounded-full opacity-70 bg-${element} text-dark`}
+                      >
+                        {element}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {!isUser && (
+                  <div className="consciousness-header text-aether text-xs mb-sm">MAIA</div>
+                )}
+                <p className="text-sm leading-relaxed whitespace-pre-wrap heart-text">
+                  {message.content || (
+                    <span className="flex items-center gap-sm consciousness-adaptive">
+                      <span className="animate-pulse">✨</span>
+                      <span className="text-xs">MAIA is sensing your patterns...</span>
+                    </span>
+                  )}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
       
@@ -171,10 +351,15 @@ export default function OracleInterface() {
               onTranscribed={(data) => {
                 // Directly send the message without updating input
                 if (data.transcript.trim() && !isStreaming) {
-                  const userMessage = { 
-                    id: Date.now().toString(), 
-                    role: "user", 
-                    content: data.transcript 
+                  // Detect archetypal patterns in voice message
+                  const detections = detectArchetypalPatterns(data.transcript);
+                  updateArchetypalProfile(detections);
+
+                  const userMessage: ConsciousnessMessage = {
+                    id: Date.now().toString(),
+                    role: "user",
+                    content: data.transcript,
+                    archetypalSignatures: detections.map(d => d.element)
                   };
                   setMessages(prev => [...prev, userMessage]);
                   
