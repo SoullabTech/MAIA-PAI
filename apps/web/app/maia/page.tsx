@@ -21,7 +21,9 @@ import SoulprintSnapshot from '@/components/maia/SoulprintSnapshot';
 import SoulprintDashboard from '@/components/maia/SoulprintDashboard';
 
 export default function MaiaPage() {
-  const { currentView, setView, entries } = useMaiaStore();
+  const { currentView, setView, entries, selectedMode, isVoiceMode } = useMaiaStore();
+
+  console.log('🎯 [MAIA PAGE] Rendering with currentView:', currentView, 'selectedMode:', selectedMode);
   const [userId] = useState('demo-user');
   const [showHelp, setShowHelp] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -57,46 +59,39 @@ export default function MaiaPage() {
   }, [isDemoMode, entries.length]);
 
   const renderView = () => {
+    console.log('🎯 [RENDER VIEW] Switching on currentView:', currentView, 'isVoiceMode:', isVoiceMode);
     switch (currentView) {
       case 'mode-select':
+        console.log('🎯 [RENDER VIEW] Rendering ModeSelection');
         return <ModeSelection />;
       case 'journal-entry':
-        return useVoiceMode ? <VoiceJournaling /> : <JournalEntry />;
+        console.log('🎯 [RENDER VIEW] Rendering JournalEntry');
+        return <JournalEntry />;
+      case 'voice-journal':
+        console.log('🎯 [RENDER VIEW] Rendering VoiceJournaling');
+        return <VoiceJournaling />;
       case 'reflection':
+        console.log('🎯 [RENDER VIEW] Rendering MaiaReflection');
         return <MaiaReflection />;
       case 'timeline':
+        console.log('🎯 [RENDER VIEW] Rendering TimelineView');
         return <TimelineView />;
       case 'search':
+        console.log('🎯 [RENDER VIEW] Rendering SemanticSearch');
         return <SemanticSearch />;
       default:
+        console.log('🎯 [RENDER VIEW] Default case - rendering ModeSelection');
         return <ModeSelection />;
     }
   };
 
   return (
     <SoulfulAppShell userId={userId}>
-      <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-amber-50 dark:from-[#0A0E27] dark:via-[#0E1428] dark:to-[#1A1F3A]">
-        <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#0A0E27]/80 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800">
-          <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="min-h-screen bg-gradient-to-br from-jade-abyss via-jade-shadow to-jade-night">
+        <div className="max-w-4xl mx-auto px-6 py-6">
+          {/* Consciousness Header Info */}
+          <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <motion.div
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  className="w-10 h-10 rounded-full bg-gradient-to-br from-[#FFD700] via-amber-500 to-orange-500 flex items-center justify-center"
-                >
-                  <Sparkles className="w-5 h-5 text-[#0A0E27]" />
-                </motion.div>
-                <div>
-                  <h1 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
-                    MAIA Journal
-                  </h1>
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                    Your sacred space for reflection
-                  </p>
-                </div>
-              </div>
-
               {entries.length > 0 && (
                 <div className="hidden md:block">
                   <CoherencePulse />
@@ -108,9 +103,9 @@ export default function MaiaPage() {
               <button
                 onClick={() => setView('mode-select')}
                 className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-all ${
-                  currentView === 'mode-select' || currentView === 'journal-entry' || currentView === 'reflection'
-                    ? 'bg-[#FFD700] text-[#0A0E27] font-medium'
-                    : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                  currentView === 'mode-select' || currentView === 'journal-entry' || currentView === 'voice-journal' || currentView === 'reflection'
+                    ? 'bg-jade-jade text-jade-abyss font-medium shadow-lg shadow-jade-jade/25'
+                    : 'text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage'
                 }`}
               >
                 <BookOpen className="w-4 h-4" />
@@ -122,8 +117,8 @@ export default function MaiaPage() {
                   onClick={() => setView('timeline')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-all ${
                     currentView === 'timeline'
-                      ? 'bg-[#FFD700] text-[#0A0E27] font-medium'
-                      : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                      ? 'bg-jade-jade text-jade-abyss font-medium shadow-lg shadow-jade-jade/25'
+                      : 'text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage'
                   }`}
                 >
                   <Clock className="w-4 h-4" />
@@ -136,8 +131,8 @@ export default function MaiaPage() {
                   onClick={() => setView('search')}
                   className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-all ${
                     currentView === 'search'
-                      ? 'bg-[#FFD700] text-[#0A0E27] font-medium'
-                      : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                      ? 'bg-jade-jade text-jade-abyss font-medium shadow-lg shadow-jade-jade/25'
+                      : 'text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage'
                   }`}
                 >
                   <Search className="w-4 h-4" />
@@ -148,7 +143,7 @@ export default function MaiaPage() {
               {entries.length > 0 && (
                 <button
                   onClick={() => setShowSoulprint(!showSoulprint)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all"
+                  className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
                   title="Soulprint"
                 >
                   <Sparkles className="w-4 h-4" />
@@ -157,7 +152,7 @@ export default function MaiaPage() {
 
               <button
                 onClick={() => setShowAnalytics(!showAnalytics)}
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all"
+                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
                 title="Analytics"
               >
                 <BarChart3 className="w-4 h-4" />
@@ -165,7 +160,7 @@ export default function MaiaPage() {
 
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all"
+                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
                 title="Settings"
               >
                 <SettingsIcon className="w-4 h-4" />
@@ -173,16 +168,15 @@ export default function MaiaPage() {
 
               <button
                 onClick={() => setShowHelp(!showHelp)}
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all"
+                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
                 title="Help"
               >
                 <HelpCircle className="w-4 h-4" />
               </button>
             </nav>
           </div>
-        </header>
 
-        <main className="py-8">
+          <main className="py-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentView}
@@ -286,7 +280,7 @@ export default function MaiaPage() {
 
                 <button
                   onClick={() => setShowHelp(false)}
-                  className="mt-6 w-full py-3 bg-[#FFD700] text-[#0A0E27] rounded-full font-semibold hover:shadow-lg hover:shadow-[#FFD700]/25 transition-all"
+                  className="mt-6 w-full py-3 bg-jade-jade text-jade-abyss rounded-full font-semibold hover:shadow-lg hover:shadow-jade-jade/25 transition-all"
                 >
                   Got it
                 </button>
@@ -358,6 +352,7 @@ export default function MaiaPage() {
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </div>
     </SoulfulAppShell>
   );

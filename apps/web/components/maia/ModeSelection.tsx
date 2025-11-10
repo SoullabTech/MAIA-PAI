@@ -1,86 +1,453 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useCallback, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Mic, Edit3 } from 'lucide-react';
 import { Copy } from '@/lib/copy/MaiaCopy';
 import { JournalingMode, JOURNALING_MODE_DESCRIPTIONS } from '@/lib/journaling/JournalingPrompts';
 import { useMaiaStore } from '@/lib/maia/state';
+import ConsciousnessVessel from '@/components/consciousness/ConsciousnessVessel';
+import ConsciousnessRipple from '@/components/consciousness/ConsciousnessRipple';
+import NeuralFireSystem from '@/components/consciousness/NeuralFireSystem';
 
 export default function ModeSelection() {
+  console.log('🌸 ModeSelection component mounting...');
   const setMode = useMaiaStore((state) => state.setMode);
+  const [consciousnessRipples, setConsciousnessRipples] = useState<{
+    id: string;
+    x: number;
+    y: number;
+    variant: 'jade' | 'neural' | 'mystical' | 'transcendent';
+    timestamp: number;
+  }[]>([]);
+  const [voiceModePreferences, setVoiceModePreferences] = useState<Record<JournalingMode, boolean>>({
+    free: false,
+    direction: false,
+    dream: false,
+    emotional: false,
+    shadow: false
+  });
+  const [isVoiceSupported, setIsVoiceSupported] = useState(false);
 
-  const modes: JournalingMode[] = ['free', 'dream', 'emotional', 'shadow', 'direction'];
+  // Reorganized for better visual balance: 2 primary gateways on top, 3 exploration gateways below
+  const firstRowModes: JournalingMode[] = ['free', 'direction'];
+  const secondRowModes: JournalingMode[] = ['dream', 'emotional', 'shadow'];
+
+  // Voice support detection
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      setIsVoiceSupported(!!SpeechRecognition);
+    }
+  }, []);
+
+  // Toggle voice preference for a specific mode
+  const toggleVoicePreference = useCallback((mode: JournalingMode, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent gateway click
+    setVoiceModePreferences(prev => ({
+      ...prev,
+      [mode]: !prev[mode]
+    }));
+  }, []);
+
+  // Create consciousness ripples for mode selection
+  const createConsciousnessRipple = useCallback((x: number, y: number, mode: JournalingMode) => {
+    const variant = mode === 'shadow' ? 'neural' :
+                   mode === 'dream' ? 'mystical' :
+                   mode === 'direction' ? 'transcendent' :
+                   'jade';
+
+    const ripple = {
+      id: `mode-${Date.now()}-${Math.random()}`,
+      x,
+      y,
+      variant,
+      timestamp: Date.now()
+    };
+
+    setConsciousnessRipples(prev => [...prev, ripple]);
+
+    setTimeout(() => {
+      setConsciousnessRipples(prev => prev.filter(r => r.id !== ripple.id));
+    }, 2500);
+  }, []);
+
+  // Handle consciousness gateway selection
+  const handleGatewayClick = useCallback((mode: JournalingMode, e: React.MouseEvent<HTMLDivElement>) => {
+    console.log('Consciousness Gateway Clicked:', mode, 'Voice mode:', voiceModePreferences[mode]);
+    const rect = e.currentTarget.getBoundingClientRect();
+    createConsciousnessRipple(rect.left + rect.width/2, rect.top + rect.height/2, mode);
+
+    // Set mode with voice preference
+    setTimeout(() => setMode(mode, voiceModePreferences[mode]), 300);
+  }, [voiceModePreferences, createConsciousnessRipple, setMode]);
+
+  // Get mode-specific vessel variant
+  const getModeVariant = (mode: JournalingMode) => {
+    switch (mode) {
+      case 'free': return 'jade';
+      case 'shadow': return 'neural';
+      case 'dream': return 'mystical';
+      case 'emotional': return 'jade';
+      case 'direction': return 'transcendent';
+      default: return 'jade';
+    }
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-4xl mx-auto p-6"
-    >
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-8"
-      >
-        <h2 className="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
-          {Copy.introPrompt}
-        </h2>
-        <p className="text-neutral-600 dark:text-neutral-400">
-          Choose a journaling mode to begin
-        </p>
-      </motion.div>
+    <>
+      {/* Neural Fire Background */}
+      <NeuralFireSystem
+        isActive={true}
+        density="moderate"
+        firingRate="slow"
+        variant="jade"
+        className="fixed inset-0 z-0 opacity-20"
+      />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {modes.map((mode, index) => {
-          const modeInfo = JOURNALING_MODE_DESCRIPTIONS[mode];
-          return (
-            <motion.button
-              key={mode}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              onClick={() => setMode(mode)}
-              className="group relative p-6 rounded-2xl bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 hover:border-[#FFD700] dark:hover:border-[#FFD700] transition-all hover:shadow-lg hover:shadow-[#FFD700]/10 text-left"
-            >
-              <div className="flex items-start gap-4">
-                <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="text-4xl"
-                >
-                  {modeInfo.icon}
-                </motion.div>
+      {/* Main Content */}
+      <div className="relative z-10 min-h-screen bg-gradient-to-br from-jade-abyss via-jade-shadow to-jade-night">
+        {/* Atmospheric Background */}
+        <div className="absolute inset-0 bg-gradient-radial from-jade-forest/5 via-transparent to-jade-abyss/30" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_center,_var(--tw-gradient-stops))] from-jade-copper/5 via-transparent to-transparent" />
 
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2 group-hover:text-[#FFD700] transition-colors">
-                    {modeInfo.name}
-                  </h3>
-                  <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">
-                    {modeInfo.description}
-                  </p>
-                  <p className="text-xs italic text-neutral-500 dark:text-neutral-500">
-                    "{modeInfo.prompt}"
-                  </p>
-                </div>
+        <div className="relative z-10 max-w-6xl mx-auto p-8">
+          {/* Sacred Header */}
+          <div className="text-center mb-12">
+            <div className="relative mb-8">
+              <div className="absolute inset-0 bg-gradient-to-br from-jade-copper/20 to-jade-shadow/40 rounded-2xl backdrop-blur-sm" />
+              <div className="absolute inset-0 border border-jade-sage/30 rounded-2xl" />
+
+              <div className="relative p-8">
+                <h2 className="text-4xl font-light text-jade-light mb-4 tracking-wide">
+                  Sacred Consciousness Portal
+                </h2>
+                <p className="text-jade-mineral font-light text-lg">
+                  Choose your mode of inner exploration
+                </p>
               </div>
+            </div>
+          </div>
 
-              <motion.div
-                initial={{ width: 0 }}
-                whileHover={{ width: '100%' }}
-                className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-[#FFD700] to-amber-500"
-              />
-            </motion.button>
-          );
-        })}
+          {/* First Row - Two Primary Consciousness Gateways */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
+            {firstRowModes.map((mode, index) => {
+              const modeInfo = JOURNALING_MODE_DESCRIPTIONS[mode];
+              return (
+                <div key={mode} className="h-full">
+                  <ConsciousnessVessel
+                    title={modeInfo.name}
+                    subtitle={voiceModePreferences[mode] ? "voice gateway" : "consciousness gateway"}
+                    variant={getModeVariant(mode)}
+                    depth="profound"
+                    size="large"
+                    onClick={(e) => handleGatewayClick(mode, e)}
+                    className="cursor-pointer transition-all duration-500 hover:scale-105 h-full"
+                  >
+                    <div className="text-center space-y-4">
+                      {/* Sacred Flower of Life */}
+                      <div className="relative w-16 h-16 mx-auto mb-4">
+                        <svg
+                          className="w-full h-full"
+                          viewBox="0 0 64 64"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          {/* Background circle */}
+                          <circle
+                            cx="32"
+                            cy="32"
+                            r="30"
+                            fill={`url(#flowerGradient-${mode})`}
+                            stroke="rgba(168,203,180,0.6)"
+                            strokeWidth="1"
+                            className="backdrop-blur-sm"
+                          />
+
+                          {/* Flower of Life Pattern - 7 circles in sacred formation */}
+                          {/* Center circle */}
+                          <motion.circle
+                            cx="32"
+                            cy="32"
+                            r="8"
+                            fill="none"
+                            stroke="rgba(168,203,180,0.9)"
+                            strokeWidth="1.5"
+                            initial={{ pathLength: 0, opacity: 0 }}
+                            animate={{ pathLength: 1, opacity: 1 }}
+                            transition={{ duration: 2, ease: "easeInOut" }}
+                          />
+
+                          {/* Surrounding 6 circles */}
+                          {Array.from({ length: 6 }).map((_, i) => {
+                            const angle = (i * 60) * (Math.PI / 180);
+                            const radius = 10;
+                            const x = 32 + Math.cos(angle) * radius;
+                            const y = 32 + Math.sin(angle) * radius;
+                            return (
+                              <motion.circle
+                                key={i}
+                                cx={x}
+                                cy={y}
+                                r="8"
+                                fill="none"
+                                stroke="rgba(168,203,180,0.8)"
+                                strokeWidth="1.2"
+                                initial={{ pathLength: 0, opacity: 0 }}
+                                animate={{ pathLength: 1, opacity: 1 }}
+                                transition={{
+                                  duration: 2,
+                                  delay: i * 0.2,
+                                  ease: "easeInOut"
+                                }}
+                              />
+                            );
+                          })}
+
+                          {/* Sacred center dot */}
+                          <motion.circle
+                            cx="32"
+                            cy="32"
+                            r="2.5"
+                            fill="rgba(168,203,180,1)"
+                            animate={{ opacity: [0.7, 1, 0.7] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                          />
+
+                          {/* Gradient definition */}
+                          <defs>
+                            <radialGradient id={`flowerGradient-${mode}`} cx="50%" cy="50%" r="50%">
+                              <stop offset="0%" stopColor="rgba(168,203,180,0.1)" />
+                              <stop offset="70%" stopColor="rgba(111,143,118,0.2)" />
+                              <stop offset="100%" stopColor="rgba(31,58,42,0.3)" />
+                            </radialGradient>
+                          </defs>
+                        </svg>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="text-xs text-jade-mineral uppercase tracking-wide">Sacred Path</div>
+                        <div className="text-sm text-jade-sage leading-relaxed px-2">
+                          {modeInfo.description}
+                        </div>
+                        <div className="text-xs italic text-jade-copper/80 px-3 py-2 rounded bg-jade-shadow/20 border border-jade-sage/20">
+                          "{modeInfo.prompt}"
+                        </div>
+
+                        {/* Voice Mode Toggle */}
+                        {isVoiceSupported && (
+                          <div className="pt-3 border-t border-jade-sage/20">
+                            <div className="flex items-center justify-center gap-3">
+                              <motion.button
+                                onClick={(e) => toggleVoicePreference(mode, e)}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 ${
+                                  voiceModePreferences[mode]
+                                    ? 'bg-jade-jade/30 border border-jade-jade/50 shadow-sm'
+                                    : 'bg-jade-shadow/20 border border-jade-sage/30'
+                                }`}
+                              >
+                                <div className="flex items-center gap-1.5">
+                                  {voiceModePreferences[mode] ? (
+                                    <Mic className="w-3 h-3 text-jade-jade" />
+                                  ) : (
+                                    <Edit3 className="w-3 h-3 text-jade-sage" />
+                                  )}
+                                  <span className={`text-xs font-light ${
+                                    voiceModePreferences[mode] ? 'text-jade-jade' : 'text-jade-sage'
+                                  }`}>
+                                    {voiceModePreferences[mode] ? 'Voice' : 'Text'}
+                                  </span>
+                                </div>
+                              </motion.button>
+                            </div>
+                            <div className="text-center mt-2">
+                              <span className="text-xs text-jade-mineral/60">
+                                {voiceModePreferences[mode] ? 'Speak your truth' : 'Write your thoughts'}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </ConsciousnessVessel>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Second Row - Three Exploration Consciousness Gateways */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {secondRowModes.map((mode, index) => {
+              const modeInfo = JOURNALING_MODE_DESCRIPTIONS[mode];
+              return (
+                <div key={mode} className="h-full">
+                  <ConsciousnessVessel
+                    title={modeInfo.name}
+                    subtitle={voiceModePreferences[mode] ? "voice gateway" : "consciousness gateway"}
+                    variant={getModeVariant(mode)}
+                    depth="profound"
+                    size="large"
+                    onClick={(e) => handleGatewayClick(mode, e)}
+                    className="cursor-pointer transition-all duration-500 hover:scale-105 h-full"
+                  >
+                    <div className="text-center space-y-4">
+                      {/* Sacred Flower of Life */}
+                      <div className="relative w-16 h-16 mx-auto mb-4">
+                        <svg
+                          className="w-full h-full"
+                          viewBox="0 0 64 64"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          {/* Background circle */}
+                          <circle
+                            cx="32"
+                            cy="32"
+                            r="30"
+                            fill={`url(#flowerGradient-${mode})`}
+                            stroke="rgba(168,203,180,0.6)"
+                            strokeWidth="1"
+                            className="backdrop-blur-sm"
+                          />
+
+                          {/* Flower of Life Pattern - 7 circles in sacred formation */}
+                          {/* Center circle */}
+                          <motion.circle
+                            cx="32"
+                            cy="32"
+                            r="8"
+                            fill="none"
+                            stroke="rgba(168,203,180,0.9)"
+                            strokeWidth="1.5"
+                            initial={{ pathLength: 0, opacity: 0 }}
+                            animate={{ pathLength: 1, opacity: 1 }}
+                            transition={{ duration: 2, ease: "easeInOut" }}
+                          />
+
+                          {/* Surrounding 6 circles */}
+                          {Array.from({ length: 6 }).map((_, i) => {
+                            const angle = (i * 60) * (Math.PI / 180);
+                            const radius = 10;
+                            const x = 32 + Math.cos(angle) * radius;
+                            const y = 32 + Math.sin(angle) * radius;
+                            return (
+                              <motion.circle
+                                key={i}
+                                cx={x}
+                                cy={y}
+                                r="8"
+                                fill="none"
+                                stroke="rgba(168,203,180,0.8)"
+                                strokeWidth="1.2"
+                                initial={{ pathLength: 0, opacity: 0 }}
+                                animate={{ pathLength: 1, opacity: 1 }}
+                                transition={{
+                                  duration: 2,
+                                  delay: i * 0.2,
+                                  ease: "easeInOut"
+                                }}
+                              />
+                            );
+                          })}
+
+                          {/* Sacred center dot */}
+                          <motion.circle
+                            cx="32"
+                            cy="32"
+                            r="2.5"
+                            fill="rgba(168,203,180,1)"
+                            animate={{ opacity: [0.7, 1, 0.7] }}
+                            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                          />
+
+                          {/* Gradient definition */}
+                          <defs>
+                            <radialGradient id={`flowerGradient-${mode}`} cx="50%" cy="50%" r="50%">
+                              <stop offset="0%" stopColor="rgba(168,203,180,0.1)" />
+                              <stop offset="70%" stopColor="rgba(111,143,118,0.2)" />
+                              <stop offset="100%" stopColor="rgba(31,58,42,0.3)" />
+                            </radialGradient>
+                          </defs>
+                        </svg>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="text-xs text-jade-mineral uppercase tracking-wide">Sacred Path</div>
+                        <div className="text-sm text-jade-sage leading-relaxed px-2">
+                          {modeInfo.description}
+                        </div>
+                        <div className="text-xs italic text-jade-copper/80 px-3 py-2 rounded bg-jade-shadow/20 border border-jade-sage/20">
+                          "{modeInfo.prompt}"
+                        </div>
+
+                        {/* Voice Mode Toggle */}
+                        {isVoiceSupported && (
+                          <div className="pt-3 border-t border-jade-sage/20">
+                            <div className="flex items-center justify-center gap-3">
+                              <motion.button
+                                onClick={(e) => toggleVoicePreference(mode, e)}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 ${
+                                  voiceModePreferences[mode]
+                                    ? 'bg-jade-jade/30 border border-jade-jade/50 shadow-sm'
+                                    : 'bg-jade-shadow/20 border border-jade-sage/30'
+                                }`}
+                              >
+                                <div className="flex items-center gap-1.5">
+                                  {voiceModePreferences[mode] ? (
+                                    <Mic className="w-3 h-3 text-jade-jade" />
+                                  ) : (
+                                    <Edit3 className="w-3 h-3 text-jade-sage" />
+                                  )}
+                                  <span className={`text-xs font-light ${
+                                    voiceModePreferences[mode] ? 'text-jade-jade' : 'text-jade-sage'
+                                  }`}>
+                                    {voiceModePreferences[mode] ? 'Voice' : 'Text'}
+                                  </span>
+                                </div>
+                              </motion.button>
+                            </div>
+                            <div className="text-center mt-2">
+                              <span className="text-xs text-jade-mineral/60">
+                                {voiceModePreferences[mode] ? 'Speak your truth' : 'Write your thoughts'}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </ConsciousnessVessel>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Sacred Footer */}
+          <div className="text-center">
+            <div className="relative">
+              <div className="absolute inset-0 bg-jade-shadow/20 rounded-xl backdrop-blur-sm" />
+              <div className="relative px-6 py-4">
+                <p className="text-jade-mineral font-light italic">
+                  Your words are private and sacred. MAIA witnesses with reverence.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="mt-8 text-center text-xs text-neutral-500 dark:text-neutral-600"
-      >
-        Your words are private and sacred. MAIA reflects, never judges.
-      </motion.div>
-    </motion.div>
+      {/* Consciousness Ripples */}
+      <AnimatePresence>
+        {consciousnessRipples.map(ripple => (
+          <div key={ripple.id} className="fixed inset-0 pointer-events-none z-50">
+            <ConsciousnessRipple
+              x={ripple.x}
+              y={ripple.y}
+              variant={ripple.variant}
+              intensity="profound"
+            />
+          </div>
+        ))}
+      </AnimatePresence>
+    </>
   );
 }

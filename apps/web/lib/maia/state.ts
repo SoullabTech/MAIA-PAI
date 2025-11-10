@@ -15,19 +15,21 @@ export interface JournalEntry {
 }
 
 export interface MaiaState {
-  currentView: 'mode-select' | 'journal-entry' | 'reflection' | 'timeline' | 'search';
+  currentView: 'mode-select' | 'journal-entry' | 'voice-journal' | 'reflection' | 'timeline' | 'search';
   selectedMode: JournalingMode | null;
   currentEntry: string;
   entries: JournalEntry[];
   isProcessing: boolean;
   searchQuery: string;
+  isVoiceMode: boolean;
 
   setView: (view: MaiaState['currentView']) => void;
-  setMode: (mode: JournalingMode) => void;
+  setMode: (mode: JournalingMode, isVoice?: boolean) => void;
   setEntry: (content: string) => void;
   addEntry: (entry: JournalEntry) => void;
   setProcessing: (processing: boolean) => void;
   setSearchQuery: (query: string) => void;
+  setVoiceMode: (isVoice: boolean) => void;
   resetEntry: () => void;
 }
 
@@ -40,9 +42,15 @@ export const useMaiaStore = create<MaiaState>()(
       entries: [],
       isProcessing: false,
       searchQuery: '',
+      isVoiceMode: false,
 
       setView: (view) => set({ currentView: view }),
-      setMode: (mode) => set({ selectedMode: mode, currentView: 'journal-entry' }),
+      setMode: (mode, isVoice = false) => {
+        console.log('🔥 [MAIA STATE] setMode called with:', mode, 'isVoice:', isVoice);
+        const targetView = isVoice ? 'voice-journal' : 'journal-entry';
+        set({ selectedMode: mode, currentView: targetView, isVoiceMode: isVoice });
+        console.log('🔥 [MAIA STATE] State updated to:', { selectedMode: mode, currentView: targetView, isVoiceMode: isVoice });
+      },
       setEntry: (content) => set({ currentEntry: content }),
       addEntry: (entry) => set((state) => ({
         entries: [entry, ...state.entries],
@@ -51,11 +59,16 @@ export const useMaiaStore = create<MaiaState>()(
       })),
       setProcessing: (processing) => set({ isProcessing: processing }),
       setSearchQuery: (query) => set({ searchQuery: query }),
-      resetEntry: () => set({ currentEntry: '', selectedMode: null, currentView: 'mode-select' })
+      setVoiceMode: (isVoice) => set({ isVoiceMode: isVoice }),
+      resetEntry: () => set({ currentEntry: '', selectedMode: null, currentView: 'mode-select', isVoiceMode: false })
     }),
     {
       name: 'maia-storage',
-      partialize: (state) => ({ entries: state.entries })
+      partialize: (state) => ({
+        entries: state.entries,
+        selectedMode: state.selectedMode,
+        currentView: state.currentView
+      })
     }
   )
 );
