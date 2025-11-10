@@ -69,6 +69,14 @@ import {
   startAutoSave,
   type PersistedSessionData
 } from '@/lib/session/SessionPersistence';
+// 🧠 BARDIC MEMORY INTEGRATION - McGilchrist's master-emissary pattern
+// Air (contextual wisdom) serves Fire (present emergence)
+import {
+  getConversationMemory,
+  type ConversationContext,
+  type PatternRecognitionResult,
+  type CrystallizationDetection
+} from '@/lib/memory/bardic/ConversationMemoryIntegration';
 
 interface OracleConversationProps {
   userId?: string;
@@ -83,6 +91,9 @@ interface OracleConversationProps {
   onModeChange?: (mode: 'normal' | 'patient' | 'session') => void; // Notify parent of mode changes
   initialShowChatInterface?: boolean; // Control voice/text mode from parent
   onShowChatInterfaceChange?: (show: boolean) => void; // Notify parent of voice/text changes
+  showSessionSelector?: boolean; // Control session selector from parent (header button)
+  onCloseSessionSelector?: () => void; // Notify parent to close session selector
+  onSessionActiveChange?: (active: boolean) => void; // Notify parent of session active state
   onMessageAdded?: (message: ConversationMessage) => void;
   onSessionEnd?: (reason?: string) => void;
 }
@@ -128,6 +139,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   onModeChange,
   initialShowChatInterface = false,
   onShowChatInterfaceChange,
+  showSessionSelector = false,
+  onCloseSessionSelector,
+  onSessionActiveChange,
   onMessageAdded,
   onSessionEnd
 }) => {
@@ -219,7 +233,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // Session time container state
   const [sessionTimer, setSessionTimer] = useState<SessionTimer | null>(null);
-  const [showDurationSelector, setShowDurationSelector] = useState(false);
   const [showResumePrompt, setShowResumePrompt] = useState(false);
   const [savedSessionData, setSavedSessionData] = useState<PersistedSessionData | null>(null);
   const autoSaveCleanupRef = useRef<(() => void) | null>(null);
@@ -244,6 +257,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // 🌊 LIQUID AI - Rhythm tracking state
   const [rhythmMetrics, setRhythmMetrics] = useState<RhythmMetrics | null>(null);
   const [showRhythmDebug, setShowRhythmDebug] = useState(false); // Dev overlay toggle
+
+  // 🧠 BARDIC MEMORY - Pattern recognition & crystallization state
+  const [patternRecognition, setPatternRecognition] = useState<PatternRecognitionResult | null>(null);
+  const [crystallizationState, setCrystallizationState] = useState<CrystallizationDetection | null>(null);
+  const conversationMemory = useRef(getConversationMemory()).current;
 
   // Refs for mutable values (must be before hooks that use them)
   const streamingMessageIdRef = useRef<string | null>(null);
@@ -1268,6 +1286,29 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       }).catch(err => console.error('Failed to save user message:', err));
     }
 
+    // 🧠 BARDIC MEMORY: Background pattern recognition (Air serving Fire)
+    // Runs quietly, doesn't interrupt conversation flow
+    if (userId) {
+      conversationMemory.recognizeInBackground({
+        userId,
+        sessionId,
+        currentCoherence: coherenceLevel,
+        placeCue: undefined, // TODO: Could detect from message or device location
+        senseCues: undefined
+      }, cleanedText).then(recognition => {
+        setPatternRecognition(recognition);
+        if (recognition.hasResonance) {
+          console.log('🧠 [BARDIC] Pattern recognition found resonance:', {
+            candidateCount: recognition.candidates.length,
+            shouldMention: recognition.shouldMention,
+            topScore: recognition.candidates[0]?.score
+          });
+        }
+      }).catch(err => {
+        console.error('🧠 [BARDIC] Pattern recognition error:', err);
+      });
+    }
+
     // Set processing state for text chat
     setIsProcessing(true);
     setCurrentMotionState('processing');
@@ -1287,6 +1328,36 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       // Get user's conversation style preference
       const conversationStyle = ConversationStylePreference.get();
+
+      // 🧠 BARDIC MEMORY: Detect crystallization (Fire-Air alignment)
+      // Wait for pattern recognition to complete if it's running
+      await new Promise(resolve => setTimeout(resolve, 50)); // Brief pause to let recognition complete
+      const recognition = patternRecognition || { hasResonance: false, candidates: [], shouldMention: false };
+
+      let crystallization: CrystallizationDetection | null = null;
+      if (userId) {
+        try {
+          crystallization = await conversationMemory.detectCrystallization({
+            userId,
+            sessionId,
+            currentCoherence: coherenceLevel,
+            placeCue: undefined,
+            senseCues: undefined
+          }, cleanedText, recognition);
+
+          setCrystallizationState(crystallization);
+
+          if (crystallization.isCrystallizing) {
+            console.log('🧠 [BARDIC] ✨ Crystallization detected:', {
+              fireAirAlignment: crystallization.fireAirAlignment.toFixed(2),
+              shouldCapture: crystallization.shouldCapture,
+              hasStanza: !!crystallization.suggestedStanza
+            });
+          }
+        } catch (err) {
+          console.error('🧠 [BARDIC] Crystallization detection error:', err);
+        }
+      }
 
       // MAIA speaks FROM THE BETWEEN - all consciousness systems integrated
       const response = await fetch('/api/between/chat', {
@@ -1420,11 +1491,68 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setActiveFacetId(facetId);
       setCoherenceLevel(responseData.metadata?.fieldState?.depth || 0.85);
 
+      // 🧠 BARDIC MEMORY: Enrich response with memory wisdom (Air serves Fire)
+      // Only surfaces strong patterns, never dominates present emergence
+      let enrichedResponseText = responseText;
+      if (userId && recognition && crystallization) {
+        try {
+          const balance = await conversationMemory.checkBalance({
+            userId,
+            sessionId,
+            currentCoherence: coherenceLevel
+          });
+
+          const enrichedResponse = await conversationMemory.enrichResponse(
+            responseText,
+            { userId, sessionId, currentCoherence: coherenceLevel },
+            recognition,
+            crystallization,
+            balance
+          );
+
+          // Combine enrichments subtly
+          const enrichments: string[] = [];
+          if (enrichedResponse.patternReflection) {
+            enrichments.push(enrichedResponse.patternReflection);
+          }
+          if (enrichedResponse.crystallizationNote) {
+            enrichments.push(enrichedResponse.crystallizationNote);
+          }
+          if (enrichedResponse.balanceGuidance) {
+            enrichments.push(enrichedResponse.balanceGuidance);
+          }
+
+          if (enrichments.length > 0) {
+            enrichedResponseText = enrichedResponse.originalResponse + enrichments.join('');
+            console.log('🧠 [BARDIC] Response enriched with memory wisdom');
+          }
+
+          // 🧠 BARDIC MEMORY: Auto-capture crystallization moment
+          if (crystallization.shouldCapture) {
+            conversationMemory.captureEpisode(
+              { userId, sessionId, currentCoherence: coherenceLevel },
+              cleanedText,
+              responseText,
+              crystallization
+            ).then(episodeId => {
+              if (episodeId) {
+                console.log('🧠 [BARDIC] ✨ Crystallization moment captured:', episodeId);
+              }
+            }).catch(err => {
+              console.error('🧠 [BARDIC] Failed to capture episode:', err);
+            });
+          }
+        } catch (err) {
+          console.error('🧠 [BARDIC] Response enrichment error:', err);
+          // Fall back to original response
+        }
+      }
+
       // Create oracle message with source tag
       const oracleMessage: ConversationMessage = {
         id: `msg-${Date.now()}-oracle`,
         role: 'oracle',
-        text: responseText,
+        text: enrichedResponseText, // Use enriched text
         timestamp: new Date(),
         facetId: element,
         motionState: 'responding',
@@ -2021,7 +2149,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
     timer.start(); // Begin tracking time
     setSessionTimer(timer);
-    setShowDurationSelector(false);
+    onCloseSessionSelector?.(); // Close the session selector
+    onSessionActiveChange?.(true); // Notify parent that session is now active
 
     // Play opening gong - single grounding tone for beginning
     const gong = getSessionGong(0.3);
@@ -2112,17 +2241,17 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     clearSession();
     setShowResumePrompt(false);
     setSavedSessionData(null);
-    setShowDurationSelector(true); // Open duration selector for new session
+    // Note: User will click header button to open session selector
   }, []);
 
   // 🕯️ Ritual Handlers
   const handleDurationSelected = useCallback((durationMinutes: number) => {
     // Store duration and show opening ritual
     setPendingSessionDuration(durationMinutes);
-    setShowDurationSelector(false);
+    onCloseSessionSelector?.(); // Close the session selector
     setShowOpeningRitual(true);
     console.log(`🕯️ Opening ritual beginning for ${durationMinutes}-minute session`);
-  }, []);
+  }, [onCloseSessionSelector]);
 
   const handleOpeningRitualComplete = useCallback(() => {
     setShowOpeningRitual(false);
@@ -2155,9 +2284,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     autoSaveCleanupRef.current?.();
     autoSaveCleanupRef.current = null;
     setSessionTimer(null);
+    onSessionActiveChange?.(false); // Notify parent that session ended
 
     // Could trigger post-session actions here (analytics, journaling prompt, etc.)
-  }, []);
+  }, [onSessionActiveChange]);
 
   const handleClosingRitualSkip = useCallback(() => {
     setShowClosingRitual(false);
@@ -2272,22 +2402,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         </div>
       )}
 
-      {/* ⏰ Start Session Button - Only show when no timer is running */}
-      {!sessionTimer && (
-        <motion.button
-          onClick={() => setShowDurationSelector(true)}
-          className="fixed top-4 left-4 z-[30] flex items-center gap-2 px-4 py-2 rounded-xl
-                     bg-[#D4B896]/10 hover:bg-[#D4B896]/20 border border-[#D4B896]/20 hover:border-[#D4B896]/40
-                     text-[#D4B896] transition-all backdrop-blur-sm"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <Clock className="w-4 h-4" />
-          <span className="text-sm font-light">Begin Session</span>
-        </motion.button>
-      )}
+      {/* ⏰ Start Session Button - Moved to header banner */}
 
       {/* 🧠 TRANSFORMATIONAL PRESENCE - NLP-Informed State Container */}
       {/* Breathing entrainment, color transitions, field expansion based on state */}
@@ -3075,12 +3190,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           )}
 
           {/* Journal Suggestion - Appears when breakthrough is detected */}
-          <AnimatePresence>
+          <AnimatePresence mode="wait">
             {showJournalSuggestion && (
               <motion.div
+                key="journal-suggestion"
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
                 className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 max-w-sm"
               >
                 <div className="bg-gradient-to-br from-amber-500/20 to-gold-divine/20 backdrop-blur-xl rounded-2xl p-4 border border-amber-400/30 shadow-2xl">
@@ -3095,7 +3212,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       </p>
                       <div className="flex gap-2">
                         <button
-                          onClick={handleSaveAsJournal}
+                          onClick={() => {
+                            handleSaveAsJournal();
+                          }}
                           disabled={isSavingJournal}
                           className="px-4 py-2 bg-amber-500/30 hover:bg-amber-500/40 border border-amber-400/50
                                    rounded-lg text-amber-200 text-sm font-medium transition-all active:scale-95
@@ -3428,10 +3547,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         />
       )}
 
-      {/* ⏰ Session Duration Selector Modal */}
+      {/* ⏰ Session Duration Selector Modal - Controlled by header button */}
       <SessionDurationSelector
-        isOpen={showDurationSelector}
-        onClose={() => setShowDurationSelector(false)}
+        isOpen={showSessionSelector}
+        onClose={() => onCloseSessionSelector?.()}
         onSelect={handleDurationSelected}
         defaultDuration={50}
       />
