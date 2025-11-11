@@ -83,6 +83,23 @@ export default function MAIAPage() {
 
   const hasCheckedAuth = useRef(false);
 
+  // Redirect to sacred interface - /oracle-sacred is the new home
+  useEffect(() => {
+    const betaUser = localStorage.getItem('beta_user');
+    if (betaUser) {
+      try {
+        const userData = JSON.parse(betaUser);
+        if (userData.onboarded === true) {
+          console.log('🌸 Redirecting to sacred interface...');
+          router.replace('/oracle-sacred');
+          return;
+        }
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+  }, [router]);
+
   // Fix hydration: Initialize user data and session after mount
   useEffect(() => {
     setIsMounted(true);
