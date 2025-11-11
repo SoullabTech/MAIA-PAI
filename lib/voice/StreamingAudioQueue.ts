@@ -36,6 +36,14 @@ export class StreamingAudioQueue {
     this.onTextChange = callbacks?.onTextChange;
     this.onComplete = callbacks?.onComplete;
     this.feedbackPrevention = VoiceFeedbackPrevention.getInstance();
+
+    // Listen for interrupt events from user
+    if (typeof window !== 'undefined') {
+      window.addEventListener('maya-voice-interrupted', () => {
+        console.log('🛑 [StreamingQueue] Received interrupt signal - stopping playback');
+        this.stop();
+      });
+    }
   }
 
   /**
