@@ -169,6 +169,10 @@ export async function POST(request: NextRequest) {
     const lightweightMemory = await loadLightweightMemory(soulSignature);
     const existingEssence = lightweightMemory.essence;
 
+    // Use database name if available (soul recognition), otherwise use passed userName
+    const recognizedName = existingEssence?.userName || effectiveUserName;
+    console.log(`💫 [NAME] Using recognized name: ${recognizedName} (from ${existingEssence?.userName ? 'database' : 'localStorage'})`);
+
     if (existingEssence) {
       const threadCount = lightweightMemory.archetypalThreads.length;
       const hasBreakthrough = !!lightweightMemory.recentBreakthrough;
