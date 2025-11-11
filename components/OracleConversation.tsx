@@ -1622,6 +1622,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         // Initialize audio queue for voice mode
         const shouldStreamAudio = !showChatInterface && voiceEnabled && maiaReady;
         let audioQueue: InstanceType<typeof StreamingAudioQueue> | null = null;
+        let element = 'aether'; // Default element, will be updated from metadata if available
 
         if (shouldStreamAudio) {
           console.log('🎵 [STREAM] Initializing streaming audio queue...');
@@ -1778,7 +1779,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       }
 
       // THE BETWEEN metadata includes field depth, sovereignty check, etc
-      const element = responseData.metadata?.archetypalField?.dominantArchetype || 'aether';
+      element = responseData.metadata?.archetypalField?.dominantArchetype || 'aether';
       const facetId = mapElementToFacetId(element);
       setActiveFacetId(facetId);
       setCoherenceLevel(responseData.metadata?.fieldState?.depth || 0.85);

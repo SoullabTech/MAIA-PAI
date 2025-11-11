@@ -138,7 +138,7 @@ export const BrandedWelcome: React.FC<BrandedWelcomeProps> = ({
                 <p className="text-xs text-amber-200/50 mt-1">
                   {isReturning
                     ? "Your soulful journey continues"
-                    : "Soul Beta Experience • 31 Consciousness Pioneers"
+                    : "Soul Beta Experience • 47 Consciousness Pioneers"
                   }
                 </p>
               </motion.div>
