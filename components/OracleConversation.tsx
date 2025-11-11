@@ -2187,34 +2187,89 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   }, []);
 
   // Download conversation transcript
-  const downloadTranscript = useCallback(() => {
-    // Create a formatted transcript with markdown
-    const header = `# Conversation with ${agentConfig.name}\n`;
-    const date = `Date: ${new Date().toLocaleString()}\n`;
-    const sessionInfo = `Session ID: ${sessionId}\n`;
-    const separator = `${'='.repeat(50)}\n\n`;
+  const downloadTranscript = useCallback(async () => {
+    try {
+      console.log('📥 Starting conversation download...', { messageCount: messages.length });
 
-    const transcript = messages.map(msg => {
-      const timestamp = msg.timestamp?.toLocaleString() || '';
-      const speaker = msg.role === 'user' ? `**${userName}**` : '**MAIA**';
-      return `### ${speaker}\n*${timestamp}*\n\n${msg.text}\n`;
-    }).join('\n---\n\n');
+      // Create a formatted transcript with markdown
+      const header = `# Conversation with ${agentConfig.name}\n`;
+      const date = `Date: ${new Date().toLocaleString()}\n`;
+      const sessionInfo = `Session ID: ${sessionId}\n`;
+      const separator = `${'='.repeat(50)}\n\n`;
 
-    const fullContent = header + date + sessionInfo + separator + transcript;
+      const transcript = messages.map(msg => {
+        const timestamp = msg.timestamp?.toLocaleString() || '';
+        const speaker = msg.role === 'user' ? `**${userName}**` : '**MAIA**';
+        return `### ${speaker}\n*${timestamp}*\n\n${msg.text}\n`;
+      }).join('\n---\n\n');
 
-    // Save as markdown file (only on client side)
-    if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-      const blob = new Blob([fullContent], { type: 'text/markdown' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `conversation-${agentConfig.name}-${new Date().toISOString().split('T')[0]}.md`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const fullContent = header + date + sessionInfo + separator + transcript;
+
+      // 1. Save to Supabase for admin review
+      try {
+        const startTime = messages[0]?.timestamp || new Date();
+        const endTime = messages[messages.length - 1]?.timestamp || new Date();
+
+        const response = await fetch('/api/conversations/save-transcript', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            sessionId,
+            agentName: agentConfig.name,
+            agentId: agentConfig.id || 'maia',
+            transcript: fullContent,
+            messageCount: messages.length,
+            startTime: startTime,
+            endTime: endTime
+          })
+        });
+
+        if (response.ok) {
+          console.log('✅ Transcript saved to Supabase');
+        } else {
+          console.warn('⚠️ Failed to save transcript to Supabase:', await response.text());
+        }
+      } catch (saveError) {
+        console.error('❌ Error saving to Supabase:', saveError);
+        // Continue with download even if save fails
+      }
+
+      // 2. Download as markdown file (only on client side)
+      if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+        const blob = new Blob([fullContent], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `conversation-${agentConfig.name}-${new Date().toISOString().split('T')[0]}.md`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        console.log('✅ Conversation downloaded successfully');
+
+        // Show success toast
+        toast.success(
+          <div>
+            <div className="font-semibold">Conversation Downloaded</div>
+            <div className="text-sm text-white/70">
+              {messages.length} messages saved • Check your Downloads folder
+            </div>
+          </div>,
+          { duration: 4000 }
+        );
+      }
+    } catch (error) {
+      console.error('❌ Error downloading conversation:', error);
+      toast.error(
+        <div>
+          <div className="font-semibold">Download Failed</div>
+          <div className="text-sm text-white/70">Please try again</div>
+        </div>
+      );
     }
-  }, [messages, agentConfig.name, sessionId]);
+  }, [messages, agentConfig.name, agentConfig.id, sessionId, userId, userName]);
 
   // Voice synthesis for text chat
   const [currentlySpeakingId, setCurrentlySpeakingId] = useState<string | undefined>();
@@ -3305,14 +3360,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       <button
                         type="submit"
                         disabled={isProcessing}
-                        className="flex-shrink-0 w-10 h-10 bg-gold-divine/20 border border-gold-divine/30
-                                 rounded-full text-gold-divine flex items-center justify-center
-                                 hover:bg-gold-divine/30 active:scale-95 transition-all
-                                 disabled:opacity-30"
+                        className="flex-shrink-0 w-10 h-10 bg-amber-500/30 border border-amber-400/50
+                                 rounded-full text-amber-300 flex items-center justify-center
+                                 hover:bg-amber-500/40 hover:border-amber-400/70 active:scale-95 transition-all
+                                 disabled:opacity-30 shadow-lg shadow-amber-500/20"
                         aria-label="Send"
                       >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                         </svg>
                       </button>
 
@@ -3334,12 +3389,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       />
                       <label
                         htmlFor="chatFileUpload"
-                        className="flex-shrink-0 w-10 h-10 bg-amber-500/10 border border-amber-500/30
-                                 rounded-full text-amber-400 flex items-center justify-center
-                                 hover:bg-amber-500/20 active:scale-95 transition-all cursor-pointer"
+                        className="flex-shrink-0 w-10 h-10 bg-amber-500/30 border border-amber-400/50
+                                 rounded-full text-amber-300 flex items-center justify-center
+                                 hover:bg-amber-500/40 hover:border-amber-400/70 active:scale-95 transition-all
+                                 cursor-pointer shadow-lg shadow-amber-500/20"
                         title="Upload files"
                       >
-                        <Paperclip className="w-5 h-5 text-amber-400" />
+                        <Paperclip className="w-5 h-5 text-amber-300" strokeWidth={2.5} />
                       </label>
 
                       {/* Journal button - shows when conversation has substance */}
@@ -3349,14 +3405,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                           onClick={handleSaveAsJournal}
                           disabled={isSavingJournal}
                           className={`flex-shrink-0 w-10 h-10 border rounded-full flex items-center justify-center
-                                   active:scale-95 transition-all ${
+                                   active:scale-95 transition-all shadow-lg ${
                             breakthroughScore >= 70
-                              ? 'bg-amber-500/20 border-amber-400/50 text-amber-300 hover:bg-amber-500/30 animate-pulse'
-                              : 'bg-gold-divine/10 border-gold-divine/30 text-gold-divine hover:bg-gold-divine/20'
+                              ? 'bg-amber-500/40 border-amber-400/60 text-amber-200 hover:bg-amber-500/50 hover:border-amber-400/80 animate-pulse shadow-amber-500/30'
+                              : 'bg-amber-500/30 border-amber-400/50 text-amber-300 hover:bg-amber-500/40 hover:border-amber-400/70 shadow-amber-500/20'
                           } ${isSavingJournal ? 'opacity-50 cursor-not-allowed' : ''}`}
                           title={breakthroughScore >= 70 ? 'Breakthrough detected - Save to journal' : 'Save as journal entry'}
                         >
-                          <BookOpen className="w-5 h-5" />
+                          <BookOpen className="w-5 h-5" strokeWidth={2.5} />
                         </button>
                       )}
                     </div>
