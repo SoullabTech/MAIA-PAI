@@ -318,8 +318,12 @@ export default function SacredOraclePage() {
 
   return (
     <div className="fixed inset-0 bg-black overflow-hidden">
-      {/* Sacred Holoflower - Full Screen */}
-      <div className="absolute inset-0">
+      {/* Sacred Holoflower - Full Screen - CLICKABLE */}
+      <button
+        onClick={isRecording ? stopRecording : startRecording}
+        className="absolute inset-0 cursor-pointer focus:outline-none"
+        aria-label={isRecording ? "Stop recording" : "Tap to speak with MAIA"}
+      >
         <HoloflowerMotion
           motionState={motionState}
           width={typeof window !== 'undefined' ? window.innerWidth : 800}
@@ -329,10 +333,10 @@ export default function SacredOraclePage() {
             setMode('transcendent');
           }}
         />
-      </div>
-      
-      {/* Sacred Voice Orb */}
-      <div className="absolute bottom-0 left-0 right-0 p-8 flex flex-col items-center">
+      </button>
+
+      {/* Status overlay at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-8 flex flex-col items-center pointer-events-none">
         {/* Oracle Response */}
         {oracleResponse && mode === 'responding' && (
           <div className="mb-8 max-w-md text-center">
@@ -341,7 +345,7 @@ export default function SacredOraclePage() {
             </p>
           </div>
         )}
-        
+
         {/* Voice Input Display */}
         {transcript && mode !== 'grounded' && (
           <div className="mb-4 max-w-md text-center">
@@ -350,53 +354,13 @@ export default function SacredOraclePage() {
             </p>
           </div>
         )}
-        
-        {/* Sacred Mic Button - iOS Safe Area */}
-        <button
-          onClick={isRecording ? stopRecording : startRecording}
-          className={`
-            relative w-24 h-24 rounded-full transition-all duration-500
-            ${isRecording ? 'scale-110' : 'scale-100'}
-            ${mode === 'transcendent' ? 'animate-pulse-golden' : ''}
-            active:scale-95
-          `}
-          style={{
-            background: mode === 'grounded' ? 'radial-gradient(circle, #FFD700, #B8860B)' :
-                       mode === 'listening' ? 'radial-gradient(circle, #87CEEB, #4682B4)' :
-                       mode === 'processing' ? 'radial-gradient(circle, #DDA0DD, #8B008B)' :
-                       mode === 'responding' ? 'radial-gradient(circle, #98FB98, #228B22)' :
-                       'radial-gradient(circle, #FFD700, #FF6347)',
-            boxShadow: isRecording ? '0 0 40px rgba(255, 215, 0, 0.6)' : '0 0 20px rgba(255, 215, 0, 0.3)',
-            marginBottom: '2rem' // Extra spacing for iPad home bar
-          }}
-          aria-label={isRecording ? "Stop recording" : "Start recording"}
-        >
-          <div className="absolute inset-0 flex items-center justify-center">
-            {isRecording ? (
-              <div className="w-6 h-6 bg-white rounded-sm animate-pulse" />
-            ) : (
-              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
-              </svg>
-            )}
-          </div>
-          
-          {/* Breathing rings */}
-          {mode !== 'grounded' && (
-            <>
-              <div className="absolute inset-0 rounded-full border-2 border-white/20 animate-ping" />
-              <div className="absolute inset-0 rounded-full border-2 border-white/10 animate-ping animation-delay-200" />
-              <div className="absolute inset-0 rounded-full border-2 border-white/5 animate-ping animation-delay-400" />
-            </>
-          )}
-        </button>
-        
+
         {/* Mode indicator */}
-        <div className="mt-4 text-white/70 text-sm font-light tracking-wide text-center px-8">
-          {mode === 'grounded' && 'Tap to speak with MAIA'}
-          {mode === 'listening' && 'Listening... speak now'}
-          {mode === 'processing' && 'Processing...'}
-          {mode === 'responding' && 'MAIA speaks'}
+        <div className="mt-4 text-white/70 text-lg font-light tracking-wide text-center px-8">
+          {mode === 'grounded' && 'Tap Holoflower to speak with MAIA'}
+          {mode === 'listening' && '🎤 Listening... speak now'}
+          {mode === 'processing' && '✨ Processing...'}
+          {mode === 'responding' && '💫 MAIA speaks'}
           {mode === 'transcendent' && '✨ Sacred breakthrough ✨'}
         </div>
       </div>
