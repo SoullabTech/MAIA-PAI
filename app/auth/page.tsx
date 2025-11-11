@@ -102,8 +102,8 @@ export default function AuthPage() {
 
         // Check if user has completed onboarding
         if (userData.onboarded === true) {
-          console.log('✅ Returning user - going directly to Sacred Oracle');
-          router.push('/oracle-sacred');
+          console.log('✅ Returning user - going to MAIA');
+          router.push('/maia');
         } else {
           console.log('🆕 User needs onboarding - going to /beta-onboarding');
           router.push('/beta-onboarding');

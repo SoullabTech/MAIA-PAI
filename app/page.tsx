@@ -12,8 +12,8 @@ export default function HomePage() {
     const week2Onboarded = localStorage.getItem('week2_onboarded') === 'true';
 
     if (week2Onboarded) {
-      console.log('✅ Auto-redirecting week2 user to /oracle-sacred');
-      router.replace('/oracle-sacred');
+      console.log('✅ Auto-redirecting week2 user to /maia');
+      router.replace('/maia');
       return;
     }
 
@@ -21,8 +21,8 @@ export default function HomePage() {
       try {
         const userData = JSON.parse(storedUser);
         if (userData.onboarded === true) {
-          console.log('✅ Auto-redirecting onboarded user to /oracle-sacred');
-          router.replace('/oracle-sacred');
+          console.log('✅ Auto-redirecting onboarded user to /maia');
+          router.replace('/maia');
           return;
         }
       } catch (e) {

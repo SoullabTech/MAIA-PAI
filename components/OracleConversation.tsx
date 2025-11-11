@@ -322,6 +322,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     onMessageAddedRef.current = onMessageAdded;
   }, [onMessageAdded]);
 
+  // ==================== RECORDING STATE CALLBACK ====================
+  // Sync isListening state from ContinuousConversation to parent
+  const handleRecordingStateChange = useCallback((isRecording: boolean) => {
+    console.log('📡 Recording state changed:', isRecording);
+    setIsListening(isRecording);
+  }, []);
+
   // ==================== AUDIO LEVEL CALLBACK (THROTTLED) ====================
   // Prevent infinite render loop by throttling setState calls
   const handleAudioLevelChange = useCallback((amplitude: number, isSpeaking: boolean) => {
@@ -2703,9 +2710,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           // Enable audio context first
           await enableAudio();
 
-          // Simple toggle logic - no complex conditions
+          // Use isListening state instead of isMuted for accurate toggle
           if (voiceMicRef.current) {
-            if (isMuted) {
+            if (!isListening) {
               // Start listening
               console.log('🎤 Starting voice via holoflower...');
               setIsMuted(false);
@@ -3641,6 +3648,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           <ContinuousConversation
             ref={voiceMicRef}
             onTranscript={handleVoiceTranscript}
+            onRecordingStateChange={handleRecordingStateChange}
             onAudioLevelChange={handleAudioLevelChange}
             isProcessing={isResponding}
             isSpeaking={isAudioPlaying}

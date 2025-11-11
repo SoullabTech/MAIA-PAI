@@ -329,7 +329,10 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         console.log('🚫 [onend] Not restarting - conditions not met. State:', {
           isListening: isListeningRef.current,
           isProcessing: isProcessingRef.current,
-          isSpeaking: isSpeakingRef.current
+          isSpeaking: isSpeakingRef.current,
+          reason: !isListeningRef.current ? 'NOT_LISTENING' :
+                  isProcessingRef.current ? 'IS_PROCESSING' :
+                  isSpeakingRef.current ? 'IS_SPEAKING' : 'UNKNOWN'
         });
       }
     };
