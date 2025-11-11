@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { IntegrationAuthService } from "@/lib/auth/integrationAuth";
 
 // Robust error message helper - fixes TypeScript never type issue
@@ -16,7 +16,18 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const authService = new IntegrationAuthService();
+
+  // Get redirect and error from URL params
+  const redirect = searchParams.get('redirect');
+  const error = searchParams.get('error');
+
+  useEffect(() => {
+    if (error) {
+      setMessage(error);
+    }
+  }, [error]);
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,9 +37,9 @@ export default function SignInPage() {
     setMessage("");
 
     try {
-      // Send magic link
-      const { error } = await authService.signInWithEmail(email);
-      
+      // Send magic link with optional redirect
+      const { error } = await authService.signInWithEmail(email, redirect || undefined);
+
       if (error) {
         setMessage(`Error: ${getErrorMessage(error)}`);
       } else {

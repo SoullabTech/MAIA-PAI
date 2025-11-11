@@ -400,15 +400,21 @@ export class IntegrationAuthService {
     return user;
   }
 
-  async signInWithEmail(email: string) {
+  async signInWithEmail(email: string, redirectPath?: string) {
     if (!this.isSupabaseAvailable()) {
       throw new Error("Authentication not available in demo mode");
+    }
+
+    // Build redirect URL with optional redirect parameter
+    let redirectTo = `${window.location.origin}/auth/callback`;
+    if (redirectPath) {
+      redirectTo += `?redirect=${encodeURIComponent(redirectPath)}`;
     }
 
     return await this.supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: redirectTo,
       },
     });
   }

@@ -26,7 +26,7 @@ function AuthCallbackContent() {
     try {
       // Handle the auth callback
       const { data, error } = await authService.handleAuthCallback();
-      
+
       if (error) {
         setStatus("error");
         setMessage(`Authentication failed: ${getErrorMessage(error)}`);
@@ -37,17 +37,26 @@ function AuthCallbackContent() {
         setStatus("success");
         setMessage("Authentication successful!");
 
+        // Check if there's a redirect parameter
+        const redirectPath = searchParams.get('redirect');
+
         // Check if user has completed onboarding
         const userMetadata = data.user.user_metadata || {};
         const hasCompletedOnboarding = userMetadata.onboarding_completed;
 
         // Redirect after a short delay
         setTimeout(() => {
+          // If there's a specific redirect, use that
+          if (redirectPath) {
+            router.push(redirectPath);
+            return;
+          }
+
           // Check if onboarding is skipped via env var (client-side check)
           const skipOnboarding = process.env.NEXT_PUBLIC_SKIP_ONBOARDING === 'true';
-          
+
           if (skipOnboarding || hasCompletedOnboarding) {
-            router.push("/oracle"); // Go straight to Oracle for testing
+            router.push("/maia"); // Go to MAIA after sign in
           } else {
             router.push("/auth/onboarding");
           }
