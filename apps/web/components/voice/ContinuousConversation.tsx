@@ -65,6 +65,11 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   const networkErrorCount = useRef<number>(0);
   const lastNetworkErrorTime = useRef<number>(0);
 
+  // 🎯 ADAPTIVE SILENCE DETECTION - Monitor audio levels for natural speech pauses
+  const isSpeakingNowRef = useRef(false); // Track if user is actively speaking based on audio levels
+  const silenceStartTimeRef = useRef<number>(0); // When silence began
+  const adaptiveSilenceThreshold = 1500; // 1.5 seconds of silence after speaking = send (much faster!)
+
   // Function refs to avoid temporal dead zone in useImperativeHandle
   const startListeningFnRef = useRef<() => void>();
   const stopListeningFnRef = useRef<() => void>();
@@ -557,6 +562,33 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         // 🌸 Call amplitude callback directly for holoflower visualization
         // Use ref instead of state to avoid triggering re-renders
         onAudioLevelChange?.(normalizedLevel, isRecordingRef.current);
+
+        // 🎯 ADAPTIVE SILENCE DETECTION - Detect when user stops speaking
+        const voiceThreshold = vadSensitivity; // Use sensitivity from props (default 0.3)
+        const wasSpeaking = isSpeakingNowRef.current;
+        const isSpeakingNow = normalizedLevel > voiceThreshold;
+
+        if (isSpeakingNow && !wasSpeaking) {
+          // User started speaking
+          isSpeakingNowRef.current = true;
+          silenceStartTimeRef.current = 0;
+          console.log('🗣️ [VAD] User started speaking (level:', normalizedLevel.toFixed(2), ')');
+        } else if (!isSpeakingNow && wasSpeaking) {
+          // User stopped speaking - start silence timer
+          isSpeakingNowRef.current = false;
+          silenceStartTimeRef.current = now;
+          console.log('🤫 [VAD] User stopped speaking - silence timer started');
+        } else if (!isSpeakingNow && silenceStartTimeRef.current > 0) {
+          // Check if silence threshold reached
+          const silenceDuration = now - silenceStartTimeRef.current;
+          if (silenceDuration >= adaptiveSilenceThreshold && accumulatedTranscript.current.trim()) {
+            console.log('⚡ [VAD] Adaptive silence detected after', silenceDuration, 'ms - processing now!');
+            silenceStartTimeRef.current = 0; // Reset to prevent duplicate triggers
+            if (!isProcessingRef.current) {
+              processAccumulatedTranscript();
+            }
+          }
+        }
 
         if (isListening) {
           requestAnimationFrame(checkAudioLevel);
