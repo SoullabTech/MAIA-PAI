@@ -9,6 +9,8 @@
  * THE BETWEEN (streaming text) → Split sentences → TTS per sentence → Queue → Play
  */
 
+import { VoiceFeedbackPrevention } from './voice-feedback-prevention';
+
 export interface AudioQueueItem {
   audio: HTMLAudioElement;
   text: string;
@@ -23,6 +25,7 @@ export class StreamingAudioQueue {
   private onPlayingChange?: (isPlaying: boolean) => void;
   private onTextChange?: (text: string) => void;
   private onComplete?: () => void;
+  private feedbackPrevention: VoiceFeedbackPrevention;
 
   constructor(callbacks?: {
     onPlayingChange?: (isPlaying: boolean) => void;
@@ -32,6 +35,7 @@ export class StreamingAudioQueue {
     this.onPlayingChange = callbacks?.onPlayingChange;
     this.onTextChange = callbacks?.onTextChange;
     this.onComplete = callbacks?.onComplete;
+    this.feedbackPrevention = VoiceFeedbackPrevention.getInstance();
   }
 
   /**
@@ -67,15 +71,20 @@ export class StreamingAudioQueue {
     console.log('🔊 [StreamingQueue] Playing chunk:', item.text.substring(0, 50));
     this.onTextChange?.(item.text);
 
+    // Register audio with feedback prevention to pause microphone
+    this.feedbackPrevention.registerAudioElement(item.audio);
+
     return new Promise((resolve) => {
       item.audio.onended = () => {
         console.log('✅ [StreamingQueue] Chunk finished');
+        this.feedbackPrevention.unregisterAudioElement(item.audio);
         resolve();
         this.playNext(); // Play next chunk
       };
 
       item.audio.onerror = (error) => {
         console.error('❌ [StreamingQueue] Audio error:', error);
+        this.feedbackPrevention.unregisterAudioElement(item.audio);
         resolve();
         this.playNext(); // Continue to next chunk even on error
       };
@@ -83,6 +92,7 @@ export class StreamingAudioQueue {
       // Start playback
       item.audio.play().catch((error) => {
         console.error('❌ [StreamingQueue] Play failed:', error);
+        this.feedbackPrevention.unregisterAudioElement(item.audio);
         resolve();
         this.playNext();
       });
@@ -95,10 +105,11 @@ export class StreamingAudioQueue {
   stop(): void {
     console.log('🛑 [StreamingQueue] Stopping playback and clearing queue');
 
-    // Stop current audio
+    // Stop current audio and unregister from feedback prevention
     if (this.currentAudio) {
       this.currentAudio.pause();
       this.currentAudio.currentTime = 0;
+      this.feedbackPrevention.unregisterAudioElement(this.currentAudio);
       this.currentAudio = null;
     }
 
