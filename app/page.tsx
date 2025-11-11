@@ -4,11 +4,34 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function HomePage() {
-  // Beautiful intro experience with MAIA as Daimon
   const router = useRouter();
 
   useEffect(() => {
-    // Show the beautiful intro with rotating quotes and mantras
+    // Check if user is already onboarded - skip intro if so
+    const storedUser = localStorage.getItem('beta_user');
+    const week2Onboarded = localStorage.getItem('week2_onboarded') === 'true';
+
+    if (week2Onboarded) {
+      console.log('✅ Auto-redirecting week2 user to /oracle-sacred');
+      router.replace('/oracle-sacred');
+      return;
+    }
+
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        if (userData.onboarded === true) {
+          console.log('✅ Auto-redirecting onboarded user to /oracle-sacred');
+          router.replace('/oracle-sacred');
+          return;
+        }
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+
+    // New users see the beautiful intro with rotating quotes and mantras
+    console.log('👋 New user - showing intro');
     router.replace('/intro');
   }, [router]);
 
