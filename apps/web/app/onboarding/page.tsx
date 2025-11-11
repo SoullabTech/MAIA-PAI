@@ -344,27 +344,8 @@ export default function OnboardingPage() {
               <div className="w-3 h-3 bg-soul-aetherWarm rounded-full animate-bounce" style={{ animationDelay: '800ms' }}></div>
             </div>
           </div>
-          </div>
         </div>
       )}
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>
       </div>
     </div>
   );
