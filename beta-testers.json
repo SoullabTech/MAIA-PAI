@@ -1,0 +1,14 @@
+{
+  "testers": [
+    {
+      "id": "beta_001",
+      "name": "Jacob Mense",
+      "email": "jacobmense@gmail.com",
+      "status": "invited",
+      "invitedAt": "2025-11-11T00:00:00.000Z",
+      "accessLevel": "standard",
+      "notes": "Added via admin request",
+      "inviteCode": null
+    }
+  ]
+}
