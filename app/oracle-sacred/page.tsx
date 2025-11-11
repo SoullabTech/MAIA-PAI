@@ -43,24 +43,46 @@ export default function SacredOraclePage() {
   // Handle voice recording
   const startRecording = async () => {
     try {
+      console.log('🎤 Starting recording...');
+
+      // Request microphone permission
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('✅ Microphone access granted');
+
+      // Check if MediaRecorder is supported (iOS Safari issue)
+      if (!window.MediaRecorder) {
+        console.error('❌ MediaRecorder not supported on this device');
+        alert('Voice recording is not supported on your device. Please try using Chrome or update your iOS.');
+        return;
+      }
+
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
-      
+
       mediaRecorder.ondataavailable = (event) => {
+        console.log('📊 Audio data chunk received:', event.data.size, 'bytes');
         audioChunksRef.current.push(event.data);
       };
-      
+
       mediaRecorder.onstop = async () => {
+        console.log('🛑 Recording stopped, processing...');
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         await processVoiceInput(audioBlob);
+
+        // Stop all tracks to release microphone
+        stream.getTracks().forEach(track => track.stop());
       };
-      
+
+      mediaRecorder.onerror = (event) => {
+        console.error('❌ MediaRecorder error:', event);
+      };
+
       mediaRecorder.start();
+      console.log('🎙️ Recording started successfully');
       setIsRecording(true);
       setMode('listening');
-      
+
       // Update motion state for listening
       setMotionState(prev => ({
         ...prev,
@@ -73,9 +95,27 @@ export default function SacredOraclePage() {
         },
         phase: 'inhale'
       }));
-      
-    } catch (error) {
-      console.error('Failed to start recording:', error);
+
+      // Auto-stop after 30 seconds (safety)
+      setTimeout(() => {
+        if (isRecording) {
+          console.log('⏰ Auto-stopping recording after 30s');
+          stopRecording();
+        }
+      }, 30000);
+
+    } catch (error: any) {
+      console.error('❌ Failed to start recording:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+
+      if (error.name === 'NotAllowedError') {
+        alert('Microphone permission denied. Please allow microphone access in your browser settings.');
+      } else if (error.name === 'NotFoundError') {
+        alert('No microphone found. Please check your device.');
+      } else {
+        alert(`Recording failed: ${error.message}. Try refreshing the page.`);
+      }
     }
   };
 
@@ -220,13 +260,14 @@ export default function SacredOraclePage() {
           </div>
         )}
         
-        {/* Sacred Mic Button */}
+        {/* Sacred Mic Button - iOS Safe Area */}
         <button
           onClick={isRecording ? stopRecording : startRecording}
           className={`
-            relative w-20 h-20 rounded-full transition-all duration-500
+            relative w-24 h-24 rounded-full transition-all duration-500
             ${isRecording ? 'scale-110' : 'scale-100'}
             ${mode === 'transcendent' ? 'animate-pulse-golden' : ''}
+            active:scale-95
           `}
           style={{
             background: mode === 'grounded' ? 'radial-gradient(circle, #FFD700, #B8860B)' :
@@ -234,8 +275,10 @@ export default function SacredOraclePage() {
                        mode === 'processing' ? 'radial-gradient(circle, #DDA0DD, #8B008B)' :
                        mode === 'responding' ? 'radial-gradient(circle, #98FB98, #228B22)' :
                        'radial-gradient(circle, #FFD700, #FF6347)',
-            boxShadow: isRecording ? '0 0 40px rgba(255, 215, 0, 0.6)' : '0 0 20px rgba(255, 215, 0, 0.3)'
+            boxShadow: isRecording ? '0 0 40px rgba(255, 215, 0, 0.6)' : '0 0 20px rgba(255, 215, 0, 0.3)',
+            marginBottom: '2rem' // Extra spacing for iPad home bar
           }}
+          aria-label={isRecording ? "Stop recording" : "Start recording"}
         >
           <div className="absolute inset-0 flex items-center justify-center">
             {isRecording ? (
@@ -258,12 +301,12 @@ export default function SacredOraclePage() {
         </button>
         
         {/* Mode indicator */}
-        <div className="mt-4 text-white/50 text-xs uppercase tracking-wider">
-          {mode === 'grounded' && 'Tap to enter sacred space'}
-          {mode === 'listening' && 'Listening...'}
-          {mode === 'processing' && 'Processing...'}
-          {mode === 'responding' && 'Oracle speaks'}
-          {mode === 'transcendent' && '✨ Sacred moment ✨'}
+        <div className="mt-4 text-white/70 text-sm font-light tracking-wide text-center">
+          {mode === 'grounded' && '👆 Tap the golden button to speak with MAIA'}
+          {mode === 'listening' && '🎤 Listening... speak now, tap again when done'}
+          {mode === 'processing' && '✨ Processing your voice...'}
+          {mode === 'responding' && '💫 MAIA speaks'}
+          {mode === 'transcendent' && '✨ Sacred breakthrough moment ✨'}
         </div>
       </div>
       
