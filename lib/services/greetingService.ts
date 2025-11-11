@@ -384,9 +384,12 @@ export async function generateGreeting(context: Partial<GreetingContext>): Promi
     const essence = await loadRelationshipEssence(soulSignature);
     if (essence) {
       relationshipEssence = essence;
-      console.log(`💫 [GREETING] Generating soul-recognized greeting for ${context.userName} (${essence.encounterCount} encounters)`);
+      console.log(`💫 [GREETING] Soul-recognized greeting for ${essence.userName || context.userName} (${essence.encounterCount} encounters)`);
     }
   }
+
+  // Use database name if available (soul recognition), otherwise fall back to localStorage name
+  const recognizedName = relationshipEssence?.userName || context.userName || 'friend';
 
   // Determine content level based on user readiness
   let contentLevel: ContentLevel = 'companion';
@@ -410,7 +413,7 @@ export async function generateGreeting(context: Partial<GreetingContext>): Promi
   }
 
   const fullContext: GreetingContext = {
-    userName: context.userName || 'friend',
+    userName: recognizedName,
     userId: context.userId,
     timeOfDay: context.timeOfDay || getTimeOfDay(),
     daysSinceLastVisit: context.daysSinceLastVisit ?? 0,
