@@ -34,13 +34,31 @@ export default function SacredOraclePage() {
   const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
 
-  // Initialize audio context
+  // Initialize audio context on first user interaction
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      setAudioContext(ctx);
-    }
-  }, []);
+    const initAudio = () => {
+      if (!audioContext && typeof window !== 'undefined') {
+        const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        // Resume context immediately on user interaction
+        if (ctx.state === 'suspended') {
+          ctx.resume().then(() => {
+            console.log('🔊 AudioContext resumed and ready');
+          });
+        }
+        setAudioContext(ctx);
+        console.log('🎵 AudioContext initialized');
+      }
+    };
+
+    // Initialize on any user interaction
+    document.addEventListener('click', initAudio, { once: true });
+    document.addEventListener('touchstart', initAudio, { once: true });
+
+    return () => {
+      document.removeEventListener('click', initAudio);
+      document.removeEventListener('touchstart', initAudio);
+    };
+  }, [audioContext]);
 
   // Detect silence and auto-stop recording
   const detectSilence = (stream: MediaStream) => {
@@ -101,6 +119,12 @@ export default function SacredOraclePage() {
   const startRecording = async () => {
     try {
       console.log('🎤 Starting recording...');
+
+      // Ensure AudioContext is initialized and resumed
+      if (audioContext && audioContext.state === 'suspended') {
+        await audioContext.resume();
+        console.log('🔊 AudioContext resumed');
+      }
 
       // Request microphone permission
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
