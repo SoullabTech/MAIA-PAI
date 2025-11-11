@@ -849,9 +849,20 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // Reduced to 30s for better UX - if MAIA is stuck, recover quickly
   useEffect(() => {
     if (isProcessing || isResponding) {
+      // Create a unique ID for this processing session
+      const sessionId = `recovery-${Date.now()}`;
+      const stateActivatedTime = Date.now();
+      console.log(`🔄 [${sessionId}] Recovery timer started - isProcessing: ${isProcessing}, isResponding: ${isResponding}`);
+
       const recoveryTimer = setTimeout(() => {
-        if (isProcessing || isResponding) {
-          console.warn('⚠️ States stuck for >30s - auto-recovery triggered');
+        // Check if states are STILL stuck
+        const currentTime = Date.now();
+        const timeSinceActivation = currentTime - stateActivatedTime;
+
+        console.log(`⏰ [${sessionId}] Recovery timer fired after ${timeSinceActivation}ms - isProcessing: ${isProcessing}, isResponding: ${isResponding}`);
+
+        if ((isProcessing || isResponding) && timeSinceActivation >= 29000) {
+          console.warn(`⚠️ [${sessionId}] States genuinely stuck for >30s - auto-recovery triggered`);
 
           // Show user-friendly message
           const errorMessage: ConversationMessage = {
@@ -866,10 +877,15 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           onMessageAddedRef.current?.(errorMessage);
 
           resetAllStates();
+        } else {
+          console.log(`✅ [${sessionId}] Recovery timer fired but states already reset - no action needed`);
         }
       }, 30000); // 30 second recovery timeout for better UX
 
-      return () => clearTimeout(recoveryTimer);
+      return () => {
+        console.log(`🧹 [${sessionId}] Recovery timer cleanup - states reset normally`);
+        clearTimeout(recoveryTimer);
+      };
     }
   }, [isProcessing, isResponding, resetAllStates]);
 
@@ -1695,6 +1711,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           }
         } finally {
           // Always reset states to prevent getting stuck
+          console.log('🧹 Voice response complete - resetting all states');
           setIsResponding(false);
           setIsAudioPlaying(false);
           setIsMicrophonePaused(false); // 🎤 RESUME MIC AFTER MAIA FINISHES
@@ -1754,7 +1771,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       onMessageAddedRef.current?.(errorMessage);
     } finally {
       // Always reset processing state for text chat
-      console.log('📝 Text processing complete - resetting states');
+      console.log('🧹 Text processing complete - resetting all states (isProcessing: false, isResponding: false)');
       setIsProcessing(false);
       setIsResponding(false);
       setCurrentMotionState('idle');
