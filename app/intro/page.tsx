@@ -243,16 +243,16 @@ export default function IntroPage() {
                 const week2Onboarded = localStorage.getItem('week2_onboarded') === 'true';
                 console.log(`🎬 Week 2 onboarded:`, week2Onboarded);
 
-                // If week2_onboarded is set, go straight to MAIA
+                // If week2_onboarded is set, go straight to Sacred Oracle
                 if (week2Onboarded) {
-                  console.log(`🎬 Navigating to /maia (week 2 onboarded)`);
-                  router.push('/maia');
+                  console.log(`🎬 Navigating to /oracle-sacred (week 2 onboarded)`);
+                  router.push('/oracle-sacred');
                 } else if (storedUser) {
                   const userData = JSON.parse(storedUser);
                   console.log(`🎬 User data:`, userData);
                   if (userData.onboarded === true) {
-                    console.log(`🎬 Navigating to /maia (onboarded user)`);
-                    router.push('/maia');
+                    console.log(`🎬 Navigating to /oracle-sacred (onboarded user)`);
+                    router.push('/oracle-sacred');
                   } else {
                     console.log(`🎬 Navigating to /onboarding (not onboarded)`);
                     router.push('/onboarding');
@@ -280,16 +280,16 @@ export default function IntroPage() {
             const storedUser = localStorage.getItem('beta_user');
             const week2Onboarded = localStorage.getItem('week2_onboarded') === 'true';
 
-            // If week2_onboarded is set, go straight to MAIA
+            // If week2_onboarded is set, go straight to Sacred Oracle
             if (week2Onboarded) {
-              console.log(`🎬 Navigating to /maia (week 2 onboarded)`);
-              router.push('/maia');
+              console.log(`🎬 Navigating to /oracle-sacred (week 2 onboarded)`);
+              router.push('/oracle-sacred');
             } else if (storedUser) {
               const userData = JSON.parse(storedUser);
               console.log(`🎬 User data:`, userData);
               if (userData.onboarded === true) {
-                console.log(`🎬 Navigating to /maia (onboarded user)`);
-                router.push('/maia');
+                console.log(`🎬 Navigating to /oracle-sacred (onboarded user)`);
+                router.push('/oracle-sacred');
               } else {
                 console.log(`🎬 Navigating to /onboarding (not onboarded)`);
                 router.push('/onboarding');

@@ -83,6 +83,22 @@ export function SoulfulOnboarding({ initialName }: { initialName: string }) {
     };
     localStorage.setItem('beta_user', JSON.stringify(betaUserData));
 
+    // ALSO UPDATE beta_users storage (master list) - this is critical for sign-in to work!
+    try {
+      const betaUsersString = localStorage.getItem('beta_users');
+      if (betaUsersString) {
+        const betaUsers = JSON.parse(betaUsersString);
+        // Find user by username and update their onboarded flag
+        if (betaUsers[explorerName]) {
+          betaUsers[explorerName].onboarded = true;
+          localStorage.setItem('beta_users', JSON.stringify(betaUsers));
+          console.log('✅ Updated beta_users storage with onboarded: true for', explorerName);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating beta_users storage:', error);
+    }
+
     console.log('✅ localStorage set BEFORE API call:', { explorerId, explorerName, betaOnboardingComplete: 'true', onboarded: true });
 
     try {

@@ -102,11 +102,11 @@ export default function AuthPage() {
 
         // Check if user has completed onboarding
         if (userData.onboarded === true) {
-          console.log('✅ Returning user - going through intro ritual');
-          router.push('/intro');
+          console.log('✅ Returning user - going directly to MAIA');
+          router.push('/maia');
         } else {
-          console.log('🆕 User needs onboarding - going to /onboarding');
-          router.push('/onboarding');
+          console.log('🆕 User needs onboarding - going to /beta-onboarding');
+          router.push('/beta-onboarding');
         }
       }
     } catch (err: any) {

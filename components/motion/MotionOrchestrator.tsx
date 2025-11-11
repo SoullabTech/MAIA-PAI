@@ -174,6 +174,7 @@ export const MotionOrchestrator: React.FC<MotionOrchestratorProps> = ({
   return (
     <motion.div
       className="motion-orchestrator relative"
+      style={{ pointerEvents: 'none' }}  // Allow clicks to pass through
       variants={shouldReduceMotion ? {} : containerVariants}
       animate={shouldReduceMotion ? "idle" : motionState}
       onAnimationComplete={() => onMotionComplete?.(motionState)}
@@ -202,16 +203,16 @@ export const MotionOrchestrator: React.FC<MotionOrchestratorProps> = ({
               </feMerge>
             </filter>
 
-            {/* Radial gradient for aura effect */}
+            {/* Radial gradient for aura effect - ultra subtle */}
             <radialGradient id="aura-gradient">
-              <stop offset="0%" stopColor="white" stopOpacity="0.4"/>
-              <stop offset="30%" stopColor="white" stopOpacity="0.2"/>
-              <stop offset="70%" stopColor="white" stopOpacity="0.05"/>
+              <stop offset="0%" stopColor="white" stopOpacity="0.08"/>
+              <stop offset="30%" stopColor="white" stopOpacity="0.04"/>
+              <stop offset="70%" stopColor="white" stopOpacity="0.01"/>
               <stop offset="100%" stopColor="white" stopOpacity="0"/>
             </radialGradient>
           </defs>
 
-          {/* Diffused aura ring - wide and soft like an energy field */}
+          {/* Diffused aura ring - barely perceptible energy field */}
           <motion.circle
             cx="200"
             cy="200"
@@ -220,7 +221,7 @@ export const MotionOrchestrator: React.FC<MotionOrchestratorProps> = ({
             strokeWidth="40"
             stroke="url(#aura-gradient)"
             filter="url(#coherence-aura)"
-            opacity="0.3"
+            opacity="0.08"
             variants={coherenceRingVariants}
             animate={motionState}
           />

@@ -321,7 +321,7 @@ export default function JournalEntry() {
                   value={currentEntry}
                   onChange={handleTextChange}
                   placeholder="Let your consciousness flow onto the digital canvas..."
-                  className="w-full min-h-[500px] bg-transparent border-none resize-none outline-none text-jade-light text-lg leading-relaxed placeholder:text-jade-shadow/60 font-light"
+                  className="w-full min-h-[500px] bg-transparent border-none resize-none outline-none text-white text-lg leading-relaxed placeholder:text-jade-shadow/60 font-light"
                   autoFocus
                 />
 

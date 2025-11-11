@@ -11,7 +11,7 @@ import type { NextRequest } from 'next/server';
 const LEGACY_ROUTES = [
   '/oracle-beta',
   '/maya-voice',
-  '/sacred-oracle',
+  // '/sacred-oracle', // REMOVED - Now active sacred Holoflower interface
   '/voice-chat',
   // '/consciousness', // REMOVED - Now active as MAIA/KAIROS/UNIFIED interface
   '/oracle',

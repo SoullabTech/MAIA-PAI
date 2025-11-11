@@ -747,7 +747,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     setBreakthroughScore(score);
 
     // Suggest journaling if breakthrough potential is high and we haven't suggested yet
+    // FIXED: Only show if not already dismissed for this conversation
     if (score >= 70 && !showJournalSuggestion && !journalSuggestionDismissed && messages.length >= 6) {
+      console.log('📊 [Breakthrough] Score >=70, showing journal suggestion');
       setShowJournalSuggestion(true);
     }
   }, [messages, showJournalSuggestion, journalSuggestionDismissed]);
@@ -892,7 +894,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   }, [showChatInterface]);
 
   // Auto-recovery timer - if processing states are stuck for too long, reset
-  // Reduced to 30s for better UX - if MAIA is stuck, recover quickly
+  // FIXED: Set to 75s (longer than 60s API timeout) to avoid false positives
   // Keep refs in sync with state (refs declared earlier at line ~299)
   useEffect(() => {
     isProcessingRef.current = isProcessing;
@@ -923,9 +925,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           return;
         }
 
-        // Only trigger recovery if states are STILL stuck after 30s AND audio isn't playing
-        if ((currentIsProcessing || currentIsResponding) && timeSinceActivation >= 29000) {
-          console.warn(`⚠️ [${sessionId}] States genuinely stuck for >30s - auto-recovery triggered`);
+        // Only trigger recovery if states are STILL stuck after 75s AND audio isn't playing
+        // Note: API timeout is 60s, so this only triggers if truly stuck beyond API timeout
+        if ((currentIsProcessing || currentIsResponding) && timeSinceActivation >= 74000) {
+          console.warn(`⚠️ [${sessionId}] States genuinely stuck for >75s - auto-recovery triggered`);
 
           // Show user-friendly message
           const errorMessage: ConversationMessage = {
@@ -943,7 +946,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         } else {
           console.log(`✅ [${sessionId}] Recovery timer fired but states already reset - no action needed`);
         }
-      }, 30000); // 30 second recovery timeout for better UX
+      }, 75000); // 75 second recovery timeout (longer than 60s API timeout to avoid false positives)
 
       return () => {
         console.log(`🧹 [${sessionId}] Recovery timer cleanup - states reset normally`);
@@ -2189,7 +2192,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // Download conversation transcript
   const downloadTranscript = useCallback(async () => {
     try {
-      console.log('📥 Starting conversation download...', { messageCount: messages.length });
+      console.log('📥 Saving conversation to Obsidian...', { messageCount: messages.length });
 
       // Create a formatted transcript with markdown
       const header = `# Conversation with ${agentConfig.name}\n`;
@@ -2205,71 +2208,46 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       const fullContent = header + date + sessionInfo + separator + transcript;
 
-      // 1. Save to Supabase for admin review
-      try {
-        const startTime = messages[0]?.timestamp || new Date();
-        const endTime = messages[messages.length - 1]?.timestamp || new Date();
+      // Save to Obsidian vault
+      const response = await fetch('/api/obsidian/save-conversation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          transcript: fullContent,
+          agentName: agentConfig.name,
+          messageCount: messages.length
+        })
+      });
 
-        const response = await fetch('/api/conversations/save-transcript', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userId,
-            sessionId,
-            agentName: agentConfig.name,
-            agentId: agentConfig.id || 'maia',
-            transcript: fullContent,
-            messageCount: messages.length,
-            startTime: startTime,
-            endTime: endTime
-          })
-        });
-
-        if (response.ok) {
-          console.log('✅ Transcript saved to Supabase');
-        } else {
-          console.warn('⚠️ Failed to save transcript to Supabase:', await response.text());
-        }
-      } catch (saveError) {
-        console.error('❌ Error saving to Supabase:', saveError);
-        // Continue with download even if save fails
-      }
-
-      // 2. Download as markdown file (only on client side)
-      if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-        const blob = new Blob([fullContent], { type: 'text/markdown' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `conversation-${agentConfig.name}-${new Date().toISOString().split('T')[0]}.md`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        console.log('✅ Conversation downloaded successfully');
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Conversation saved to Obsidian:', data.filename);
 
         // Show success toast
         toast.success(
           <div>
-            <div className="font-semibold">Conversation Downloaded</div>
+            <div className="font-semibold">💎 Saved to Obsidian</div>
             <div className="text-sm text-white/70">
-              {messages.length} messages saved • Check your Downloads folder
+              {messages.length} messages • AIN Vault/MAIA Conversations
             </div>
           </div>,
-          { duration: 4000 }
+          { duration: 5000 }
         );
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to save to Obsidian');
       }
-    } catch (error) {
-      console.error('❌ Error downloading conversation:', error);
+    } catch (error: any) {
+      console.error('❌ Error saving conversation to Obsidian:', error);
       toast.error(
         <div>
-          <div className="font-semibold">Download Failed</div>
-          <div className="text-sm text-white/70">Please try again</div>
-        </div>
+          <div className="font-semibold">Save Failed</div>
+          <div className="text-sm text-white/70">{error.message || 'Please try again'}</div>
+        </div>,
+        { duration: 5000 }
       );
     }
-  }, [messages, agentConfig.name, agentConfig.id, sessionId, userId, userName]);
+  }, [messages, agentConfig.name, sessionId, userName]);
 
   // Voice synthesis for text chat
   const [currentlySpeakingId, setCurrentlySpeakingId] = useState<string | undefined>();
@@ -2618,6 +2596,43 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         />
       )}
 
+      {/* Scribe Mode Recording Indicator */}
+      <AnimatePresence>
+        {isScribing && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-8 left-1/2 transform -translate-x-1/2 z-50"
+          >
+            <div className="bg-gradient-to-r from-jade-shadow/90 to-jade-night/90 backdrop-blur-xl rounded-full px-6 py-3 border border-jade-sage/50 shadow-2xl">
+              <div className="flex items-center gap-3">
+                <motion.div
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 1, 0.5]
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="w-3 h-3 bg-jade-jade rounded-full shadow-[0_0_12px_rgba(168,203,180,0.8)]"
+                />
+                <div>
+                  <div className="text-jade-jade text-sm font-medium">📝 Scribe Mode Active</div>
+                  <div className="text-jade-mineral/70 text-xs">
+                    Recording session •
+                    {scribeSession?.voiceTranscripts.length || 0} voice +
+                    {scribeSession?.consultationMessages.length || 0} consultations
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* MAIA Settings Panel */}
       {showSettingsPanel && (
         <MaiaSettingsPanel onClose={() => setShowSettingsPanel(false)} />
@@ -2675,7 +2690,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         >
           {/* Holoflower wrapped in Transformational Presence - inherits breathing, color, field */}
           <motion.div
-            className="cursor-pointer opacity-60 hover:opacity-80 transition-opacity"
+            className="cursor-pointer opacity-60 hover:opacity-80 transition-opacity relative"
+            style={{
+              zIndex: 20,
+              pointerEvents: 'auto'  // Ensure this div captures clicks
+            }}
         onClick={async (e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -2721,7 +2740,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                width: holoflowerSize,
                height: holoflowerSize,
                background: 'transparent',
-               overflow: 'visible'
+               overflow: 'visible',
+               pointerEvents: 'none'  // Allow clicks to pass through to parent
              }}>
           {/* 🌊 LIQUID AI - Rhythm-aware Holoflower pulses with conversational rhythm */}
           <RhythmHoloflower

@@ -180,7 +180,8 @@ export const SacredHoloflower: React.FC<SacredHoloflowerProps> = ({
           background: 'transparent',
           overflow: 'visible',
           opacity: dimmed ? 0.3 : 1,
-          transition: 'opacity 0.3s ease'
+          transition: 'opacity 0.3s ease',
+          pointerEvents: interactive ? 'auto' : 'none'  // Pass clicks through when not interactive
         }}
       >
         {/* Base Holoflower Image - Sacred Spiralogic mandala */}

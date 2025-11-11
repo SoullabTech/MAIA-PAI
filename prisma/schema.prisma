@@ -419,3 +419,34 @@ model BetaTester {
   @@index([status])
   @@index([invitedAt])
 }
+
+// ============================================================================
+// CONVERSATION TRANSCRIPTS (Admin Review)
+// ============================================================================
+
+model ConversationTranscript {
+  id            String   @id @default(cuid())
+  userId        String
+  sessionId     String
+
+  // Agent info
+  agentName     String
+  agentId       String
+
+  // Conversation data
+  messageCount  Int
+  transcript    String   @db.Text // Full markdown transcript
+
+  // Metadata
+  startTime     DateTime?
+  endTime       DateTime?
+  downloadedAt  DateTime @default(now())
+
+  // Analytics snapshot
+  dominantPhase String?
+  conversationDepth Float?
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([downloadedAt])
+}
