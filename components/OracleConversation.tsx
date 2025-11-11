@@ -1683,9 +1683,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
             for (const line of lines) {
               if (line.startsWith('data: ')) {
-                const data = line.slice(6);
-                if (data === '[DONE]') {
-                  console.log('✅ [STREAM] Done signal received');
+                const data = line.slice(6).trim();
+                if (data === '[DONE]' || !data) {
+                  if (data === '[DONE]') {
+                    console.log('✅ [STREAM] Done signal received');
+                  }
                   continue;
                 }
 
@@ -1738,7 +1740,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     }
                   }
                 } catch (e) {
-                  console.warn('⚠️ [STREAM] Failed to parse JSON:', data.substring(0, 50));
+                  // Only log parse errors for non-empty data that looks like it should be JSON
+                  if (data.startsWith('{') || data.startsWith('[')) {
+                    console.warn('⚠️ [STREAM] Failed to parse JSON:', data.substring(0, 50));
+                  }
                 }
               }
             }
