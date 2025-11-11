@@ -286,41 +286,6 @@ export const SacredHoloflower: React.FC<SacredHoloflowerProps> = ({
           );
         })}
 
-        {/* Dynamic Voice Visualization Ring */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={size * 0.42}
-          fill="none"
-          stroke={isMaiaSpeaking ? 'url(#maia-voice-gradient)' : 'url(#user-voice-gradient)'}
-          strokeWidth={6 + voiceAmplitude * 12}
-          opacity={0.6 + voiceAmplitude * 0.9}
-          className="voice-ring"
-          style={{
-            filter: `blur(${voiceAmplitude * 3}px) drop-shadow(0 0 ${voiceAmplitude * 20}px ${isMaiaSpeaking ? 'rgba(147, 51, 234, 1)' : 'rgba(59, 130, 246, 1)'})`,
-            transform: `scale(${1 + voiceAmplitude * 0.15})`,
-            transformOrigin: 'center',
-            transition: 'all 0.1s ease-out'
-          }}
-          pointerEvents="none"
-        />
-
-        {/* Voice gradient definitions */}
-        <defs>
-          {/* MAIA speaking - purple/violet gradient */}
-          <linearGradient id="maia-voice-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#a855f7" stopOpacity="1" />
-            <stop offset="50%" stopColor="#d946ef" stopOpacity="1" />
-            <stop offset="100%" stopColor="#f0abfc" stopOpacity="1" />
-          </linearGradient>
-
-          {/* User speaking - blue/cyan gradient */}
-          <linearGradient id="user-voice-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#60a5fa" stopOpacity="1" />
-            <stop offset="50%" stopColor="#93c5fd" stopOpacity="1" />
-            <stop offset="100%" stopColor="#dbeafe" stopOpacity="1" />
-          </linearGradient>
-        </defs>
       </svg>
 
       {/* Facet info tooltip */}

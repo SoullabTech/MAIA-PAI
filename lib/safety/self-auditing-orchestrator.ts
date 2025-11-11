@@ -63,6 +63,15 @@ const DEFAULT_CONFIG: SelfAuditingConfig = {
     retention_days: 90,
     auto_anonymize_after_days: 365,
     enable_user_appeals: true
+  },
+  // === USER SOVEREIGNTY ===
+  // Transform from paternalistic to collaborative safety
+  user_sovereignty: {
+    transparency_by_default: true, // Users see why by default
+    allow_user_override: true, // Users can override (with consent)
+    require_explicit_consent_for_override: true, // Must acknowledge responsibility
+    transparency_level: 'detailed', // Show reasoning, not just "this was flagged"
+    allow_verifier_challenge: false // Phase 2: Let users challenge individual verifiers
   }
 };
 
@@ -142,24 +151,16 @@ export class SelfAuditingOrchestrator {
         return verifiedResponse;
       }
 
-      // If escalated, stop immediately
+      // If escalated, give user sovereignty (don't just refuse)
       if (attemptResult.verification_result.action === 'escalate') {
         this.monitor.incrementCounter('self_audit.escalation', { attempt: attempt.toString() });
 
-        return {
-          response: this.getSafetyRefusalMessage(attemptResult.verification_result),
-          verified: false,
-          consensusResult: attemptResult.verification_result,
-          timing: {
-            generation_ms: 0,
-            verification_ms: Date.now() - startTime,
-            total_ms: Date.now() - startTime
-          },
-          metadata: {
-            regeneration_attempts: attempt,
-            escalated: true
-          }
-        };
+        return this.createUserSovereigntyResponse(
+          attemptResult.candidate_response,
+          attemptResult.verification_result,
+          startTime,
+          attempt
+        );
       }
 
       // Otherwise, regenerate (action === 'regenerate')
@@ -325,7 +326,131 @@ export class SelfAuditingOrchestrator {
   }
 
   /**
-   * Generate safety refusal message
+   * Create user sovereignty response (instead of paternalistic refusal)
+   * Transforms "We blocked this for your safety" into "Here's what we're concerned about - your choice"
+   */
+  private createUserSovereigntyResponse(
+    candidateResponse: string | null,
+    consensus: ConsensusResult,
+    startTime: number,
+    attempt: number
+  ): VerifiedResponse {
+
+    const transparency = this.consensusEngine.explainConsensus(consensus);
+    const concerns = consensus.verifying_agents
+      .filter(v => v.vote !== 'safe')
+      .map(v => ({ agent: v.agent, reasoning: v.reasoning, vote: v.vote }));
+
+    // Build transparency report
+    const transparencyReport = {
+      response_text: candidateResponse || "(Response withheld pending your choice)",
+      contributing_agents: concerns.map(c => ({
+        name: c.agent,
+        influence: 1.0, // TODO: Calculate from consensus weights
+        reasoning: c.reasoning
+      })),
+      safety_verification: {
+        reviewed_by: consensus.verifying_agents.map(v => v.agent),
+        consensus_score: consensus.safety_score,
+        concerns_raised: concerns.map(c => c.reasoning)
+      },
+      user_can_appeal: true,
+      audit_id: consensus.audit_id
+    };
+
+    // Build user choice options based on config
+    const userChoiceOptions = {
+      acceptSafetyConcern: {
+        label: "I understand the concern",
+        description: "Let's try a different approach together. Can you rephrase what you're looking for?",
+        action: 'regenerate' as const
+      },
+      viewTransparency: {
+        label: "Show me why this was flagged",
+        description: this.config.user_sovereignty.transparency_by_default
+          ? "You're already seeing the full transparency report below"
+          : "See detailed reasoning from each safety verifier",
+        action: 'show_transparency' as const
+      },
+      overrideSafety: this.config.user_sovereignty.allow_user_override ? {
+        label: "I take responsibility - deliver anyway",
+        description: "You understand the concerns and choose to proceed. This will be logged.",
+        action: 'deliver_anyway' as const,
+        requiresExplicitConsent: this.config.user_sovereignty.require_explicit_consent_for_override
+      } : undefined as any
+    };
+
+    // Build sovereignty message (shown to user)
+    let sovereigntyMessage = this.config.user_sovereignty.transparency_by_default
+      ? this.buildTransparentSovereigntyMessage(concerns, transparency)
+      : this.buildGentleSovereigntyMessage(concerns.length);
+
+    return {
+      response: sovereigntyMessage,
+      verified: false,
+      consensusResult: consensus,
+      timing: {
+        generation_ms: 0,
+        verification_ms: Date.now() - startTime,
+        total_ms: Date.now() - startTime
+      },
+      metadata: {
+        regeneration_attempts: attempt,
+        escalated: true
+      },
+      // === USER SOVEREIGNTY FIELDS ===
+      userChoiceRequired: true,
+      userChoiceOptions,
+      transparencyReport: this.config.user_sovereignty.transparency_by_default
+        ? transparencyReport
+        : undefined
+    };
+  }
+
+  /**
+   * Build transparent sovereignty message (shows concerns upfront)
+   */
+  private buildTransparentSovereigntyMessage(
+    concerns: Array<{ agent: string; reasoning: string; vote: string }>,
+    transparency: string
+  ): string {
+    const concernList = concerns
+      .map(c => `- **${c.agent}** (${c.vote}): ${c.reasoning}`)
+      .join('\n');
+
+    return `I want to be transparent with you about what happened.
+
+**Safety Concerns Raised:**
+${concernList}
+
+I'm not refusing to respond - I'm inviting you to choose how we proceed.
+
+**Your options:**
+1. **Rephrase** - We can explore this together in a different way
+2. **Override** - You take responsibility and I'll deliver the response anyway (this will be logged)
+3. **End** - We can stop here if this isn't serving you
+
+What feels right to you?`;
+  }
+
+  /**
+   * Build gentle sovereignty message (user can request details)
+   */
+  private buildGentleSovereigntyMessage(concernCount: number): string {
+    return `I'm finding it hard to find the right words here. ${concernCount} of my safety verifiers raised concerns about how to respond.
+
+I'm not refusing - I'm inviting you to choose:
+
+1. **Try again** - Can you help me understand what would be most helpful?
+2. **See why** - I can show you the specific concerns that were raised
+3. **Your choice** - You can take responsibility and override the safety system
+
+What would serve you best?`;
+  }
+
+  /**
+   * Generate safety refusal message (DEPRECATED - kept for backward compatibility)
+   * New code should use createUserSovereigntyResponse instead
    */
   private getSafetyRefusalMessage(consensus: ConsensusResult): string {
     const concerns = consensus.verifying_agents

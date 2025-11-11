@@ -3,6 +3,9 @@ import Head from 'next/head';
 export const PWAMetaTags = () => (
   <Head>
     <meta name="application-name" content="ARIA Maya Dashboard" />
+    {/* Both meta tags included for maximum compatibility:
+        - apple-mobile-web-app-capable: iOS/Safari specific (deprecated but still functional)
+        - mobile-web-app-capable: Modern cross-platform standard */}
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Maya" />

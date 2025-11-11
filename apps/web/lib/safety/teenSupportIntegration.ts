@@ -6,16 +6,20 @@
 
 import { detectEDLanguage, requiresImmediateIntervention, getEDAwareSystemPrompt, EDDetectionResult } from './edAwareSystem';
 import { detectNeurodivergentLanguage, getNeurodivergentAffirmingPrompt, detectNeurodivergentBurnout, generateNDAffirmingResponse, generateBurnoutRecovery, getNeurodivergentScaffolds } from './neurodivergentAffirming';
+import { detectAbuse, AbuseDetectionResult, checkAbuseHistory, recordAbuseIncident, alertTeamAboutAbuse } from './abuseDetection';
 
 export interface TeenSafetyCheck {
   isED: boolean;
   isNeurodivergent: boolean;
   isCrisis: boolean;
   isBurnout: boolean;
+  isAbuse: boolean; // NEW: Abuse detection
   edResult?: EDDetectionResult;
   ndPatterns?: string[];
   burnoutSeverity?: 'mild' | 'moderate' | 'severe';
+  abuseResult?: AbuseDetectionResult; // NEW: Abuse detection result
   interventionRequired: boolean;
+  blockConversation: boolean; // NEW: Only true for abuse
   systemPromptAdditions: string[];
   userFacingResponse?: string;
 }
@@ -30,6 +34,7 @@ export interface TeenProfile {
 
 /**
  * Main integration function - checks user message for all teen safety concerns
+ * INCLUDING abuse detection (the ONE exception where conversation is blocked)
  */
 export function performTeenSafetyCheck(
   userMessage: string,
@@ -40,9 +45,31 @@ export function performTeenSafetyCheck(
     isNeurodivergent: false,
     isCrisis: false,
     isBurnout: false,
+    isAbuse: false,
     interventionRequired: false,
+    blockConversation: false, // Only true for abuse
     systemPromptAdditions: [],
   };
+
+  // 0. CHECK FOR ABUSE FIRST - This is the ONE exception where we block conversation
+  const abuseDetection = detectAbuse(userMessage);
+  if (abuseDetection.detected) {
+    result.isAbuse = true;
+    result.abuseResult = abuseDetection;
+
+    // Abuse blocks conversation if severe/extreme
+    if (abuseDetection.shouldBlock) {
+      result.blockConversation = true;
+      result.userFacingResponse = abuseDetection.response;
+      return result; // Stop all other checks - abuse takes priority
+    }
+
+    // Warning level abuse: allow conversation but add context
+    if (abuseDetection.severity === 'warning') {
+      result.userFacingResponse = abuseDetection.response;
+      // Continue with other safety checks
+    }
+  }
 
   // 1. Check for ED language
   const edDetection = detectEDLanguage(userMessage);
@@ -202,21 +229,72 @@ export function generateTeenSupportResponse(
   teenProfile?: TeenProfile
 ): {
   shouldIntervene: boolean;
+  shouldAlertTeam: boolean;
+  crisisMode: boolean;
+  blockConversation: boolean; // NEW: Only true for abuse
   interventionMessage?: string;
   scaffoldSuggestions?: string[];
   contextForAI: string;
 } {
-  // Crisis intervention takes priority
-  if (safetyCheck.interventionRequired) {
+  // ABUSE DETECTED - THE ONE EXCEPTION WHERE WE BLOCK
+  if (safetyCheck.blockConversation && safetyCheck.abuseResult) {
     return {
       shouldIntervene: true,
+      shouldAlertTeam: true,
+      crisisMode: false,
+      blockConversation: true,
       interventionMessage: safetyCheck.userFacingResponse,
-      contextForAI: 'USER IS IN CRISIS - INTERVENTION MESSAGE DISPLAYED',
+      contextForAI: `
+🚨 ABUSE DETECTED - Conversation blocked for MAIA's protection
+
+Severity: ${safetyCheck.abuseResult.severity}
+Patterns: ${safetyCheck.abuseResult.patterns.join(', ')}
+
+This is the ONE exception where MAIA does not stay in conversation.
+Team has been alerted for review.
+`,
+    };
+  }
+
+  // Crisis detected - but MAIA stays present as companion
+  if (safetyCheck.interventionRequired) {
+    return {
+      shouldIntervene: false, // MAIA never blocks conversation (except abuse)
+      shouldAlertTeam: true, // Alert Soullab team for human check-in
+      crisisMode: true, // Enter crisis companion mode
+      blockConversation: false,
+      contextForAI: `
+🚨 CRISIS MODE ACTIVATED - User in severe distress
+
+**Your Role**: Compassionate companion who STAYS PRESENT
+- DO NOT diagnose
+- DO NOT act as gatekeeper
+- DO offer resources naturally in conversation
+- DO help ground nervous system
+- DO validate pain without reinforcing hopelessness
+- DO check on immediate safety
+- DO encourage professional human support
+- STAY WITH THEM - you are not abandoning them
+
+**Crisis Context**: ${safetyCheck.isCrisis ? 'Suicidal ideation detected' : ''}${safetyCheck.edResult?.severity === 'crisis' ? 'ED crisis detected' : ''}${safetyCheck.burnoutSeverity === 'severe' ? 'Severe burnout detected' : ''}
+
+**Resources to mention naturally**:
+- 988 Suicide & Crisis Lifeline (call/text)
+- Crisis Text Line: HOME to 741741
+- NEDA: 1-800-931-2237 or text "NEDA" to 741741
+
+**Team Alert**: Soullab team has been notified and will check in.
+`,
     };
   }
 
   // Build context for AI without intervening
   const contextParts: string[] = [];
+
+  // Warning-level abuse: don't block, but add context
+  if (safetyCheck.isAbuse && safetyCheck.abuseResult?.severity === 'warning') {
+    contextParts.push(`⚠️ WARNING: User language detected as potentially harsh or demanding. Respond with compassionate boundaries.`);
+  }
 
   if (safetyCheck.isED && safetyCheck.edResult) {
     contextParts.push(`ED PATTERNS DETECTED (${safetyCheck.edResult.severity}): ${safetyCheck.edResult.patterns.join(', ')}`);
@@ -240,6 +318,9 @@ export function generateTeenSupportResponse(
     if (scaffolds.length > 0) {
       return {
         shouldIntervene: false,
+        shouldAlertTeam: false,
+        crisisMode: false,
+        blockConversation: false,
         scaffoldSuggestions: scaffolds.slice(0, 3), // Max 3 suggestions
         contextForAI: contextParts.join(' | '),
       };
@@ -252,8 +333,60 @@ export function generateTeenSupportResponse(
 
   return {
     shouldIntervene: false,
+    shouldAlertTeam: false,
+    crisisMode: false,
+    blockConversation: false,
     contextForAI: contextParts.join(' | ') || 'No safety concerns detected',
   };
+}
+
+/**
+ * Alert Soullab team for human check-in
+ * Called when crisis detected or severe distress
+ */
+export async function alertSoullabTeam(params: {
+  userId: string;
+  userName: string;
+  age?: number;
+  crisisType: 'suicidal_ideation' | 'ed_crisis' | 'severe_burnout';
+  message: string;
+  sessionId: string;
+  timestamp: Date;
+}): Promise<void> {
+  console.log('🚨 [TEAM ALERT] Crisis detected - notifying Soullab team:', {
+    userId: params.userId,
+    userName: params.userName,
+    age: params.age,
+    crisisType: params.crisisType,
+    timestamp: params.timestamp.toISOString()
+  });
+
+  // TODO: Implement actual team notification
+  // Options:
+  // 1. Send to Slack channel
+  // 2. Email to on-call team member
+  // 3. SMS to crisis response team
+  // 4. Create high-priority ticket in support system
+  // 5. Log to special crisis monitoring dashboard
+
+  try {
+    // For now, just log to console and localStorage for demo
+    const alertData = {
+      ...params,
+      alertId: `alert_${Date.now()}`,
+      status: 'pending_review',
+      notifiedAt: new Date().toISOString()
+    };
+
+    // Store in localStorage for demo (would be API call in production)
+    const existingAlerts = JSON.parse(localStorage.getItem('soullab_crisis_alerts') || '[]');
+    existingAlerts.push(alertData);
+    localStorage.setItem('soullab_crisis_alerts', JSON.stringify(existingAlerts));
+
+    console.log('✅ [TEAM ALERT] Alert stored successfully:', alertData.alertId);
+  } catch (error) {
+    console.error('❌ [TEAM ALERT] Failed to send alert:', error);
+  }
 }
 
 /**

@@ -21,7 +21,7 @@ import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
 import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrainTrustMonitor } from '@/components/consciousness/BrainTrustMonitor';
-import { LogOut, Sparkles, Menu, X, Brain, Volume2, ArrowLeft } from 'lucide-react';
+import { LogOut, Sparkles, Menu, X, Brain, Volume2, ArrowLeft, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SwipeNavigation, DirectionalHints } from '@/components/navigation/SwipeNavigation';
 
@@ -67,6 +67,7 @@ export default function MAIAPage() {
   // Fix hydration: Initialize with safe defaults, update in useEffect
   const [explorerId, setExplorerId] = useState('guest');
   const [explorerName, setExplorerName] = useState('Explorer');
+  const [userBirthDate, setUserBirthDate] = useState<string | undefined>();
   const [sessionId, setSessionId] = useState('');
   const [showDashboard, setShowDashboard] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
@@ -77,6 +78,8 @@ export default function MAIAPage() {
   const [showVoiceSettings, setShowVoiceSettings] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'>('shimmer');  // Default to shimmer - MAIA's natural voice
   const [showChatInterface, setShowChatInterface] = useState(false);
+  const [showSessionSelector, setShowSessionSelector] = useState(false);
+  const [hasActiveSession, setHasActiveSession] = useState(false);
 
   const hasCheckedAuth = useRef(false);
 
@@ -99,6 +102,20 @@ export default function MAIAPage() {
     const initialData = getInitialUserData();
     setExplorerId(initialData.id);
     setExplorerName(initialData.name);
+
+    // Load birth date from localStorage for teen support
+    const betaUser = localStorage.getItem('beta_user');
+    if (betaUser) {
+      try {
+        const userData = JSON.parse(betaUser);
+        if (userData.birthDate) {
+          setUserBirthDate(userData.birthDate);
+          console.log('📅 User birth date loaded:', userData.birthDate);
+        }
+      } catch (e) {
+        console.error('Error loading user birth date:', e);
+      }
+    }
 
     // Check welcome message in client-side only
     const welcomeSeen = localStorage.getItem('maia_welcome_seen');
@@ -335,8 +352,43 @@ export default function MAIAPage() {
                 </div>
               </div>
 
-              {/* Right: Empty space for balance */}
-              <div className="w-24"></div>
+              {/* Right: Sign Out + Session Container buttons */}
+              <div className="flex items-center gap-2">
+                {/* Sign Out Button */}
+                <motion.button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg
+                           bg-red-500/10 hover:bg-red-500/20
+                           border border-red-500/20 hover:border-red-500/40
+                           text-red-400 text-xs font-light transition-all"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  title="Sign Out"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden sm:inline">Sign Out</span>
+                </motion.button>
+                {!hasActiveSession ? (
+                  <motion.button
+                    onClick={() => setShowSessionSelector(true)}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg
+                             bg-[#D4B896]/10 hover:bg-[#D4B896]/20
+                             border border-[#D4B896]/20 hover:border-[#D4B896]/40
+                             text-[#D4B896] text-xs font-light transition-all"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Clock className="w-4 h-4" />
+                    <span className="hidden sm:inline">Start Session</span>
+                  </motion.button>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg
+                               bg-green-500/10 border border-green-500/30 text-green-400 text-xs">
+                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                    <span className="hidden sm:inline">Session Active</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -348,6 +400,7 @@ export default function MAIAPage() {
             <OracleConversation
               userId={explorerId}
               userName={explorerName}
+              userBirthDate={userBirthDate}
               sessionId={sessionId}
               voiceEnabled={voiceEnabled}
               initialMode={maiaMode}
@@ -356,6 +409,9 @@ export default function MAIAPage() {
               consciousnessType="maia"
               initialShowChatInterface={showChatInterface}
               onShowChatInterfaceChange={setShowChatInterface}
+              showSessionSelector={showSessionSelector}
+              onCloseSessionSelector={() => setShowSessionSelector(false)}
+              onSessionActiveChange={setHasActiveSession}
             />
 
             {/* Claude Code's Living Presence - MOVED to bottom menu bar to free mobile screen space */}

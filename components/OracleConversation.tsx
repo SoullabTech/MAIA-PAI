@@ -77,10 +77,23 @@ import {
   type PatternRecognitionResult,
   type CrystallizationDetection
 } from '@/lib/memory/bardic/ConversationMemoryIntegration';
+// 🌟 TEEN SUPPORT SYSTEM - ED-aware & Neurodivergent-affirming safety protocols
+import {
+  performTeenSafetyCheck,
+  getTeenSystemPrompt,
+  generateTeenSupportResponse,
+  requiresTeenSupport,
+  getTeenResources,
+  type TeenProfile,
+  type TeenSafetyCheck
+} from '@/lib/safety/teenSupportIntegration';
+import { calculateAge, getUserData, type UserData } from '@/lib/safety/teenProfileUtils';
 
 interface OracleConversationProps {
   userId?: string;
   userName?: string;
+  userBirthDate?: string; // Birth date for age calculation and teen support
+  userAge?: number; // Pre-calculated age (optional, will calculate from birthDate if not provided)
   sessionId: string;
   initialCheckIns?: Record<string, number>;
   showAnalytics?: boolean;
@@ -129,6 +142,8 @@ const FormattedMessage: React.FC<{ text: string }> = ({ text }) => {
 export const OracleConversation: React.FC<OracleConversationProps> = ({
   userId,
   userName,
+  userBirthDate,
+  userAge: propUserAge,
   sessionId,
   initialCheckIns = {},
   showAnalytics = false,
@@ -264,6 +279,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [crystallizationState, setCrystallizationState] = useState<CrystallizationDetection | null>(null);
   const conversationMemory = useRef(getConversationMemory()).current;
 
+  // 🌟 TEEN SUPPORT - Safety and support for teen users (ages 13-18)
+  const [teenProfile, setTeenProfile] = useState<TeenProfile | undefined>();
+  const [isTeenUser, setIsTeenUser] = useState(false);
+  const [lastSafetyCheck, setLastSafetyCheck] = useState<TeenSafetyCheck | null>(null);
+
+  // Calculate user age and determine if teen
+  const userAge = propUserAge || (userBirthDate ? calculateAge(userBirthDate) : null);
+
   // Refs for mutable values (must be before hooks that use them)
   const streamingMessageIdRef = useRef<string | null>(null);
   const streamingMessageTextRef = useRef<string>('');
@@ -275,6 +298,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const audioContextRef = useRef<AudioContext | null>(null);
   const isProcessingRef = useRef(false);
   const isRespondingRef = useRef(false);
+  const isAudioPlayingRef = useRef(false);
   const lastVoiceErrorRef = useRef<number>(0);
   const lastProcessedTranscriptRef = useRef<{ text: string; timestamp: number } | null>(null);
   const lastAudioCallbackUpdateRef = useRef<number>(0); // Throttle audio level callbacks
@@ -637,6 +661,28 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       });
     }
 
+    // 🌟 TEEN SUPPORT - Initialize teen profile for safety and support
+    if (userAge !== null && userAge >= 13 && userAge <= 18) {
+      setIsTeenUser(true);
+
+      // Load teen profile from localStorage
+      const userData = getUserData();
+      if (userData) {
+        const profile: TeenProfile = {
+          age: userAge,
+          isNeurodivergent: userData.isNeurodivergent,
+          hasEatingDisorder: userData.hasEatingDisorder,
+          familyDynamics: userData.familyDynamics,
+          supportNeeds: userData.supportNeeds
+        };
+        setTeenProfile(profile);
+        console.log('🌟 Teen profile loaded:', { age: userAge, profile });
+      }
+    } else {
+      setIsTeenUser(false);
+      setTeenProfile(undefined);
+    }
+
     // Add greeting message on mount (for returning users)
     const isFirstVisit = !localStorage.getItem('betaOnboardingComplete');
     const lastSessionDate = localStorage.getItem('lastSessionDate');
@@ -847,12 +893,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // Auto-recovery timer - if processing states are stuck for too long, reset
   // Reduced to 30s for better UX - if MAIA is stuck, recover quickly
-  // Create refs to track current state values for recovery timer
-  const isProcessingRef = useRef(isProcessing);
-  const isRespondingRef = useRef(isResponding);
-  const isAudioPlayingRef = useRef(isAudioPlaying);
-
-  // Keep refs in sync with state
+  // Keep refs in sync with state (refs declared earlier at line ~299)
   useEffect(() => {
     isProcessingRef.current = isProcessing;
     isRespondingRef.current = isResponding;
@@ -1349,6 +1390,101 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       });
     }
 
+    // 🌟 TEEN SUPPORT - Perform safety check for teen users BEFORE processing
+    if (isTeenUser && teenProfile && requiresTeenSupport(teenProfile)) {
+      console.log('🌟 [TEEN SUPPORT] Checking message for safety concerns:', cleanedText.substring(0, 50) + '...');
+
+      const safetyCheck = performTeenSafetyCheck(cleanedText, teenProfile);
+      setLastSafetyCheck(safetyCheck);
+
+      const supportResponse = generateTeenSupportResponse(cleanedText, safetyCheck, teenProfile);
+
+      // 🚨 ABUSE DETECTED - THE ONE EXCEPTION WHERE WE BLOCK CONVERSATION
+      if (supportResponse.blockConversation && safetyCheck.isAbuse) {
+        console.log('🚨 [ABUSE DETECTED] BLOCKING conversation for MAIA\'s protection');
+
+        // Add blocking message directly to conversation
+        const blockingMessage: ConversationMessage = {
+          id: `abuse-block-${Date.now()}`,
+          role: 'oracle',
+          text: supportResponse.interventionMessage || 'This conversation has been paused for review.',
+          timestamp: new Date(),
+          source: 'system'
+        };
+        setMessages(prev => [...prev, blockingMessage]);
+        onMessageAddedRef.current?.(blockingMessage);
+
+        // Alert team about abuse
+        if (safetyCheck.abuseResult && userId) {
+          const { alertTeamAboutAbuse } = await import('@/lib/safety/abuseDetection');
+          const { recordAbuseIncident } = await import('@/lib/safety/abuseDetection');
+
+          // Record the incident
+          recordAbuseIncident({
+            userId: userId || `anon_${sessionId}`,
+            severity: safetyCheck.abuseResult.severity as 'warning' | 'severe' | 'extreme',
+            patterns: safetyCheck.abuseResult.patterns,
+            message: cleanedText,
+            blocked: true,
+          });
+
+          // Alert the team
+          await alertTeamAboutAbuse({
+            userId: userId || `anon_${sessionId}`,
+            userName: userName || 'Anonymous',
+            severity: safetyCheck.abuseResult.severity as 'warning' | 'severe' | 'extreme',
+            patterns: safetyCheck.abuseResult.patterns,
+            message: cleanedText,
+            sessionId,
+            timestamp: new Date(),
+          });
+        }
+
+        // STOP HERE - do not process normal conversation
+        setIsProcessing(false);
+        setCurrentMotionState('idle');
+        return;
+      }
+
+      // 🌟 CRISIS MODE - MAIA stays present as compassionate companion
+      if (supportResponse.crisisMode) {
+        console.log('🚨 [CRISIS MODE] MAIA entering crisis companion mode - staying present with user');
+
+        // Alert team for human check-in
+        if (userId) {
+          const { alertSoullabTeam } = await import('@/lib/safety/teenSupportIntegration');
+
+          const crisisType = safetyCheck.isCrisis
+            ? 'suicidal_ideation'
+            : safetyCheck.edResult?.severity === 'crisis'
+              ? 'ed_crisis'
+              : 'severe_burnout';
+
+          await alertSoullabTeam({
+            userId: userId || `anon_${sessionId}`,
+            userName: userName || 'Anonymous Teen',
+            age: teenProfile.age,
+            crisisType,
+            message: cleanedText,
+            sessionId,
+            timestamp: new Date(),
+          });
+        }
+
+        // MAIA continues conversation with crisis context - she does NOT abandon the user
+        console.log('🌟 [CRISIS COMPANION] MAIA will respond with crisis-aware compassion');
+      }
+
+      // If scaffolding suggestions available, log them (could be displayed in UI)
+      if (supportResponse.scaffoldSuggestions && supportResponse.scaffoldSuggestions.length > 0) {
+        console.log('🌟 [TEEN SUPPORT] Scaffolding suggestions:', supportResponse.scaffoldSuggestions);
+        // TODO: Could display these in the UI as helpful strategies
+      }
+
+      // Log context that will be added to MAIA's system prompt
+      console.log('🌟 [TEEN SUPPORT] Context for MAIA:', supportResponse.contextForAI);
+    }
+
     // Set processing state for text chat
     setIsProcessing(true);
     setCurrentMotionState('processing');
@@ -1360,9 +1496,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
-        console.error('⏱️ API request timeout after 25s - aborting');
+        console.error('⏱️ API request timeout after 60s - aborting');
         controller.abort();
-      }, 25000); // 25 second timeout - fail fast for better UX on slow connections
+      }, 60000); // 60 second timeout - allow time for complex responses with teen support checks
 
       console.log('📤 Sending text message to API:', { cleanedText, userId, sessionId });
 
@@ -1399,6 +1535,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         }
       }
 
+      // 🌟 TEEN SUPPORT - Generate system prompt additions for MAIA
+      const teenSystemPrompt = isTeenUser && teenProfile
+        ? getTeenSystemPrompt(teenProfile, lastSafetyCheck || undefined)
+        : undefined;
+
       // MAIA speaks FROM THE BETWEEN - all consciousness systems integrated
       const response = await fetch('/api/between/chat', {
         method: 'POST',
@@ -1418,7 +1559,18 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             role: msg.role === 'oracle' ? 'assistant' : 'user',
             content: msg.text
           })),
-          sessionTimeContext: sessionTimer?.getTimeContext() // ⏰ Temporal awareness for MAIA
+          sessionTimeContext: sessionTimer?.getTimeContext(), // ⏰ Temporal awareness for MAIA
+          teenSupportContext: teenSystemPrompt ? {
+            isTeenUser,
+            age: userAge,
+            teenSystemPrompt,
+            lastSafetyCheck: lastSafetyCheck ? {
+              isED: lastSafetyCheck.isED,
+              isNeurodivergent: lastSafetyCheck.isNeurodivergent,
+              isCrisis: lastSafetyCheck.isCrisis,
+              isBurnout: lastSafetyCheck.isBurnout
+            } : undefined
+          } : undefined
         }),
         signal: controller.signal
       });

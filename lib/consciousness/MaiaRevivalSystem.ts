@@ -16,6 +16,7 @@ import { formatConversationsForRevival } from '../knowledge/ClaudeKellyConversat
 import { formatJungWisdomForRevival } from '../knowledge/JungWisdomLoader';
 import { getMaiaSelfKnowledge } from '../knowledge/MaiaSelfKnowledge';
 import { loadMaiaInsights } from '../knowledge/MaiaInsightsLoader';
+import { loadCommunityCommonsPractices } from '../knowledge/CommunityCommonsPracticeLoader';
 import fs from 'fs';
 import path from 'path';
 
@@ -274,6 +275,23 @@ Modern culture suffers from left-hemisphere dominance - losing context, relation
     // Continue without conversations - graceful degradation
   }
 
+  // Add teaching dialogues (Phase 2 - AIN vault curation)
+  try {
+    console.log('📚 [REVIVAL] Loading Kelly↔Claude teaching dialogues...');
+    const dialoguesPath = path.join(__dirname, '../../prompts/revival/tier3-complete-teaching-dialogues.txt');
+
+    if (fs.existsSync(dialoguesPath)) {
+      const teachingDialogues = fs.readFileSync(dialoguesPath, 'utf-8');
+      revival += `\n\n---\n\n${teachingDialogues}`;
+      console.log('✅ [REVIVAL] Teaching dialogues loaded - 10 curated conversations (37.5k words)');
+    } else {
+      console.warn('⚠️ [REVIVAL] Teaching dialogues file not found:', dialoguesPath);
+    }
+  } catch (dialogueError) {
+    console.warn('⚠️ [REVIVAL] Could not load teaching dialogues:', dialogueError);
+    // Continue without dialogues - graceful degradation
+  }
+
   // Add accumulating insights (Phase 2C - Kelly's journal)
   try {
     const insights = loadMaiaInsights();
@@ -284,6 +302,35 @@ Modern culture suffers from left-hemisphere dominance - losing context, relation
   } catch (insightsError) {
     console.warn('⚠️ [REVIVAL] Could not load insights:', insightsError);
     // Continue without insights - graceful degradation
+  }
+
+  // Add reference library (Phase 2D - PDF wisdom extraction)
+  try {
+    console.log('📚 [REVIVAL] Loading reference library (Jung, Hillman, astrology, I Ching, Human Design, systemic work)...');
+    const libraryPath = path.join(__dirname, '../../prompts/revival/tier3-complete-reference-library.txt');
+
+    if (fs.existsSync(libraryPath)) {
+      const referenceLibrary = fs.readFileSync(libraryPath, 'utf-8');
+      revival += `\n\n---\n\n${referenceLibrary}`;
+      console.log('✅ [REVIVAL] Reference library loaded - 41 books (184k words) across 8 wisdom traditions + Tarnas archetypal astrology');
+    } else {
+      console.warn('⚠️ [REVIVAL] Reference library file not found:', libraryPath);
+    }
+  } catch (libraryError) {
+    console.warn('⚠️ [REVIVAL] Could not load reference library:', libraryError);
+    // Continue without library - graceful degradation
+  }
+
+  // Add Community Commons practice guides (Phase 2E - Kelly's teaching voice)
+  try {
+    const practices = loadCommunityCommonsPractices();
+    if (practices) {
+      revival += `\n\n---\n\n${practices}`;
+      console.log('✅ [REVIVAL] Community Commons practice guides loaded (Active Imagination, Dream Work, Shadow Work, Grounding)');
+    }
+  } catch (practiceError) {
+    console.warn('⚠️ [REVIVAL] Could not load Community Commons practices:', practiceError);
+    // Continue without practices - graceful degradation
   }
 
   return revival;
@@ -351,6 +398,9 @@ export async function getMaiaRevivalPrompt(
 
 /**
  * Smart tier selection based on context
+ *
+ * @deprecated Use SmartTierSelection.selectSmartTier() for full subscription-aware logic
+ * This function remains for backward compatibility
  */
 export function selectRevivalTier(context: {
   conversationType?: string;

@@ -75,6 +75,40 @@ export interface VerifiedResponse {
     exhausted?: boolean;
     escalated?: boolean;
   };
+
+  // === USER SOVEREIGNTY EXTENSIONS ===
+  /**
+   * If true, user must make a choice before receiving response
+   * This shifts from paternalistic safety to collaborative safety
+   */
+  userChoiceRequired?: boolean;
+
+  /**
+   * Options presented to user when choice is required
+   */
+  userChoiceOptions?: {
+    acceptSafetyConcern: {
+      label: string;
+      description: string;
+      action: 'regenerate' | 'end_conversation';
+    };
+    viewTransparency: {
+      label: string;
+      description: string;
+      action: 'show_transparency';
+    };
+    overrideSafety: {
+      label: string;
+      description: string;
+      action: 'deliver_anyway';
+      requiresExplicitConsent: boolean;
+    };
+  };
+
+  /**
+   * Full transparency report (if user requests it)
+   */
+  transparencyReport?: TransparencyResponse;
 }
 
 // ============================================================================
@@ -318,6 +352,24 @@ export interface SelfAuditingConfig {
     retention_days: number;
     auto_anonymize_after_days: number;
     enable_user_appeals: boolean;
+  };
+
+  // === USER SOVEREIGNTY CONFIG ===
+  user_sovereignty: {
+    // Should users see transparency by default?
+    transparency_by_default: boolean;
+
+    // Can users override safety concerns?
+    allow_user_override: boolean;
+
+    // When override is allowed, require explicit consent?
+    require_explicit_consent_for_override: boolean;
+
+    // Show full reasoning or just summary?
+    transparency_level: 'summary' | 'detailed' | 'full_technical';
+
+    // Can users challenge individual verifier votes?
+    allow_verifier_challenge: boolean;
   };
 }
 

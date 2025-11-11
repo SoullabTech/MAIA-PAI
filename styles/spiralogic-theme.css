@@ -5,22 +5,45 @@
 
 @layer base {
   :root {
-    /* Elemental Colors */
-    --fire: #FF6B6B;
-    --water: #4ECDC4;
-    --earth: #95E77E;
-    --air: #A8DADC;
-    --aether: #9B5DE5;
+    /* Enhanced Consciousness-Aware Elemental Colors */
+    --fire: #FF6B35;        /* Creative inspiration - sophisticated orange-red */
+    --fire-secondary: #F7931E;      /* Manifestation energy */
+    --fire-tertiary: #FFE66D;       /* Breakthrough illumination */
 
-    /* Core Colors */
+    --water: #4ECDC4;       /* Empathic flow - keep existing balance */
+    --water-secondary: #45B7B8;     /* Emotional intelligence */
+    --water-tertiary: #6C5CE7;      /* Intuitive depth */
+
+    --earth: #A8E6CF;       /* Grounding safety - softer, more sophisticated */
+    --earth-secondary: #88D8A3;     /* Growth embodiment */
+    --earth-tertiary: #68BBE3;      /* Stable flow */
+
+    --air: #E8F4FD;         /* Mental clarity - very light, spacious */
+    --air-secondary: #C7ECEE;       /* Spacious awareness */
+    --air-tertiary: #95E1D3;        /* Communication flow */
+
+    --aether: #9B59B6;      /* Sacred integration - keep existing depth */
+    --aether-secondary: #BB8FCE;    /* Synthesis wisdom */
+    --aether-tertiary: #D7BDE2;     /* Transcendent unity */
+
+    /* Consciousness State Colors - Professional & Elegant */
+    --recognition: #FFD93D;         /* Being seen moments - warm gold */
+    --breakthrough: #FF6B9D;        /* Aha experiences - sophisticated pink */
+    --integration: #C44569;         /* Wisdom embodiment - deep rose */
+    --emergence: #6A4C93;          /* New aspects arising - deep purple */
+    --sacred-pause: #F8F9FA;       /* Contemplative space - almost white */
+
+    /* Core Colors - Refined */
     --dark: #0A0E27;
     --dark-secondary: #1a1f3a;
     --light: #F7F9FB;
-    --gold: #FFD700;
+    --gold: #FFD93D;        /* Updated to match recognition color */
 
-    /* Opacity variants */
+    /* Glass Morphism - Enhanced */
     --glass: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-heavy: rgba(255, 255, 255, 0.08);
+    --glass-border-heavy: rgba(255, 255, 255, 0.15);
   }
 
   * {
@@ -267,9 +290,9 @@
       0 4px 20px rgba(0, 0, 0, 0.6);
   }
 
-  /* Glow effects */
+  /* Enhanced Glow effects with new colors */
   .glow-fire {
-    filter: drop-shadow(0 0 20px rgba(255, 107, 107, 0.5));
+    filter: drop-shadow(0 0 20px rgba(255, 107, 53, 0.5));
   }
 
   .glow-water {
@@ -277,10 +300,99 @@
   }
 
   .glow-earth {
-    filter: drop-shadow(0 0 20px rgba(149, 231, 126, 0.5));
+    filter: drop-shadow(0 0 20px rgba(168, 230, 207, 0.5));
+  }
+
+  .glow-air {
+    filter: drop-shadow(0 0 20px rgba(199, 236, 238, 0.5));
   }
 
   .glow-aether {
-    filter: drop-shadow(0 0 20px rgba(155, 93, 229, 0.5));
+    filter: drop-shadow(0 0 20px rgba(155, 89, 182, 0.5));
+  }
+
+  /* Consciousness State Glows */
+  .glow-recognition {
+    filter: drop-shadow(0 0 25px rgba(255, 217, 61, 0.6));
+  }
+
+  .glow-breakthrough {
+    filter: drop-shadow(0 0 30px rgba(255, 107, 157, 0.5));
+  }
+
+  .glow-integration {
+    filter: drop-shadow(0 0 20px rgba(196, 69, 105, 0.4));
+  }
+
+  /* Consciousness-Aware Adaptive Classes */
+  .consciousness-adaptive {
+    transition: all 0.4s ease-in-out;
+  }
+
+  .fire-user {
+    --primary-archetype: var(--fire);
+    --secondary-archetype: var(--fire-secondary);
+    --tertiary-archetype: var(--fire-tertiary);
+  }
+
+  .water-user {
+    --primary-archetype: var(--water);
+    --secondary-archetype: var(--water-secondary);
+    --tertiary-archetype: var(--water-tertiary);
+  }
+
+  .earth-user {
+    --primary-archetype: var(--earth);
+    --secondary-archetype: var(--earth-secondary);
+    --tertiary-archetype: var(--earth-tertiary);
+  }
+
+  .air-user {
+    --primary-archetype: var(--air);
+    --secondary-archetype: var(--air-secondary);
+    --tertiary-archetype: var(--air-tertiary);
+  }
+
+  .aether-user {
+    --primary-archetype: var(--aether);
+    --secondary-archetype: var(--aether-secondary);
+    --tertiary-archetype: var(--aether-tertiary);
+  }
+
+  /* Recognition and "Being Seen" Effects */
+  .being-seen-moment {
+    background: var(--recognition);
+    color: var(--dark);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    animation: being-seen-glow 3s ease-in-out;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .recognition-sparkle {
+    display: inline-block;
+    animation: sacred-recognition 0.8s ease-out;
+  }
+
+  .personality-recognition {
+    padding: 1rem;
+    border-radius: 1rem;
+    border: 2px solid var(--recognition);
+    background: rgba(255, 217, 61, 0.1);
+    backdrop-filter: blur(20px);
+    margin: 1rem 0;
+  }
+
+  .breakthrough-support {
+    background: var(--breakthrough);
+    color: white;
+    padding: 1rem;
+    border-radius: 1rem;
+    margin: 0.5rem 0;
+    animation: breakthrough-emergence 0.6s ease-out;
   }
 }

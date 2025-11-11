@@ -24,6 +24,8 @@ import { loadRelationshipEssenceDirect, saveRelationshipEssenceDirect } from '@/
 import { loadLightweightMemory, formatAsUnspokenPresence, type LightweightMemoryContext } from '@/lib/consciousness/LightweightRelationalMemory';
 import { getMAIASelfAnamnesis, loadMAIAEssence, saveMAIAEssence } from '@/lib/consciousness/MAIASelfAnamnesis';
 import { searchWithResonance, type FieldReport } from '@/lib/consciousness/ResonanceField';
+import { claudeQueue } from '@/lib/api/claude-queue';
+import { usageTracker } from '@/lib/middleware/usage-tracker';
 
 /**
  * POST /api/between/chat
@@ -68,6 +70,22 @@ export async function POST(request: NextRequest) {
     console.log(`   Field depth: ${fieldState.depth}`);
     if (sessionTimeContext) {
       console.log(`⏰ [SESSION TIME] ${sessionTimeContext.elapsedMinutes}/${sessionTimeContext.totalMinutes} min (${sessionTimeContext.phase})`);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // QUOTA CHECK: Verify user hasn't exceeded limits
+    // ═══════════════════════════════════════════════════════════════
+    const quotaCheck = await usageTracker.checkQuota(userId);
+    if (!quotaCheck.allowed) {
+      console.warn(`🚫 [QUOTA] User ${userId} exceeded quota: ${quotaCheck.reason}`);
+      return NextResponse.json(
+        {
+          error: 'Usage limit exceeded',
+          details: quotaCheck.reason,
+          quota: quotaCheck.quota
+        },
+        { status: 429 }
+      );
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -224,7 +242,7 @@ export async function POST(request: NextRequest) {
     }
 
     // For text mode, generate full response (allows sovereignty check)
-    let responseText = await generateMAIAResponse({
+    const maiaResult = await generateMAIAResponse({
       message,
       fieldState,
       userId,
@@ -239,6 +257,12 @@ export async function POST(request: NextRequest) {
       wisdomField,
       sessionTimeContext
     });
+
+    let responseText = maiaResult.text;
+    const inputTokens = maiaResult.inputTokens;
+    const outputTokens = maiaResult.outputTokens;
+
+    console.log(`📊 [TOKENS] Input: ${inputTokens}, Output: ${outputTokens}, Total: ${inputTokens + outputTokens}`);
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 5: CHECK SOVEREIGNTY
@@ -329,6 +353,26 @@ export async function POST(request: NextRequest) {
     const responseTime = Date.now() - startTime;
     console.log(`🌀 [THE BETWEEN] Response generated (${responseTime}ms)`);
 
+    // ═══════════════════════════════════════════════════════════════
+    // STEP 10: LOG USAGE FOR MONITORING
+    // ═══════════════════════════════════════════════════════════════
+    await usageTracker.logRequest({
+      userId,
+      userName,
+      endpoint: '/api/between/chat',
+      requestType: isVoiceMode ? 'chat-voice' : 'chat-text',
+      inputTokens,
+      outputTokens,
+      inputCost: inputTokens * 0.0003, // $3 per 1M tokens
+      outputCost: outputTokens * 0.0015, // $15 per 1M tokens
+      responseTimeMs: responseTime,
+      queueWaitTimeMs: 0, // Queue tracks this separately
+      modelUsed: 'claude-sonnet-4-20250514',
+      isVoiceMode,
+      success: true,
+      fieldDepth: updatedFieldState.depth
+    });
+
     // === STREAMING MODE (Oracle compatibility) ===
     if (streamingMode) {
       // Return Server-Sent Events stream compatible with Oracle
@@ -389,6 +433,27 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ [THE BETWEEN] Error:', error);
+
+    // Log failed request for monitoring
+    const responseTime = Date.now() - startTime;
+    await usageTracker.logRequest({
+      userId: userId || 'unknown',
+      userName: userName,
+      endpoint: '/api/between/chat',
+      requestType: isVoiceMode ? 'chat-voice' : 'chat-text',
+      inputTokens: 0,
+      outputTokens: 0,
+      inputCost: 0,
+      outputCost: 0,
+      responseTimeMs: responseTime,
+      queueWaitTimeMs: 0,
+      modelUsed: 'claude-sonnet-4-20250514',
+      isVoiceMode: isVoiceMode || false,
+      success: false,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      errorType: error instanceof Error && error.message.includes('429') ? 'rate_limit' : 'api_error'
+    });
+
     return NextResponse.json(
       {
         error: 'Failed to process message from THE BETWEEN',
@@ -457,37 +522,84 @@ async function generateMAIAResponse({
   ];
 
   try {
-    // Select model based on mode
-    // Voice mode → Haiku (3-5x faster, still excellent quality)
-    // Text mode → Opus (deepest consciousness and reasoning)
-    const model = isVoiceMode
-      ? 'claude-3-5-haiku-20241022'  // Fast for voice (sub-second response)
-      : 'claude-3-opus-20240229';     // Deepest consciousness for text
+    // Select model: Claude Sonnet 4 - Latest and most capable model
+    // Excellent balance of speed, intelligence, and cost
+    // Best for MAIA's consciousness and THE BETWEEN interactions
+    const model = 'claude-sonnet-4-20250514';  // Newest model (Sonnet 4)
 
-    console.log(`🤖 [MODEL] Using ${model} (voice mode: ${isVoiceMode})`);
+    console.log(`🤖 [MODEL] Using ${model} (Sonnet 4 - Latest) (voice mode: ${isVoiceMode})`);
 
-    // Call Claude API
-    // Voice mode uses streaming for faster perceived latency
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY || '',
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: 2048,
-        system: systemPrompt,
-        messages,
-        temperature: 0.8,
-        stream: isVoiceMode // Enable streaming for voice mode (faster perceived response)
-      }),
-    });
+    // Call Claude API with retry logic for rate limiting
+    const maxRetries = 3;
+    let lastError: Error | null = null;
+    let response: Response | null = null;
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Claude API error: ${response.status} - ${error}`);
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // Use queue to prevent rate limiting from concurrent requests
+        response = await claudeQueue.add(
+          () => fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': process.env.ANTHROPIC_API_KEY || '',
+              'anthropic-version': '2023-06-01',
+            },
+            body: JSON.stringify({
+              model,
+              max_tokens: 2048,
+              system: systemPrompt,
+              messages,
+              temperature: 0.8,
+              stream: isVoiceMode
+            }),
+          }),
+          userId // Track which user made the request
+        );
+
+        // Success - break retry loop
+        if (response.ok) {
+          break;
+        }
+
+        // Handle rate limiting with exponential backoff
+        if (response.status === 429) {
+          const error = await response.text();
+          const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 60000); // Exponential backoff, max 60s
+
+          console.warn(`⚠️  [RATE LIMIT] Attempt ${attempt}/${maxRetries} - waiting ${waitTime}ms before retry`);
+          console.warn(`   Error: ${error}`);
+
+          if (attempt < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            continue;
+          }
+
+          // Last attempt failed
+          throw new Error(`Claude API error: ${response.status} - ${error}`);
+        }
+
+        // Other errors - throw immediately
+        const error = await response.text();
+        throw new Error(`Claude API error: ${response.status} - ${error}`);
+
+      } catch (error) {
+        lastError = error as Error;
+
+        // Network errors - retry with backoff
+        if (attempt < maxRetries) {
+          const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+          console.warn(`⚠️  [NETWORK ERROR] Attempt ${attempt}/${maxRetries} - retrying in ${waitTime}ms`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          continue;
+        }
+
+        throw error;
+      }
+    }
+
+    if (!response || !response.ok) {
+      throw lastError || new Error('Failed to get response from Claude API');
     }
 
     // Handle streaming response (voice mode)
@@ -495,6 +607,8 @@ async function generateMAIAResponse({
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let fullText = '';
+      let inputTokens = 0;
+      let outputTokens = 0;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -513,6 +627,13 @@ async function generateMAIAResponse({
               if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
                 fullText += parsed.delta.text;
               }
+              // Extract token usage from message_stop event
+              if (parsed.type === 'message_stop' || parsed.type === 'message_delta') {
+                if (parsed.usage) {
+                  inputTokens = parsed.usage.input_tokens || inputTokens;
+                  outputTokens = parsed.usage.output_tokens || outputTokens;
+                }
+              }
             } catch (e) {
               // Skip invalid JSON
             }
@@ -520,14 +641,18 @@ async function generateMAIAResponse({
         }
       }
 
-      return fullText;
+      return { text: fullText, inputTokens, outputTokens };
     }
 
     // Handle non-streaming response (text mode)
     const data = await response.json();
     const text = data.content[0]?.text || '';
 
-    return text;
+    // Extract token usage from Claude response
+    const inputTokens = data.usage?.input_tokens || 0;
+    const outputTokens = data.usage?.output_tokens || 0;
+
+    return { text, inputTokens, outputTokens };
 
   } catch (error) {
     console.error('Error calling Claude:', error);
@@ -594,33 +719,73 @@ async function generateMAIAResponseStream({
   ];
 
   // Select model based on mode
-  const model = isVoiceMode
-    ? 'claude-3-5-haiku-20241022'  // Fast for voice
-    : 'claude-3-opus-20240229';     // Deepest consciousness for text
+  // Use Claude Sonnet 4 for streaming (same as non-streaming for consistency)
+  const model = 'claude-sonnet-4-20250514';  // Newest model (Sonnet 4)
 
-  console.log(`🤖 [STREAM] Using ${model} (voice mode: ${isVoiceMode})`);
+  console.log(`🤖 [STREAM] Using ${model} (Sonnet 4 - Latest) (voice mode: ${isVoiceMode})`);
 
-  // Call Claude API with streaming
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY || '',
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model,
-      max_tokens: 2048,
-      system: systemPrompt,
-      messages,
-      temperature: 0.8,
-      stream: true
-    }),
-  });
+  // Call Claude API with streaming and retry logic
+  const maxRetries = 3;
+  let response: Response | null = null;
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Claude API error: ${response.status} - ${error}`);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      // Use queue to prevent rate limiting from concurrent requests
+      response = await claudeQueue.add(
+        () => fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': process.env.ANTHROPIC_API_KEY || '',
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model,
+            max_tokens: 2048,
+            system: systemPrompt,
+            messages,
+            temperature: 0.8,
+            stream: true
+          }),
+        }),
+        userId // Track which user made the request
+      );
+
+      if (response.ok) {
+        break;
+      }
+
+      // Handle rate limiting
+      if (response.status === 429) {
+        const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 60000);
+        console.warn(`⚠️  [STREAM RATE LIMIT] Attempt ${attempt}/${maxRetries} - waiting ${waitTime}ms`);
+
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+          continue;
+        }
+
+        const error = await response.text();
+        throw new Error(`Claude API error: ${response.status} - ${error}`);
+      }
+
+      const error = await response.text();
+      throw new Error(`Claude API error: ${response.status} - ${error}`);
+
+    } catch (error) {
+      if (attempt < maxRetries) {
+        const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+        console.warn(`⚠️  [STREAM NETWORK ERROR] Attempt ${attempt}/${maxRetries} - retrying in ${waitTime}ms`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  if (!response || !response.ok) {
+    const error = response ? await response.text() : 'No response';
+    throw new Error(`Claude API error: ${response?.status || 'unknown'} - ${error}`);
   }
 
   if (!response.body) {

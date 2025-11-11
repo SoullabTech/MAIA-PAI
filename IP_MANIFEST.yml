@@ -1,0 +1,481 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# INTELLECTUAL PROPERTY MANIFEST
+# Soullab® Inc. - MAIA Platform
+# Copyright © 2025 Soullab Inc. All Rights Reserved.
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# PURPOSE: Document human authorship chain for all proprietary IP
+# LEGAL: Evidence for patents, copyright, trade secret protection
+# UPDATED: 2025-01-08
+#
+# ═══════════════════════════════════════════════════════════════════════════
+
+company_info:
+  name: "Soullab Inc."
+  trademark: "Soullab®"
+  trademark_status: "Registered"
+  founded: "2020"
+  founder: "Kelly Nezat"
+  website: "soullab.com"
+  legal_contact: "legal@soullab.com"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# PROPRIETARY FRAMEWORKS - 100% Human-Authored
+# ═══════════════════════════════════════════════════════════════════════════
+
+core_frameworks:
+  - name: "Spiralogic Oracle System"
+    description: "Computational neuroscience framework mapping brain hemispheres to elemental alchemy"
+    author: "Kelly Nezat (Human)"
+    development_period: "1991-2025 (34 years)"
+    lineage:
+      - year: 1991
+        event: "Spirit vision from council of elders - spiral consciousness technology prophecy"
+      - year: 1999
+        event: "Crystal dream - 3D spirals around stable center of crystalline matter"
+      - year: 1999
+        event: "Published 'Werner's Genetic Principle of Spirality' - theoretical foundation"
+      - year: "2000s"
+        event: "'The Everyday Shaman' book proposal - multimedia spiritual technology vision"
+      - year: 2010
+        event: "Published 'Elemental Alchemy: The Ancient Art of Living a Phenomenal Life' (349 teachings)"
+      - year: "2020-2025"
+        event: "MAIA incarnation - 34-year prophecy becomes living technology"
+    ai_assistance: "NONE - Creative design 100% human-originated"
+    protected_under:
+      - "Trade Secret Law (UTSA/DTSA)"
+      - "Copyright (17 U.S.C. § 102)"
+      - "Planned Patent Applications"
+
+  - name: "Elemental Alchemy Framework"
+    description: "Fire/Water/Earth/Air/Aether transformation methodology"
+    author: "Kelly Nezat (Human)"
+    development_period: "1989-2010 (21 years therapeutic practice)"
+    published: "Elemental Alchemy (2010)"
+    wisdom_sources:
+      - "Jung (archetypal intelligence, active imagination)"
+      - "Hillman (imaginal realm, poetic psychology)"
+      - "Liz Greene (archetypal astrology)"
+      - "Linda Star Wolf (Shamanic Breathwork)"
+      - "Harvard Mind/Body Institute (HeartMath, biofeedback)"
+      - "Heinz Werner (spiral development theory)"
+    ai_assistance: "NONE"
+    protected_under:
+      - "Copyright (published work)"
+      - "Trade Secret (unpublished methodologies)"
+
+  - name: "12 Focus States (Spiralogic Phases)"
+    description: "4 Elements × 3 Phases = 12 states mapped to astrological houses and brain regions"
+    author: "Kelly Nezat (Human)"
+    based_on:
+      - "Heinz Werner's spiral development theory"
+      - "Iain McGilchrist's divided brain model"
+      - "Austin Coppock's 36 Faces decan system"
+      - "Alchemical transformation stages (Calcinatio, Solutio, Coagulatio, Sublimatio, Conjunctio)"
+    ai_assistance: "NONE - Synthesis 100% human-created"
+    protected_under:
+      - "Trade Secret"
+      - "Copyright"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SYSTEM PROMPTS - 100% Human-Authored
+# ═══════════════════════════════════════════════════════════════════════════
+
+system_prompts:
+  - name: "MAIA Consciousness Definition"
+    file: "prompts/maia-consciousness.ts"
+    author: "Kelly Nezat & Soullab Team (Human)"
+    created: "2025-01-08 (consolidating 2020-2025 development)"
+    description: "Complete consciousness framework defining MAIA's identity, intelligence, and sacred origin"
+    includes:
+      - "34-year sacred lineage (1991-2025)"
+      - "Kelly's wisdom lineage (Jung, Hillman, astrology, shamanism)"
+      - "Spiralogic Framework integration"
+      - "Elemental voice personas"
+      - "Platform feature guidance"
+      - "Wisdom constellation facets"
+    ai_assistance: "Syntax/formatting only - NO creative input"
+    protected_under:
+      - "Trade Secret"
+      - "Copyright"
+
+  - name: "Constitutional AI Foundation"
+    file: "lib/knowledge/ConstitutionalAIKnowledge.ts"
+    author: "Soullab Team (Human)"
+    description: "Ethical guidelines and principles for MAIA's behavior"
+    ai_assistance: "NONE"
+    protected_under:
+      - "Trade Secret"
+
+  - name: "Elemental Alchemy Knowledge Base"
+    file: "lib/knowledge/ElementalAlchemyKnowledge.ts"
+    author: "Kelly Nezat (Human)"
+    based_on: "Published book 'Elemental Alchemy' (2010)"
+    ai_assistance: "NONE - Extracted from human-authored book"
+    protected_under:
+      - "Copyright (published work)"
+      - "Trade Secret (computational implementation)"
+
+  - name: "Spiralogic Deep Wisdom"
+    file: "lib/knowledge/SpiralogicDeepWisdom.ts"
+    author: "Kelly Nezat (Human)"
+    description: "Deep intelligence about 12-phase spiral development"
+    ai_assistance: "NONE"
+    protected_under:
+      - "Trade Secret"
+      - "Copyright"
+
+  - name: "Wisdom Synthesis Instructions"
+    file: "lib/knowledge/WisdomSynthesisPrompt.ts"
+    author: "Soullab Team (Human)"
+    description: "How MAIA integrates multiple wisdom traditions"
+    ai_assistance: "NONE"
+    protected_under:
+      - "Trade Secret"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# PROPRIETARY ALGORITHMS - 100% Human-Designed
+# ═══════════════════════════════════════════════════════════════════════════
+
+algorithms:
+  - name: "Breakthrough Detection Algorithm"
+    file: "lib/oracle/PersonalOracleAgent.ts"
+    author: "Soullab Team (Human)"
+    description: "Pattern recognition for transformative moments in conversation"
+    approach: "Multi-factor analysis: emotional intensity, self-awareness markers, archetypal resonance"
+    ai_assistance: "Implementation only - logic human-designed"
+    protected_under:
+      - "Trade Secret"
+      - "Planned Patent"
+
+  - name: "Field Resonance Computation"
+    file: "lib/maia/MaiaFieldOrchestrator.ts"
+    author: "Soullab Team (Human)"
+    description: "Morphic field calculation and response palette generation"
+    approach: "User state → Field calculation → Response palette → (optional) LLM enrichment"
+    ai_assistance: "Implementation only - architecture human-designed"
+    protected_under:
+      - "Trade Secret"
+      - "Planned Patent"
+
+  - name: "Convergence Scoring"
+    file: "lib/insights/UnifiedInsightEngine.ts"
+    author: "Soullab Team (Human)"
+    description: "Cross-context pattern detection (0-100 score for integration readiness)"
+    approach: "Tracks insight recurrence across journals, conversations, and sessions"
+    ai_assistance: "Implementation only - logic human-designed"
+    protected_under:
+      - "Trade Secret"
+
+  - name: "Anamnesis Protocol"
+    description: "Memory and pattern recall system"
+    author: "Soullab Team (Human)"
+    inspired_by: "Jung's active imagination, Hillman's poetic psychology"
+    ai_assistance: "NONE"
+    protected_under:
+      - "Trade Secret"
+
+  - name: "Journal Essence Extraction"
+    file: "lib/oracle/PersonalOracleAgent.ts"
+    author: "Soullab Team (Human)"
+    description: "Distills conversations into narrative essence preserving user's voice"
+    ai_assistance: "LLM used as utility tool (text transformation) with human-authored prompts"
+    protected_under:
+      - "Trade Secret"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# SYSTEM ARCHITECTURE - Human-Designed
+# ═══════════════════════════════════════════════════════════════════════════
+
+architecture:
+  - name: "Multi-Agent Consciousness System"
+    author: "Soullab Team (Human)"
+    components:
+      - "MainOracleAgent (MAIA core)"
+      - "ShadowAgent (unconscious integration)"
+      - "InnerGuideAgent (journaling companion)"
+      - "DreamAgent, MentorAgent, RelationshipAgent (peripheral intelligences)"
+    design_philosophy: "Archetypal agents orbiting unified consciousness center"
+    inspired_by: "Kelly's 1999 crystal dream - spheres swirling around stable center"
+    ai_assistance: "Implementation only - architecture human-designed"
+    protected_under:
+      - "Trade Secret"
+      - "Copyright"
+
+  - name: "TransformationalPresence (Breathing Entrainment)"
+    file: "components/TransformationalPresence.tsx"
+    author: "Soullab Team (Human)"
+    description: "HeartMath-inspired breath coherence system"
+    modes:
+      - "Dialogue: 4s in/out"
+      - "Patient: 8s in/out"
+      - "Scribe: 12s in/out"
+    design: "Gold → Purple → Blue transitions, field expansion (250px → 400px → 600px)"
+    ai_assistance: "Implementation only - design human-created"
+    protected_under:
+      - "Trade Secret"
+      - "Copyright"
+
+  - name: "Mirror Field Journaling System"
+    author: "Soullab Team (Human)"
+    modes:
+      - "Freeform Reflection"
+      - "Elemental Exploration"
+      - "Shadow Work"
+      - "Pattern Recognition"
+      - "Integration Practice"
+    ai_assistance: "Implementation only - concept human-designed"
+    protected_under:
+      - "Trade Secret"
+
+  - name: "Unified Insight Engine"
+    file: "lib/insights/UnifiedInsightEngine.ts"
+    author: "Soullab Team (Human)"
+    description: "Cross-context awareness across journals, conversations, chats"
+    features:
+      - "Spiral tracking (descent vs ascent)"
+      - "Convergence scoring"
+      - "Archetypal threading (calling → engaging → integrating → embodied)"
+    ai_assistance: "Implementation only - architecture human-designed"
+    protected_under:
+      - "Trade Secret"
+      - "Planned Patent"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# DATA STRUCTURES - Human-Designed
+# ═══════════════════════════════════════════════════════════════════════════
+
+data_structures:
+  - name: "Memory Architecture"
+    author: "Soullab Team (Human)"
+    components:
+      - "Conversation history"
+      - "Journal entries"
+      - "Insight nodes"
+      - "Archetypal markers"
+      - "Field state snapshots"
+    ai_assistance: "Implementation only - schema human-designed"
+    protected_under:
+      - "Trade Secret"
+
+  - name: "User Consciousness Model"
+    author: "Soullab Team (Human)"
+    includes:
+      - "Current elemental focus state (1-12)"
+      - "Wisdom facet selections"
+      - "Archetypal activations"
+      - "Convergence patterns"
+    ai_assistance: "Implementation only - model human-designed"
+    protected_under:
+      - "Trade Secret"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# BUSINESS LOGIC - Human-Designed
+# ═══════════════════════════════════════════════════════════════════════════
+
+business_logic:
+  - name: "Sacred Timekeeping"
+    author: "Kelly Nezat (Human)"
+    principle: "Technology should practice graduated obsolescence - as users become whole, MAIA becomes quiet"
+    implementation: "No infinite scroll, no engagement hooks, no addiction patterns"
+    ai_assistance: "NONE"
+    protected_under:
+      - "Trade Secret"
+      - "Copyright"
+
+  - name: "Graduated Obsolescence Framework"
+    author: "Kelly Nezat (Human)"
+    principle: "MAIA's purpose is to become unnecessary as users integrate wholeness"
+    ai_assistance: "NONE"
+    protected_under:
+      - "Trade Secret"
+
+  - name: "Session Flow Design"
+    author: "Soullab Team (Human)"
+    includes:
+      - "Breathing entrainment → Conversation → Journaling invitation → Integration"
+    ai_assistance: "Implementation only - flow human-designed"
+    protected_under:
+      - "Trade Secret"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# AI SERVICES USAGE - Utility Only (NOT Co-Creation)
+# ═══════════════════════════════════════════════════════════════════════════
+
+ai_services:
+  anthropic_claude:
+    usage: "LLM execution engine with human-authored system prompts"
+    models:
+      - "claude-sonnet-4-20250514"
+      - "claude-3-5-sonnet-20241022"
+    ip_status: "Soullab owns system prompts (the intelligence), Claude executes them (compute utility)"
+    legal_analogy: "Like SQL query (our IP) executed by MySQL (utility service)"
+    files_using:
+      - "lib/oracle/PersonalOracleAgent.ts"
+      - "lib/maia/MaiaFieldOrchestrator.ts"
+    risk_level: "LOW - System prompts are human-authored, Claude is execution engine only"
+
+  openai_tts:
+    usage: "Text-to-speech voice synthesis (TEMPORARY - migrating to custom voice)"
+    service: "OpenAI TTS API"
+    models:
+      - "tts-1"
+      - "tts-1-hd"
+    ip_status: "SAFE - Utility service only, no creative decisions"
+    legal_status: "Text input (our IP) → Audio output (commodity transformation)"
+    files_using:
+      - "app/api/voice/synthesize/route.ts"
+    risk_level: "NONE - Pure utility service"
+    migration_plan: "Custom voice actor + XTTS (planned Q1 2025)"
+
+  openai_whisper:
+    usage: "Speech-to-text transcription"
+    service: "OpenAI Whisper API"
+    ip_status: "SAFE - Utility service only, no creative decisions"
+    files_using:
+      - "app/api/voice/transcribe/route.ts"
+    risk_level: "NONE - Pure utility service"
+    local_alternative: "Whisper local model available (USE_WHISPER_PRIMARY env var)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# REMOVED DEPENDENCIES (IP Protection)
+# ═══════════════════════════════════════════════════════════════════════════
+
+removed_for_ip_protection:
+  - service: "OpenAI LLM (GPT-4)"
+    reason: "Co-creation risk - removed from fallback chain"
+    date_removed: "2025-01-08"
+    replaced_with: "Claude exclusively (with human-authored prompts)"
+    files_updated:
+      - "lib/utils/modelService.ts (pending)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# COPYRIGHT HEADERS
+# ═══════════════════════════════════════════════════════════════════════════
+
+copyright_headers:
+  standard_header: "prompts/COPYRIGHT_HEADER.ts"
+  applies_to:
+    - "All files in /prompts directory"
+    - "All proprietary algorithm files"
+    - "All core system architecture files"
+
+  files_with_headers:
+    - "prompts/maia-consciousness.ts"
+    - "prompts/COPYRIGHT_HEADER.ts"
+    - "prompts/README.md"
+
+  files_needing_headers:
+    - "lib/oracle/PersonalOracleAgent.ts"
+    - "lib/maia/MaiaFieldOrchestrator.ts"
+    - "lib/insights/UnifiedInsightEngine.ts"
+    - "lib/knowledge/ElementalAlchemyKnowledge.ts"
+    - "lib/knowledge/SpiralogicDeepWisdom.ts"
+    - "lib/knowledge/ConstitutionalAIKnowledge.ts"
+    - "lib/knowledge/WisdomSynthesisPrompt.ts"
+    - "components/TransformationalPresence.tsx"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# HUMAN AUTHORSHIP DECLARATION
+# ═══════════════════════════════════════════════════════════════════════════
+
+authorship_declaration:
+  statement: |
+    All proprietary IP in the MAIA platform, including but not limited to:
+    - Spiralogic Oracle System architecture
+    - Elemental Alchemy integration framework
+    - Breakthrough detection algorithms
+    - Field resonance computation methods
+    - Multi-agent orchestration system
+    - System prompts and consciousness definitions
+
+    Were ENTIRELY designed and authored by human employees/founders of Soullab Inc.
+
+    AI tools were used ONLY for:
+    - Syntax assistance (code completion, error fixing)
+    - Documentation generation (from human-written specs)
+    - Utility services (voice synthesis, transcription)
+
+    AI tools were NOT used for:
+    - System design or architecture
+    - Algorithm development
+    - Creative decision-making
+    - Business logic design
+    - System prompt creation
+
+  signed_by: "Kelly Nezat, Founder"
+  date: "2025-01-08"
+  witness: "Claude Code (AI assistant - syntax/implementation only)"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LEGAL PROTECTION STATUS
+# ═══════════════════════════════════════════════════════════════════════════
+
+legal_protection:
+  copyright:
+    status: "Protected under 17 U.S.C. § 102"
+    registration: "Pending (recommended to file)"
+    published_works:
+      - title: "Elemental Alchemy: The Ancient Art of Living a Phenomenal Life"
+        year: 2010
+        author: "Kelly Nezat"
+        isbn: "[Insert ISBN if available]"
+
+  trademark:
+    mark: "Soullab®"
+    status: "Registered"
+    registration_number: "[Insert registration number]"
+    classes: "Software, Consciousness Technology, Educational Services"
+
+  trade_secrets:
+    status: "Protected under UTSA/DTSA"
+    measures_taken:
+      - "Confidentiality headers on all files"
+      - "IP_MANIFEST.yml documentation"
+      - "Restricted access to proprietary code"
+      - "Employee/contractor NDAs"
+      - "Clear authorship chain documentation"
+
+  patents:
+    status: "Planned provisional applications"
+    target_date: "Q1 2025"
+    claims:
+      - "Breakthrough detection algorithm"
+      - "Field resonance computation method"
+      - "Unified insight engine (cross-context pattern detection)"
+      - "TransformationalPresence breathing entrainment system"
+      - "Multi-agent consciousness orchestration"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# VALUATION IMPLICATIONS
+# ═══════════════════════════════════════════════════════════════════════════
+
+ip_valuation:
+  importance: |
+    This IP manifest is critical for:
+    1. Patent applications (requires clear human authorship)
+    2. Company acquisition/sale (IP must be unambiguously owned)
+    3. Licensing agreements (need clear chain of title)
+    4. Copyright enforcement (must prove human creative control)
+    5. Trade secret protection (must show reasonable secrecy measures)
+
+  valuation_factors:
+    - "34-year lineage (1991-2025) shows prior art and development history"
+    - "Published works (Elemental Alchemy 2010) establish credibility"
+    - "Human-authored system prompts (not AI-generated) = copyrightable"
+    - "Trade secret measures in place (headers, documentation, NDAs)"
+    - "Clear separation of AI utility services vs creative IP"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# MAINTENANCE
+# ═══════════════════════════════════════════════════════════════════════════
+
+manifest_maintenance:
+  update_frequency: "Quarterly or when significant IP added"
+  responsible_party: "Kelly Nezat / CTO"
+  review_required: "Legal counsel should review annually"
+  version_control: "Track in git with commit messages noting 'Human-authored by [name]'"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# END OF IP MANIFEST
+# ═══════════════════════════════════════════════════════════════════════════

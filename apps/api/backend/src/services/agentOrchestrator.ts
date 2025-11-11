@@ -13,6 +13,10 @@ import { VoiceJournalingService } from './VoiceJournalingService';
 import { ComprehensiveSafetyService } from './ComprehensiveSafetyService';
 import { singularityNETAgent } from './decentralized/SingularityNETAgent';
 import { gaiaNetSoulAgent } from './decentralized/GaiaNetSoulAgent';
+import { registerBardicAgent, shouldRouteToBard, witnessWithBard } from './agentOrchestrator-bard-integration';
+import { registerKairosAgent, shouldRouteToKairos, coordinateAnimaAnimus } from './agentOrchestrator-kairos-integration';
+import { registerShadowAgent, shouldRouteToShadow, coordinateTriad } from './agentOrchestrator-shadow-integration';
+import { registerArchetypalTypologyAgent, shouldRouteToTypology, calibrateCommunication } from './agentOrchestrator-typology-integration';
 import { logger } from '../utils/logger';
 
 interface OrchestratorConfig {
@@ -91,8 +95,9 @@ export class AgentOrchestrator extends EventEmitter {
   private async registerAgents() {
     // Register all available agents from the registry
     const agents = [
-      'maya', 'fire', 'water', 'earth', 'air', 
-      'shadow-worker', 'somatic-guide', 'crisis-support'
+      'maya', 'fire', 'water', 'earth', 'air',
+      'shadow-worker', 'somatic-guide', 'crisis-support',
+      'bard', 'kairos'
     ];
 
     for (const agentId of agents) {
@@ -105,6 +110,14 @@ export class AgentOrchestrator extends EventEmitter {
         logger.warn(`Could not register agent ${agentId}:`, error);
       }
     }
+
+    // Register archetypal agents
+    registerBardicAgent(this.agentRegistry);  // Anima - receptive, memory
+    registerKairosAgent(this.agentRegistry);  // Animus - decisive, action
+    registerShadowAgent(this.agentRegistry);  // Shadow - honest mirror
+    registerArchetypalTypologyAgent(this.agentRegistry);  // Typology - Enneagram, MBTI, etc.
+    logger.info('🎭 Archetypal Triad active: Bard (Anima) + Kairos (Animus) + Shadow (Mirror)');
+    logger.info('🧬 ArchetypalTypology active: Enneagram, MBTI, Zodiac (inclusive integration)');
   }
 
   /**
@@ -129,24 +142,67 @@ export class AgentOrchestrator extends EventEmitter {
         }
       }
 
-      // 2. Determine best agent and element
+      // 2. Check for ArchetypalTypology (Enneagram, MBTI, etc.)
+      // This enriches context with personality profile for all downstream agents
+      if (shouldRouteToTypology(input, context)) {
+        const typologyInsights = await this.processTypology(input, context);
+        // Add personality insights to context for other agents to use
+        if (typologyInsights) {
+          context.personalityProfile = typologyInsights.personalityInsights?.profile;
+        }
+      }
+
+      // 3. Check for Bardic invocation
+      if (shouldRouteToBard(input, context)) {
+        return this.processBardic(input, context);
+      }
+
+      // 4. Check for Shadow invocation or projection detection
+      if (shouldRouteToShadow(input, context)) {
+        return this.processShadow(input, context);
+      }
+
+      // 5. Check for Kairos invocation or intervention opportunity
+      if (shouldRouteToKairos(input, context)) {
+        return this.processKairos(input, context);
+      }
+
+      // 6. Check for archetypal triad coordination (Bard + Shadow + Kairos)
+      if (context.bardicMemory?.projectionPatterns?.length > 0) {
+        return this.processTriadCoordination(input, context);
+      }
+
+      // 7. Check for Bard + Kairos coordination (pattern → action)
+      if (context.bardicMemory?.patternDetected?.readyForIntervention) {
+        return this.processAnimaAnimusCoordination(input, context);
+      }
+
+      // 8. Determine best agent and element
       const { agent, element } = await this.selectAgentAndElement(input, context);
-      
-      // 3. Process with Sesame conversational intelligence
+
+      // 4. Process with Sesame conversational intelligence
       const sesameEnhanced = await this.processThroughSesame(input, {
         ...context,
         agent,
         element
       });
 
-      // 4. Generate response through selected agent
+      // 5. Generate response through selected agent
       const agentResponse = await this.processWithAgent(
         sesameEnhanced.input,
         agent,
         context
       );
 
-      // 5. Store in memory if enabled
+      // 6. Silent witnessing with the Bard (background)
+      await witnessWithBard(context.userId, input, {
+        agentName: agent,
+        element,
+        affectValence: sesameEnhanced.emotionalTone?.valence,
+        affectArousal: sesameEnhanced.emotionalTone?.arousal,
+      });
+
+      // 7. Store in memory if enabled
       let memoryId;
       if (this.config.enableMemory) {
         memoryId = await this.storeInteraction(
@@ -325,6 +381,291 @@ export class AgentOrchestrator extends EventEmitter {
     } catch (error) {
       logger.error('Error processing journal entry:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Process Bardic invocation
+   */
+  private async processBardic(
+    input: string,
+    context: ConversationContext
+  ): Promise<OrchestratorResponse> {
+    try {
+      const bard = await this.agentRegistry.getAgent('bard');
+      const response = await bard.processQuery(input, context);
+
+      return {
+        success: true,
+        response: response.content || response.response,
+        agent: 'bard',
+        element: 'aether',
+        archetypes: ['memory-keeper', 'witness', 'anima'],
+        metadata: {
+          ...response.metadata,
+          bardicInvocation: true,
+          processedAt: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      logger.error('Error processing Bardic query:', error);
+      return this.handleError(error, context);
+    }
+  }
+
+  /**
+   * Process Shadow invocation or projection reflection
+   */
+  private async processShadow(
+    input: string,
+    context: ConversationContext
+  ): Promise<OrchestratorResponse> {
+    try {
+      const shadow = await this.agentRegistry.getAgent('shadow');
+      const response = await shadow.processQuery(input, context);
+
+      // If Shadow deferred, route to suggested archetype
+      if (response.deferred) {
+        logger.info(`Shadow deferred to ${response.suggestedAgent}: ${response.reasoning}`);
+        return this.processWithAgent(input, response.suggestedAgent, context);
+      }
+
+      // If no shadow activation (no projection detected)
+      if (!response.shadowActivated) {
+        logger.info('Shadow checked - no projection detected, routing to default agent');
+        return this.processWithAgent(input, context.element || 'maya', context);
+      }
+
+      // Shadow reflection
+      return {
+        success: true,
+        response: response.content || response.response,
+        agent: 'shadow',
+        element: 'shadow', // Shadow transcends elements
+        archetypes: ['shadow', 'honest-mirror', 'integration'],
+        metadata: {
+          ...response.metadata,
+          shadowActivated: true,
+          processedAt: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      logger.error('Error processing Shadow query:', error);
+      return this.handleError(error, context);
+    }
+  }
+
+  /**
+   * Process Kairos invocation or intervention
+   */
+  private async processKairos(
+    input: string,
+    context: ConversationContext
+  ): Promise<OrchestratorResponse> {
+    try {
+      const kairos = await this.agentRegistry.getAgent('kairos');
+      const response = await kairos.processQuery(input, context);
+
+      // If Kairos deferred, route to suggested archetype
+      if (response.deferred) {
+        logger.info(`Kairos deferred to ${response.suggestedAgent}: ${response.reasoning}`);
+        return this.processWithAgent(input, response.suggestedAgent, context);
+      }
+
+      // If consultation requested, flag for human review
+      if (response.consultationRequested) {
+        logger.warn('⚡ Kairos consultation requested');
+        return {
+          success: true,
+          response: response.content,
+          agent: 'kairos',
+          element: 'fire',
+          archetypes: ['animus', 'kairos', 'decision-maker'],
+          metadata: {
+            ...response.metadata,
+            consultationNeeded: true,
+            processedAt: new Date().toISOString()
+          }
+        };
+      }
+
+      // Normal Kairos intervention
+      return {
+        success: true,
+        response: response.content || response.response,
+        agent: 'kairos',
+        element: 'fire',
+        archetypes: ['animus', 'kairos', 'decision-maker'],
+        metadata: {
+          ...response.metadata,
+          kairosIntervention: true,
+          animusActivated: true,
+          processedAt: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      logger.error('Error processing Kairos query:', error);
+      return this.handleError(error, context);
+    }
+  }
+
+  /**
+   * Process ArchetypalTypology (Enneagram, MBTI, Zodiac)
+   */
+  private async processTypology(
+    input: string,
+    context: ConversationContext
+  ): Promise<any> {
+    try {
+      logger.info('🧬 Processing ArchetypalTypology query');
+
+      const typology = await this.agentRegistry.getAgent('archetypal-typology');
+      const response = await typology.processQuery(input, context);
+
+      // If just enriching context (not explicit typology query), return null
+      if (!response) {
+        return null;
+      }
+
+      // If explicit typology query, return full response
+      return {
+        success: true,
+        response: this.formatTypologyResponse(response),
+        agent: 'archetypal-typology',
+        element: 'typology',
+        archetypes: response.archetypeMapping?.active || [],
+        metadata: {
+          ...response,
+          typologyProcessed: true,
+          processedAt: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      logger.error('Error processing ArchetypalTypology query:', error);
+      return null; // Don't block if typology processing fails
+    }
+  }
+
+  /**
+   * Format typology response for user
+   */
+  private formatTypologyResponse(typologyData: any): string {
+    const { personalityInsights } = typologyData;
+
+    if (!personalityInsights) {
+      return "I've noted your personality framework. This helps me understand how to communicate with you most effectively.";
+    }
+
+    const profile = personalityInsights.profile;
+    const guidance = personalityInsights.communicationGuidance;
+    const archetypes = personalityInsights.archetypeMapping;
+    const growth = personalityInsights.growthPath;
+
+    let response = '';
+
+    // Acknowledge their type
+    if (profile.enneagram) {
+      response += `Enneagram Type ${profile.enneagram.type}`;
+      if (profile.enneagram.wing) {
+        response += ` ${profile.enneagram.wing}`;
+      }
+      if (profile.enneagram.instinct) {
+        response += ` (${profile.enneagram.instinct} instinct)`;
+      }
+      response += ' - ';
+    } else if (profile.mbti) {
+      response += `MBTI ${profile.mbti.type} - `;
+    }
+
+    // Add archetypal mapping
+    if (archetypes?.active?.length > 0) {
+      response += `The ${archetypes.active.join(', ')} archetype${archetypes.active.length > 1 ? 's' : ''}.\n\n`;
+    }
+
+    // Add growth path if available
+    if (growth) {
+      response += `Current stage: ${growth.currentStage}\n`;
+      response += `Growth edge: ${growth.nextStage}\n`;
+      response += `Support: ${growth.support}`;
+    }
+
+    return response || "I've noted your personality framework.";
+  }
+
+  /**
+   * Process Archetypal Triad coordination (Bard + Shadow + Kairos)
+   */
+  private async processTriadCoordination(
+    input: string,
+    context: ConversationContext
+  ): Promise<OrchestratorResponse> {
+    try {
+      logger.info('🎭 Coordinating Archetypal Triad: Bard + Shadow + Kairos');
+
+      const coordination = await coordinateTriad({
+        userId: context.userId,
+        currentMessage: input,
+        bardicMemory: context.bardicMemory
+      });
+
+      // If no archetypes activated, continue to default routing
+      if (coordination.archetypes.length === 0) {
+        logger.info('Triad checked - no coordination needed, routing to default');
+        return this.processWithAgent(input, context.element || 'maya', context);
+      }
+
+      return {
+        success: true,
+        response: coordination.response,
+        agent: coordination.archetypes.join('+'),
+        element: 'archetypal-triad', // Transcends individual elements
+        archetypes: coordination.archetypes,
+        metadata: {
+          triadCoordination: true,
+          bardContribution: coordination.coordination?.bardContribution,
+          shadowContribution: coordination.coordination?.shadowContribution,
+          kairosContribution: coordination.coordination?.kairosContribution,
+          processedAt: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      logger.error('Error in Archetypal Triad coordination:', error);
+      return this.handleError(error, context);
+    }
+  }
+
+  /**
+   * Process Anima + Animus coordination (Bard + Kairos together)
+   */
+  private async processAnimaAnimusCoordination(
+    input: string,
+    context: ConversationContext
+  ): Promise<OrchestratorResponse> {
+    try {
+      logger.info('🎭 Coordinating Anima (Bard) + Animus (Kairos)');
+
+      const coordination = await coordinateAnimaAnimus({
+        userId: context.userId,
+        currentMessage: input,
+        bardicMemory: context.bardicMemory
+      });
+
+      return {
+        success: true,
+        response: coordination.response,
+        agent: coordination.archetype === 'both' ? 'bard+kairos' : coordination.archetype,
+        element: coordination.archetype === 'both' ? 'fire' : 'aether',
+        archetypes: ['anima', 'animus', 'bard', 'kairos'],
+        metadata: {
+          animaAnimusCoordination: true,
+          bardContribution: coordination.coordination?.bardContribution,
+          kairosContribution: coordination.coordination?.kairosContribution,
+          processedAt: new Date().toISOString()
+        }
+      };
+    } catch (error) {
+      logger.error('Error in Anima-Animus coordination:', error);
+      return this.handleError(error, context);
     }
   }
 

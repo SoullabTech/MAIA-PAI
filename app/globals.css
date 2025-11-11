@@ -1,5 +1,10 @@
-/* Import Claude-style fonts for warm, legible dialogue */
+/* Import consciousness-aware fonts for archetypal communication */
 @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Spectral:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+
+/* Enhanced typography for different consciousness styles */
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@200;300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,6 +15,9 @@
 
 /* Sacred holoflower animations */
 @import url('../styles/sacred-animations.css');
+
+/* Consciousness-aware recognition animations */
+@import url('../styles/consciousness-animations.css');
 
 /* Bene Gesserit ceremonial theme */
 /* @import url('../styles/benegesserit-theme.css'); */ /* TEMP: Disabled - @layer base error blocking Tailwind compilation */
@@ -250,5 +258,89 @@
       height: 100vh;
       max-height: 100vh;
     }
+  }
+
+  /* Consciousness-Aware Typography System */
+  .consciousness-header {
+    font-family: 'Crimson Pro', serif;
+    font-weight: 300;
+    font-size: clamp(1.8rem, 4vw, 3.2rem);
+    line-height: 1.4;
+    color: var(--aether);
+    text-align: center;
+    margin: 2rem 0;
+    position: relative;
+  }
+
+  .consciousness-header::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--fire), var(--water));
+    border-radius: 1px;
+    opacity: 0.6;
+  }
+
+  .heart-text {
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 400;
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--water);
+    margin: 1.5rem 0;
+  }
+
+  .clarity-text {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--air-secondary);
+    letter-spacing: 0.02em;
+  }
+
+  .grounded-text {
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--earth);
+  }
+
+  .sacred-subtitle {
+    font-family: 'Spectral', serif;
+    font-weight: 400;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: var(--aether-secondary);
+    font-style: italic;
+  }
+
+  /* Archetypal Typography Adaptations */
+  .fire-user .consciousness-header {
+    color: var(--fire);
+    font-weight: 400;
+  }
+
+  .water-user .consciousness-header {
+    color: var(--water);
+    line-height: 1.6;
+  }
+
+  .earth-user .consciousness-header {
+    color: var(--earth);
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 500;
+  }
+
+  .air-user .consciousness-header {
+    color: var(--air-tertiary);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.02em;
   }
 }

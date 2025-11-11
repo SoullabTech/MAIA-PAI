@@ -144,25 +144,73 @@ export async function POST(request: NextRequest) {
     // text in any language (50+ languages) without needing a language parameter.
     // It handles Spanish, French, Arabic, Chinese, etc. natively with correct pronunciation.
     // The 'language' parameter is tracked for logging but doesn't need to be passed to API.
-    const response = await fetch('https://api.openai.com/v1/audio/speech', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: config.model,
-        input: cleanedText,
-        voice: config.voice,
-        speed: config.speed,
-        response_format: 'mp3'
-      })
-    });
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('OpenAI TTS error:', response.status, error);
-      throw new Error(`OpenAI TTS failed: ${response.status}`);
+    // Add timeout and retry logic for OpenAI API
+    const maxRetries = 3;
+    let response: Response | null = null;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // Create AbortController for timeout
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+        response = await fetch('https://api.openai.com/v1/audio/speech', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: config.model,
+            input: cleanedText,
+            voice: config.voice,
+            speed: config.speed,
+            response_format: 'mp3'
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeout);
+
+        if (response.ok) {
+          break;
+        }
+
+        // Handle rate limiting or server errors
+        if (response.status === 429 || response.status >= 500) {
+          const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+          console.warn(`⚠️  [TTS] Status ${response.status}, attempt ${attempt}/${maxRetries} - waiting ${waitTime}ms`);
+
+          if (attempt < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            continue;
+          }
+        }
+
+        const error = await response.text();
+        console.error('OpenAI TTS error:', response.status, error);
+        throw new Error(`OpenAI TTS failed: ${response.status}`);
+
+      } catch (error: any) {
+        // Handle timeout or network errors
+        if (error.name === 'AbortError' || error.message?.includes('fetch')) {
+          console.warn(`⚠️  [TTS TIMEOUT/NETWORK] Attempt ${attempt}/${maxRetries}`);
+
+          if (attempt < maxRetries) {
+            const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            continue;
+          }
+        }
+        throw error;
+      }
+    }
+
+    if (!response || !response.ok) {
+      const error = response ? await response.text() : 'No response from OpenAI';
+      console.error('OpenAI TTS error:', response?.status, error);
+      throw new Error(`OpenAI TTS failed: ${response?.status || 'timeout'}`);
     }
 
     // Get the audio data

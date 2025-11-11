@@ -156,7 +156,7 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
         {
           icon: Download,
           label: 'Download Conversation',
-          action: () => onAction?.('download'),
+          action: () => onAction?.('download-transcript'),
           description: 'Save this conversation as markdown'
         },
         {

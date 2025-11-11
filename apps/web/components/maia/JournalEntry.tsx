@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Send, Sparkles } from 'lucide-react';
 import { Copy } from '@/lib/copy/MaiaCopy';
@@ -20,13 +21,16 @@ export default function JournalEntry() {
   const [isWriting, setIsWriting] = useState(false);
   const [consciousnessLevel, setConsciousnessLevel] = useState(0);
   const [writingRhythm, setWritingRhythm] = useState(0);
-  const [consciousnessRipples, setConsciousnessRipples] = useState<Array<{
+  // Consciousness ripples state with explicit type
+  type ConsciousnessRipple = {
     id: string;
     x: number;
     y: number;
     variant: 'jade' | 'neural' | 'mystical' | 'transcendent';
     timestamp: number;
-  }>([]);
+  };
+
+  const [consciousnessRipples, setConsciousnessRipples] = useState<ConsciousnessRipple[]>([]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lastTypingTimeRef = useRef<number>(0);

@@ -1,0 +1,41 @@
+# SOVEREIGNTY INFRASTRUCTURE
+# Local vector database for MAIA wisdom storage
+
+version: '3.8'
+
+services:
+  # Qdrant Vector Database
+  # Stores MAIA's 50-book wisdom library as searchable embeddings
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: maia-qdrant
+    ports:
+      - "6333:6333"  # HTTP API
+      - "6334:6334"  # gRPC API (optional)
+    volumes:
+      - ./data/qdrant:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    restart: unless-stopped
+
+  # Qdrant Web UI (optional, for debugging)
+  qdrant-ui:
+    image: qdrant/qdrant:latest
+    container_name: maia-qdrant-ui
+    ports:
+      - "6335:6333"
+    depends_on:
+      - qdrant
+    environment:
+      - QDRANT_HOST=qdrant
+    restart: unless-stopped
+
+# Networks
+networks:
+  default:
+    name: maia-sovereignty
+
+# Volumes
+volumes:
+  qdrant_data:
+    driver: local
