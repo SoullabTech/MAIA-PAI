@@ -243,7 +243,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [showWelcome, setShowWelcome] = useState(true);
   const [isReturningUser, setIsReturningUser] = useState(false);
   const [isSavingJournal, setIsSavingJournal] = useState(false);
-  const [showJournalSuggestion, setShowJournalSuggestion] = useState(false);
+  const [showJournalSuggestion, setShowJournalSuggestion] = useState(false); // Permanently disabled
   const [journalSuggestionDismissed, setJournalSuggestionDismissed] = useState(false);
   const [breakthroughScore, setBreakthroughScore] = useState(0);
 
@@ -753,12 +753,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     const score = detectBreakthroughPotential(conversationMessages);
     setBreakthroughScore(score);
 
-    // Suggest journaling if breakthrough potential is high and we haven't suggested yet
-    // FIXED: Only show if not already dismissed for this conversation
-    if (score >= 70 && !showJournalSuggestion && !journalSuggestionDismissed && messages.length >= 6) {
-      console.log('📊 [Breakthrough] Score >=70, showing journal suggestion');
-      setShowJournalSuggestion(true);
-    }
+    // Breakthrough detection PERMANENTLY DISABLED per user request
+    // if (score >= 70 && !showJournalSuggestion && !journalSuggestionDismissed && messages.length >= 6) {
+    //   console.log('📊 [Breakthrough] Score >=70, showing journal suggestion');
+    //   setShowJournalSuggestion(true);
+    // }
   }, [messages, showJournalSuggestion, journalSuggestionDismissed]);
 
   // Agent configuration with persistence

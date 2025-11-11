@@ -136,22 +136,43 @@ class UsageTracker {
     if (!this.supabase) return;
 
     try {
-      // Use upsert to handle new users automatically
-      const { error } = await this.supabase
+      // First, ensure the user record exists
+      const { data: existing } = await this.supabase
         .from('user_usage_quotas')
-        .upsert({
-          user_id: userId,
-          current_daily_messages: this.supabase.rpc('increment', { x: 1 }),
-          current_daily_tokens: this.supabase.rpc('increment', { x: tokens }),
-          current_daily_cost_cents: this.supabase.rpc('increment', { x: costCents }),
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id',
-          ignoreDuplicates: false
-        });
+        .select('current_daily_messages, current_daily_tokens, current_daily_cost_cents')
+        .eq('user_id', userId)
+        .maybeSingle();
 
-      if (error) {
-        console.error('❌ [USAGE TRACKER] Failed to update quota:', error);
+      if (!existing) {
+        // Create new record with initial values
+        await this.supabase
+          .from('user_usage_quotas')
+          .insert({
+            user_id: userId,
+            user_name: userId,
+            user_tier: 'beta',
+            daily_message_limit: 100,
+            daily_token_limit: 50000,
+            daily_cost_limit_cents: 50,
+            requests_per_minute: 10,
+            requests_per_hour: 100,
+            current_daily_messages: 1,
+            current_daily_tokens: tokens,
+            current_daily_cost_cents: costCents,
+            is_active: true,
+            is_blocked: false
+          });
+      } else {
+        // Update existing record by incrementing values
+        await this.supabase
+          .from('user_usage_quotas')
+          .update({
+            current_daily_messages: (existing.current_daily_messages || 0) + 1,
+            current_daily_tokens: (existing.current_daily_tokens || 0) + tokens,
+            current_daily_cost_cents: (existing.current_daily_cost_cents || 0) + costCents,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId);
       }
 
     } catch (error) {
