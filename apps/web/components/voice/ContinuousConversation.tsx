@@ -68,7 +68,8 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   // 🎯 ADAPTIVE SILENCE DETECTION - Monitor audio levels for natural speech pauses
   const isSpeakingNowRef = useRef(false); // Track if user is actively speaking based on audio levels
   const silenceStartTimeRef = useRef<number>(0); // When silence began
-  const adaptiveSilenceThreshold = 1500; // 1.5 seconds of silence after speaking = send (much faster!)
+  const hasSpokenRef = useRef(false); // Track if user has spoken at all (to differentiate from background noise)
+  const adaptiveSilenceThreshold = 2500; // 2.5 seconds for thinking pauses - respectful, not rushed
 
   // Function refs to avoid temporal dead zone in useImperativeHandle
   const startListeningFnRef = useRef<() => void>();
@@ -564,6 +565,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         onAudioLevelChange?.(normalizedLevel, isRecordingRef.current);
 
         // 🎯 ADAPTIVE SILENCE DETECTION - Detect when user stops speaking
+        // Respect thinking pauses - only send after meaningful silence
         const voiceThreshold = vadSensitivity; // Use sensitivity from props (default 0.3)
         const wasSpeaking = isSpeakingNowRef.current;
         const isSpeakingNow = normalizedLevel > voiceThreshold;
@@ -571,19 +573,21 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         if (isSpeakingNow && !wasSpeaking) {
           // User started speaking
           isSpeakingNowRef.current = true;
+          hasSpokenRef.current = true; // Mark that we've detected real speech
           silenceStartTimeRef.current = 0;
-          console.log('🗣️ [VAD] User started speaking (level:', normalizedLevel.toFixed(2), ')');
+          console.log('🗣️ [VAD] User speaking (level:', normalizedLevel.toFixed(2), ')');
         } else if (!isSpeakingNow && wasSpeaking) {
-          // User stopped speaking - start silence timer
+          // User paused - start silence timer (might be thinking, might be done)
           isSpeakingNowRef.current = false;
           silenceStartTimeRef.current = now;
-          console.log('🤫 [VAD] User stopped speaking - silence timer started');
-        } else if (!isSpeakingNow && silenceStartTimeRef.current > 0) {
-          // Check if silence threshold reached
+          console.log('⏸️ [VAD] Pause detected - listening for continuation...');
+        } else if (!isSpeakingNow && silenceStartTimeRef.current > 0 && hasSpokenRef.current) {
+          // Check if pause has lasted long enough AND we have real content
           const silenceDuration = now - silenceStartTimeRef.current;
           if (silenceDuration >= adaptiveSilenceThreshold && accumulatedTranscript.current.trim()) {
-            console.log('⚡ [VAD] Adaptive silence detected after', silenceDuration, 'ms - processing now!');
+            console.log('✅ [VAD] Natural completion detected after', silenceDuration, 'ms - sending to MAIA');
             silenceStartTimeRef.current = 0; // Reset to prevent duplicate triggers
+            hasSpokenRef.current = false; // Reset for next turn
             if (!isProcessingRef.current) {
               processAccumulatedTranscript();
             }
