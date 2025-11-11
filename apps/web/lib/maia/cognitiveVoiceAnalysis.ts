@@ -7,12 +7,13 @@ import { SOARPlanner, WisdomGoal } from '../cognitive-engines/soar-planner';
 import { ACTRMemory, MemoryElement } from '../cognitive-engines/actr-memory';
 import { MicroPsiCore, EmotionalState } from '../cognitive-engines/micropsi-core';
 
+// TODO: Restore when elemental agents are implemented
 // Import elemental agents
-import { FireAgent } from '../elemental-agents/FireAgent';
-import { WaterAgent } from '../elemental-agents/WaterAgent';
-import { EarthAgent } from '../elemental-agents/EarthAgent';
-import { AirAgent } from '../elemental-agents/AirAgent';
-import { AetherAgent } from '../elemental-agents/AetherAgent';
+// import { FireAgent } from '../elemental-agents/FireAgent';
+// import { WaterAgent } from '../elemental-agents/WaterAgent';
+// import { EarthAgent } from '../elemental-agents/EarthAgent';
+// import { AirAgent } from '../elemental-agents/AirAgent';
+// import { AetherAgent } from '../elemental-agents/AetherAgent';
 
 export interface CognitiveVoiceAnalysis {
   // Basic voice patterns
@@ -75,11 +76,12 @@ export class CognitiveVoiceProcessor {
   private actr: ACTRMemory;
   private microPsi: MicroPsiCore;
 
-  private fireAgent: FireAgent;
-  private waterAgent: WaterAgent;
-  private earthAgent: EarthAgent;
-  private airAgent: AirAgent;
-  private aetherAgent: AetherAgent;
+  // TODO: Restore when elemental agents are implemented
+  // private fireAgent: FireAgent;
+  // private waterAgent: WaterAgent;
+  // private earthAgent: EarthAgent;
+  // private airAgent: AirAgent;
+  // private aetherAgent: AetherAgent;
 
   constructor() {
     // Initialize cognitive architectures
@@ -88,12 +90,13 @@ export class CognitiveVoiceProcessor {
     this.actr = new ACTRMemory();
     this.microPsi = new MicroPsiCore();
 
+    // TODO: Restore when elemental agents are implemented
     // Initialize elemental agents
-    this.fireAgent = new FireAgent();
-    this.waterAgent = new WaterAgent();
-    this.earthAgent = new EarthAgent();
-    this.airAgent = new AirAgent();
-    this.aetherAgent = new AetherAgent();
+    // this.fireAgent = new FireAgent();
+    // this.waterAgent = new WaterAgent();
+    // this.earthAgent = new EarthAgent();
+    // this.airAgent = new AirAgent();
+    // this.aetherAgent = new AetherAgent();
   }
 
   public async analyzeCognitiveVoicePatterns(
