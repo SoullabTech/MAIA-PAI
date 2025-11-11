@@ -122,46 +122,48 @@ export const MotionOrchestrator: React.FC<MotionOrchestratorProps> = ({
   const coherenceRingVariants: Variants = {
     idle: {
       rotate: 0,
-      opacity: 0.3,
-      scale: 1,
-      stroke: getCoherenceColor(coherenceLevel)
+      opacity: 0.15,
+      scale: 1
     },
     listening: {
       rotate: shouldReduceMotion ? 0 : 360,
-      opacity: [0.3, 0.6, 0.3],
+      opacity: [0.15, 0.3, 0.15],
+      scale: [1, 1.02, 1],
       transition: {
         rotate: {
-          duration: isLowPower ? 60 : 30,
+          duration: isLowPower ? 60 : 40,
           repeat: Infinity,
           ease: "linear"
         },
         opacity: {
-          duration: 2,
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut"
+        },
+        scale: {
+          duration: 3,
           repeat: Infinity,
           ease: "easeInOut"
         }
       }
     },
     processing: {
-      scale: [1, 1.02, 1],
-      opacity: [0.3, 0.8, 0.3],
-      stroke: getCoherenceColor(coherenceLevel),
+      scale: [1, 1.03, 1],
+      opacity: [0.15, 0.4, 0.15],
       transition: {
-        duration: 1,
-        repeat: 3,
+        duration: 1.5,
+        repeat: Infinity,
         ease: "easeInOut"
       }
     },
     responding: {
-      opacity: coherenceLevel >= 0.7 ? 0.9 : 0.6,
+      opacity: 0.25,
       scale: 1.02,
-      stroke: getCoherenceColor(coherenceLevel),
-      transition: { duration: 0.5 }
+      transition: { duration: 0.8, ease: "easeOut" }
     },
     breakthrough: {
-      stroke: "#FFD700",
-      opacity: [0.3, 1, 0.8],
-      scale: [1, 1.1, 1.05],
+      opacity: [0.15, 0.6, 0.4],
+      scale: [1, 1.15, 1.08],
       transition: {
         duration: 3,
         ease: "easeOut"
@@ -185,47 +187,42 @@ export const MotionOrchestrator: React.FC<MotionOrchestratorProps> = ({
           className="absolute inset-0"
         >
           <defs>
-            <filter id="coherence-glow">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-              <feMerge> 
-                <feMergeNode in="coloredBlur"/>
+            {/* Soft, diffused aura glow filter */}
+            <filter id="coherence-aura">
+              <feGaussianBlur stdDeviation="20" result="softBlur"/>
+              <feColorMatrix in="softBlur" type="matrix" values="
+                1 0 0 0 0
+                0 1 0 0 0
+                0 0 1 0 0
+                0 0 0 0.3 0
+              " result="softGlow"/>
+              <feMerge>
+                <feMergeNode in="softGlow"/>
                 <feMergeNode in="SourceGraphic"/>
               </feMerge>
             </filter>
+
+            {/* Radial gradient for aura effect */}
+            <radialGradient id="aura-gradient">
+              <stop offset="0%" stopColor="white" stopOpacity="0.4"/>
+              <stop offset="30%" stopColor="white" stopOpacity="0.2"/>
+              <stop offset="70%" stopColor="white" stopOpacity="0.05"/>
+              <stop offset="100%" stopColor="white" stopOpacity="0"/>
+            </radialGradient>
           </defs>
 
-          {/* Outer coherence ring */}
+          {/* Diffused aura ring - wide and soft like an energy field */}
           <motion.circle
             cx="200"
             cy="200"
-            r="180"
+            r="185"
             fill="none"
-            strokeWidth="2"
-            strokeDasharray="5,5"
-            filter="url(#coherence-glow)"
+            strokeWidth="40"
+            stroke="url(#aura-gradient)"
+            filter="url(#coherence-aura)"
+            opacity="0.3"
             variants={coherenceRingVariants}
             animate={motionState}
-          />
-
-          {/* Inner coherence ring */}
-          <motion.circle
-            cx="200"
-            cy="200"
-            r="140"
-            fill="none"
-            strokeWidth="1"
-            strokeDasharray="3,3"
-            opacity="0.5"
-            variants={coherenceRingVariants}
-            animate={motionState}
-            transition={{
-              ...coherenceRingVariants.listening?.transition,
-              rotate: {
-                duration: isLowPower ? 45 : 25,
-                repeat: Infinity,
-                ease: "linear"
-              }
-            }}
           />
         </svg>
       </div>
