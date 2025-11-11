@@ -96,13 +96,13 @@ export default function SacredOraclePage() {
         phase: 'inhale'
       }));
 
-      // Auto-stop after 30 seconds (safety)
+      // Auto-stop after 10 seconds of recording (natural speaking time)
       setTimeout(() => {
-        if (isRecording) {
-          console.log('⏰ Auto-stopping recording after 30s');
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+          console.log('⏰ Auto-stopping recording after 10s - processing your message');
           stopRecording();
         }
-      }, 30000);
+      }, 10000);
 
     } catch (error: any) {
       console.error('❌ Failed to start recording:', error);
@@ -301,12 +301,12 @@ export default function SacredOraclePage() {
         </button>
         
         {/* Mode indicator */}
-        <div className="mt-4 text-white/70 text-sm font-light tracking-wide text-center">
-          {mode === 'grounded' && '👆 Tap the golden button to speak with MAIA'}
-          {mode === 'listening' && '🎤 Listening... speak now, tap again when done'}
-          {mode === 'processing' && '✨ Processing your voice...'}
-          {mode === 'responding' && '💫 MAIA speaks'}
-          {mode === 'transcendent' && '✨ Sacred breakthrough moment ✨'}
+        <div className="mt-4 text-white/70 text-sm font-light tracking-wide text-center px-8">
+          {mode === 'grounded' && 'Tap to speak with MAIA'}
+          {mode === 'listening' && 'Listening... speak now'}
+          {mode === 'processing' && 'Processing...'}
+          {mode === 'responding' && 'MAIA speaks'}
+          {mode === 'transcendent' && '✨ Sacred breakthrough ✨'}
         </div>
       </div>
       
