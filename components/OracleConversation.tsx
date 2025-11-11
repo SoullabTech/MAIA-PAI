@@ -229,6 +229,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [isReturningUser, setIsReturningUser] = useState(false);
   const [isSavingJournal, setIsSavingJournal] = useState(false);
   const [showJournalSuggestion, setShowJournalSuggestion] = useState(false);
+  const [journalSuggestionDismissed, setJournalSuggestionDismissed] = useState(false);
   const [breakthroughScore, setBreakthroughScore] = useState(0);
 
   // Session time container state
@@ -700,10 +701,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     setBreakthroughScore(score);
 
     // Suggest journaling if breakthrough potential is high and we haven't suggested yet
-    if (score >= 70 && !showJournalSuggestion && messages.length >= 6) {
+    if (score >= 70 && !showJournalSuggestion && !journalSuggestionDismissed && messages.length >= 6) {
       setShowJournalSuggestion(true);
     }
-  }, [messages, showJournalSuggestion]);
+  }, [messages, showJournalSuggestion, journalSuggestionDismissed]);
 
   // Agent configuration with persistence
   const [agentConfig, setAgentConfig] = useState<AgentConfig>(() => {
@@ -1155,6 +1156,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     } finally {
       setIsSavingJournal(false);
       setShowJournalSuggestion(false);
+      setJournalSuggestionDismissed(true);
     }
   }, [userId, messages, sessionId]);
 
@@ -3225,6 +3227,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                         <button
                           onClick={() => {
                             setShowJournalSuggestion(false);
+                            setJournalSuggestionDismissed(true);
                             console.log('🚫 [Journal] User dismissed journal suggestion');
                           }}
                           className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/20
