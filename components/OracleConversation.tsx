@@ -847,6 +847,18 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // Auto-recovery timer - if processing states are stuck for too long, reset
   // Reduced to 30s for better UX - if MAIA is stuck, recover quickly
+  // Create refs to track current state values for recovery timer
+  const isProcessingRef = useRef(isProcessing);
+  const isRespondingRef = useRef(isResponding);
+  const isAudioPlayingRef = useRef(isAudioPlaying);
+
+  // Keep refs in sync with state
+  useEffect(() => {
+    isProcessingRef.current = isProcessing;
+    isRespondingRef.current = isResponding;
+    isAudioPlayingRef.current = isAudioPlaying;
+  }, [isProcessing, isResponding, isAudioPlaying]);
+
   useEffect(() => {
     if (isProcessing || isResponding) {
       // Create a unique ID for this processing session
@@ -855,13 +867,23 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       console.log(`🔄 [${sessionId}] Recovery timer started - isProcessing: ${isProcessing}, isResponding: ${isResponding}`);
 
       const recoveryTimer = setTimeout(() => {
-        // Check if states are STILL stuck
+        // Check CURRENT state values using refs, not closure values
         const currentTime = Date.now();
         const timeSinceActivation = currentTime - stateActivatedTime;
+        const currentIsProcessing = isProcessingRef.current;
+        const currentIsResponding = isRespondingRef.current;
+        const currentIsAudioPlaying = isAudioPlayingRef.current;
 
-        console.log(`⏰ [${sessionId}] Recovery timer fired after ${timeSinceActivation}ms - isProcessing: ${isProcessing}, isResponding: ${isResponding}`);
+        console.log(`⏰ [${sessionId}] Recovery timer fired after ${timeSinceActivation}ms - CURRENT states: isProcessing: ${currentIsProcessing}, isResponding: ${currentIsResponding}, isAudioPlaying: ${currentIsAudioPlaying}`);
 
-        if ((isProcessing || isResponding) && timeSinceActivation >= 29000) {
+        // If audio is still playing, states SHOULD be active - not stuck
+        if (currentIsAudioPlaying) {
+          console.log(`✅ [${sessionId}] Audio still playing - states are working correctly, no recovery needed`);
+          return;
+        }
+
+        // Only trigger recovery if states are STILL stuck after 30s AND audio isn't playing
+        if ((currentIsProcessing || currentIsResponding) && timeSinceActivation >= 29000) {
           console.warn(`⚠️ [${sessionId}] States genuinely stuck for >30s - auto-recovery triggered`);
 
           // Show user-friendly message
