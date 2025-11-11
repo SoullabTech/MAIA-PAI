@@ -1607,11 +1607,44 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
       if (isStreaming) {
         // Handle streaming response (voice mode - fastest)
-        console.log('🎤 [STREAM] Receiving streaming response...');
+        // 🔥 STREAMING AUDIO: Process sentences as they arrive for immediate TTS
+        console.log('🎤 [STREAM] Receiving streaming response with live audio...');
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
         let fullText = '';
+        let partialSentence = ''; // Buffer for incomplete sentences
         let firstChunkReceived = false;
+
+        // Import streaming audio utilities
+        const { StreamingAudioQueue, splitIntoSentences, generateAudioChunk } =
+          await import('@/lib/voice/StreamingAudioQueue');
+
+        // Initialize audio queue for voice mode
+        const shouldStreamAudio = !showChatInterface && voiceEnabled && maiaReady;
+        let audioQueue: InstanceType<typeof StreamingAudioQueue> | null = null;
+
+        if (shouldStreamAudio) {
+          console.log('🎵 [STREAM] Initializing streaming audio queue...');
+          audioQueue = new StreamingAudioQueue({
+            onPlayingChange: (isPlaying) => {
+              setIsAudioPlaying(isPlaying);
+              setIsMicrophonePaused(isPlaying); // Pause mic while speaking
+            },
+            onTextChange: (text) => {
+              setMaiaResponseText(text); // Update display with current sentence
+            },
+            onComplete: () => {
+              console.log('✅ [STREAM] All audio chunks played');
+              setIsResponding(false);
+              setIsAudioPlaying(false);
+              // Resume mic after cooldown
+              setTimeout(() => {
+                setIsMicrophonePaused(false);
+              }, 2000);
+            },
+          });
+          setIsResponding(true); // Start responding state immediately
+        }
 
         try {
           if (!reader) {
@@ -1622,6 +1655,24 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             const { done, value } = await reader.read();
             if (done) {
               console.log('🏁 [STREAM] Stream complete');
+
+              // Process any remaining partial sentence
+              if (partialSentence.trim() && audioQueue) {
+                console.log('📝 [STREAM] Processing final partial sentence:', partialSentence.substring(0, 50));
+                try {
+                  const audio = await generateAudioChunk(partialSentence, {
+                    agentVoice: 'maya',
+                    element,
+                  });
+                  audioQueue.enqueue({
+                    audio,
+                    text: partialSentence,
+                    element,
+                  });
+                } catch (err) {
+                  console.error('❌ [STREAM] Failed to generate audio for final sentence:', err);
+                }
+              }
               break;
             }
 
@@ -1648,6 +1699,42 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                       const firstChunkTime = Date.now() - startTime;
                       console.log(`⚡ [STREAM] First chunk received in ${firstChunkTime}ms`);
                     }
+
+                    // 🔥 STREAMING AUDIO: Process complete sentences immediately
+                    if (audioQueue) {
+                      partialSentence += text;
+
+                      // Check if we have complete sentences (ending with . ! ?)
+                      const sentenceEndMatch = partialSentence.match(/[.!?]+\s/);
+                      if (sentenceEndMatch) {
+                        const sentences = splitIntoSentences(partialSentence);
+
+                        // Process all complete sentences
+                        for (let i = 0; i < sentences.length - 1; i++) {
+                          const sentence = sentences[i].trim();
+                          if (sentence) {
+                            console.log('🎤 [STREAM] Complete sentence, generating audio:', sentence.substring(0, 50));
+
+                            // Generate and queue audio asynchronously (don't await - let it run in background)
+                            generateAudioChunk(sentence, {
+                              agentVoice: 'maya',
+                              element,
+                            }).then(audio => {
+                              audioQueue!.enqueue({
+                                audio,
+                                text: sentence,
+                                element,
+                              });
+                            }).catch(err => {
+                              console.error('❌ [STREAM] Failed to generate audio:', err);
+                            });
+                          }
+                        }
+
+                        // Keep the last sentence (might be incomplete)
+                        partialSentence = sentences[sentences.length - 1] || '';
+                      }
+                    }
                   }
                 } catch (e) {
                   console.warn('⚠️ [STREAM] Failed to parse JSON:', data.substring(0, 50));
@@ -1665,7 +1752,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
         } catch (streamError) {
           console.error('❌ [STREAM] Error reading stream:', streamError);
-          // Fall back to error message
+          // Clean up audio queue on error
+          if (audioQueue) {
+            audioQueue.stop();
+          }
           throw streamError;
         }
 
@@ -1811,10 +1901,14 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       }
 
       // Play audio response with Maia's voice - ALWAYS in voice mode
-      const shouldSpeak = !showChatInterface || (showChatInterface && voiceEnabled && maiaReady && enableVoiceInChat);
+      // 🔥 SKIP if we already used streaming audio (audioQueue handled it)
+      const usedStreamingAudio = isStreaming && !showChatInterface && voiceEnabled && maiaReady;
+      const shouldSpeak = !usedStreamingAudio && (!showChatInterface || (showChatInterface && voiceEnabled && maiaReady && enableVoiceInChat));
 
       console.log('🎤 Voice response check:', {
         shouldSpeak,
+        usedStreamingAudio,
+        isStreaming,
         showChatInterface,
         voiceEnabled,
         maiaReady,
@@ -1822,7 +1916,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       });
 
       if (shouldSpeak && maiaSpeak) {
-        console.log('🔊 Maia speaking response in', showChatInterface ? 'Chat' : 'Voice', 'mode');
+        console.log('🔊 Maia speaking response in', showChatInterface ? 'Chat' : 'Voice', 'mode (non-streaming)');
         const ttsStartTime = Date.now();
         trackEvent.ttsSpoken(userId || 'anonymous', responseText.length, 0);
         // Set speaking state for visual feedback
