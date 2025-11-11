@@ -1318,7 +1318,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       }
 
       // THE BETWEEN metadata includes field depth, sovereignty check, etc
-      const element = responseData.metadata?.archetypalField?.dominantArchetype || 'aether';
+      const element = responseData.metadata?.archetypalResonance?.primaryResonance?.toLowerCase() || 'aether';
       const facetId = mapElementToFacetId(element);
       setActiveFacetId(facetId);
       setCoherenceLevel(responseData.metadata?.fieldState?.depth || 0.85);
