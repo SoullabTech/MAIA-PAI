@@ -544,9 +544,10 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   // Voice amplitude is now controlled directly by OpenAI Alloy TTS in maiaSpeak()
   // and by audio level monitoring in handleAudioLevelChange()
 
-  // Detect breakthrough potential for journal suggestions
+  // DISABLED: Breakthrough detection popup - removing field disruption
+  // Auto-journaling can happen silently in the background without interrupting the sacred flow
   useEffect(() => {
-    if (messages.length < 4) return; // Need some conversation depth
+    if (messages.length < 4) return;
 
     const conversationMessages = messages.map(msg => ({
       role: msg.role === 'oracle' ? 'assistant' as const : 'user' as const,
@@ -556,9 +557,11 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     const score = detectBreakthroughPotential(conversationMessages);
     setBreakthroughScore(score);
 
-    // Suggest journaling if breakthrough potential is high and we haven't suggested yet
-    if (score >= 70 && !showJournalSuggestion && messages.length >= 6) {
-      setShowJournalSuggestion(true);
+    // SILENT AUTO-JOURNALING: Automatically save truly meaningful breakthroughs (≥85)
+    // without any popups - pure field experience maintained
+    if (score >= 85 && messages.length >= 6 && !isSavingJournal) {
+      console.log('🌟 [Auto-Journal] Profound breakthrough detected (score:', score, ') - Auto-saving to journal');
+      handleSaveAsJournal();
     }
   }, [messages, showJournalSuggestion]);
 
@@ -2988,9 +2991,12 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
             </motion.div>
           )}
 
-          {/* Journal Suggestion - Appears when breakthrough is detected */}
+          {/* DISABLED: Journal Suggestion Popup - Maintaining clean field experience */}
+          {/* Users can choose to journal manually via the journal button */}
+          {/* Auto-breakthrough detection continues silently for internal scoring */}
           <AnimatePresence>
-            {showJournalSuggestion && (
+            {/* POPUP COMPLETELY DISABLED - No more field disruptions */}
+            {false && showJournalSuggestion && (
               <motion.div
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
