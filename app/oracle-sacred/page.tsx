@@ -31,6 +31,8 @@ export default function SacredOraclePage() {
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const silenceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
 
   // Initialize audio context
   useEffect(() => {
@@ -39,6 +41,61 @@ export default function SacredOraclePage() {
       setAudioContext(ctx);
     }
   }, []);
+
+  // Detect silence and auto-stop recording
+  const detectSilence = (stream: MediaStream) => {
+    if (!audioContext) return;
+
+    const analyser = audioContext.createAnalyser();
+    const microphone = audioContext.createMediaStreamSource(stream);
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    analyser.smoothingTimeConstant = 0.8;
+    analyser.fftSize = 1024;
+
+    microphone.connect(analyser);
+    analyserRef.current = analyser;
+
+    let isSpeaking = false;
+
+    const checkAudioLevel = () => {
+      if (!analyserRef.current) return;
+
+      analyser.getByteFrequencyData(dataArray);
+      const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+
+      // Threshold for detecting speech (adjust based on testing)
+      const SPEECH_THRESHOLD = 10;
+      const SILENCE_DURATION = 2000; // 2 seconds of silence to auto-stop
+
+      if (average > SPEECH_THRESHOLD) {
+        // User is speaking
+        isSpeaking = true;
+
+        // Clear any existing silence timeout
+        if (silenceTimeoutRef.current) {
+          clearTimeout(silenceTimeoutRef.current);
+          silenceTimeoutRef.current = null;
+        }
+      } else if (isSpeaking) {
+        // User was speaking but now silent
+        if (!silenceTimeoutRef.current) {
+          // Start silence countdown
+          silenceTimeoutRef.current = setTimeout(() => {
+            console.log('🤫 Detected 2s of silence - auto-stopping recording');
+            stopRecording();
+          }, SILENCE_DURATION);
+        }
+      }
+
+      // Continue monitoring if still recording
+      if (mediaRecorderRef.current?.state === 'recording') {
+        requestAnimationFrame(checkAudioLevel);
+      }
+    };
+
+    checkAudioLevel();
+  };
 
   // Handle voice recording
   const startRecording = async () => {
@@ -67,6 +124,13 @@ export default function SacredOraclePage() {
 
       mediaRecorder.onstop = async () => {
         console.log('🛑 Recording stopped, processing...');
+
+        // Clean up silence detection
+        if (silenceTimeoutRef.current) {
+          clearTimeout(silenceTimeoutRef.current);
+          silenceTimeoutRef.current = null;
+        }
+
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         await processVoiceInput(audioBlob);
 
@@ -96,13 +160,16 @@ export default function SacredOraclePage() {
         phase: 'inhale'
       }));
 
-      // Auto-stop after 60 seconds (allows for thoughtful, unhurried sharing)
+      // Start adaptive silence detection
+      detectSilence(stream);
+
+      // Safety timeout: auto-stop after 2 minutes max
       setTimeout(() => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-          console.log('⏰ Auto-stopping recording after 60s - processing your message');
+          console.log('⏰ Safety timeout - auto-stopping recording after 2 minutes');
           stopRecording();
         }
-      }, 60000);
+      }, 120000);
 
     } catch (error: any) {
       console.error('❌ Failed to start recording:', error);
