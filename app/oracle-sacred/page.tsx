@@ -96,13 +96,13 @@ export default function SacredOraclePage() {
         phase: 'inhale'
       }));
 
-      // Auto-stop after 10 seconds of recording (natural speaking time)
+      // Auto-stop after 60 seconds (allows for thoughtful, unhurried sharing)
       setTimeout(() => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-          console.log('⏰ Auto-stopping recording after 10s - processing your message');
+          console.log('⏰ Auto-stopping recording after 60s - processing your message');
           stopRecording();
         }
-      }, 10000);
+      }, 60000);
 
     } catch (error: any) {
       console.error('❌ Failed to start recording:', error);
