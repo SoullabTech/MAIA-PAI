@@ -132,7 +132,7 @@ export function SoulfulOnboarding({ initialName }: { initialName: string }) {
       console.log('Saved locally only');
     }
 
-    router.push('/maia');
+    router.push('/oracle-sacred');
   };
 
   const renderStep = () => {
