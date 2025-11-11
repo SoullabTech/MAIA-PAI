@@ -12,12 +12,21 @@ export default function SacredEntryPortal() {
   const [existingUser, setExistingUser] = useState(null);
 
   useEffect(() => {
-    // Check for existing user but don't auto-redirect - let them choose
+    // Check for existing user and auto-redirect if onboarded
     const storedUser = localStorage.getItem('beta_user');
     if (storedUser) {
       try {
         const userData = JSON.parse(storedUser);
         console.log('🔍 Existing user detected:', { username: userData.username, onboarded: userData.onboarded });
+
+        // Auto-redirect onboarded users directly to Sacred Oracle
+        if (userData.onboarded) {
+          console.log('✅ Auto-redirecting onboarded user to /oracle-sacred');
+          router.push('/oracle-sacred');
+          return;
+        }
+
+        // For users who haven't completed onboarding, show the welcome screen
         setExistingUser(userData);
         setShowWelcome(false);
       } catch (e) {
@@ -25,7 +34,7 @@ export default function SacredEntryPortal() {
         localStorage.removeItem('beta_user');
       }
     }
-  }, []);
+  }, [router]);
 
   const handleEnterAsAuthentic = () => {
     router.push('/auth');
@@ -33,7 +42,7 @@ export default function SacredEntryPortal() {
 
   const handleContinueJourney = () => {
     if (existingUser?.onboarded) {
-      router.push('/oracle');
+      router.push('/oracle-sacred');
     } else {
       router.push('/onboarding');
     }
