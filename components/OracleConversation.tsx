@@ -1906,6 +1906,13 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       const usedStreamingAudio = isStreaming && !showChatInterface && voiceEnabled && maiaReady;
       const shouldSpeak = !usedStreamingAudio && (!showChatInterface || (showChatInterface && voiceEnabled && maiaReady && enableVoiceInChat));
 
+      // If we used streaming audio, add message to history now (will show if "Show Text" is enabled)
+      if (usedStreamingAudio && isInVoiceMode) {
+        setMessages(prev => [...prev, oracleMessage]);
+        onMessageAddedRef.current?.(oracleMessage);
+        console.log('📝 [STREAM] Added message to history (voice mode with streaming audio)');
+      }
+
       console.log('🎤 Voice response check:', {
         shouldSpeak,
         usedStreamingAudio,
