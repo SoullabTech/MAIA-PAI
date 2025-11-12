@@ -80,7 +80,7 @@ export default function OnboardingPage() {
       const fallbackUser = {
         ...existingData, // Preserve existing data
         id: existingData.id || crypto.randomUUID(),
-        username: existingData.username || 'Seeker', // Fallback to Seeker only if no username
+        username: existingData.username || 'Explorer', // Fallback to Explorer only if no username
         agentName: 'Maya',
         sessionId: `session-${Date.now()}`,
         element: 'aether'
