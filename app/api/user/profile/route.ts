@@ -19,24 +19,11 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 [User Profile API] Fetching profile for:', { userId, domain });
 
-    // Production domain Kelly recognition
-    if (domain && (domain.includes('soullab.life') || domain.includes('soullab.org'))) {
-      console.log('🌟 [User Profile API] Kelly auto-recognized on production domain:', domain);
-      return NextResponse.json({
-        success: true,
-        user: {
-          id: 'kelly-nezat',
-          name: 'Kelly',
-          email: 'kelly@soullab.life'
-        }
-      });
-    }
-
-    // If no userId provided, check if we can identify from domain
+    // MUST have userId to fetch profile
     if (!userId) {
       return NextResponse.json({
         success: false,
-        error: 'No userId provided and domain not recognized'
+        error: 'No userId provided'
       }, { status: 400 });
     }
 

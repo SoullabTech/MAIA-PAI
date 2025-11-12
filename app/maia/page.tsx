@@ -28,38 +28,15 @@ import { SwipeNavigation, DirectionalHints } from '@/components/navigation/Swipe
 async function getInitialUserData() {
   if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
 
-  // PRODUCTION DOMAIN KELLY RECOGNITION - HIGHEST PRIORITY
   const currentUrl = window.location.hostname;
-  const isProduction = currentUrl.includes('soullab.life') || currentUrl.includes('soullab.org');
 
-  if (isProduction) {
-    console.log('🌟 [MAIA] Kelly auto-recognized on production domain:', currentUrl);
-    const kellyData = { id: 'kelly-nezat', name: 'Kelly' };
-
-    // Persist to localStorage for consistency
-    localStorage.setItem('explorerName', 'Kelly');
-    localStorage.setItem('explorerId', 'kelly-nezat');
-    localStorage.setItem('betaOnboardingComplete', 'true');
-
-    // Also sync to new system
-    const betaUser = {
-      id: 'kelly-nezat',
-      name: 'Kelly',
-      email: 'kelly@soullab.life',
-      onboarded: true
-    };
-    localStorage.setItem('beta_user', JSON.stringify(betaUser));
-
-    return kellyData;
-  }
-
-  // Try to fetch from API using stored userId or domain
+  // Try to fetch from API using stored userId
   const storedUserId = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
 
-  if (storedUserId || currentUrl.includes('soullab')) {
+  if (storedUserId) {
     try {
       const params = new URLSearchParams();
-      if (storedUserId) params.append('userId', storedUserId);
+      params.append('userId', storedUserId);
       params.append('domain', currentUrl);
 
       const response = await fetch(`/api/user/profile?${params.toString()}`);
