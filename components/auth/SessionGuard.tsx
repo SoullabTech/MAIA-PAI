@@ -67,10 +67,17 @@ export function SessionGuard({
       setSessionState(newState);
     });
 
+    // Add timeout to prevent indefinite loading
+    const timeout = setTimeout(() => {
+      console.warn('[SessionGuard] Timeout reached, force completing session check');
+      setIsChecking(false);
+    }, 3000);
+
     setIsChecking(false);
 
     return () => {
       unsubscribe();
+      clearTimeout(timeout);
     };
   }, [pathname]);
 

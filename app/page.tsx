@@ -7,32 +7,37 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is already onboarded - skip intro if so
-    const storedUser = localStorage.getItem('beta_user');
-    const week2Onboarded = localStorage.getItem('week2_onboarded') === 'true';
+    // Add a small delay to let SessionGuard complete first
+    const redirectTimer = setTimeout(() => {
+      // Check if user is already onboarded - skip intro if so
+      const storedUser = localStorage.getItem('beta_user');
+      const week2Onboarded = localStorage.getItem('week2_onboarded') === 'true';
 
-    if (week2Onboarded) {
-      console.log('✅ Auto-redirecting week2 user to /maia');
-      router.replace('/maia');
-      return;
-    }
-
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser);
-        if (userData.onboarded === true) {
-          console.log('✅ Auto-redirecting onboarded user to /maia');
-          router.replace('/maia');
-          return;
-        }
-      } catch (e) {
-        console.error('Error parsing user data:', e);
+      if (week2Onboarded) {
+        console.log('✅ Auto-redirecting week2 user to /maia');
+        router.replace('/maia');
+        return;
       }
-    }
 
-    // New users see the beautiful intro with rotating quotes and mantras
-    console.log('👋 New user - showing intro');
-    router.replace('/intro');
+      if (storedUser) {
+        try {
+          const userData = JSON.parse(storedUser);
+          if (userData.onboarded === true) {
+            console.log('✅ Auto-redirecting onboarded user to /maia');
+            router.replace('/maia');
+            return;
+          }
+        } catch (e) {
+          console.error('Error parsing user data:', e);
+        }
+      }
+
+      // New users see the beautiful intro with rotating quotes and mantras
+      console.log('👋 New user - showing intro');
+      router.replace('/intro');
+    }, 100); // Small delay to let SessionGuard run first
+
+    return () => clearTimeout(redirectTimer);
   }, [router]);
 
   // Show loading while redirecting to MAIA
