@@ -9,9 +9,10 @@
  * - Store in episode_vectors table (pgvector)
  * - Use for fast approximate nearest neighbor search
  * - Calculate LSH/SimHash for even faster matching
+ *
+ * SECURITY: Calls server-side /api/memory/embed route (never exposes API keys)
  */
 
-import OpenAI from 'openai';
 import { createClientComponentClient } from '@/lib/supabase';
 import type { Episode } from './types';
 
@@ -28,14 +29,7 @@ export interface EmbeddingResult {
 }
 
 export class EmbeddingService {
-  private openai: OpenAI;
   private supabase = createClientComponentClient();
-
-  constructor(apiKey?: string) {
-    this.openai = new OpenAI({
-      apiKey: apiKey || process.env.OPENAI_API_KEY || ''
-    });
-  }
 
   /**
    * Generate embedding for episode
@@ -47,45 +41,32 @@ export class EmbeddingService {
    * - Optional full text
    *
    * This creates a rich semantic representation
+   * Calls secure server-side API route
    */
   async generate(input: GenerateEmbeddingInput): Promise<EmbeddingResult> {
     try {
-      // Construct embedding text from available components
-      const parts: string[] = [];
-
-      if (input.stanza) {
-        parts.push(`Scene: ${input.stanza}`);
-      }
-
-      if (input.placeCue) {
-        parts.push(`Place: ${input.placeCue}`);
-      }
-
-      if (input.senseCues && input.senseCues.length > 0) {
-        parts.push(`Senses: ${input.senseCues.join(', ')}`);
-      }
-
-      if (input.text) {
-        // Use first 500 chars of text for context
-        parts.push(input.text.substring(0, 500));
-      }
-
-      const embeddingText = parts.join('\n');
-
-      // Generate embedding using OpenAI
-      const response = await this.openai.embeddings.create({
-        model: 'text-embedding-3-small', // 1536 dimensions, fast & affordable
-        input: embeddingText
+      // Call server-side API route (keeps OpenAI API key secure)
+      const response = await fetch('/api/memory/embed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text: input.text,
+          stanza: input.stanza,
+          placeCue: input.placeCue,
+          senseCues: input.senseCues
+        })
       });
 
-      const embedding = response.data[0].embedding;
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
 
-      // Calculate similarity hash (LSH) for fast approximate matching
-      const similarityHash = this.calculateSimHash(embedding);
-
+      const data = await response.json();
       return {
-        embedding,
-        similarityHash
+        embedding: data.embedding,
+        similarityHash: data.similarityHash
       };
     } catch (error) {
       console.error('[EmbeddingService] Error generating embedding:', error);
@@ -172,60 +153,6 @@ export class EmbeddingService {
     }
   }
 
-  /**
-   * Calculate SimHash for fast approximate matching
-   *
-   * SimHash produces a fixed-length hash where similar vectors
-   * have similar hashes (measured by Hamming distance)
-   *
-   * This enables very fast pre-filtering before cosine similarity
-   */
-  private calculateSimHash(embedding: number[]): string {
-    const hashLength = 64; // 64-bit hash
-    const bits: number[] = new Array(hashLength).fill(0);
-
-    // For each dimension, contribute to hash bits
-    for (let i = 0; i < embedding.length; i++) {
-      const value = embedding[i];
-
-      // Use simple hash function: dimension index mod hash length
-      const bitIndex = i % hashLength;
-
-      // Contribute to that bit based on value
-      if (value > 0) {
-        bits[bitIndex] += value;
-      } else {
-        bits[bitIndex] -= Math.abs(value);
-      }
-    }
-
-    // Convert to binary hash
-    const hash = bits.map(b => (b > 0 ? '1' : '0')).join('');
-
-    // Convert to hex for storage
-    const hexHash = parseInt(hash, 2).toString(16).padStart(16, '0');
-
-    return hexHash;
-  }
-
-  /**
-   * Calculate Hamming distance between two SimHashes
-   *
-   * Lower distance = more similar
-   */
-  private hammingDistance(hash1: string, hash2: string): number {
-    let distance = 0;
-    const bin1 = parseInt(hash1, 16).toString(2).padStart(64, '0');
-    const bin2 = parseInt(hash2, 16).toString(2).padStart(64, '0');
-
-    for (let i = 0; i < bin1.length; i++) {
-      if (bin1[i] !== bin2[i]) {
-        distance++;
-      }
-    }
-
-    return distance;
-  }
 }
 
 /**

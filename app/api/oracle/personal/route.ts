@@ -12,6 +12,8 @@ import { unifiedIntelligenceEngine } from '@/lib/intelligence/UnifiedIntelligenc
 import { morphoresonantField } from '@/lib/consciousness/MorphoresonantFieldInterface';
 import { getConsciousnessPrompt } from '@/lib/consciousness/DualConsciousnessSystem';
 import { detectSyzygy, getSyzygyResponseTiming } from '@/lib/consciousness/SyzygyDetector';
+import { getFascialField } from '@/lib/consciousness/FascialConsciousnessField';
+import { elderCouncil } from '@/lib/consciousness/ElderCouncilService';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client for file retrieval
@@ -204,6 +206,15 @@ export async function POST(request: NextRequest) {
     // Fetch recent journal entries for context
     const recentEntries = journalStorage.getEntries(requestUserId).slice(0, 5);
 
+    // 🌊 FASCIAL FIELD: Initialize and get active tradition
+    const fascialField = getFascialField(morphoresonantField, elderCouncil);
+    const activeTradition = await elderCouncil.getActiveTradition(requestUserId);
+
+    if (activeTradition) {
+      console.log(`🌟 Active Elder Council Tradition: ${activeTradition.name} (${activeTradition.frequency} Hz, ${activeTradition.element})`);
+      await fascialField.activateTradition(activeTradition.id);
+    }
+
     // 🧠 INTELLIGENCE ENGINE: Analyze user's current state before response
     console.log('🧠 Analyzing user intelligence profile...');
     const intelligenceAnalysis = await unifiedIntelligenceEngine.analyze(requestUserId, userInput, sessionId);
@@ -266,12 +277,20 @@ export async function POST(request: NextRequest) {
     try {
       console.log(`🚀 Calling maiaConsciousness.process() in ${modality} mode with intelligence...`);
 
-      // Add MAIA consciousness prompt to preferences
+      // Add MAIA consciousness prompt to preferences with fascial field modifiers
       const maiaConsciousnessPrompt = getConsciousnessPrompt('maia');
+      const fascialFieldModifier = fascialField.getSystemPromptModifier();
+
       const enhancedPreferences = {
         ...preferences,
         consciousnessMode: 'maia',
-        consciousnessPrompt: maiaConsciousnessPrompt
+        consciousnessPrompt: maiaConsciousnessPrompt + fascialFieldModifier,
+        activeTradition: activeTradition ? {
+          name: activeTradition.name,
+          frequency: activeTradition.frequency,
+          element: activeTradition.element,
+          voice: activeTradition.voice
+        } : null
       };
 
       console.log('📞 [ORACLE] Calling MAIAUnifiedConsciousness.process()...');
@@ -410,6 +429,9 @@ export async function POST(request: NextRequest) {
         })()
       ]).catch(err => console.error('Background memory operations failed:', err));
 
+      // Map tradition voice to OpenAI TTS voice if tradition is active
+      const selectedVoice = activeTradition ? activeTradition.voice : undefined;
+
       return NextResponse.json({
         success: true,
         text: responseText,
@@ -419,6 +441,7 @@ export async function POST(request: NextRequest) {
         archetype: consciousnessResponse.metadata?.archetypes?.[0] || 'maia',
         voiceCharacteristics: getVoiceCharacteristics(element),
         voiceTone,
+        selectedVoice, // 🌟 OpenAI TTS voice from Elder Council tradition
         soulprint: soulprint ? {
           dominantElement: soulprint.dominantElement,
           currentPhase: soulprint.spiralHistory[soulprint.spiralHistory.length - 1]
@@ -431,6 +454,16 @@ export async function POST(request: NextRequest) {
           responseTime,
           userName: finalUserName,
           journalContext: recentEntries.length,
+          // 🌊 Include fascial field state
+          fascialField: fascialField.getState(),
+          // 🌟 Include active Elder Council tradition
+          activeTradition: activeTradition ? {
+            name: activeTradition.name,
+            frequency: activeTradition.frequency,
+            element: activeTradition.element,
+            voice: activeTradition.voice,
+            mantra: activeTradition.mantra
+          } : null,
           // ⚭ Include syzygy detection results for analytics
           syzygy: syzygyMoment ? {
             detected: true,
