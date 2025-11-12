@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
     // Save file metadata to database
     const supabase = await getSupabaseREST();
     if (supabase) {
-      await supabase
-        .from('file_uploads')
+      const uploadsTable = await supabase.from('file_uploads');
+      await uploadsTable
         .insert({
           explorer_id: explorerId,
           explorer_name: explorerName,
@@ -99,8 +99,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ files: [] });
     }
 
-    const { data, error } = await supabase
-      .from('file_uploads')
+    const uploadsTable = await supabase.from('file_uploads');
+    const { data, error } = await uploadsTable
       .eq('explorer_id', explorerId)
       .select('*');
 

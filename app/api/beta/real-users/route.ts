@@ -49,9 +49,9 @@ export async function GET(request: NextRequest) {
     const allTrackedUsers = await userTracker.getAllUsers();
 
     // Merge with beta tester list to show both tracked and untracked
-    const mergedUsers = BETA_TESTERS.map(tester => {
+    const mergedUsers = BETA_TESTERS.map((tester: any) => {
       const trackedUser = allTrackedUsers.find(
-        u => u.name === tester.name || u.email === tester.email
+        (u: any) => u.name === tester.name || u.email === tester.email
       );
 
       if (trackedUser) {

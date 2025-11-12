@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
     let publicKey: string;
     try {
-      publicKey = this.extractPublicKeyFromAttestation(attestationBuffer);
+      publicKey = extractPublicKeyFromAttestation(attestationBuffer);
     } catch (error) {
       console.error('Failed to extract public key:', error);
       publicKey = response.attestationObject;

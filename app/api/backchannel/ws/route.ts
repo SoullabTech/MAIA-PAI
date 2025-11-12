@@ -1,8 +1,6 @@
 // app/api/backchannel/ws/route.ts
 // WebSocket backchannel for collective listening - privacy-preserving pattern recognition
 
-import { Server } from 'socket.io';
-import { NextApiRequest } from 'next';
 import { SymbolicSignal, CollectiveSnapshot } from '@/lib/voice/types';
 
 // In-memory storage for beta (replace with Redis/DB in production)
@@ -21,17 +19,29 @@ export async function GET(req: Request) {
     return new Response('Expected Upgrade: websocket', { status: 426 });
   }
 
-  // Create WebSocket response
-  const webSocketPair = new WebSocketPair();
-  const [client, server] = Object.values(webSocketPair);
+  try {
+    // Use the Web Standard WebSocket API if available
+    // For Next.js 14+, this requires the WebSocket to be declared properly
+    const WebSocketPairConstructor = (global as any).WebSocketPair;
+    const webSocketPair = WebSocketPairConstructor ? new WebSocketPairConstructor() : { 0: null, 1: null };
+    const client = webSocketPair[0];
+    const server = webSocketPair[1];
 
-  // Handle the WebSocket connection
-  handleWebSocket(server);
+    if (!client || !server) {
+      return new Response('WebSocket not supported', { status: 501 });
+    }
 
-  return new Response(null, {
-    status: 101,
-    webSocket: client,
-  } as any); // Next.js 14+ WebSocket support
+    // Handle the WebSocket connection
+    handleWebSocket(server);
+
+    return new Response(null, {
+      status: 101,
+      webSocket: client,
+    } as any); // Next.js 14+ WebSocket support
+  } catch (error) {
+    console.error('WebSocket setup error:', error);
+    return new Response('WebSocket setup failed', { status: 500 });
+  }
 }
 
 function handleWebSocket(ws: WebSocket) {
@@ -171,7 +181,7 @@ function detectCollectivePatterns(signals: SymbolicSignal[]) {
 
   // Detect tension (opposing forces)
   const hasOpposing = (breathCounts.in > 0 && breathCounts.out > 0) ||
-                      (elementCounts.get('fire') > 0 && elementCounts.get('water') > 0);
+                      ((elementCounts.get('fire') ?? 0) > 0 && (elementCounts.get('water') ?? 0) > 0);
 
   return {
     coherence: overallCoherence,

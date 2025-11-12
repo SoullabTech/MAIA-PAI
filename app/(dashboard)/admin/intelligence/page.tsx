@@ -76,7 +76,8 @@ export default function AdminIntelligencePage() {
 
   async function loadFullIntelligence(userId: string) {
     try {
-      const intelligence = await unifiedIntelligenceEngine.analyze(userId);
+      // For admin overview, use empty message and session
+      const intelligence = await unifiedIntelligenceEngine.analyze(userId, '', '');
       setSelectedIntelligence(intelligence);
     } catch (error) {
       console.error('Error loading intelligence:', error);

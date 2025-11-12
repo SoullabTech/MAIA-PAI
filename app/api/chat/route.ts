@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     // Extract text response
     const textContent = response.content.find((c: any) => c.type === 'text');
-    const responseText = textContent?.text || 'I sense something profound here. Tell me more...';
+    const responseText = (textContent && 'text' in textContent && textContent.text) || 'I sense something profound here. Tell me more...';
 
     console.log(`✅ [Chat] Response generated (${response.usage.input_tokens} in, ${response.usage.output_tokens} out)`);
 

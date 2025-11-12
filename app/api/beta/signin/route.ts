@@ -32,8 +32,8 @@ export async function POST(request: NextRequest) {
     if (supabase) {
       try {
         // Look up user in database (using 'users' table where onboarding saves)
-        const userQuery = await supabase
-          .from('users')
+        const usersTable = await supabase.from('users');
+        const userQuery = await usersTable
           .eq('sacred_name', explorerName)
           .single();
 
@@ -43,14 +43,14 @@ export async function POST(request: NextRequest) {
           // Check if email matches (if provided and stored)
           if (!user.email || user.email === email) {
             // Load their oracle agent config
-            const agentQuery = await supabase
-              .from('oracle_agents')
+            const agentsTable = await supabase.from('oracle_agents');
+            const agentQuery = await agentsTable
               .eq('user_id', user.id)
               .single();
 
             // Load their preferences
-            const prefsQuery = await supabase
-              .from('user_preferences')
+            const prefsTable = await supabase.from('user_preferences');
+            const prefsQuery = await prefsTable
               .eq('user_id', user.id)
               .single();
 

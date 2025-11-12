@@ -13,7 +13,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import IntelligenceDashboard from '@/components/dashboard/IntelligenceDashboard';
 
 export default function IntelligencePage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

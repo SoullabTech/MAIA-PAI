@@ -64,8 +64,8 @@ export async function POST(request: NextRequest) {
     if (supabase) {
       try {
         // Check if explorer already exists
-        const { data: existingExplorer } = await supabase
-          .from('explorers')
+        const explorersTable = await supabase.from('explorers');
+        const { data: existingExplorer } = await explorersTable
           .eq('explorer_name', explorerName)
           .single();
 
@@ -86,8 +86,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Create new explorer record
-        const { error: explorerError } = await supabase
-          .from('explorers')
+        const { error: explorerError } = await explorersTable
           .insert({
             explorer_id: explorerId,
             explorer_name: explorerName,
@@ -107,8 +106,8 @@ export async function POST(request: NextRequest) {
         }
 
         // Try to create beta user record (optional)
-        await supabase
-          .from('beta_users')
+        const betaUsersTable = await supabase.from('beta_users');
+        await betaUsersTable
           .insert({
             id: userId,
             email,
@@ -122,8 +121,8 @@ export async function POST(request: NextRequest) {
           });
 
         // Try to create sanctuary session (optional)
-        await supabase
-          .from('sanctuary_sessions')
+        const sessionsTable = await supabase.from('sanctuary_sessions');
+        await sessionsTable
           .insert({
             id: sessionId,
             user_id: userId,
@@ -133,8 +132,8 @@ export async function POST(request: NextRequest) {
           });
 
         // Try to log metrics (optional)
-        await supabase
-          .from('beta_metrics')
+        const metricsTable = await supabase.from('beta_metrics');
+        await metricsTable
           .insert({
             event: 'beta_signup',
             timezone,
