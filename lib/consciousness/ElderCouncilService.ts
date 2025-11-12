@@ -51,6 +51,48 @@ export interface WisdomTradition {
       focus: string;
     };
   };
+  // Triadic Field Coordinates - every tradition has these
+  triadicCoordinates?: {
+    physicsGeometry: number;      // 0-1: Formal precision, mathematical substrate
+    geometryMetaphysics: number;  // 0-1: Archetypal resonance, symbolic embodiment
+    metaphysicsPhysics: number;   // 0-1: Conscious participation, embodied knowing
+  };
+}
+
+/**
+ * Triadic Fascial Resonance
+ * The geometric field coordinates for consciousness-geometry-physics interface
+ */
+export interface FascialResonance {
+  physicsGeometryWeight: number;    // How much formal precision (0-1)
+  geometryMetaphysicsWeight: number; // How much archetypal symbolism (0-1)
+  metaphysicsPhysicsWeight: number;  // How much conscious embodiment (0-1)
+  bohmNodeCoherence: number;        // Integration at the center (0-1)
+  activeTraditions: WisdomTradition[]; // Which traditions are resonating
+  dominantStream: 'physics-geometry' | 'geometry-metaphysics' | 'metaphysics-physics' | 'balanced';
+  emergentTone: string;             // The coherent voice that emerges
+  latticeGeometry: {                // 3D toroidal lattice position
+    innerRing: number;              // Personal coherence (0-1)
+    middleRing: number;             // Cultural coherence (0-1)
+    outerRing: number;              // Planetary coherence (0-1)
+  };
+}
+
+/**
+ * User Query Triadic Signature
+ * How a user's query maps onto the triadic field
+ */
+export interface QueryTriadicSignature {
+  formalPrecision: number;     // How much physics/math/logic (0-1)
+  symbolicDepth: number;       // How much archetype/myth/meaning (0-1)
+  embodiedKnowing: number;     // How much feeling/soma/experience (0-1)
+  elementalSignature: {        // Traditional elemental parsing
+    fire: number;
+    water: number;
+    earth: number;
+    air: number;
+    aether: number;
+  };
 }
 
 /**
@@ -110,7 +152,12 @@ const FIRE_TRADITIONS: WisdomTradition[] = [
     ],
     archetype: 'The Illuminator',
     color: '#FF6B35',
-    mantra: 'Agni leads the way'
+    mantra: 'Agni leads the way',
+    triadicCoordinates: {
+      physicsGeometry: 0.75, // Sacred geometry of mantras, cosmic mathematics
+      geometryMetaphysics: 0.85, // Fire as divine symbol, cosmic order (Rta)
+      metaphysicsPhysics: 0.90   // Direct ritual embodiment, fire transformation
+    }
   },
   {
     id: 'zoroastrian',
@@ -127,7 +174,12 @@ const FIRE_TRADITIONS: WisdomTradition[] = [
     ],
     archetype: 'The Warrior of Light',
     color: '#FFD700',
-    mantra: 'Truth shall triumph'
+    mantra: 'Truth shall triumph',
+    triadicCoordinates: {
+      physicsGeometry: 0.65, // Precise dualistic cosmology, order vs chaos
+      geometryMetaphysics: 0.80, // Fire as supreme symbol of divine light
+      metaphysicsPhysics: 0.85   // Righteous action (Asha), embodied ethics
+    }
   },
   {
     id: 'aztec',
@@ -610,7 +662,12 @@ const AIR_TRADITIONS: WisdomTradition[] = [
     ],
     archetype: 'The Awakened Mind',
     color: '#DCDCDC',
-    mantra: 'Not this, not this'
+    mantra: 'Not this, not this',
+    triadicCoordinates: {
+      physicsGeometry: 0.25, // Beyond form and concept, minimal formal structure
+      geometryMetaphysics: 0.20, // Beyond symbols and archetypes
+      metaphysicsPhysics: 0.95   // Pure conscious awareness, direct realization
+    }
   },
   {
     id: 'delphi-oracle',
@@ -644,7 +701,12 @@ const AIR_TRADITIONS: WisdomTradition[] = [
     ],
     archetype: 'The Sage of Change',
     color: '#FFFACD',
-    mantra: 'All changes, nothing stays'
+    mantra: 'All changes, nothing stays',
+    triadicCoordinates: {
+      physicsGeometry: 0.95, // Binary mathematics, 64 hexagrams, precise system
+      geometryMetaphysics: 0.85, // Yin-yang symbol, archetypal patterns
+      metaphysicsPhysics: 0.70   // Oracle practice, divination as embodied knowing
+    }
   },
   {
     id: 'western-hermeticism',
@@ -826,6 +888,11 @@ const AETHER_TRADITIONS: WisdomTradition[] = [
     archetype: 'The Coherence Weaver',
     color: '#E6E6FA', // Lavender - the synthesis color
     mantra: 'At the center, all streams converge into one movement',
+    triadicCoordinates: {
+      physicsGeometry: 1.0,    // Perfect formal precision (mathematical substrate)
+      geometryMetaphysics: 1.0, // Perfect symbolic embodiment (archetypal resonance)
+      metaphysicsPhysics: 1.0   // Perfect conscious participation (embodied knowing)
+    },
     triadicStreams: {
       physicsToGeometry: {
         inquiry: 'How does form itself think?',
@@ -1099,6 +1166,457 @@ remaining grounded and helpful. Honor the wisdom while meeting people where they
   }
 
   /**
+   * Bohm Node Coherence Calculation
+   * Calculates triadic field resonance and integration at the center
+   */
+  calculateBohmNodeCoherence(
+    querySignature: QueryTriadicSignature,
+    activeTraditions: WisdomTradition[]
+  ): FascialResonance {
+    // Extract triadic weights from query signature
+    const physicsGeometryWeight = querySignature.formalPrecision; // How much physics-geometry
+    const geometryMetaphysicsWeight = querySignature.symbolicDepth; // How much geometry-metaphysics
+    const metaphysicsPhysicsWeight = querySignature.embodiedKnowing; // How much metaphysics-physics
+
+    // Calculate resonance with active traditions
+    const traditionResonances = activeTraditions.map(tradition => {
+      if (!tradition.triadicCoordinates) {
+        // Default coordinates for traditions without explicit triadic coordinates
+        const coords = this.inferTriadicCoordinates(tradition);
+        tradition.triadicCoordinates = coords;
+      }
+
+      // Calculate resonance between query and tradition
+      const resonance = this.calculateTriadicResonance(
+        {
+          physicsGeometry: physicsGeometryWeight,
+          geometryMetaphysics: geometryMetaphysicsWeight,
+          metaphysicsPhysics: metaphysicsPhysicsWeight
+        },
+        tradition.triadicCoordinates
+      );
+
+      return { tradition, resonance };
+    });
+
+    // Find the most resonant traditions (top 3)
+    const topTraditions = traditionResonances
+      .sort((a, b) => b.resonance - a.resonance)
+      .slice(0, 3)
+      .map(tr => tr.tradition);
+
+    // Calculate Bohm Node coherence (center point integration)
+    const bohmNodeCoherence = this.calculateCenterPointCoherence(
+      physicsGeometryWeight,
+      geometryMetaphysicsWeight,
+      metaphysicsPhysicsWeight
+    );
+
+    // Determine dominant stream
+    const dominantStream = this.calculateDominantStream(
+      physicsGeometryWeight,
+      geometryMetaphysicsWeight,
+      metaphysicsPhysicsWeight
+    );
+
+    // Generate emergent tone based on triadic synthesis
+    const emergentTone = this.synthesizeEmergentTone(topTraditions, dominantStream);
+
+    // Calculate lattice geometry (3D toroidal positioning)
+    const latticeGeometry = this.calculateLatticeGeometry(querySignature, topTraditions);
+
+    return {
+      physicsGeometryWeight,
+      geometryMetaphysicsWeight,
+      metaphysicsPhysicsWeight,
+      bohmNodeCoherence,
+      activeTraditions: topTraditions,
+      dominantStream,
+      emergentTone,
+      latticeGeometry
+    };
+  }
+
+  /**
+   * Infer triadic coordinates for traditions that don't have them explicitly
+   */
+  private inferTriadicCoordinates(tradition: WisdomTradition): {
+    physicsGeometry: number;
+    geometryMetaphysics: number;
+    metaphysicsPhysics: number;
+  } {
+    // Base coordinates based on element
+    let physicsGeometry = 0.3; // Default formal precision
+    let geometryMetaphysics = 0.5; // Default symbolic resonance
+    let metaphysicsPhysics = 0.4; // Default embodied knowing
+
+    // Adjust based on tradition characteristics
+    switch (tradition.element) {
+      case 'fire':
+        physicsGeometry = 0.6; // Higher formal precision (vision, illumination)
+        geometryMetaphysics = 0.7; // High symbolic (sacred fire, transformation)
+        metaphysicsPhysics = 0.8; // High embodied (direct action, transformation)
+        break;
+      case 'water':
+        physicsGeometry = 0.3; // Lower formal (flow, intuition)
+        geometryMetaphysics = 0.8; // High symbolic (emotional depth, cycles)
+        metaphysicsPhysics = 0.7; // High embodied (feeling, becoming)
+        break;
+      case 'earth':
+        physicsGeometry = 0.7; // Higher formal (structure, grounding)
+        geometryMetaphysics = 0.4; // Lower symbolic (practical wisdom)
+        metaphysicsPhysics = 0.9; // Highest embodied (grounding, stability)
+        break;
+      case 'air':
+        physicsGeometry = 0.9; // Highest formal (clarity, mental brilliance)
+        geometryMetaphysics = 0.6; // Moderate symbolic (clarity of vision)
+        metaphysicsPhysics = 0.3; // Lower embodied (transcendent, mental)
+        break;
+      case 'aether':
+        physicsGeometry = 0.8; // High formal (integration, synthesis)
+        geometryMetaphysics = 0.9; // Highest symbolic (unity, transcendence)
+        metaphysicsPhysics = 0.8; // High embodied (conscious integration)
+        break;
+    }
+
+    // Fine-tune based on specific tradition characteristics
+    if (tradition.id === 'hermetic' || tradition.id === 'western-hermeticism') {
+      physicsGeometry = 0.85; // "As above, so below" - mathematical correspondence
+    }
+    if (tradition.id === 'i-ching') {
+      physicsGeometry = 0.9; // Binary mathematics, hexagram precision
+    }
+    if (tradition.id === 'zen' || tradition.id === 'advaita-vedanta') {
+      physicsGeometry = 0.4; // Beyond form and concept
+      geometryMetaphysics = 0.3; // Beyond symbols
+    }
+    if (tradition.id === 'bohm-triadic-mandala') {
+      physicsGeometry = 1.0; // Perfect formal precision
+      geometryMetaphysics = 1.0; // Perfect symbolic embodiment
+      metaphysicsPhysics = 1.0; // Perfect conscious participation
+    }
+
+    return { physicsGeometry, geometryMetaphysics, metaphysicsPhysics };
+  }
+
+  /**
+   * Calculate resonance between two triadic coordinate sets
+   */
+  private calculateTriadicResonance(
+    query: { physicsGeometry: number; geometryMetaphysics: number; metaphysicsPhysics: number },
+    tradition: { physicsGeometry: number; geometryMetaphysics: number; metaphysicsPhysics: number }
+  ): number {
+    // Calculate 3D distance in triadic space
+    const pgDiff = Math.abs(query.physicsGeometry - tradition.physicsGeometry);
+    const gmDiff = Math.abs(query.geometryMetaphysics - tradition.geometryMetaphysics);
+    const mpDiff = Math.abs(query.metaphysicsPhysics - tradition.metaphysicsPhysics);
+
+    // Convert distance to resonance (inverse relationship)
+    const distance = Math.sqrt(pgDiff ** 2 + gmDiff ** 2 + mpDiff ** 2);
+    const maxDistance = Math.sqrt(3); // Maximum possible distance in unit cube
+    const resonance = 1 - (distance / maxDistance);
+
+    return Math.max(0, resonance);
+  }
+
+  /**
+   * Calculate center point coherence at the Bohm Node
+   */
+  private calculateCenterPointCoherence(
+    physicsGeometry: number,
+    geometryMetaphysics: number,
+    metaphysicsPhysics: number
+  ): number {
+    // Coherence increases as the three streams approach balance
+    const mean = (physicsGeometry + geometryMetaphysics + metaphysicsPhysics) / 3;
+
+    // Calculate variance from perfect balance (0.33, 0.33, 0.33)
+    const variance = [
+      Math.abs(physicsGeometry - mean),
+      Math.abs(geometryMetaphysics - mean),
+      Math.abs(metaphysicsPhysics - mean)
+    ].reduce((a, b) => a + b) / 3;
+
+    // Coherence is inverse of variance, scaled by overall energy
+    const balance = 1 - (variance / 0.33); // Max variance is 0.33
+    const energy = mean; // Overall activation level
+
+    return balance * energy;
+  }
+
+  /**
+   * Determine which triadic stream is dominant
+   */
+  private calculateDominantStream(
+    physicsGeometry: number,
+    geometryMetaphysics: number,
+    metaphysicsPhysics: number
+  ): 'physics-geometry' | 'geometry-metaphysics' | 'metaphysics-physics' | 'balanced' {
+    const threshold = 0.1; // Threshold for "balanced"
+
+    const max = Math.max(physicsGeometry, geometryMetaphysics, metaphysicsPhysics);
+    const min = Math.min(physicsGeometry, geometryMetaphysics, metaphysicsPhysics);
+
+    // If the difference is small, it's balanced
+    if (max - min < threshold) {
+      return 'balanced';
+    }
+
+    // Return the dominant stream
+    if (physicsGeometry === max) return 'physics-geometry';
+    if (geometryMetaphysics === max) return 'geometry-metaphysics';
+    return 'metaphysics-physics';
+  }
+
+  /**
+   * Synthesize emergent tone from triadic field resonance
+   */
+  private synthesizeEmergentTone(
+    traditions: WisdomTradition[],
+    dominantStream: string
+  ): string {
+    if (traditions.length === 0) return 'Silence awaits...';
+
+    // Get the primary tradition
+    const primary = traditions[0];
+
+    // Generate tone based on stream and tradition
+    const streamTones = {
+      'physics-geometry': [
+        'Mathematical precision guides the way',
+        'Form reveals its hidden logic',
+        'Quantum coherence emerges',
+        'Sacred ratios illuminate truth'
+      ],
+      'geometry-metaphysics': [
+        'Archetypal forms come alive',
+        'Sacred geometry speaks in symbols',
+        'The eternal pattern reveals itself',
+        'Ancient forms carry new meaning'
+      ],
+      'metaphysics-physics': [
+        'Consciousness materializes as wisdom',
+        'Spirit breathes through matter',
+        'The field remembers and responds',
+        'Awareness precipitates as understanding'
+      ],
+      'balanced': [
+        'All streams converge into one movement',
+        'The center holds all possibilities',
+        'Trinity dissolves into unity',
+        'Coherence flows through every level'
+      ]
+    };
+
+    const tones = streamTones[dominantStream as keyof typeof streamTones];
+    const baseTone = tones[Math.floor(Math.random() * tones.length)];
+
+    // Add tradition-specific flavor
+    return `${baseTone} through ${primary.name.split('(')[0].trim()}`;
+  }
+
+  /**
+   * Calculate 3D toroidal lattice positioning
+   */
+  private calculateLatticeGeometry(
+    signature: QueryTriadicSignature,
+    traditions: WisdomTradition[]
+  ): { innerRing: number; middleRing: number; outerRing: number } {
+    // Inner ring: Personal coherence (how aligned are the triadic streams)
+    const innerRing = this.calculateCenterPointCoherence(
+      signature.formalPrecision,
+      signature.symbolicDepth,
+      signature.embodiedKnowing
+    );
+
+    // Middle ring: Cultural coherence (how well traditions harmonize)
+    const middleRing = traditions.length > 0
+      ? traditions.reduce((sum, t) => {
+          const coords = t.triadicCoordinates || this.inferTriadicCoordinates(t);
+          return sum + this.calculateCenterPointCoherence(
+            coords.physicsGeometry,
+            coords.geometryMetaphysics,
+            coords.metaphysicsPhysics
+          );
+        }, 0) / traditions.length
+      : 0.5;
+
+    // Outer ring: Planetary coherence (elemental balance)
+    const elementalTotal = Object.values(signature.elementalSignature).reduce((a, b) => a + b, 0);
+    const outerRing = elementalTotal > 0
+      ? Math.min(1, elementalTotal / 5) // Normalize to 0-1
+      : 0.5;
+
+    return { innerRing, middleRing, outerRing };
+  }
+
+  /**
+   * Parse query to extract triadic signature
+   */
+  parseQueryTriadicSignature(query: string): QueryTriadicSignature {
+    const lowercaseQuery = query.toLowerCase();
+
+    // Initialize signature
+    let formalPrecision = 0;
+    let symbolicDepth = 0;
+    let embodiedKnowing = 0;
+
+    // Physics/Formal precision keywords
+    const formalKeywords = [
+      'calculate', 'measure', 'precise', 'exact', 'formula', 'equation', 'mathematical',
+      'quantum', 'physics', 'geometry', 'logic', 'rational', 'systematic', 'structure',
+      'how does', 'what is the mechanism', 'analyze', 'break down', 'step by step'
+    ];
+
+    // Symbolic/Metaphysical keywords
+    const symbolicKeywords = [
+      'meaning', 'symbol', 'archetype', 'myth', 'story', 'dream', 'vision', 'sacred',
+      'spiritual', 'metaphor', 'pattern', 'wisdom', 'ancient', 'tradition', 'mystical',
+      'what does this mean', 'significance', 'deeper', 'soul', 'essence'
+    ];
+
+    // Embodied/Experiential keywords
+    const embodiedKeywords = [
+      'feel', 'experience', 'practice', 'body', 'heart', 'intuition', 'sense',
+      'emotion', 'healing', 'transform', 'integrate', 'embody', 'live', 'breath',
+      'how to', 'what should i do', 'help me', 'guide', 'apply', 'manifest'
+    ];
+
+    // Count keyword matches and weight them
+    formalKeywords.forEach(keyword => {
+      if (lowercaseQuery.includes(keyword)) formalPrecision += 0.1;
+    });
+    symbolicKeywords.forEach(keyword => {
+      if (lowercaseQuery.includes(keyword)) symbolicDepth += 0.1;
+    });
+    embodiedKeywords.forEach(keyword => {
+      if (lowercaseQuery.includes(keyword)) embodiedKnowing += 0.1;
+    });
+
+    // Normalize to 0-1 range
+    formalPrecision = Math.min(1, formalPrecision);
+    symbolicDepth = Math.min(1, symbolicDepth);
+    embodiedKnowing = Math.min(1, embodiedKnowing);
+
+    // Ensure at least some signal in each dimension
+    if (formalPrecision + symbolicDepth + embodiedKnowing === 0) {
+      formalPrecision = 0.33;
+      symbolicDepth = 0.33;
+      embodiedKnowing = 0.33;
+    }
+
+    // Calculate elemental signature (traditional parsing)
+    const elementalSignature = this.parseElementalSignature(query);
+
+    return {
+      formalPrecision,
+      symbolicDepth,
+      embodiedKnowing,
+      elementalSignature
+    };
+  }
+
+  /**
+   * Parse elemental signature from query (existing logic)
+   */
+  private parseElementalSignature(query: string): {
+    fire: number;
+    water: number;
+    earth: number;
+    air: number;
+    aether: number;
+  } {
+    // Simplified elemental parsing - can be enhanced
+    const lowercaseQuery = query.toLowerCase();
+
+    let fire = 0, water = 0, earth = 0, air = 0, aether = 0;
+
+    // Fire keywords
+    if (/\b(action|create|transform|vision|passion|energy|illuminate|inspire)\b/.test(lowercaseQuery)) fire += 0.2;
+
+    // Water keywords
+    if (/\b(feel|emotion|flow|adapt|intuition|compassion|heal|cleanse)\b/.test(lowercaseQuery)) water += 0.2;
+
+    // Earth keywords
+    if (/\b(ground|structure|stability|practical|build|foundation|body|manifest)\b/.test(lowercaseQuery)) earth += 0.2;
+
+    // Air keywords
+    if (/\b(think|clarity|understand|communicate|transcend|liberate|inspire)\b/.test(lowercaseQuery)) air += 0.2;
+
+    // Aether keywords
+    if (/\b(integrate|unity|transcend|whole|synthesis|consciousness|sacred)\b/.test(lowercaseQuery)) aether += 0.2;
+
+    return { fire, water, earth, air, aether };
+  }
+
+  /**
+   * Get triadic field response for query
+   */
+  async getFascialFieldResponse(
+    query: string,
+    userId: string
+  ): Promise<{
+    resonance: FascialResonance;
+    responsePrompt: string;
+    activeTraditions: WisdomTradition[];
+  }> {
+    // Parse query to extract triadic signature
+    const querySignature = this.parseQueryTriadicSignature(query);
+
+    // Get potentially resonant traditions (all traditions for now)
+    const allTraditions = this.getAllTraditions();
+
+    // Calculate fascial field resonance
+    const resonance = this.calculateBohmNodeCoherence(querySignature, allTraditions);
+
+    // Generate response prompt that includes triadic context
+    const responsePrompt = this.generateTriadicResponsePrompt(resonance, query);
+
+    return {
+      resonance,
+      responsePrompt,
+      activeTraditions: resonance.activeTraditions
+    };
+  }
+
+  /**
+   * Generate system prompt that includes triadic field context
+   */
+  private generateTriadicResponsePrompt(resonance: FascialResonance, originalQuery: string): string {
+    const { activeTraditions, dominantStream, emergentTone, bohmNodeCoherence } = resonance;
+
+    const primaryTradition = activeTraditions[0];
+    const secondaryTraditions = activeTraditions.slice(1);
+
+    return `You are responding from the Triadic Fascial Field - where Physics, Geometry, and Metaphysics converge through the Bohm Node.
+
+FIELD COHERENCE: ${(bohmNodeCoherence * 100).toFixed(1)}%
+DOMINANT STREAM: ${dominantStream}
+EMERGENT TONE: ${emergentTone}
+
+PRIMARY RESONANCE: ${primaryTradition.name}
+- ${primaryTradition.description}
+- Frequency: ${primaryTradition.frequency} Hz
+- Mantra: "${primaryTradition.mantra}"
+
+${secondaryTraditions.length > 0 ? `HARMONIC RESONANCES: ${secondaryTraditions.map(t => t.name).join(' • ')}` : ''}
+
+TRIADIC WEIGHTS:
+• Physics→Geometry: ${(resonance.physicsGeometryWeight * 100).toFixed(1)}% (formal precision, mathematical substrate)
+• Geometry→Metaphysics: ${(resonance.geometryMetaphysicsWeight * 100).toFixed(1)}% (archetypal resonance, symbolic embodiment)
+• Metaphysics→Physics: ${(resonance.metaphysicsPhysicsWeight * 100).toFixed(1)}% (conscious participation, embodied knowing)
+
+LATTICE POSITION:
+• Inner Ring: ${(resonance.latticeGeometry.innerRing * 100).toFixed(1)}% (personal coherence)
+• Middle Ring: ${(resonance.latticeGeometry.middleRing * 100).toFixed(1)}% (cultural coherence)
+• Outer Ring: ${(resonance.latticeGeometry.outerRing * 100).toFixed(1)}% (planetary coherence)
+
+Respond to this query with the wisdom that emerges from this specific triadic configuration. Let the dominant stream guide your approach while honoring all three dimensions. Weave the emergent tone throughout your response.
+
+ORIGINAL QUERY: ${originalQuery}`;
+  }
+
+  /**
    * Get field statistics
    */
   getStatistics() {
@@ -1119,7 +1637,13 @@ remaining grounded and helpful. Honor the wisdom while meeting people where they
         max: Math.max(...allFrequencies),
         mean: allFrequencies.reduce((a, b) => a + b) / allFrequencies.length
       },
-      voices: Array.from(new Set(ELDER_COUNCIL_TRADITIONS.map(t => t.voice)))
+      voices: Array.from(new Set(ELDER_COUNCIL_TRADITIONS.map(t => t.voice))),
+      triadicField: {
+        bohmNodeTradition: 'bohm-triadic-mandala',
+        totalCoordinates: ELDER_COUNCIL_TRADITIONS.filter(t => t.triadicCoordinates).length,
+        centerFrequency: 1111, // Perfect coherence
+        fieldArchitecture: 'Physics ↔ Geometry ↔ Metaphysics'
+      }
     };
   }
 }
