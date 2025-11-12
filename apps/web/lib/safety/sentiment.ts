@@ -1,13 +1,10 @@
 /**
  * Sentiment Analysis & Safety Moderation
  * Protects sacred space while understanding emotional depth
+ *
+ * SECURITY FIX: Removed direct OpenAI client instantiation from browser code
+ * Now uses secure server-side API endpoints instead
  */
-
-import { OpenAI } from 'openai';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
 
 export interface SentimentAnalysis {
   overall: 'positive' | 'neutral' | 'negative' | 'complex';
@@ -44,12 +41,16 @@ export interface ModerationResult {
 export class SentimentService {
   async analyzeSentiment(text: string): Promise<SentimentAnalysis> {
     try {
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4',
-        messages: [
-          {
-            role: 'system',
-            content: `You are an emotionally intelligent analyzer. Analyze the emotional tone and needs of the text.
+      // Use secure server-side Claude API instead of direct OpenAI client
+      const response = await fetch('/api/claude/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-3-5-sonnet-20241022',
+          max_tokens: 300,
+          system: `You are an emotionally intelligent analyzer. Analyze the emotional tone and needs of the text.
 
 Return a JSON object with:
 {
@@ -58,19 +59,20 @@ Return a JSON object with:
   "emotions": [{"emotion": "name", "confidence": 0.0-1.0}],
   "needsSupport": boolean,
   "suggestedTone": "gentle|warm|grounding|celebratory"
-}`
-          },
-          {
-            role: 'user',
-            content: text
-          }
-        ],
-        temperature: 0.3,
-        max_tokens: 300
+}`,
+          messages: [{ role: 'user', content: text }],
+          temperature: 0.3,
+          stream: false
+        }),
       });
 
-      const content = response.choices[0].message.content;
-      const analysis = JSON.parse(content || '{}');
+      if (!response.ok) {
+        throw new Error(`Claude API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.content?.[0]?.text || '{}';
+      const analysis = JSON.parse(content);
 
       return {
         overall: analysis.overall || 'neutral',
@@ -94,15 +96,24 @@ Return a JSON object with:
 
   async moderateContent(text: string): Promise<ModerationResult> {
     try {
-      if (!process.env.OPENAI_API_KEY) {
+      // Use secure server-side moderation API instead of direct OpenAI client
+      const response = await fetch('/api/moderation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text
+        }),
+      });
+
+      if (!response.ok) {
+        console.warn(`Moderation API error: ${response.status}, falling back to passthrough`);
         return this.getPassthroughResult();
       }
 
-      const moderation = await openai.moderations.create({
-        input: text
-      });
-
-      const result = moderation.results[0];
+      const data = await response.json();
+      const result = data.results[0];
 
       const selfHarmScore = result.category_scores['self-harm'] || 0;
       const alert = selfHarmScore > 0.5;

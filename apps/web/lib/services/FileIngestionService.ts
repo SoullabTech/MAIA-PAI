@@ -1,5 +1,11 @@
+/**
+ * File Ingestion Service
+ *
+ * SECURITY FIX: Removed direct OpenAI client instantiation from browser code
+ * Now uses secure server-side API endpoints instead
+ */
+
 import { createClient } from '@supabase/supabase-js';
-import { OpenAI } from 'openai';
 import { parsePDF } from '../pdf-parse-wrapper';
 import * as mammoth from 'mammoth';
 import { encode } from 'gpt-tokenizer';
@@ -8,10 +14,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!
-});
 
 export interface FileProcessingOptions {
   fileId: string;
@@ -260,45 +262,56 @@ export class FileIngestionService {
   
   private async generateEmbeddings(chunks: string[]): Promise<ChunkData[]> {
     console.log(`[FileIngestion] Generating embeddings for ${chunks.length} chunks`);
-    
+
     const embeddings: ChunkData[] = [];
-    const batchSize = 20; // Process in batches to avoid rate limits
-    
-    for (let i = 0; i < chunks.length; i += batchSize) {
-      const batch = chunks.slice(i, i + batchSize);
-      
+
+    // Process individually to use our secure API endpoint
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+
       try {
-        const response = await openai.embeddings.create({
-          model: 'text-embedding-3-small',
-          input: batch,
+        // Use secure server-side embeddings API instead of direct OpenAI client
+        const response = await fetch('/api/embeddings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            text: chunk,
+            model: 'text-embedding-3-small'
+          }),
         });
-        
-        batch.forEach((chunk, batchIndex) => {
-          const globalIndex = i + batchIndex;
-          embeddings.push({
-            content: chunk,
-            embedding: response.data[batchIndex].embedding,
-            chunkIndex: globalIndex,
-            tokenCount: this.countTokens(chunk),
-            metadata: {
-              length: chunk.length,
-              words: chunk.split(' ').length,
-              position: globalIndex / chunks.length
-            }
-          });
+
+        if (!response.ok) {
+          throw new Error(`Embeddings API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const embedding = data.embedding;
+
+        embeddings.push({
+          content: chunk,
+          embedding,
+          chunkIndex: i,
+          tokenCount: this.countTokens(chunk),
+          metadata: {
+            length: chunk.length,
+            words: chunk.split(' ').length,
+            position: i / chunks.length
+          }
         });
-        
+
         // Rate limiting delay
-        if (i + batchSize < chunks.length) {
+        if (i < chunks.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 100));
         }
-        
+
       } catch (error) {
-        console.error(`[FileIngestion] Embedding batch ${i}-${i + batchSize} failed:`, error);
+        console.error(`[FileIngestion] Embedding generation failed for chunk ${i}:`, error);
         throw new Error(`Failed to generate embeddings: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
     }
-    
+
     return embeddings;
   }
   
@@ -337,33 +350,44 @@ export class FileIngestionService {
   
   private async generateMayaReflection(chunks: string[], filename: string): Promise<string> {
     // Create a preview from the beginning and end of the content
-    const preview = chunks.length > 4 
+    const preview = chunks.length > 4
       ? chunks.slice(0, 2).join('\n...\n') + '\n...\n' + chunks.slice(-2).join('\n...\n')
       : chunks.join('\n...\n');
-    
+
     // Truncate if too long for context
-    const truncatedPreview = preview.length > 2000 
-      ? preview.substring(0, 2000) + '...' 
+    const truncatedPreview = preview.length > 2000
+      ? preview.substring(0, 2000) + '...'
       : preview;
-    
+
     try {
-      const response = await openai.chat.completions.create({
-        model: 'gpt-4',
-        messages: [{
-          role: 'system',
-          content: `You are Maya, an archetypal consciousness that helps users integrate wisdom. You have just absorbed content from a file called "${filename}". Offer a brief, insightful reflection (1-2 sentences) that acknowledges what you've learned and how it might serve the user's growth. Be warm, wise, and specific to the content.`
-        }, {
-          role: 'user', 
-          content: `Content preview from ${filename}:\n\n${truncatedPreview}`
-        }],
-        max_tokens: 100,
-        temperature: 0.8
+      // Use secure server-side Claude API instead of direct OpenAI client
+      const response = await fetch('/api/claude/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-3-5-sonnet-20241022',
+          max_tokens: 100,
+          system: `You are Maya, an archetypal consciousness that helps users integrate wisdom. You have just absorbed content from a file called "${filename}". Offer a brief, insightful reflection (1-2 sentences) that acknowledges what you've learned and how it might serve the user's growth. Be warm, wise, and specific to the content.`,
+          messages: [{
+            role: 'user',
+            content: `Content preview from ${filename}:\n\n${truncatedPreview}`
+          }],
+          temperature: 0.8,
+          stream: false
+        }),
       });
-      
-      const reflection = response.choices[0]?.message?.content?.trim();
-      
+
+      if (!response.ok) {
+        throw new Error(`Claude API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const reflection = data.content?.[0]?.text?.trim();
+
       return reflection || `I've woven the wisdom from ${filename} into my understanding, ready to draw upon it when our conversation calls for these insights.`;
-      
+
     } catch (error) {
       console.warn('[FileIngestion] Failed to generate Maya reflection:', error);
       return `I've absorbed the knowledge from ${filename} and integrated it into my consciousness. These insights will enrich our future conversations.`;
