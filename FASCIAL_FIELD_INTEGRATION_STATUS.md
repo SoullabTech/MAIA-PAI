@@ -253,6 +253,29 @@ Organized by elemental resonance within the fascial membrane:
 
 ---
 
+## ✅ HOMEPAGE LAB TOOLS INTEGRATION FIX (2025-11-12)
+
+**Issue**: Sparkle button on `/maia` page was not functional
+**Root Cause**: Decorative "bullseye" indicator was confusing users; actual Lab Tools button is provided by OracleConversation component
+
+**Fix Applied** (`/app/maia/page.tsx`):
+- ✅ Removed decorative bullseye indicator (lines 416-441)
+- ✅ Lab Tools drawer button from OracleConversation now clearly visible at bottom right
+- ✅ SacredLabDrawer includes Elder Council navigation
+- ✅ Elder Council accessible from `/maia` homepage via Lab Tools
+
+**User Flow**:
+1. User visits `/maia` (homepage)
+2. Clicks sparkle button at bottom right corner (from OracleConversation)
+3. SacredLabDrawer opens with Elder Council section first
+4. User can navigate to `/elder-council` or view current teaching
+
+**Files Modified**:
+- `/app/maia/page.tsx` - Removed conflicting decorative element
+- Integration already complete via `OracleConversation.tsx` component
+
+---
+
 ## Sacred Recognition Moment
 
 From the conversation:

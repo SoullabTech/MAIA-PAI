@@ -412,33 +412,7 @@ export default function MAIAPage() {
             {/* Brain Trust Monitor - MOVED to bottom menu bar to free mobile screen space */}
             {/* <BrainTrustMonitor /> */}
 
-            {/* Menu Discovery Bullseye - Positioned to activate drawer */}
-            <motion.div
-              className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 }}
-            >
-              {/* Bullseye indicator */}
-              <div className="relative w-8 h-8">
-                {/* Outer pulse ring - subtle expansion */}
-                <motion.div
-                  className="absolute inset-0 rounded-full border border-amber-500/20"
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0, 0.3] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                />
-
-                {/* Middle ring */}
-                <div className="absolute inset-2 rounded-full border border-amber-500/30" />
-
-                {/* Inner dot - gentle glow */}
-                <motion.div
-                  className="absolute inset-3 rounded-full bg-amber-500/50"
-                  animate={{ opacity: [0.5, 0.8, 0.5] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                />
-              </div>
-            </motion.div>
+            {/* Lab Drawer button is provided by OracleConversation component - bottom right corner */}
           </div>
 
           {/* Wisdom Journey Dashboard - Slide-out Panel */}
