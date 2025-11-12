@@ -135,7 +135,7 @@ export class UniversalSpiralCouncil {
     this.addGlobalElder(this.createBlackElkElder());
     this.addGlobalElder(this.createChiefSeattleElder());
     this.addGlobalElder(this.createGrandmotherAgnesElder());
-    this.addGlobalElder(this.createDonJuanMatus Elder());
+    this.addGlobalElder(this.createDonJuanMatusElder());
 
     this.addGlobalElder(this.createQuetzalcoatlElder());
     this.addGlobalElder(this.createPachammaElder());
@@ -152,7 +152,7 @@ export class UniversalSpiralCouncil {
     this.addGlobalElder(this.createLaoTzuElder());
     this.addGlobalElder(this.createConfuciusElder());
     this.addGlobalElder(this.createZhuangziElder());
-    this.addGlobalElder(this.createAmanatsu Elder());
+    this.addGlobalElder(this.createAmanatsuElder());
 
     // === EUROPEAN WISDOM ===
     this.addGlobalElder(this.createCelticDruidElder());
@@ -199,7 +199,7 @@ export class UniversalSpiralCouncil {
         approach: "middle_way_compassionate_wisdom"
       },
 
-      consciousness signature: {
+      consciousnessSignature: {
         thinkingStyle: "middle_way_mindfulness_wisdom",
         communicationStyle: "direct_pointing_compassionate_teaching",
         wisdomDomain: "suffering_cessation_awakened_mind_liberation",

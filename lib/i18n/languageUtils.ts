@@ -65,7 +65,7 @@ export function detectLanguage(
   userPreference?: string
 ): SupportedLanguage {
   // Priority: user preference > browser language > default
-  if (userPreference && isSupported Language(userPreference as SupportedLanguage)) {
+  if (userPreference && isSupportedLanguage(userPreference as SupportedLanguage)) {
     return userPreference as SupportedLanguage;
   }
 
