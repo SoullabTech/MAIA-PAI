@@ -328,14 +328,14 @@ export default function MAIAPage() {
           <div className="relative max-w-7xl mx-auto px-4 py-1.5">
             <div className="flex items-center justify-between">
               {/* Left: SOULLAB Logo with Holoflower */}
-              <div className="flex items-center gap-2 ml-12">
+              <div className="flex items-center gap-2 ml-0 sm:ml-12">
                 <img
                   src="/holoflower-amber.png"
                   alt="Holoflower"
-                  className="w-6 h-6 opacity-100 drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]"
+                  className="w-5 h-5 sm:w-6 sm:h-6 opacity-100 drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]"
                   style={{ filter: 'brightness(1.2)' }}
                 />
-                <h1 className="text-lg font-light text-amber-300/90 tracking-wider">
+                <h1 className="text-base sm:text-lg font-light text-amber-300/90 tracking-wider">
                   SOULLAB
                 </h1>
               </div>
