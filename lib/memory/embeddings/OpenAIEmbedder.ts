@@ -1,20 +1,19 @@
 /**
  * OpenAI Embedding Service
  * Generates vector embeddings for semantic search
+ *
+ * OpenAI client removed from browser-side code for security
+ * Now uses secure server-side API endpoint
  */
 
-import OpenAI from 'openai';
 import type { EmbeddingService } from '../core/MemoryCore';
 
 export class OpenAIEmbedder implements EmbeddingService {
-  private openai: OpenAI;
-  private model: string = 'text-embedding-ada-002';
+  private model: string = 'text-embedding-3-small';
   private cache: Map<string, number[]> = new Map();
-  
+
   constructor() {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
-    });
+    // No direct OpenAI client instantiation - uses secure server-side API
   }
   
   async embed(text: string): Promise<number[]> {
@@ -23,25 +22,36 @@ export class OpenAIEmbedder implements EmbeddingService {
     if (this.cache.has(cacheKey)) {
       return this.cache.get(cacheKey)!;
     }
-    
+
     try {
-      const response = await this.openai.embeddings.create({
-        model: this.model,
-        input: text,
-        encoding_format: 'float'
+      // Use secure server-side embeddings API instead of direct OpenAI client
+      const response = await fetch('/api/embeddings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: text,
+          model: this.model
+        }),
       });
-      
-      const embedding = response.data[0].embedding;
-      
+
+      if (!response.ok) {
+        throw new Error(`Embeddings API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const embedding = data.embedding;
+
       // Cache the result
       this.cache.set(cacheKey, embedding);
-      
+
       // Limit cache size
       if (this.cache.size > 1000) {
         const firstKey = this.cache.keys().next().value;
         this.cache.delete(firstKey);
       }
-      
+
       return embedding;
     } catch (error) {
       console.error('Error generating embedding:', error);
@@ -52,29 +62,15 @@ export class OpenAIEmbedder implements EmbeddingService {
   
   async embedBatch(texts: string[]): Promise<number[][]> {
     try {
-      // OpenAI allows up to 2048 embeddings per request
-      const batchSize = 100;
+      // For batch processing, call individual embeds to reuse our secure API
+      // This is less efficient but maintains security
       const embeddings: number[][] = [];
-      
-      for (let i = 0; i < texts.length; i += batchSize) {
-        const batch = texts.slice(i, i + batchSize);
-        
-        const response = await this.openai.embeddings.create({
-          model: this.model,
-          input: batch,
-          encoding_format: 'float'
-        });
-        
-        const batchEmbeddings = response.data.map(d => d.embedding);
-        embeddings.push(...batchEmbeddings);
-        
-        // Cache individual embeddings
-        batch.forEach((text, idx) => {
-          const cacheKey = this.getCacheKey(text);
-          this.cache.set(cacheKey, batchEmbeddings[idx]);
-        });
+
+      for (const text of texts) {
+        const embedding = await this.embed(text);
+        embeddings.push(embedding);
       }
-      
+
       return embeddings;
     } catch (error) {
       console.error('Error generating batch embeddings:', error);

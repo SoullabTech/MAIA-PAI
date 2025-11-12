@@ -1,14 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
-import { OpenAI } from 'openai';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!
-});
+// OpenAI client removed from browser-side code for security
+// Now uses secure server-side API endpoint
 
 export interface FileContext {
   fileId: string;
@@ -391,12 +389,24 @@ export class FileMemoryIntegration {
   }
   
   private async generateEmbedding(text: string): Promise<number[]> {
-    const response = await openai.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: text.trim()
+    // Use secure server-side embeddings API instead of exposing OpenAI key to browser
+    const response = await fetch('/api/embeddings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: text.trim(),
+        model: 'text-embedding-3-small'
+      })
     });
-    
-    return response.data[0].embedding;
+
+    if (!response.ok) {
+      throw new Error(`Embeddings API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.embedding;
   }
 }
 

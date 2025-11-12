@@ -632,14 +632,12 @@ async function generateMAIAResponse({
     console.log(`🎚️  [SOVEREIGNTY] Temperature: ${sovereignParams.temperature} (encounters: ${lightweightMemory.essence?.encounterCount || 0}, resonance: ${lightweightMemory.essence?.morphicResonance || 0})`);
     console.log(`   Reasoning: ${sovereignParams.reasoning}`);
 
-    // Call Claude API
+    // Call secure server-side Claude API endpoint
     // Voice mode uses streaming for faster perceived latency
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/api/claude/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY || '',
-        'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
         model,
@@ -789,13 +787,11 @@ async function generateMAIAResponseStream({
   console.log(`🎚️  [SOVEREIGNTY-STREAM] Temperature: ${sovereignParams.temperature}`);
   console.log(`   Reasoning: ${sovereignParams.reasoning}`);
 
-  // Call Claude API with streaming
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  // Call secure server-side Claude API with streaming
+  const response = await fetch(`${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/api/claude/chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY || '',
-      'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
       model,

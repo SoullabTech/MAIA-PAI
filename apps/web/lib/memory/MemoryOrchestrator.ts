@@ -1,12 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { createClient } from '@supabase/supabase-js';
 import { searchUserFiles } from '../../backend/src/services/IngestionQueue';
-import { OpenAI } from 'openai';
+// OpenAI client removed from browser-side code for security
+// Now uses secure server-side API endpoint
 
 const prisma = new PrismaClient();
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -187,11 +185,24 @@ export class MemoryOrchestrator {
 
   private async generateQueryEmbedding(text: string): Promise<number[]> {
     try {
-      const response = await openai.embeddings.create({
-        model: 'text-embedding-3-small',
-        input: text.substring(0, 8000),
+      // Use secure server-side embeddings API instead of direct OpenAI client
+      const response = await fetch('/api/embeddings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: text.substring(0, 8000),
+          model: 'text-embedding-3-small'
+        }),
       });
-      return response.data[0].embedding;
+
+      if (!response.ok) {
+        throw new Error(`Embeddings API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.embedding;
     } catch (error) {
       console.error('Query embedding error:', error);
       return [];

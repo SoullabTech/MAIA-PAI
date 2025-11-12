@@ -1,4 +1,5 @@
-import Anthropic from '@anthropic-ai/sdk';
+// Anthropic client removed from browser-side code for security
+// Now uses secure server-side API endpoint
 
 export interface JournalAnalysisRequest {
   entry: string;
@@ -54,114 +55,54 @@ const MODE_CONTEXT = {
 };
 
 export class ClaudeBridge {
-  private anthropic: Anthropic | null = null;
   private mockMode: boolean;
 
   constructor() {
     this.mockMode = process.env.NEXT_PUBLIC_MOCK_AI === 'true';
-
-    if (!this.mockMode) {
-      const apiKey = process.env.ANTHROPIC_API_KEY;
-      if (!apiKey) {
-        console.warn('ANTHROPIC_API_KEY not found. Falling back to mock mode.');
-        this.mockMode = true;
-      } else {
-        this.anthropic = new Anthropic({ apiKey });
-      }
-    }
   }
 
   async analyzeEntry(request: JournalAnalysisRequest): Promise<JournalAnalysisResponse> {
-    if (this.mockMode || !this.anthropic) {
+    if (this.mockMode) {
       return this.generateMockResponse(request);
     }
 
     try {
-      const prompt = this.buildPrompt(request);
-
-      const message = await this.anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1024,
-        temperature: 0.7,
-        system: MAIA_SYSTEM_PROMPT,
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ]
+      // Use secure server-side API endpoint instead of direct Anthropic client
+      const response = await fetch('/api/claude/journal-analysis', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
       });
 
-      const content = message.content[0];
-      if (content.type !== 'text') {
-        throw new Error('Unexpected response type from Claude');
+      if (!response.ok) {
+        throw new Error(`Claude API endpoint error: ${response.status}`);
       }
 
-      return this.parseResponse(content.text, request);
+      const analysis = await response.json();
+
+      // Ensure response matches expected format
+      return {
+        symbols: Array.isArray(analysis.symbols) ? analysis.symbols.slice(0, 5) : [],
+        archetypes: Array.isArray(analysis.archetypes) ? analysis.archetypes.slice(0, 3) : [],
+        emotionalTone: analysis.emotionalTone || 'contemplative',
+        reflection: analysis.reflection || "I'm here with you in this moment.",
+        prompt: analysis.prompt || "What wants to emerge next?",
+        closing: analysis.closing || "Thank you for sharing this with me.",
+        transformationScore: analysis.transformationScore || 0.5,
+        metadata: {
+          wordCount: request.entry.split(/\s+/).length,
+          themes: analysis.metadata?.themes || [],
+          imagesSuggested: analysis.metadata?.imagesSuggested || []
+        }
+      };
     } catch (error) {
       console.error('Claude API error:', error);
       return this.generateMockResponse(request);
     }
   }
 
-  private buildPrompt(request: JournalAnalysisRequest): string {
-    const { entry, mode, previousContext } = request;
-
-    let prompt = `${MODE_CONTEXT[mode]}\n\n`;
-
-    if (previousContext?.recentSymbols && previousContext.recentSymbols.length > 0) {
-      prompt += `Recent symbols in this user's journey: ${previousContext.recentSymbols.join(', ')}\n`;
-    }
-
-    if (previousContext?.recentArchetypes && previousContext.recentArchetypes.length > 0) {
-      prompt += `Recent archetypes: ${previousContext.recentArchetypes.join(', ')}\n`;
-    }
-
-    prompt += `\nJournal Entry:\n${entry}\n\n`;
-    prompt += `Analyze this entry and respond in this exact JSON format:\n`;
-    prompt += `{\n`;
-    prompt += `  "symbols": ["symbol1", "symbol2", "symbol3"],\n`;
-    prompt += `  "archetypes": ["archetype1", "archetype2"],\n`;
-    prompt += `  "emotionalTone": "single emotion word",\n`;
-    prompt += `  "reflection": "Your warm, insightful reflection (60-100 words)",\n`;
-    prompt += `  "prompt": "A gentle question or invitation to explore further",\n`;
-    prompt += `  "closing": "Brief closing acknowledgment",\n`;
-    prompt += `  "transformationScore": 0.7,\n`;
-    prompt += `  "themes": ["theme1", "theme2"]\n`;
-    prompt += `}\n\n`;
-    prompt += `Respond ONLY with valid JSON. No markdown, no explanation.`;
-
-    return prompt;
-  }
-
-  private parseResponse(text: string, request: JournalAnalysisRequest): JournalAnalysisResponse {
-    try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('No JSON found in response');
-      }
-
-      const parsed = JSON.parse(jsonMatch[0]);
-
-      return {
-        symbols: Array.isArray(parsed.symbols) ? parsed.symbols.slice(0, 5) : [],
-        archetypes: Array.isArray(parsed.archetypes) ? parsed.archetypes.slice(0, 3) : [],
-        emotionalTone: parsed.emotionalTone || 'contemplative',
-        reflection: parsed.reflection || "I'm here with you in this moment.",
-        prompt: parsed.prompt || "What wants to emerge next?",
-        closing: parsed.closing || "Thank you for sharing this with me.",
-        transformationScore: parsed.transformationScore || 0.5,
-        metadata: {
-          wordCount: request.entry.split(/\s+/).length,
-          themes: parsed.themes || [],
-          imagesSuggested: parsed.imagesSuggested || []
-        }
-      };
-    } catch (error) {
-      console.error('Failed to parse Claude response:', error);
-      return this.generateMockResponse(request);
-    }
-  }
 
   private generateMockResponse(request: JournalAnalysisRequest): JournalAnalysisResponse {
     const { entry, mode } = request;
