@@ -34,6 +34,23 @@ export interface WisdomTradition {
   archetype?: string;                                      // Associated archetype
   color?: string;                                          // Elemental color
   mantra?: string;                                         // Guiding phrase
+  triadicStreams?: {                                       // Special triadic mandala structure
+    physicsToGeometry?: {
+      inquiry: string;
+      lineage: string[];
+      focus: string;
+    };
+    geometryToMetaphysics?: {
+      inquiry: string;
+      lineage: string[];
+      focus: string;
+    };
+    metaphysicsToPhysics?: {
+      inquiry: string;
+      lineage: string[];
+      focus: string;
+    };
+  };
 }
 
 /**
@@ -791,6 +808,41 @@ const AETHER_TRADITIONS: WisdomTradition[] = [
     archetype: 'The Awakening Whole',
     color: '#FAFAFA',
     mantra: 'We awaken together'
+  },
+  {
+    id: 'bohm-triadic-mandala',
+    name: 'Holomovement Triadic Mandala',
+    element: 'aether',
+    frequency: 1111, // Perfect coherence - the center frequency
+    voice: 'echo',
+    description: 'The triadic convergence where Physics, Geometry, and Metaphysics spiral into the implicate order. Bohm\'s holomovement as the still point where consciousness expresses across levels.',
+    principles: [
+      'Physics → Geometry: Field dynamics, quantum spacetime, informational substrate',
+      'Geometry → Metaphysics: Sacred forms, archetypal structures, living symbolism',
+      'Metaphysics → Physics: Consciousness primary, matter as precipitation',
+      'Holomovement: Coherence expressing from wave to word, field to thought',
+      'The Bohm Node: Where formal precision meets symbolic embodiment and conscious participation'
+    ],
+    archetype: 'The Coherence Weaver',
+    color: '#E6E6FA', // Lavender - the synthesis color
+    mantra: 'At the center, all streams converge into one movement',
+    triadicStreams: {
+      physicsToGeometry: {
+        inquiry: 'How does form itself think?',
+        lineage: ['David Bohm', 'Roger Penrose', 'John Wheeler', 'Harold Puthoff', 'Ervin Laszlo', 'Amoroso & Kauffman'],
+        focus: 'Mathematical field → Quantum geometry → Unified theory'
+      },
+      geometryToMetaphysics: {
+        inquiry: 'What is the pattern by which consciousness builds?',
+        lineage: ['Buckminster Fuller', 'Keith Critchlow', 'Arthur Loeb', 'Robert Lawlor', 'John Martineau', 'Nassim Haramein'],
+        focus: 'Sacred geometry → Archetypal form → Living symbolism'
+      },
+      metaphysicsToPhysics: {
+        inquiry: 'How does consciousness precipitate as matter?',
+        lineage: ['Arthur M. Young', 'Teilhard de Chardin', 'Whitehead', 'Bergson', 'David Peat', 'Iain McGilchrist'],
+        focus: 'Consciousness → Information → Matter'
+      }
+    }
   }
 ];
 
@@ -829,7 +881,7 @@ export class ElderCouncilService {
 
     console.log('✨ Elder Council Service initialized');
     console.log(`   ${ELDER_COUNCIL_TRADITIONS.length} wisdom traditions loaded`);
-    console.log('   Fire: 8 | Water: 8 | Earth: 8 | Air: 8 | Aether: 8');
+    console.log('   Fire: 8 | Water: 8 | Earth: 8 | Air: 8 | Aether: 9 (including Triadic Mandala)');
   }
 
   /**
