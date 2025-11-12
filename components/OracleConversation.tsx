@@ -211,7 +211,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   const [isMuted, setIsMuted] = useState(false);
   const [voiceAmplitude, setVoiceAmplitude] = useState(0);
   const [userVoiceState, setUserVoiceState] = useState<VoiceState | null>(null);
-  const [audioEnabled, setAudioEnabled] = useState(false); // Track if user has enabled audio
+  const [audioEnabled, setAudioEnabled] = useState(true); // AUTO-START FIX: Start as true to enable immediate voice
 
   // UI state
   const [showLabDrawer, setShowLabDrawer] = useState(false);
@@ -642,6 +642,16 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   useEffect(() => {
     setIsMounted(true);
     trackEvent('session_start', { userId: userId || 'anonymous', sessionId });
+
+    // AUTO-START FIX: Initialize AudioContext immediately on mount
+    if (!audioContextRef.current) {
+      try {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        console.log('✅ AudioContext initialized automatically on mount');
+      } catch (err) {
+        console.warn('⚠️ Could not auto-initialize AudioContext:', err);
+      }
+    }
 
     // Track real user activity
     const trackingUserId = userId || `anon_${sessionId}`;
