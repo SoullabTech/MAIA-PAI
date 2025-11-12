@@ -272,27 +272,32 @@ export const JOURNALING_MODE_DESCRIPTIONS = {
   free: {
     name: 'Free Expression',
     description: 'Stream of consciousness. No structure—just what wants to emerge.',
-    prompt: 'What part of your story wants to be spoken today?'
+    prompt: 'What part of your story wants to be spoken today?',
+    icon: '📝'
   },
   dream: {
     name: 'Dream Integration',
     description: 'Explore the symbolic language of your dreams and unconscious.',
-    prompt: 'Tell me about the dream that is lingering with you...'
+    prompt: 'Tell me about the dream that is lingering with you...',
+    icon: '🌙'
   },
   emotional: {
     name: 'Emotional Processing',
     description: 'Name, hold, and process emotions with compassion.',
-    prompt: 'What emotion is asking for your attention right now?'
+    prompt: 'What emotion is asking for your attention right now?',
+    icon: '❤️'
   },
   shadow: {
     name: 'Shadow Work',
     description: 'Explore hidden aspects, tensions, or uncomfortable truths gently.',
-    prompt: 'What part of yourself are you ready to look at more honestly?'
+    prompt: 'What part of yourself are you ready to look at more honestly?',
+    icon: '🌑'
   },
   direction: {
     name: 'Life Direction',
     description: 'Clarify next steps, purpose, and alignment with your deeper path.',
-    prompt: 'What question about your path is calling for clarity?'
+    prompt: 'What question about your path is calling for clarity?',
+    icon: '🗺️'
   },
 
   // 🧠 NEUROSCIENCE-BACKED MODES
