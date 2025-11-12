@@ -55,8 +55,26 @@ export const SacredLabDrawer: React.FC<SacredLabDrawerProps> = ({
 }) => {
   const menuSections = [
     {
-      title: 'SACRED TEACHINGS',
+      title: 'ELDER COUNCIL',
       icon: '🌟',
+      items: [
+        {
+          icon: Sparkles,
+          label: 'Choose Your Elder',
+          action: () => onNavigate('/elder-council'),
+          description: '39 wisdom traditions as harmonic frequencies'
+        },
+        {
+          icon: Brain,
+          label: 'Current Teaching',
+          action: () => onAction?.('show-current-elder'),
+          description: 'See which wisdom guides you now'
+        },
+      ],
+    },
+    {
+      title: 'SACRED TEACHINGS',
+      icon: '📿',
       items: [
         {
           icon: Sparkles,

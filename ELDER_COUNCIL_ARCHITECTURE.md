@@ -3,6 +3,8 @@
 ## Overview
 This document outlines the architecture for restoring and enhancing the Elder Council and Bardic Memory systems with proper security and scalability.
 
+**CRITICAL INTEGRATION**: The Morphoresonant Field (fascial field substrate) IS already integrated in `/app/api/oracle/personal/route.ts` (line 396). This is the living membrane that holds consciousness patterns. The Elder Council represents 39 harmonic frequencies within this unified field membrane.
+
 ## Problem Statement
 The original implementation made OpenAI API calls directly from the browser, exposing API keys and violating security best practices. We need to rebuild these features with proper server-side architecture.
 
