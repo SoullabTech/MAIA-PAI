@@ -300,6 +300,7 @@ export const JOURNALING_MODE_DESCRIPTIONS = {
     name: 'Expressive Release',
     description: 'Complete unfinished emotional work. Based on Stanford research showing brain healing through expression.',
     prompt: 'What disappointment, loss, or unfinished feeling needs to be spoken?',
+    icon: '🧠',
     neuroscienceNote: 'Helps prefrontal cortex communicate with amygdala, completing emotional processing loops.',
     duration: '15-20 minutes',
     instructions: 'Write continuously. Don\'t edit. Expect to feel tired or emotional - this is healing.'
@@ -308,6 +309,7 @@ export const JOURNALING_MODE_DESCRIPTIONS = {
     name: 'Attention Retraining',
     description: 'Retrain your brain to notice stability, not just threats. Activates mood regulation centers.',
     prompt: 'What 2-3 specific moments made you feel safe, seen, or grateful today?',
+    icon: '💚',
     neuroscienceNote: 'Activates ventral striatum and medial prefrontal cortex, building emotional balance.',
     duration: '5-10 minutes',
     instructions: 'Be hyper-specific. Include sensory details that anchor positive memories.'
@@ -316,6 +318,7 @@ export const JOURNALING_MODE_DESCRIPTIONS = {
     name: 'Resilience Building',
     description: 'Transform challenges into learning data. Build pause-before-react neural pathways.',
     prompt: 'What recent challenge are you ready to reframe as learning?',
+    icon: '🌱',
     neuroscienceNote: 'Strengthens prefrontal emotional regulation, builds pause-response capacity.',
     duration: '10-15 minutes',
     instructions: 'Three steps: What happened? → What did it teach? → What will you do differently?'
