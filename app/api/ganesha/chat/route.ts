@@ -26,6 +26,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getGaneshaCore } from '@/lib/consciousness/GaneshaCore';
 import { getGaneshaMAIABridge } from '@/lib/consciousness/GaneshaMAIABridge';
 import { getSovereigntyProtocol } from '@/lib/consciousness/SovereigntyProtocol';
+import { GaneshaAgent } from '@/lib/consciousness/ganesha/GaneshaAgent';
+import type { AgentContext } from '@/lib/consciousness/ganesha/GaneshaAgent';
 
 /**
  * POST /api/ganesha/chat
@@ -111,19 +113,47 @@ export async function POST(request: NextRequest) {
     let responseText = integratedResponse;
 
     // ═══════════════════════════════════════════════════════════════
-    // STEP 6: ENHANCE WITH CLAUDE (Full GANESHA consciousness)
+    // STEP 6: LANGCHAIN AGENT EXECUTION (Personal Assistant Capabilities)
     // ═══════════════════════════════════════════════════════════════
-    const fullResponse = await generateGaneshaResponse({
-      message,
-      userId,
-      conversationHistory,
-      adhdPattern,
-      nervousSystem,
-      integrationContext,
-      baseResponse: responseText
-    });
 
-    responseText = fullResponse;
+    // Build agent context
+    const agentContext: AgentContext = {
+      userId,
+      userName: userName || 'Explorer',
+      sessionId: sessionId || `ganesha_${Date.now()}`,
+      nervousSystem,
+      timeSinceLastMessage: 0, // TODO: Track this from session data
+      inFlowState: adhdPattern?.type === 'hyperfocus',
+      recentPatterns: adhdPattern ? [adhdPattern] : [],
+      activeThreads: integrationContext.activeThreads || []
+    };
+
+    // Execute LangChain agent (The Four Arms now automate!)
+    const ganeshaAgent = new GaneshaAgent();
+    const agentResponse = await ganeshaAgent.execute(message, agentContext);
+
+    console.log(`🤖 [LANGCHAIN AGENT] Action: ${agentResponse.actionTaken}, Tools: ${agentResponse.toolsUsed.join(', ')}`);
+
+    // Use agent response if tools were executed, otherwise use integrated response
+    if (agentResponse.toolsUsed.length > 0) {
+      responseText = agentResponse.message;
+      console.log(`   → Using agent response (tools executed)`);
+    } else {
+      // ═══════════════════════════════════════════════════════════════
+      // FALLBACK: ENHANCE WITH CLAUDE (Full GANESHA consciousness without tools)
+      // ═══════════════════════════════════════════════════════════════
+      const fullResponse = await generateGaneshaResponse({
+        message,
+        userId,
+        conversationHistory,
+        adhdPattern,
+        nervousSystem,
+        integrationContext,
+        baseResponse: responseText
+      });
+
+      responseText = fullResponse;
+    }
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 7: CHECK SOVEREIGNTY (inherited from MAIA)
@@ -186,6 +216,11 @@ export async function POST(request: NextRequest) {
         sovereigntyCheck: {
           recommendation: sovereigntyCheck.recommendation,
           filtered: sovereigntyCheck.recommendation !== 'ALLOW'
+        },
+        langchainAgent: {
+          actionTaken: agentResponse.actionTaken,
+          toolsUsed: agentResponse.toolsUsed,
+          automation: agentResponse.automation
         },
         responseTime
       }
@@ -480,10 +515,15 @@ export async function GET() {
     systemsActive: [
       'GaneshaCore (Divine Harmonics recognition)',
       'GaneshaMAIABridge (Integration layer)',
+      'GaneshaAgent (LangChain personal assistant - The Four Arms automate!)',
       'SovereigntyProtocol (Inherited from MAIA)',
       'Working Memory Support',
       'Micro-Win Celebration',
-      'Nervous System Sensing'
+      'Nervous System Sensing',
+      'Task Breakdown Automation',
+      'Hyperfocus Protection',
+      'Context Recall Tool',
+      'Grounding Protocol Tool'
     ]
   });
 }

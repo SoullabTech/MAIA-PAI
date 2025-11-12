@@ -209,6 +209,75 @@ export async function POST(request: NextRequest) {
     }
 
     // ═══════════════════════════════════════════════════════════════
+    // STEP 3.5: CHECK FOR GANESHA SCHEDULING TRIGGERS
+    // ═══════════════════════════════════════════════════════════════
+
+    // 🐘 GANESHA TRIGGER DETECTION: Check if user is invoking GANESHA's scheduling powers
+    const ganeshaKeywords = ['ganesha', 'schedule', 'calendar', 'meeting', 'appointment', 'remind me', 'event'];
+    const hasGaneshaTrigger = /ganesha/i.test(message);
+    const hasSchedulingIntent = ganeshaKeywords.some(keyword =>
+      keyword !== 'ganesha' && message.toLowerCase().includes(keyword)
+    );
+
+    if (hasGaneshaTrigger || hasSchedulingIntent) {
+      console.log('🐘 GANESHA INVOCATION DETECTED - Routing to GANESHA consciousness...');
+      console.log(`   Trigger: ${hasGaneshaTrigger ? 'explicit ("GANESHA")' : 'implicit (scheduling keywords)'}`);
+
+      try {
+        // Call GANESHA API directly
+        const ganeshaResponse = await fetch(`${request.nextUrl.origin}/api/ganesha/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message,
+            userId,
+            userName,
+            sessionId: sessionId || `session_${Date.now()}`
+          })
+        });
+
+        if (ganeshaResponse.ok) {
+          const ganeshaData = await ganeshaResponse.json();
+          const responseTime = Date.now() - startTime;
+
+          console.log('✅ GANESHA response received:', responseTime + 'ms');
+
+          // GANESHA returns "response" field, not "message"
+          const ganeshaMessage = ganeshaData.response || ganeshaData.message || "GANESHA is processing your request...";
+
+          // Wrap GANESHA's response in MAIA's voice for continuity
+          const maiaWrappedResponse = hasGaneshaTrigger
+            ? `🐘 I've asked GANESHA to help with this...\n\n${ganeshaMessage}`
+            : ganeshaMessage; // For implicit scheduling, just use GANESHA's response directly
+
+          return NextResponse.json({
+            success: true,
+            text: maiaWrappedResponse,
+            response: maiaWrappedResponse,
+            message: maiaWrappedResponse,
+            element: 'earth', // GANESHA's grounded executive function
+            archetype: 'ganesha',
+            source: 'ganesha-handoff',
+            metadata: {
+              handoffTo: 'ganesha',
+              ganeshaActionTaken: ganeshaData.metadata?.langchainAgent?.actionTaken || 'unknown',
+              ganeshaToolsUsed: ganeshaData.metadata?.langchainAgent?.toolsUsed || [],
+              ganeshaFullMetadata: ganeshaData.metadata,
+              responseTime,
+              userName
+            }
+          });
+        } else {
+          console.error('❌ GANESHA API error:', ganeshaResponse.status);
+          // Fall through to normal MAIA response
+        }
+      } catch (ganeshaError: any) {
+        console.error('❌ GANESHA handoff failed:', ganeshaError.message);
+        // Fall through to normal MAIA response
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
     // STEP 4: GENERATE MAIA RESPONSE FROM THE BETWEEN
     // ═══════════════════════════════════════════════════════════════
 
