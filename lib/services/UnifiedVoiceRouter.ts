@@ -2,9 +2,11 @@
  * Unified Voice Router
  * OpenAI Primary + ElevenLabs Fallback
  * Maya → Alloy, Anthony → Onyx
+ *
+ * SECURITY FIX: Removed direct API client instantiation from browser code
+ * Now uses secure server-side API endpoints instead
  */
 
-import OpenAI from 'openai';
 import { ElevenLabsClient } from 'elevenlabs';
 import { EventEmitter } from 'events';
 
@@ -26,7 +28,6 @@ export interface VoiceResponse {
 }
 
 export class UnifiedVoiceRouter extends EventEmitter {
-  private openai: OpenAI;
   private elevenLabs: ElevenLabsClient;
   private audioCache: Map<string, Buffer>;
 
@@ -45,11 +46,7 @@ export class UnifiedVoiceRouter extends EventEmitter {
   constructor() {
     super();
 
-    // Initialize providers
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
-    });
-
+    // Initialize ElevenLabs (OpenAI calls go through secure API endpoint)
     this.elevenLabs = new ElevenLabsClient({
       apiKey: process.env.ELEVENLABS_API_KEY
     });
@@ -161,12 +158,23 @@ export class UnifiedVoiceRouter extends EventEmitter {
     // Adjust speed based on element
     const speed = this.getElementalSpeed(element);
 
-    const response = await this.openai.audio.speech.create({
-      model: 'tts-1',  // or 'tts-1-hd' for higher quality
-      voice: voice as any,
-      input: text,
-      speed
+    // Use secure server-side TTS API instead of direct OpenAI client
+    const response = await fetch('/api/voice/synthesize', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text,
+        voice,
+        model: 'tts-1',
+        speed
+      }),
     });
+
+    if (!response.ok) {
+      throw new Error(`TTS API error: ${response.status}`);
+    }
 
     const audioBuffer = Buffer.from(await response.arrayBuffer());
 
@@ -340,10 +348,14 @@ export class UnifiedVoiceRouter extends EventEmitter {
     let openaiStatus = false;
     let elevenLabsStatus = false;
 
-    // Test OpenAI
+    // Test OpenAI via secure API endpoint
     try {
-      await this.openai.models.list();
-      openaiStatus = true;
+      const response = await fetch('/api/voice/synthesize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: 'test', voice: 'alloy', model: 'tts-1' })
+      });
+      openaiStatus = response.ok;
     } catch (e) {
       openaiStatus = false;
     }

@@ -1,15 +1,13 @@
 /**
  * Pinecone Vector Store for Archetypal Indexing
  * "SoulMap" - tracks user's symbolic evolution in vector space
+ *
+ * SECURITY FIX: Removed OpenAI client instantiation from browser code
+ * Now uses secure server-side API endpoint for embeddings
  */
 
-import { OpenAI } from 'openai';
 import { StoredJournalEntry } from '../storage/journal-storage';
 import { MemoryEntry } from '../memory/mem0';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
 
 export interface VectorMetadata {
   userId: string;
@@ -212,12 +210,24 @@ class SoulIndex {
 
   private async generateEmbedding(text: string): Promise<number[]> {
     try {
-      const response = await openai.embeddings.create({
-        model: 'text-embedding-3-small',
-        input: text.slice(0, 8000)
+      // Use secure server-side embeddings API instead of direct OpenAI client
+      const response = await fetch('/api/embeddings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: text.slice(0, 8000),
+          model: 'text-embedding-3-small'
+        }),
       });
 
-      return response.data[0].embedding;
+      if (!response.ok) {
+        throw new Error(`Embeddings API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.embedding;
     } catch (error) {
       console.error('Embedding generation error:', error);
       return Array(1536).fill(0);

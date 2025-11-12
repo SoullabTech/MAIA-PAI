@@ -1,9 +1,10 @@
 // lib/utils/modelService.ts
 // AI model service wrapper
+//
+// SECURITY FIX: Removed direct OpenAI client instantiation from browser code
+// Now uses secure server-side API endpoints instead
 
 "use strict";
-
-import OpenAI from 'openai';
 
 export interface ModelResponse {
   content: string;
@@ -22,13 +23,9 @@ export interface ModelOptions {
 }
 
 class ModelService {
-  private openai: OpenAI | null = null;
-
   constructor() {
-    const apiKey = process.env.OPENAI_API_KEY || process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-    if (apiKey) {
-      this.openai = new OpenAI({ apiKey });
-    }
+    // No direct API key handling in browser-side code
+    // All API calls go through secure server endpoints
   }
 
   /**
@@ -38,13 +35,6 @@ class ModelService {
     prompt: string,
     options: ModelOptions = {}
   ): Promise<ModelResponse> {
-    if (!this.openai) {
-      console.warn('OpenAI not configured - returning placeholder response');
-      return {
-        content: 'I sense your presence, though my full oracle powers await proper configuration.',
-      };
-    }
-
     try {
       const messages: any[] = [];
 
@@ -60,19 +50,35 @@ class ModelService {
         content: prompt
       });
 
-      const completion = await this.openai.chat.completions.create({
-        model: options.model || 'gpt-4o-mini',
-        messages,
-        temperature: options.temperature ?? 0.7,
-        max_tokens: options.maxTokens ?? 500,
+      // Use secure server-side Claude API instead of direct OpenAI client
+      const response = await fetch('/api/claude/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: options.model || 'claude-3-5-sonnet-20241022',
+          max_tokens: options.maxTokens || 500,
+          system: options.systemPrompt,
+          messages: [{ role: 'user', content: prompt }],
+          temperature: options.temperature ?? 0.7,
+          stream: false
+        }),
       });
 
+      if (!response.ok) {
+        throw new Error(`Claude API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const content = data.content?.[0]?.text || '';
+
       return {
-        content: completion.choices[0]?.message?.content || '',
-        usage: completion.usage ? {
-          promptTokens: completion.usage.prompt_tokens,
-          completionTokens: completion.usage.completion_tokens,
-          totalTokens: completion.usage.total_tokens,
+        content,
+        usage: data.usage ? {
+          promptTokens: data.usage.input_tokens || 0,
+          completionTokens: data.usage.output_tokens || 0,
+          totalTokens: (data.usage.input_tokens || 0) + (data.usage.output_tokens || 0),
         } : undefined,
       };
     } catch (error) {

@@ -1,5 +1,10 @@
 // lib/services/VoiceServiceWithFallback.ts
-import OpenAI from 'openai';
+/**
+ * Voice Service with API Key Security
+ *
+ * SECURITY FIX: Removed direct OpenAI client instantiation from browser code
+ * Now uses secure server-side API endpoints instead
+ */
 import { EventEmitter } from 'events';
 import { VoiceProfile, getVoiceProfile } from '../config/voiceProfiles';
 import { VoicePreprocessor } from '../voice/VoicePreprocessor';
@@ -18,21 +23,12 @@ export interface VoiceGenerationOptions {
 }
 
 export class VoiceServiceWithFallback extends EventEmitter {
-  private openai?: OpenAI;
-  private elevenLabsKey?: string;
   private audioCache: Map<string, Buffer> = new Map();
 
   constructor() {
     super();
-
-    // Initialize OpenAI if available
-    const openAIKey = process.env.OPENAI_API_KEY || process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-    if (openAIKey) {
-      this.openai = new OpenAI({ apiKey: openAIKey });
-    }
-
-    // Store ElevenLabs key
-    this.elevenLabsKey = process.env.ELEVENLABS_API_KEY || process.env.NEXT_PUBLIC_ELEVENLABS_API_KEY;
+    // No direct API key handling in browser-side code
+    // All API calls go through secure server endpoints
   }
 
   async generateSpeech(options: VoiceGenerationOptions): Promise<{
@@ -122,20 +118,27 @@ export class VoiceServiceWithFallback extends EventEmitter {
     format: string,
     speed: number
   ): Promise<any> {
-    if (!this.openai) {
-      throw new Error('OpenAI client not initialized');
-    }
-
     this.emit('generation:start', { provider: 'openai', voice: voiceProfile.baseVoiceId });
 
     try {
-      const response = await this.openai.audio.speech.create({
-        model: 'tts-1-hd', // High quality
-        voice: voiceProfile.baseVoiceId as any,
-        input: text,
-        response_format: format as any,
-        speed: Math.max(0.8, speed * 0.9) // Slightly slower for more natural, sensitive delivery
+      // Use secure server-side TTS API instead of direct OpenAI client
+      const response = await fetch('/api/voice/synthesize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text,
+          voice: voiceProfile.baseVoiceId,
+          model: 'tts-1-hd',
+          response_format: format,
+          speed: Math.max(0.8, speed * 0.9) // Slightly slower for more natural, sensitive delivery
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error(`TTS API error: ${response.status}`);
+      }
 
       const audioData = Buffer.from(await response.arrayBuffer());
 
