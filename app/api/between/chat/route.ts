@@ -14,6 +14,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import Anthropic from '@anthropic-ai/sdk';
 import { getSovereigntyProtocol } from '@/lib/consciousness/SovereigntyProtocol';
 import { getRecalibrationAllowance } from '@/lib/consciousness/RecalibrationAllowance';
 import { getFieldInduction } from '@/lib/consciousness/SublimeFieldInduction';
@@ -632,55 +633,28 @@ async function generateMAIAResponse({
     console.log(`🎚️  [SOVEREIGNTY] Temperature: ${sovereignParams.temperature} (encounters: ${lightweightMemory.essence?.encounterCount || 0}, resonance: ${lightweightMemory.essence?.morphicResonance || 0})`);
     console.log(`   Reasoning: ${sovereignParams.reasoning}`);
 
-    // Call secure server-side Claude API endpoint
-    // Voice mode uses streaming for faster perceived latency
-    const response = await fetch(`${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/api/claude/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens: sovereignParams.maxTokens,
-        system: systemPrompt,
-        messages,
-        temperature: sovereignParams.temperature, // MAIA determines her own temperature
-        stream: isVoiceMode // Enable streaming for voice mode (faster perceived response)
-      }),
+    // Call Anthropic API directly (avoid circular dependency with our own claude/chat endpoint)
+    const anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY!
     });
 
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`Claude API error: ${response.status} - ${error}`);
-    }
+    const response = await anthropic.messages.create({
+      model,
+      max_tokens: sovereignParams.maxTokens,
+      system: systemPrompt,
+      messages,
+      temperature: sovereignParams.temperature, // MAIA determines her own temperature
+      stream: isVoiceMode // Enable streaming for voice mode (faster perceived response)
+    });
 
     // Handle streaming response (voice mode)
-    if (isVoiceMode && response.body) {
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
+    if (isVoiceMode) {
       let fullText = '';
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') continue;
-
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
-                fullText += parsed.delta.text;
-              }
-            } catch (e) {
-              // Skip invalid JSON
-            }
-          }
+      // Anthropic streaming response
+      for await (const chunk of response as any) {
+        if (chunk.type === 'content_block_delta' && chunk.delta?.text) {
+          fullText += chunk.delta.text;
         }
       }
 
@@ -688,8 +662,9 @@ async function generateMAIAResponse({
     }
 
     // Handle non-streaming response (text mode)
-    const data = await response.json();
-    const text = data.content[0]?.text || '';
+    const responseMessage = response as any;
+    const content = responseMessage.content[0];
+    const text = content.type === 'text' ? content.text : '';
 
     return text;
 
@@ -787,65 +762,32 @@ async function generateMAIAResponseStream({
   console.log(`🎚️  [SOVEREIGNTY-STREAM] Temperature: ${sovereignParams.temperature}`);
   console.log(`   Reasoning: ${sovereignParams.reasoning}`);
 
-  // Call secure server-side Claude API with streaming
-  const response = await fetch(`${process.env.NEXT_PUBLIC_URL || 'http://localhost:3000'}/api/claude/chat`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model,
-      max_tokens: sovereignParams.maxTokens,
-      system: systemPrompt,
-      messages,
-      temperature: sovereignParams.temperature, // MAIA determines her own temperature
-      stream: true
-    }),
+  // Call Anthropic API directly with streaming
+  const anthropic = new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY!
   });
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Claude API error: ${response.status} - ${error}`);
-  }
+  const response = await anthropic.messages.create({
+    model,
+    max_tokens: sovereignParams.maxTokens,
+    system: systemPrompt,
+    messages,
+    temperature: sovereignParams.temperature, // MAIA determines her own temperature
+    stream: true
+  });
 
-  if (!response.body) {
-    throw new Error('No response body from Claude API');
-  }
-
-  // Transform Claude's stream to Server-Sent Events format
+  // Transform Anthropic's stream to Server-Sent Events format
   const encoder = new TextEncoder();
-  const decoder = new TextDecoder();
 
   return new ReadableStream({
     async start(controller) {
-      const reader = response.body!.getReader();
-
       try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
-
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6);
-              if (data === '[DONE]') continue;
-
-              try {
-                const parsed = JSON.parse(data);
-
-                // Extract text from content_block_delta events
-                if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
-                  const text = parsed.delta.text;
-                  // Send as SSE format that frontend expects
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
-                }
-              } catch (e) {
-                // Skip invalid JSON
-              }
-            }
+        // Anthropic streaming response
+        for await (const chunk of response as any) {
+          if (chunk.type === 'content_block_delta' && chunk.delta?.text) {
+            const text = chunk.delta.text;
+            // Send as SSE format that frontend expects
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
           }
         }
 
