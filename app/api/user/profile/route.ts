@@ -27,6 +27,24 @@ export async function GET(request: NextRequest) {
       }, { status: 400 });
     }
 
+    // KELLY SPECIAL CASE - Check BEFORE database lookup
+    // Recognize Kelly on localhost or production domains
+    const isLocalhost = domain && (domain.includes('localhost') || domain.includes('127.0.0.1'));
+    const isProduction = domain && (domain.includes('soullab.life') || domain.includes('soullab.org'));
+
+    if ((isLocalhost || isProduction) && userId === 'kelly-nezat') {
+      console.log('🌟 [User Profile API] Kelly auto-recognized on domain:', domain);
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: 'kelly-nezat',
+          name: 'Kelly',
+          email: 'kelly@soullab.life',
+          onboarded: true
+        }
+      });
+    }
+
     // Fetch from Supabase
     const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -44,9 +62,9 @@ export async function GET(request: NextRequest) {
       }, { status: 404 });
     }
 
-    // Kelly special case
-    if (userData.email === 'kelly@soullab.life' || userId === 'kelly-nezat') {
-      console.log('🌟 [User Profile API] Kelly recognized by email/ID');
+    // Kelly special case - also check from database
+    if (userData.email === 'kelly@soullab.life') {
+      console.log('🌟 [User Profile API] Kelly recognized by email from DB');
       return NextResponse.json({
         success: true,
         user: {

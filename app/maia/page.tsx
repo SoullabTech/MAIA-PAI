@@ -30,9 +30,21 @@ async function getInitialUserData() {
 
   const currentUrl = window.location.hostname;
 
-  // Try to fetch from API using stored userId
+  // KELLY SPECIAL CASE - Check localStorage for Kelly first
+  const isLocalhost = currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1');
+  const isProduction = currentUrl.includes('soullab.life') || currentUrl.includes('soullab.org');
+
   const storedUserId = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
 
+  // If Kelly's ID is in localStorage on localhost or production, use it immediately
+  if ((isLocalhost || isProduction) && storedUserId === 'kelly-nezat') {
+    console.log('🌟 [MAIA] Kelly recognized from localStorage on domain:', currentUrl);
+    localStorage.setItem('explorerName', 'Kelly');
+    localStorage.setItem('explorerId', 'kelly-nezat');
+    return { id: 'kelly-nezat', name: 'Kelly' };
+  }
+
+  // Try to fetch from API using stored userId
   if (storedUserId) {
     try {
       const params = new URLSearchParams();
