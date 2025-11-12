@@ -1377,27 +1377,28 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
 
     // 🧠 BARDIC MEMORY: Background pattern recognition (Air serving Fire)
-    // Runs quietly, doesn't interrupt conversation flow
-    if (userId) {
-      conversationMemory.recognizeInBackground({
-        userId,
-        sessionId,
-        currentCoherence: coherenceLevel,
-        placeCue: undefined, // TODO: Could detect from message or device location
-        senseCues: undefined
-      }, cleanedText).then(recognition => {
-        setPatternRecognition(recognition);
-        if (recognition.hasResonance) {
-          console.log('🧠 [BARDIC] Pattern recognition found resonance:', {
-            candidateCount: recognition.candidates.length,
-            shouldMention: recognition.shouldMention,
-            topScore: recognition.candidates[0]?.score
-          });
-        }
-      }).catch(err => {
-        console.error('🧠 [BARDIC] Pattern recognition error:', err);
-      });
-    }
+    // TEMPORARILY DISABLED - Causes browser API security errors
+    // TODO: Move to server-side API route
+    // if (userId) {
+    //   conversationMemory.recognizeInBackground({
+    //     userId,
+    //     sessionId,
+    //     currentCoherence: coherenceLevel,
+    //     placeCue: undefined,
+    //     senseCues: undefined
+    //   }, cleanedText).then(recognition => {
+    //     setPatternRecognition(recognition);
+    //     if (recognition.hasResonance) {
+    //       console.log('🧠 [BARDIC] Pattern recognition found resonance:', {
+    //         candidateCount: recognition.candidates.length,
+    //         shouldMention: recognition.shouldMention,
+    //         topScore: recognition.candidates[0]?.score
+    //       });
+    //     }
+    //   }).catch(err => {
+    //     console.error('🧠 [BARDIC] Pattern recognition error:', err);
+    //   });
+    // }
 
     // 🌟 TEEN SUPPORT - Perform safety check for teen users BEFORE processing
     if (isTeenUser && teenProfile && requiresTeenSupport(teenProfile)) {
@@ -1519,30 +1520,29 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       await new Promise(resolve => setTimeout(resolve, 50)); // Brief pause to let recognition complete
       const recognition = patternRecognition || { hasResonance: false, candidates: [], shouldMention: false };
 
+      // TEMP DISABLED - Causes browser API errors
       let crystallization: CrystallizationDetection | null = null;
-      if (userId) {
-        try {
-          crystallization = await conversationMemory.detectCrystallization({
-            userId,
-            sessionId,
-            currentCoherence: coherenceLevel,
-            placeCue: undefined,
-            senseCues: undefined
-          }, cleanedText, recognition);
-
-          setCrystallizationState(crystallization);
-
-          if (crystallization.isCrystallizing) {
-            console.log('🧠 [BARDIC] ✨ Crystallization detected:', {
-              fireAirAlignment: crystallization.fireAirAlignment.toFixed(2),
-              shouldCapture: crystallization.shouldCapture,
-              hasStanza: !!crystallization.suggestedStanza
-            });
-          }
-        } catch (err) {
-          console.error('🧠 [BARDIC] Crystallization detection error:', err);
-        }
-      }
+      // if (userId) {
+      //   try {
+      //     crystallization = await conversationMemory.detectCrystallization({
+      //       userId,
+      //       sessionId,
+      //       currentCoherence: coherenceLevel,
+      //       placeCue: undefined,
+      //       senseCues: undefined
+      //     }, cleanedText, recognition);
+      //     setCrystallizationState(crystallization);
+      //     if (crystallization.isCrystallizing) {
+      //       console.log('🧠 [BARDIC] ✨ Crystallization detected:', {
+      //         fireAirAlignment: crystallization.fireAirAlignment.toFixed(2),
+      //         shouldCapture: crystallization.shouldCapture,
+      //         hasStanza: !!crystallization.suggestedStanza
+      //       });
+      //     }
+      //   } catch (err) {
+      //     console.error('🧠 [BARDIC] Crystallization detection error:', err);
+      //   }
+      // }
 
       // 🌟 TEEN SUPPORT - Generate system prompt additions for MAIA
       const teenSystemPrompt = isTeenUser && teenProfile
@@ -1789,61 +1789,54 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setCoherenceLevel(responseData.metadata?.fieldState?.depth || 0.85);
 
       // 🧠 BARDIC MEMORY: Enrich response with memory wisdom (Air serves Fire)
-      // Only surfaces strong patterns, never dominates present emergence
+      // TEMP DISABLED - Causes browser API errors
       let enrichedResponseText = responseText;
-      if (userId && recognition && crystallization) {
-        try {
-          const balance = await conversationMemory.checkBalance({
-            userId,
-            sessionId,
-            currentCoherence: coherenceLevel
-          });
-
-          const enrichedResponse = await conversationMemory.enrichResponse(
-            responseText,
-            { userId, sessionId, currentCoherence: coherenceLevel },
-            recognition,
-            crystallization,
-            balance
-          );
-
-          // Combine enrichments subtly
-          const enrichments: string[] = [];
-          if (enrichedResponse.patternReflection) {
-            enrichments.push(enrichedResponse.patternReflection);
-          }
-          if (enrichedResponse.crystallizationNote) {
-            enrichments.push(enrichedResponse.crystallizationNote);
-          }
-          if (enrichedResponse.balanceGuidance) {
-            enrichments.push(enrichedResponse.balanceGuidance);
-          }
-
-          if (enrichments.length > 0) {
-            enrichedResponseText = enrichedResponse.originalResponse + enrichments.join('');
-            console.log('🧠 [BARDIC] Response enriched with memory wisdom');
-          }
-
-          // 🧠 BARDIC MEMORY: Auto-capture crystallization moment
-          if (crystallization.shouldCapture) {
-            conversationMemory.captureEpisode(
-              { userId, sessionId, currentCoherence: coherenceLevel },
-              cleanedText,
-              responseText,
-              crystallization
-            ).then(episodeId => {
-              if (episodeId) {
-                console.log('🧠 [BARDIC] ✨ Crystallization moment captured:', episodeId);
-              }
-            }).catch(err => {
-              console.error('🧠 [BARDIC] Failed to capture episode:', err);
-            });
-          }
-        } catch (err) {
-          console.error('🧠 [BARDIC] Response enrichment error:', err);
-          // Fall back to original response
-        }
-      }
+      // if (userId && recognition && crystallization) {
+      //   try {
+      //     const balance = await conversationMemory.checkBalance({
+      //       userId,
+      //       sessionId,
+      //       currentCoherence: coherenceLevel
+      //     });
+      //     const enrichedResponse = await conversationMemory.enrichResponse(
+      //       responseText,
+      //       { userId, sessionId, currentCoherence: coherenceLevel },
+      //       recognition,
+      //       crystallization,
+      //       balance
+      //     );
+      //     const enrichments: string[] = [];
+      //     if (enrichedResponse.patternReflection) {
+      //       enrichments.push(enrichedResponse.patternReflection);
+      //     }
+      //     if (enrichedResponse.crystallizationNote) {
+      //       enrichments.push(enrichedResponse.crystallizationNote);
+      //     }
+      //     if (enrichedResponse.balanceGuidance) {
+      //       enrichments.push(enrichedResponse.balanceGuidance);
+      //     }
+      //     if (enrichments.length > 0) {
+      //       enrichedResponseText = enrichedResponse.originalResponse + enrichments.join('');
+      //       console.log('🧠 [BARDIC] Response enriched with memory wisdom');
+      //     }
+      //     if (crystallization.shouldCapture) {
+      //       conversationMemory.captureEpisode(
+      //         { userId, sessionId, currentCoherence: coherenceLevel },
+      //         cleanedText,
+      //         responseText,
+      //         crystallization
+      //       ).then(episodeId => {
+      //         if (episodeId) {
+      //           console.log('🧠 [BARDIC] ✨ Crystallization moment captured:', episodeId);
+      //         }
+      //       }).catch(err => {
+      //         console.error('🧠 [BARDIC] Failed to capture episode:', err);
+      //       });
+      //     }
+      //   } catch (err) {
+      //     console.error('🧠 [BARDIC] Response enrichment error:', err);
+      //   }
+      // }
 
       // Create oracle message with source tag
       const oracleMessage: ConversationMessage = {
