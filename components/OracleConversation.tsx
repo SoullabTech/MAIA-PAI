@@ -3339,7 +3339,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div className="text-xs" style={{ color: '#D4A574', opacity: 0.8, fontFamily: 'Spectral, Georgia, serif', letterSpacing: '0.05em' }}>
-                          {message.role === 'user' ? (userName && userName !== 'Explorer' && userName !== 'Seeker' ? userName : 'You') : 'MAIA'}
+                          {message.role === 'user' ? (userName || 'You') : 'MAIA'}
                         </div>
                         <div className="flex items-center gap-1 text-xs text-amber-400
                                       opacity-100 sm:opacity-0 sm:group-hover:opacity-100

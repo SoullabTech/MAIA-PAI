@@ -25,21 +25,71 @@ import { LogOut, Sparkles, Menu, X, Brain, Volume2, ArrowLeft, Clock } from 'luc
 import { motion, AnimatePresence } from 'framer-motion';
 import { SwipeNavigation, DirectionalHints } from '@/components/navigation/SwipeNavigation';
 
-function getInitialUserData() {
+async function getInitialUserData() {
   if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
 
-  // Check NEW system first (beta_user from auth system)
+  // PRODUCTION DOMAIN KELLY RECOGNITION - HIGHEST PRIORITY
+  const currentUrl = window.location.hostname;
+  const isProduction = currentUrl.includes('soullab.life') || currentUrl.includes('soullab.org');
+
+  if (isProduction) {
+    console.log('🌟 [MAIA] Kelly auto-recognized on production domain:', currentUrl);
+    const kellyData = { id: 'kelly-nezat', name: 'Kelly' };
+
+    // Persist to localStorage for consistency
+    localStorage.setItem('explorerName', 'Kelly');
+    localStorage.setItem('explorerId', 'kelly-nezat');
+    localStorage.setItem('betaOnboardingComplete', 'true');
+
+    // Also sync to new system
+    const betaUser = {
+      id: 'kelly-nezat',
+      name: 'Kelly',
+      email: 'kelly@soullab.life',
+      onboarded: true
+    };
+    localStorage.setItem('beta_user', JSON.stringify(betaUser));
+
+    return kellyData;
+  }
+
+  // Try to fetch from API using stored userId or domain
+  const storedUserId = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
+
+  if (storedUserId || currentUrl.includes('soullab')) {
+    try {
+      const params = new URLSearchParams();
+      if (storedUserId) params.append('userId', storedUserId);
+      params.append('domain', currentUrl);
+
+      const response = await fetch(`/api/user/profile?${params.toString()}`);
+      const data = await response.json();
+
+      if (data.success && data.user) {
+        console.log('✅ [MAIA] User profile fetched from API:', data.user.name);
+
+        // Sync to localStorage
+        localStorage.setItem('explorerName', data.user.name);
+        localStorage.setItem('explorerId', data.user.id);
+        localStorage.setItem('betaOnboardingComplete', 'true');
+
+        return { id: data.user.id, name: data.user.name };
+      }
+    } catch (error) {
+      console.error('❌ [MAIA] Error fetching user profile:', error);
+    }
+  }
+
+  // Check NEW system (beta_user from auth system)
   const betaUser = localStorage.getItem('beta_user');
   if (betaUser) {
     try {
       const userData = JSON.parse(betaUser);
-      // Try multiple field names for username (username, name, displayName)
       const userName = userData.username || userData.name || userData.displayName;
       if (userData.onboarded === true && userData.id && userName) {
-        // Also sync to old system for compatibility
         localStorage.setItem('explorerName', userName);
         localStorage.setItem('explorerId', userData.id);
-        console.log('✅ [MAIA] User authenticated as:', userName);
+        console.log('✅ [MAIA] User authenticated from localStorage:', userName);
         return { id: userData.id, name: userName };
       }
     } catch (e) {
@@ -54,30 +104,6 @@ function getInitialUserData() {
     if (id && name) {
       console.log('📦 [MAIA] Using legacy user data:', name);
       return { id, name };
-    }
-  }
-
-  // SPECIAL: Kelly Nezat recognition - check for Kelly-specific patterns
-  // This ensures Kelly is always properly identified even without formal auth
-  const currentUrl = typeof window !== 'undefined' ? window.location.hostname : '';
-  const domain = currentUrl.includes('soullab') || currentUrl.includes('localhost');
-
-  if (domain) {
-    // Check if this might be Kelly based on environment or localStorage patterns
-    const possibleKellyId = localStorage.getItem('kelly-session') ||
-                           localStorage.getItem('founder-session') ||
-                           (localStorage.getItem('explorerName')?.toLowerCase().includes('kelly'));
-
-    if (possibleKellyId || currentUrl.includes('soullab')) {
-      console.log('🌟 [MAIA] Kelly Nezat recognition pattern detected');
-      const kellyData = { id: 'kelly-nezat', name: 'Kelly Nezat' };
-
-      // Set proper auth data for Kelly
-      localStorage.setItem('explorerName', 'Kelly Nezat');
-      localStorage.setItem('explorerId', 'kelly-nezat');
-      localStorage.setItem('betaOnboardingComplete', 'true');
-
-      return kellyData;
     }
   }
 
@@ -125,47 +151,51 @@ export default function MAIAPage() {
 
   // Fix hydration: Initialize user data and session after mount
   useEffect(() => {
-    setIsMounted(true);
+    const initializeUser = async () => {
+      setIsMounted(true);
 
-    // Get or create persistent sessionId - this enables conversation continuity across reloads!
-    const existingSessionId = localStorage.getItem('maia_session_id');
-    if (existingSessionId) {
-      setSessionId(existingSessionId);
-      console.log('💫 [MAIA] Restored session:', existingSessionId);
-    } else {
-      const newSessionId = `session_${Date.now()}`;
-      localStorage.setItem('maia_session_id', newSessionId);
-      setSessionId(newSessionId);
-      console.log('✨ [MAIA] Created new session:', newSessionId);
-    }
-
-    const initialData = getInitialUserData();
-    setExplorerId(initialData.id);
-    setExplorerName(initialData.name);
-
-    // Load birth date from localStorage for teen support
-    const betaUser = localStorage.getItem('beta_user');
-    if (betaUser) {
-      try {
-        const userData = JSON.parse(betaUser);
-        if (userData.birthDate) {
-          setUserBirthDate(userData.birthDate);
-          console.log('📅 User birth date loaded:', userData.birthDate);
-        }
-      } catch (e) {
-        console.error('Error loading user birth date:', e);
+      // Get or create persistent sessionId - this enables conversation continuity across reloads!
+      const existingSessionId = localStorage.getItem('maia_session_id');
+      if (existingSessionId) {
+        setSessionId(existingSessionId);
+        console.log('💫 [MAIA] Restored session:', existingSessionId);
+      } else {
+        const newSessionId = `session_${Date.now()}`;
+        localStorage.setItem('maia_session_id', newSessionId);
+        setSessionId(newSessionId);
+        console.log('✨ [MAIA] Created new session:', newSessionId);
       }
-    }
 
-    // Check welcome message in client-side only
-    const welcomeSeen = localStorage.getItem('maia_welcome_seen');
-    setShowWelcome(!welcomeSeen);
+      const initialData = await getInitialUserData();
+      setExplorerId(initialData.id);
+      setExplorerName(initialData.name);
 
-    // Load saved voice preference
-    const savedVoice = localStorage.getItem('selected_voice') as 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
-    if (savedVoice) {
-      setSelectedVoice(savedVoice);
-    }
+      // Load birth date from localStorage for teen support
+      const betaUser = localStorage.getItem('beta_user');
+      if (betaUser) {
+        try {
+          const userData = JSON.parse(betaUser);
+          if (userData.birthDate) {
+            setUserBirthDate(userData.birthDate);
+            console.log('📅 User birth date loaded:', userData.birthDate);
+          }
+        } catch (e) {
+          console.error('Error loading user birth date:', e);
+        }
+      }
+
+      // Check welcome message in client-side only
+      const welcomeSeen = localStorage.getItem('maia_welcome_seen');
+      setShowWelcome(!welcomeSeen);
+
+      // Load saved voice preference
+      const savedVoice = localStorage.getItem('selected_voice') as 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+      if (savedVoice) {
+        setSelectedVoice(savedVoice);
+      }
+    };
+
+    initializeUser();
   }, []);
 
   const handleVoiceChange = (voice: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer') => {

@@ -299,7 +299,7 @@ export async function POST(request: NextRequest) {
         context: {
           userId: requestUserId,
           sessionId: sessionId || requestUserId,
-          userName: userName,
+          userName: finalUserName,  // Use stored name or fallback to provided name
           preferences: enhancedPreferences,
           intelligence: intelligenceAnalysis  // 🧠 Pass intelligence to consciousness
         },
