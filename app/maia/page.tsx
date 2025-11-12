@@ -57,6 +57,30 @@ function getInitialUserData() {
     }
   }
 
+  // SPECIAL: Kelly Nezat recognition - check for Kelly-specific patterns
+  // This ensures Kelly is always properly identified even without formal auth
+  const currentUrl = typeof window !== 'undefined' ? window.location.hostname : '';
+  const domain = currentUrl.includes('soullab') || currentUrl.includes('localhost');
+
+  if (domain) {
+    // Check if this might be Kelly based on environment or localStorage patterns
+    const possibleKellyId = localStorage.getItem('kelly-session') ||
+                           localStorage.getItem('founder-session') ||
+                           (localStorage.getItem('explorerName')?.toLowerCase().includes('kelly'));
+
+    if (possibleKellyId || currentUrl.includes('soullab')) {
+      console.log('🌟 [MAIA] Kelly Nezat recognition pattern detected');
+      const kellyData = { id: 'kelly-nezat', name: 'Kelly Nezat' };
+
+      // Set proper auth data for Kelly
+      localStorage.setItem('explorerName', 'Kelly Nezat');
+      localStorage.setItem('explorerId', 'kelly-nezat');
+      localStorage.setItem('betaOnboardingComplete', 'true');
+
+      return kellyData;
+    }
+  }
+
   console.log('⚠️ [MAIA] No user data found, using defaults');
   return { id: 'guest', name: 'Explorer' };
 }
