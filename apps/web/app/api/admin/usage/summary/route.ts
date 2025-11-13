@@ -8,6 +8,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { usageTracker } from '@/lib/middleware/usage-tracker';
 
+// Mark route as dynamic since it uses searchParams
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
