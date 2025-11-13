@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check MAIA Session Memory</title>
+    <style>
+        body {
+            font-family: system-ui;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #f0f0f0;
+        }
+        .section {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        h2 {
+            color: #fb923c;
+            margin-top: 0;
+        }
+        pre {
+            background: #0a0a0a;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            color: #4ade80;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #065f46;
+            color: #4ade80;
+        }
+        .warning {
+            background: #78350f;
+            color: #fb923c;
+        }
+        .info {
+            background: #1e3a8a;
+            color: #60a5fa;
+        }
+        button {
+            background: #fb923c;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #ea580c;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 MAIA Session Memory Checker</h1>
+
+    <div class="section">
+        <h2>Current Session Information</h2>
+        <div id="session-info"></div>
+    </div>
+
+    <div class="section">
+        <h2>User Identity</h2>
+        <div id="user-info"></div>
+    </div>
+
+    <div class="section">
+        <h2>All MAIA localStorage Keys</h2>
+        <pre id="all-storage"></pre>
+    </div>
+
+    <div class="section">
+        <h2>Actions</h2>
+        <button onclick="refreshData()">🔄 Refresh Data</button>
+        <button onclick="clearSession()">🗑️ Clear Session (Start Fresh)</button>
+        <button onclick="window.location.href='http://localhost:3003/maia'">🚀 Open MAIA</button>
+    </div>
+
+    <script>
+        function displaySessionInfo() {
+            const sessionId = localStorage.getItem('maia_session_id');
+            const sessionDiv = document.getElementById('session-info');
+
+            if (sessionId) {
+                const sessionAge = Date.now() - parseInt(sessionId.split('_')[1]);
+                const ageHours = Math.floor(sessionAge / (1000 * 60 * 60));
+                const ageMinutes = Math.floor((sessionAge % (1000 * 60 * 60)) / (1000 * 60));
+
+                sessionDiv.innerHTML = `
+                    <div class="status success">
+                        <strong>✅ Active Session Found</strong><br>
+                        Session ID: <code>${sessionId}</code><br>
+                        Age: ${ageHours}h ${ageMinutes}m
+                    </div>
+                    <div class="status info">
+                        This means MAIA should remember your conversations when you reload the page.
+                    </div>
+                `;
+            } else {
+                sessionDiv.innerHTML = `
+                    <div class="status warning">
+                        <strong>⚠️ No Session Found</strong><br>
+                        A new session will be created when you open MAIA.
+                    </div>
+                `;
+            }
+        }
+
+        function displayUserInfo() {
+            const userDiv = document.getElementById('user-info');
+            const explorerId = localStorage.getItem('explorerId');
+            const explorerName = localStorage.getItem('explorerName');
+            const betaUser = localStorage.getItem('beta_user');
+
+            let html = '';
+
+            if (explorerId && explorerName) {
+                html += `
+                    <div class="status success">
+                        <strong>✅ User Identity Found</strong><br>
+                        Name: <strong>${explorerName}</strong><br>
+                        ID: <code>${explorerId}</code>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="status warning">
+                        <strong>⚠️ No User Identity</strong><br>
+                        You might appear as "Explorer" or "Seeker"
+                    </div>
+                `;
+            }
+
+            if (betaUser) {
+                try {
+                    const userData = JSON.parse(betaUser);
+                    html += `
+                        <div class="status info">
+                            <strong>Beta User Data:</strong><br>
+                            <pre>${JSON.stringify(userData, null, 2)}</pre>
+                        </div>
+                    `;
+                } catch (e) {
+                    html += `<div class="status warning">Beta user data exists but couldn't parse</div>`;
+                }
+            }
+
+            userDiv.innerHTML = html;
+        }
+
+        function displayAllStorage() {
+            const allDiv = document.getElementById('all-storage');
+            const maiaKeys = {};
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.includes('maia') || key.includes('explorer') || key.includes('beta')) {
+                    maiaKeys[key] = localStorage.getItem(key);
+                }
+            }
+
+            allDiv.textContent = JSON.stringify(maiaKeys, null, 2);
+        }
+
+        function refreshData() {
+            displaySessionInfo();
+            displayUserInfo();
+            displayAllStorage();
+        }
+
+        function clearSession() {
+            if (confirm('This will clear your session ID and start fresh. Your messages in the database will remain. Continue?')) {
+                localStorage.removeItem('maia_session_id');
+                alert('✅ Session cleared! MAIA will create a new session when you open it.');
+                refreshData();
+            }
+        }
+
+        // Initial load
+        refreshData();
+    </script>
+</body>
+</html>
