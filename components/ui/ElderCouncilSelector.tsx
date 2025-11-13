@@ -64,6 +64,35 @@ export function ElderCouncilSelector({
     aether: '#E6E6FA'
   };
 
+  // Text colors for better contrast against element backgrounds
+  const getTextColor = (element: string) => {
+    switch (element) {
+      case 'air':
+      case 'aether':
+        return '#1a1a1a'; // Dark text for light backgrounds
+      case 'fire':
+      case 'water':
+      case 'earth':
+        return '#ffffff'; // White text for darker backgrounds
+      default:
+        return '#ffffff';
+    }
+  };
+
+  const getSecondaryTextColor = (element: string) => {
+    switch (element) {
+      case 'air':
+      case 'aether':
+        return '#4a4a4a'; // Slightly lighter dark text for secondary content
+      case 'fire':
+      case 'water':
+      case 'earth':
+        return 'rgba(255, 255, 255, 0.7)'; // Semi-transparent white
+      default:
+        return 'rgba(255, 255, 255, 0.7)';
+    }
+  };
+
   const elementIcons = {
     fire: '🔥',
     water: '🌊',
@@ -111,7 +140,8 @@ export function ElderCouncilSelector({
                 className="w-full flex items-center justify-between p-4 rounded-lg transition-all hover:scale-[1.02]"
                 style={{
                   backgroundColor: `${elementColors[element as keyof typeof elementColors]}20`,
-                  borderLeft: `4px solid ${elementColors[element as keyof typeof elementColors]}`
+                  borderLeft: `4px solid ${elementColors[element as keyof typeof elementColors]}`,
+                  color: getTextColor(element)
                 }}
               >
                 <div className="flex items-center gap-3">
@@ -119,11 +149,17 @@ export function ElderCouncilSelector({
                     {elementIcons[element as keyof typeof elementIcons]}
                   </span>
                   <div className="text-left">
-                    <h3 className="font-semibold capitalize">{element}</h3>
-                    <p className="text-xs opacity-70">{traditions.length} traditions</p>
+                    <h3 className="font-semibold capitalize" style={{ color: getTextColor(element) }}>
+                      {element}
+                    </h3>
+                    <p className="text-xs" style={{ color: getSecondaryTextColor(element) }}>
+                      {traditions.length} traditions
+                    </p>
                   </div>
                 </div>
-                <span className="text-xl">{isSelected ? '↑' : '↓'}</span>
+                <span className="text-xl" style={{ color: getTextColor(element) }}>
+                  {isSelected ? '↑' : '↓'}
+                </span>
               </button>
 
               {/* Traditions List (Expandable) */}
@@ -148,13 +184,16 @@ export function ElderCouncilSelector({
                           backgroundColor: elementColors[element as keyof typeof elementColors],
                           borderLeft: isActive
                             ? `3px solid ${elementColors[element as keyof typeof elementColors]}`
-                            : 'none'
+                            : 'none',
+                          color: getTextColor(element)
                         }}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h4 className="font-medium text-sm">{tradition.name}</h4>
-                            <p className="text-xs opacity-70 mt-1 line-clamp-2">
+                            <h4 className="font-medium text-sm" style={{ color: getTextColor(element) }}>
+                              {tradition.name}
+                            </h4>
+                            <p className="text-xs mt-1 line-clamp-2" style={{ color: getSecondaryTextColor(element) }}>
                               {tradition.description}
                             </p>
                             {isActive && (
@@ -162,7 +201,13 @@ export function ElderCouncilSelector({
                                 {tradition.principles.slice(0, 2).map((principle, i) => (
                                   <span
                                     key={i}
-                                    className="text-[10px] px-2 py-1 rounded-full bg-black bg-opacity-20"
+                                    className="text-[10px] px-2 py-1 rounded-full"
+                                    style={{
+                                      backgroundColor: element === 'air' || element === 'aether'
+                                        ? 'rgba(0, 0, 0, 0.15)'
+                                        : 'rgba(0, 0, 0, 0.2)',
+                                      color: getTextColor(element)
+                                    }}
                                   >
                                     {principle}
                                   </span>
@@ -170,13 +215,13 @@ export function ElderCouncilSelector({
                               </div>
                             )}
                           </div>
-                          <div className="ml-3 text-xs opacity-60 text-right">
+                          <div className="ml-3 text-xs text-right" style={{ color: getSecondaryTextColor(element) }}>
                             <div>{tradition.frequency} Hz</div>
                             <div className="mt-1">{tradition.voice}</div>
                           </div>
                         </div>
                         {(isHovered || isActive) && tradition.mantra && (
-                          <p className="text-xs italic opacity-80 mt-2">
+                          <p className="text-xs italic mt-2" style={{ color: getSecondaryTextColor(element) }}>
                             "{tradition.mantra}"
                           </p>
                         )}
