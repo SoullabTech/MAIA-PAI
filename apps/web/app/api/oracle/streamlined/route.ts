@@ -11,6 +11,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Stub logger
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 const logger = {
   info: (message: string, data?: any) => console.log(message, data),
   error: (message: string, error?: any) => console.error(message, error),

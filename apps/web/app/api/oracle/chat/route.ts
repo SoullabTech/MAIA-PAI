@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDemoFileContext, formatDemoFileContext, hasUserFiles } from '@/lib/services/demoFiles';
 
 // Enhanced Oracle Chat API with Sesame-Primary Voice
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 export async function POST(request: NextRequest) {
   try {
     const { 

@@ -5,6 +5,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import {
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
   exportBetaTestersFromSupabase,
   generateGaneshaContactsFromSupabase,
   generateContactsCode,

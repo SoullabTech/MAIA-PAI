@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { semanticSearch } from '@/lib/semantic/index';
 import { mem0 } from '@/lib/memory/mem0';
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 
 export async function POST(req: NextRequest) {
   try {

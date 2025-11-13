@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "../../../lib/supabaseClient";
 import { getSoulprintForUser, getSymbolicInsights, exportSoulprint, soulprintMemory } from "@/lib/memory/soulprint";
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 
 export async function POST(request: NextRequest) {
   try {

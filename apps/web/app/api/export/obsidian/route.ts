@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { voiceJournalingService } from '@/lib/journaling/VoiceJournalingService';
 import { ObsidianExporter } from '@/lib/export/ObsidianExporter';
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 
 export async function POST(req: NextRequest) {
   try {

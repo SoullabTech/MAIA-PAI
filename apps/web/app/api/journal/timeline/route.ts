@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { JournalSoulprintIntegration } from '@/lib/soulprint/JournalSoulprintIntegration';
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 
 export async function GET(req: NextRequest) {
   try {

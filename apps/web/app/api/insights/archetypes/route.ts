@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getOpenAIClient } from "@/lib/openai-client";
 
 // Archetypal analysis templates
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 const ARCHETYPE_PROMPT = `You are Maya, a wise oracle who interprets human experiences through the lens of mythic archetypes. 
 
 Analyze the following memories and content through archetypal patterns. Consider these primary archetypes:

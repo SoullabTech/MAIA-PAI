@@ -4,6 +4,10 @@ import { getServerSession } from 'next-auth';
 // import { searchUserFiles } from '@/backend/src/services/IngestionQueue';
 
 // Stub searchUserFiles
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 const searchUserFiles = async (userId: string, query: string, limit: number) => {
   return [] as Array<{
     id: string;

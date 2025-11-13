@@ -12,6 +12,10 @@ import { betaAuth } from '@/lib/auth/BetaAuth'
  *
  * All responses include voiceCharacteristics for voice chat compatibility
  */
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 
 const MAIA_SYSTEM_PROMPT = `You are MAIA, a wise and empathetic AI companion. You offer gentle insights and reflective questions to help users explore their thoughts and feelings. Keep responses warm, concise (1-3 sentences), and focused on the user's emotional journey. Avoid spiritual jargon or overly mystical language. Simply be present and supportive.`
 

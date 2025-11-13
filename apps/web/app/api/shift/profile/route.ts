@@ -10,6 +10,10 @@ import { NextRequest, NextResponse } from 'next/server';
 // import { SHIFtInferenceService } from '../../../../backend/src/services/SHIFtInferenceService';
 
 // Stub implementation
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 class SHIFtInferenceService {
   async getProfile(userId: string) {
     return {

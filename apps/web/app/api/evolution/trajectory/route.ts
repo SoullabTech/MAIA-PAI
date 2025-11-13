@@ -4,6 +4,10 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
 // Request validation schemas
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 const TrajectoryQuerySchema = z.object({
   userId: z.string().optional(),
   timeRange: z.enum(['7d', '30d', '90d', 'all']).optional().default('30d'),

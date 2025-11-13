@@ -3,6 +3,10 @@ import { CollectiveService, CollectiveStats } from '@/lib/services/CollectiveSer
 import { CollectiveNarrativeService } from '@/lib/services/CollectiveNarrativeService';
 
 // Personal stats interface (simplified for demo)
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 interface PersonalStats {
   timeframe: string;
   totalSessions: number;

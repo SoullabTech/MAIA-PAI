@@ -8,6 +8,10 @@ import { NextRequest, NextResponse } from 'next/server';
 // import { DaimonicFacilitationService } from '../../../../backend/src/services/DaimonicFacilitationService';
 
 // Create service instance (stubbed)
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 const daimonicService = {
   processEncounter: async () => ({ response: 'Daimonic service not available in beta' })
 };

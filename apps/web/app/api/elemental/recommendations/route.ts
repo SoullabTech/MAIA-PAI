@@ -5,6 +5,10 @@ import { apiClient, API_ENDPOINTS } from "../../../../lib/config";
 import { getSupabaseConfig } from "../../../../lib/config/supabase";
 
 // Type definitions for elemental content
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 interface ContentDeliveryContext {
   userId: string;
   currentStage: string;

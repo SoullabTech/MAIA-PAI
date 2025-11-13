@@ -1,6 +1,10 @@
 import type { NextRequest } from 'next/server';
 
 // Stub PersonalOracleAgent
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 class PersonalOracleAgent {
   async requestStageTransition(userId: string, targetStage: string, reason: string) {
     return {

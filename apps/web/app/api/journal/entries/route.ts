@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { journalStorage } from '@/lib/storage/journal-storage';
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 
 export async function GET(req: NextRequest) {
   try {

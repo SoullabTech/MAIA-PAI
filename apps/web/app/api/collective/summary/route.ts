@@ -16,6 +16,10 @@ import { CollectiveIntelligence, collective, Logger } from '@/lib/stubs/Collecti
 // import { LanguageMappingService } from '../../../../backend/src/services/LanguageMappingService';
 
 // Initialize services (stubbed)
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 const dashboardService = {
   getSnapshot: async (params: any) => ({ 
     coherence: { value: 0.75, trend: 'steady', delta: 0 },

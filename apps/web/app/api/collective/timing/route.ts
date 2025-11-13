@@ -15,6 +15,10 @@ import { CollectiveIntelligence, collective, Logger } from '@/lib/stubs/Collecti
 // import { CollectiveIntelligence } from '../../../../backend/src/ain/collective/CollectiveIntelligence';
 // import { CollectiveDashboardService } from '../../../../backend/src/services/CollectiveDashboardService';
 // import { DashboardQueryParams } from '../../../../backend/src/types/collectiveDashboard';
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 
 type DashboardQueryParams = {
   window?: '1d' | '7d' | '30d';

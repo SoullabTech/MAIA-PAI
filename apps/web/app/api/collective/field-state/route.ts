@@ -4,6 +4,10 @@ import { createClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
 // Request validation schema
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 const FieldStateQuerySchema = z.object({
   includePatterns: z.boolean().optional().default(true),
   includeEvolution: z.boolean().optional().default(true),

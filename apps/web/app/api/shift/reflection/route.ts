@@ -10,6 +10,10 @@ import { NextRequest, NextResponse } from 'next/server';
 // import { generateRitualReflectionForm } from '../../../../backend/src/content/SHIFtRitualReflection';
 
 // Stub function
+// Mark route as dynamic since it uses searchParams or other dynamic features
+export const dynamic = 'force-dynamic';
+
+
 function generateRitualReflectionForm() {
   return {
     opening: 'Welcome to the ritual reflection',
