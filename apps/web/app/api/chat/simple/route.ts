@@ -10,9 +10,16 @@ import { SimpleInsightGenerator } from '@/lib/insights/SimpleInsightGenerator';
 // import { BasicMetricsTracker } from '@/lib/metrics/BasicMetricsTracker'; // Stubbed
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization to avoid build-time errors
+let openai: OpenAI | null = null;
+function getOpenAI() {
+  if (!openai) {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY || '',
+    });
+  }
+  return openai;
+}
 
 const safetyMonitor = new SafetyMonitor();
 // Stub BasicMetricsTracker
@@ -139,7 +146,7 @@ Guidelines:
 - Suggest simple, actionable steps when appropriate
 - Always be encouraging but realistic`;
 
-  const completion = await openai.chat.completions.create({
+  const completion = await getOpenAI().chat.completions.create({
     model: 'gpt-3.5-turbo', // Cost-effective for MVP
     messages: [
       { role: 'system', content: systemPrompt },
