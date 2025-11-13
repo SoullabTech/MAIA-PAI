@@ -21,9 +21,10 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
-      "@/lib/*": ["./lib/*"],
-      "@/app/*": ["./app/*"]
+      "@/*": ["./apps/web/*"],
+      "@/lib/*": ["./apps/web/lib/*"],
+      "@/app/*": ["./apps/web/app/*"],
+      "@/components/*": ["./apps/web/components/*"]
     }
   },
   "include": [

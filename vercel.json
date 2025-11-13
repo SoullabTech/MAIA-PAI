@@ -1,37 +1,37 @@
 {
   "buildCommand": "npm run build",
-  "outputDirectory": ".next",
+  "outputDirectory": "apps/web/.next",
   "framework": "nextjs",
   "installCommand": "npm install",
   "functions": {
-    "app/api/soulprint/route.ts": {
+    "apps/web/app/api/soulprint/route.ts": {
       "maxDuration": 30
     },
-    "app/api/journal/route.ts": {
+    "apps/web/app/api/journal/route.ts": {
       "maxDuration": 30
     },
-    "app/api/sacred-timeline/route.ts": {
+    "apps/web/app/api/sacred-timeline/route.ts": {
       "maxDuration": 30
     },
-    "app/api/sacred-portal/route.ts": {
+    "apps/web/app/api/sacred-portal/route.ts": {
       "maxDuration": 30
     },
-    "app/api/documents/analyze/route.ts": {
+    "apps/web/app/api/documents/analyze/route.ts": {
       "maxDuration": 60
     },
-    "app/api/upload/route.ts": {
+    "apps/web/app/api/upload/route.ts": {
       "maxDuration": 60
     },
-    "app/api/oracle/personal/route.ts": {
+    "apps/web/app/api/oracle/personal/route.ts": {
       "maxDuration": 30
     },
-    "app/api/oracle/maya/route.ts": {
+    "apps/web/app/api/oracle/maya/route.ts": {
       "maxDuration": 30
     },
-    "app/dashboard/page.tsx": {
+    "apps/web/app/dashboard/page.tsx": {
       "maxDuration": 10
     },
-    "app/api/dashboard/[...route].ts": {
+    "apps/web/app/api/dashboard/[...route].ts": {
       "maxDuration": 30
     }
   },
