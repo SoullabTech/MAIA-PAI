@@ -4,34 +4,22 @@
   "framework": "nextjs",
   "installCommand": "npm install",
   "functions": {
-    "apps/web/app/api/soulprint/route.ts": {
+    "app/api/journal/route.ts": {
       "maxDuration": 30
     },
-    "apps/web/app/api/journal/route.ts": {
+    "app/api/journal/save-conversation/route.ts": {
       "maxDuration": 30
     },
-    "apps/web/app/api/sacred-timeline/route.ts": {
+    "app/api/beta/journal/route.ts": {
       "maxDuration": 30
     },
-    "apps/web/app/api/sacred-portal/route.ts": {
+    "app/api/beta/monitor/route.ts": {
       "maxDuration": 30
     },
-    "apps/web/app/api/documents/analyze/route.ts": {
+    "app/api/beta/real-data/route.ts": {
       "maxDuration": 60
     },
-    "apps/web/app/api/upload/route.ts": {
-      "maxDuration": 60
-    },
-    "apps/web/app/api/oracle/personal/route.ts": {
-      "maxDuration": 30
-    },
-    "apps/web/app/api/oracle/maya/route.ts": {
-      "maxDuration": 30
-    },
-    "apps/web/app/dashboard/page.tsx": {
-      "maxDuration": 10
-    },
-    "apps/web/app/api/dashboard/[...route].ts": {
+    "app/api/beta/track-session/route.ts": {
       "maxDuration": 30
     }
   },
