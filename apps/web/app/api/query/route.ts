@@ -2,16 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 // Temporarily stub out backend imports that are excluded from build
 // import { searchUserFiles } from '@/backend/src/services/IngestionQueue';
 import { getServerSession } from 'next-auth';
-import { OpenAI } from 'openai';
+import { getOpenAIClient } from '@/lib/openai-client';
 
 // Stub function
 async function searchUserFiles(userId: string, question: string, limit: number) {
   return [];
 }
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
 
 export async function POST(req: NextRequest) {
   try {
@@ -56,6 +52,7 @@ export async function POST(req: NextRequest) {
       .join('\n\n---\n\n');
 
     // Generate response with Maya's voice
+    const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [

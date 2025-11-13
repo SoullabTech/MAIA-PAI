@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 // Temporarily stub out backend imports that are excluded from build
 // import { searchUserFiles } from '@/backend/src/services/IngestionQueue';
-import { OpenAI } from 'openai';
 
 // Stub searchUserFiles
 const searchUserFiles = async (userId: string, query: string, limit: number) => {
@@ -19,10 +18,6 @@ const searchUserFiles = async (userId: string, query: string, limit: number) => 
     metadata?: any;
   }>;
 };
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
 
 interface SearchResult {
   id: string;

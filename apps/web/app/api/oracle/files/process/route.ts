@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import OpenAI from 'openai';
+import { getOpenAIClient } from '@/lib/openai-client';
 import { parsePDF } from '@/lib/pdf-parse-wrapper';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -13,10 +13,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
 
 // Optimal chunk size for text-embedding-3-small model
 const CHUNK_SIZE = 600; // tokens (~800 characters)
@@ -253,6 +249,7 @@ function getOverlapText(text: string, maxTokens: number): string {
 
 // Generate embedding using OpenAI
 async function generateEmbedding(text: string): Promise<number[]> {
+  const openai = getOpenAIClient();
   const response = await openai.embeddings.create({
     model: 'text-embedding-3-small',
     input: text.trim(),

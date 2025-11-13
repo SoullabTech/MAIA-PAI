@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { getOpenAIClient } from "@/lib/openai-client";
 
 // Archetypal analysis templates
 const ARCHETYPE_PROMPT = `You are Maya, a wise oracle who interprets human experiences through the lens of mythic archetypes. 
@@ -61,6 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate archetypal insight using GPT-4
+    const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [

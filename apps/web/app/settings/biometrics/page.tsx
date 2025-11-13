@@ -214,8 +214,15 @@ export default function BiometricsSettingsPage() {
         {/* Tab Navigation */}
         <div className="flex gap-2 mt-6">
           <button
-            onClick={() => setActiveTab('upload')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('✅ Upload Data tab clicked');
+              setActiveTab('upload');
+            }}
+            tabIndex={0}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               activeTab === 'upload'
                 ? 'bg-dune-wellness-crimson text-white'
                 : 'bg-white/40 text-dune-deep-sand hover:bg-white/60'
@@ -224,8 +231,15 @@ export default function BiometricsSettingsPage() {
             Upload Data
           </button>
           <button
-            onClick={() => setActiveTab('coherence')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('✅ Field Coherence tab clicked');
+              setActiveTab('coherence');
+            }}
+            tabIndex={0}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               activeTab === 'coherence'
                 ? 'bg-dune-wellness-crimson text-white'
                 : 'bg-white/40 text-dune-deep-sand hover:bg-white/60'
@@ -234,8 +248,15 @@ export default function BiometricsSettingsPage() {
             Field Coherence
           </button>
           <button
-            onClick={() => setActiveTab('fascia')}
-            className={`px-4 py-2 rounded-lg font-medium transition-all ${
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('✅ Log Fascia tab clicked');
+              setActiveTab('fascia');
+            }}
+            tabIndex={0}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               activeTab === 'fascia'
                 ? 'bg-dune-wellness-crimson text-white'
                 : 'bg-white/40 text-dune-deep-sand hover:bg-white/60'
