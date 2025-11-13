@@ -30,32 +30,12 @@ async function getInitialUserData() {
 
   const currentUrl = window.location.hostname;
 
-  // KELLY SPECIAL CASE - Aggressive detection for localhost and production
-  const isLocalhost = currentUrl.includes('localhost') || currentUrl.includes('127.0.0.1');
-  const isProduction = currentUrl.includes('soullab.life') || currentUrl.includes('soullab.org');
-
-  // Check if Kelly is already saved in explorerName
-  const savedName = localStorage.getItem('explorerName');
-  if (savedName === 'Kelly' && (isLocalhost || isProduction)) {
-    console.log('🌟 [MAIA] Kelly recognized from saved name on domain:', currentUrl);
-    localStorage.setItem('explorerId', 'kelly-nezat');
-    return { id: 'kelly-nezat', name: 'Kelly' };
-  }
-
   const storedUserId = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
 
-  // If Kelly's ID is in localStorage on localhost or production, use it immediately
-  if ((isLocalhost || isProduction) && storedUserId === 'kelly-nezat') {
-    console.log('🌟 [MAIA] Kelly recognized from userId on domain:', currentUrl);
-    localStorage.setItem('explorerName', 'Kelly');
-    localStorage.setItem('explorerId', 'kelly-nezat');
-    return { id: 'kelly-nezat', name: 'Kelly' };
-  }
-
-  // TEMPORARY: Auto-assign Kelly if on localhost/production and name gets set to Seeker
-  // This is a fallback to prevent Kelly from being called Seeker
-  if ((isLocalhost || isProduction) && savedName === 'Seeker') {
-    console.log('🌟 [MAIA] Correcting Seeker to Kelly on domain:', currentUrl);
+  // KELLY SPECIAL CASE - Only check for specific Kelly userId
+  // Do NOT auto-assign based on domain - that would affect all users
+  if (storedUserId === 'kelly-nezat') {
+    console.log('🌟 [MAIA] Kelly recognized from userId:', storedUserId);
     localStorage.setItem('explorerName', 'Kelly');
     localStorage.setItem('explorerId', 'kelly-nezat');
     return { id: 'kelly-nezat', name: 'Kelly' };
