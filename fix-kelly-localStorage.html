@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fix Kelly's localStorage</title>
+    <style>
+        body {
+            font-family: system-ui;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #f0f0f0;
+        }
+        button {
+            background: #fb923c;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #ea580c;
+        }
+        .status {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        .success {
+            color: #4ade80;
+        }
+        .warning {
+            color: #fb923c;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌟 Fix Kelly's MAIA Identity</h1>
+
+    <div class="status" id="current-status">
+        <h3>Current localStorage:</h3>
+        <div id="current-data"></div>
+    </div>
+
+    <button onclick="fixKellyIdentity()">Fix Kelly's Identity</button>
+    <button onclick="clearAll()">Clear All (Reset)</button>
+
+    <div class="status" id="result-status" style="display: none;">
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function displayCurrentData() {
+            const data = {
+                explorerId: localStorage.getItem('explorerId'),
+                betaUserId: localStorage.getItem('betaUserId'),
+                explorerName: localStorage.getItem('explorerName'),
+                beta_user: localStorage.getItem('beta_user'),
+                betaOnboardingComplete: localStorage.getItem('betaOnboardingComplete')
+            };
+
+            document.getElementById('current-data').innerHTML =
+                '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        }
+
+        function fixKellyIdentity() {
+            // Set Kelly's correct identity
+            localStorage.setItem('explorerId', 'kelly-nezat');
+            localStorage.setItem('betaUserId', 'kelly-nezat');
+            localStorage.setItem('explorerName', 'Kelly');
+            localStorage.setItem('betaOnboardingComplete', 'true');
+
+            // Also set beta_user for new system
+            const kellyUser = {
+                id: 'kelly-nezat',
+                email: 'kelly@soullab.life',
+                name: 'Kelly',
+                username: 'Kelly',
+                onboarded: true
+            };
+            localStorage.setItem('beta_user', JSON.stringify(kellyUser));
+
+            const result = document.getElementById('result');
+            const resultStatus = document.getElementById('result-status');
+
+            result.innerHTML = '<h3 class="success">✅ Kelly\'s Identity Fixed!</h3>' +
+                '<p>localStorage has been updated with:</p>' +
+                '<pre>' + JSON.stringify({
+                    explorerId: 'kelly-nezat',
+                    betaUserId: 'kelly-nezat',
+                    explorerName: 'Kelly',
+                    beta_user: kellyUser
+                }, null, 2) + '</pre>' +
+                '<p class="warning">⚠️ Now refresh the MAIA page to see the change!</p>';
+
+            resultStatus.style.display = 'block';
+            displayCurrentData();
+        }
+
+        function clearAll() {
+            localStorage.removeItem('explorerId');
+            localStorage.removeItem('betaUserId');
+            localStorage.removeItem('explorerName');
+            localStorage.removeItem('beta_user');
+            localStorage.removeItem('betaOnboardingComplete');
+            localStorage.removeItem('maia_session_id');
+
+            const result = document.getElementById('result');
+            const resultStatus = document.getElementById('result-status');
+
+            result.innerHTML = '<h3 class="warning">🧹 All localStorage cleared</h3>' +
+                '<p>You can now run "Fix Kelly\'s Identity" again.</p>';
+
+            resultStatus.style.display = 'block';
+            displayCurrentData();
+        }
+
+        // Display current data on load
+        displayCurrentData();
+    </script>
+</body>
+</html>
