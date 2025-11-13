@@ -21,23 +21,8 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get('userId'); // Optional filter
 
     // ═══════════════════════════════════════════════════════════
-    // OVERVIEW STATS
+    // OVERVIEW STATS - Direct queries
     // ═══════════════════════════════════════════════════════════
-
-    const { data: overviewStats } = await supabase.rpc('exec_sql', {
-      sql: `
-        SELECT
-          (SELECT COUNT(*) FROM unified_insights WHERE is_active = TRUE) as total_active_insights,
-          (SELECT COUNT(*) FROM unified_insights) as total_insights,
-          (SELECT COUNT(DISTINCT user_id) FROM unified_insights) as total_users,
-          (SELECT COUNT(*) FROM insight_recurrences WHERE date >= NOW() - INTERVAL '24 hours') as recurrences_24h,
-          (SELECT COUNT(*) FROM insight_recurrences WHERE date >= NOW() - INTERVAL '7 days') as recurrences_7d,
-          (SELECT AVG(convergence_score) FROM spiral_movements WHERE convergence_score > 0) as avg_convergence,
-          (SELECT COUNT(*) FROM spiral_movements WHERE convergence_score >= 70) as breakthrough_ready
-      `
-    }).catch(() => null);
-
-    // Fallback: Direct queries if RPC doesn't work
     const [
       { count: totalActiveInsights },
       { count: totalInsights },

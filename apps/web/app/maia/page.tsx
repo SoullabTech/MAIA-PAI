@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BookOpen, Clock, Search, HelpCircle, Sparkles, Mic, BarChart3, Settings as SettingsIcon } from 'lucide-react';
+import { BookOpen, Clock, Search, HelpCircle, Sparkles, Mic, BarChart3, Settings as SettingsIcon, Gem } from 'lucide-react';
 import { Copy } from '@/lib/copy/MaiaCopy';
 import { useMaiaStore } from '@/lib/maia/state';
 import { mockEntries } from '@/lib/maia/mockData';
@@ -106,6 +106,15 @@ export default function MaiaPage() {
                 <BookOpen className="w-4 h-4" />
                 <span className="hidden sm:inline">Journal</span>
               </button>
+
+              <a
+                href="/journal"
+                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
+                title="Jade Journal - Temporal Consciousness"
+              >
+                <Gem className="w-4 h-4" />
+                <span className="hidden sm:inline">Jade</span>
+              </a>
 
               {entries.length >= 3 && (
                 <button

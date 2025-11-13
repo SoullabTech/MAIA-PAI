@@ -480,13 +480,22 @@ export async function processContentForInsights(
   // Detect insights in the content
   const detection = await detectInsights(content, context, userId, metadata);
 
-  if (detection.insights.length === 0) return;
+  if (detection.insights.length === 0) {
+    console.log('🔍 No insights detected in content');
+    return;
+  }
+
+  console.log(`🌀 Detected ${detection.insights.length} insights, processing...`);
+
+  // Dynamically import persistence layer to avoid circular dependencies
+  const { saveUnifiedInsight, loadUserInsights } = await import('./InsightPersistence');
+
+  // Load existing insights from database
+  const existingInsights = await loadUserInsights(userId);
+  console.log(`📚 Loaded ${existingInsights.length} existing insights for user ${userId}`);
 
   // For each detected insight
   for (const insight of detection.insights) {
-    // TODO: Load existing UnifiedInsights from database
-    const existingInsights: UnifiedInsight[] = []; // Placeholder
-
     // Find matching patterns
     const matches = await findMatchingInsights(insight, userId, existingInsights);
 
@@ -509,7 +518,8 @@ export async function processContentForInsights(
       matches[0] // Use first match if found
     );
 
-    // TODO: Save to database
-    console.log('📊 Unified Insight recorded:', unifiedInsight.id);
+    // Save to database - WHERE TEMPORAL BECOMES ETERNAL
+    await saveUnifiedInsight(unifiedInsight);
+    console.log('✨ Unified Insight persisted to cathedral:', unifiedInsight.id);
   }
 }

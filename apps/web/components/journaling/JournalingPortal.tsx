@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BookOpen } from 'lucide-react';
 import { JournalingMode, JOURNALING_MODE_DESCRIPTIONS } from '@/lib/journaling/JournalingPrompts';
 import HybridInput from '@/components/chat/HybridInput';
 import MaiaReflector from './MaiaReflector';
