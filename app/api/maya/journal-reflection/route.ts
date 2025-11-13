@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PersonalOracleAgent } from '@/lib/oracle/PersonalOracleAgent';
+import { processContentForInsights } from '@/lib/services/UnifiedInsightEngine';
 
 // Sacred reflection templates based on elemental energies
 const elementalReflections = {
@@ -76,11 +77,12 @@ export async function POST(req: Request) {
       );
     }
 
+    // Get user ID from session or use default
+    const userId = 'journal-user'; // TODO: Get actual user ID from session
+    const sessionId = `journal_${Date.now()}`;
+
     // Process through PersonalOracleAgent for consistency with ARIA system
     try {
-      // Get user ID from session or use default
-      const userId = 'journal-user'; // TODO: Get actual user ID from session
-
       // Process journal reflection through oracle agent
       const oracleResult = await oracleAgent.processJournalReflection(
         content,
@@ -98,6 +100,21 @@ export async function POST(req: Request) {
                               ? journalData.reflection
                               : elementalReflections[element as keyof typeof elementalReflections]?.[0] ||
                                 "I see deep wisdom emerging from your words. Trust what is unfolding within you.";
+
+        // 🌀 UNIFIED INSIGHT ENGINE - Process journal content for patterns
+        processContentForInsights(
+          content,
+          'journal',
+          userId,
+          {
+            element: journalData.element as any,
+            emotionalTone: emotionalState,
+            sessionId,
+            date: new Date()
+          }
+        ).catch(error => {
+          console.error('⚠️ Journal insight processing failed (non-critical):', error);
+        });
 
         // Format response for journal component
         return NextResponse.json({
@@ -166,6 +183,21 @@ export async function POST(req: Request) {
     const prompt = wordCount > 50
       ? continuationPrompts[Math.floor(Math.random() * continuationPrompts.length)]
       : undefined;
+
+    // 🌀 UNIFIED INSIGHT ENGINE - Process journal for all return paths
+    processContentForInsights(
+      content,
+      'journal',
+      userId,
+      {
+        element: detectedElement as any,
+        emotionalTone: emotionalState,
+        sessionId,
+        date: new Date()
+      }
+    ).catch(error => {
+      console.error('⚠️ Journal insight processing failed (non-critical):', error);
+    });
 
     // Try to get enhanced reflection from OpenAI if available
     if (process.env.OPENAI_API_KEY) {

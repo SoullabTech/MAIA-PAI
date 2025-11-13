@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent';
 import { saveConversationWithAnalytics, detectDeviceType } from '@/lib/services/conversation-analytics-service';
+import { processContentForInsights } from '@/lib/services/UnifiedInsightEngine';
 // TODO: Re-enable when elemental reflection hook is implemented
 // import { processElementalReflection } from '@/apps/api/backend/src/services/elementalReflectionHook';
 // import { getConfigWithEnvOverrides } from '@/config/elemental-reflection.config';
@@ -47,6 +48,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Save conversation with analytics
+    const sessionId = `chatgpt_${Date.now()}`;
     try {
       await saveConversationWithAnalytics({
         userId,
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest) {
         brevityScore: response.metadata?.qualityMetrics?.brevityScore,
 
         // Session context
-        sessionId: `chatgpt_${Date.now()}`,
+        sessionId,
         deviceType: detectDeviceType(),
         voiceEnabled,
         ttsEnabled: false
@@ -80,6 +82,22 @@ export async function POST(request: NextRequest) {
       console.error('⚠️ Failed to save analytics:', saveError);
       // Don't fail the request if analytics save fails
     }
+
+    // 🌀 UNIFIED INSIGHT ENGINE - Process conversation for patterns
+    // Run in background to not slow down response
+    processContentForInsights(
+      `${message}\n\n${response.response}`,
+      'conversation',
+      userId,
+      {
+        element: response.element,
+        emotionalTone: response.metadata?.emotionalTone,
+        sessionId,
+        date: new Date()
+      }
+    ).catch(error => {
+      console.error('⚠️ Insight processing failed (non-critical):', error);
+    });
 
     // Return MAIA's response with elemental reflection if detected
     return NextResponse.json({
