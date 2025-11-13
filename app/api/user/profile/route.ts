@@ -19,25 +19,30 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 [User Profile API] Fetching profile for:', { userId, domain });
 
-    // Production domain Kelly recognition
-    if (domain && (domain.includes('soullab.life') || domain.includes('soullab.org'))) {
-      console.log('🌟 [User Profile API] Kelly auto-recognized on production domain:', domain);
+    // MUST have userId to fetch profile
+    if (!userId) {
+      return NextResponse.json({
+        success: false,
+        error: 'No userId provided'
+      }, { status: 400 });
+    }
+
+    // KELLY SPECIAL CASE - Check BEFORE database lookup
+    // Recognize Kelly on localhost or production domains
+    const isLocalhost = domain && (domain.includes('localhost') || domain.includes('127.0.0.1'));
+    const isProduction = domain && (domain.includes('soullab.life') || domain.includes('soullab.org'));
+
+    if ((isLocalhost || isProduction) && userId === 'kelly-nezat') {
+      console.log('🌟 [User Profile API] Kelly auto-recognized on domain:', domain);
       return NextResponse.json({
         success: true,
         user: {
           id: 'kelly-nezat',
           name: 'Kelly',
-          email: 'kelly@soullab.life'
+          email: 'kelly@soullab.life',
+          onboarded: true
         }
       });
-    }
-
-    // If no userId provided, check if we can identify from domain
-    if (!userId) {
-      return NextResponse.json({
-        success: false,
-        error: 'No userId provided and domain not recognized'
-      }, { status: 400 });
     }
 
     // Fetch from Supabase
@@ -57,9 +62,9 @@ export async function GET(request: NextRequest) {
       }, { status: 404 });
     }
 
-    // Kelly special case
-    if (userData.email === 'kelly@soullab.life' || userId === 'kelly-nezat') {
-      console.log('🌟 [User Profile API] Kelly recognized by email/ID');
+    // Kelly special case - also check from database
+    if (userData.email === 'kelly@soullab.life') {
+      console.log('🌟 [User Profile API] Kelly recognized by email from DB');
       return NextResponse.json({
         success: true,
         user: {

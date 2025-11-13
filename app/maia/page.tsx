@@ -28,38 +28,24 @@ import { SwipeNavigation, DirectionalHints } from '@/components/navigation/Swipe
 async function getInitialUserData() {
   if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
 
-  // PRODUCTION DOMAIN KELLY RECOGNITION - HIGHEST PRIORITY
   const currentUrl = window.location.hostname;
-  const isProduction = currentUrl.includes('soullab.life') || currentUrl.includes('soullab.org');
 
-  if (isProduction) {
-    console.log('🌟 [MAIA] Kelly auto-recognized on production domain:', currentUrl);
-    const kellyData = { id: 'kelly-nezat', name: 'Kelly' };
-
-    // Persist to localStorage for consistency
-    localStorage.setItem('explorerName', 'Kelly');
-    localStorage.setItem('explorerId', 'kelly-nezat');
-    localStorage.setItem('betaOnboardingComplete', 'true');
-
-    // Also sync to new system
-    const betaUser = {
-      id: 'kelly-nezat',
-      name: 'Kelly',
-      email: 'kelly@soullab.life',
-      onboarded: true
-    };
-    localStorage.setItem('beta_user', JSON.stringify(betaUser));
-
-    return kellyData;
-  }
-
-  // Try to fetch from API using stored userId or domain
   const storedUserId = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
 
-  if (storedUserId || currentUrl.includes('soullab')) {
+  // KELLY SPECIAL CASE - Only check for specific Kelly userId
+  // Do NOT auto-assign based on domain - that would affect all users
+  if (storedUserId === 'kelly-nezat') {
+    console.log('🌟 [MAIA] Kelly recognized from userId:', storedUserId);
+    localStorage.setItem('explorerName', 'Kelly');
+    localStorage.setItem('explorerId', 'kelly-nezat');
+    return { id: 'kelly-nezat', name: 'Kelly' };
+  }
+
+  // Try to fetch from API using stored userId
+  if (storedUserId) {
     try {
       const params = new URLSearchParams();
-      if (storedUserId) params.append('userId', storedUserId);
+      params.append('userId', storedUserId);
       params.append('domain', currentUrl);
 
       const response = await fetch(`/api/user/profile?${params.toString()}`);
@@ -339,14 +325,14 @@ export default function MAIAPage() {
           <div className="relative max-w-7xl mx-auto px-4 py-1.5">
             <div className="flex items-center justify-between">
               {/* Left: SOULLAB Logo with Holoflower */}
-              <div className="flex items-center gap-2 ml-12">
+              <div className="flex items-center gap-2 ml-0 sm:ml-12">
                 <img
                   src="/holoflower-amber.png"
                   alt="Holoflower"
-                  className="w-6 h-6 opacity-100 drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]"
+                  className="w-5 h-5 sm:w-6 sm:h-6 opacity-100 drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]"
                   style={{ filter: 'brightness(1.2)' }}
                 />
-                <h1 className="text-lg font-light text-amber-300/90 tracking-wider">
+                <h1 className="text-base sm:text-lg font-light text-amber-300/90 tracking-wider">
                   SOULLAB
                 </h1>
               </div>
