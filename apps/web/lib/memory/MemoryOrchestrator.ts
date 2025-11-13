@@ -1,12 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { createClient } from '@supabase/supabase-js';
 import { searchUserFiles } from '../../backend/src/services/IngestionQueue';
-import { OpenAI } from 'openai';
+import { getOpenAIClient } from '../ai/openaiClient';
 
 const prisma = new PrismaClient();
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -187,6 +184,7 @@ export class MemoryOrchestrator {
 
   private async generateQueryEmbedding(text: string): Promise<number[]> {
     try {
+      const openai = getOpenAIClient();
       const response = await openai.embeddings.create({
         model: 'text-embedding-3-small',
         input: text.substring(0, 8000),

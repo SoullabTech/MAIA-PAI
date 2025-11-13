@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { getServerAuth } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from '@/lib/supabaseAdminClient';
 
 interface BulkDeleteRequest {
   fileIds: string[];
@@ -35,6 +29,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
+    const supabase = getSupabaseAdmin();
 
     // Get all files to verify ownership and get storage paths
     const { data: files, error: filesError } = await supabase

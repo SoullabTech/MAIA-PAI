@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerAuth } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
-import { createClient } from '@supabase/supabase-js';
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getSupabaseAdmin } from '@/lib/supabaseAdminClient';
 
 /**
  * GET /api/oracle/files/[fileId]
@@ -29,6 +24,7 @@ export async function GET(
     const userId = session.user.email || "anonymous";
 
     // Fetch file details from Supabase
+    const supabase = getSupabaseAdmin();
     const { data: file, error } = await supabase
       .from('user_files')
       .select('*')
@@ -122,6 +118,7 @@ export async function DELETE(
     const userId = session.user.email || "anonymous";
 
     // First, verify the file belongs to the user
+    const supabase = getSupabaseAdmin();
     const { data: file, error: fetchError } = await supabase
       .from('user_files')
       .select('*')
@@ -228,6 +225,7 @@ export async function PATCH(
     }
 
     // Update file metadata
+    const supabase = getSupabaseAdmin();
     const { data: updatedFile, error: updateError } = await supabase
       .from('user_files')
       .update({

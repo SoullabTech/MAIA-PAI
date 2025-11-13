@@ -19,12 +19,20 @@ export const supabase = (() => {
   }
 
   // 🚫 Security: Refuse service role key in frontend
-  if (!url) {
-    throw new Error("[SUPABASE] Missing NEXT_PUBLIC_SUPABASE_URL");
-  }
+  if (!url || !anonKey) {
+    // During build time, env vars might not be available - return null gracefully
+    if (typeof window === 'undefined' && process.env.NODE_ENV === 'production') {
+      console.warn("[SUPABASE] Missing env vars during build - returning null");
+      return null;
+    }
 
-  if (!anonKey) {
-    throw new Error("[SUPABASE] Missing NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    if (!url) {
+      throw new Error("[SUPABASE] Missing NEXT_PUBLIC_SUPABASE_URL");
+    }
+
+    if (!anonKey) {
+      throw new Error("[SUPABASE] Missing NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    }
   }
 
   // Check if someone accidentally used a service role key

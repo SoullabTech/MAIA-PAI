@@ -116,6 +116,15 @@ export default function MaiaPage() {
                 <span className="hidden sm:inline">Jade</span>
               </a>
 
+              <a
+                href="/ganesha"
+                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
+                title="Ganesha - Community Management"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span className="hidden sm:inline">Ganesha</span>
+              </a>
+
               {entries.length >= 3 && (
                 <button
                   onClick={() => setView('timeline')}

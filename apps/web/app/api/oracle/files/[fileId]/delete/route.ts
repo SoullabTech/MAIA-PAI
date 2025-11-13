@@ -2,16 +2,25 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getServerAuth } from '@/lib/auth';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy initialization to prevent build-time errors
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error('[Oracle FileDelete] Missing Supabase credentials');
+  }
+
+  return createClient(supabaseUrl, serviceRoleKey);
+}
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { fileId: string } }
 ) {
   try {
+    const supabase = getSupabaseAdmin();
+
     // Get user from auth
     const { userId, userEmail } = getServerAuth(request);
     if (!userId) {

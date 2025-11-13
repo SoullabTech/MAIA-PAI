@@ -3,13 +3,9 @@
  * "Have I written about rebirth before?" → finds thematically similar entries
  */
 
-import { OpenAI } from 'openai';
 import { journalStorage, StoredJournalEntry } from '../storage/journal-storage';
 import { mem0, MemoryEntry } from '../memory/mem0';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+import { getOpenAIClient } from '../ai/openaiClient';
 
 export interface SemanticSearchResult {
   entries: Array<{
@@ -153,6 +149,7 @@ export class SemanticSearch {
 
   private async generateQueryEmbedding(text: string): Promise<number[]> {
     try {
+      const openai = getOpenAIClient();
       const response = await openai.embeddings.create({
         model: 'text-embedding-3-small',
         input: text.slice(0, 8000)

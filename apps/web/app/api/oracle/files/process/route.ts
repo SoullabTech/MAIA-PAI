@@ -4,15 +4,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabaseAdminClient';
 import { getOpenAIClient } from '@/lib/openai-client';
 import { parsePDF } from '@/lib/pdf-parse-wrapper';
 import { v4 as uuidv4 } from 'uuid';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 // Optimal chunk size for text-embedding-3-small model
 const CHUNK_SIZE = 600; // tokens (~800 characters)
@@ -29,14 +24,15 @@ export async function POST(request: NextRequest) {
   try {
     const { fileId, userId, mimeType, storagePath }: ProcessingRequest = await request.json();
 
+    const supabase = getSupabaseAdmin();
 
     // Update file status to processing
-    await updateFileStatus(fileId, 'processing', 'Extracting text content...');
+    await updateFileStatus(fileId, 'processing', 'Extracting text content...', supabase);
 
     // 1. Download file from storage
-    const fileContent = await downloadFile(storagePath);
+    const fileContent = await downloadFile(storagePath, supabase);
     if (!fileContent) {
-      await updateFileStatus(fileId, 'error', 'Failed to download file from storage');
+      await updateFileStatus(fileId, 'error', 'Failed to download file from storage', supabase);
       return NextResponse.json({ error: 'Failed to download file' }, { status: 500 });
     }
 
@@ -46,23 +42,23 @@ export async function POST(request: NextRequest) {
       extractedText = await extractText(fileContent, mimeType);
     } catch (error) {
       console.error('Text extraction failed:', error);
-      await updateFileStatus(fileId, 'error', 'Failed to extract text from file');
+      await updateFileStatus(fileId, 'error', 'Failed to extract text from file', supabase);
       return NextResponse.json({ error: 'Text extraction failed' }, { status: 500 });
     }
 
     if (!extractedText.trim()) {
-      await updateFileStatus(fileId, 'error', 'No text content found in file');
+      await updateFileStatus(fileId, 'error', 'No text content found in file', supabase);
       return NextResponse.json({ error: 'No text content found' }, { status: 400 });
     }
 
     // Update status
-    await updateFileStatus(fileId, 'processing', 'Creating memory chunks...');
+    await updateFileStatus(fileId, 'processing', 'Creating memory chunks...', supabase);
 
     // 3. Smart chunking - preserve sentence boundaries
     const chunks = await intelligentChunking(extractedText, fileId);
 
     // Update status
-    await updateFileStatus(fileId, 'processing', 'Generating embeddings...');
+    await updateFileStatus(fileId, 'processing', 'Generating embeddings...', supabase);
 
     // 4. Generate embeddings for each chunk
     const embeddingPromises = chunks.map(async (chunk, index) => {
@@ -91,12 +87,12 @@ export async function POST(request: NextRequest) {
     const validEmbeddings = embeddingResults.filter(r => r !== null);
 
     if (validEmbeddings.length === 0) {
-      await updateFileStatus(fileId, 'error', 'Failed to generate embeddings');
+      await updateFileStatus(fileId, 'error', 'Failed to generate embeddings', supabase);
       return NextResponse.json({ error: 'Failed to generate embeddings' }, { status: 500 });
     }
 
     // Update status
-    await updateFileStatus(fileId, 'processing', 'Storing in memory system...');
+    await updateFileStatus(fileId, 'processing', 'Storing in memory system...', supabase);
 
     // 5. Store embeddings in database
     const { error: embeddingError } = await supabase
@@ -105,7 +101,7 @@ export async function POST(request: NextRequest) {
 
     if (embeddingError) {
       console.error('Failed to store embeddings:', embeddingError);
-      await updateFileStatus(fileId, 'error', 'Failed to store embeddings in memory');
+      await updateFileStatus(fileId, 'error', 'Failed to store embeddings in memory', supabase);
       return NextResponse.json({ error: 'Failed to store embeddings' }, { status: 500 });
     }
 
@@ -148,7 +144,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Download file from Supabase storage
-async function downloadFile(storagePath: string): Promise<Buffer | null> {
+async function downloadFile(storagePath: string, supabase: any): Promise<Buffer | null> {
   try {
     const { data, error } = await supabase.storage
       .from('maya-files')
@@ -260,7 +256,7 @@ async function generateEmbedding(text: string): Promise<number[]> {
 }
 
 // Update file processing status
-async function updateFileStatus(fileId: string, status: string, notes?: string) {
+async function updateFileStatus(fileId: string, status: string, notes: string | undefined, supabase: any) {
   const { error } = await supabase
     .from('user_files')
     .update({

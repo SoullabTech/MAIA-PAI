@@ -1,14 +1,9 @@
 import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabaseAdminClient';
 import { v4 as uuidv4 } from 'uuid';
 import { getServerAuth } from '@/lib/auth';
 // import { fileProcessingQueue } from '@/lib/queues/fileProcessor';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 const SUPPORTED_TYPES = {
   'text/plain': '.txt',
@@ -75,6 +70,7 @@ export async function POST(request: NextRequest) {
     const storagePath = `user-files/${userId}/${fileId}${fileExtension}`;
 
     // Upload to Supabase Storage
+    const supabase = getSupabaseAdmin();
     const fileBuffer = await file.arrayBuffer();
     const { error: uploadError } = await supabase.storage
       .from('maya-files')

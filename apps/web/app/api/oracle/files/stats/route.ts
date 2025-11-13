@@ -1,12 +1,6 @@
-import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { getServerAuth } from '@/lib/auth';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getServerSession } from 'next-auth';
+import { getSupabaseAdmin } from '@/lib/supabaseAdminClient';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,6 +13,7 @@ export async function GET(request: NextRequest) {
     const userId = session.user.email;
 
     // Get file counts by status
+    const supabase = getSupabaseAdmin();
     const { data: files, error: filesError } = await supabase
       .from('user_files')
       .select('status, category')

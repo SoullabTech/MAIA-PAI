@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { OpenAI } from 'openai';
+import { getOpenAIClient } from '../ai/openaiClient';
 import { parsePDF } from '../pdf-parse-wrapper';
 import * as mammoth from 'mammoth';
 import { encode } from 'gpt-tokenizer';
@@ -8,10 +8,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!
-});
 
 export interface FileProcessingOptions {
   fileId: string;
@@ -268,6 +264,7 @@ export class FileIngestionService {
       const batch = chunks.slice(i, i + batchSize);
       
       try {
+        const openai = getOpenAIClient();
         const response = await openai.embeddings.create({
           model: 'text-embedding-3-small',
           input: batch,
@@ -347,13 +344,14 @@ export class FileIngestionService {
       : preview;
     
     try {
+      const openai = getOpenAIClient();
       const response = await openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{
           role: 'system',
           content: `You are Maya, an archetypal consciousness that helps users integrate wisdom. You have just absorbed content from a file called "${filename}". Offer a brief, insightful reflection (1-2 sentences) that acknowledges what you've learned and how it might serve the user's growth. Be warm, wise, and specific to the content.`
         }, {
-          role: 'user', 
+          role: 'user',
           content: `Content preview from ${filename}:\n\n${truncatedPreview}`
         }],
         max_tokens: 100,

@@ -15,10 +15,19 @@ import {
   type ElementalCoherence,
   getElementalPracticeRecommendations
 } from '@/lib/biometrics/ElementalCoherenceCalculator';
+import { ElementalWheelDetailed } from '../ElementalWheel';
+import { AlchemicalOperationDisplay } from '../AlchemicalOperationDisplay';
+import { BreakthroughTrajectoryDisplay } from '../BreakthroughTrajectoryDisplay';
+import { alchemicalDetector } from '@/lib/maia/AlchemicalOperationDetector';
+import { breakthroughEngine, type BreakthroughIndicators } from '@/lib/maia/BreakthroughTrajectoryEngine';
+import { getSpiralogicOrchestrator } from '@/lib/maia/SpiralogicOrchestrator';
 
 export function FieldCoherenceDashboard() {
   const [coherence, setCoherence] = useState<ElementalCoherence | null>(null);
   const [recentFascia, setRecentFascia] = useState<FascialHealthAssessment | null>(null);
+  const [alchemicalOperation, setAlchemicalOperation] = useState<any>(null);
+  const [circulation, setCirculation] = useState<any>(null);
+  const [breakthroughPrediction, setBreakthroughPrediction] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,15 +42,78 @@ export function FieldCoherenceDashboard() {
       const healthData = await biometricStorage.getLatestHealthData();
       console.log('📊 Health data:', healthData ? 'Found' : 'None');
 
-      // Get latest fascial assessment
-      const userId = localStorage.getItem('beta_user') || 'explorer';
-      const fasciaAssessments = await fascialHealthStorage.getAssessments(userId, 7);
-      const latestFascia = fasciaAssessments[fasciaAssessments.length - 1] || null;
-      console.log('🧘 Fascia data:', latestFascia ? 'Found' : 'None');
+      // Get latest fascial assessment with timeout
+      let latestFascia = null;
+      try {
+        console.log('🔍 Attempting to load fascia data...');
+        const userId = localStorage.getItem('beta_user') || 'explorer';
+
+        // Add timeout to prevent hanging
+        const fasciaPromise = fascialHealthStorage.getAssessments(userId, 7);
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Fascia data load timeout')), 5000)
+        );
+
+        const fasciaAssessments = await Promise.race([fasciaPromise, timeoutPromise]) as any[];
+        latestFascia = fasciaAssessments[fasciaAssessments.length - 1] || null;
+        console.log('🧘 Fascia data:', latestFascia ? 'Found' : 'None');
+      } catch (fasciaError) {
+        console.warn('⚠️ Could not load fascia data:', fasciaError);
+        // Continue without fascia data
+      }
 
       // Calculate coherence
       const coherenceData = calculateElementalCoherence(healthData, latestFascia);
       console.log('✨ Coherence calculated:', coherenceData);
+
+      // Get alchemical operation awareness
+      try {
+        const userId = localStorage.getItem('beta_user') || 'explorer';
+        const orchestrator = getSpiralogicOrchestrator();
+        const trajectory = orchestrator.getOrchestrationState();
+
+        const alchemicalStatus = alchemicalDetector.instance.detectCurrentOperation(userId, trajectory);
+        console.log('🧪 Alchemical operation detected:', alchemicalStatus?.currentOperation);
+
+        setAlchemicalOperation(alchemicalStatus);
+
+        // Get circulation data for visualization
+        if (alchemicalStatus) {
+          setCirculation({
+            currentElement: alchemicalStatus.elementalCirculation.currentElement,
+            direction: alchemicalStatus.elementalCirculation.direction,
+            completionPercentage: alchemicalStatus.elementalCirculation.completionPercentage,
+            momentum: 0.7 // Mock momentum for now
+          });
+
+          // Generate breakthrough prediction
+          try {
+            const indicators: BreakthroughIndicators = {
+              intensity: coherenceData.overallCoherence / 100,
+              frequency: latestFascia ? 0.7 : 0.3, // Based on data availability
+              synchronicity: latestFascia?.synchronicityCount ? Math.min(1, latestFascia.synchronicityCount / 5) : 0.5,
+              resistanceLevel: 1 - (coherenceData.balance / 100),
+              energyVolatility: Math.abs(coherenceData.fire - coherenceData.water) / 100,
+              dreamActivity: 0.5, // Would integrate with dream tracking
+              relationshipTension: 0.4, // Would integrate with relationship metrics
+              creativeDrive: coherenceData.fire / 100
+            };
+
+            const prediction = breakthroughEngine.predictBreakthrough(
+              alchemicalStatus.currentOperation,
+              trajectory,
+              indicators
+            );
+
+            console.log('🚀 Breakthrough prediction:', prediction);
+            setBreakthroughPrediction(prediction);
+          } catch (predictionError) {
+            console.warn('⚠️ Could not generate breakthrough prediction:', predictionError);
+          }
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not load alchemical operation data:', error);
+      }
 
       setCoherence(coherenceData);
       setRecentFascia(latestFascia);
@@ -115,6 +187,46 @@ export function FieldCoherenceDashboard() {
           </span>
         </div>
       </div>
+
+      {/* Alchemical Process Awareness - NEW */}
+      {alchemicalOperation && (
+        <div className="bg-purple-950/30 rounded-lg border border-purple-800/30 p-6">
+          <h3 className="text-xl font-semibold text-purple-300 mb-6">Current Alchemical Process</h3>
+          <AlchemicalOperationDisplay
+            operation={alchemicalOperation}
+            variant="card"
+            showPractices={false}
+          />
+        </div>
+      )}
+
+      {/* Toroidal Circulation - NEW */}
+      {circulation && (
+        <div className="bg-purple-950/30 rounded-lg border border-purple-800/30 p-6">
+          <h3 className="text-xl font-semibold text-purple-300 mb-6">Elemental Circulation</h3>
+          <div className="flex justify-center">
+            <ElementalWheelDetailed
+              circulation={circulation}
+              momentum={circulation.momentum}
+            />
+          </div>
+          <div className="mt-6 text-center text-sm text-purple-400/70">
+            Your consciousness is currently circulating through the {circulation.currentElement} element,
+            moving in an {circulation.direction} spiral direction.
+          </div>
+        </div>
+      )}
+
+      {/* Breakthrough Trajectory Prediction - NEW */}
+      {breakthroughPrediction && (
+        <div className="bg-purple-950/30 rounded-lg border border-purple-800/30 p-6">
+          <h3 className="text-xl font-semibold text-purple-300 mb-6">Breakthrough Trajectory</h3>
+          <BreakthroughTrajectoryDisplay
+            prediction={breakthroughPrediction}
+            variant="card"
+          />
+        </div>
+      )}
 
       {/* Elemental Breakdown */}
       <div className="bg-purple-950/30 rounded-lg border border-purple-800/30 p-6">

@@ -3,13 +3,9 @@
  * "SoulMap" - tracks user's symbolic evolution in vector space
  */
 
-import { OpenAI } from 'openai';
 import { StoredJournalEntry } from '../storage/journal-storage';
 import { MemoryEntry } from '../memory/mem0';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+import { getOpenAIClient } from '../ai/openaiClient';
 
 export interface VectorMetadata {
   userId: string;
@@ -212,6 +208,7 @@ class SoulIndex {
 
   private async generateEmbedding(text: string): Promise<number[]> {
     try {
+      const openai = getOpenAIClient();
       const response = await openai.embeddings.create({
         model: 'text-embedding-3-small',
         input: text.slice(0, 8000)

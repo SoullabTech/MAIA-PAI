@@ -1,20 +1,12 @@
-import { getServerSession } from 'next-auth';
 /**
  * File Management API - Delete, reprocess, and manage files
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { getServerAuth } from '@/lib/auth';
+import { getServerSession } from 'next-auth';
+import { getSupabaseAdmin } from '@/lib/supabaseAdminClient';
 // Mark route as dynamic since it uses searchParams or other dynamic features
 export const dynamic = 'force-dynamic';
-
-
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -31,6 +23,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Get file details for cleanup
+    const supabase = getSupabaseAdmin();
     const { data: file, error: fetchError } = await supabase
       .from('user_files')
       .select('id, storage_path')
@@ -120,6 +113,7 @@ export async function POST(request: NextRequest) {
 
 async function reprocessFile(fileId: string, userId: string) {
   // Get file details
+  const supabase = getSupabaseAdmin();
   const { data: file, error: fetchError } = await supabase
     .from('user_files')
     .select('*')
@@ -191,6 +185,7 @@ async function reprocessFile(fileId: string, userId: string) {
 }
 
 async function updateFileMetadata(fileId: string, userId: string, metadata: any) {
+  const supabase = getSupabaseAdmin();
   const { error } = await supabase
     .from('user_files')
     .update({
