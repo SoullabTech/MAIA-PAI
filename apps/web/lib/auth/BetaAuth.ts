@@ -32,3 +32,11 @@ export async function revokeBetaAccess(userId: string): Promise<void> {
   // Stub implementation
   console.log(`Revoked beta access from user: ${userId}`);
 }
+
+// Export a unified auth object for compatibility
+export const betaAuth = {
+  checkBetaAccess,
+  getBetaUser,
+  grantBetaAccess,
+  revokeBetaAccess
+};

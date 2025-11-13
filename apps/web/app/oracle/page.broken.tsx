@@ -12,10 +12,10 @@ import { MaiaWebRTCConversation, MaiaWebRTCConversationRef } from "@/components/
 import { OracleVoicePlayer } from "@/components/voice/OracleVoicePlayer";
 import TranscriptPreview from "@/app/components/TranscriptPreview";
 import { unlockAudio, addAutoUnlockListeners } from "@/lib/audio/audioUnlock";
-import { betaTracker } from "@/lib/analytics/betaTracker";
-import { onboardingTracker } from "@/lib/analytics/onboardingTracker";
-import { voiceFlowAnalytics } from "@/lib/analytics/voiceFlowAnalytics";
-import { Analytics } from "@/lib/analytics/supabaseAnalytics";
+import { betaTracker } from "@/lib/services/betaTracker";
+import { onboardingTracker } from "@/lib/services/onboardingTracker";
+import { voiceFlowAnalytics } from "@/lib/services/voiceFlowAnalytics";
+import { Analytics } from "@/lib/services/supabaseAnalytics";
 import QuickFeedback from "@/components/beta/QuickFeedback";
 import FileUploadTracker from "@/components/beta/FileUploadTracker";
 import MicTorusIndicator from "@/components/voice/MicTorusIndicator";

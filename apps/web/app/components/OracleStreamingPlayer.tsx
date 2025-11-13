@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Analytics } from '@/lib/analytics/supabaseAnalytics';
+import { Analytics } from '@/lib/services/supabaseAnalytics';
 
 interface AudioChunk {
   chunkId: string;

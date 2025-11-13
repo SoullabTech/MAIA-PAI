@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
 import { Mic, MicOff, Loader2 } from "lucide-react";
-import { Analytics } from "../../lib/analytics/supabaseAnalytics";
+import { Analytics } from "../../lib/services/supabaseAnalytics";
 
 interface MicrophoneCaptureProps {
   onTranscript: (text: string) => void;

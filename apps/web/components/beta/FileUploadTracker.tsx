@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Upload, Link, File, Image } from 'lucide-react';
-import { onboardingTracker } from '@/lib/analytics/onboardingTracker';
+import { onboardingTracker } from '@/lib/services/onboardingTracker';
 
 interface FileUploadTrackerProps {
   onFileAnalyzed?: (success: boolean, metadata?: any) => void;

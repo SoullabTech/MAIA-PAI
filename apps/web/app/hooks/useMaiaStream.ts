@@ -2,7 +2,7 @@
 // Optimized streaming hook with phrase-based voice synthesis
 
 import { useEffect, useRef, useState } from "react";
-import { Analytics } from "../../lib/analytics/supabaseAnalytics";
+import { Analytics } from "../../lib/services/supabaseAnalytics";
 
 type StreamOptions = {
   backendUrl: string; // e.g., NEXT_PUBLIC_BACKEND_URL

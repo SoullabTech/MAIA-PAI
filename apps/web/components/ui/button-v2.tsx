@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { motion } from "framer-motion"
-import { useUizardTracking } from "@/components/analytics/uizard-metrics"
+import { useUizardTracking } from "@/components/metrics/uizard-metrics"
 
 // PRESERVE ORIGINAL API - All existing props must work identically
 export interface ButtonPropsV2

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@/lib/supabase'
 import { motion, AnimatePresence } from 'framer-motion'
-import { trackEvent } from '@/lib/analytics/eventTracking'
+import { trackEvent } from '@/lib/services/eventTracking'
 
 interface ExpandedReflectionPanelProps {
   sessionId: string

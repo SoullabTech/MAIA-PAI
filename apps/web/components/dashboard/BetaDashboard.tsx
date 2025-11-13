@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Activity, Users, MessageCircle, Mic, Speaker, AlertTriangle, TrendingUp, Clock } from 'lucide-react';
-import { dashboardService, DashboardData, VoiceFunnel, UserPatterns } from '@/lib/analytics/dashboardService';
+import { dashboardService, DashboardData, VoiceFunnel, UserPatterns } from '@/lib/services/dashboardService';
 
 interface MetricCardProps {
   title: string;
