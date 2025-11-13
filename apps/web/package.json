@@ -48,7 +48,7 @@
     "bcryptjs": "^3.0.2",
     "better-sqlite3": "^12.2.0",
     "bowser": "^2.12.1",
-    "canvas-confetti": "^1.9.3",
+    "canvas-confetti": "^1.9.4",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "critters": "^0.0.23",
