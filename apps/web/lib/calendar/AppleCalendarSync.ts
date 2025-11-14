@@ -4,7 +4,7 @@
  */
 
 // @ts-ignore - ical.js doesn't have proper TypeScript definitions
-import * as ical from 'ical.js';
+import ical from 'ical.js';
 
 export interface CalDAVConfig {
   serverUrl: string; // iCloud: https://caldav.icloud.com

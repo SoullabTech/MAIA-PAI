@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { format, addDays, startOfDay, endOfDay, addMinutes, isBefore, isAfter } from 'date-fns';
 
+export const dynamic = 'force-dynamic';
+
 // This would typically come from your database or calendar service
 interface AvailabilitySettings {
   workingHours: {
