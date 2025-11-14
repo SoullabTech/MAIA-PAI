@@ -6,23 +6,12 @@ import { ErrorOverlay } from "@/components/system/ErrorOverlay";
 import { AudioUnlockBanner } from "@/components/system/AudioUnlockBanner";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import Link from "next/link";
-import IOSFixInitializer from "@/components/system/IOSFixInitializer";
 import { HeaderWrapper } from "@/components/layout/HeaderWrapper";
 import dynamic from 'next/dynamic';
 
-// Dynamically import client-side providers to avoid SSR issues
-const ThemeProvider = dynamic(
-  () => import("@/components/providers/ThemeProvider").then(mod => ({ default: mod.ThemeProvider })),
-  { ssr: false }
-);
-
-const ToastProvider = dynamic(
-  () => import("@/components/system/ToastProvider").then(mod => ({ default: mod.ToastProvider })),
-  { ssr: false }
-);
-
-const SecureAuthProvider = dynamic(
-  () => import("@/components/SecureAuthProvider").then(mod => ({ default: mod.SecureAuthProvider })),
+// Dynamically import all client providers to avoid SSR issues
+const ClientProviders = dynamic(
+  () => import("@/components/ClientProviders").then(mod => ({ default: mod.ClientProviders })),
   {
     ssr: false,
     loading: () => <div className="min-h-screen bg-soul-background animate-pulse" />
@@ -62,23 +51,18 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-soul-background text-soul-textPrimary transition-colors duration-200 overflow-x-hidden`}>
-        <ThemeProvider>
-          <SecureAuthProvider>
-            <IOSFixInitializer />
-            <ToastProvider>
-              {/* Conditional Header */}
-              <HeaderWrapper />
+        <ClientProviders>
+          {/* Conditional Header */}
+          <HeaderWrapper />
 
-              {/* Main Content */}
-              <main className="min-h-[calc(100vh-73px)]">
-                {children}
-              </main>
+          {/* Main Content */}
+          <main className="min-h-[calc(100vh-73px)]">
+            {children}
+          </main>
 
-              <AudioUnlockBanner />
-              <ErrorOverlay />
-            </ToastProvider>
-          </SecureAuthProvider>
-        </ThemeProvider>
+          <AudioUnlockBanner />
+          <ErrorOverlay />
+        </ClientProviders>
       </body>
     </html>
   );
