@@ -162,23 +162,74 @@ export class OptimizedVoiceRecognition {
     }
 
     try {
+      // iPad Safari specific fixes
+      const isIPadSafari = /iPad.*Safari/.test(navigator.userAgent);
+
+      if (isIPadSafari) {
+        this.log('🎯 Applying iPad Safari fixes');
+
+        // Create audio context to ensure proper permission flow on iPad
+        try {
+          const audioContext = new AudioContext();
+          await audioContext.resume();
+          await audioContext.close();
+        } catch (e) {
+          this.log('⚠️ Audio context setup failed', e);
+        }
+
+        // Add delay for iPad Safari permission dialog
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+
       // Request microphone permission
       await navigator.mediaDevices.getUserMedia({ audio: true });
 
+      // Additional delay for iPad Safari after permission granted
+      if (isIPadSafari) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+
       this.recognition = new SpeechRecognition();
-      this.recognition.continuous = true;
-      this.recognition.interimResults = true;
-      this.recognition.lang = 'en-US';
-      this.recognition.maxAlternatives = 1;
+
+      // iPad Safari specific configuration
+      if (isIPadSafari) {
+        this.log('🎯 Configuring for iPad Safari');
+        // Start with single recognition to avoid issues
+        this.recognition.continuous = false;
+        this.recognition.interimResults = false;
+
+        // Enable continuous mode after a brief delay
+        setTimeout(() => {
+          if (this.recognition) {
+            this.recognition.continuous = this.config.continuous ?? true;
+            this.recognition.interimResults = this.config.interimResults ?? true;
+            this.log('🎯 iPad Safari: Enabled continuous mode');
+          }
+        }, 500);
+      } else {
+        this.recognition.continuous = this.config.continuous ?? true;
+        this.recognition.interimResults = this.config.interimResults ?? true;
+      }
+
+      this.recognition.lang = this.config.language || 'en-US';
+      this.recognition.maxAlternatives = this.config.maxAlternatives || 1;
 
       this.setupEventHandlers();
 
       this.log('✅ Recognition initialized');
       return true;
 
-    } catch (error) {
+    } catch (error: any) {
       this.log('❌ Initialization error:', error);
-      this.onError?.('Microphone access denied');
+
+      // Provide more specific error messages for iPad Safari
+      if (error.name === 'NotAllowedError') {
+        this.onError?.('Microphone permission denied. Please allow microphone access in Safari settings.');
+      } else if (error.name === 'NotFoundError') {
+        this.onError?.('No microphone found. Please check your device settings.');
+      } else {
+        this.onError?.('Unable to access microphone. Please try again.');
+      }
       return false;
     }
   }
