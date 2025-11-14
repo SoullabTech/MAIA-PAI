@@ -175,15 +175,13 @@ export default function ConsciousnessVessel({
       style={{
         ...sizeStyles,
         perspective: '1000px',
-        transformStyle: 'preserve-3d'
-      }}
-      initial={{ scale: 1, rotateX: 0, rotateY: 0 }}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      animate={{
+        transformStyle: 'preserve-3d',
         rotateX: isHovered ? rotateX : 0,
         rotateY: isHovered ? rotateY : 0
       }}
+      initial={{ scale: 1 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
       transition={{
         type: "spring",
         stiffness: 400,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent'
-import { journalStorage } from '@/lib/storage/journal-storage'
+import { secureJournalStorage } from '@/lib/storage/secure-journal-storage'
+import { secureAuth } from '@/lib/auth/secure-auth'
 import { ApprenticeMayaTraining, TrainingExchange } from '@/lib/maya/ApprenticeMayaTraining'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { maiaRealtimeMonitor } from '@/lib/monitoring/MaiaRealtimeMonitor'
@@ -164,7 +165,20 @@ export async function POST(req: NextRequest) {
     const styleChangeAck = getStyleChangeAcknowledgment(previousStyle || '', conversationStyle || 'natural');
 
     // Fetch recent journal entries for context
-    const recentEntries = journalStorage.getEntries(requestUserId).slice(0, 5)
+    let recentEntries: any[] = [];
+    try {
+      const authState = secureAuth.getAuthState();
+      if (authState.isAuthenticated && authState.encryptionContext) {
+        if (!secureJournalStorage.isInitialized()) {
+          await secureJournalStorage.initialize(authState.encryptionContext);
+        }
+        recentEntries = (await secureJournalStorage.getEntries(requestUserId, { limit: 5 }));
+      } else {
+        console.log('⚠️ No authentication context for journal access');
+      }
+    } catch (error) {
+      console.warn('Could not fetch journal entries:', error);
+    }
 
     // Build journal context
     let journalContext = ''

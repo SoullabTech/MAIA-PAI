@@ -95,11 +95,97 @@ export async function POST(req: NextRequest) {
 
 /**
  * Handle successful checkout
- * Grant initial access to the user
+ * Handle both subscription and session booking payments
  */
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   console.log('Checkout completed:', session.id);
 
+  // Check if this is a session booking or subscription
+  const isSessionBooking = session.metadata?.type === 'session_booking';
+
+  if (isSessionBooking) {
+    await handleSessionBooking(session);
+  } else {
+    await handleSubscriptionSignup(session);
+  }
+}
+
+/**
+ * Handle session booking payment completion
+ */
+async function handleSessionBooking(session: Stripe.Checkout.Session) {
+  console.log('Session booking completed:', session.id);
+
+  const {
+    sessionType,
+    date,
+    time,
+    duration,
+    clientName,
+    clientEmail,
+    clientPhone,
+    clientNotes,
+    timeSlotId
+  } = session.metadata || {};
+
+  if (!sessionType || !date || !time || !clientEmail) {
+    console.error('Missing required session booking data');
+    return;
+  }
+
+  try {
+    // 1. Create session record in database
+    // TODO: Insert into session_records table
+    console.log('Creating session record:', {
+      sessionType,
+      date,
+      time,
+      duration,
+      clientName,
+      clientEmail,
+      paymentId: session.payment_intent,
+      amount: session.amount_total,
+      status: 'confirmed'
+    });
+
+    // 2. Create Apple Calendar event
+    const startDateTime = new Date(`${date} ${time}`);
+    const endDateTime = new Date(startDateTime.getTime() + parseInt(duration || '60') * 60000);
+
+    const calendarEventResponse = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/calendar/apple`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: `${getSessionTypeName(sessionType)} Session - ${clientName}`,
+        description: `Session with ${clientName}\nEmail: ${clientEmail}\n${clientPhone ? `Phone: ${clientPhone}\n` : ''}${clientNotes ? `Notes: ${clientNotes}` : ''}`,
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
+        location: 'Online Session',
+        attendees: [clientEmail]
+      })
+    });
+
+    if (!calendarEventResponse.ok) {
+      console.error('Failed to create Apple Calendar event');
+    }
+
+    // 3. Send confirmation emails
+    await sendSessionConfirmationEmails(session);
+
+    // 4. Send practitioner notification
+    await notifyPractitionerOfBooking(session);
+
+    console.log('Session booking processed successfully');
+
+  } catch (error) {
+    console.error('Error processing session booking:', error);
+  }
+}
+
+/**
+ * Handle subscription signup (existing functionality)
+ */
+async function handleSubscriptionSignup(session: Stripe.Checkout.Session) {
   const userId = session.metadata?.userId;
   const tier = session.metadata?.tier;
   const customerEmail = session.customer_email;
@@ -260,4 +346,34 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
   // - Payment failed notification
   // - Update payment method link
   // - Grace period explanation
+}
+
+/**
+ * Helper functions for session booking
+ */
+function getSessionTypeName(sessionType: string): string {
+  const names: Record<string, string> = {
+    consultation: 'Initial Consultation',
+    session: 'Spiralogic Session',
+    intensive: 'Breakthrough Intensive',
+  };
+  return names[sessionType] || 'Session';
+}
+
+/**
+ * Send confirmation emails for session booking
+ */
+async function sendSessionConfirmationEmails(session: Stripe.Checkout.Session) {
+  // TODO: Implement with Resend
+  // Send to client and practitioner with calendar invites
+  console.log('Sending session confirmation emails for:', session.id);
+}
+
+/**
+ * Notify practitioner of new booking
+ */
+async function notifyPractitionerOfBooking(session: Stripe.Checkout.Session) {
+  // TODO: Send immediate notification to practitioner
+  // Could be email, SMS, or in-app notification
+  console.log('Notifying practitioner of booking:', session.id);
 }

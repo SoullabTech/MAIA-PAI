@@ -128,6 +128,24 @@ export default function MaiaPage() {
                 <span className="hidden sm:inline">Ganesha</span>
               </a>
 
+              <a
+                href="/maia/insights"
+                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
+                title="Developmental Insights - Track Your Consciousness Evolution"
+              >
+                <TrendingUp className="w-4 h-4" />
+                <span className="hidden sm:inline">Insights</span>
+              </a>
+
+              <a
+                href="/maia/dev-chat"
+                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
+                title="Chat with Development-Aware MAIA"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span className="hidden sm:inline">Dev Chat</span>
+              </a>
+
               {entries.length >= 3 && (
                 <button
                   onClick={() => setView('timeline')}

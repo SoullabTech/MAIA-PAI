@@ -6,40 +6,59 @@ This documentation package covers the complete implementation of MAIA's voice-fi
 
 ## Documentation Index
 
+### 🌟 Start Here
+
+1. **[Complete Member Offerings](./COMPLETE_MEMBER_OFFERINGS.md)** ⭐ **ESSENTIAL READ**
+   - Unified vision of all MAIA capabilities
+   - Member-facing feature guide
+   - Integration map showing how systems work together
+   - Privacy architecture and transparency commitment
+   - Future roadmap (Q1-Q4 2025)
+   - Member journey pathways
+   - Community Library access guide
+
+2. **[System Integration Analysis](./SYSTEM_INTEGRATION_ANALYSIS.md)** 🔬 **FOR DEVELOPERS**
+   - Comparative analysis of all systems
+   - Integration point mapping
+   - Data flow analysis
+   - Feature gap identification
+   - Priority recommendations
+   - Metrics for success
+
 ### Core Systems
 
-1. **[Maya Voice System White Paper](./MAYA_VOICE_SYSTEM_WHITE_PAPER.md)**
+3. **[Maya Voice System White Paper](./MAYA_VOICE_SYSTEM_WHITE_PAPER.md)**
    - Original architecture and design principles
    - Pause/resume commands and natural conversation flow
    - 1.5s silence detection and intelligent nudging
    - Privacy-first architecture
 
-2. **[Sesame Hybrid Implementation](./SESAME_HYBRID_IMPLEMENTATION.md)**
+4. **[Sesame Hybrid Implementation](./SESAME_HYBRID_IMPLEMENTATION.md)**
    - 3-tier TTS fallback (Sesame → OpenAI → Web Speech)
    - 5 elemental voice profiles (Fire, Water, Earth, Air, Aether)
    - Voice cloning and caching strategies
    - Error handling and graceful degradation
 
-3. **[Voice Journaling System](./VOICE_JOURNALING_SYSTEM.md)**
+5. **[Voice Journaling System](./VOICE_JOURNALING_SYSTEM.md)**
    - Session management and lifecycle
    - Real-time transcription and analysis
    - Symbol and archetype extraction
    - Integration with Soulprint database
 
-4. **[Progressive Discovery System](./PROGRESSIVE_DISCOVERY_SYSTEM.md)** ⭐ NEW
+6. **[Progressive Discovery System](./PROGRESSIVE_DISCOVERY_SYSTEM.md)**
    - "Reveal, Don't Overwhelm" principle
    - Milestone-based feature unlocking
    - Celebration animations and haptic feedback
    - Onboarding orchestration
 
-5. **[AI Integration Guide](./AI_INTEGRATION.md)** 🧠 NEW
+7. **[AI Integration Guide](./AI_INTEGRATION.md)** 🧠
    - ClaudeBridge utility for journal analysis
    - Real Claude 3.5 Sonnet vs mock mode
    - Symbol/archetype extraction
    - Soulprint integration and memory system
    - **[Quick Summary](./AI_INTEGRATION_SUMMARY.md)** - What was built and how to use it
 
-6. **[Analytics System](./ANALYTICS_SYSTEM.md)** 📊 NEW
+8. **[Analytics System](./ANALYTICS_SYSTEM.md)** 📊
    - Symbol frequency tracking and visualization
    - Archetype distribution analysis
    - Emotional pattern recognition
@@ -47,13 +66,36 @@ This documentation package covers the complete implementation of MAIA's voice-fi
    - Progressive unlock at 3 entries
    - Desktop and mobile dashboards
 
+### Developmental Insights
+
+9. **[Developmental Insights Dashboard](./features/DEVELOPMENTAL_INSIGHTS.md)** 🧬 **CONSCIOUSNESS TRACKING**
+   - Dual-perspective consciousness evolution tracking
+   - Your Development: Practice tracking, journal sentiment, fascia health, elemental coherence, breakthrough timeline
+   - MAIA Development: Attending quality, dissociation patterns, consciousness shifts, archetype performance
+   - Privacy-first architecture (IndexedDB + Supabase)
+   - Metrics that matter for transformation
+   - Advanced features and future enhancements
+
+10. **[Insights Quick Start](./quickstart/INSIGHTS_QUICKSTART.md)** 🚀
+    - 5-minute onboarding guide
+    - Step-by-step setup walkthrough
+    - Understanding your first metrics
+    - Pro tips for first week
+    - Common questions answered
+
 ### Implementation Details
 
-7. **[Complete System Summary](./COMPLETE_SYSTEM_SUMMARY.md)**
-   - Full architecture overview
-   - Component relationships
-   - Data flow diagrams
-   - API endpoints
+11. **[Complete System Summary](./COMPLETE_SYSTEM_SUMMARY.md)**
+    - Full architecture overview
+    - Component relationships
+    - Data flow diagrams
+    - API endpoints
+
+12. **[Developmental Insights System Architecture](./DEVELOPMENTAL_INSIGHTS_SYSTEM.md)**
+    - Technical implementation details
+    - Data infrastructure and engines
+    - Visualization layer components
+    - AI integration strategy
 
 ## Quick Start
 
