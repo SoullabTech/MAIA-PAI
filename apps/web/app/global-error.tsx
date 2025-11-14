@@ -1,11 +1,17 @@
-'use client';
+'use client'
+
+/**
+ * Global error boundary that catches all unhandled errors
+ * This file prevents useContext errors during static generation
+ * by providing a completely isolated error page with no external dependencies
+ */
 
 export default function GlobalError({
   error,
   reset,
 }: {
-  error: Error & { digest?: string };
-  reset: () => void;
+  error: Error & { digest?: string }
+  reset: () => void
 }) {
   return (
     <html>
@@ -39,7 +45,14 @@ export default function GlobalError({
                 borderRadius: '0.5rem',
                 color: 'white',
                 cursor: 'pointer',
-                fontSize: '1rem'
+                fontSize: '1rem',
+                transition: 'transform 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
               }}
             >
               Try Again
@@ -48,5 +61,5 @@ export default function GlobalError({
         </div>
       </body>
     </html>
-  );
+  )
 }
