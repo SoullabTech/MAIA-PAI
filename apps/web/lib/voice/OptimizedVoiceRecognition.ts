@@ -36,6 +36,8 @@ export class OptimizedVoiceRecognition {
 
   private finalTranscriptRef = '';
   private silenceTimeoutRef: NodeJS.Timeout | null = null;
+  private retryAttempts = 0;
+  private MAX_RETRY_ATTEMPTS = 3;
 
   private LOG_ENABLED = process.env.NODE_ENV === 'development';
   private logCount = 0;
@@ -99,14 +101,31 @@ export class OptimizedVoiceRecognition {
 
       this.isActive = true;
       this.isInitializing = false;
+      this.retryAttempts = 0; // Reset retry counter on successful start
       return true;
 
     } catch (error) {
       this.log('❌ Start listening error:', error);
       this.isInitializing = false;
       this.isActive = false;
-      this.onError?.('Failed to start listening');
-      return false;
+
+      // Retry logic for failed activation
+      if (this.retryAttempts < this.MAX_RETRY_ATTEMPTS) {
+        this.retryAttempts++;
+        this.log(`🔄 Retrying activation (attempt ${this.retryAttempts}/${this.MAX_RETRY_ATTEMPTS})`);
+
+        // Wait before retry with exponential backoff
+        const retryDelay = 1000 * Math.pow(2, this.retryAttempts - 1);
+        setTimeout(() => {
+          this.startListening();
+        }, retryDelay);
+
+        return false;
+      } else {
+        this.callbacks.onError?.('Failed to start voice recognition after multiple attempts. Please refresh the page.');
+        this.retryAttempts = 0; // Reset for next time
+        return false;
+      }
     }
   }
 
@@ -224,11 +243,15 @@ export class OptimizedVoiceRecognition {
 
       // Provide more specific error messages for iPad Safari
       if (error.name === 'NotAllowedError') {
-        this.onError?.('Microphone permission denied. Please allow microphone access in Safari settings.');
+        this.callbacks.onError?.('Microphone permission denied. Please allow microphone access in Safari settings and try again.');
       } else if (error.name === 'NotFoundError') {
-        this.onError?.('No microphone found. Please check your device settings.');
+        this.callbacks.onError?.('No microphone found. Please check your device settings and try again.');
+      } else if (error.name === 'AbortError') {
+        this.callbacks.onError?.('Voice activation was interrupted. Please try again.');
+      } else if (error.message?.includes('getUserMedia')) {
+        this.callbacks.onError?.('Unable to access microphone. Please check permissions and try again.');
       } else {
-        this.onError?.('Unable to access microphone. Please try again.');
+        this.callbacks.onError?.('Voice activation failed. Please refresh the page and try again.');
       }
       return false;
     }
