@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent'
-import { journalStorage } from '@/lib/storage/journal-storage'
+import { secureJournalStorage } from '@/lib/storage/secure-journal-storage'
+import { secureAuth } from '@/lib/auth/secure-auth'
 import { betaAuth } from '@/lib/auth/BetaAuth'
 
 /**
@@ -89,8 +90,25 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    // Verify authentication and get encryption context
+    const authState = secureAuth.getAuthState();
+
     // Fetch recent journal entries for context
-    const recentEntries = journalStorage.getEntries(requestUserId).slice(0, 5)
+    let recentEntries: any[] = [];
+    try {
+      if (authState.isAuthenticated && authState.encryptionContext) {
+        // Initialize secure storage if needed
+        if (!secureJournalStorage.isInitialized()) {
+          await secureJournalStorage.initialize(authState.encryptionContext);
+        }
+        recentEntries = await secureJournalStorage.getEntries(requestUserId, { limit: 5 });
+      } else {
+        console.log('⚠️ No authentication context, skipping journal context');
+      }
+    } catch (journalError) {
+      console.warn('Failed to fetch journal context:', journalError);
+      // Continue without journal context
+    }
 
     // PRIMARY PATH: Try PersonalOracleAgent (Claude with full MAIA intelligence)
     console.log('🔮 Attempting PersonalOracleAgent (primary MAIA path)...')

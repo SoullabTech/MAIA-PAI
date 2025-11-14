@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { obsidianJournalExporter, JournalEntry } from '@/lib/journaling/ObsidianJournalExporter';
-import { journalStorage } from '@/lib/storage/journal-storage';
+import { secureJournalStorage } from '@/lib/storage/secure-journal-storage';
+import { secureAuth } from '@/lib/auth/secure-auth';
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,14 +24,29 @@ export async function POST(req: NextRequest) {
       element
     };
 
-    journalStorage.addEntry({
+    // Verify authentication and initialize secure storage
+    const authState = secureAuth.getAuthState();
+    if (!authState.isAuthenticated || !authState.encryptionContext) {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    if (!secureJournalStorage.isInitialized()) {
+      await secureJournalStorage.initialize(authState.encryptionContext);
+    }
+
+    await secureJournalStorage.addEntry({
       id: journalEntry.id,
       userId: journalEntry.userId,
       mode: journalEntry.mode,
-      entry: journalEntry.entry,
+      content: journalEntry.entry,
       reflection: journalEntry.reflection,
-      timestamp: journalEntry.timestamp.toISOString(),
-      element: journalEntry.element
+      timestamp: journalEntry.timestamp,
+      element: journalEntry.element,
+      wordCount: journalEntry.entry.split(/\s+/).length,
+      isVoice: false
     });
 
     const result = await obsidianJournalExporter.exportJournalEntry(journalEntry);

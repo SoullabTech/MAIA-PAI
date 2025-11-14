@@ -20,55 +20,14 @@ function getStripeClient() {
  */
 export async function POST(req: NextRequest) {
   try {
-    const { tier, billingPeriod, userId, userEmail } = await req.json();
+    const body = await req.json();
 
-    // Validate inputs
-    if (!tier || !billingPeriod) {
-      return NextResponse.json(
-        { error: 'Missing tier or billing period' },
-        { status: 400 }
-      );
+    // Handle session booking vs subscription based on request type
+    if (body.sessionType) {
+      return handleSessionBooking(body);
+    } else {
+      return handleSubscriptionCheckout(body);
     }
-
-    if (!userEmail) {
-      return NextResponse.json(
-        { error: 'User email required for checkout' },
-        { status: 400 }
-      );
-    }
-
-    // Get price ID from environment variables
-    const priceId = getPriceId(tier, billingPeriod);
-
-    if (!priceId) {
-      return NextResponse.json(
-        { error: 'Invalid tier or billing period' },
-        { status: 400 }
-      );
-    }
-
-    // Create Stripe checkout session
-    const stripe = getStripeClient();
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      customer_email: userEmail,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      metadata: {
-        userId: userId || '',
-        tier,
-        billingPeriod,
-      },
-      success_url: `${process.env.NEXT_PUBLIC_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_URL}/pricing`,
-      allow_promotion_codes: true, // Enable founder discount codes
-    });
-
-    return NextResponse.json({ url: session.url });
   } catch (error) {
     console.error('Stripe checkout error:', error);
     return NextResponse.json(
@@ -76,6 +35,118 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+/**
+ * Handle session booking checkout
+ */
+async function handleSessionBooking(body: any) {
+  const { sessionType, timeSlot, clientInfo, amount, successUrl, cancelUrl } = body;
+
+  // Validate inputs
+  if (!sessionType || !timeSlot || !clientInfo || !amount) {
+    return NextResponse.json(
+      { error: 'Missing required session booking data' },
+      { status: 400 }
+    );
+  }
+
+  if (!clientInfo.email) {
+    return NextResponse.json(
+      { error: 'Client email required for booking' },
+      { status: 400 }
+    );
+  }
+
+  const stripe = getStripeClient();
+  const session = await stripe.checkout.sessions.create({
+    mode: 'payment',
+    customer_email: clientInfo.email,
+    line_items: [
+      {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `${getSessionTypeName(sessionType)} Session`,
+            description: `${timeSlot.startTime ? new Date(timeSlot.startTime).toLocaleDateString() : ''} - ${getSessionTypeDescription(sessionType)}`,
+          },
+          unit_amount: amount,
+        },
+        quantity: 1,
+      },
+    ],
+    metadata: {
+      type: 'session_booking',
+      sessionType,
+      date: timeSlot.startTime ? new Date(timeSlot.startTime).toISOString().split('T')[0] : '',
+      time: timeSlot.startTime ? new Date(timeSlot.startTime).toLocaleTimeString() : '',
+      duration: getDurationForSessionType(sessionType).toString(),
+      clientName: clientInfo.name || '',
+      clientEmail: clientInfo.email,
+      clientPhone: clientInfo.phone || '',
+      clientNotes: clientInfo.notes || '',
+      timeSlotId: timeSlot.id || '',
+    },
+    success_url: successUrl || `${process.env.NEXT_PUBLIC_URL}/book/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: cancelUrl || `${process.env.NEXT_PUBLIC_URL}/book`,
+  });
+
+  return NextResponse.json({ url: session.url });
+}
+
+/**
+ * Handle subscription checkout (existing functionality)
+ */
+async function handleSubscriptionCheckout(body: any) {
+  const { tier, billingPeriod, userId, userEmail } = body;
+
+  // Validate inputs
+  if (!tier || !billingPeriod) {
+    return NextResponse.json(
+      { error: 'Missing tier or billing period' },
+      { status: 400 }
+    );
+  }
+
+  if (!userEmail) {
+    return NextResponse.json(
+      { error: 'User email required for checkout' },
+      { status: 400 }
+    );
+  }
+
+  // Get price ID from environment variables
+  const priceId = getPriceId(tier, billingPeriod);
+
+  if (!priceId) {
+    return NextResponse.json(
+      { error: 'Invalid tier or billing period' },
+      { status: 400 }
+    );
+  }
+
+  // Create Stripe checkout session
+  const stripe = getStripeClient();
+  const session = await stripe.checkout.sessions.create({
+    mode: 'subscription',
+    customer_email: userEmail,
+    line_items: [
+      {
+        price: priceId,
+        quantity: 1,
+      },
+    ],
+    metadata: {
+      userId: userId || '',
+      tier,
+      billingPeriod,
+    },
+    success_url: `${process.env.NEXT_PUBLIC_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.NEXT_PUBLIC_URL}/pricing`,
+    allow_promotion_codes: true, // Enable founder discount codes
+  });
+
+  return NextResponse.json({ url: session.url });
 }
 
 /**
@@ -100,4 +171,40 @@ function getPriceId(tier: string, billingPeriod: 'monthly' | 'annual'): string |
   };
 
   return priceMap[tier.toLowerCase()]?.[billingPeriod] || null;
+}
+
+/**
+ * Get session type display name
+ */
+function getSessionTypeName(sessionType: string): string {
+  const names: Record<string, string> = {
+    consultation: 'Initial Consultation',
+    session: 'Spiralogic Session',
+    intensive: 'Breakthrough Intensive',
+  };
+  return names[sessionType] || 'Session';
+}
+
+/**
+ * Get session type description
+ */
+function getSessionTypeDescription(sessionType: string): string {
+  const descriptions: Record<string, string> = {
+    consultation: 'A deep dive into your current life situation and elemental alignment',
+    session: 'A full archetypal exploration using the MAIA oracle system',
+    intensive: 'Extended deep work for major life transitions and breakthrough moments',
+  };
+  return descriptions[sessionType] || 'Spiritual guidance session';
+}
+
+/**
+ * Get session duration in minutes
+ */
+function getDurationForSessionType(sessionType: string): number {
+  const durations: Record<string, number> = {
+    consultation: 90,
+    session: 60,
+    intensive: 120,
+  };
+  return durations[sessionType] || 60;
 }

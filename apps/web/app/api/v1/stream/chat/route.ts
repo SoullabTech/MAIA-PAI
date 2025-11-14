@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent';
-import { journalStorage } from '@/lib/storage/journal-storage';
+import { secureJournalStorage } from '@/lib/storage/secure-journal-storage';
+import { secureAuth } from '@/lib/auth/secure-auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -48,7 +49,19 @@ export async function POST(request: NextRequest) {
             }
           });
 
-          const recentEntries = journalStorage.getEntries(userId).slice(0, 5);
+          // Fetch recent journal entries if user is authenticated
+          let recentEntries: any[] = [];
+          try {
+            const authState = secureAuth.getAuthState();
+            if (authState.isAuthenticated && authState.encryptionContext) {
+              if (!secureJournalStorage.isInitialized()) {
+                await secureJournalStorage.initialize(authState.encryptionContext);
+              }
+              recentEntries = (await secureJournalStorage.getEntries(userId, { limit: 5 }));
+            }
+          } catch (error) {
+            console.warn('Could not fetch journal entries:', error);
+          }
 
           console.log('🌀 Starting streaming chat for:', { userId, messageLength: message.length });
 

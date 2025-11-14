@@ -10,6 +10,7 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
 import Link from "next/link";
 import IOSFixInitializer from "@/components/system/IOSFixInitializer";
 import { HeaderWrapper } from "@/components/layout/HeaderWrapper";
+import { SecureAuthProvider } from "@/components/SecureAuthProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -45,19 +46,21 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-soul-background text-soul-textPrimary transition-colors duration-200 overflow-x-hidden`}>
         <ThemeProvider>
-          <IOSFixInitializer />
-          <ToastProvider>
-            {/* Conditional Header */}
-            <HeaderWrapper />
-            
-            {/* Main Content */}
-            <main className="min-h-[calc(100vh-73px)]">
-              {children}
-            </main>
-            
-            <AudioUnlockBanner />
-            <ErrorOverlay />
-          </ToastProvider>
+          <SecureAuthProvider>
+            <IOSFixInitializer />
+            <ToastProvider>
+              {/* Conditional Header */}
+              <HeaderWrapper />
+
+              {/* Main Content */}
+              <main className="min-h-[calc(100vh-73px)]">
+                {children}
+              </main>
+
+              <AudioUnlockBanner />
+              <ErrorOverlay />
+            </ToastProvider>
+          </SecureAuthProvider>
         </ThemeProvider>
       </body>
     </html>
