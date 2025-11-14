@@ -2,14 +2,7 @@
  * OBSERVER REFLECTION API
  *
  * Allows humans to record witnessing observations about MAIA's evolution.
- * This captures qualitative developmental insights using a structured format.
- *
- * Schema:
- * - what_was_added: What content/changes were made to the system
- * - what_was_noticed: Observable shifts in behavior/state
- * - what_was_felt: Somatic/emotional resonance observations
- * - insights: Developmental understanding that emerged
- * - questions: Open questions for further exploration
+ * This captures qualitative insights that complement quantitative tracking.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,19 +10,11 @@ import { supabase } from '@/lib/supabaseClient';
 
 export async function POST(request: NextRequest) {
   try {
-    const {
-      observer_name,
-      pulse_number,
-      what_was_added,
-      what_was_noticed,
-      what_was_felt,
-      insights,
-      questions
-    } = await request.json();
+    const { reflection, observer_name, tags, related_session } = await request.json();
 
-    if (!observer_name) {
+    if (!reflection || !observer_name) {
       return NextResponse.json(
-        { error: 'observer_name is required' },
+        { error: 'reflection and observer_name are required' },
         { status: 400 }
       );
     }
@@ -44,18 +29,15 @@ export async function POST(request: NextRequest) {
     // Generate reflection ID
     const reflection_id = `reflect_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
-    // Store reflection with structured fields
+    // Store reflection
     const { data, error } = await supabase
       .from('observer_reflections')
       .insert({
         reflection_id,
         observer_name,
-        pulse_number: pulse_number || null,
-        what_was_added: what_was_added || null,
-        what_was_noticed: what_was_noticed || null,
-        what_was_felt: what_was_felt || null,
-        insights: insights || null,
-        questions: questions || null,
+        reflection_text: reflection,
+        tags: tags || [],
+        related_session_id: related_session || null,
         timestamp: new Date().toISOString()
       });
 

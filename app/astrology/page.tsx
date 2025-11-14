@@ -14,8 +14,8 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Sparkles, Flame, Droplet, Sprout, Wind, Sparkle, Target, TrendingUp, BookOpen } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Sparkles, Flame, Droplet, Sprout, Wind, Sparkle, Target, TrendingUp, BookOpen, Settings } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ElementalBalanceDisplay } from '@/components/astrology/ElementalBalanceDisplay';
 import { SacredHouseWheel } from '@/components/astrology/SacredHouseWheel';
 import { getZodiacArchetype } from '@/lib/astrology/archetypeLibrary';
@@ -24,6 +24,8 @@ import { BirthDataForm } from '@/components/astrology/BirthDataForm';
 import { MiniHoloflower } from '@/components/holoflower/MiniHoloflower';
 import { Mission } from '@/lib/story/types';
 import ConsciousnessFieldWithTorus from '@/components/consciousness/ConsciousnessFieldWithTorus';
+import { useMissions } from '@/lib/hooks/useMissions';
+import MissionManager from '@/components/missions/MissionManager';
 
 interface BirthChartData {
   sun: { sign: string; degree: number; house: number };
@@ -174,6 +176,10 @@ export default function AstrologyPage() {
 
   // Arrakis aesthetic - always desert night (the twin moons never set)
   const [isDayMode, setIsDayMode] = useState(false);
+
+  // Mission management
+  const { missions, loading: missionsLoading } = useMissions();
+  const [showMissionManager, setShowMissionManager] = useState(false);
 
   // Demo/Tutorial mode - toggle between user's chart and Kelly's example chart
   const [showExampleChart, setShowExampleChart] = useState(false);
@@ -622,7 +628,7 @@ export default function AstrologyPage() {
               {/* Start Your Missions CTA */}
               {!showExampleChart && (
                 <button
-                  onClick={() => window.location.href = '/maia'}
+                  onClick={() => setShowMissionManager(true)}
                   className="px-4 py-2 rounded-lg text-xs font-serif tracking-wide transition-all"
                   style={{
                     background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
@@ -714,7 +720,7 @@ export default function AstrologyPage() {
                       aspects={chartData.aspects}
                       isDayMode={isDayMode}
                       showAspects={true}
-                      missions={KELLY_MISSIONS}  // Always show missions with progress rings
+                      missions={missions}  // Show user's actual missions with progress rings
                     />
                 </div>
               </ConsciousnessFieldWithTorus>
@@ -736,10 +742,43 @@ export default function AstrologyPage() {
             <p className={`text-sm ${isDayMode ? 'text-stone-600' : 'text-stone-400'} italic`}>
               Creative manifestations pulsing on your consciousness field map
             </p>
+            <button
+              onClick={() => setShowMissionManager(true)}
+              className={`mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                isDayMode
+                  ? 'bg-stone-200 text-stone-800 hover:bg-stone-300'
+                  : 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30'
+              }`}
+            >
+              <Settings className="w-4 h-4" />
+              Manage Missions
+            </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {KELLY_MISSIONS.map((mission) => {
+            {missionsLoading ? (
+              <div className="col-span-2 text-center py-8">
+                <div className="w-8 h-8 border-2 border-amber-300/30 border-t-amber-300 rounded-full animate-spin mx-auto" />
+              </div>
+            ) : missions.length === 0 ? (
+              <div className="col-span-2 text-center py-8">
+                <Target className="w-12 h-12 text-amber-300/50 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-amber-300 mb-2">
+                  No missions yet
+                </h3>
+                <p className="text-stone-400 mb-4">
+                  Create your first mission to start tracking your consciousness journey
+                </p>
+                <button
+                  onClick={() => setShowMissionManager(true)}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500/20 text-amber-300 rounded-full font-medium hover:bg-amber-500/30 transition-all"
+                >
+                  <Target className="w-4 h-4" />
+                  Create Your First Mission
+                </button>
+              </div>
+            ) : (
+              missions.map((mission) => {
               const statusColors = {
                 emerging: 'border-blue-500/40 bg-blue-500/10',
                 active: 'border-green-500/40 bg-green-500/10',
@@ -845,7 +884,8 @@ export default function AstrologyPage() {
                   )}
                 </motion.div>
               );
-            })}
+            })
+            )}
           </div>
 
           {/* Legend */}
@@ -1908,6 +1948,18 @@ export default function AstrologyPage() {
           </motion.div>
         </motion.div>
       )}
+
+      {/* Mission Manager Modal */}
+      <AnimatePresence>
+        {showMissionManager && (
+          <MissionManager
+            onClose={() => setShowMissionManager(false)}
+            onMissionUpdate={() => {
+              // Missions will automatically update via the useMissions hook
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

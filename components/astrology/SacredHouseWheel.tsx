@@ -272,26 +272,95 @@ export function SacredHouseWheel({
     };
   };
 
-  // Calculate planet position (more precise, based on degree within house)
-  // Uses Spiralogic spiral order for positioning
+  // Calculate planet positions with collision detection and spacing
+  // Uses Spiralogic spiral order for positioning with anti-overlap intelligence
+  const getPlanetPositions = (planetsArray: Planet[]) => {
+    if (!planetsArray || planetsArray.length === 0) return {};
+
+    const minAngularSeparation = 4; // Minimum degrees between planets for clickability
+    const positions: { [key: string]: { x: number; y: number; adjustedAngle: number } } = {};
+    const sortedPlanets = [...planetsArray].sort((a, b) => {
+      // Sort by house first, then by degree within house
+      const aSpiral = spiralogicOrder.indexOf(a.house);
+      const bSpiral = spiralogicOrder.indexOf(b.house);
+      if (aSpiral !== bSpiral) return aSpiral - bSpiral;
+      return (a.degree % 30) - (b.degree % 30);
+    });
+
+    const occupiedAngles: number[] = [];
+
+    sortedPlanets.forEach((planet) => {
+      // Find house position in spiral order
+      const spiralIndex = spiralogicOrder.indexOf(planet.house);
+      const houseStartAngle = spiralIndex * 30;
+      const idealAngle = (houseStartAngle + (planet.degree % 30)) - 90;
+
+      // Check for collisions with already placed planets
+      let adjustedAngle = idealAngle;
+      let attempts = 0;
+      const maxAttempts = 30; // Prevent infinite loops
+
+      while (attempts < maxAttempts) {
+        const collision = occupiedAngles.some(occupiedAngle => {
+          const angleDiff = Math.abs(adjustedAngle - occupiedAngle);
+          const normalizedDiff = Math.min(angleDiff, 360 - angleDiff);
+          return normalizedDiff < minAngularSeparation;
+        });
+
+        if (!collision) {
+          break;
+        }
+
+        // If collision detected, try adjusting the angle
+        // First try moving forward, then backward in small increments
+        const offset = Math.ceil(attempts / 2) * minAngularSeparation * (attempts % 2 === 0 ? 1 : -1);
+        adjustedAngle = idealAngle + offset;
+
+        // Keep angle within house boundaries (30-degree segments)
+        const houseMin = houseStartAngle - 90;
+        const houseMax = houseMin + 30;
+        if (adjustedAngle < houseMin) {
+          adjustedAngle = houseMin + minAngularSeparation;
+        } else if (adjustedAngle > houseMax) {
+          adjustedAngle = houseMax - minAngularSeparation;
+        }
+
+        attempts++;
+      }
+
+      occupiedAngles.push(adjustedAngle);
+
+      const angle = adjustedAngle * (Math.PI / 180);
+      const radius = 120;
+
+      positions[planet.name] = {
+        x: 200 + radius * Math.cos(angle),
+        y: 200 + radius * Math.sin(angle),
+        adjustedAngle
+      };
+    });
+
+    return positions;
+  };
+
+  // Legacy function for backward compatibility - now uses the new collision detection
   const getPlanetPosition = (planet: Planet) => {
-    // Find house position in spiral order
-    const spiralIndex = spiralogicOrder.indexOf(planet.house);
-    const houseStartAngle = spiralIndex * 30;
-    const planetAngle = (houseStartAngle + (planet.degree % 30)) - 90;
-    const angle = planetAngle * (Math.PI / 180);
-    const radius = 120;
-    return {
-      x: 200 + radius * Math.cos(angle),
-      y: 200 + radius * Math.sin(angle),
+    const positions = getPlanetPositions(planets || []);
+    return positions[planet.name] || {
+      x: 200,
+      y: 200,
+      adjustedAngle: 0
     };
   };
+
+  // Calculate all planet positions with collision detection for optimal performance
+  const planetPositions = getPlanetPositions(planets);
 
   // FIELD DYNAMICS 4: Draw aspect as field current through Aether center
   // All currents converge on the unmoved witness (nothing orbits, everything passes through)
   const drawAspectLine = (planet1: Planet, planet2: Planet, aspect: Aspect) => {
-    const pos1 = getPlanetPosition(planet1);
-    const pos2 = getPlanetPosition(planet2);
+    const pos1 = planetPositions[planet1.name] || { x: 200, y: 200 };
+    const pos2 = planetPositions[planet2.name] || { x: 200, y: 200 };
     const center = { x: 200, y: 200 }; // Aether node
 
     // Create Bezier path through center
@@ -1446,7 +1515,7 @@ export function SacredHouseWheel({
 
         {/* Planets as constellation points - static (not rotating) */}
         {planets.map((planet) => {
-          const pos = getPlanetPosition(planet);
+          const pos = planetPositions[planet.name] || { x: 200, y: 200 };
           const element = houseElements[planet.house as keyof typeof houseElements] as keyof typeof elementalColors;
           const color = elementalColors[element][isDayMode ? 'day' : 'night'];
           const isHovered = hoveredPlanet?.name === planet.name;
