@@ -4,13 +4,30 @@ import "./globals.css";
 import "../styles/ios-fallbacks.css";
 import { ErrorOverlay } from "@/components/system/ErrorOverlay";
 import { AudioUnlockBanner } from "@/components/system/AudioUnlockBanner";
-import { ToastProvider } from "@/components/system/ToastProvider";
-import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import Link from "next/link";
 import IOSFixInitializer from "@/components/system/IOSFixInitializer";
 import { HeaderWrapper } from "@/components/layout/HeaderWrapper";
-import { SecureAuthProvider } from "@/components/SecureAuthProvider";
+import dynamic from 'next/dynamic';
+
+// Dynamically import client-side providers to avoid SSR issues
+const ThemeProvider = dynamic(
+  () => import("@/components/providers/ThemeProvider").then(mod => ({ default: mod.ThemeProvider })),
+  { ssr: false }
+);
+
+const ToastProvider = dynamic(
+  () => import("@/components/system/ToastProvider").then(mod => ({ default: mod.ToastProvider })),
+  { ssr: false }
+);
+
+const SecureAuthProvider = dynamic(
+  () => import("@/components/SecureAuthProvider").then(mod => ({ default: mod.SecureAuthProvider })),
+  {
+    ssr: false,
+    loading: () => <div className="min-h-screen bg-soul-background animate-pulse" />
+  }
+);
 
 const inter = Inter({ subsets: ["latin"] });
 
