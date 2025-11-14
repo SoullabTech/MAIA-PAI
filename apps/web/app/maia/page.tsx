@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BookOpen, Clock, Search, HelpCircle, Sparkles, Mic, BarChart3, Settings as SettingsIcon, Gem, Beaker, Library, Users } from 'lucide-react';
+import { BookOpen, Clock, Search, HelpCircle, Sparkles, Mic, BarChart3, Settings as SettingsIcon, Gem, Beaker, Library, Users, Target } from 'lucide-react';
 import { Copy } from '@/lib/copy/MaiaCopy';
 import { useMaiaStore } from '@/lib/maia/state';
 import { mockEntries } from '@/lib/maia/mockData';
@@ -18,6 +18,7 @@ import Analytics from '@/components/maia/Analytics';
 import Settings from '@/components/maia/Settings';
 import SoulprintSnapshot from '@/components/maia/SoulprintSnapshot';
 import SoulprintDashboard from '@/components/maia/SoulprintDashboard';
+import MissionManager from '@/components/missions/MissionManager';
 
 export default function MaiaPage() {
   const { currentView, setView, entries, selectedMode, isVoiceMode } = useMaiaStore();
@@ -29,6 +30,7 @@ export default function MaiaPage() {
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showSoulprint, setShowSoulprint] = useState(false);
   const [showLabTools, setShowLabTools] = useState(false);
+  const [showMissionManager, setShowMissionManager] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [isDevMode, setIsDevMode] = useState(false);
   const [useVoiceMode, setUseVoiceMode] = useState(false);
@@ -402,6 +404,23 @@ export default function MaiaPage() {
                 </div>
 
                 <div className="space-y-4">
+                  {/* Mission Management */}
+                  <button
+                    onClick={() => {
+                      setShowMissionManager(true);
+                      setShowLabTools(false);
+                    }}
+                    className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl hover:from-amber-100 hover:to-orange-100 dark:hover:from-amber-900/30 dark:hover:to-orange-900/30 transition-all border border-amber-200 dark:border-amber-800"
+                  >
+                    <div className="flex-shrink-0 w-12 h-12 bg-amber-500 rounded-lg flex items-center justify-center">
+                      <Target className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="text-left">
+                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Mission Management</h3>
+                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Create & track your consciousness missions</p>
+                    </div>
+                  </button>
+
                   {/* Oracle Library */}
                   <button
                     onClick={() => {
@@ -470,6 +489,37 @@ export default function MaiaPage() {
                     </div>
                   </button>
                 </div>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {showMissionManager && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+              onClick={() => setShowMissionManager(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white dark:bg-neutral-800 rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+                    Mission Management
+                  </h2>
+                  <button
+                    onClick={() => setShowMissionManager(false)}
+                    className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <MissionManager />
               </motion.div>
             </motion.div>
           )}
