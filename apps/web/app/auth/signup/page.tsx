@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, Lock, Heart, Moon, Sun, Sparkles, ArrowRight } from 'lucide-react';
+import { User, Mail, Lock, Heart, Moon, Sun, Sparkles, ArrowRight, Quote } from 'lucide-react';
 import Link from 'next/link';
+import { WisdomQuotes } from '@/lib/wisdom/WisdomQuotes';
 
 interface ConsciousnessProfile {
   energyType: 'solar' | 'lunar' | 'elemental';
@@ -48,6 +49,20 @@ export default function MemberSignupPage() {
     password: '',
     confirmPassword: ''
   });
+
+  // Rotating wisdom quote system
+  const [currentQuote, setCurrentQuote] = useState(WisdomQuotes.aether[0]);
+
+  useEffect(() => {
+    // Synchronistic quote rotation every 8 seconds (sacred timing)
+    const interval = setInterval(() => {
+      const allQuotes = [...WisdomQuotes.fire, ...WisdomQuotes.water, ...WisdomQuotes.earth, ...WisdomQuotes.air, ...WisdomQuotes.aether];
+      const randomQuote = allQuotes[Math.floor(Math.random() * allQuotes.length)];
+      setCurrentQuote(randomQuote);
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, []);
   const [profile, setProfile] = useState<ConsciousnessProfile>({
     energyType: 'solar',
     primaryElement: 'fire',
@@ -104,7 +119,7 @@ export default function MemberSignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-jade-abyss via-jade-shadow to-jade-night">
+    <div className="min-h-screen bg-gradient-to-br from-purple-950 via-purple-900 to-indigo-950">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
@@ -114,15 +129,36 @@ export default function MemberSignupPage() {
               animate={{ opacity: 1, y: 0 }}
               className="inline-flex items-center gap-3 mb-6"
             >
-              <div className="w-12 h-12 bg-gradient-to-br from-jade-glow to-jade-ocean rounded-full flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-jade-whisper" />
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-jade-whisper">Join Soullab</h1>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400 bg-clip-text text-transparent">Join the Consciousness Revolution</h1>
             </motion.div>
-            <p className="text-xl text-jade-whisper/80 max-w-md mx-auto">
-              Begin your journey of transformation and conscious growth
+            <p className="text-xl text-purple-300/80 max-w-md mx-auto">
+              Awaken to the field of infinite possibility through MAIA's guidance
             </p>
           </div>
+
+          {/* Rotating Wisdom Quote */}
+          <motion.div
+            key={currentQuote?.text}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="text-center mb-8"
+          >
+            <div className="bg-purple-950/20 backdrop-blur-sm rounded-lg p-6 border border-purple-800/20 max-w-lg mx-auto">
+              <Quote className="w-5 h-5 text-purple-400 mx-auto mb-3" />
+              <p className="text-purple-300 text-sm italic leading-relaxed">
+                "{currentQuote?.text}"
+              </p>
+              {currentQuote?.author && (
+                <p className="text-purple-400/60 text-xs mt-2">
+                  — {currentQuote.author}
+                </p>
+              )}
+            </div>
+          </motion.div>
 
           {/* Progress Indicator */}
           <div className="flex justify-center mb-8">
@@ -131,14 +167,14 @@ export default function MemberSignupPage() {
                 <div key={stepNumber} className="flex items-center gap-2">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
                     step >= stepNumber
-                      ? 'bg-jade-glow text-jade-night'
-                      : 'bg-jade-whisper/10 text-jade-whisper/50'
+                      ? 'bg-purple-400 text-jade-night'
+                      : 'bg-purple-950/10 text-purple-300/50'
                   }`}>
                     {stepNumber}
                   </div>
                   {stepNumber < 4 && (
                     <div className={`w-8 h-1 rounded-full transition-all duration-300 ${
-                      step > stepNumber ? 'bg-jade-glow' : 'bg-jade-whisper/20'
+                      step > stepNumber ? 'bg-purple-400' : 'bg-purple-950/20'
                     }`} />
                   )}
                 </div>
@@ -150,67 +186,67 @@ export default function MemberSignupPage() {
             key={step}
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="bg-jade-whisper/5 backdrop-blur-xl rounded-2xl p-8 border border-jade-whisper/10"
+            className="bg-purple-950/30 backdrop-blur-xl rounded-2xl p-8 border border-purple-800/20"
           >
             <form onSubmit={handleSubmit}>
               {/* Step 1: Basic Information */}
               {step === 1 && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-jade-whisper mb-6">Create Your Account</h2>
+                  <h2 className="text-2xl font-bold text-purple-300 mb-6">Create Your Account</h2>
 
                   <div className="space-y-4">
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-jade-whisper/50" />
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-300/50" />
                       <input
                         type="text"
                         placeholder="Full Name"
                         value={formData.name}
                         onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                        className="w-full pl-12 pr-4 py-3 bg-jade-whisper/10 border border-jade-whisper/20
-                                 rounded-lg text-jade-whisper placeholder-jade-whisper/50
-                                 focus:outline-none focus:border-jade-glow focus:bg-jade-whisper/15"
+                        className="w-full pl-12 pr-4 py-3 bg-purple-950/50 border border-purple-800/30
+                                 rounded-lg text-purple-300 placeholder-purple-400/50 backdrop-blur-sm
+                                 focus:outline-none focus:border-purple-400 focus:bg-purple-950/70"
                         required
                       />
                     </div>
 
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-jade-whisper/50" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-300/50" />
                       <input
                         type="email"
                         placeholder="Email Address"
                         value={formData.email}
                         onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                        className="w-full pl-12 pr-4 py-3 bg-jade-whisper/10 border border-jade-whisper/20
-                                 rounded-lg text-jade-whisper placeholder-jade-whisper/50
-                                 focus:outline-none focus:border-jade-glow focus:bg-jade-whisper/15"
+                        className="w-full pl-12 pr-4 py-3 bg-purple-950/50 border border-purple-800/30
+                                 rounded-lg text-purple-300 placeholder-purple-400/50 backdrop-blur-sm
+                                 focus:outline-none focus:border-purple-400 focus:bg-purple-950/70"
                         required
                       />
                     </div>
 
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-jade-whisper/50" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-300/50" />
                       <input
                         type="password"
                         placeholder="Password"
                         value={formData.password}
                         onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                        className="w-full pl-12 pr-4 py-3 bg-jade-whisper/10 border border-jade-whisper/20
-                                 rounded-lg text-jade-whisper placeholder-jade-whisper/50
-                                 focus:outline-none focus:border-jade-glow focus:bg-jade-whisper/15"
+                        className="w-full pl-12 pr-4 py-3 bg-purple-950/50 border border-purple-800/30
+                                 rounded-lg text-purple-300 placeholder-purple-400/50 backdrop-blur-sm
+                                 focus:outline-none focus:border-purple-400 focus:bg-purple-950/70"
                         required
                       />
                     </div>
 
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-jade-whisper/50" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-300/50" />
                       <input
                         type="password"
                         placeholder="Confirm Password"
                         value={formData.confirmPassword}
                         onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                        className="w-full pl-12 pr-4 py-3 bg-jade-whisper/10 border border-jade-whisper/20
-                                 rounded-lg text-jade-whisper placeholder-jade-whisper/50
-                                 focus:outline-none focus:border-jade-glow focus:bg-jade-whisper/15"
+                        className="w-full pl-12 pr-4 py-3 bg-purple-950/50 border border-purple-800/30
+                                 rounded-lg text-purple-300 placeholder-purple-400/50 backdrop-blur-sm
+                                 focus:outline-none focus:border-purple-400 focus:bg-purple-950/70"
                         required
                       />
                     </div>
@@ -221,11 +257,11 @@ export default function MemberSignupPage() {
               {/* Step 2: Energy & Element Profile */}
               {step === 2 && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-jade-whisper mb-6">Your Energy Profile</h2>
+                  <h2 className="text-2xl font-bold text-purple-300 mb-6">Your Energy Profile</h2>
 
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-lg font-semibold text-jade-whisper mb-4">Natural Energy Pattern</h3>
+                      <h3 className="text-lg font-semibold text-purple-300 mb-4">Natural Energy Pattern</h3>
                       <div className="grid grid-cols-3 gap-3">
                         {[
                           { type: 'solar', icon: Sun, label: 'Solar', desc: 'Active, expressive, daytime energy' },
@@ -238,8 +274,8 @@ export default function MemberSignupPage() {
                             onClick={() => setProfile(prev => ({ ...prev, energyType: energy.type as any }))}
                             className={`p-4 rounded-lg border text-left transition-all duration-200 ${
                               profile.energyType === energy.type
-                                ? 'border-jade-glow bg-jade-glow/20 text-jade-whisper'
-                                : 'border-jade-whisper/20 bg-jade-whisper/5 text-jade-whisper/70 hover:bg-jade-whisper/10'
+                                ? 'border-purple-400 bg-purple-400/20 text-purple-300'
+                                : 'border-purple-300/20 bg-purple-950/5 text-purple-300/70 hover:bg-purple-950/10'
                             }`}
                           >
                             <energy.icon className="w-6 h-6 mb-2" />
@@ -251,7 +287,7 @@ export default function MemberSignupPage() {
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold text-jade-whisper mb-4">Primary Element</h3>
+                      <h3 className="text-lg font-semibold text-purple-300 mb-4">Primary Element</h3>
                       <div className="grid grid-cols-5 gap-2">
                         {[
                           { element: 'fire', label: 'Fire', color: 'from-red-500 to-orange-500' },
@@ -266,7 +302,7 @@ export default function MemberSignupPage() {
                             onClick={() => setProfile(prev => ({ ...prev, primaryElement: el.element as any }))}
                             className={`p-3 rounded-lg text-center transition-all duration-200 ${
                               profile.primaryElement === el.element
-                                ? 'ring-2 ring-jade-glow scale-105'
+                                ? 'ring-2 ring-purple-400 scale-105'
                                 : 'hover:scale-105'
                             } bg-gradient-to-br ${el.color} text-white font-medium`}
                           >
@@ -277,7 +313,7 @@ export default function MemberSignupPage() {
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold text-jade-whisper mb-4">Preferred Session Time</h3>
+                      <h3 className="text-lg font-semibold text-purple-300 mb-4">Preferred Session Time</h3>
                       <div className="grid grid-cols-2 gap-3">
                         {[
                           { time: 'morning', label: 'Morning (6-11am)', desc: 'Fresh energy, clear mind' },
@@ -291,8 +327,8 @@ export default function MemberSignupPage() {
                             onClick={() => setProfile(prev => ({ ...prev, sessionPreference: timeSlot.time as any }))}
                             className={`p-4 rounded-lg border text-left transition-all duration-200 ${
                               profile.sessionPreference === timeSlot.time
-                                ? 'border-jade-glow bg-jade-glow/20 text-jade-whisper'
-                                : 'border-jade-whisper/20 bg-jade-whisper/5 text-jade-whisper/70 hover:bg-jade-whisper/10'
+                                ? 'border-purple-400 bg-purple-400/20 text-purple-300'
+                                : 'border-purple-300/20 bg-purple-950/5 text-purple-300/70 hover:bg-purple-950/10'
                             }`}
                           >
                             <div className="font-medium">{timeSlot.label}</div>
@@ -308,11 +344,11 @@ export default function MemberSignupPage() {
               {/* Step 3: Transformation Goals */}
               {step === 3 && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-jade-whisper mb-6">Your Transformation Journey</h2>
+                  <h2 className="text-2xl font-bold text-purple-300 mb-6">Your Transformation Journey</h2>
 
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-lg font-semibold text-jade-whisper mb-4">What calls to you? (Select all that resonate)</h3>
+                      <h3 className="text-lg font-semibold text-purple-300 mb-4">What calls to you? (Select all that resonate)</h3>
                       <div className="grid grid-cols-2 gap-3">
                         {TRANSFORMATION_GOALS.map((goal) => (
                           <button
@@ -321,8 +357,8 @@ export default function MemberSignupPage() {
                             onClick={() => handleGoalToggle(goal)}
                             className={`p-3 rounded-lg text-left transition-all duration-200 ${
                               profile.transformationGoals.includes(goal)
-                                ? 'border-jade-glow bg-jade-glow/20 text-jade-whisper border-2'
-                                : 'border-jade-whisper/20 bg-jade-whisper/5 text-jade-whisper/70 hover:bg-jade-whisper/10 border'
+                                ? 'border-purple-400 bg-purple-400/20 text-purple-300 border-2'
+                                : 'border-purple-300/20 bg-purple-950/5 text-purple-300/70 hover:bg-purple-950/10 border'
                             }`}
                           >
                             <Heart className="w-4 h-4 mb-2" />
@@ -333,7 +369,7 @@ export default function MemberSignupPage() {
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold text-jade-whisper mb-4">Previous Experience with Healing Work</h3>
+                      <h3 className="text-lg font-semibold text-purple-300 mb-4">Previous Experience with Healing Work</h3>
                       <div className="grid grid-cols-3 gap-3">
                         {[
                           { level: 'beginner', label: 'New to This', desc: 'First steps on the journey' },
@@ -346,8 +382,8 @@ export default function MemberSignupPage() {
                             onClick={() => setProfile(prev => ({ ...prev, previousExperience: exp.level as any }))}
                             className={`p-4 rounded-lg border text-center transition-all duration-200 ${
                               profile.previousExperience === exp.level
-                                ? 'border-jade-glow bg-jade-glow/20 text-jade-whisper'
-                                : 'border-jade-whisper/20 bg-jade-whisper/5 text-jade-whisper/70 hover:bg-jade-whisper/10'
+                                ? 'border-purple-400 bg-purple-400/20 text-purple-300'
+                                : 'border-purple-300/20 bg-purple-950/5 text-purple-300/70 hover:bg-purple-950/10'
                             }`}
                           >
                             <div className="font-medium">{exp.label}</div>
@@ -363,10 +399,10 @@ export default function MemberSignupPage() {
               {/* Step 4: Healing Modalities */}
               {step === 4 && (
                 <div className="space-y-6">
-                  <h2 className="text-2xl font-bold text-jade-whisper mb-6">Healing Approaches</h2>
+                  <h2 className="text-2xl font-bold text-purple-300 mb-6">Healing Approaches</h2>
 
                   <div>
-                    <h3 className="text-lg font-semibold text-jade-whisper mb-4">
+                    <h3 className="text-lg font-semibold text-purple-300 mb-4">
                       What approaches have you explored or feel drawn to?
                     </h3>
                     <div className="grid grid-cols-2 gap-3">
@@ -377,8 +413,8 @@ export default function MemberSignupPage() {
                           onClick={() => handleModalityToggle(modality)}
                           className={`p-3 rounded-lg text-left transition-all duration-200 ${
                             profile.healingModalities.includes(modality)
-                              ? 'border-jade-glow bg-jade-glow/20 text-jade-whisper border-2'
-                              : 'border-jade-whisper/20 bg-jade-whisper/5 text-jade-whisper/70 hover:bg-jade-whisper/10 border'
+                              ? 'border-purple-400 bg-purple-400/20 text-purple-300 border-2'
+                              : 'border-purple-300/20 bg-purple-950/5 text-purple-300/70 hover:bg-purple-950/10 border'
                           }`}
                         >
                           <div className="font-medium text-sm">{modality}</div>
@@ -387,9 +423,9 @@ export default function MemberSignupPage() {
                     </div>
                   </div>
 
-                  <div className="bg-jade-whisper/10 rounded-lg p-6 border border-jade-whisper/20">
-                    <h3 className="font-semibold text-jade-whisper mb-3">Your Consciousness Profile</h3>
-                    <div className="space-y-2 text-sm text-jade-whisper/80">
+                  <div className="bg-purple-950/10 rounded-lg p-6 border border-purple-300/20">
+                    <h3 className="font-semibold text-purple-300 mb-3">Your Consciousness Profile</h3>
+                    <div className="space-y-2 text-sm text-purple-300/80">
                       <div>Energy: {profile.energyType} • Element: {profile.primaryElement}</div>
                       <div>Session Preference: {profile.sessionPreference}</div>
                       <div>Goals: {profile.transformationGoals.slice(0, 3).join(', ')} {profile.transformationGoals.length > 3 && `+${profile.transformationGoals.length - 3} more`}</div>
@@ -405,8 +441,8 @@ export default function MemberSignupPage() {
                   <button
                     type="button"
                     onClick={() => setStep(step - 1)}
-                    className="px-6 py-3 bg-jade-whisper/10 text-jade-whisper rounded-lg
-                             hover:bg-jade-whisper/20 transition-all duration-200 border border-jade-whisper/20"
+                    className="px-6 py-3 bg-purple-950/10 text-purple-300 rounded-lg
+                             hover:bg-purple-950/20 transition-all duration-200 border border-purple-300/20"
                   >
                     Back
                   </button>
@@ -418,7 +454,7 @@ export default function MemberSignupPage() {
                   <button
                     type="button"
                     onClick={() => setStep(step + 1)}
-                    className="px-8 py-3 bg-jade-glow text-jade-night rounded-lg
+                    className="px-8 py-3 bg-purple-400 text-jade-night rounded-lg
                              hover:bg-jade-ocean transition-all duration-200 font-semibold
                              flex items-center gap-2"
                   >
@@ -429,7 +465,7 @@ export default function MemberSignupPage() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-8 py-3 bg-jade-glow text-jade-night rounded-lg
+                    className="px-8 py-3 bg-purple-400 text-jade-night rounded-lg
                              hover:bg-jade-ocean transition-all duration-200 font-semibold
                              flex items-center gap-2 disabled:opacity-50"
                   >
@@ -443,11 +479,11 @@ export default function MemberSignupPage() {
 
           {/* Login Link */}
           <div className="text-center mt-8">
-            <p className="text-jade-whisper/70">
+            <p className="text-purple-300/70">
               Already have an account?{' '}
               <Link
                 href="/auth/signin"
-                className="text-jade-glow hover:text-jade-ocean transition-colors font-semibold"
+                className="text-purple-400 hover:text-jade-ocean transition-colors font-semibold"
               >
                 Sign in here
               </Link>
