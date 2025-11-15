@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { detectTimezone } from '@/lib/astrology/timezoneDetection';
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 /**
  * Geocoding API Route
  *

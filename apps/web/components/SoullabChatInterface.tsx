@@ -32,12 +32,12 @@ interface JournalEntry {
   processed: boolean;
 }
 
-export function SoullabChatInterface({ 
-  userId, 
-  userName = 'Friend',
+export function SoullabChatInterface({
+  userId,
+  userName: propUserName = 'Friend',
   onboardingPrefs = { tone: 0.5, style: 'prose' }
-}: { 
-  userId: string; 
+}: {
+  userId: string;
   userName?: string;
   onboardingPrefs?: { tone: number; style: 'prose' | 'poetic' | 'auto' };
 }) {
@@ -48,6 +48,7 @@ export function SoullabChatInterface({
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [journalInput, setJournalInput] = useState('');
   const [journalTitle, setJournalTitle] = useState('');
+  const [userName, setUserName] = useState<string>(propUserName);
   const [uploadQueue, setUploadQueue] = useState<File[]>([]);
   const [showDebugPanel, setShowDebugPanel] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState('en-US');
