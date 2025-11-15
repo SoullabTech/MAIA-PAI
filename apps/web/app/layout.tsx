@@ -14,26 +14,22 @@ export const fetchCache = 'force-no-store';
 const ClientProviders = dynamicImport(
   () => import("@/components/ClientProviders").then(mod => ({ default: mod.ClientProviders })),
   {
-    ssr: false,
     loading: () => <div className="min-h-screen bg-soul-background animate-pulse" />
   }
 );
 
 // Dynamically import header to prevent SSR issues
 const DynamicHeaderWrapper = dynamicImport(
-  () => import("@/components/layout/HeaderWrapper").then(mod => ({ default: mod.HeaderWrapper })),
-  { ssr: false }
+  () => import("@/components/layout/HeaderWrapper").then(mod => ({ default: mod.HeaderWrapper }))
 );
 
 // Dynamically import system components to prevent SSR issues
 const DynamicAudioUnlockBanner = dynamicImport(
-  () => import("@/components/system/AudioUnlockBanner").then(mod => ({ default: mod.AudioUnlockBanner })),
-  { ssr: false }
+  () => import("@/components/system/AudioUnlockBanner").then(mod => ({ default: mod.AudioUnlockBanner }))
 );
 
 const DynamicErrorOverlay = dynamicImport(
-  () => import("@/components/system/ErrorOverlay").then(mod => ({ default: mod.ErrorOverlay })),
-  { ssr: false }
+  () => import("@/components/system/ErrorOverlay").then(mod => ({ default: mod.ErrorOverlay }))
 );
 
 const inter = Inter({ subsets: ["latin"] });
