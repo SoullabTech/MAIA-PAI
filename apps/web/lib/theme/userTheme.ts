@@ -1,4 +1,4 @@
-import { createClientComponentClient } from '@/lib/supabase'
+import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient'
 
 export type ThemePreference = 'light' | 'dark' | 'system'
 
@@ -7,7 +7,7 @@ export type ThemePreference = 'light' | 'dark' | 'system'
  */
 export async function getUserTheme(userId: string): Promise<ThemePreference> {
   try {
-    const supabase = createClientComponentClient()
+    const supabase = getBrowserSupabaseClient()
     const { data, error } = await supabase
       .from('profiles')
       .select('theme_preference')
@@ -31,7 +31,7 @@ export async function getUserTheme(userId: string): Promise<ThemePreference> {
  */
 export async function saveUserTheme(userId: string, theme: ThemePreference): Promise<boolean> {
   try {
-    const supabase = createClientComponentClient()
+    const supabase = getBrowserSupabaseClient()
     const { error } = await supabase
       .from('profiles')
       .update({ theme_preference: theme })

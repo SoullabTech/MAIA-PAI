@@ -4,13 +4,13 @@ import { useTheme } from 'next-themes';
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { createClientComponentClient } from '@/lib/supabase';
+import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient';
 
 export default function ThemeToggleWithAnalytics() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [previousTheme, setPreviousTheme] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
+  const supabase = getBrowserSupabaseClient();
 
   // Prevent hydration mismatch
   useEffect(() => {
