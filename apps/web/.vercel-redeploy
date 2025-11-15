@@ -1,4 +1,4 @@
-Force redeploy trigger - CLEAN SLATE
-Timestamp: Fri Nov 15 11:23:00 EST 2025
-Commit: 83af2b26 - Pre-styled-jsx state
-Status: FORCING CLEAN REDEPLOY
+Force redeploy trigger - FIXED BUILD
+Timestamp: Fri Nov 15 11:30:00 EST 2025
+Commit: 2002a14e - Removed broken oracle-local route
+Status: FIXED LOCAL PATH IMPORT ERROR
