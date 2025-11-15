@@ -1,9 +1,6 @@
 'use client'
 
 import { useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertTriangle, RefreshCw } from 'lucide-react'
 
 export default function Error({
   error,
@@ -17,48 +14,109 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-amber-900/20 to-slate-900 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-background/80 backdrop-blur-xl border-red-500/20">
-        <CardHeader className="text-center">
-          <div className="mx-auto w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center mb-4">
-            <AlertTriangle className="w-6 h-6 text-red-400" />
-          </div>
-          <CardTitle className="text-xl font-semibold">Something went wrong</CardTitle>
-        </CardHeader>
-        <CardContent className="text-center space-y-4">
-          <p className="text-sm text-muted-foreground">
-            We encountered an unexpected error. This has been logged and our team will investigate.
-          </p>
-          
-          {process.env.NODE_ENV === 'development' && (
-            <details className="text-left">
-              <summary className="cursor-pointer text-xs text-red-400 hover:text-red-300">
-                Error Details (Development)
-              </summary>
-              <pre className="mt-2 p-2 bg-red-900/20 rounded text-xs text-red-200 overflow-auto">
-                {error.message}
-              </pre>
-            </details>
-          )}
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #1e293b 0%, #451a03 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '1rem',
+      color: 'white',
+      fontFamily: 'system-ui, -apple-system, sans-serif'
+    }}>
+      <div style={{
+        textAlign: 'center',
+        maxWidth: '400px',
+        background: 'rgba(0, 0, 0, 0.5)',
+        borderRadius: '12px',
+        padding: '2rem',
+        border: '1px solid rgba(239, 68, 68, 0.2)'
+      }}>
+        <div style={{
+          width: '48px',
+          height: '48px',
+          background: 'rgba(239, 68, 68, 0.2)',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto 1rem',
+          fontSize: '24px'
+        }}>
+          ⚠️
+        </div>
+        <h1 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#f59e0b' }}>
+          Something went wrong
+        </h1>
+        <p style={{ marginBottom: '2rem', opacity: 0.8 }}>
+          We encountered an unexpected error. This has been logged and our team will investigate.
+        </p>
 
-          <div className="flex flex-col sm:flex-row gap-2 justify-center">
-            <Button 
-              onClick={reset}
-              className="bg-gradient-to-r from-amber-600 to-orange-500 hover:from-amber-700 hover:to-orange-600"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Try Again
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => window.location.href = '/'}
-              className="border-amber-500/20 hover:bg-amber-500/10"
-            >
-              Go Home
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        {process.env.NODE_ENV === 'development' && error && (
+          <details style={{ marginBottom: '2rem', textAlign: 'left' }}>
+            <summary style={{ cursor: 'pointer', fontSize: '0.75rem', color: '#fca5a5' }}>
+              Error Details (Development)
+            </summary>
+            <pre style={{
+              marginTop: '0.5rem',
+              padding: '0.5rem',
+              background: 'rgba(127, 29, 29, 0.2)',
+              borderRadius: '4px',
+              fontSize: '0.75rem',
+              color: '#fecaca',
+              overflow: 'auto'
+            }}>
+              {error.message}
+            </pre>
+          </details>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <button
+            onClick={reset}
+            style={{
+              padding: '0.75rem 1.5rem',
+              background: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)',
+              border: 'none',
+              borderRadius: '0.5rem',
+              color: 'white',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              fontWeight: 'medium',
+              transition: 'transform 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)'
+            }}
+          >
+            🔄 Try Again
+          </button>
+          <button
+            onClick={() => window.location.href = '/'}
+            style={{
+              padding: '0.75rem 1.5rem',
+              background: 'transparent',
+              border: '1px solid rgba(249, 115, 22, 0.3)',
+              borderRadius: '0.5rem',
+              color: '#f59e0b',
+              cursor: 'pointer',
+              fontSize: '1rem',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(249, 115, 22, 0.1)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent'
+            }}
+          >
+            🏠 Go Home
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
