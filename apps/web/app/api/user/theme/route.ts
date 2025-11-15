@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSupabaseClient } from '@/lib/supabaseServerClient';
 
+export const runtime = 'nodejs'; // Force Node runtime for Supabase
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const { theme, previous, timestamp } = await request.json();

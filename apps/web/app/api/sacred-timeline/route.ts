@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSupabaseClient } from "../../../lib/supabaseServerClient";
-// Mark route as dynamic since it uses searchParams or other dynamic features
+
+export const runtime = 'nodejs'; // Force Node runtime for Supabase
 export const dynamic = 'force-dynamic';
 
 

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSupabaseClient } from "../../../lib/supabaseServerClient";
 import { getSoulprintForUser, getSymbolicInsights, exportSoulprint, soulprintMemory } from "@/lib/memory/soulprint";
-// Mark route as dynamic since it uses searchParams or other dynamic features
+
+export const runtime = 'nodejs'; // Force Node runtime for Supabase
 export const dynamic = 'force-dynamic';
 
 
