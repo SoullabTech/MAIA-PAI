@@ -4,6 +4,10 @@ import "./globals.css";
 import "../styles/ios-fallbacks.css";
 import { ClientLayout } from "@/components/ClientLayout";
 
+// NUCLEAR: Disable static generation globally to fix useContext SSR errors
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {

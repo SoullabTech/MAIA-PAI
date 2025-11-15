@@ -7,13 +7,7 @@ import IOSFixInitializer from "@/components/system/IOSFixInitializer";
 import { ToastProvider } from "@/components/system/ToastProvider";
 import { ErrorOverlay } from "@/components/system/ErrorOverlay";
 import { AudioUnlockBanner } from "@/components/system/AudioUnlockBanner";
-import dynamic from "next/dynamic";
-
-// Dynamically import components that use Supabase client with ssr: false
-const HeaderWrapper = dynamic(() => import("@/components/layout/HeaderWrapper").then(mod => ({ default: mod.HeaderWrapper })), {
-  ssr: false,
-  loading: () => <div className="h-[73px] bg-soul-background" />
-});
+import { HeaderWrapper } from "@/components/layout/HeaderWrapper";
 
 interface ClientLayoutProps {
   children: ReactNode;

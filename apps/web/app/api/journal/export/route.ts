@@ -1,7 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { obsidianJournalExporter, JournalEntry } from '@/lib/journaling/ObsidianJournalExporter';
-import { secureJournalStorage } from '@/lib/storage/secure-journal-storage';
-import { secureAuth } from '@/lib/auth/secure-auth';
+
+// Build-time guard to prevent client-side imports in server routes
+if (typeof window !== 'undefined') {
+  throw new Error('This is a server-side route');
+}
+
+// Dynamic imports to prevent build-time issues with client-side dependencies
+const getJournalModules = async () => {
+  const [
+    { obsidianJournalExporter },
+    { secureJournalStorage },
+    { secureAuth }
+  ] = await Promise.all([
+    import('@/lib/journaling/ObsidianJournalExporter'),
+    import('@/lib/storage/secure-journal-storage'),
+    import('@/lib/auth/secure-auth')
+  ]);
+
+  return { obsidianJournalExporter, secureJournalStorage, secureAuth };
+};
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,7 +31,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const journalEntry: JournalEntry = {
+    // Get modules dynamically to avoid build issues
+    const { obsidianJournalExporter, secureJournalStorage, secureAuth } = await getJournalModules();
+
+    const journalEntry = {
       id: `journal_${Date.now()}`,
       userId: userId || 'beta-user',
       mode,

@@ -1,7 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent';
-import { secureJournalStorage } from '@/lib/storage/secure-journal-storage';
-import { secureAuth } from '@/lib/auth/secure-auth';
+
+// Build-time guard to prevent client-side imports in server routes
+if (typeof window !== 'undefined') {
+  throw new Error('This is a server-side route');
+}
+
+// Dynamic imports to prevent build-time issues with client-side dependencies
+const getStreamChatModules = async () => {
+  const [
+    { PersonalOracleAgent },
+    { secureJournalStorage },
+    { secureAuth }
+  ] = await Promise.all([
+    import('@/lib/agents/PersonalOracleAgent'),
+    import('@/lib/storage/secure-journal-storage'),
+    import('@/lib/auth/secure-auth')
+  ]);
+
+  return { PersonalOracleAgent, secureJournalStorage, secureAuth };
+};
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -40,6 +57,9 @@ export async function POST(request: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
+          // Get modules dynamically to avoid build issues
+          const { PersonalOracleAgent, secureJournalStorage, secureAuth } = await getStreamChatModules();
+
           sendSSE(controller, {
             type: 'metadata',
             metadata: {

@@ -1,12 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent'
-import { secureJournalStorage } from '@/lib/storage/secure-journal-storage'
-import { secureAuth } from '@/lib/auth/secure-auth'
-import { ApprenticeMayaTraining, TrainingExchange } from '@/lib/maya/ApprenticeMayaTraining'
-import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { maiaRealtimeMonitor } from '@/lib/monitoring/MaiaRealtimeMonitor'
-import { maiaMonitoring } from '@/lib/beta/MaiaMonitoring'
-import { betaAuth } from '@/lib/auth/BetaAuth'
+
+// Build-time guard to prevent client-side imports in server routes
+if (typeof window !== 'undefined') {
+  throw new Error('This is a server-side route');
+}
+
+// Dynamic imports to prevent build-time issues with client-side dependencies
+const getMayaChatModules = async () => {
+  const [
+    { PersonalOracleAgent },
+    { secureJournalStorage },
+    { secureAuth },
+    { ApprenticeMayaTraining },
+    { createServerSupabaseClient },
+    { maiaRealtimeMonitor },
+    { maiaMonitoring },
+    { betaAuth }
+  ] = await Promise.all([
+    import('@/lib/agents/PersonalOracleAgent'),
+    import('@/lib/storage/secure-journal-storage'),
+    import('@/lib/auth/secure-auth'),
+    import('@/lib/maya/ApprenticeMayaTraining'),
+    import('@/lib/supabase/server'),
+    import('@/lib/monitoring/MaiaRealtimeMonitor'),
+    import('@/lib/beta/MaiaMonitoring'),
+    import('@/lib/auth/BetaAuth')
+  ]);
+
+  return {
+    PersonalOracleAgent,
+    secureJournalStorage,
+    secureAuth,
+    ApprenticeMayaTraining,
+    createServerSupabaseClient,
+    maiaRealtimeMonitor,
+    maiaMonitoring,
+    betaAuth
+  };
+};
 
 // Conversation style-specific prompt modifiers
 function getStyleModifier(style: string): string {
@@ -131,6 +162,18 @@ export async function POST(req: NextRequest) {
 
     // Accept either 'message' or 'content' field
     const userText = (message || content || '').trim()
+
+    // Get modules dynamically to avoid build issues
+    const {
+      PersonalOracleAgent,
+      secureJournalStorage,
+      secureAuth,
+      ApprenticeMayaTraining,
+      createServerSupabaseClient,
+      maiaRealtimeMonitor,
+      maiaMonitoring,
+      betaAuth
+    } = await getMayaChatModules();
 
     // 🔐 BETA AUTHENTICATION
     let requestUserId: string;

@@ -1,6 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { secureJournalStorage } from '@/lib/storage/secure-journal-storage';
-import { secureAuth } from '@/lib/auth/secure-auth';
+
+// Build-time guard to prevent client-side imports in server routes
+if (typeof window !== 'undefined') {
+  throw new Error('This is a server-side route');
+}
+
+// Dynamic imports to prevent build-time issues with client-side dependencies
+const getJournalModules = async () => {
+  const [
+    { secureJournalStorage },
+    { secureAuth }
+  ] = await Promise.all([
+    import('@/lib/storage/secure-journal-storage'),
+    import('@/lib/auth/secure-auth')
+  ]);
+
+  return { secureJournalStorage, secureAuth };
+};
+
 // Mark route as dynamic since it uses searchParams or other dynamic features
 export const dynamic = 'force-dynamic';
 
@@ -14,6 +31,9 @@ export async function GET(req: NextRequest) {
     const symbol = searchParams.get('symbol');
     const archetype = searchParams.get('archetype');
     const emotion = searchParams.get('emotion');
+
+    // Get modules dynamically to avoid build issues
+    const { secureJournalStorage, secureAuth } = await getJournalModules();
 
     // Verify authentication and get encryption context
     const authState = secureAuth.getAuthState();
