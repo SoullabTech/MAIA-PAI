@@ -1,0 +1,26 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next",
+      "config": {
+        "zeroConfig": true,
+        "buildCommand": "npm run build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "status": 404,
+      "dest": "/not-found.html"
+    }
+  ],
+  "functions": {
+    "app/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "framework": "nextjs",
+  "buildCommand": "npm install && npm run build"
+}
