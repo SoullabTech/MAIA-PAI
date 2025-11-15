@@ -1,12 +1,13 @@
-Force redeploy trigger - NUCLEAR CACHE CLEAR
-Timestamp: Fri Nov 15 16:50:00 EST 2025
-Commit: FORCING FRESH INSTALL IN VERCEL
-Status: CACHE CLEARING DEPLOYMENT IN PROGRESS
+Force redeploy trigger - ROOT PACKAGE.JSON FIXED
+Timestamp: Fri Nov 15 16:55:00 EST 2025
+Commit: ROOT CAUSE IDENTIFIED AND FIXED
+Status: VERCEL WAS READING WRONG PACKAGE.JSON
 
-Aggressive cache clearing applied:
-- Removed package-lock.json to force fresh resolution
-- Updated vercel.json with aggressive cache clearing commands
-- Forcing Next.js 14.2.32 installation without cache
-- This MUST resolve the 15.5.6 vs 14.2.32 version conflict
+THE SMOKING GUN:
+- Root /package.json had "next": "^15.5.6"
+- apps/web/package.json had "next": "14.2.32"
+- Vercel reads ROOT package.json first!!!
+- Fixed root package.json to use "next": "14.2.32"
 
-Final attempt to end deployment nightmare.
+This was THE issue causing the persistent 15.5.6 usage.
+NOW Vercel should finally use Next.js 14.2.32 correctly.
