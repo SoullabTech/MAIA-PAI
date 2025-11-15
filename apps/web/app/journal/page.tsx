@@ -1,9 +1,11 @@
-import JournalingPortal from '@/components/journaling/JournalingPortal';
+'use client';
 
-export const metadata = {
-  title: 'Sacred Journaling with MAIA | Spiralogic Oracle',
-  description: 'Interactive journaling with symbolic reflection, archetypal awareness, and emotional intelligence.'
-};
+import dynamic from 'next/dynamic';
+
+const JournalingPortal = dynamic(() => import('@/components/journaling/JournalingPortal'), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center min-h-screen">Loading...</div>
+});
 
 export default function JournalPage() {
   return <JournalingPortal />;
