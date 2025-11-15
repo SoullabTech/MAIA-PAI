@@ -169,6 +169,48 @@ class UsageTracker {
       topEndpoints
     };
   }
+
+  // Admin methods for usage summary - implemented as stubs for now
+  async getUserSummary(userId: string, days: number = 7): Promise<any> {
+    console.log(`[USAGE] Getting summary for user ${userId} (${days} days)`);
+
+    // Return stub data - this should be implemented with actual database queries
+    return {
+      userId,
+      period: `${days} days`,
+      totalRequests: 0,
+      totalCost: '$0.00',
+      dailyBreakdown: [],
+      quotaStatus: 'ok'
+    };
+  }
+
+  async getSystemSummary(days: number = 7): Promise<any> {
+    console.log(`[USAGE] Getting system summary (${days} days)`);
+
+    // Return stub data - this should be implemented with actual database queries
+    return {
+      period: `${days} days`,
+      totalUsers: 0,
+      totalRequests: 0,
+      totalCost: '$0.00',
+      activeUsers: 0,
+      topEndpoints: []
+    };
+  }
+
+  async checkQuota(userId: string): Promise<any> {
+    console.log(`[USAGE] Checking quota for user ${userId}`);
+
+    // Return stub data - this should be implemented with actual database queries
+    return {
+      quota: 100,
+      used: 0,
+      remaining: 100,
+      allowed: true,
+      reason: 'Within limits'
+    };
+  }
 }
 
 export const usageTracker = new UsageTracker();

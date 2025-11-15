@@ -11,6 +11,8 @@ import { usageTracker } from '@/lib/middleware/usage-tracker';
 export const dynamic = 'force-dynamic';
 // Use Node.js runtime instead of Edge Runtime for Supabase compatibility
 export const runtime = 'nodejs';
+// Disable any caching/prerender
+export const revalidate = 0;
 
 
 
