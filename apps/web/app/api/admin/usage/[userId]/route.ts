@@ -9,6 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { usageTracker } from '@/lib/middleware/usage-tracker';
 // Mark route as dynamic since it uses searchParams or other dynamic features
 export const dynamic = 'force-dynamic';
+// Use Node.js runtime instead of Edge Runtime for Supabase compatibility
+export const runtime = 'nodejs';
 
 
 
