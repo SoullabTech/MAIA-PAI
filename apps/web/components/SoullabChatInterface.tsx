@@ -66,6 +66,79 @@ export function SoullabChatInterface({
 
   const { sendMessage, isLoading, error, oracleState: liveOracleState, lastMessage, clearError } = useSoullabOracle();
 
+  // Enhanced user name resolution
+  useEffect(() => {
+    async function resolveUserName() {
+      try {
+        // If prop userName was provided and it's not default, use it
+        if (propUserName && propUserName !== 'Friend') {
+          setUserName(propUserName);
+          return;
+        }
+
+        // Try to get from auth context first
+        const authData = localStorage.getItem('auth');
+        if (authData) {
+          const parsed = JSON.parse(authData);
+          if (parsed.user?.profile?.name) {
+            setUserName(parsed.user.profile.name);
+            return;
+          }
+        }
+
+        // Check for beta code verification
+        const betaCode = localStorage.getItem('betaCode');
+        if (betaCode) {
+          const { verifyBetaCode } = await import('@/lib/auth/BetaAuth');
+          const verification = await verifyBetaCode(betaCode);
+          if (verification.valid && verification.name) {
+            setUserName(verification.name);
+            console.log('🎯 Resolved userName from beta code verification:', verification.name);
+            return;
+          }
+        }
+
+        // Check for beta user data
+        const betaUser = localStorage.getItem('beta_user');
+        if (betaUser) {
+          const parsed = JSON.parse(betaUser);
+          if (parsed.name) {
+            setUserName(parsed.name);
+            console.log('🎯 Resolved userName from beta user data:', parsed.name);
+            return;
+          }
+        }
+
+        // Check for email in auth and try to extract name
+        if (authData) {
+          const parsed = JSON.parse(authData);
+          if (parsed.user?.email) {
+            const email = parsed.user.email;
+            // Extract name from email (before @)
+            const nameFromEmail = email.split('@')[0]
+              .replace(/[._]/g, ' ')
+              .split(' ')
+              .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ');
+            if (nameFromEmail && nameFromEmail !== 'user') {
+              setUserName(nameFromEmail);
+              console.log('🎯 Resolved userName from email:', nameFromEmail);
+              return;
+            }
+          }
+        }
+
+        console.log('🎯 Using default userName: Friend');
+        setUserName('Friend');
+      } catch (error) {
+        console.warn('Failed to resolve user name:', error);
+        setUserName('Friend');
+      }
+    }
+
+    resolveUserName();
+  }, [propUserName, userId]);
+
   // Handle retroactive journaling
   const handleRetroJournal = async (messageId: string, content: string) => {
     try {
