@@ -1,4 +1,12 @@
-Force redeploy trigger - FIXED BUILD
-Timestamp: Fri Nov 15 11:30:00 EST 2025
-Commit: 2002a14e - Removed broken oracle-local route
-Status: FIXED LOCAL PATH IMPORT ERROR
+Force redeploy trigger - NUCLEAR CACHE CLEAR
+Timestamp: Fri Nov 15 16:50:00 EST 2025
+Commit: FORCING FRESH INSTALL IN VERCEL
+Status: CACHE CLEARING DEPLOYMENT IN PROGRESS
+
+Aggressive cache clearing applied:
+- Removed package-lock.json to force fresh resolution
+- Updated vercel.json with aggressive cache clearing commands
+- Forcing Next.js 14.2.32 installation without cache
+- This MUST resolve the 15.5.6 vs 14.2.32 version conflict
+
+Final attempt to end deployment nightmare.

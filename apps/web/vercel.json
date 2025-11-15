@@ -1,26 +1,15 @@
 {
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/next",
-      "config": {
-        "zeroConfig": true,
-        "buildCommand": "npm run build"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "status": 404,
-      "dest": "/not-found.html"
-    }
-  ],
+  "framework": "nextjs",
+  "buildCommand": "rm -rf node_modules && npm cache clean --force && npm install --no-package-lock && npm run build",
+  "installCommand": "rm -rf node_modules .next && npm cache clean --force && npm install --no-package-lock",
   "functions": {
-    "app/**/*.js": {
+    "app/**/*.ts": {
+      "maxDuration": 60,
+      "runtime": "nodejs18.x"
+    },
+    "app/api/**/*.ts": {
+      "maxDuration": 60,
       "runtime": "nodejs18.x"
     }
-  },
-  "framework": "nextjs",
-  "buildCommand": "npm install && npm run build"
+  }
 }
