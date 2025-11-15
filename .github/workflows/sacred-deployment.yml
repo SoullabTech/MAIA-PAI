@@ -170,7 +170,7 @@ jobs:
           echo "MAYA_PRESENCE_LEVEL=activated" >> .env.sacred
 
       - name: Upload Sacred Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: sacred-build
           path: |
