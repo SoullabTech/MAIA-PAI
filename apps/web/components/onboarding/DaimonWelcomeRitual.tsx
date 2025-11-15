@@ -96,11 +96,21 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
     setCurrentPhase('integration');
   };
 
-  const handleCompleteRitual = () => {
+  const handleCompleteRitual = async () => {
+    try {
+      // Mark onboarding as completed
+      await fetch('/api/auth/complete-onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      console.warn('Failed to mark onboarding complete:', error);
+    }
+
     if (onComplete) {
       onComplete();
     } else {
-      window.location.href = '/maia/labtools';
+      window.location.href = '/maia';
     }
   };
 

@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from 'framer-motion';
-import { Mail, Sparkles, ArrowRight, Quote } from 'lucide-react';
+import { Mail, Sparkles, ArrowRight, Quote, Shield } from 'lucide-react';
 import Link from 'next/link';
 import { IntegrationAuthService } from "@/lib/auth/integrationAuth";
 import { WisdomQuotes } from '@/lib/wisdom/WisdomQuotes';
+import { deviceAuthService } from '@/lib/auth/deviceAuth';
 
 // Robust error message helper - fixes TypeScript never type issue
 function getErrorMessage(e: unknown): string {
@@ -19,6 +20,8 @@ export default function MemberSigninPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isAutoSigning, setIsAutoSigning] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const authService = new IntegrationAuthService();
@@ -36,6 +39,41 @@ export default function MemberSigninPage() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Check for auto-signin on component mount
+  useEffect(() => {
+    const tryAutoSignin = async () => {
+      const autoSigninData = deviceAuthService.shouldAutoSignIn();
+      if (autoSigninData) {
+        setIsAutoSigning(true);
+        setEmail(autoSigninData.email);
+        setMessage("Recognizing your consciousness signature...");
+
+        try {
+          // Attempt to auto-sign in with saved email
+          const { error } = await authService.signInWithEmail(autoSigninData.email);
+
+          if (!error) {
+            // Extend remember period since they're active
+            deviceAuthService.extendRememberPeriod(autoSigninData.email);
+            setMessage("Welcome back, consciousness explorer! Redirecting to MAIA...");
+            setTimeout(() => router.push('/maia'), 1500);
+          } else {
+            // Auto-signin failed, clear device auth and let them sign in manually
+            deviceAuthService.clearDeviceAuth();
+            setIsAutoSigning(false);
+            setMessage("");
+          }
+        } catch (error) {
+          deviceAuthService.clearDeviceAuth();
+          setIsAutoSigning(false);
+          setMessage("");
+        }
+      }
+    };
+
+    tryAutoSignin();
+  }, [authService, router]);
 
   // Get redirect and error from URL params
   const redirect = searchParams.get('redirect');
@@ -61,6 +99,12 @@ export default function MemberSigninPage() {
       if (error) {
         setMessage(`Error: ${getErrorMessage(error)}`);
       } else {
+        // Save device auth if remember me is checked
+        if (rememberMe) {
+          // We'll save this when they successfully sign in via the callback
+          sessionStorage.setItem('maia_remember_pending', JSON.stringify({ email, rememberMe: true }));
+        }
+
         setMessage("Check your email for the sacred link to enter Soullab!");
       }
     } catch (err: unknown) {
@@ -165,6 +209,37 @@ export default function MemberSigninPage() {
                 />
               </div>
             </div>
+
+            {/* Remember Me Option */}
+            {!isAutoSigning && (
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-3 cursor-pointer group">
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="sr-only"
+                    />
+                    <div className={`w-5 h-5 border-2 rounded transition-all duration-200 ${
+                      rememberMe
+                        ? 'bg-purple-500 border-purple-500'
+                        : 'border-purple-400/50 group-hover:border-purple-400'
+                    }`}>
+                      {rememberMe && (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <div className="w-2 h-2 bg-white rounded-sm"></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-purple-300/80 text-sm flex items-center gap-2">
+                    <Shield className="w-4 h-4" />
+                    Remember this device for 30 days
+                  </span>
+                </label>
+              </div>
+            )}
 
             {/* Sign In Button */}
             <button

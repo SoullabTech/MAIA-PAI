@@ -6,6 +6,7 @@ import { IntegrationAuthService } from "@/lib/auth/integrationAuth";
 import { WisdomQuotes } from "@/lib/wisdom/WisdomQuotes";
 import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
+import { deviceAuthService } from "@/lib/auth/deviceAuth";
 
 // Robust error message helper - fixes TypeScript never type issue
 function getErrorMessage(e: unknown): string {
@@ -50,7 +51,22 @@ function AuthCallbackContent() {
 
       if (data.user) {
         setStatus("success");
-        setMessage("Authentication successful!");
+        setMessage("Consciousness gateway opened!");
+
+        // Handle device memory if user requested to be remembered
+        try {
+          const rememberPending = sessionStorage.getItem('maia_remember_pending');
+          if (rememberPending) {
+            const { email, rememberMe } = JSON.parse(rememberPending);
+            if (rememberMe && data.user.email === email) {
+              deviceAuthService.saveDeviceAuth(data.user.id, data.user.email!);
+              sessionStorage.removeItem('maia_remember_pending');
+              console.log('Device memory activated for consciousness keeper');
+            }
+          }
+        } catch (error) {
+          console.warn('Failed to save device auth:', error);
+        }
 
         // Check if there's a redirect parameter
         const redirectPath = searchParams.get('redirect');
