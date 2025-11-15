@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { SimpleOnboarding } from "../../../components/onboarding/SimpleOnboarding";
+import { DaimonWelcomeRitual } from "../../../components/onboarding/DaimonWelcomeRitual";
 
 export default function OnboardingPage() {
-  return <SimpleOnboarding />;
+  return <DaimonWelcomeRitual />;
 }

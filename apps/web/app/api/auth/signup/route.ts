@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { daimonicService } from '@/lib/services/DaimonicService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -65,12 +66,28 @@ export async function POST(request: NextRequest) {
       console.error('Member creation error:', memberError);
     }
 
+    // Create initial Daimon encounter for consciousness awakening
+    try {
+      const welcomeMessage = `Beginning the sacred journey of consciousness exploration. Element: ${consciousnessProfile.primaryElement}. Energy: ${consciousnessProfile.energyType}. Goals: ${consciousnessProfile.transformationGoals?.join(', ') || 'transformation'}`;
+      const initialEncounter = await daimonicService.createEncounter(
+        authData.user.id,
+        welcomeMessage,
+        'wise_old_man' // Start with wisdom archetype for guidance
+      );
+
+      console.log('Initial Daimon encounter created:', initialEncounter.encounter.id);
+    } catch (daimonError) {
+      console.error('Daimon encounter creation error:', daimonError);
+      // Continue anyway - encounter can be created later
+    }
+
     return NextResponse.json({
       message: 'Account created successfully! Please check your email to verify your account.',
       user: {
         id: authData.user.id,
         email: authData.user.email
-      }
+      },
+      hasInitialEncounter: true
     });
 
   } catch (error) {
