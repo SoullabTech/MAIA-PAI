@@ -1,24 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Build-time guard to prevent client-side imports in server routes
-if (typeof window !== 'undefined') {
-  throw new Error('This is a server-side route');
-}
-
-// Dynamic imports to prevent build-time issues with client-side dependencies
-const getJournalModules = async () => {
-  const [
-    { obsidianJournalExporter },
-    { secureJournalStorage },
-    { secureAuth }
-  ] = await Promise.all([
-    import('@/lib/journaling/ObsidianJournalExporter'),
-    import('@/lib/storage/secure-journal-storage'),
-    import('@/lib/auth/secure-auth')
-  ]);
-
-  return { obsidianJournalExporter, secureJournalStorage, secureAuth };
-};
+import { getServerSupabaseClient } from '@/lib/supabaseServerClient';
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,58 +12,48 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get modules dynamically to avoid build issues
-    const { obsidianJournalExporter, secureJournalStorage, secureAuth } = await getJournalModules();
-
-    const journalEntry = {
-      id: `journal_${Date.now()}`,
-      userId: userId || 'beta-user',
-      mode,
-      entry,
-      reflection,
-      timestamp: new Date(),
-      element
-    };
-
-    // Verify authentication and initialize secure storage
-    const authState = secureAuth.getAuthState();
-    if (!authState.isAuthenticated || !authState.encryptionContext) {
+    if (!userId) {
       return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
+        { error: 'userId is required' },
+        { status: 400 }
       );
     }
 
-    if (!secureJournalStorage.isInitialized()) {
-      await secureJournalStorage.initialize(authState.encryptionContext);
+    const supabase = getServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Database not configured' },
+        { status: 500 }
+      );
     }
 
-    await secureJournalStorage.addEntry({
-      id: journalEntry.id,
-      userId: journalEntry.userId,
-      mode: journalEntry.mode,
-      content: journalEntry.entry,
-      reflection: journalEntry.reflection,
-      timestamp: journalEntry.timestamp,
-      element: journalEntry.element,
-      wordCount: journalEntry.entry.split(/\s+/).length,
-      isVoice: false
+    // Save journal entry to database directly
+    const { data, error } = await supabase
+      .from('journal_entries')
+      .insert({
+        user_id: userId,
+        mode,
+        prompt: entry,
+        response: reflection,
+        word_count: entry.split(/\s+/).length,
+        reflection_quality: 'auto-generated'
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error:', error);
+      return NextResponse.json(
+        { error: 'Failed to save journal entry' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      entryId: data.id,
+      message: 'Journal entry saved successfully'
     });
-
-    const result = await obsidianJournalExporter.exportJournalEntry(journalEntry);
-
-    if (result.success) {
-      return NextResponse.json({
-        success: true,
-        filePath: result.filePath,
-        message: 'Journal entry exported to Obsidian and saved to storage'
-      });
-    } else {
-      return NextResponse.json({
-        success: true,
-        message: 'Journal entry saved to storage (Obsidian export failed)'
-      });
-    }
 
   } catch (error) {
     console.error('Journal export error:', error);

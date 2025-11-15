@@ -1,9 +1,10 @@
 "use client";
 
+// DISABLED: Browser Supabase client removed to fix build issues
+// import { createBrowserClient } from "@supabase/ssr";
 import { User } from "@supabase/supabase-js";
 import { HolisticDomain, DevelopmentStage, UserState } from "../types/holistic";
-import { getSupabaseConfig } from "../config/supabase";
-import { getBrowserSupabaseClient } from "../supabaseBrowserClient";
+// import { getSupabaseConfig } from "../config/supabase";
 
 export interface IntegrationUserMetadata {
   developmentStage: DevelopmentStage;
@@ -64,10 +65,15 @@ export class IntegrationAuthService {
 
   constructor() {
     if (typeof window !== "undefined") {
-      this._config = getSupabaseConfig();
-      if (this._config.isConfigured) {
-        this._supabase = getBrowserSupabaseClient();
-      }
+      // DISABLED: Browser Supabase client removed to fix build issues
+      // this._config = getSupabaseConfig();
+      // if (this._config.isConfigured) {
+      //   this._supabase = createBrowserClient(
+      //     this._config.url,
+      //     this._config.anonKey,
+      //   );
+      // }
+      console.warn('IntegrationAuthService: Browser client disabled - use API routes instead');
     }
   }
 

@@ -9,19 +9,13 @@ if (typeof window !== 'undefined') {
 const getMayaChatModules = async () => {
   const [
     { PersonalOracleAgent },
-    { secureJournalStorage },
-    { secureAuth },
     { ApprenticeMayaTraining },
-    { createServerSupabaseClient },
     { maiaRealtimeMonitor },
     { maiaMonitoring },
     { betaAuth }
   ] = await Promise.all([
     import('@/lib/agents/PersonalOracleAgent'),
-    import('@/lib/storage/secure-journal-storage'),
-    import('@/lib/auth/secure-auth'),
     import('@/lib/maya/ApprenticeMayaTraining'),
-    import('@/lib/supabase/server'),
     import('@/lib/monitoring/MaiaRealtimeMonitor'),
     import('@/lib/beta/MaiaMonitoring'),
     import('@/lib/auth/BetaAuth')
@@ -29,10 +23,7 @@ const getMayaChatModules = async () => {
 
   return {
     PersonalOracleAgent,
-    secureJournalStorage,
-    secureAuth,
     ApprenticeMayaTraining,
-    createServerSupabaseClient,
     maiaRealtimeMonitor,
     maiaMonitoring,
     betaAuth
@@ -166,7 +157,6 @@ export async function POST(req: NextRequest) {
     // Get modules dynamically to avoid build issues
     const {
       PersonalOracleAgent,
-      secureJournalStorage,
       secureAuth,
       ApprenticeMayaTraining,
       createServerSupabaseClient,
@@ -212,10 +202,7 @@ export async function POST(req: NextRequest) {
     try {
       const authState = secureAuth.getAuthState();
       if (authState.isAuthenticated && authState.encryptionContext) {
-        if (!secureJournalStorage.isInitialized()) {
-          await secureJournalStorage.initialize(authState.encryptionContext);
-        }
-        recentEntries = (await secureJournalStorage.getEntries(requestUserId, { limit: 5 }));
+        // Skip journal entries for now - pure chat mode
       } else {
         console.log('⚠️ No authentication context for journal access');
       }

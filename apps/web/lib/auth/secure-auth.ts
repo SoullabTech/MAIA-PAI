@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react';
 import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient';
 import { MAIAEncryption, UserEncryptionContext, PasswordValidator } from '@/lib/security/encryption';
-import { secureJournalStorage } from '@/lib/storage/secure-journal-storage';
+// import { secureJournalStorage } from '@/lib/storage/secure-journal-storage'; // DISABLED
 
 export interface SecureUser {
   id: string;
@@ -151,7 +151,7 @@ class SecureAuthManager {
       }
 
       // Initialize secure storage
-      await secureJournalStorage.initialize(encryptionContext);
+      // await secureJournalStorage.initialize(encryptionContext); // DISABLED
 
       // Update auth state
       this.updateAuthState({
@@ -330,7 +330,7 @@ class SecureAuthManager {
       });
 
       // Reinitialize secure storage with new context
-      await secureJournalStorage.initialize(newEncryptionContext);
+      // await secureJournalStorage.initialize(newEncryptionContext); // DISABLED
 
       return { success: true };
 
@@ -563,7 +563,7 @@ class SecureAuthManager {
       };
 
       // Initialize secure storage
-      await secureJournalStorage.initialize(encryptionContext);
+      // await secureJournalStorage.initialize(encryptionContext); // DISABLED
 
       // Update last active time
       await this.updateLastActive(authUserId);

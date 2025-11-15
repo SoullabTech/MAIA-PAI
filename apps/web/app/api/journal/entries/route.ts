@@ -1,22 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Build-time guard to prevent client-side imports in server routes
-if (typeof window !== 'undefined') {
-  throw new Error('This is a server-side route');
-}
-
-// Dynamic imports to prevent build-time issues with client-side dependencies
-const getJournalModules = async () => {
-  const [
-    { secureJournalStorage },
-    { secureAuth }
-  ] = await Promise.all([
-    import('@/lib/storage/secure-journal-storage'),
-    import('@/lib/auth/secure-auth')
-  ]);
-
-  return { secureJournalStorage, secureAuth };
-};
+import { getServerSupabaseClient } from '@/lib/supabaseServerClient';
 
 // Mark route as dynamic since it uses searchParams or other dynamic features
 export const dynamic = 'force-dynamic';
@@ -26,42 +9,47 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const userId = searchParams.get('userId') || 'beta-user';
-    const mode = searchParams.get('mode') as any;
-    const symbol = searchParams.get('symbol');
-    const archetype = searchParams.get('archetype');
-    const emotion = searchParams.get('emotion');
+    const userId = searchParams.get('userId');
 
-    // Get modules dynamically to avoid build issues
-    const { secureJournalStorage, secureAuth } = await getJournalModules();
-
-    // Verify authentication and get encryption context
-    const authState = secureAuth.getAuthState();
-    if (!authState.isAuthenticated || !authState.encryptionContext) {
+    if (!userId) {
       return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
+        { success: false, error: 'userId is required' },
+        { status: 400 }
       );
     }
 
-    // Initialize secure storage if needed
-    if (!secureJournalStorage.isInitialized()) {
-      await secureJournalStorage.initialize(authState.encryptionContext);
+    const supabase = getServerSupabaseClient();
+    if (!supabase) {
+      return NextResponse.json(
+        { success: false, error: 'Database not configured' },
+        { status: 500 }
+      );
     }
 
-    const entries = await secureJournalStorage.getEntries(userId, {
-      mode,
-      symbol: symbol || undefined,
-      archetype: archetype || undefined,
-      emotion: emotion || undefined
-    });
+    // Get journal entries directly from database
+    const { data: entries, error } = await supabase
+      .from('journal_entries')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
 
-    const stats = await secureJournalStorage.getUserStats(userId);
+    if (error) {
+      console.error('Database error:', error);
+      return NextResponse.json(
+        { success: false, error: 'Failed to fetch journal entries' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      entries,
-      stats
+      entries: entries || [],
+      stats: {
+        totalEntries: entries?.length || 0,
+        modeDistribution: {},
+        last7Days: 0,
+        last30Days: 0
+      }
     });
 
   } catch (error) {

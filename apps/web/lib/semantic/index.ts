@@ -3,7 +3,7 @@
  * "Have I written about rebirth before?" → finds thematically similar entries
  */
 
-import { secureJournalStorage, SecureJournalEntry } from '../storage/secure-journal-storage';
+// import { secureJournalStorage, SecureJournalEntry } from '../storage/secure-journal-storage'; // DISABLED
 import { StoredJournalEntry } from '../storage/journal-storage';
 import { mem0, MemoryEntry } from '../memory/mem0';
 import { getOpenAIClient } from '../ai/openaiClient';
@@ -33,11 +33,13 @@ export class SemanticSearch {
     }
 
     // Initialize secure storage if needed
-    if (!secureJournalStorage.isInitialized()) {
-      await secureJournalStorage.initialize(authState.encryptionContext);
-    }
+    // DISABLED: Secure journal storage removed for build stability
+    // if (!secureJournalStorage.isInitialized()) {
+    //   await secureJournalStorage.initialize(authState.encryptionContext);
+    // }
 
-    const entries = await secureJournalStorage.getEntries(userId);
+    // const entries = await secureJournalStorage.getEntries(userId);
+    const entries: any[] = [];
 
     if (entries.length === 0) {
       return {

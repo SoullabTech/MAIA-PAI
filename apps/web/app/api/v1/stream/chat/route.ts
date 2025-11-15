@@ -8,16 +8,12 @@ if (typeof window !== 'undefined') {
 // Dynamic imports to prevent build-time issues with client-side dependencies
 const getStreamChatModules = async () => {
   const [
-    { PersonalOracleAgent },
-    { secureJournalStorage },
-    { secureAuth }
+    { PersonalOracleAgent }
   ] = await Promise.all([
-    import('@/lib/agents/PersonalOracleAgent'),
-    import('@/lib/storage/secure-journal-storage'),
-    import('@/lib/auth/secure-auth')
+    import('@/lib/agents/PersonalOracleAgent')
   ]);
 
-  return { PersonalOracleAgent, secureJournalStorage, secureAuth };
+  return { PersonalOracleAgent };
 };
 
 export const runtime = 'nodejs';
@@ -58,7 +54,7 @@ export async function POST(request: NextRequest) {
       async start(controller) {
         try {
           // Get modules dynamically to avoid build issues
-          const { PersonalOracleAgent, secureJournalStorage, secureAuth } = await getStreamChatModules();
+          const { PersonalOracleAgent } = await getStreamChatModules();
 
           sendSSE(controller, {
             type: 'metadata',
@@ -71,17 +67,7 @@ export async function POST(request: NextRequest) {
 
           // Fetch recent journal entries if user is authenticated
           let recentEntries: any[] = [];
-          try {
-            const authState = secureAuth.getAuthState();
-            if (authState.isAuthenticated && authState.encryptionContext) {
-              if (!secureJournalStorage.isInitialized()) {
-                await secureJournalStorage.initialize(authState.encryptionContext);
-              }
-              recentEntries = (await secureJournalStorage.getEntries(userId, { limit: 5 }));
-            }
-          } catch (error) {
-            console.warn('Could not fetch journal entries:', error);
-          }
+          // Skip journal context for now - pure chat mode
 
           console.log('🌀 Starting streaming chat for:', { userId, messageLength: message.length });
 
