@@ -22,6 +22,7 @@ soul_memory/
 oracle-responses/
 conversation-logs/
 analytics/
+!apps/web/lib/analytics/eventTracking.ts
 telemetry/
 
 # Documentation that reveals architecture
