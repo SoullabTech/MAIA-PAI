@@ -2,9 +2,9 @@
 
 export const dynamic = 'force-dynamic';
 
-import dynamic from 'next/dynamic';
+import dynamicImport from 'next/dynamic';
 
-const AttunePanel = dynamic(() => import('@/components/onboarding/AttunePanel'), {
+const AttunePanel = dynamicImport(() => import('@/components/onboarding/AttunePanel'), {
   ssr: false,
   loading: () => <div className="flex items-center justify-center min-h-screen">Loading...</div>
 });
