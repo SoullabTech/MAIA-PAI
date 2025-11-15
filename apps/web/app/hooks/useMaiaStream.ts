@@ -1,5 +1,6 @@
 // app/hooks/useMayaStream.ts
 // Optimized streaming hook with phrase-based voice synthesis
+'use client';
 
 import { useEffect, useRef, useState } from "react";
 import { Analytics } from "../../lib/services/supabaseAnalytics";

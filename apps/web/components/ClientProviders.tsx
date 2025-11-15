@@ -29,10 +29,16 @@ interface ClientProvidersProps {
 }
 
 export function ClientProviders({ children }: ClientProvidersProps) {
-  // NUCLEAR TEST: Temporarily disable all providers to isolate useContext error
   return (
     <div suppressHydrationWarning>
-      {children}
+      <ThemeProvider>
+        <SecureAuthProvider>
+          <ToastProvider>
+            <IOSFixInitializer />
+            {children}
+          </ToastProvider>
+        </SecureAuthProvider>
+      </ThemeProvider>
     </div>
   );
 }

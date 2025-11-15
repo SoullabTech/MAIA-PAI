@@ -1,4 +1,6 @@
 // useStreamingConversation.ts - Hook for managing streaming chat with chunked audio
+'use client';
+
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getStreamingAudioQueue } from '@/lib/audio/StreamingAudioQueue';
 
