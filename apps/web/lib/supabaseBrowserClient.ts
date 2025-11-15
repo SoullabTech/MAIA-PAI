@@ -4,3 +4,6 @@
 export function getBrowserSupabaseClient() {
   throw new Error('Browser Supabase client is disabled. Use API routes instead.');
 }
+
+// Legacy alias for components that import createClient from this file
+export const createClient = getBrowserSupabaseClient;
