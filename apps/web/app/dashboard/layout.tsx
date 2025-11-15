@@ -2,9 +2,23 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import ConsciousnessTransition from '@/components/transitions/ConsciousnessTransition';
-import NeuralFireSystem from '@/components/consciousness/NeuralFireSystem';
-import VoiceConsciousness from '@/components/consciousness/VoiceConsciousness';
+import dynamic from 'next/dynamic';
+
+// Dynamically import consciousness components to prevent SSR useContext errors
+const ConsciousnessTransition = dynamic(
+  () => import('@/components/transitions/ConsciousnessTransition'),
+  { ssr: false }
+);
+
+const NeuralFireSystem = dynamic(
+  () => import('@/components/consciousness/NeuralFireSystem'),
+  { ssr: false }
+);
+
+const VoiceConsciousness = dynamic(
+  () => import('@/components/consciousness/VoiceConsciousness'),
+  { ssr: false }
+);
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
