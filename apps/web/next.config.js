@@ -72,15 +72,9 @@ const nextConfig = {
   // Optimize production builds
   productionBrowserSourceMaps: false,
 
-  // Force static 404 page to bypass SSR issues
-  generateStaticParams: false,
-
-  // Ensure CSS is processed correctly and disable dynamic routes that cause registerClientReference issues
+  // Ensure CSS is processed correctly
   experimental: {
     optimizeCss: true,
-    // Fix for async storage issues in Next.js 15
-    workerThreads: false,
-    staticPageGenerationTimeout: 0,
   },
 
   // Webpack configuration for IPFS compatibility and Supabase Edge Runtime warnings
