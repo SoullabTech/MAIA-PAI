@@ -11,7 +11,7 @@ import { Holoflower } from './holoflower';
 export function HoloflowerOracle() {
   const { askOracle, loading, error } = useMAIAOracle();
   const [message, setMessage] = useState('');
-  const [userId, setUserId] = useState('seeker-' + Date.now());
+  const [userId] = useState('seeker-' + Date.now());
   const [response, setResponse] = useState<OracleResponse | null>(null);
   const [holoflowerStage, setHoloflowerStage] = useState<'dormant' | 'awakening' | 'processing' | 'blooming' | 'complete'>('dormant');
   const [useThreeD, setUseThreeD] = useState(false);
@@ -171,18 +171,15 @@ export function HoloflowerOracle() {
                 />
               </div>
 
-              <div>
-                <label className="block text-purple-200 text-sm font-medium mb-2">
-                  Seeker ID
-                </label>
-                <input
-                  type="text"
-                  value={userId}
-                  onChange={(e) => setUserId(e.target.value)}
-                  className="w-full px-4 py-3 bg-white bg-opacity-10 border border-purple-300 rounded-lg text-white placeholder-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
-                  placeholder="Your unique identifier"
-                />
-              </div>
+              {/* Consciousness level display (if detected) */}
+              {response?.level && (
+                <div className="bg-purple-800 bg-opacity-30 rounded-lg p-4">
+                  <div className="text-purple-200 text-sm">MAIA detected your consciousness level:</div>
+                  <div className="text-white font-bold">
+                    Level {response.level}: {getLevelDescription(response.level)}
+                  </div>
+                </div>
+              )}
 
               <button
                 onClick={handleAskOracle}

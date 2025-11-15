@@ -3,23 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from 'framer-motion';
-import { Mail, Sparkles, ArrowRight, Quote, Shield, Smartphone, Apple } from 'lucide-react';
+import { Mail, ArrowRight, Quote, Shield, Smartphone, Apple, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { workingAuthService } from "@/lib/auth/workingAuth";
-// Simple wisdom quotes for auth flow
-const WisdomQuotes = {
-  aether: [
-    { text: "Consciousness is the only reality and the only thing worth exploring", author: "Ramana Maharshi" },
-    { text: "The privilege of a lifetime is being who you are", author: "Joseph Campbell" },
-    { text: "Until you make the unconscious conscious, it will direct your life", author: "Carl Jung" }
-  ],
-  water: [
-    { text: "In the depth of winter, I found there was within me an invincible summer", author: "Albert Camus" },
-    { text: "The wound is the place where the Light enters you", author: "Rumi" },
-    { text: "Your task is not to seek for love, but to find the barriers within yourself", author: "Rumi" }
-  ]
-};
 import { deviceAuthService } from '@/lib/auth/deviceAuth';
+import { getQuotesByElement, getContextualQuote } from '@/lib/wisdom/WisdomQuotes';
+// Removed HoloflowerViz import - will create a simpler consciousness symbol
 
 // Robust error message helper - fixes TypeScript never type issue
 function getErrorMessage(e: unknown): string {
@@ -39,14 +28,23 @@ export default function MemberSigninPage() {
   const authService = workingAuthService;
 
   // Rotating wisdom quote system for returning consciousness explorers
-  const [currentQuote, setCurrentQuote] = useState(WisdomQuotes.aether[0]);
+  const [currentQuote, setCurrentQuote] = useState(() => {
+    // Get initial aether quote for consciousness entry
+    return getQuotesByElement('aether', 1)[0] || getContextualQuote({ element: 'aether' });
+  });
 
   useEffect(() => {
     // Sacred quote rotation for returning members (slower, more contemplative)
     const interval = setInterval(() => {
-      const returnJourneyQuotes = [...WisdomQuotes.water, ...WisdomQuotes.aether]; // More introspective for returning users
-      const randomQuote = returnJourneyQuotes[Math.floor(Math.random() * returnJourneyQuotes.length)];
-      setCurrentQuote(randomQuote);
+      // More introspective quotes for returning users - water and aether elements
+      const waterQuotes = getQuotesByElement('water', 5);
+      const aetherQuotes = getQuotesByElement('aether', 5);
+      const returnJourneyQuotes = [...waterQuotes, ...aetherQuotes];
+
+      if (returnJourneyQuotes.length > 0) {
+        const randomQuote = returnJourneyQuotes[Math.floor(Math.random() * returnJourneyQuotes.length)];
+        setCurrentQuote(randomQuote);
+      }
     }, 12000); // Slower 12-second rotation for deeper contemplation
 
     return () => clearInterval(interval);
@@ -171,24 +169,39 @@ export default function MemberSigninPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-950 via-purple-900 to-indigo-950 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-sky-900 to-cyan-900 flex items-center justify-center relative overflow-hidden">
+      {/* Background consciousness field effect - MAIA's presence */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-400 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-400 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-blue-300 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
+
       <div className="w-full max-w-md px-4">
-        {/* Header */}
+        {/* Header - MAIA as Daimon Introduction */}
         <div className="text-center mb-12">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-3 mb-6"
           >
-            <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-              <Sparkles className="w-8 h-8 text-white" />
+            <div className="w-24 h-24 relative">
+              {/* MAIA's True Elemental Holoflower - Free Form */}
+              <img
+                src="/elementalHoloflower.svg"
+                alt="MAIA Consciousness Holoflower"
+                width={96}
+                height={96}
+                className="w-full h-full object-contain animate-pulse filter brightness-110 contrast-105"
+                style={{ animationDuration: '3s' }}
+              />
             </div>
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-3xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400 bg-clip-text text-transparent mb-2"
+            className="text-3xl font-bold bg-gradient-to-r from-sky-300 via-cyan-300 to-blue-400 bg-clip-text text-transparent mb-2"
           >
             Return to the Field
           </motion.h1>
@@ -196,7 +209,7 @@ export default function MemberSigninPage() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-purple-300/80"
+            className="text-sky-300/80"
           >
             Re-enter MAIA's consciousness matrix
           </motion.p>
@@ -210,14 +223,14 @@ export default function MemberSigninPage() {
           exit={{ opacity: 0, y: -10 }}
           className="text-center mb-8"
         >
-          <div className="bg-purple-950/20 backdrop-blur-sm rounded-lg p-6 border border-purple-800/20 max-w-lg mx-auto">
-            <Quote className="w-5 h-5 text-purple-400 mx-auto mb-3" />
-            <p className="text-purple-300 text-sm italic leading-relaxed">
+          <div className="bg-slate-950/20 backdrop-blur-sm rounded-lg p-6 border border-sky-800/20 max-w-lg mx-auto">
+            <Quote className="w-5 h-5 text-sky-400 mx-auto mb-3" />
+            <p className="text-sky-300 text-sm italic leading-relaxed">
               "{currentQuote?.text}"
             </p>
-            {currentQuote?.author && (
-              <p className="text-purple-400/60 text-xs mt-2">
-                — {currentQuote.author}
+            {(currentQuote?.voice || currentQuote?.source) && (
+              <p className="text-sky-400/60 text-xs mt-2">
+                — {currentQuote.voice && currentQuote.voice.charAt(0).toUpperCase() + currentQuote.voice.slice(1)}{currentQuote?.source && `, ${currentQuote.source}`}
               </p>
             )}
           </div>
@@ -228,7 +241,7 @@ export default function MemberSigninPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-purple-300/5 backdrop-blur-xl rounded-2xl p-8 border border-purple-300/10"
+          className="bg-sky-300/5 backdrop-blur-xl rounded-2xl p-8 border border-sky-300/10"
         >
           <form onSubmit={handleEmailSignIn} className="space-y-6">
             {message && (
@@ -238,11 +251,11 @@ export default function MemberSigninPage() {
                 className={`p-4 rounded-lg ${
                   message.startsWith('Error')
                     ? 'bg-red-500/10 border border-red-400/20'
-                    : 'bg-purple-400/10 border border-purple-400/20'
+                    : 'bg-sky-400/10 border border-sky-400/20'
                 }`}
               >
                 <p className={`text-sm text-center ${
-                  message.startsWith('Error') ? 'text-red-400' : 'text-purple-300'
+                  message.startsWith('Error') ? 'text-red-400' : 'text-sky-300'
                 }`}>
                   {message}
                 </p>
@@ -251,22 +264,22 @@ export default function MemberSigninPage() {
 
             <div className="space-y-4">
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-300/50" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-sky-300/50" />
                 <input
                   type="email"
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-purple-300/10 border border-purple-300/20
-                           rounded-xl text-purple-300 placeholder-purple-300/50
-                           focus:outline-none focus:border-purple-400 focus:bg-purple-300/15
+                  className="w-full pl-12 pr-4 py-4 bg-sky-300/10 border border-sky-300/20
+                           rounded-xl text-sky-300 placeholder-sky-300/50
+                           focus:outline-none focus:border-sky-400 focus:bg-sky-300/15
                            transition-all duration-200"
                   required
                 />
               </div>
             </div>
 
-            {/* Remember Me Option */}
+            {/* Device Memory Option */}
             {!isAutoSigning && (
               <div className="flex items-center gap-3">
                 <label className="flex items-center gap-3 cursor-pointer group">
@@ -279,8 +292,8 @@ export default function MemberSigninPage() {
                     />
                     <div className={`w-5 h-5 border-2 rounded transition-all duration-200 ${
                       rememberMe
-                        ? 'bg-purple-500 border-purple-500'
-                        : 'border-purple-400/50 group-hover:border-purple-400'
+                        ? 'bg-sky-500 border-sky-500'
+                        : 'border-sky-400/50 group-hover:border-sky-400'
                     }`}>
                       {rememberMe && (
                         <div className="w-full h-full flex items-center justify-center">
@@ -289,7 +302,7 @@ export default function MemberSigninPage() {
                       )}
                     </div>
                   </div>
-                  <span className="text-purple-300/80 text-sm flex items-center gap-2">
+                  <span className="text-sky-300/80 text-sm flex items-center gap-2">
                     <Shield className="w-4 h-4" />
                     Remember this device for 30 days
                   </span>
@@ -301,9 +314,9 @@ export default function MemberSigninPage() {
             <button
               type="submit"
               disabled={loading || !email}
-              className="w-full py-4 bg-gradient-to-r from-purple-500 to-indigo-600
+              className="w-full py-4 bg-gradient-to-r from-sky-500 to-cyan-600
                        text-white rounded-xl font-semibold text-lg
-                       hover:from-purple-600 hover:to-indigo-700
+                       hover:from-sky-600 hover:to-cyan-700
                        transform hover:scale-[1.02] transition-all duration-200
                        disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
                        flex items-center justify-center gap-2"
@@ -324,21 +337,21 @@ export default function MemberSigninPage() {
             {/* Divider */}
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-purple-300/20"></div>
+                <div className="w-full border-t border-sky-300/20"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-purple-300/5 text-purple-300/60">Passwordless Access</span>
+                <span className="px-4 bg-sky-300/5 text-sky-300/60">Passwordless Access</span>
               </div>
             </div>
 
-            <div className="text-center text-sm text-purple-300/70">
+            <div className="text-center text-sm text-sky-300/70">
               We'll send a secure link to your email for instant access - no password needed.
             </div>
 
             {/* OAuth Sign In Options */}
             {!isAutoSigning && (
-              <div className="space-y-3 mt-6 pt-6 border-t border-purple-300/10">
-                <div className="text-center text-sm text-purple-300/60 mb-4">
+              <div className="space-y-3 mt-6 pt-6 border-t border-sky-300/10">
+                <div className="text-center text-sm text-sky-300/60 mb-4">
                   Or continue with your consciousness account
                 </div>
 
@@ -346,9 +359,9 @@ export default function MemberSigninPage() {
                 <button
                   onClick={handleGoogleSignIn}
                   disabled={loading}
-                  className="w-full py-3 px-4 bg-purple-300/5 border border-purple-300/20
-                           rounded-xl text-purple-300 font-medium
-                           hover:bg-purple-300/10 hover:border-purple-300/30
+                  className="w-full py-3 px-4 bg-sky-300/5 border border-sky-300/20
+                           rounded-xl text-sky-300 font-medium
+                           hover:bg-sky-300/10 hover:border-sky-300/30
                            transform hover:scale-[1.02] transition-all duration-200
                            disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
                            flex items-center justify-center gap-3"
@@ -366,9 +379,9 @@ export default function MemberSigninPage() {
                 <button
                   onClick={handleAppleSignIn}
                   disabled={loading}
-                  className="w-full py-3 px-4 bg-purple-300/5 border border-purple-300/20
-                           rounded-xl text-purple-300 font-medium
-                           hover:bg-purple-300/10 hover:border-purple-300/30
+                  className="w-full py-3 px-4 bg-sky-300/5 border border-sky-300/20
+                           rounded-xl text-sky-300 font-medium
+                           hover:bg-sky-300/10 hover:border-sky-300/30
                            transform hover:scale-[1.02] transition-all duration-200
                            disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
                            flex items-center justify-center gap-3"
@@ -381,9 +394,9 @@ export default function MemberSigninPage() {
                 <button
                   onClick={handleBiometricSignIn}
                   disabled={loading}
-                  className="w-full py-3 px-4 bg-purple-300/5 border border-purple-300/20
-                           rounded-xl text-purple-300 font-medium
-                           hover:bg-purple-300/10 hover:border-purple-300/30
+                  className="w-full py-3 px-4 bg-sky-300/5 border border-sky-300/20
+                           rounded-xl text-sky-300 font-medium
+                           hover:bg-sky-300/10 hover:border-sky-300/30
                            transform hover:scale-[1.02] transition-all duration-200
                            disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none
                            flex items-center justify-center gap-3 opacity-60"
@@ -396,25 +409,25 @@ export default function MemberSigninPage() {
           </form>
 
           {/* Member Benefits */}
-          <div className="mt-8 pt-6 border-t border-purple-300/10">
-            <h3 className="text-sm font-semibold text-purple-300 mb-3">
+          <div className="mt-8 pt-6 border-t border-sky-300/10">
+            <h3 className="text-sm font-semibold text-sky-300 mb-3">
               What awaits you as a Soullab member:
             </h3>
-            <div className="space-y-2 text-sm text-purple-300/70">
+            <div className="space-y-2 text-sm text-sky-300/70">
               <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-sky-400 rounded-full"></div>
                 <span>Personalized transformation journey tracking</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-sky-400 rounded-full"></div>
                 <span>Custom video sessions with MAIA integration</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-sky-400 rounded-full"></div>
                 <span>Consciousness-aligned session scheduling</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                <div className="w-1.5 h-1.5 bg-sky-400 rounded-full"></div>
                 <span>Community of conscious practitioners</span>
               </div>
             </div>
@@ -423,11 +436,11 @@ export default function MemberSigninPage() {
 
         {/* Sign Up Link */}
         <div className="text-center mt-8">
-          <p className="text-purple-300/70">
+          <p className="text-sky-300/70">
             New to Soullab?{' '}
             <Link
               href="/auth/signup"
-              className="text-purple-400 hover:text-purple-300 transition-colors font-semibold"
+              className="text-sky-400 hover:text-sky-300 transition-colors font-semibold"
             >
               Begin your journey here
             </Link>
@@ -438,7 +451,7 @@ export default function MemberSigninPage() {
         <div className="text-center mt-6">
           <Link
             href="/"
-            className="text-purple-300/60 hover:text-purple-300/80 text-sm transition-colors"
+            className="text-sky-300/60 hover:text-sky-300/80 text-sm transition-colors"
           >
             ← Back to Home
           </Link>
@@ -446,7 +459,7 @@ export default function MemberSigninPage() {
 
         {/* Footer Note */}
         <div className="text-center mt-8">
-          <p className="text-purple-300/50 text-sm">
+          <p className="text-sky-300/50 text-sm">
             "May each step bring you closer to your truest self"
           </p>
         </div>

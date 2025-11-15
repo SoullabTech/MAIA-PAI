@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Mail, Lock, Heart, Moon, Sun, Sparkles, ArrowRight, Quote } from 'lucide-react';
 import Link from 'next/link';
-import { WisdomQuotes } from '@/lib/wisdom/WisdomQuotes';
+import { getQuotesByElement, getContextualQuote } from '@/lib/wisdom/WisdomQuotes';
 
 interface ConsciousnessProfile {
   energyType: 'solar' | 'lunar' | 'elemental';
@@ -51,14 +51,27 @@ export default function MemberSignupPage() {
   });
 
   // Rotating wisdom quote system
-  const [currentQuote, setCurrentQuote] = useState(WisdomQuotes.aether[0]);
+  const [currentQuote, setCurrentQuote] = useState(() => {
+    // Get initial fire quote for new consciousness journeys
+    return getQuotesByElement('fire', 1)[0] || getContextualQuote({ element: 'fire' });
+  });
 
   useEffect(() => {
     // Synchronistic quote rotation every 8 seconds (sacred timing)
     const interval = setInterval(() => {
-      const allQuotes = [...WisdomQuotes.fire, ...WisdomQuotes.water, ...WisdomQuotes.earth, ...WisdomQuotes.air, ...WisdomQuotes.aether];
-      const randomQuote = allQuotes[Math.floor(Math.random() * allQuotes.length)];
-      setCurrentQuote(randomQuote);
+      // Get quotes from all elements for new member inspiration
+      const fireQuotes = getQuotesByElement('fire', 3);
+      const waterQuotes = getQuotesByElement('water', 3);
+      const earthQuotes = getQuotesByElement('earth', 3);
+      const airQuotes = getQuotesByElement('air', 3);
+      const aetherQuotes = getQuotesByElement('aether', 3);
+
+      const allQuotes = [...fireQuotes, ...waterQuotes, ...earthQuotes, ...airQuotes, ...aetherQuotes];
+
+      if (allQuotes.length > 0) {
+        const randomQuote = allQuotes[Math.floor(Math.random() * allQuotes.length)];
+        setCurrentQuote(randomQuote);
+      }
     }, 8000);
 
     return () => clearInterval(interval);

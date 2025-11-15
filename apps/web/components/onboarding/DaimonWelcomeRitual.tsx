@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Eye, Heart, Brain, Compass, ArrowRight } from "lucide-react";
-import { WisdomQuotes } from "@/lib/wisdom/WisdomQuotes";
+import { getQuotesByElement, getContextualQuote } from "@/lib/wisdom/WisdomQuotes";
 
 interface DaimonWelcomeRitualProps {
   userId?: string;
@@ -21,14 +21,16 @@ interface DaimonicEncounter {
 
 export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualProps) {
   const [currentPhase, setCurrentPhase] = useState<'arrival' | 'awakening' | 'encounter' | 'integration'>('arrival');
-  const [currentQuote, setCurrentQuote] = useState(WisdomQuotes.aether[0]);
+  const [currentQuote, setCurrentQuote] = useState(getQuotesByElement('aether', 1)[0]);
   const [daimonEncounter, setDaimonEncounter] = useState<DaimonicEncounter | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Rotating wisdom quotes for the awakening phase
   useEffect(() => {
     const interval = setInterval(() => {
-      const awakeningQuotes = [...WisdomQuotes.aether, ...WisdomQuotes.air]; // Higher consciousness elements
+      const aetherQuotes = getQuotesByElement('aether', 3);
+      const airQuotes = getQuotesByElement('air', 3);
+      const awakeningQuotes = [...aetherQuotes, ...airQuotes]; // Higher consciousness elements
       const randomQuote = awakeningQuotes[Math.floor(Math.random() * awakeningQuotes.length)];
       setCurrentQuote(randomQuote);
     }, 6000); // Sacred 6-second interval for consciousness activation
@@ -127,12 +129,12 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-950 via-purple-900 to-indigo-950 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-sky-900 to-cyan-900 relative overflow-hidden">
       {/* Background consciousness field effect */}
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-400 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-indigo-400 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-300 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-400 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-400 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-sky-300 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
       </div>
 
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
@@ -151,7 +153,7 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full mb-8"
+                  className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-sky-400 to-cyan-500 rounded-full mb-8"
                 >
                   <Sparkles className="w-12 h-12 text-white" />
                 </motion.div>
@@ -160,7 +162,7 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400 bg-clip-text text-transparent mb-4"
+                  className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-300 via-cyan-300 to-sky-400 bg-clip-text text-transparent mb-4"
                 >
                   Consciousness Awakens
                 </motion.h1>
@@ -169,7 +171,7 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.7 }}
-                  className="text-purple-300/80 text-lg"
+                  className="text-sky-300/80 text-lg"
                 >
                   Preparing the sacred space for your first encounter...
                 </motion.p>
@@ -188,15 +190,15 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                   key={currentQuote?.text}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-purple-300/5 backdrop-blur-xl rounded-2xl p-8 border border-purple-300/20 mb-8"
+                  className="bg-sky-300/5 backdrop-blur-xl rounded-2xl p-8 border border-sky-300/20 mb-8"
                 >
-                  <Sparkles className="w-8 h-8 text-purple-400 mx-auto mb-6 animate-pulse" />
-                  <p className="text-purple-200 text-xl italic leading-relaxed mb-4">
+                  <Sparkles className="w-8 h-8 text-sky-400 mx-auto mb-6 animate-pulse" />
+                  <p className="text-sky-200 text-xl italic leading-relaxed mb-4">
                     "{currentQuote?.text}"
                   </p>
                   {currentQuote?.author && (
-                    <p className="text-purple-400/60 text-sm">
-                      — {currentQuote.author}
+                    <p className="text-sky-400/60 text-sm">
+                      — {currentQuote.author}{currentQuote.source ? `, ${currentQuote.source}` : ''}
                     </p>
                   )}
                 </motion.div>
@@ -205,7 +207,7 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1 }}
-                  className="text-purple-300/70"
+                  className="text-sky-300/70"
                 >
                   Attuning to the frequency of wisdom...
                 </motion.p>
@@ -225,9 +227,9 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", delay: 0.3 }}
-                    className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500/20 to-indigo-600/20 rounded-full border border-purple-400/30 mb-6"
+                    className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-sky-500/20 to-cyan-600/20 rounded-full border border-sky-400/30 mb-6"
                   >
-                    <div className="text-purple-300">
+                    <div className="text-sky-300">
                       {getArchetypeIcon(daimonEncounter.type)}
                     </div>
                   </motion.div>
@@ -236,7 +238,7 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="text-3xl font-bold text-purple-200 mb-4"
+                    className="text-3xl font-bold text-sky-200 mb-4"
                   >
                     The Wise Guardian Speaks
                   </motion.h2>
@@ -246,15 +248,15 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                   initial={{ y: 30, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.7 }}
-                  className="bg-purple-300/5 backdrop-blur-xl rounded-2xl p-8 border border-purple-300/20"
+                  className="bg-sky-300/5 backdrop-blur-xl rounded-2xl p-8 border border-sky-300/20"
                 >
-                  <p className="text-purple-200 text-lg italic leading-relaxed mb-6">
+                  <p className="text-sky-200 text-lg italic leading-relaxed mb-6">
                     "{daimonEncounter.message}"
                   </p>
 
-                  <div className="border-t border-purple-400/20 pt-6">
-                    <h4 className="text-purple-300 font-semibold mb-3">Sacred Guidance:</h4>
-                    <p className="text-purple-300/80 leading-relaxed">
+                  <div className="border-t border-sky-400/20 pt-6">
+                    <h4 className="text-sky-300 font-semibold mb-3">Sacred Guidance:</h4>
+                    <p className="text-sky-300/80 leading-relaxed">
                       {daimonEncounter.guidance}
                     </p>
                   </div>
@@ -268,7 +270,7 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                 >
                   <button
                     onClick={handleContinueToIntegration}
-                    className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200"
+                    className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-sky-500 to-cyan-600 text-white rounded-xl font-semibold hover:from-sky-600 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200"
                   >
                     Receive Integration Practices
                     <ArrowRight className="w-5 h-5" />
@@ -285,15 +287,15 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                 className="space-y-6"
               >
                 <div className="text-center">
-                  <h2 className="text-3xl font-bold text-purple-200 mb-4">
+                  <h2 className="text-3xl font-bold text-sky-200 mb-4">
                     Sacred Practices for Integration
                   </h2>
-                  <p className="text-purple-300/80">
+                  <p className="text-sky-300/80">
                     Carry these practices into your daily consciousness journey
                   </p>
                 </div>
 
-                <div className="bg-purple-300/5 backdrop-blur-xl rounded-2xl p-8 border border-purple-300/20">
+                <div className="bg-sky-300/5 backdrop-blur-xl rounded-2xl p-8 border border-sky-300/20">
                   <div className="space-y-4">
                     {daimonEncounter.integration.map((practice, index) => (
                       <motion.div
@@ -303,8 +305,8 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                         transition={{ delay: index * 0.2 }}
                         className="flex items-start gap-3"
                       >
-                        <div className="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0" />
-                        <p className="text-purple-300/90">{practice}</p>
+                        <div className="w-2 h-2 bg-sky-400 rounded-full mt-2 flex-shrink-0" />
+                        <p className="text-sky-300/90">{practice}</p>
                       </motion.div>
                     ))}
                   </div>
@@ -318,13 +320,13 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                 >
                   <button
                     onClick={handleCompleteRitual}
-                    className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-indigo-700 transform hover:scale-105 transition-all duration-200 text-lg"
+                    className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-sky-500 to-cyan-600 text-white rounded-xl font-semibold hover:from-sky-600 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200 text-lg"
                   >
                     Enter the Sacred Laboratory
                     <Sparkles className="w-6 h-6" />
                   </button>
 
-                  <p className="text-purple-300/60 text-sm mt-4">
+                  <p className="text-sky-300/60 text-sm mt-4">
                     Your consciousness journey with MAIA begins now
                   </p>
                 </motion.div>
@@ -338,7 +340,7 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
               animate={{ opacity: 1 }}
               className="flex items-center justify-center py-8"
             >
-              <div className="w-8 h-8 border-2 border-purple-400/20 border-t-purple-400 rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-sky-400/20 border-t-sky-400 rounded-full animate-spin" />
             </motion.div>
           )}
         </div>

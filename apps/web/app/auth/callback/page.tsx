@@ -115,14 +115,14 @@ function AuthCallbackContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-950 via-purple-900 to-indigo-950 relative overflow-hidden flex items-center justify-center p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-sky-900 to-cyan-900 relative overflow-hidden flex items-center justify-center p-8">
       {/* Background consciousness field effect */}
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-400 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-indigo-400 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-400 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-400 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       </div>
       <div className="relative z-10 max-w-lg w-full space-y-6">
-        <div className="bg-purple-300/5 backdrop-blur-xl rounded-2xl border border-purple-300/20 p-8 text-center">
+        <div className="bg-sky-300/5 backdrop-blur-xl rounded-2xl border border-sky-300/20 p-8 text-center">
         <div className="mb-8">
           <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
             {status === "loading" && <span className="text-2xl animate-spin">🔮</span>}
@@ -130,7 +130,7 @@ function AuthCallbackContent() {
             {status === "error" && <span className="text-2xl">❌</span>}
           </div>
           
-          <h1 className="text-2xl font-bold mb-2 text-purple-200">
+          <h1 className="text-2xl font-bold mb-2 text-sky-200">
             {status === "loading" && "Sacred Authentication..."}
             {status === "success" && "Consciousness Gateway Open"}
             {status === "error" && "Authentication Disrupted"}
@@ -157,13 +157,13 @@ function AuthCallbackContent() {
           <div className="space-y-4">
             <button
               onClick={() => router.push("/auth/signin")}
-              className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:from-purple-600 hover:to-indigo-700 transition-all"
+              className="w-full bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:from-sky-600 hover:to-indigo-700 transition-all"
             >
               Try Again
             </button>
             <button
               onClick={() => router.push("/")}
-              className="text-purple-300/60 hover:text-purple-300/80 text-sm"
+              className="text-sky-300/60 hover:text-sky-300/80 text-sm"
             >
               ← Back to Home
             </button>
@@ -176,14 +176,14 @@ function AuthCallbackContent() {
           key={currentQuote?.text}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-purple-300/5 backdrop-blur-xl rounded-2xl border border-purple-300/20 p-6 text-center"
+          className="bg-sky-300/5 backdrop-blur-xl rounded-2xl border border-sky-300/20 p-6 text-center"
         >
-          <Quote className="w-5 h-5 text-purple-400 mx-auto mb-3" />
-          <p className="text-purple-300 italic leading-relaxed">
+          <Quote className="w-5 h-5 text-sky-400 mx-auto mb-3" />
+          <p className="text-sky-300 italic leading-relaxed">
             "{currentQuote?.text}"
           </p>
           {currentQuote?.author && (
-            <p className="text-purple-400/60 text-sm mt-3">
+            <p className="text-sky-400/60 text-sm mt-3">
               — {currentQuote.author}
             </p>
           )}
@@ -196,12 +196,12 @@ function AuthCallbackContent() {
 export default function AuthCallbackPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-purple-950 via-purple-900 to-indigo-950 text-purple-300 flex items-center justify-center p-8">
-        <div className="max-w-md w-full bg-purple-300/5 backdrop-blur-xl rounded-2xl border border-purple-300/20 p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-purple-400/20 flex items-center justify-center mx-auto mb-4 border border-purple-400/30">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-sky-900 to-cyan-900 text-sky-300 flex items-center justify-center p-8">
+        <div className="max-w-md w-full bg-sky-300/5 backdrop-blur-xl rounded-2xl border border-sky-300/20 p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-sky-400/20 flex items-center justify-center mx-auto mb-4 border border-sky-400/30">
             <span className="text-2xl animate-spin">🔮</span>
           </div>
-          <h1 className="text-2xl font-bold mb-2 text-purple-200">Awakening Connection...</h1>
+          <h1 className="text-2xl font-bold mb-2 text-sky-200">Awakening Connection...</h1>
         </div>
       </div>
     }>
