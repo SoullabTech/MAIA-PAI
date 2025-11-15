@@ -7,6 +7,7 @@ import { ClientLayout } from "@/components/ClientLayout";
 // NUCLEAR: Disable static generation globally to fix useContext SSR errors
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
+export const runtime = 'nodejs';
 
 const inter = Inter({ subsets: ["latin"] });
 

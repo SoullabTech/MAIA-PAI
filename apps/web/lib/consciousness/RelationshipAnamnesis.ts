@@ -330,9 +330,10 @@ export function getRelationshipAnamnesis(): RelationshipAnamnesis {
  */
 
 // Supabase client import
-import { supabase } from '../supabase';
+import { createClient } from '../supabase';
 
 export async function saveRelationshipEssence(essence: RelationshipEssence): Promise<void> {
+  const supabase = createClient();
   if (!supabase) {
     console.warn('⚠️ [ANAMNESIS] Supabase not configured, essence not persisted');
     return;
@@ -384,6 +385,7 @@ export async function saveRelationshipEssence(essence: RelationshipEssence): Pro
 }
 
 export async function loadRelationshipEssence(soulSignature: string): Promise<RelationshipEssence | null> {
+  const supabase = createClient();
   if (!supabase) {
     console.warn('⚠️ [ANAMNESIS] Supabase not configured, cannot load essence');
     return null;

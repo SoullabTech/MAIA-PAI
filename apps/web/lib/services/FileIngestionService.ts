@@ -4,10 +4,17 @@ import { parsePDF } from '../pdf-parse-wrapper';
 import * as mammoth from 'mammoth';
 import { encode } from 'gpt-tokenizer';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function createSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.warn('[FileIngestionService] Supabase environment variables not available during build');
+    return null;
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey);
+}
 
 export interface FileProcessingOptions {
   fileId: string;
@@ -53,6 +60,11 @@ export class FileIngestionService {
       const reflection = await this.generateMayaReflection(chunks, filename);
       
       // 6. Update file status to ready
+      const supabase = createSupabaseClient();
+      if (!supabase) {
+        throw new Error('Supabase client not available');
+      }
+
       await supabase
         .from('user_files')
         .update({

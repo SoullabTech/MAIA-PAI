@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient';
 import { MAIAEncryption, UserEncryptionContext, PasswordValidator } from '@/lib/security/encryption';
 import { secureJournalStorage } from '@/lib/storage/secure-journal-storage';
 
@@ -31,7 +31,7 @@ export interface AuthState {
 }
 
 class SecureAuthManager {
-  private supabase = createClient();
+  private supabase = getBrowserSupabaseClient();
   private authState: AuthState = {
     user: null,
     encryptionContext: null,

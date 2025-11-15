@@ -3,7 +3,9 @@
  * Replaces the in-memory storage with encrypted Supabase persistence
  */
 
-import { createClient } from '@/lib/supabase/client';
+'use client';
+
+import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient';
 import { MAIAEncryption, UserEncryptionContext, SecureLocalStorage } from '@/lib/security/encryption';
 import { JournalingMode, JournalingResponse } from '@/lib/journaling/JournalingPrompts';
 
@@ -39,7 +41,7 @@ export interface StoredEncryptedEntry {
 }
 
 export class SecureJournalStorage {
-  private supabase = createClient();
+  private supabase = getBrowserSupabaseClient();
   private encryptionContext: UserEncryptionContext | null = null;
   private localCache: Map<string, SecureJournalEntry> = new Map();
   private initialized = false;
