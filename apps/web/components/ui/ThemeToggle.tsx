@@ -4,13 +4,11 @@ import { useTheme } from 'next-themes';
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient';
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [previousTheme, setPreviousTheme] = useState<string | null>(null);
-  const supabase = getBrowserSupabaseClient();
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -21,6 +19,10 @@ export default function ThemeToggle() {
   // Log theme changes to Supabase
   const logThemeChange = async (newTheme: string) => {
     try {
+      // Lazy-load Supabase client only when actually needed
+      const { getBrowserSupabaseClient } = await import('@/lib/supabaseBrowserClient');
+      const supabase = getBrowserSupabaseClient();
+
       // Get current user session if available
       const { data: { session } } = await supabase.auth.getSession();
       
