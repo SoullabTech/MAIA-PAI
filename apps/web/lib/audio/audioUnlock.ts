@@ -3,7 +3,7 @@
  * Unlocks audio context on first user interaction
  */
 
-import { trackAudioUnlock } from '@/lib/services/eventTracking';
+import { trackAudioUnlock } from '@/lib/analytics/eventTracking';
 
 let audioUnlocked = false;
 let toastShown = false;
