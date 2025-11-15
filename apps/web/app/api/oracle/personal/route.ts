@@ -90,21 +90,12 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Verify authentication and get encryption context
-    const authState = secureAuth.getAuthState();
-
-    // Fetch recent journal entries for context
+    // Fetch recent journal entries for context (skip auth check for beta users)
     let recentEntries: any[] = [];
     try {
-      if (authState.isAuthenticated && authState.encryptionContext) {
-        // Initialize secure storage if needed
-        if (!secureJournalStorage.isInitialized()) {
-          await secureJournalStorage.initialize(authState.encryptionContext);
-        }
-        recentEntries = await secureJournalStorage.getEntries(requestUserId, { limit: 5 });
-      } else {
-        console.log('⚠️ No authentication context, skipping journal context');
-      }
+      // For beta users, we'll skip the secure journal context for now
+      // Since they don't have full auth setup yet
+      console.log('⚠️ Skipping journal context for beta user:', requestUserId);
     } catch (journalError) {
       console.warn('Failed to fetch journal context:', journalError);
       // Continue without journal context

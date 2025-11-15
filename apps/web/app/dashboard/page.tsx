@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import ConsciousnessVessel from '@/components/consciousness/ConsciousnessVessel';
 import PrivacyAwareVoiceInsights from '@/components/dashboard/PrivacyAwareVoiceInsights';
+import { useAuth } from '@/components/SecureAuthProvider';
+import { verifyBetaCode } from '@/lib/auth/BetaAuth';
 
 interface ConsciousnessStats {
   conversations: number;
@@ -31,6 +33,8 @@ interface WisdomRecord {
 }
 
 export default function DashboardPage() {
+  const authState = useAuth();
+  const [userName, setUserName] = useState<string>('Explorer');
   const [stats, setStats] = useState<ConsciousnessStats>({
     conversations: 0,
     wisdomMoments: 0,
@@ -93,6 +97,42 @@ export default function DashboardPage() {
       setLoading(false);
     }, 1200);
   }, []);
+
+  // Resolve user name from authentication context or beta code
+  useEffect(() => {
+    async function resolveUserName() {
+      try {
+        // Priority 1: Check if user is authenticated with profile name
+        if (authState.user?.profile?.name) {
+          setUserName(authState.user.profile.name);
+          return;
+        }
+
+        // Priority 2: Check localStorage for beta code and resolve name
+        const betaCode = localStorage.getItem('betaCode');
+        if (betaCode) {
+          const verification = await verifyBetaCode(betaCode);
+          if (verification.valid && verification.name) {
+            setUserName(verification.name);
+            return;
+          }
+        }
+
+        // Priority 3: Use email or fallback
+        if (authState.user?.email) {
+          const emailName = authState.user.email.split('@')[0];
+          setUserName(emailName.charAt(0).toUpperCase() + emailName.slice(1));
+        } else {
+          setUserName('Explorer');
+        }
+      } catch (error) {
+        console.warn('Failed to resolve user name:', error);
+        setUserName('Explorer');
+      }
+    }
+
+    resolveUserName();
+  }, [authState.user]);
 
   if (loading) {
     return (
@@ -255,7 +295,7 @@ export default function DashboardPage() {
                 transition={{ delay: 0.5, duration: 1 }}
                 className="text-4xl md:text-6xl font-extralight text-jade-jade tracking-wide"
               >
-                Welcome back, Kelly
+                Welcome back, {userName}
               </motion.h1>
             </motion.div>
 

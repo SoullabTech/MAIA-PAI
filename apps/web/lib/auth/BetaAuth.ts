@@ -3,7 +3,7 @@
  * Handles beta user access and permissions
  */
 
-import { GANESHA_CONTACTS } from '../ganesha/contacts';
+import { ganeshaContacts } from '../ganesha/contacts';
 
 export interface BetaUser {
   id: string;
@@ -44,7 +44,7 @@ export async function revokeBetaAccess(userId: string): Promise<void> {
 
 export async function verifyBetaCode(code: string): Promise<BetaVerificationResult> {
   // Look for the code in the contacts database
-  const contact = GANESHA_CONTACTS.find(contact =>
+  const contact = ganeshaContacts.find(contact =>
     contact.metadata?.passcode === code
   );
 
