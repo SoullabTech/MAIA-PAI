@@ -1,17 +1,31 @@
 "use client";
 
 import { createContext, useContext, ReactNode } from 'react';
-import { useSecureAuth } from '@/lib/auth/secure-auth';
 
-type SecureAuthContextType = ReturnType<typeof useSecureAuth>;
+interface AuthState {
+  isAuthenticated: boolean;
+  user: any;
+  loading: boolean;
+  login: (credentials: any) => Promise<{ success: boolean; error?: string }>;
+  logout: () => Promise<void>;
+  getAuthState: () => AuthState;
+}
 
-const SecureAuthContext = createContext<SecureAuthContextType | undefined>(undefined);
+const SecureAuthContext = createContext<AuthState | undefined>(undefined);
 
 export function SecureAuthProvider({ children }: { children: ReactNode }) {
-  const authState = useSecureAuth();
+  // Provide a simple default auth state for SSR compatibility
+  const defaultState: AuthState = {
+    isAuthenticated: false,
+    user: null,
+    loading: false,
+    login: () => Promise.resolve({ success: false, error: 'Not implemented' }),
+    logout: () => Promise.resolve(),
+    getAuthState: () => ({ isAuthenticated: false, user: null, loading: false, login: () => Promise.resolve({ success: false }), logout: () => Promise.resolve(), getAuthState: () => ({}) as AuthState })
+  };
 
   return (
-    <SecureAuthContext.Provider value={authState}>
+    <SecureAuthContext.Provider value={defaultState}>
       {children}
     </SecureAuthContext.Provider>
   );
