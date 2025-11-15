@@ -1,9 +1,8 @@
-import JournalTimeline from '@/components/journaling/JournalTimeline';
+'use client';
 
-export const metadata = {
-  title: 'Journey Timeline | Sacred Journaling with MAIA',
-  description: 'Visual timeline of your journaling journey with symbolic patterns and archetypal evolution.'
-};
+export const dynamic = 'force-dynamic';
+
+import JournalTimeline from '@/components/journaling/JournalTimeline';
 
 export default function TimelinePage() {
   return <JournalTimeline />;

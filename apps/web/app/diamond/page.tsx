@@ -1,3 +1,6 @@
+'use client';
+export const dynamic = 'force-dynamic';
+
 import InteractiveDiamondSystem from '@/components/diamond/InteractiveDiamondSystem';
 
 export default function DiamondPage() {

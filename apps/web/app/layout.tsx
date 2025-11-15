@@ -6,6 +6,10 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
 import Link from "next/link";
 import dynamic from 'next/dynamic';
 
+// NUCLEAR: Disable static generation globally to fix useContext SSR errors
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 // Dynamically import all client providers to avoid SSR issues
 const ClientProviders = dynamic(
   () => import("@/components/ClientProviders").then(mod => ({ default: mod.ClientProviders })),

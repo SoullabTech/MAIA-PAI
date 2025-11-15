@@ -1,9 +1,8 @@
-import VoiceJournaling from '@/components/journaling/VoiceJournaling';
+'use client';
 
-export const metadata = {
-  title: 'Voice Journaling | Sacred Journaling with MAIA',
-  description: 'Speak your truth with voice-only journaling and receive symbolic reflections from MAIA.'
-};
+export const dynamic = 'force-dynamic';
+
+import VoiceJournaling from '@/components/journaling/VoiceJournaling';
 
 export default function VoiceJournalingPage() {
   return <VoiceJournaling />;
