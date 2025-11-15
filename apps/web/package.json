@@ -85,6 +85,7 @@
     "sharp": "^0.34.3",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
+    "styled-jsx": "^5.1.7",
     "tailwindcss": "^3.4.17",
     "tesseract.js": "^6.0.1",
     "three": "^0.169.0",
