@@ -208,6 +208,7 @@
     "socket.io-client": "^4.5.0",
     "sonner": "^2.0.7",
     "stripe": "^14.0.0",
+    "styled-jsx": "5.1.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^3.4.18",
     "tailwindcss-animate": "^1.0.7",

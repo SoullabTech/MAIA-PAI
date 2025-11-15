@@ -1,13 +1,12 @@
-Force redeploy trigger - ROOT PACKAGE.JSON FIXED
-Timestamp: Fri Nov 15 16:55:00 EST 2025
-Commit: ROOT CAUSE IDENTIFIED AND FIXED
-Status: VERCEL WAS READING WRONG PACKAGE.JSON
+Force redeploy trigger - STYLED-JSX VERSION ALIGNMENT
+Timestamp: Fri Nov 15 17:00:00 EST 2025
+Commit: PINNED STYLED-JSX TO EXACT VERSION
+Status: STYLED-JSX VERSION CONFLICT RESOLVED
 
-THE SMOKING GUN:
-- Root /package.json had "next": "^15.5.6"
-- apps/web/package.json had "next": "14.2.32"
-- Vercel reads ROOT package.json first!!!
-- Fixed root package.json to use "next": "14.2.32"
+VERSION ALIGNMENT COMPLETED:
+- Next.js 14.2.32 expects styled-jsx@5.1.1
+- Fixed apps/web/package.json: "styled-jsx": "5.1.1" (was ^5.1.6)
+- Added to root package.json: "styled-jsx": "5.1.1"
+- Verified consistent resolution: both now use 5.1.1
 
-This was THE issue causing the persistent 15.5.6 usage.
-NOW Vercel should finally use Next.js 14.2.32 correctly.
+This should resolve the "Cannot find module 'styled-jsx/style'" errors.
