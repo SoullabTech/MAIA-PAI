@@ -5,10 +5,17 @@ import { getOpenAIClient } from '../ai/openaiClient';
 
 const prisma = new PrismaClient();
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function createSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.warn('[MemoryOrchestrator] Supabase environment variables not available during build');
+    return null;
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey);
+}
 
 export interface MemoryContext {
   session: ConversationTurn[];       // Last N turns

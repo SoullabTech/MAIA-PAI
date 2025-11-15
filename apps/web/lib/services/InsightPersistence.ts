@@ -8,20 +8,29 @@
 import { createClient } from '@supabase/supabase-js';
 import type { UnifiedInsight, InsightSource, SpiralMovement, ArchetypalThread } from './UnifiedInsightEngine';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+function createSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  console.error('❌ Missing Supabase credentials for InsightPersistence');
+  if (!supabaseUrl || !supabaseServiceKey) {
+    console.warn('[InsightPersistence] Supabase environment variables not available during build');
+    return null;
+  }
+
+  return createClient(supabaseUrl, supabaseServiceKey);
 }
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 /**
  * Save or update a UnifiedInsight to the database
  */
 export async function saveUnifiedInsight(insight: UnifiedInsight): Promise<void> {
   try {
+    const supabase = createSupabaseClient();
+    if (!supabase) {
+      console.warn('[InsightPersistence] Supabase not available, skipping insight save');
+      return;
+    }
+
     // Check if insight already exists
     const { data: existing } = await supabase
       .from('unified_insights')
@@ -66,20 +75,20 @@ export async function saveUnifiedInsight(insight: UnifiedInsight): Promise<void>
 
     // Save recurrences
     if (insight.recurrences.length > 0) {
-      await saveRecurrences(insight.id, insight.recurrences);
+      await saveRecurrences(supabase, insight.id, insight.recurrences);
     }
 
     // Save spiral movement
-    await saveSpiralMovement(insight.id, insight.userId, insight.spiralMovement);
+    await saveSpiralMovement(supabase, insight.id, insight.userId, insight.spiralMovement);
 
     // Save archetypal thread if present
     if (insight.archetypalThread) {
-      await saveArchetypalThread(insight.id, insight.userId, insight.archetypalThread);
+      await saveArchetypalThread(supabase, insight.id, insight.userId, insight.archetypalThread);
     }
 
     // Save elemental transformations
     if (insight.elementalJourney.transformations.length > 0) {
-      await saveElementalTransformations(insight.id, insight.userId, insight.elementalJourney.transformations);
+      await saveElementalTransformations(supabase, insight.id, insight.userId, insight.elementalJourney.transformations);
     }
 
   } catch (error) {
@@ -92,6 +101,7 @@ export async function saveUnifiedInsight(insight: UnifiedInsight): Promise<void>
  * Save insight recurrences
  */
 async function saveRecurrences(
+  supabase: any,
   insightId: string,
   recurrences: UnifiedInsight['recurrences']
 ): Promise<void> {
@@ -122,6 +132,7 @@ async function saveRecurrences(
  * Save spiral movement state
  */
 async function saveSpiralMovement(
+  supabase: any,
   insightId: string,
   userId: string,
   movement: SpiralMovement
@@ -150,6 +161,7 @@ async function saveSpiralMovement(
  * Save archetypal thread
  */
 async function saveArchetypalThread(
+  supabase: any,
   insightId: string,
   userId: string,
   thread: ArchetypalThread
@@ -177,6 +189,7 @@ async function saveArchetypalThread(
  * Save elemental transformations
  */
 async function saveElementalTransformations(
+  supabase: any,
   insightId: string,
   userId: string,
   transformations: UnifiedInsight['elementalJourney']['transformations']
@@ -207,6 +220,12 @@ async function saveElementalTransformations(
  */
 export async function loadUserInsights(userId: string): Promise<UnifiedInsight[]> {
   try {
+    const supabase = createSupabaseClient();
+    if (!supabase) {
+      console.warn('[InsightPersistence] Supabase not available, returning empty insights');
+      return [];
+    }
+
     const { data: insights, error } = await supabase
       .from('unified_insights')
       .select(`
