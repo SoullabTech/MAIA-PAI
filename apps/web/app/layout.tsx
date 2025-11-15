@@ -2,11 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "../styles/ios-fallbacks.css";
-import { ErrorOverlay } from "@/components/system/ErrorOverlay";
-import { AudioUnlockBanner } from "@/components/system/AudioUnlockBanner";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import Link from "next/link";
-import { HeaderWrapper } from "@/components/layout/HeaderWrapper";
 import dynamic from 'next/dynamic';
 
 // Dynamically import all client providers to avoid SSR issues
@@ -16,6 +13,23 @@ const ClientProviders = dynamic(
     ssr: false,
     loading: () => <div className="min-h-screen bg-soul-background animate-pulse" />
   }
+);
+
+// Dynamically import header to prevent SSR issues
+const DynamicHeaderWrapper = dynamic(
+  () => import("@/components/layout/HeaderWrapper").then(mod => ({ default: mod.HeaderWrapper })),
+  { ssr: false }
+);
+
+// Dynamically import system components to prevent SSR issues
+const DynamicAudioUnlockBanner = dynamic(
+  () => import("@/components/system/AudioUnlockBanner").then(mod => ({ default: mod.AudioUnlockBanner })),
+  { ssr: false }
+);
+
+const DynamicErrorOverlay = dynamic(
+  () => import("@/components/system/ErrorOverlay").then(mod => ({ default: mod.ErrorOverlay })),
+  { ssr: false }
 );
 
 const inter = Inter({ subsets: ["latin"] });
@@ -54,15 +68,15 @@ export default function RootLayout({
       <body className={`${inter.className} bg-soul-background text-soul-textPrimary transition-colors duration-200 overflow-x-hidden`}>
         <ClientProviders>
           {/* Conditional Header */}
-          <HeaderWrapper />
+          <DynamicHeaderWrapper />
 
           {/* Main Content */}
           <main className="min-h-[calc(100vh-73px)]">
             {children}
           </main>
 
-          <AudioUnlockBanner />
-          <ErrorOverlay />
+          <DynamicAudioUnlockBanner />
+          <DynamicErrorOverlay />
         </ClientProviders>
       </body>
     </html>
