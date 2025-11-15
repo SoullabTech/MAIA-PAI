@@ -67,14 +67,11 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   
-  // Ignore ESLint errors during production builds
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   // Ensure CSS is processed correctly
   experimental: {
     optimizeCss: true,
+    // Disable server components for problematic pages
+    serverComponentsExternalPackages: [],
   },
 
   // Optimize production builds

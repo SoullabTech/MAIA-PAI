@@ -698,9 +698,25 @@ export function useSecureAuth(): AuthState & {
   updateProfile: typeof secureAuth.updateProfile;
   deleteAccount: typeof secureAuth.deleteAccount;
 } {
-  const [authState, setAuthState] = useState<AuthState>(secureAuth.getAuthState());
+  // Initialize with default state to avoid SSR issues, will be set properly in useEffect
+  const [authState, setAuthState] = useState<AuthState>(() => {
+    // Only call getAuthState during client-side rendering
+    if (typeof window !== 'undefined') {
+      return secureAuth.getAuthState();
+    }
+    // Return default state for SSR
+    return {
+      isAuthenticated: false,
+      user: null,
+      loading: true
+    };
+  });
 
   useEffect(() => {
+    // Set the initial auth state on the client-side
+    setAuthState(secureAuth.getAuthState());
+
+    // Subscribe to auth state changes
     const unsubscribe = secureAuth.onAuthStateChange(setAuthState);
     return unsubscribe;
   }, []);
