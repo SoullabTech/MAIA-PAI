@@ -1,11 +1,12 @@
+'use client'
+
 /**
  * Static 500 error page
- * This is a static page that doesn't use React client features
- * to prevent useContext errors during static generation
+ * This is a client component to prevent useContext errors during static generation
  */
 
 export default function Custom500() {
-  // This is a server component that won't cause useContext issues
+  // This is a client component that won't cause useContext issues
   return (
     <div style={{
       minHeight: '100vh',
