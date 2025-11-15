@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { getServerSupabaseClient } from "../../../../lib/supabaseServerClient";
 import { apiClient, API_ENDPOINTS } from "../../../../lib/config";
 import { getSupabaseConfig } from "../../../../lib/config/supabase";
 
@@ -40,18 +39,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      supabaseConfig.url,
-      supabaseConfig.anonKey,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-        },
-      },
-    );
+    const supabase = getServerSupabaseClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -185,18 +173,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      supabaseConfig.url,
-      supabaseConfig.anonKey,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-        },
-      },
-    );
+    const supabase = getServerSupabaseClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
