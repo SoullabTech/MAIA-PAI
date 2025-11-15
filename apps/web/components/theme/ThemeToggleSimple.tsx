@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClientComponentClient } from '@/lib/supabase'
+import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient'
 import { motion } from 'framer-motion'
 
 type Theme = 'light' | 'dark' | 'system'
@@ -9,7 +9,7 @@ type Theme = 'light' | 'dark' | 'system'
 export default function ThemeToggleSimple() {
   const [currentTheme, setCurrentTheme] = useState<Theme>('system')
   const [mounted, setMounted] = useState(false)
-  const supabase = createClientComponentClient()
+  const supabase = getBrowserSupabaseClient()
 
   // Load saved theme on mount
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function ThemeToggleSimple() {
 export function ThemeToggleCycle() {
   const [currentTheme, setCurrentTheme] = useState<Theme>('system')
   const [mounted, setMounted] = useState(false)
-  const supabase = createClientComponentClient()
+  const supabase = getBrowserSupabaseClient()
 
   useEffect(() => {
     setMounted(true)

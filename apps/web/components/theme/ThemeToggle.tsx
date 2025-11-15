@@ -5,14 +5,23 @@ import { useTheme } from 'next-themes'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sun, Moon, Monitor } from 'lucide-react'
 import { saveUserTheme, getUserTheme, getLocalTheme, ThemePreference } from '@/lib/theme/userTheme'
-import { useUser } from '@/lib/supabase'
-import { createClientComponentClient } from '@/lib/supabase'
+import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient'
 
 export default function ThemeToggle() {
   const { theme, setTheme, systemTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [saving, setSaving] = useState(false)
-  const user = useUser()
+  const [user, setUser] = useState<any>(null)
+
+  // Get user from Supabase auth
+  useEffect(() => {
+    const getUser = async () => {
+      const supabase = getBrowserSupabaseClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    getUser()
+  }, [])
 
   // Initialize theme on mount
   useEffect(() => {
@@ -40,7 +49,7 @@ export default function ThemeToggle() {
     
     try {
       // Log theme change event
-      const supabase = createClientComponentClient()
+      const supabase = getBrowserSupabaseClient()
       const sessionId = sessionStorage.getItem('session_id') || 
                         `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { createClientComponentClient } from '@/lib/supabase'
+import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient'
 import { motion, AnimatePresence } from 'framer-motion'
 import { trackEvent } from '@/lib/services/eventTracking'
 
@@ -28,7 +28,7 @@ export default function ExpandedReflectionPanel({
   const [surprise, setSurprise] = useState('')
   const [frustration, setFrustration] = useState('')
   
-  const supabase = createClientComponentClient()
+  const supabase = getBrowserSupabaseClient()
 
   useEffect(() => {
     if (messageCount >= triggerAfter && !hasSubmitted) {
