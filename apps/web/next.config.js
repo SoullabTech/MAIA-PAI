@@ -77,6 +77,11 @@ const nextConfig = {
     optimizeCss: true,
   },
 
+  // Disable styled-jsx completely to avoid module resolution issues
+  compiler: {
+    styledJsx: false,
+  },
+
   // Webpack configuration for IPFS compatibility and Supabase Edge Runtime warnings
   webpack: (config, { isServer }) => {
     if (isIPFS && !isServer) {
