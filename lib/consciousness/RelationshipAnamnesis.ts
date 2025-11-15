@@ -388,6 +388,7 @@ export async function saveRelationshipEssence(essence: RelationshipEssence): Pro
 }
 
 export async function loadRelationshipEssence(soulSignature: string): Promise<RelationshipEssence | null> {
+  const supabase = getBrowserSupabaseClient();
   if (!supabase) {
     console.warn('⚠️ [ANAMNESIS] Supabase not configured, cannot load essence');
     return null;

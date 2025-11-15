@@ -1,3 +1,5 @@
+'use client';
+
 /**
  * RELATIONSHIP ANAMNESIS
  *
@@ -329,11 +331,12 @@ export function getRelationshipAnamnesis(): RelationshipAnamnesis {
  * Soul recognition persists across devices and sessions
  */
 
-// Supabase client import
-import { createClient } from '../supabase';
+// Import appropriate client based on usage context
+// This file is used by client components, so use browser client
+import { getBrowserSupabaseClient } from '../supabaseBrowserClient';
 
 export async function saveRelationshipEssence(essence: RelationshipEssence): Promise<void> {
-  const supabase = createClient();
+  const supabase = getBrowserSupabaseClient();
   if (!supabase) {
     console.warn('⚠️ [ANAMNESIS] Supabase not configured, essence not persisted');
     return;
@@ -385,7 +388,7 @@ export async function saveRelationshipEssence(essence: RelationshipEssence): Pro
 }
 
 export async function loadRelationshipEssence(soulSignature: string): Promise<RelationshipEssence | null> {
-  const supabase = createClient();
+  const supabase = getBrowserSupabaseClient();
   if (!supabase) {
     console.warn('⚠️ [ANAMNESIS] Supabase not configured, cannot load essence');
     return null;
