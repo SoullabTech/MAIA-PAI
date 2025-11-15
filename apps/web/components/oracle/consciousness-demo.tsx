@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useMAIAOracle, OracleResponse, OracleDiagnosis } from '@/hooks/use-maia-oracle';
+import { SimpleHoloflower } from './holoflower-simple';
 
 export function ConsciousnessOracleDemo() {
   const { askOracle, diagnoseUser, testCringeDetection, getSystemStatus, loading, error } = useMAIAOracle();
@@ -14,9 +15,14 @@ export function ConsciousnessOracleDemo() {
   const [diagnosis, setDiagnosis] = useState<OracleDiagnosis | null>(null);
   const [cringeTest, setCringeTest] = useState<any>(null);
   const [systemStatus, setSystemStatus] = useState<any>(null);
+  const [holoflowerStage, setHoloflowerStage] = useState<'dormant' | 'awakening' | 'processing' | 'blooming' | 'complete'>('dormant');
 
   const handleAskOracle = async () => {
     if (!message.trim()) return;
+
+    // Animate holoflower through oracle stages
+    setHoloflowerStage('awakening');
+    setTimeout(() => setHoloflowerStage('processing'), 500);
 
     const result = await askOracle({
       userId,
@@ -29,6 +35,9 @@ export function ConsciousnessOracleDemo() {
     });
 
     if (result) {
+      setHoloflowerStage('blooming');
+      setTimeout(() => setHoloflowerStage('complete'), 1000);
+      setTimeout(() => setHoloflowerStage('dormant'), 3000);
       setResponse(result);
     }
   };
@@ -84,7 +93,21 @@ export function ConsciousnessOracleDemo() {
 
       {/* Oracle Chat Interface */}
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">Ask the Oracle</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold">Ask the Oracle</h2>
+
+          {/* Holoflower Oracle Visualization */}
+          <div className="flex-shrink-0">
+            <SimpleHoloflower
+              stage={holoflowerStage}
+              consciousnessLevel={response?.level}
+              elementalSignature={response?.elementalSignature}
+              cringeScore={response?.metadata?.cringeScore}
+              size={120}
+              className="transition-all duration-500"
+            />
+          </div>
+        </div>
 
         <div className="space-y-4">
           <div>
