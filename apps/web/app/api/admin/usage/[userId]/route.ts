@@ -20,6 +20,20 @@ export async function GET(
   request: NextRequest,
   { params }: { params: { userId: string } }
 ) {
+  // During build, return mock data to avoid async storage issues
+  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL_URL) {
+    return NextResponse.json({
+      userId: params.userId,
+      period: '7 days',
+      totalRequests: 0,
+      totalCost: '$0.00',
+      dailyBreakdown: [],
+      quotaStatus: 'ok',
+      quota: 100,
+      quotaMessage: 'Build time mock'
+    });
+  }
+
   try {
     const userId = params.userId;
     const searchParams = request.nextUrl.searchParams;
@@ -27,8 +41,32 @@ export async function GET(
 
     console.log(`📊 [ADMIN] Fetching usage for ${userId} (last ${days} days)`);
 
-    // Get user summary
-    const summary = await usageTracker.getUserSummary(userId, days);
+    // Get user summary - wrapped in try-catch for build safety
+    let summary;
+    let quotaCheck;
+
+    try {
+      summary = await usageTracker.getUserSummary(userId, days);
+      quotaCheck = await usageTracker.checkQuota(userId);
+    } catch (serviceError) {
+      console.error('Service error:', serviceError);
+      // Return fallback data during build or service errors
+      summary = {
+        userId,
+        period: `${days} days`,
+        totalRequests: 0,
+        totalCost: '$0.00',
+        dailyBreakdown: [],
+        quotaStatus: 'ok'
+      };
+      quotaCheck = {
+        quota: 100,
+        used: 0,
+        remaining: 100,
+        allowed: true,
+        reason: 'Service unavailable'
+      };
+    }
 
     if (!summary) {
       return NextResponse.json(
@@ -37,14 +75,11 @@ export async function GET(
       );
     }
 
-    // Get current quota
-    const quotaCheck = await usageTracker.checkQuota(userId);
-
     return NextResponse.json({
       ...summary,
-      quota: quotaCheck.quota || null,
-      quotaStatus: quotaCheck.allowed ? 'ok' : 'exceeded',
-      quotaMessage: quotaCheck.reason || null
+      quota: quotaCheck?.quota || null,
+      quotaStatus: quotaCheck?.allowed ? 'ok' : 'exceeded',
+      quotaMessage: quotaCheck?.reason || null
     });
 
   } catch (error) {

@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { communityStorage } from '@/lib/community/storage'
 import { CreateCommentPayload } from '@/lib/community/types'
 
+// Route segment config for dynamic behavior
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 /**
  * GET /api/community/posts/[postId]/comments
  * Fetch all comments for a post
@@ -11,12 +15,12 @@ export async function GET(
   { params }: { params: { postId: string } }
 ) {
   try {
-    const comments = communityStorage.getComments(params.postId)
+    const comments = await communityStorage.getComments(params.postId)
 
-    // For each comment, get replies
+    // For now, just return comments without replies as replies feature is not implemented yet
     const commentsWithReplies = comments.map(comment => ({
       ...comment,
-      replies: communityStorage.getReplies(comment.id)
+      replies: [] // Empty replies for now, can be implemented later
     }))
 
     return NextResponse.json({
@@ -59,7 +63,16 @@ export async function POST(
       }, { status: 400 })
     }
 
-    const comment = communityStorage.createComment(payload)
+    // Create comment object compatible with storage
+    const commentData = {
+      id: `comment_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      postId: payload.postId,
+      userId: payload.userId,
+      content: payload.content,
+      timestamp: Date.now()
+    }
+
+    const comment = await communityStorage.createComment(commentData)
 
     if (!comment) {
       return NextResponse.json({

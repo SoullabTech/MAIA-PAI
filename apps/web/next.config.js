@@ -68,11 +68,12 @@ const nextConfig = {
   compress: true,
 
 
+
   // Ensure CSS is processed correctly
   experimental: {
     optimizeCss: true,
-    // Disable server components for problematic pages
-    serverComponentsExternalPackages: [],
+    // Fix for async storage issues in Next.js 15
+    workerThreads: false,
   },
 
   // Optimize production builds
