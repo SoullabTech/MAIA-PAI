@@ -25,14 +25,6 @@ export const metadata: Metadata = {
   description:
     "Sacred Mirror - Maya Voice AI companion for consciousness exploration",
   manifest: "/manifest.json",
-  themeColor: "#FFD700",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-    viewportFit: "cover",
-  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -41,6 +33,15 @@ export const metadata: Metadata = {
   other: {
     "mobile-web-app-capable": "yes",
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
+  themeColor: "#FFD700",
 };
 
 export default function RootLayout({

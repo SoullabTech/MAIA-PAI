@@ -20,15 +20,32 @@ import { cn } from '@/lib/utils';
 export function AmbientVoiceIndicator() {
   const {
     ambientMode,
-    isConnected,
-    isListening,
-    isSpeaking,
     currentElement,
-    startListening,
-    stopListening,
-    disconnect,
     toggleVoiceOnly
   } = useMaiaPresence();
+
+  // Mock voice state for now - these should come from a voice service context
+  const [isConnected, setIsConnected] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  // Mock voice controls - these will be replaced with actual voice service integration
+  const startListening = () => {
+    setIsListening(true);
+    console.log('🎙️ Voice listening started');
+  };
+
+  const stopListening = () => {
+    setIsListening(false);
+    console.log('🎙️ Voice listening stopped');
+  };
+
+  const disconnect = () => {
+    setIsConnected(false);
+    setIsListening(false);
+    setIsSpeaking(false);
+    console.log('🎙️ Voice disconnected');
+  };
 
   const [isExpanded, setIsExpanded] = useState(false);
 
