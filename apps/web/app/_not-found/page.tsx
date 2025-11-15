@@ -1,50 +1,33 @@
-// frontend
-
+// Nuclear static page to avoid registerClientReference issues
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
-export default function NotFoundPage() {
+export default function NotFound() {
   return (
-    <html lang="en">
+    <html>
       <head>
         <title>Page Not Found - MAIA</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body style={{
         margin: 0,
-        padding: 0,
+        padding: '2rem',
+        backgroundColor: '#030712',
+        color: 'white',
         fontFamily: 'system-ui, -apple-system, sans-serif',
-        backgroundColor: '#0f0f0f',
-        color: '#ffffff',
         minHeight: '100vh',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        textAlign: 'center'
       }}>
-        <div style={{
-          textAlign: 'center',
-          maxWidth: '400px',
-          padding: '2rem'
-        }}>
-          <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>404</h1>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Page not found</h2>
-          <p style={{ marginBottom: '2rem', opacity: 0.7 }}>
-            The page you were looking for doesn't exist or may have moved.
-          </p>
-          <a
-            href="/"
-            style={{
-              display: 'inline-block',
-              padding: '0.75rem 1.5rem',
-              backgroundColor: '#FFD700',
-              color: '#000000',
-              textDecoration: 'none',
-              borderRadius: '0.375rem',
-              fontWeight: 500
-            }}
-          >
-            Return to MAIA home
-          </a>
-        </div>
+        <h1 style={{ fontSize: '2rem', marginBottom: '1rem' }}>Page not found</h1>
+        <p style={{ color: '#9CA3AF', marginBottom: '1rem', maxWidth: '28rem' }}>
+          The page you were looking for doesn't exist or may have moved.
+        </p>
+        <a href="/" style={{ color: 'white', textDecoration: 'underline' }}>
+          Return to MAIA home
+        </a>
       </body>
     </html>
   );
