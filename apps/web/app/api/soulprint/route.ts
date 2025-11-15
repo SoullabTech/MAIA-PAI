@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseClient } from "../../../lib/supabaseClient";
+import { getServerSupabaseClient } from "../../../lib/supabaseServerClient";
 import { getSoulprintForUser, getSymbolicInsights, exportSoulprint, soulprintMemory } from "@/lib/memory/soulprint";
 // Mark route as dynamic since it uses searchParams or other dynamic features
 export const dynamic = 'force-dynamic';
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createSupabaseClient();
+    const supabase = getServerSupabaseClient();
     if (!supabase) {
       return NextResponse.json(
         { success: false, error: "Database not configured" },
@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const supabase = createSupabaseClient();
+    const supabase = getServerSupabaseClient();
     if (!supabase) {
       return NextResponse.json(
         { success: false, error: "Database not configured" },

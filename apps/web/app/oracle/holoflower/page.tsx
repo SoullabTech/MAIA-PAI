@@ -31,7 +31,7 @@ import {
 import { HoloflowerSurvey } from '@/components/oracle/HoloflowerSurvey';
 import { journalService } from '@/lib/services/journalService';
 import { holoflowerMemoryIntegration } from '@/lib/services/holoflowerMemoryIntegration';
-import { createSupabaseClient } from '@/lib/supabaseClient';
+import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient';
 import type { ConfigurationMethod } from '@/types/journal';
 
 type Phase = 'intro' | 'intention' | 'checkin' | 'survey' | 'processing' | 'reading' | 'conversation' | 'merge';
@@ -778,7 +778,7 @@ Engage in a soulful, explorative conversation about meanings, implications, pote
 
     try {
       // Get current user
-      const supabase = createSupabaseClient();
+      const supabase = getBrowserSupabaseClient();
       const { data: { user } } = await supabase?.auth.getUser();
 
       if (!user) {

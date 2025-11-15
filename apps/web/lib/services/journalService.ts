@@ -4,7 +4,7 @@
  * All roads lead back to MAIA's deepening understanding of each member
  */
 
-import { createSupabaseClient } from '@/lib/supabaseClient';
+import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient';
 import type {
   HoloflowerJournalEntry,
   CreateJournalEntryInput,
@@ -14,7 +14,7 @@ import type {
 
 export class JournalService {
   private get supabase() {
-    return createSupabaseClient();
+    return getBrowserSupabaseClient();
   }
 
   /**

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseClient } from "../../../lib/supabaseClient";
+import { getServerSupabaseClient } from "../../../lib/supabaseServerClient";
 // Mark route as dynamic since it uses searchParams or other dynamic features
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = createSupabaseClient();
+    const supabase = getServerSupabaseClient();
     if (!supabase) {
       return NextResponse.json(
         { success: false, error: "Database not configured" },
