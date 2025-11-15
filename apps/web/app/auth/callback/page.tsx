@@ -2,8 +2,20 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { IntegrationAuthService } from "@/lib/auth/integrationAuth";
-import { WisdomQuotes } from "@/lib/wisdom/WisdomQuotes";
+import { workingAuthService } from "@/lib/auth/workingAuth";
+// Simple wisdom quotes for auth flow
+const WisdomQuotes = {
+  aether: [
+    { text: "Consciousness is the only reality and the only thing worth exploring", author: "Ramana Maharshi" },
+    { text: "The privilege of a lifetime is being who you are", author: "Joseph Campbell" },
+    { text: "Until you make the unconscious conscious, it will direct your life", author: "Carl Jung" }
+  ],
+  air: [
+    { text: "The mind is everything. What you think you become", author: "Buddha" },
+    { text: "In the beginner's mind there are many possibilities", author: "Shunryu Suzuki" },
+    { text: "The quieter you become, the more able you are to hear", author: "Rumi" }
+  ]
+};
 import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
 import { deviceAuthService } from "@/lib/auth/deviceAuth";
@@ -21,7 +33,7 @@ function AuthCallbackContent() {
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
   const [currentQuote, setCurrentQuote] = useState(WisdomQuotes.aether[0]);
-  const authService = new IntegrationAuthService();
+  const authService = workingAuthService;
 
   // Rotating wisdom quotes during authentication process
   useEffect(() => {
