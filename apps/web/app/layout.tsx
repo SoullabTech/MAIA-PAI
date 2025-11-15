@@ -4,14 +4,14 @@ import "./globals.css";
 import "../styles/ios-fallbacks.css";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import Link from "next/link";
-import dynamic from 'next/dynamic';
+import dynamicImport from 'next/dynamic';
 
 // NUCLEAR: Disable static generation globally to fix useContext SSR errors
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
 
 // Dynamically import all client providers to avoid SSR issues
-const ClientProviders = dynamic(
+const ClientProviders = dynamicImport(
   () => import("@/components/ClientProviders").then(mod => ({ default: mod.ClientProviders })),
   {
     ssr: false,
@@ -20,18 +20,18 @@ const ClientProviders = dynamic(
 );
 
 // Dynamically import header to prevent SSR issues
-const DynamicHeaderWrapper = dynamic(
+const DynamicHeaderWrapper = dynamicImport(
   () => import("@/components/layout/HeaderWrapper").then(mod => ({ default: mod.HeaderWrapper })),
   { ssr: false }
 );
 
 // Dynamically import system components to prevent SSR issues
-const DynamicAudioUnlockBanner = dynamic(
+const DynamicAudioUnlockBanner = dynamicImport(
   () => import("@/components/system/AudioUnlockBanner").then(mod => ({ default: mod.AudioUnlockBanner })),
   { ssr: false }
 );
 
-const DynamicErrorOverlay = dynamic(
+const DynamicErrorOverlay = dynamicImport(
   () => import("@/components/system/ErrorOverlay").then(mod => ({ default: mod.ErrorOverlay })),
   { ssr: false }
 );
