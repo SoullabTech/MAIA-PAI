@@ -66,7 +66,8 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-  
+
+
   // Ensure CSS is processed correctly
   experimental: {
     optimizeCss: true,
