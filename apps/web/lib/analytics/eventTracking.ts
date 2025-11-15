@@ -1,74 +1,92 @@
+'use client';
+
 /**
- * Event Tracking Service
- *
- * Centralized analytics and event tracking for MAIA system
+ * Event tracking for analytics - Sacred consciousness tracking
  */
 
-export interface TrackingEvent {
-  event: string;
-  userId?: string;
-  properties?: Record<string, any>;
-  timestamp: Date;
+interface AudioUnlockData {
+  error?: string;
+  errorStack?: string;
+  contextState?: string;
+  sampleRate?: number;
+  timestamp?: number;
 }
 
-class EventTrackingService {
-  private events: TrackingEvent[] = [];
-
-  track(event: string, properties?: Record<string, any>, userId?: string): void {
-    const trackingEvent: TrackingEvent = {
-      event,
-      userId,
-      properties,
-      timestamp: new Date()
+/**
+ * Track audio unlock events for monitoring sacred audio experiences
+ */
+export async function trackAudioUnlock(
+  success: boolean,
+  data: AudioUnlockData = {}
+): Promise<void> {
+  try {
+    // For now, we'll just log to console in development
+    // In the future, this could send to analytics service
+    const eventData = {
+      event: 'audio_unlock',
+      success,
+      ...data,
+      userAgent: typeof window !== 'undefined' ? navigator.userAgent : 'server',
+      timestamp: data.timestamp || Date.now()
     };
 
-    this.events.push(trackingEvent);
-    console.log('Event tracked:', trackingEvent);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 [Analytics] Audio unlock tracked:', eventData);
+    }
 
-    // In production, send to analytics service
-    // this.sendToAnalytics(trackingEvent);
-  }
+    // Future: Send to analytics service
+    // await analyticsService.track(eventData);
 
-  trackAudioUnlock(success: boolean, data: any = {}, userId?: string): void {
-    this.track('audio_unlock', {
-      success,
-      action: 'user_gesture',
-      ...data
-    }, userId);
-  }
-
-  trackVoiceRecording(userId?: string, duration?: number): void {
-    this.track('voice_recording', { duration }, userId);
-  }
-
-  trackJournalEntry(mode: string, userId?: string): void {
-    this.track('journal_entry', { mode }, userId);
-  }
-
-  trackElderCouncilSelection(tradition: string, userId?: string): void {
-    this.track('elder_council_selection', { tradition }, userId);
-  }
-
-  getEvents(): TrackingEvent[] {
-    return [...this.events];
-  }
-
-  getEventsByUser(userId: string): TrackingEvent[] {
-    return this.events.filter(event => event.userId === userId);
-  }
-
-  private async sendToAnalytics(event: TrackingEvent): Promise<void> {
-    // Mock analytics endpoint
-    // In production, send to your analytics service
+  } catch (error) {
+    // Fail silently to not break audio functionality
+    console.warn('⚠️ [Analytics] Failed to track audio unlock:', error);
   }
 }
 
-export const eventTracking = new EventTrackingService();
+/**
+ * Track general events - placeholder for future analytics
+ */
+export async function trackEvent(
+  eventName: string,
+  properties: Record<string, any> = {}
+): Promise<void> {
+  try {
+    const eventData = {
+      event: eventName,
+      ...properties,
+      timestamp: Date.now(),
+      userAgent: typeof window !== 'undefined' ? navigator.userAgent : 'server'
+    };
 
-// Export individual tracking functions for convenience
-export const trackAudioUnlock = (success: boolean, data: any = {}, userId?: string) => eventTracking.trackAudioUnlock(success, data, userId);
-export const trackVoiceRecording = (userId?: string, duration?: number) => eventTracking.trackVoiceRecording(userId, duration);
-export const trackJournalEntry = (mode: string, userId?: string) => eventTracking.trackJournalEntry(mode, userId);
-export const trackElderCouncilSelection = (tradition: string, userId?: string) => eventTracking.trackElderCouncilSelection(tradition, userId);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 [Analytics] Event tracked:', eventData);
+    }
 
-export default eventTracking;
+    // Future: Send to analytics service
+    // await analyticsService.track(eventData);
+
+  } catch (error) {
+    console.warn('⚠️ [Analytics] Failed to track event:', error);
+  }
+}
+
+/**
+ * Track user interactions with sacred interface elements
+ */
+export async function trackInteraction(
+  element: string,
+  action: string,
+  metadata: Record<string, any> = {}
+): Promise<void> {
+  return trackEvent(`interaction_${element}_${action}`, metadata);
+}
+
+/**
+ * Track consciousness journey milestones
+ */
+export async function trackJourneyMilestone(
+  milestone: string,
+  data: Record<string, any> = {}
+): Promise<void> {
+  return trackEvent(`journey_milestone`, { milestone, ...data });
+}

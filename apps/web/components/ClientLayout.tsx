@@ -6,7 +6,8 @@ import { SecureAuthProvider } from "@/components/SecureAuthProvider";
 import IOSFixInitializer from "@/components/system/IOSFixInitializer";
 import { ToastProvider } from "@/components/system/ToastProvider";
 import { ErrorOverlay } from "@/components/system/ErrorOverlay";
-import { AudioUnlockBanner } from "@/components/system/AudioUnlockBanner";
+// TEMPORARY: AudioUnlockBanner disabled to fix Vercel build
+// import { AudioUnlockBanner } from "@/components/system/AudioUnlockBanner";
 import { HeaderWrapper } from "@/components/layout/HeaderWrapper";
 
 interface ClientLayoutProps {
@@ -27,7 +28,8 @@ export function ClientLayout({ children }: ClientLayoutProps) {
             {children}
           </main>
 
-          <AudioUnlockBanner />
+          {/* TEMPORARY: AudioUnlockBanner disabled to fix Vercel build */}
+          {/* <AudioUnlockBanner /> */}
           <ErrorOverlay />
         </ToastProvider>
       </SecureAuthProvider>
