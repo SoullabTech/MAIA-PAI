@@ -3,10 +3,19 @@
  * Handles beta user access and permissions
  */
 
+import { GANESHA_CONTACTS } from '../ganesha/contacts';
+
 export interface BetaUser {
   id: string;
   email: string;
   hasAccess: boolean;
+}
+
+export interface BetaVerificationResult {
+  valid: boolean;
+  explorerId?: string;
+  name?: string;
+  email?: string;
 }
 
 export async function checkBetaAccess(userId: string): Promise<boolean> {
@@ -33,10 +42,29 @@ export async function revokeBetaAccess(userId: string): Promise<void> {
   console.log(`Revoked beta access from user: ${userId}`);
 }
 
+export async function verifyBetaCode(code: string): Promise<BetaVerificationResult> {
+  // Look for the code in the contacts database
+  const contact = GANESHA_CONTACTS.find(contact =>
+    contact.metadata?.passcode === code
+  );
+
+  if (contact) {
+    return {
+      valid: true,
+      explorerId: contact.id,
+      name: contact.name,
+      email: contact.email
+    };
+  }
+
+  return { valid: false };
+}
+
 // Export a unified auth object for compatibility
 export const betaAuth = {
   checkBetaAccess,
   getBetaUser,
   grantBetaAccess,
-  revokeBetaAccess
+  revokeBetaAccess,
+  verifyBetaCode
 };
