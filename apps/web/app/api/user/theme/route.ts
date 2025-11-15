@@ -5,13 +5,14 @@ export async function POST(request: NextRequest) {
   try {
     const { theme, previous, timestamp } = await request.json();
 
+    // Get server-side Supabase client
     const supabase = getServerSupabaseClient();
 
     // Get current user session if available
     const { data: { session } } = await supabase.auth.getSession();
 
     // Log to event_logs table
-    await supabase.from('event_logs').insert({
+    const { error: logError } = await supabase.from('event_logs').insert({
       event_name: 'theme_changed',
       user_id: session?.user?.id || null,
       metadata: {
@@ -26,17 +27,28 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    if (logError) {
+      console.error('Failed to log theme change:', logError);
+    }
+
     // Update user profile if logged in
     if (session?.user?.id) {
-      await supabase
+      const { error: profileError } = await supabase
         .from('profiles')
         .update({ theme_preference: theme })
         .eq('id', session.user.id);
+
+      if (profileError) {
+        console.error('Failed to update user theme preference:', profileError);
+      }
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.warn('Failed to log theme change:', error);
-    return NextResponse.json({ error: 'Failed to log theme change' }, { status: 500 });
+    console.error('Theme API error:', error);
+    return NextResponse.json(
+      { error: 'Failed to update theme' },
+      { status: 500 }
+    );
   }
 }

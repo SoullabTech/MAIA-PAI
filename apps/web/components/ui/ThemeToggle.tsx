@@ -14,11 +14,12 @@ export default function ThemeToggle() {
   useEffect(() => {
     setMounted(true);
     setPreviousTheme(theme || 'system');
-  }, []);
+  }, [theme]);
 
-  // Log theme changes to API endpoint (no direct Supabase import)
+  // Log theme changes via API route (no direct Supabase import)
   const logThemeChange = async (newTheme: string) => {
     try {
+      // Call our API route instead of directly using Supabase
       await fetch('/api/user/theme', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
