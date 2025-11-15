@@ -8,7 +8,7 @@
  * across multiple encounters.
  */
 
-import { supabase } from '@/lib/supabaseClient';
+import { createSupabaseClient } from '@/lib/supabaseClient';
 import type { SoulPattern } from '@/types/journal';
 
 export interface CreateSoulPatternInput {
@@ -22,7 +22,9 @@ export interface CreateSoulPatternInput {
 }
 
 export class SoulPatternService {
-  private supabase = supabase;
+  private get supabase() {
+    return createSupabaseClient();
+  }
 
   /**
    * Save a new soul pattern

@@ -2,35 +2,20 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "../styles/ios-fallbacks.css";
-import ThemeToggle from "@/components/ui/ThemeToggle";
+import { ErrorOverlay } from "@/components/system/ErrorOverlay";
+import { AudioUnlockBanner } from "@/components/system/AudioUnlockBanner";
+import { ToastProvider } from "@/components/system/ToastProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import Link from "next/link";
-import dynamicImport from 'next/dynamic';
+import IOSFixInitializer from "@/components/system/IOSFixInitializer";
+import { SecureAuthProvider } from "@/components/SecureAuthProvider";
+import dynamic from "next/dynamic";
 
-// NUCLEAR: Disable static generation globally to fix useContext SSR errors
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
-
-// Dynamically import all client providers to avoid SSR issues
-const ClientProviders = dynamicImport(
-  () => import("@/components/ClientProviders").then(mod => ({ default: mod.ClientProviders })),
-  {
-    loading: () => <div className="min-h-screen bg-soul-background animate-pulse" />
-  }
-);
-
-// Dynamically import header to prevent SSR issues
-const DynamicHeaderWrapper = dynamicImport(
-  () => import("@/components/layout/HeaderWrapper").then(mod => ({ default: mod.HeaderWrapper }))
-);
-
-// Dynamically import system components to prevent SSR issues
-const DynamicAudioUnlockBanner = dynamicImport(
-  () => import("@/components/system/AudioUnlockBanner").then(mod => ({ default: mod.AudioUnlockBanner }))
-);
-
-const DynamicErrorOverlay = dynamicImport(
-  () => import("@/components/system/ErrorOverlay").then(mod => ({ default: mod.ErrorOverlay }))
-);
+// Dynamically import components that use Supabase client
+const HeaderWrapper = dynamic(() => import("@/components/layout/HeaderWrapper").then(mod => ({ default: mod.HeaderWrapper })), {
+  ssr: false,
+  loading: () => <div className="h-[73px] bg-soul-background" /> // Placeholder with same height
+});
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -66,18 +51,23 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-soul-background text-soul-textPrimary transition-colors duration-200 overflow-x-hidden`}>
-        <ClientProviders>
-          {/* Conditional Header */}
-          <DynamicHeaderWrapper />
+        <ThemeProvider>
+          <SecureAuthProvider>
+            <IOSFixInitializer />
+            <ToastProvider>
+              {/* Conditional Header */}
+              <HeaderWrapper />
 
-          {/* Main Content */}
-          <main className="min-h-[calc(100vh-73px)]">
-            {children}
-          </main>
+              {/* Main Content */}
+              <main className="min-h-[calc(100vh-73px)]">
+                {children}
+              </main>
 
-          <DynamicAudioUnlockBanner />
-          <DynamicErrorOverlay />
-        </ClientProviders>
+              <AudioUnlockBanner />
+              <ErrorOverlay />
+            </ToastProvider>
+          </SecureAuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

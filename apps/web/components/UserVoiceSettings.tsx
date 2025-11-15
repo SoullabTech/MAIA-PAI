@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Settings, Save, RefreshCw, Info } from 'lucide-react';
 import ToneSlider from './ToneSlider';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 interface UserVoiceSettingsProps {
   userId: string;
@@ -44,6 +44,7 @@ export default function UserVoiceSettings({
   const loadUserSettings = async () => {
     try {
       setLoading(true);
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('user_settings')
         .select('voice_tone, adaptive_learning, greeting_frequency, elemental_balance, symbol_recognition')
@@ -69,7 +70,8 @@ export default function UserVoiceSettings({
   const saveSettings = async () => {
     try {
       setSaving(true);
-      
+
+      const supabase = createClient();
       const { error } = await supabase
         .from('user_settings')
         .upsert({

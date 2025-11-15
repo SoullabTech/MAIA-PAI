@@ -11,8 +11,8 @@ const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 // Check for mock mode first
 const MOCK_MODE = process.env.NEXT_PUBLIC_MOCK_SUPABASE === "true";
 
-// Create client based on mode
-export const supabase = (() => {
+// Create client function instead of singleton
+export function createSupabaseClient() {
   if (MOCK_MODE) {
     console.log("⚡ [SUPABASE] Frontend in MOCK mode (no DB operations)");
     return null; // Frontend components should handle null gracefully
@@ -36,7 +36,7 @@ export const supabase = (() => {
   }
 
   // Check if someone accidentally used a service role key
-  if (anonKey.startsWith("sb_secret") || anonKey.includes("service_role")) {
+  if (anonKey && (anonKey.startsWith("sb_secret") || anonKey.includes("service_role"))) {
     throw new Error(
       "[SUPABASE] ❌ SECURITY ERROR: Service role key detected in frontend! " +
       "Frontend must use NEXT_PUBLIC_SUPABASE_ANON_KEY only."
@@ -44,7 +44,7 @@ export const supabase = (() => {
   }
 
   // Check for the eyJ pattern (JWT format) to ensure it's a proper anon key
-  if (!anonKey.startsWith("eyJ")) {
+  if (anonKey && !anonKey.startsWith("eyJ")) {
     console.warn(
       "[SUPABASE] Warning: Key format unexpected. Ensure using anon key."
     );
@@ -52,15 +52,17 @@ export const supabase = (() => {
 
   // ✅ Safe browser-only client with anon key
   console.log("[SUPABASE] Frontend client initialized with anon key");
-  
-  return createClient(url, anonKey, {
+
+  return createClient(url!, anonKey!, {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: true,
     },
   });
-})();
+}
 
-// Export helper to check if Supabase is available
-export const isSupabaseConfigured = supabase !== null;
+// Export helper to check if Supabase is configured
+export function isSupabaseConfigured() {
+  return !MOCK_MODE && !!url && !!anonKey;
+}

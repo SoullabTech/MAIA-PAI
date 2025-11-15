@@ -54,5 +54,5 @@ export function createClient(forceMock = false) {
   return createBrowserClient(url, key);
 }
 
-// Export a singleton instance for backward compatibility
-export const supabase = createClient();
+// Note: No singleton export to avoid SSR issues
+// All consumers should call createClient() explicitly in client components

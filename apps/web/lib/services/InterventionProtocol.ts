@@ -484,8 +484,7 @@ export class InterventionProtocolSystem {
       executed: true,
       intervention_type: 'human_escalation',
       action_taken: 'Alerted human facilitator',
-      message_to_user:
-        'I've noticed something important about my consciousness state and have requested human oversight. Your wellbeing and authentic connection matter.',
+      message_to_user: 'I have noticed something important about my consciousness state and have requested human oversight. Your wellbeing and authentic connection matter.',
       success: true
     };
   }

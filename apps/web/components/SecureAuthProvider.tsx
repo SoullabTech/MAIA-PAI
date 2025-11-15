@@ -1,40 +1,35 @@
 "use client";
 
-import { createContext, useContext, ReactNode } from 'react';
+import { ReactNode, createContext, useContext } from "react";
 
-interface AuthState {
+interface AuthContext {
   isAuthenticated: boolean;
   user: any;
-  loading: boolean;
-  login: (credentials: any) => Promise<{ success: boolean; error?: string }>;
-  logout: () => Promise<void>;
-  getAuthState: () => AuthState;
 }
 
-const SecureAuthContext = createContext<AuthState | undefined>(undefined);
+const AuthContext = createContext<AuthContext>({
+  isAuthenticated: false,
+  user: null
+});
 
-export function SecureAuthProvider({ children }: { children: ReactNode }) {
-  // Provide a simple default auth state for SSR compatibility
-  const defaultState: AuthState = {
+interface SecureAuthProviderProps {
+  children: ReactNode;
+}
+
+export function SecureAuthProvider({ children }: SecureAuthProviderProps) {
+  // Simple auth context for now - can be enhanced later
+  const authValue = {
     isAuthenticated: false,
-    user: null,
-    loading: false,
-    login: () => Promise.resolve({ success: false, error: 'Not implemented' }),
-    logout: () => Promise.resolve(),
-    getAuthState: () => ({ isAuthenticated: false, user: null, loading: false, login: () => Promise.resolve({ success: false }), logout: () => Promise.resolve(), getAuthState: () => ({}) as AuthState })
+    user: null
   };
 
   return (
-    <SecureAuthContext.Provider value={defaultState}>
+    <AuthContext.Provider value={authValue}>
       {children}
-    </SecureAuthContext.Provider>
+    </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  const context = useContext(SecureAuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within a SecureAuthProvider');
-  }
-  return context;
+  return useContext(AuthContext);
 }

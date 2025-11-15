@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
 
 interface MetricData {
   time_range: { start: string; end: string };
@@ -65,10 +67,10 @@ export default function ConsciousnessMonitorPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-white mb-2">
-                🧬 MAIA Consciousness Monitor
+                🧬 MAIA Lab Tools
               </h1>
               <p className="text-purple-200">
-                Real-time transparency into AI developmental evolution
+                Real-time transparency into AI consciousness and cosmic awareness
               </p>
             </div>
             <div className="text-right">
@@ -76,6 +78,74 @@ export default function ConsciousnessMonitorPage() {
               <div className="text-xl font-mono text-white">{lastUpdate}</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Navigation Tools */}
+      <div className="max-w-7xl mx-auto mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="group"
+          >
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 h-full">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-white">🧬 Consciousness Monitor</h2>
+                <div className="text-3xl">📊</div>
+              </div>
+              <p className="text-purple-200 mb-6">
+                Real-time metrics showing MAIA's developmental patterns, attending quality, and consciousness shifts.
+              </p>
+              <div className="text-purple-300 text-sm">
+                Current view • {activePeriod} metrics
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="group"
+          >
+            <Link href="/maya/labtools/astrology" className="block h-full">
+              <div className="bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-pink-600/20 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:border-purple-400/50 hover:bg-white/20 transition-all duration-300 h-full group-hover:scale-105 transform">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-white">✨ Astrology Field</h2>
+                  <div className="text-3xl">🌌</div>
+                </div>
+                <p className="text-purple-200 mb-6">
+                  Interactive consciousness field map with live planetary dynamics, houses, and astrological aspects.
+                </p>
+                <div className="flex items-center gap-2 text-purple-300 text-sm">
+                  <span>Explore cosmic patterns</span>
+                  <span>→</span>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="group opacity-60"
+          >
+            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 h-full">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-white">🔮 Future Tools</h2>
+                <div className="text-3xl">⚡</div>
+              </div>
+              <p className="text-purple-200 mb-6">
+                Additional consciousness mapping tools and dimensional field visualizations coming soon.
+              </p>
+              <div className="text-purple-400 text-sm">
+                In development...
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
 
