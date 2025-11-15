@@ -16,39 +16,18 @@ export default function ThemeToggle() {
     setPreviousTheme(theme || 'system');
   }, []);
 
-  // Log theme changes to Supabase
+  // Log theme changes to API endpoint (no direct Supabase import)
   const logThemeChange = async (newTheme: string) => {
     try {
-      // Lazy-load Supabase client only when actually needed
-      const { getBrowserSupabaseClient } = await import('@/lib/supabaseBrowserClient');
-      const supabase = getBrowserSupabaseClient();
-
-      // Get current user session if available
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      // Log to event_logs table
-      await supabase.from('event_logs').insert({
-        event_name: 'theme_changed',
-        user_id: session?.user?.id || null,
-        metadata: {
+      await fetch('/api/user/theme', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           theme: newTheme,
           previous: previousTheme,
           timestamp: new Date().toISOString(),
-        },
-        payload: {
-          new: newTheme,
-          previous: previousTheme,
-          session_id: session?.access_token?.substring(0, 8) || null,
-        }
+        }),
       });
-
-      // Update user profile if logged in
-      if (session?.user?.id) {
-        await supabase
-          .from('profiles')
-          .update({ theme_preference: newTheme })
-          .eq('id', session.user.id);
-      }
     } catch (error) {
       console.warn('Failed to log theme change:', error);
     }
