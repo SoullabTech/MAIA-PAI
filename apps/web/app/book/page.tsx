@@ -341,385 +341,44 @@ export default function BookingPage() {
         )}
       </div>
     );
-  };
-export default function BookPage() {
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-jade-abyss via-jade-shadow to-jade-night">
-      {/* Cinematic jade background with subtle particles */}
-      <div className="absolute inset-0 opacity-20">
-        {Array.from({ length: 30 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${4 + Math.random() * 3}s`
-            }}
-          >
-            <div className="w-1 h-1 bg-jade-seafoam rounded-full"></div>
-          </div>
-        ))}
-      </div>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-light text-center text-jade-jade mb-12">Book Your Session</h1>
 
-      <div className="relative z-10 container mx-auto px-6 py-16">
-        {/* Clean, professional header */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-light text-jade-jade mb-6 tracking-wide">
-            Book Your Session
-          </h1>
-          <p className="text-xl text-jade-mineral/90 font-light max-w-2xl mx-auto leading-relaxed">
-            Schedule a personalized session with Kelly to explore your inner world,
-            process life transitions, and create lasting transformation.
-          </p>
-          <div className="mt-6 flex items-center justify-center gap-2">
-            <div className="w-12 h-0.5 bg-jade-sage/40"></div>
-            <div className="w-2 h-2 bg-jade-sage rounded-full"></div>
-            <div className="w-12 h-0.5 bg-jade-sage/40"></div>
-          </div>
-        </div>
-
-        {/* Progress Steps - Clean Navigation */}
-        <div className="flex justify-center mb-16">
-          <div className="relative">
-            {/* Background line */}
-            <div className="absolute top-6 left-6 right-6 h-0.5 bg-jade-moss/40"></div>
-            <div className="flex items-center gap-8">
-              {[
-                { id: 'session-type', label: 'Choose Session', icon: User, description: 'Select your approach' },
-                { id: 'date-time', label: 'Pick Date & Time', icon: Calendar, description: 'Find your perfect slot' },
-                { id: 'details', label: 'Your Information', icon: User, description: 'Complete your booking' },
-                { id: 'payment', label: 'Secure Payment', icon: CreditCard, description: 'Finalize reservation' }
-              ].map((step, index) => {
-                const isActive = bookingStep === step.id;
-                const isCompleted = ['session-type', 'date-time', 'details'].indexOf(step.id) <
-                                  ['session-type', 'date-time', 'details'].indexOf(bookingStep);
-                const Icon = step.icon;
-
-                return (
-                  <div key={step.id} className="flex flex-col items-center relative">
-                    <div className={`
-                      relative flex items-center justify-center w-12 h-12 transition-all duration-500
-                      ${isCompleted
-                        ? 'bg-gradient-to-br from-jade-sage to-jade-seafoam shadow-lg shadow-jade-sage/30'
-                        : isActive
-                          ? 'bg-gradient-to-br from-jade-forest to-jade-sage shadow-lg shadow-jade-forest/40'
-                          : 'bg-gradient-to-br from-jade-shadow/60 to-jade-night/60 border border-jade-moss/30'
-                      }
-                      rounded-lg backdrop-blur-sm
-                    `}>
-                      {isCompleted ? (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <Check className="w-6 h-6 text-white" />
-                        </motion.div>
-                      ) : (
-                        <Icon className={`w-6 h-6 ${isActive ? 'text-white' : 'text-jade-mineral/70'}`} />
-                      )}
-                    </div>
-                    <div className="mt-3 text-center">
-                      <div className={`text-sm font-medium ${isActive ? 'text-jade-jade' : 'text-jade-mineral/60'}`}>
-                        {step.label}
-                      </div>
-                      <div className={`text-xs mt-1 ${isActive ? 'text-jade-mineral/80' : 'text-jade-moss/60'}`}>
-                        {step.description}
-                      </div>
-                    </div>
+        {bookingStep === 'session-type' && (
+          <div className="max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-6">
+              {SESSION_TYPES.map((sessionType) => (
+                <motion.button
+                  key={sessionType.id}
+                  onClick={() => handleSessionTypeSelect(sessionType)}
+                  className="p-6 rounded-xl border border-jade-moss/30 bg-jade-shadow/40 hover:bg-jade-shadow/60 transition-all duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <h3 className="text-xl font-medium text-jade-jade mb-2">{sessionType.name}</h3>
+                  <p className="text-jade-mineral/80 text-sm mb-4">{sessionType.description}</p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-jade-seafoam font-medium">${sessionType.price / 100}</span>
+                    <span className="text-jade-mineral/60 text-sm">{sessionType.duration}min</span>
                   </div>
-                );
-              })}
+                </motion.button>
+              ))}
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Step Content */}
-        <div className="max-w-6xl mx-auto">
-          {bookingStep === 'session-type' && (
-            <div className="space-y-12">
-              <div className="text-center">
-                <h2 className="text-4xl font-light text-jade-jade mb-4">Session Options</h2>
-                <p className="text-jade-mineral/80 text-lg">Choose the approach that feels right for where you are</p>
-              </div>
-              <div className="grid md:grid-cols-3 gap-8">
-                {SESSION_TYPES.map(sessionType => (
-                  <motion.div
-                    key={sessionType.id}
-                    onClick={() => handleSessionTypeSelect(sessionType)}
-                    className="group relative cursor-pointer"
-                    whileHover={{ scale: 1.02, y: -8 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                  >
-                    {/* Card with jade aesthetic */}
-                    <div className="relative overflow-hidden">
-                      <div className={`
-                        absolute inset-0 bg-gradient-to-br ${sessionType.color} opacity-20
-                        group-hover:opacity-30 transition-opacity duration-500
-                      `}></div>
-                      <div className="relative bg-jade-shadow/60 backdrop-blur-sm border border-jade-moss/30
-                                    rounded-lg p-8 hover:border-jade-sage/50 transition-all duration-500
-                                    group-hover:shadow-2xl group-hover:shadow-jade-forest/10">
-
-                        {/* Session type indicator */}
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-jade-sage to-transparent"></div>
-
-                        {/* Session badge */}
-                        <div className="flex items-center justify-between mb-6">
-                          <div className={`w-14 h-14 bg-gradient-to-br ${sessionType.color} rounded-lg
-                                        flex items-center justify-center shadow-lg group-hover:shadow-xl
-                                        transition-all duration-300 group-hover:scale-110`}>
-                            <div className="w-6 h-6 border-2 border-white rounded-full flex items-center justify-center">
-                              <div className="w-2 h-2 bg-white rounded-full"></div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-jade-mineral/60 text-xs tracking-wider">
-                              {sessionType.house}
-                            </div>
-                            <div className="text-jade-jade text-sm font-light">
-                              {sessionType.duration} minutes
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Title */}
-                        <h3 className="text-2xl font-light text-jade-jade mb-3">
-                          {sessionType.name}
-                        </h3>
-
-                        {/* Subtitle */}
-                        <p className="text-jade-mineral/70 text-sm italic mb-6 font-light">
-                          {sessionType.mystical}
-                        </p>
-
-                        {/* Description */}
-                        <p className="text-jade-mineral/80 mb-8 leading-relaxed text-sm">
-                          {sessionType.description}
-                        </p>
-
-                        {/* Price */}
-                        <div className="flex items-end justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-8 h-0.5 bg-jade-sage/40"></div>
-                            <div className="text-jade-mineral/60 text-xs tracking-wider">
-                              Investment
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-3xl font-light text-jade-jade">
-                              ${sessionType.price / 100}
-                            </div>
-                            <div className="text-jade-moss/60 text-xs">
-                              per session
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Hover glow effect */}
-                        <div className={`
-                          absolute inset-0 rounded-lg bg-gradient-to-br ${sessionType.color}
-                          opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none
-                        `}></div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+        {bookingStep === 'date-time' && selectedSessionType && (
+          <div className="max-w-4xl mx-auto space-y-8">
+            <div className="text-center">
+              <h2 className="text-2xl font-light text-jade-jade mb-2">{selectedSessionType.name}</h2>
+              <p className="text-jade-mineral/80">{selectedSessionType.mystical}</p>
             </div>
-          )}
-
-          {bookingStep === 'date-time' && (
-            <div className="grid lg:grid-cols-2 gap-8">
-              {renderCalendar()}
-              {renderTimeSlots()}
-            </div>
-          )}
-
-          {bookingStep === 'details' && (
-            <div className="max-w-4xl mx-auto space-y-8">
-              {/* Session Summary */}
-              <div className="text-center">
-                <h2 className="text-4xl font-light text-jade-jade mb-6">
-                  Complete Your Booking
-                </h2>
-                <p className="text-jade-mineral/70 text-lg mb-6">
-                  Almost there - just a few details to finalize your session
-                </p>
-                <div className="bg-jade-shadow/60 backdrop-blur-lg rounded-2xl p-8 border border-jade-moss/30 shadow-2xl">
-                  <div className="grid grid-cols-2 gap-6 text-sm">
-                    <div className="space-y-2">
-                      <span className="text-jade-sage font-medium tracking-wide">Session Type:</span>
-                      <p className="text-jade-jade text-lg font-light">{selectedSessionType?.name}</p>
-                      <p className="text-jade-mineral/60 text-xs italic">{selectedSessionType?.mystical}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <span className="text-jade-sage font-medium tracking-wide">Date & Time:</span>
-                      <p className="text-jade-jade text-lg font-light">{format(selectedDate, 'EEEE, MMMM d, yyyy')}</p>
-                      <p className="text-jade-mineral/60 text-xs">{selectedSlot && format(selectedSlot.startTime, 'h:mm a')}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <span className="text-jade-sage font-medium tracking-wide">Duration:</span>
-                      <p className="text-jade-jade text-lg font-light">{selectedSessionType?.duration} minutes</p>
-                    </div>
-                    <div className="space-y-2">
-                      <span className="text-jade-sage font-medium tracking-wide">Investment:</span>
-                      <p className="text-jade-jade text-2xl font-light">${selectedSessionType?.price ? selectedSessionType.price / 100 : 0}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Practitioner Connection Message */}
-              <div className="bg-jade-night/60 backdrop-blur-lg rounded-2xl p-8 border border-jade-moss/30">
-                <div className="text-center space-y-4">
-                  <div className="w-16 h-16 mx-auto bg-gradient-to-br from-jade-sage to-jade-seafoam rounded-full flex items-center justify-center mb-4">
-                    <span className="text-white text-2xl">🌱</span>
-                  </div>
-                  <h3 className="text-2xl font-light text-jade-jade">Your Session with Kelly</h3>
-                  <p className="text-jade-mineral/80 leading-relaxed max-w-2xl mx-auto">
-                    Kelly creates a safe, nurturing container for deep personal work. With over a decade of experience in
-                    therapeutic coaching and archetypal psychology, she helps you navigate life transitions, process emotions,
-                    and discover your authentic path. Each session is tailored to meet you exactly where you are.
-                  </p>
-                  <p className="text-jade-mineral/60 text-sm">
-                    Ready to begin your transformation journey?
-                  </p>
-                </div>
-              </div>
-
-              {/* Contact Information Form */}
-              <div className="bg-jade-shadow/60 backdrop-blur-lg rounded-2xl p-8 border border-jade-moss/30">
-                <h3 className="text-3xl font-light text-jade-jade text-center mb-8">
-                  Your Information
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-3">
-                    <label className="block text-sm font-medium text-jade-sage tracking-wide">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={clientDetails.name}
-                      onChange={(e) => setClientDetails({ ...clientDetails, name: e.target.value })}
-                      className="w-full px-6 py-4 bg-jade-night/60 border-2 border-jade-moss/30 rounded-xl text-jade-jade placeholder-jade-mineral/40 focus:border-jade-sage focus:ring-2 focus:ring-jade-sage/20 focus:outline-none transition-all duration-200 backdrop-blur-sm"
-                      placeholder="Your preferred name"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="block text-sm font-medium text-jade-sage tracking-wide">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      value={clientDetails.email}
-                      onChange={(e) => setClientDetails({ ...clientDetails, email: e.target.value })}
-                      className="w-full px-6 py-4 bg-jade-night/60 border-2 border-jade-moss/30 rounded-xl text-jade-jade placeholder-jade-mineral/40 focus:border-jade-sage focus:ring-2 focus:ring-jade-sage/20 focus:outline-none transition-all duration-200 backdrop-blur-sm"
-                      placeholder="your.email@example.com"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="block text-sm font-medium text-jade-sage tracking-wide">
-                      Phone Number <span className="text-jade-mineral/60 text-xs">(Optional)</span>
-                    </label>
-                    <input
-                      type="tel"
-                      value={clientDetails.phone}
-                      onChange={(e) => setClientDetails({ ...clientDetails, phone: e.target.value })}
-                      className="w-full px-6 py-4 bg-jade-night/60 border-2 border-jade-moss/30 rounded-xl text-jade-jade placeholder-jade-mineral/40 focus:border-jade-sage focus:ring-2 focus:ring-jade-sage/20 focus:outline-none transition-all duration-200 backdrop-blur-sm"
-                      placeholder="(555) 123-4567"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="block text-sm font-medium text-jade-sage tracking-wide">
-                      Time Zone
-                    </label>
-                    <select
-                      value={clientDetails.timezone}
-                      onChange={(e) => setClientDetails({ ...clientDetails, timezone: e.target.value })}
-                      className="w-full px-6 py-4 bg-jade-night/60 border-2 border-jade-moss/30 rounded-xl text-jade-jade focus:border-jade-sage focus:ring-2 focus:ring-jade-sage/20 focus:outline-none transition-all duration-200 backdrop-blur-sm"
-                    >
-                      <option value="America/Los_Angeles">Pacific Time (PT)</option>
-                      <option value="America/Denver">Mountain Time (MT)</option>
-                      <option value="America/Chicago">Central Time (CT)</option>
-                      <option value="America/New_York">Eastern Time (ET)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="mt-8 space-y-3">
-                  <label className="block text-sm font-medium text-jade-sage tracking-wide">
-                    What brings you to this session? <span className="text-jade-mineral/60 text-xs">(Optional)</span>
-                  </label>
-                  <textarea
-                    value={clientDetails.notes}
-                    onChange={(e) => setClientDetails({ ...clientDetails, notes: e.target.value })}
-                    rows={4}
-                    className="w-full px-6 py-4 bg-jade-night/60 border-2 border-jade-moss/30 rounded-xl text-jade-jade placeholder-jade-mineral/40 focus:border-jade-sage focus:ring-2 focus:ring-jade-sage/20 focus:outline-none transition-all duration-200 backdrop-blur-sm"
-                    placeholder="Share what's on your mind, any specific challenges you're facing, or areas you'd like to explore together..."
-                  />
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-6 pt-8">
-                  <button
-                    onClick={() => setBookingStep('date-time')}
-                    className="flex-1 px-8 py-4 border-2 border-jade-moss/50 text-jade-mineral rounded-xl hover:bg-jade-moss/10 hover:border-jade-sage transition-all duration-200 font-medium backdrop-blur-sm"
-                  >
-                    ← Back to Date & Time
-                  </button>
-
-                  <button
-                    onClick={handleBookingSubmit}
-                    disabled={isLoading || !clientDetails.name || !clientDetails.email}
-                    className="flex-1 px-8 py-4 bg-gradient-to-r from-jade-sage via-jade-seafoam to-jade-sage text-white rounded-xl hover:from-jade-forest hover:via-jade-sage hover:to-jade-forest disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium shadow-lg shadow-jade-sage/20 transform hover:scale-[1.02]"
-                  >
-                    {isLoading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        Securing your session...
-                      </span>
-                    ) : (
-                      `Complete Booking • $${selectedSessionType?.price ? selectedSessionType.price / 100 : 0}`
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Navigation */}
-        {bookingStep !== 'session-type' && (
-          <div className="max-w-6xl mx-auto mt-8 flex justify-between">
-            <button
-              onClick={() => {
-                if (bookingStep === 'date-time') setBookingStep('session-type');
-                if (bookingStep === 'details') setBookingStep('date-time');
-              }}
-              className="px-6 py-3 bg-jade-night/60 text-jade-mineral border border-jade-moss/30 rounded-lg hover:bg-jade-dusk/60 hover:border-jade-sage/50
-                       transition-all duration-200 backdrop-blur-sm"
-            >
-              ← Back
-            </button>
-
-            {bookingStep === 'date-time' && selectedSlot && (
-              <button
-                onClick={() => setBookingStep('details')}
-                className="px-6 py-3 bg-gradient-to-r from-jade-sage to-jade-seafoam text-white rounded-lg hover:from-jade-forest hover:to-jade-sage
-                         transition-all duration-200 font-medium shadow-lg shadow-jade-sage/20"
-              >
-                Continue to Details →
-              </button>
-            )}
+            {renderCalendar()}
+            {renderTimeSlots()}
           </div>
         )}
       </div>

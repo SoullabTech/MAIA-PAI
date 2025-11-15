@@ -6,17 +6,24 @@
 import { ganeshaContacts } from '../ganesha/contacts';
 import { createClient } from '@supabase/supabase-js';
 
-// Create Supabase client for server-side operations
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
+// Create Supabase client for server-side operations when needed
+function createSupabaseAdmin() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.warn('[BetaAuth] Supabase environment variables not available during build');
+    return null;
   }
-);
+
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  );
+}
 
 export interface BetaUser {
   id: string;
@@ -74,58 +81,64 @@ export async function verifyBetaCode(code: string): Promise<BetaVerificationResu
       };
     }
 
-    // PRIORITY 1: Check for referral codes (FIRSTNAME-REF-##)
-    const referralMatch = code.match(/^([A-Z]+)-REF-(\d{2})$/);
-    if (referralMatch) {
-      const [, referrerName, refNumber] = referralMatch;
+    const supabaseAdmin = createSupabaseAdmin();
+    if (!supabaseAdmin) {
+      console.warn('[BetaAuth] Supabase not available, falling back to Ganesha contacts only');
+      // Skip database checks, go directly to Ganesha fallback
+    } else {
+      // PRIORITY 1: Check for referral codes (FIRSTNAME-REF-##)
+      const referralMatch = code.match(/^([A-Z]+)-REF-(\d{2})$/);
+      if (referralMatch) {
+        const [, referrerName, refNumber] = referralMatch;
 
-      const { data: referralCode, error } = await supabaseAdmin
-        .from('referral_codes')
-        .select('*, owner:beta_testers!owner_user_id(username, email)')
-        .eq('code', code)
-        .eq('is_used', false)
+        const { data: referralCode, error } = await supabaseAdmin
+          .from('referral_codes')
+          .select('*, owner:beta_testers!owner_user_id(username, email)')
+          .eq('code', code)
+          .eq('is_used', false)
+          .single();
+
+        if (referralCode && !error) {
+          console.log('✅ Found valid referral code:', {
+            code,
+            owner: referralCode.owner.username,
+            refNumber
+          });
+
+          return {
+            valid: true,
+            explorerId: `ref-${code.toLowerCase()}`,
+            name: `Friend of ${referralCode.owner.username}`, // Will be updated when they complete signup
+            email: '', // Will be captured during signup
+            referralCode: code,
+            referredBy: referralCode.owner_user_id
+          };
+        }
+      }
+
+      // PRIORITY 2: Check beta_testers table for direct signup betaAccessIds
+      const { data: betaTester, error } = await supabaseAdmin
+        .from('beta_testers')
+        .select('user_id, username, email, onboarding_completed, referred_by, total_referrals')
+        .eq('user_id', code)
         .single();
 
-      if (referralCode && !error) {
-        console.log('✅ Found valid referral code:', {
-          code,
-          owner: referralCode.owner.username,
-          refNumber
+      if (betaTester && !error) {
+        console.log('✅ Found beta tester in database:', {
+          userId: betaTester.user_id,
+          username: betaTester.username,
+          email: betaTester.email,
+          referrals: betaTester.total_referrals
         });
 
         return {
           valid: true,
-          explorerId: `ref-${code.toLowerCase()}`,
-          name: `Friend of ${referralCode.owner.username}`, // Will be updated when they complete signup
-          email: '', // Will be captured during signup
-          referralCode: code,
-          referredBy: referralCode.owner_user_id
+          explorerId: betaTester.user_id,
+          name: betaTester.username,
+          email: betaTester.email,
+          totalReferrals: betaTester.total_referrals
         };
       }
-    }
-
-    // PRIORITY 2: Check beta_testers table for direct signup betaAccessIds
-    const { data: betaTester, error } = await supabaseAdmin
-      .from('beta_testers')
-      .select('user_id, username, email, onboarding_completed, referred_by, total_referrals')
-      .eq('user_id', code)
-      .single();
-
-    if (betaTester && !error) {
-      console.log('✅ Found beta tester in database:', {
-        userId: betaTester.user_id,
-        username: betaTester.username,
-        email: betaTester.email,
-        referrals: betaTester.total_referrals
-      });
-
-      return {
-        valid: true,
-        explorerId: betaTester.user_id,
-        name: betaTester.username,
-        email: betaTester.email,
-        totalReferrals: betaTester.total_referrals
-      };
     }
 
     // PRIORITY 3: Check ganeshaContacts for SOULLAB-* codes (legacy/direct invites)
@@ -181,6 +194,12 @@ export async function verifyBetaCode(code: string): Promise<BetaVerificationResu
  */
 export async function generateReferralCodes(userId: string, userName: string, count: number = 10): Promise<string[]> {
   try {
+    const supabaseAdmin = createSupabaseAdmin();
+    if (!supabaseAdmin) {
+      console.warn('[BetaAuth] Supabase not available, cannot generate referral codes');
+      return [];
+    }
+
     const codes = [];
     const basePrefix = userName.toUpperCase().replace(/[^A-Z]/g, '').substring(0, 8);
 
@@ -212,6 +231,12 @@ export async function generateReferralCodes(userId: string, userName: string, co
  */
 export async function useReferralCode(code: string, newUserId: string, newUserEmail: string): Promise<boolean> {
   try {
+    const supabaseAdmin = createSupabaseAdmin();
+    if (!supabaseAdmin) {
+      console.warn('[BetaAuth] Supabase not available, cannot track referral code usage');
+      return false;
+    }
+
     // Mark code as used
     const { data: updatedCode, error } = await supabaseAdmin
       .from('referral_codes')
@@ -261,6 +286,12 @@ export async function useReferralCode(code: string, newUserId: string, newUserEm
  */
 export async function getReferralStats(userId: string) {
   try {
+    const supabaseAdmin = createSupabaseAdmin();
+    if (!supabaseAdmin) {
+      console.warn('[BetaAuth] Supabase not available, cannot fetch referral stats');
+      return { totalReferrals: 0, codesRemaining: 0, codes: [] };
+    }
+
     const { data: stats } = await supabaseAdmin
       .from('beta_testers')
       .select('total_referrals, referral_codes_remaining')

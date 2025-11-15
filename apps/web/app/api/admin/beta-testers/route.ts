@@ -2,16 +2,23 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { ganeshaContacts } from '@/lib/ganesha/contacts';
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
+function createSupabaseAdmin() {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.warn('[BetaTesters API] Supabase environment variables not available during build');
+    return null;
   }
-);
+
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  );
+}
 
 /**
  * GET /api/admin/beta-testers
@@ -21,39 +28,47 @@ export async function GET() {
   try {
     console.log('📊 Admin fetching beta testers with referral data...');
 
-    // Try to get data from Supabase beta_testers table
-    const { data: supabaseTesters, error } = await supabaseAdmin
-      .from('beta_testers')
-      .select(`
-        *,
-        referral_codes (
-          code,
-          is_used,
-          used_at,
-          used_by_user_id
-        )
-      `)
-      .order('created_at', { ascending: false });
-
+    const supabaseAdmin = createSupabaseAdmin();
     let testers = [];
 
-    if (supabaseTesters && !error) {
-      console.log(`✅ Found ${supabaseTesters.length} beta testers in Supabase`);
-      testers = supabaseTesters.map(tester => ({
-        id: tester.user_id,
-        name: tester.full_name || tester.username,
-        email: tester.email,
-        status: tester.status || 'active',
-        invitedAt: tester.created_at,
-        totalReferrals: tester.total_referrals || 0,
-        referralCodes: tester.referral_codes || [],
-        onboardingCompleted: tester.onboarding_completed,
-        notes: tester.profile_data?.notes || ''
-      }));
-    } else {
-      console.warn('⚠️ No Supabase beta_testers data, falling back to Ganesha contacts');
+    if (supabaseAdmin) {
+      // Try to get data from Supabase beta_testers table
+      const { data: supabaseTesters, error } = await supabaseAdmin
+        .from('beta_testers')
+        .select(`
+          *,
+          referral_codes (
+            code,
+            is_used,
+            used_at,
+            used_by_user_id
+          )
+        `)
+        .order('created_at', { ascending: false });
 
-      // Fallback to Ganesha contacts for initial data
+      if (supabaseTesters && !error) {
+        console.log(`✅ Found ${supabaseTesters.length} beta testers in Supabase`);
+        testers = supabaseTesters.map(tester => ({
+          id: tester.user_id,
+          name: tester.full_name || tester.username,
+          email: tester.email,
+          status: tester.status || 'active',
+          invitedAt: tester.created_at,
+          totalReferrals: tester.total_referrals || 0,
+          referralCodes: tester.referral_codes || [],
+          onboardingCompleted: tester.onboarding_completed,
+          notes: tester.profile_data?.notes || ''
+        }));
+      } else {
+        console.warn('⚠️ No Supabase beta_testers data, falling back to Ganesha contacts');
+        // Fall through to Ganesha fallback below
+      }
+    } else {
+      console.warn('⚠️ Supabase not available, using Ganesha contacts only');
+    }
+
+    // Fallback to Ganesha contacts if no Supabase data or Supabase unavailable
+    if (testers.length === 0) {
       testers = ganeshaContacts.map(contact => ({
         id: contact.id,
         name: contact.name,
@@ -97,6 +112,14 @@ export async function POST(request: Request) {
     }
 
     console.log(`👤 Admin adding new beta tester: ${name} (${email})`);
+
+    const supabaseAdmin = createSupabaseAdmin();
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 503 }
+      );
+    }
 
     // Generate user ID
     const userId = `${name.toLowerCase().replace(/[^a-z]/g, '')}-${Date.now()}`;
