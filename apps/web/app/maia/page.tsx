@@ -1,7 +1,14 @@
 'use client';
 
-import MAIAExperimental from '@/components/maia/MAIAExperimental';
+import { useState } from 'react';
+import OracleConversation from '@/components/OracleConversation';
 
-export default function MAIAPage() {
-  return <MAIAExperimental />;
+export default function Page() {
+  const [showLabTools, setShowLabTools] = useState(false);
+
+  return (
+    <div className="min-h-screen">
+      <OracleConversation onOpenLabTools={() => setShowLabTools(!showLabTools)} />
+    </div>
+  );
 }
