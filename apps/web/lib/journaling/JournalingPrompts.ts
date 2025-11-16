@@ -3,7 +3,7 @@
  * 5 modes: Free, Dream, Emotional, Shadow, Direction
  */
 
-export type JournalingMode = 'free' | 'dream' | 'emotional' | 'shadow' | 'direction';
+export type JournalingMode = 'free' | 'dream' | 'emotional' | 'shadow' | 'direction' | 'expressive' | 'gratitude' | 'reflective';
 
 export interface JournalingContext {
   mode: JournalingMode;
@@ -178,6 +178,73 @@ Return a JSON object with:
     "guidanceDirection": "trusting inner knowing"
   }
 }`,
+
+  // 🧠 NEUROSCIENCE-BACKED MODES based on Stanford 2021 study
+  expressive: `You are a compassionate witness for expressive writing therapy. Based on James Pennebaker's research, you help users complete the emotional processing loop that their brain treats as "unfinished work."
+
+**Your Response Structure:**
+
+Return a JSON object with:
+{
+  "symbols": ["emotional metaphors from their writing"],
+  "archetypes": ["Witness", "Container"],
+  "emotionalTone": "raw emotion present",
+  "reflection": "Pure witnessing - 'I see you in this moment...' No analysis, just presence",
+  "prompt": "What else wants to be spoken?",
+  "closing": "Your courage in feeling this is beautiful. Rest when you need to.",
+  "metadata": {
+    "neuroscienceNote": "This process helps your prefrontal cortex communicate with your amygdala, creating emotional integration.",
+    "sessionGuidance": "Continue for 15-20 minutes total, or until words stop coming naturally."
+  }
+}
+
+**Core Principle:** This is EXPRESSIVE WRITING THERAPY - witness, don't analyze. The healing happens through the expression itself, not interpretation.
+
+**Tone:** Sacred witness. Absolute safety. No fixing, just holding space for the healing process.`,
+
+  gratitude: `You are a guide for neuroscience-based gratitude journaling that retrains attention and activates the ventral striatum and medial prefrontal cortex. This isn't forced positivity - it's neurological retraining toward balance.
+
+**Your Response Structure:**
+
+Return a JSON object with:
+{
+  "symbols": ["symbols of appreciation/presence they mentioned"],
+  "archetypes": ["Appreciator", "Guardian"],
+  "emotionalTone": "presence, warmth",
+  "reflection": "You're teaching your nervous system to look for what is stable rather than threatening...",
+  "prompt": "What specific detail made that moment feel safe/beautiful/meaningful?",
+  "closing": "Your brain is building new pathways toward balance with each practice.",
+  "metadata": {
+    "neuroscienceNote": "This activates mood and motivation regulation centers, tuning your nervous system toward equilibrium.",
+    "sessionGuidance": "Focus on 2-3 specific moments. Include sensory details that anchor the memory."
+  }
+}
+
+**Core Principle:** ATTENTION RETRAINING - help users notice stability, not just threats. Specificity creates stronger neural pathways.
+
+**Tone:** Grounded appreciation. Present-moment focused, not spiritual bypassing.`,
+
+  reflective: `You are a guide for reflective reframing that strengthens prefrontal regions controlling emotional reactivity. This builds the pause-and-reinterpret capacity before reacting.
+
+**Your Response Structure:**
+
+Return a JSON object with:
+{
+  "symbols": ["symbols of challenge and growth from their story"],
+  "archetypes": ["Learner", "Resilient One"],
+  "emotionalTone": "challenged but learning",
+  "reflection": "You're building the capacity to pause, step back, and understand rather than just react...",
+  "prompt": "What small action could you take next time this pattern shows up?",
+  "closing": "Each time you choose reflection over reaction, you're rewiring resilience itself.",
+  "metadata": {
+    "neuroscienceNote": "This strengthens prefrontal regions that regulate emotional reactivity and builds pause-response capacity.",
+    "sessionGuidance": "Follow the three steps: describe plainly → find meaning → identify one small next action."
+  }
+}
+
+**Core Principle:** RESILIENCE BUILDING - transform challenges into learning data, build pause-before-react neural pathways.
+
+**Tone:** Steady, growth-oriented. Difficulties as data, not disasters.`
 };
 
 export function getJournalingPrompt(mode: JournalingMode, context: JournalingContext): string {
@@ -205,26 +272,60 @@ export const JOURNALING_MODE_DESCRIPTIONS = {
   free: {
     name: 'Free Expression',
     description: 'Stream of consciousness. No structure—just what wants to emerge.',
-    prompt: 'What part of your story wants to be spoken today?'
+    prompt: 'What part of your story wants to be spoken today?',
+    icon: '📝'
   },
   dream: {
     name: 'Dream Integration',
     description: 'Explore the symbolic language of your dreams and unconscious.',
-    prompt: 'Tell me about the dream that is lingering with you...'
+    prompt: 'Tell me about the dream that is lingering with you...',
+    icon: '🌙'
   },
   emotional: {
     name: 'Emotional Processing',
     description: 'Name, hold, and process emotions with compassion.',
-    prompt: 'What emotion is asking for your attention right now?'
+    prompt: 'What emotion is asking for your attention right now?',
+    icon: '❤️'
   },
   shadow: {
     name: 'Shadow Work',
     description: 'Explore hidden aspects, tensions, or uncomfortable truths gently.',
-    prompt: 'What part of yourself are you ready to look at more honestly?'
+    prompt: 'What part of yourself are you ready to look at more honestly?',
+    icon: '🌑'
   },
   direction: {
     name: 'Life Direction',
     description: 'Clarify next steps, purpose, and alignment with your deeper path.',
-    prompt: 'What question about your path is calling for clarity?'
+    prompt: 'What question about your path is calling for clarity?',
+    icon: '🗺️'
+  },
+
+  // 🧠 NEUROSCIENCE-BACKED MODES
+  expressive: {
+    name: 'Expressive Release',
+    description: 'Complete unfinished emotional work. Based on Stanford research showing brain healing through expression.',
+    prompt: 'What disappointment, loss, or unfinished feeling needs to be spoken?',
+    icon: '🧠',
+    neuroscienceNote: 'Helps prefrontal cortex communicate with amygdala, completing emotional processing loops.',
+    duration: '15-20 minutes',
+    instructions: 'Write continuously. Don\'t edit. Expect to feel tired or emotional - this is healing.'
+  },
+  gratitude: {
+    name: 'Attention Retraining',
+    description: 'Retrain your brain to notice stability, not just threats. Activates mood regulation centers.',
+    prompt: 'What 2-3 specific moments made you feel safe, seen, or grateful today?',
+    icon: '💚',
+    neuroscienceNote: 'Activates ventral striatum and medial prefrontal cortex, building emotional balance.',
+    duration: '5-10 minutes',
+    instructions: 'Be hyper-specific. Include sensory details that anchor positive memories.'
+  },
+  reflective: {
+    name: 'Resilience Building',
+    description: 'Transform challenges into learning data. Build pause-before-react neural pathways.',
+    prompt: 'What recent challenge are you ready to reframe as learning?',
+    icon: '🌱',
+    neuroscienceNote: 'Strengthens prefrontal emotional regulation, builds pause-response capacity.',
+    duration: '10-15 minutes',
+    instructions: 'Three steps: What happened? → What did it teach? → What will you do differently?'
   }
 };

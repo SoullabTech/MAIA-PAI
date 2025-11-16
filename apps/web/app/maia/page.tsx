@@ -1,23 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { BookOpen, Clock, Search, HelpCircle, Sparkles, Mic, BarChart3, Settings as SettingsIcon } from 'lucide-react';
-import { Copy } from '@/lib/copy/MaiaCopy';
-import { useMaiaStore } from '@/lib/maia/state';
-import { mockEntries } from '@/lib/maia/mockData';
-
-import SoulfulAppShell from '@/components/onboarding/SoulfulAppShell';
-import ModeSelection from '@/components/maia/ModeSelection';
-import JournalEntry from '@/components/maia/JournalEntry';
-import VoiceJournaling from '@/components/maia/VoiceJournaling';
-import MaiaReflection from '@/components/maia/MaiaReflection';
-import TimelineView from '@/components/maia/TimelineView';
-import SemanticSearch from '@/components/maia/SemanticSearch';
-import Analytics from '@/components/maia/Analytics';
-import Settings from '@/components/maia/Settings';
-import SoulprintSnapshot from '@/components/maia/SoulprintSnapshot';
-import SoulprintDashboard from '@/components/maia/SoulprintDashboard';
+import { useState } from 'react';
+import OracleConversation from '@/components/OracleConversation';
 
 export default function MaiaPage() {
   const { currentView, setView, entries, selectedMode, isVoiceMode } = useMaiaStore();
