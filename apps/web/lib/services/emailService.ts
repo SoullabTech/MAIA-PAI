@@ -85,7 +85,7 @@ export class GaneshaEmailService {
 
       // Send via Resend
       const result = await this.resend.emails.send({
-        from: 'Kelly Nezat <kelly@soullab.life>',
+        from: 'Kelly Nezat <soullab1@gmail.com>',
         to: recipients.map(r => r.email),
         subject: template.subject,
         html: template.htmlContent,
@@ -435,7 +435,7 @@ Template: ${template.name}
               The Soullab Team
             </p>
             <p style="margin: 0; color: #666666; font-size: 14px;">
-              <a href="mailto:kelly@soullab.life" style="color: #2C5530; text-decoration: none;">kelly@soullab.life</a> | 504-453-9009
+              <a href="mailto:soullab1@gmail.com" style="color: #2C5530; text-decoration: none;">soullab1@gmail.com</a> | 504-453-9009
             </p>
           </td>
         </tr>

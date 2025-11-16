@@ -50,7 +50,7 @@ export const ganeshaContacts: GaneshaContact[] = [
   {
     id: 'founder-kelly',
     name: 'Kelly Nezat',
-    email: 'kelly@soullab.life',
+    email: 'soullab1@gmail.com',
     joinDate: '2024-01-01',
     status: 'active',
     groups: ['founders', 'beta-testers', 'all'],

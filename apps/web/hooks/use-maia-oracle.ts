@@ -24,12 +24,22 @@ export interface OracleResponse {
     air: number;
     aether: number;
   };
+  maiaState?: {
+    attendingQuality: number;
+    coherenceLevel: number;
+    archetype: string;
+    mode: 'right_brain' | 'left_brain' | 'integrated';
+    dissociationRisk: number;
+  };
   metadata: {
     processingTime: number;
     retryCount: number;
     cringeScore: number;
     isLevelAppropriate: boolean;
     validationPassed: boolean;
+    attendingQuality?: number;
+    coherenceLevel?: number;
+    dissociationRisk?: number;
   };
 }
 
@@ -48,7 +58,7 @@ export function useMAIAOracle() {
     setError(null);
 
     try {
-      const response = await fetch('/api/oracle/conscious', {
+      const response = await fetch('/api/oracle/holoflower', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -74,18 +84,18 @@ export function useMAIAOracle() {
     }
   }, []);
 
-  const diagnoseUser = useCallback(async (userId: string): Promise<OracleDiagnosis | null> => {
+  const assessUser = useCallback(async (userId: string): Promise<OracleDiagnosis | null> => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`/api/oracle/conscious?action=diagnose&userId=${userId}`, {
+      const response = await fetch(`/api/oracle/holoflower?action=assess&userId=${userId}`, {
         method: 'GET',
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.details || 'Diagnosis request failed');
+        throw new Error(errorData.details || 'Assessment request failed');
       }
 
       const data = await response.json();
@@ -94,7 +104,7 @@ export function useMAIAOracle() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      console.error('Diagnosis error:', err);
+      console.error('Assessment error:', err);
       return null;
     } finally {
       setLoading(false);
@@ -106,7 +116,7 @@ export function useMAIAOracle() {
     setError(null);
 
     try {
-      const response = await fetch('/api/oracle/conscious?action=test-cringe', {
+      const response = await fetch('/api/oracle/holoflower?action=test-cringe', {
         method: 'GET',
       });
 
@@ -133,7 +143,7 @@ export function useMAIAOracle() {
     setError(null);
 
     try {
-      const response = await fetch('/api/oracle/conscious?action=status', {
+      const response = await fetch('/api/oracle/holoflower?action=status', {
         method: 'GET',
       });
 
@@ -157,7 +167,7 @@ export function useMAIAOracle() {
 
   return {
     askOracle,
-    diagnoseUser,
+    assessUser,
     testCringeDetection,
     getSystemStatus,
     loading,

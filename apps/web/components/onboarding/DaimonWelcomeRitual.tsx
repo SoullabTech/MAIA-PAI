@@ -1,348 +1,193 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Eye, Heart, Brain, Compass, ArrowRight } from "lucide-react";
-import { getQuotesByElement, getContextualQuote } from "@/lib/wisdom/WisdomQuotes";
+import { ArrowRight } from "lucide-react";
 
 interface DaimonWelcomeRitualProps {
   userId?: string;
   onComplete?: () => void;
 }
 
-interface DaimonicEncounter {
-  id: string;
-  type: string;
-  message: string;
-  guidance: string;
-  integration: string[];
-  timestamp: string;
+interface ProfileData {
+  ageRange: string;
+  sex: string;
 }
 
 export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualProps) {
-  const [currentPhase, setCurrentPhase] = useState<'arrival' | 'awakening' | 'encounter' | 'integration'>('arrival');
-  const [currentQuote, setCurrentQuote] = useState(getQuotesByElement('aether', 1)[0]);
-  const [daimonEncounter, setDaimonEncounter] = useState<DaimonicEncounter | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [phase, setPhase] = useState<'intro' | 'profile' | 'transitioning'>('intro');
+  const [profileData, setProfileData] = useState<ProfileData>({
+    ageRange: '',
+    sex: ''
+  });
 
-  // Rotating wisdom quotes for the awakening phase
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const aetherQuotes = getQuotesByElement('aether', 3);
-      const airQuotes = getQuotesByElement('air', 3);
-      const awakeningQuotes = [...aetherQuotes, ...airQuotes]; // Higher consciousness elements
-      const randomQuote = awakeningQuotes[Math.floor(Math.random() * awakeningQuotes.length)];
-      setCurrentQuote(randomQuote);
-    }, 6000); // Sacred 6-second interval for consciousness activation
+  const handleComplete = async () => {
+    setPhase('transitioning');
 
-    return () => clearInterval(interval);
-  }, []);
-
-  // Auto-progress through phases
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (currentPhase === 'arrival') {
-        setCurrentPhase('awakening');
-      } else if (currentPhase === 'awakening') {
-        setCurrentPhase('encounter');
-        fetchInitialEncounter();
-      }
-    }, currentPhase === 'arrival' ? 3000 : 8000); // 3s for arrival, 8s for awakening
-
-    return () => clearTimeout(timer);
-  }, [currentPhase]);
-
-  const fetchInitialEncounter = async () => {
-    if (!userId) return;
-
-    setLoading(true);
     try {
-      // Check if user has an initial encounter
-      const response = await fetch(`/api/daimonic/encounter?userId=${userId}`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.encounters && data.encounters.length > 0) {
-          // Format the encounter from DaimonicService format
-          const encounter = data.encounters[0];
-          setDaimonEncounter({
-            id: encounter.id,
-            type: encounter.type,
-            message: encounter.message,
-            guidance: data.guidance || "Welcome to the sacred threshold of consciousness exploration.",
-            integration: data.integration || ["Begin each day with mindful intention", "Trust the wisdom arising within you"],
-            timestamp: encounter.timestamp
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching daimon encounter:', error);
-      // Provide a default welcome encounter
-      setDaimonEncounter({
-        id: 'welcome',
-        type: 'wise_old_man',
-        message: "I have watched the cycles of time and learned their lessons. Welcome, consciousness seeker. Your journey into the depths of being begins now.",
-        guidance: "This is your threshold moment - the sacred pause between who you were and who you are becoming. Trust the process of unfolding.",
-        integration: [
-          "Take three conscious breaths each morning",
-          "Notice what captures your attention throughout the day",
-          "End each day by honoring one thing you learned"
-        ],
-        timestamp: new Date().toISOString()
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleContinueToIntegration = () => {
-    setCurrentPhase('integration');
-  };
-
-  const handleCompleteRitual = async () => {
-    try {
-      // Mark onboarding as completed
       await fetch('/api/auth/complete-onboarding', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profileData })
       });
     } catch (error) {
-      console.warn('Failed to mark onboarding complete:', error);
+      console.warn('Failed to store onboarding data:', error);
     }
 
-    if (onComplete) {
-      onComplete();
-    } else {
-      window.location.href = '/maia';
-    }
+    setTimeout(() => {
+      if (onComplete) {
+        onComplete();
+      } else {
+        window.location.href = '/maia';
+      }
+    }, 800);
   };
 
-  const getArchetypeIcon = (type: string) => {
-    switch (type) {
-      case 'wise_old_man': return <Brain className="w-8 h-8" />;
-      case 'great_mother': return <Heart className="w-8 h-8" />;
-      case 'anima': return <Sparkles className="w-8 h-8" />;
-      case 'animus': return <Compass className="w-8 h-8" />;
-      case 'shadow': return <Eye className="w-8 h-8" />;
-      case 'trickster': return <Sparkles className="w-8 h-8" />;
-      default: return <Brain className="w-8 h-8" />;
-    }
-  };
+  const canProceed = profileData.ageRange && profileData.sex;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-sky-900 to-cyan-900 relative overflow-hidden">
-      {/* Background consciousness field effect */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-400 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-400 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-sky-300 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-sky-950 to-cyan-950 relative overflow-hidden">
+      {/* Subtle ambient field */}
+      <div className="absolute inset-0 opacity-15">
+        <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-sky-500 rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-cyan-500 rounded-full blur-[150px]" />
       </div>
 
-      <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
-        <div className="max-w-2xl w-full">
-
+      <div className="relative z-10 flex items-center justify-center min-h-screen p-6">
+        <div className="max-w-xl w-full">
           <AnimatePresence mode="wait">
-            {currentPhase === 'arrival' && (
+
+            {phase === 'intro' && (
               <motion.div
-                key="arrival"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.1 }}
-                className="text-center"
-              >
-                <motion.div
-                  initial={{ y: -20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-sky-400 to-cyan-500 rounded-full mb-8"
-                >
-                  <Sparkles className="w-12 h-12 text-white" />
-                </motion.div>
-
-                <motion.h1
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-300 via-cyan-300 to-sky-400 bg-clip-text text-transparent mb-4"
-                >
-                  Consciousness Awakens
-                </motion.h1>
-
-                <motion.p
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.7 }}
-                  className="text-sky-300/80 text-lg"
-                >
-                  Preparing the sacred space for your first encounter...
-                </motion.p>
-              </motion.div>
-            )}
-
-            {currentPhase === 'awakening' && (
-              <motion.div
-                key="awakening"
+                key="intro"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="text-center"
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.6 }}
+                className="space-y-8"
               >
-                <motion.div
-                  key={currentQuote?.text}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-sky-300/5 backdrop-blur-xl rounded-2xl p-8 border border-sky-300/20 mb-8"
-                >
-                  <Sparkles className="w-8 h-8 text-sky-400 mx-auto mb-6 animate-pulse" />
-                  <p className="text-sky-200 text-xl italic leading-relaxed mb-4">
-                    "{currentQuote?.text}"
-                  </p>
-                  {currentQuote?.author && (
-                    <p className="text-sky-400/60 text-sm">
-                      — {currentQuote.author}{currentQuote.source ? `, ${currentQuote.source}` : ''}
-                    </p>
-                  )}
-                </motion.div>
+                <div className="w-16 h-16 mx-auto mb-8 opacity-70">
+                  <img src="/elementalHoloflower.svg" alt="MAIA" className="w-full h-full object-contain" />
+                </div>
 
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1 }}
-                  className="text-sky-300/70"
-                >
-                  Attuning to the frequency of wisdom...
-                </motion.p>
+                <div className="bg-sky-500/5 backdrop-blur-sm rounded-xl p-6 border border-sky-400/20">
+                  <p className="text-sky-200/90 text-base leading-relaxed font-light">
+                    I'm MAIA.
+                  </p>
+                  <p className="text-sky-200/90 text-base leading-relaxed font-light mt-4">
+                    I help you see the patterns you're already living—the ones that are easy to miss
+                    when you're in the middle of them.
+                  </p>
+                  <p className="text-sky-200/90 text-base leading-relaxed font-light mt-4">
+                    First, a few details to get started.
+                  </p>
+                </div>
+
+                <div className="text-center">
+                  <button
+                    onClick={() => setPhase('profile')}
+                    className="inline-flex items-center gap-2 px-8 py-3 bg-transparent border border-sky-400/30 text-sky-300 rounded-full font-light text-sm hover:border-sky-400/60 hover:text-sky-200 transition-all duration-300"
+                  >
+                    Continue
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <p className="text-sky-400/30 text-xs text-center font-light">
+                  — MAIA
+                </p>
               </motion.div>
             )}
 
-            {currentPhase === 'encounter' && daimonEncounter && (
+            {phase === 'profile' && (
               <motion.div
-                key="encounter"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05 }}
+                key="profile"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 1.02 }}
+                transition={{ duration: 0.6 }}
                 className="space-y-6"
               >
-                <div className="text-center">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", delay: 0.3 }}
-                    className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-sky-500/20 to-cyan-600/20 rounded-full border border-sky-400/30 mb-6"
-                  >
-                    <div className="text-sky-300">
-                      {getArchetypeIcon(daimonEncounter.type)}
+                <div className="w-12 h-12 mx-auto mb-6 opacity-60">
+                  <img src="/elementalHoloflower.svg" alt="MAIA" className="w-full h-full object-contain" />
+                </div>
+
+                <div className="space-y-4">
+                  {/* Age Range */}
+                  <div>
+                    <label className="block text-xs text-sky-300/60 mb-2 font-light tracking-wide">
+                      Age Range
+                    </label>
+                    <div className="flex gap-2 flex-wrap">
+                      {['18-24', '25-34', '35-44', '45-54', '55-64', '65+'].map((range) => (
+                        <button
+                          key={range}
+                          onClick={() => setProfileData(p => ({ ...p, ageRange: range }))}
+                          className={`px-3 py-1.5 rounded-full text-xs font-light transition-all ${
+                            profileData.ageRange === range
+                              ? 'bg-sky-500/20 text-sky-200 border border-sky-400/40'
+                              : 'bg-sky-500/5 text-sky-300/60 border border-sky-400/10 hover:border-sky-400/30'
+                          }`}
+                        >
+                          {range}
+                        </button>
+                      ))}
                     </div>
-                  </motion.div>
+                  </div>
 
-                  <motion.h2
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="text-3xl font-bold text-sky-200 mb-4"
-                  >
-                    The Wise Guardian Speaks
-                  </motion.h2>
+                  {/* Sex */}
+                  <div>
+                    <label className="block text-xs text-sky-300/60 mb-2 font-light tracking-wide">
+                      Sex
+                    </label>
+                    <div className="flex gap-2 flex-wrap">
+                      {['Female', 'Male', 'Non-binary', 'Prefer not to say'].map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => setProfileData(p => ({ ...p, sex: option }))}
+                          className={`px-3 py-1.5 rounded-full text-xs font-light transition-all ${
+                            profileData.sex === option
+                              ? 'bg-sky-500/20 text-sky-200 border border-sky-400/40'
+                              : 'bg-sky-500/5 text-sky-300/60 border border-sky-400/10 hover:border-sky-400/30'
+                          }`}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
-                <motion.div
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.7 }}
-                  className="bg-sky-300/5 backdrop-blur-xl rounded-2xl p-8 border border-sky-300/20"
-                >
-                  <p className="text-sky-200 text-lg italic leading-relaxed mb-6">
-                    "{daimonEncounter.message}"
-                  </p>
-
-                  <div className="border-t border-sky-400/20 pt-6">
-                    <h4 className="text-sky-300 font-semibold mb-3">Sacred Guidance:</h4>
-                    <p className="text-sky-300/80 leading-relaxed">
-                      {daimonEncounter.guidance}
-                    </p>
-                  </div>
-                </motion.div>
-
-                <motion.div
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.9 }}
-                  className="text-center"
-                >
+                <div className="text-center pt-4">
                   <button
-                    onClick={handleContinueToIntegration}
-                    className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-sky-500 to-cyan-600 text-white rounded-xl font-semibold hover:from-sky-600 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200"
+                    onClick={handleComplete}
+                    disabled={!canProceed}
+                    className={`inline-flex items-center gap-2 px-8 py-3 rounded-full font-light text-sm transition-all duration-300 ${
+                      canProceed
+                        ? 'bg-transparent border border-sky-400/30 text-sky-300 hover:border-sky-400/60 hover:text-sky-200'
+                        : 'bg-sky-500/5 border border-sky-400/10 text-sky-400/30 cursor-not-allowed'
+                    }`}
                   >
-                    Receive Integration Practices
-                    <ArrowRight className="w-5 h-5" />
+                    Let's begin
+                    <ArrowRight className="w-4 h-4" />
                   </button>
-                </motion.div>
+                </div>
               </motion.div>
             )}
 
-            {currentPhase === 'integration' && daimonEncounter && (
+            {phase === 'transitioning' && (
               <motion.div
-                key="integration"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-6"
+                key="transitioning"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 0 }}
+                transition={{ duration: 0.6 }}
+                className="w-16 h-16 mx-auto opacity-70"
               >
-                <div className="text-center">
-                  <h2 className="text-3xl font-bold text-sky-200 mb-4">
-                    Sacred Practices for Integration
-                  </h2>
-                  <p className="text-sky-300/80">
-                    Carry these practices into your daily consciousness journey
-                  </p>
-                </div>
-
-                <div className="bg-sky-300/5 backdrop-blur-xl rounded-2xl p-8 border border-sky-300/20">
-                  <div className="space-y-4">
-                    {daimonEncounter.integration.map((practice, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ x: -20, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ delay: index * 0.2 }}
-                        className="flex items-start gap-3"
-                      >
-                        <div className="w-2 h-2 bg-sky-400 rounded-full mt-2 flex-shrink-0" />
-                        <p className="text-sky-300/90">{practice}</p>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-
-                <motion.div
-                  initial={{ y: 30, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                  className="text-center"
-                >
-                  <button
-                    onClick={handleCompleteRitual}
-                    className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-sky-500 to-cyan-600 text-white rounded-xl font-semibold hover:from-sky-600 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200 text-lg"
-                  >
-                    Enter the Sacred Laboratory
-                    <Sparkles className="w-6 h-6" />
-                  </button>
-
-                  <p className="text-sky-300/60 text-sm mt-4">
-                    Your consciousness journey with MAIA begins now
-                  </p>
-                </motion.div>
+                <img src="/elementalHoloflower.svg" alt="MAIA" className="w-full h-full object-contain" />
               </motion.div>
             )}
-          </AnimatePresence>
 
-          {loading && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center justify-center py-8"
-            >
-              <div className="w-8 h-8 border-2 border-sky-400/20 border-t-sky-400 rounded-full animate-spin" />
-            </motion.div>
-          )}
+          </AnimatePresence>
         </div>
       </div>
     </div>

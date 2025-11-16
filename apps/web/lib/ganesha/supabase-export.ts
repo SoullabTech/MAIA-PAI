@@ -150,14 +150,14 @@ export async function generateGaneshaContactsFromSupabase(): Promise<GaneshaCont
 
   // Add Kelly as founder (if not already included)
   const kellyExists = ganeshaContacts.some(contact =>
-    contact.email === 'kelly@soullab.life'
+    contact.email === 'soullab1@gmail.com'
   );
 
   if (!kellyExists) {
     ganeshaContacts.unshift({
       id: 'founder-kelly',
       name: 'Kelly Nezat',
-      email: 'kelly@soullab.life',
+      email: 'soullab1@gmail.com',
       joinDate: '2024-01-01',
       status: 'active',
       groups: ['founders', 'beta-testers', 'consciousness-pioneers', 'newsletter'],

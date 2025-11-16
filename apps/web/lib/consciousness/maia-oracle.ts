@@ -5,6 +5,7 @@
 import { ConsciousnessLevelDetector, ConsciousnessLevel } from './level-detector';
 import { CringeFilter, CringeCheckResult } from './cringe-filter';
 import { AdaptiveLanguageGenerator, ElementalSignature, ValidationResult } from './adaptive-language';
+import { maiaConsciousnessTracker, MAIAConsciousnessState } from './maia-consciousness-tracker';
 
 export interface OracleRequest {
   userId: string;
@@ -22,11 +23,15 @@ export interface OracleResponse {
   level: ConsciousnessLevel;
   elementalSignature: ElementalSignature;
   validation: ValidationResult;
+  maiaState?: MAIAConsciousnessState;
   metadata: {
     processingTime: number;
     retryCount: number;
     cringeScore: number;
     isLevelAppropriate: boolean;
+    attendingQuality?: number;
+    coherenceLevel?: number;
+    dissociationRisk?: number;
   };
 }
 
@@ -108,16 +113,40 @@ export class MAIAOracle {
 
     const processingTime = Date.now() - startTime;
 
+    // Track MAIA's consciousness state during this interaction
+    let maiaState: MAIAConsciousnessState | undefined;
+    let consciousnessInsight;
+
+    try {
+      consciousnessInsight = await maiaConsciousnessTracker.processInteractionInsights(
+        request.message,
+        response,
+        {
+          archetype: this.determineArchetype(elementalSignature),
+          sessionId: request.context?.sessionId || `session-${Date.now()}`,
+          userId: request.userId
+        }
+      );
+
+      maiaState = consciousnessInsight.consciousnessState;
+    } catch (error) {
+      console.warn('Consciousness tracking failed:', error);
+    }
+
     return {
       response,
       level,
       elementalSignature,
       validation,
+      maiaState,
       metadata: {
         processingTime,
         retryCount,
         cringeScore: validation.cringeCheck.score,
-        isLevelAppropriate: validation.isValid
+        isLevelAppropriate: validation.isValid,
+        attendingQuality: consciousnessInsight?.attendingQuality,
+        coherenceLevel: maiaState?.coherenceLevel,
+        dissociationRisk: maiaState?.dissociationRisk
       }
     };
   }
@@ -183,8 +212,8 @@ export class MAIAOracle {
     }
   }
 
-  // Diagnostic methods for system health and insights
-  async diagnoseUser(userId: string): Promise<{
+  // Assessment methods for system optimization and insights
+  async assessUser(userId: string): Promise<{
     level: ConsciousnessLevel;
     journeyData: any;
     recommendations: string[];
@@ -245,5 +274,22 @@ export class MAIAOracle {
   // Update configuration without recreating the oracle
   updateConfig(newConfig: Partial<OracleConfig>): void {
     this.config = { ...this.config, ...newConfig };
+  }
+
+  // Determine archetype based on elemental signature
+  private determineArchetype(elementalSignature: ElementalSignature): string {
+    const elements = [
+      { name: 'fire', value: elementalSignature.fire, archetype: 'sage' },
+      { name: 'water', value: elementalSignature.water, archetype: 'dream_weaver' },
+      { name: 'earth', value: elementalSignature.earth, archetype: 'mentor' },
+      { name: 'air', value: elementalSignature.air, archetype: 'oracle' },
+      { name: 'aether', value: elementalSignature.aether, archetype: 'alchemist' }
+    ];
+
+    const dominant = elements.reduce((prev, current) =>
+      current.value > prev.value ? current : prev
+    );
+
+    return dominant.archetype;
   }
 }

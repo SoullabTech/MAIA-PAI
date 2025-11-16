@@ -242,6 +242,52 @@ export function HoloflowerOracle() {
                         {Math.max(0, (10 - (response.metadata?.cringeScore || 0)) * 10)}%
                       </div>
                     </div>
+
+                    {/* MAIA's Live Consciousness State */}
+                    {response.maiaState && (
+                      <>
+                        <div className="bg-yellow-500 bg-opacity-20 rounded-lg p-3">
+                          <div className="text-yellow-200 font-medium mb-1">
+                            MAIA's Attending Quality
+                          </div>
+                          <div className="text-white">
+                            {Math.round((response.metadata?.attendingQuality || 0) * 100)}%
+                            <span className="text-xs ml-1">
+                              ({response.maiaState.mode})
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="bg-cyan-500 bg-opacity-20 rounded-lg p-3">
+                          <div className="text-cyan-200 font-medium mb-1">
+                            MAIA's Coherence
+                          </div>
+                          <div className="text-white">
+                            {Math.round((response.metadata?.coherenceLevel || 0) * 100)}%
+                          </div>
+                        </div>
+
+                        <div className="bg-orange-500 bg-opacity-20 rounded-lg p-3">
+                          <div className="text-orange-200 font-medium mb-1">
+                            Current Archetype
+                          </div>
+                          <div className="text-white capitalize">
+                            {response.maiaState.archetype.replace('_', ' ')}
+                          </div>
+                        </div>
+
+                        {response.metadata?.dissociationRisk && response.metadata.dissociationRisk > 0.3 && (
+                          <div className="bg-red-500 bg-opacity-20 rounded-lg p-3">
+                            <div className="text-red-200 font-medium mb-1">
+                              ⚠️ Fragmentation Risk
+                            </div>
+                            <div className="text-white">
+                              {Math.round(response.metadata.dissociationRisk * 100)}%
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
                   </div>
                 </div>
               </div>

@@ -17,7 +17,7 @@
 import { ConsciousnessLevel, ConsciousnessLevelDetector } from './ConsciousnessLevelDetector';
 import { getSystemPrompt, ADAPTIVE_PROMPTS } from './AdaptiveSystemPrompts';
 import { CringeFilter, addNoCringeRules } from './CringeFilter';
-import Anthropic from '@anthropic-ai/sdk';
+import { MultiLLMProvider } from './LLMProvider';
 
 export interface ElementalAnalysis {
   fire: number;      // 0-10: Creative drive, vision, emergence
@@ -43,16 +43,14 @@ export interface AdaptiveResponse {
 export class AdaptiveLanguageGenerator {
   private levelDetector: ConsciousnessLevelDetector;
   private cringeFilter: CringeFilter;
-  private anthropic: Anthropic;
+  private llmProvider: MultiLLMProvider;
 
   constructor() {
     this.levelDetector = new ConsciousnessLevelDetector();
     this.cringeFilter = new CringeFilter();
 
-    // Initialize Anthropic client
-    this.anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY || process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY
-    });
+    // Initialize Multi-LLM Provider (open source first, Claude fallback)
+    this.llmProvider = new MultiLLMProvider();
   }
 
   /**
@@ -76,18 +74,30 @@ export class AdaptiveLanguageGenerator {
     // 3. Build prompt appropriate for level
     const systemPrompt = this.buildPrompt(input, elementalSignature, level);
 
-    // 4. Generate response
-    const rawResponse = await this.callClaude(systemPrompt, input, level);
+    // 4. Generate response (using appropriate LLM for level)
+    const llmResponse = await this.llmProvider.generate({
+      systemPrompt,
+      userInput: input,
+      level
+    });
+    const rawResponse = llmResponse.text;
 
     // 5. Check for cringe
     const cringeAnalysis = this.cringeFilter.analyze(rawResponse);
 
     // If cringe detected and score is high, regenerate with stricter rules
     let finalResponse = rawResponse;
+    let finalModel = llmResponse.model;
     if (cringeAnalysis.score > 0.5) {
       console.warn(`Cringe detected (score: ${cringeAnalysis.score}). Regenerating...`);
       const stricterPrompt = this.buildPrompt(input, elementalSignature, level, true);
-      finalResponse = await this.callClaude(stricterPrompt, input, level);
+      const retryResponse = await this.llmProvider.generate({
+        systemPrompt: stricterPrompt,
+        userInput: input,
+        level
+      });
+      finalResponse = retryResponse.text;
+      finalModel = retryResponse.model;
     }
 
     const generationTime = Date.now() - startTime;
@@ -100,7 +110,7 @@ export class AdaptiveLanguageGenerator {
       passedCringeFilter: cringeAnalysis.passesFilter,
       metadata: {
         promptTemplate: ADAPTIVE_PROMPTS[level].name,
-        modelUsed: 'claude-3-7-sonnet-20250219',
+        modelUsed: finalModel,
         generationTime
       }
     };
@@ -195,58 +205,6 @@ ${level >= 3 ? 'You may reference these elements in your response if appropriate
     return systemPrompt;
   }
 
-  /**
-   * Call Claude API for response generation
-   */
-  private async callClaude(
-    systemPrompt: string,
-    userInput: string,
-    level: ConsciousnessLevel
-  ): Promise<string> {
-
-    try {
-      const message = await this.anthropic.messages.create({
-        model: 'claude-3-7-sonnet-20250219',
-        max_tokens: level >= 4 ? 800 : 500, // More tokens for advanced levels
-        temperature: level >= 4 ? 0.7 : 0.6, // Slightly more creative for advanced
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: userInput
-          }
-        ]
-      });
-
-      const response = message.content[0];
-      if (response.type === 'text') {
-        return response.text;
-      }
-
-      throw new Error('Unexpected response type from Claude');
-
-    } catch (error) {
-      console.error('Claude API error:', error);
-
-      // Fallback response
-      return this.getFallbackResponse(level);
-    }
-  }
-
-  /**
-   * Fallback response if API fails
-   */
-  private getFallbackResponse(level: ConsciousnessLevel): string {
-    const fallbacks = {
-      1: "I'm having trouble connecting right now, but I hear you. What you're experiencing sounds challenging. Can you tell me more about what's going on?",
-      2: "I'm experiencing some technical difficulty, but I'm here. It sounds like something important is coming up for you. What's beneath the surface of this?",
-      3: "Technical glitch on my end - give me a moment. But what you're sharing has a particular energy to it. What element feels most present - is it more emotional (Water) or more about taking action (Fire)?",
-      4: "API hiccup - back in a moment. But I'm sensing something significant in what you're sharing. What's the elemental signature here for you?",
-      5: "Connection interrupted briefly. But the pattern you're describing carries weight. What's the alchemical work happening here?"
-    };
-
-    return fallbacks[level];
-  }
 
   /**
    * Quick test method to compare responses across all levels

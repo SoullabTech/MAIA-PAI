@@ -131,6 +131,52 @@ export default function ConsciousnessMonitorPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
+            className="group"
+          >
+            <Link href="/maia" className="block h-full">
+              <div className="bg-gradient-to-br from-emerald-600/20 via-teal-600/20 to-cyan-600/20 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:border-emerald-400/50 hover:bg-white/20 transition-all duration-300 h-full group-hover:scale-105 transform">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-white">💎 Talk to MAIA</h2>
+                  <div className="text-3xl">🗨️</div>
+                </div>
+                <p className="text-purple-200 mb-6">
+                  Simple conversational interface with Dialogue, Patient, and Scribe modes.
+                </p>
+                <div className="flex items-center gap-2 text-emerald-300 text-sm">
+                  <span>Start conversation</span>
+                  <span>→</span>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="group"
+          >
+            <Link href="/journal" className="block h-full">
+              <div className="bg-gradient-to-br from-purple-600/20 via-pink-600/20 to-rose-600/20 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:border-purple-400/50 hover:bg-white/20 transition-all duration-300 h-full group-hover:scale-105 transform">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-white">📝 Advanced Journaling</h2>
+                  <div className="text-3xl">✨</div>
+                </div>
+                <p className="text-purple-200 mb-6">
+                  Full journaling dashboard with consciousness gateways, analytics, and reflection tools.
+                </p>
+                <div className="flex items-center gap-2 text-purple-300 text-sm">
+                  <span>Open journal dashboard</span>
+                  <span>→</span>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
             className="group opacity-60"
           >
             <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 h-full">
@@ -148,6 +194,20 @@ export default function ConsciousnessMonitorPage() {
           </motion.div>
         </div>
       </div>
+
+      {/* Translation Portal */}
+      {showTranslationPortal && (
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -50 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="max-w-7xl mx-auto mb-8"
+          id="translation-portal"
+        >
+          <TranslationPortal className="w-full" />
+        </motion.div>
+      )}
 
       {/* Period Selector */}
       <div className="max-w-7xl mx-auto mb-6">

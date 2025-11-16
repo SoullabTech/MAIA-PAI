@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, Edit3 } from 'lucide-react';
+import { Mic, Edit3, X, Sparkles } from 'lucide-react';
 import { Copy } from '@/lib/copy/MaiaCopy';
 import { JournalingMode, JOURNALING_MODE_DESCRIPTIONS } from '@/lib/journaling/JournalingPrompts';
 import { useMaiaStore } from '@/lib/maia/state';
@@ -31,19 +31,32 @@ export default function ModeSelection() {
     reflective: false
   });
   const [isVoiceSupported, setIsVoiceSupported] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   // Reorganized for better visual balance: 2 primary gateways on top, 3 exploration gateways below, 3 neuroscience gateways at bottom
   const firstRowModes: JournalingMode[] = ['free', 'direction'];
   const secondRowModes: JournalingMode[] = ['dream', 'emotional', 'shadow'];
   const neuroscienceRowModes: JournalingMode[] = ['expressive', 'gratitude', 'reflective'];
 
-  // Voice support detection
+  // Voice support detection and welcome modal
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       setIsVoiceSupported(!!SpeechRecognition);
+
+      // Check if this is the first time visiting the Sacred Portal
+      const hasSeenWelcome = localStorage.getItem('maia-portal-welcome-seen');
+      if (!hasSeenWelcome) {
+        setShowWelcomeModal(true);
+      }
     }
   }, []);
+
+  // Handle welcome modal close
+  const handleWelcomeClose = () => {
+    localStorage.setItem('maia-portal-welcome-seen', 'true');
+    setShowWelcomeModal(false);
+  };
 
   // Toggle voice preference for a specific mode
   const toggleVoicePreference = useCallback((mode: JournalingMode, event: React.MouseEvent) => {
@@ -642,6 +655,116 @@ export default function ModeSelection() {
           </div>
         </div>
       </div>
+
+      {/* Welcome Modal - One Time Introduction */}
+      <AnimatePresence>
+        {showWelcomeModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-gradient-to-br from-jade-abyss via-jade-shadow to-jade-night rounded-2xl p-8 max-w-2xl w-full border border-jade-sage/30 relative overflow-hidden"
+            >
+              {/* Background glow */}
+              <div className="absolute inset-0 bg-gradient-radial from-jade-jade/10 via-transparent to-transparent" />
+
+              {/* Close button */}
+              <button
+                onClick={handleWelcomeClose}
+                className="absolute top-6 right-6 text-jade-mineral hover:text-jade-light transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              {/* Content */}
+              <div className="relative z-10">
+                {/* Sacred header */}
+                <div className="text-center mb-8">
+                  <div className="w-20 h-20 mx-auto mb-6 relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-jade-jade to-jade-copper rounded-full animate-pulse" />
+                    <Sparkles className="absolute inset-4 text-jade-abyss" />
+                  </div>
+
+                  <h2 className="text-3xl font-light text-jade-light mb-3">
+                    Welcome to the Sacred Consciousness Portal
+                  </h2>
+                  <p className="text-jade-mineral text-lg font-light leading-relaxed">
+                    A sophisticated technology for consciousness exploration and inner transformation
+                  </p>
+                </div>
+
+                {/* Explanation */}
+                <div className="space-y-6 mb-8">
+                  <div className="bg-jade-shadow/20 rounded-xl p-6 border border-jade-sage/20">
+                    <h3 className="text-jade-light font-medium mb-3 flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-jade-jade" />
+                      This Is Not Simple Journaling
+                    </h3>
+                    <p className="text-jade-sage text-sm leading-relaxed">
+                      Each consciousness gateway <strong>primes MAIA</strong> with specialized mastery frameworks.
+                      When you choose a mode, MAIA becomes a different kind of companion—dream guide, shadow work consultant,
+                      emotional mastery guide, or neuroscience-based consciousness coach.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-jade-forest/20 rounded-lg p-4 border border-jade-sage/20">
+                      <h4 className="text-jade-light font-medium mb-2">🧠 Consciousness Optimization</h4>
+                      <p className="text-jade-mineral text-xs leading-relaxed">
+                        Based on Stanford neuroscience research. MAIA guides specific practices that optimize your neural pathways
+                        for resilience, emotional mastery, and peak consciousness.
+                      </p>
+                    </div>
+
+                    <div className="bg-jade-forest/20 rounded-lg p-4 border border-jade-sage/20">
+                      <h4 className="text-jade-light font-medium mb-2">🌙 Wisdom Traditions</h4>
+                      <p className="text-jade-mineral text-xs leading-relaxed">
+                        MAIA becomes an archetypal mentor for dreams, shadow integration, and symbolic mastery
+                        using Jungian and mythological wisdom frameworks.
+                      </p>
+                    </div>
+
+                    <div className="bg-jade-forest/20 rounded-lg p-4 border border-jade-sage/20">
+                      <h4 className="text-jade-light font-medium mb-2">✨ Voice or Text</h4>
+                      <p className="text-jade-mineral text-xs leading-relaxed">
+                        Each gateway offers both voice and text modes. MAIA analyzes your words, symbols,
+                        and emotional patterns to offer profound guidance and insights.
+                      </p>
+                    </div>
+
+                    <div className="bg-jade-forest/20 rounded-lg p-4 border border-jade-sage/20">
+                      <h4 className="text-jade-light font-medium mb-2">🗺️ Consciousness Evolution</h4>
+                      <p className="text-jade-mineral text-xs leading-relaxed">
+                        MAIA tracks your archetypal patterns, symbols, and growth over time,
+                        becoming a true companion in your consciousness evolution.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Call to action */}
+                <div className="text-center">
+                  <button
+                    onClick={handleWelcomeClose}
+                    className="px-8 py-4 bg-gradient-to-r from-jade-jade to-jade-copper text-jade-abyss rounded-full font-medium hover:shadow-lg hover:shadow-jade-jade/25 transition-all text-lg"
+                  >
+                    Enter the Sacred Portal
+                  </button>
+                  <p className="text-jade-mineral/70 text-xs mt-3 italic">
+                    Choose your consciousness gateway to begin your exploration
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Consciousness Ripples */}
       <AnimatePresence>

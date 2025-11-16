@@ -12,33 +12,33 @@ interface ConsciousnessProfile {
   sessionPreference: 'morning' | 'afternoon' | 'evening' | 'intuitive';
   transformationGoals: string[];
   previousExperience: 'beginner' | 'some' | 'experienced';
-  healingModalities: string[];
+  masteryPractices: string[];
 }
 
 const TRANSFORMATION_GOALS = [
-  'Emotional Healing',
+  'Emotional Mastery',
   'Spiritual Growth',
   'Relationship Harmony',
   'Career Alignment',
   'Creative Expression',
-  'Inner Child Work',
+  'Inner Child Integration',
   'Shadow Integration',
-  'Somatic Healing',
+  'Somatic Awareness',
   'Consciousness Expansion',
-  'Life Transition Support'
+  'Life Transition Guidance'
 ];
 
-const HEALING_MODALITIES = [
-  'Talk Therapy',
-  'Somatic Work',
-  'Energy Healing',
+const MASTERY_PRACTICES = [
+  'Dialogue Mastery',
+  'Somatic Awareness',
+  'Energy Cultivation',
   'Breathwork',
   'Meditation',
   'Bodywork',
-  'Plant Medicine',
-  'Art Therapy',
+  'Plant Wisdom',
+  'Creative Expression',
   'Movement Practice',
-  'Sound Healing'
+  'Sound Immersion'
 ];
 
 export default function MemberSignupPage() {
@@ -82,7 +82,7 @@ export default function MemberSignupPage() {
     sessionPreference: 'morning',
     transformationGoals: [],
     previousExperience: 'beginner',
-    healingModalities: []
+    masteryPractices: []
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -122,12 +122,12 @@ export default function MemberSignupPage() {
     }));
   };
 
-  const handleModalityToggle = (modality: string) => {
+  const handlePracticeToggle = (practice: string) => {
     setProfile(prev => ({
       ...prev,
-      healingModalities: prev.healingModalities.includes(modality)
-        ? prev.healingModalities.filter(m => m !== modality)
-        : [...prev.healingModalities, modality]
+      masteryPractices: prev.masteryPractices.includes(practice)
+        ? prev.masteryPractices.filter(m => m !== practice)
+        : [...prev.masteryPractices, practice]
     }));
   };
 
@@ -419,18 +419,18 @@ export default function MemberSignupPage() {
                       What approaches have you explored or feel drawn to?
                     </h3>
                     <div className="grid grid-cols-2 gap-3">
-                      {HEALING_MODALITIES.map((modality) => (
+                      {MASTERY_PRACTICES.map((practice) => (
                         <button
-                          key={modality}
+                          key={practice}
                           type="button"
-                          onClick={() => handleModalityToggle(modality)}
+                          onClick={() => handlePracticeToggle(practice)}
                           className={`p-3 rounded-lg text-left transition-all duration-200 ${
-                            profile.healingModalities.includes(modality)
+                            profile.masteryPractices.includes(practice)
                               ? 'border-purple-400 bg-purple-400/20 text-purple-300 border-2'
                               : 'border-purple-300/20 bg-purple-950/5 text-purple-300/70 hover:bg-purple-950/10 border'
                           }`}
                         >
-                          <div className="font-medium text-sm">{modality}</div>
+                          <div className="font-medium text-sm">{practice}</div>
                         </button>
                       ))}
                     </div>
