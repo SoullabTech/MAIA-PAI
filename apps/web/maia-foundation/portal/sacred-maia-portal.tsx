@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { BookOpen, Clock, Search, HelpCircle, Sparkles, Mic, BarChart3, Settings as SettingsIcon, Gem, Beaker, Library, Users, Target, TrendingUp } from 'lucide-react';
+import { BookOpen, Clock, Search, HelpCircle, Sparkles, Mic, BarChart3, Settings as SettingsIcon } from 'lucide-react';
 import { Copy } from '@/lib/copy/MaiaCopy';
 import { useMaiaStore } from '@/lib/maia/state';
 import { mockEntries } from '@/lib/maia/mockData';
@@ -18,7 +18,6 @@ import Analytics from '@/components/maia/Analytics';
 import Settings from '@/components/maia/Settings';
 import SoulprintSnapshot from '@/components/maia/SoulprintSnapshot';
 import SoulprintDashboard from '@/components/maia/SoulprintDashboard';
-import MissionManager from '@/components/missions/MissionManager';
 
 export default function MaiaPage() {
   const { currentView, setView, entries, selectedMode, isVoiceMode } = useMaiaStore();
@@ -29,8 +28,6 @@ export default function MaiaPage() {
   const [showSettings, setShowSettings] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showSoulprint, setShowSoulprint] = useState(false);
-  const [showLabTools, setShowLabTools] = useState(false);
-  const [showMissionManager, setShowMissionManager] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [isDevMode, setIsDevMode] = useState(false);
   const [useVoiceMode, setUseVoiceMode] = useState(false);
@@ -110,42 +107,6 @@ export default function MaiaPage() {
                 <span className="hidden sm:inline">Journal</span>
               </button>
 
-              <a
-                href="/journal"
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Jade Journal - Temporal Consciousness"
-              >
-                <Gem className="w-4 h-4" />
-                <span className="hidden sm:inline">Jade</span>
-              </a>
-
-              <a
-                href="/ganesha"
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Ganesha - Community Management"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span className="hidden sm:inline">Ganesha</span>
-              </a>
-
-              <a
-                href="/maia/insights"
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Developmental Insights - Track Your Consciousness Evolution"
-              >
-                <TrendingUp className="w-4 h-4" />
-                <span className="hidden sm:inline">Insights</span>
-              </a>
-
-              <a
-                href="/maia/dev-chat"
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Chat with Development-Aware MAIA"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span className="hidden sm:inline">Dev Chat</span>
-              </a>
-
               {entries.length >= 3 && (
                 <button
                   onClick={() => setView('timeline')}
@@ -183,14 +144,6 @@ export default function MaiaPage() {
                   <Sparkles className="w-4 h-4" />
                 </button>
               )}
-
-              <button
-                onClick={() => setShowLabTools(!showLabTools)}
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Lab Tools & Community"
-              >
-                <Beaker className="w-4 h-4" />
-              </button>
 
               <button
                 onClick={() => setShowAnalytics(!showAnalytics)}
@@ -390,154 +343,6 @@ export default function MaiaPage() {
                   </button>
                 </div>
                 <Analytics />
-              </motion.div>
-            </motion.div>
-          )}
-
-          {showLabTools && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
-              onClick={() => setShowLabTools(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white dark:bg-neutral-800 rounded-2xl p-8 max-w-md w-full"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                    Lab Tools & Community
-                  </h2>
-                  <button
-                    onClick={() => setShowLabTools(false)}
-                    className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {/* Mission Management */}
-                  <button
-                    onClick={() => {
-                      setShowMissionManager(true);
-                      setShowLabTools(false);
-                    }}
-                    className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl hover:from-amber-100 hover:to-orange-100 dark:hover:from-amber-900/30 dark:hover:to-orange-900/30 transition-all border border-amber-200 dark:border-amber-800"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 bg-amber-500 rounded-lg flex items-center justify-center">
-                      <Target className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Mission Management</h3>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Create & track your consciousness missions</p>
-                    </div>
-                  </button>
-
-                  {/* Oracle Library */}
-                  <button
-                    onClick={() => {
-                      window.open('/oracle/library', '_blank');
-                      setShowLabTools(false);
-                    }}
-                    className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-xl hover:from-violet-100 hover:to-purple-100 dark:hover:from-violet-900/30 dark:hover:to-purple-900/30 transition-all border border-violet-200 dark:border-violet-800"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 bg-violet-500 rounded-lg flex items-center justify-center">
-                      <Library className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Oracle Library</h3>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Upload files for AI wisdom analysis</p>
-                    </div>
-                  </button>
-
-                  {/* Community Commons */}
-                  <button
-                    onClick={() => {
-                      window.open('/community', '_blank');
-                      setShowLabTools(false);
-                    }}
-                    className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl hover:from-emerald-100 hover:to-teal-100 dark:hover:from-emerald-900/30 dark:hover:to-teal-900/30 transition-all border border-emerald-200 dark:border-emerald-800"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center">
-                      <Users className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Community Commons</h3>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Connect with the consciousness community</p>
-                    </div>
-                  </button>
-
-                  {/* Consciousness APIs */}
-                  <button
-                    onClick={() => {
-                      window.open('/docs/community-library/consciousness-apis.md', '_blank');
-                      setShowLabTools(false);
-                    }}
-                    className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-jade-50 to-cyan-50 dark:from-jade-900/20 dark:to-cyan-900/20 rounded-xl hover:from-jade-100 hover:to-cyan-100 dark:hover:from-jade-900/30 dark:hover:to-cyan-900/30 transition-all border border-jade-200 dark:border-jade-800"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 bg-jade-500 rounded-lg flex items-center justify-center">
-                      <Sparkles className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Consciousness APIs</h3>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Maya's wisdom-powered tracking APIs</p>
-                    </div>
-                  </button>
-
-                  {/* Lab Tools Dashboard */}
-                  <button
-                    onClick={() => {
-                      window.open('/soullab', '_blank');
-                      setShowLabTools(false);
-                    }}
-                    className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-xl hover:from-orange-100 hover:to-amber-100 dark:hover:from-orange-900/30 dark:hover:to-amber-900/30 transition-all border border-orange-200 dark:border-orange-800"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
-                      <Beaker className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Lab Tools Dashboard</h3>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Advanced development & testing tools</p>
-                    </div>
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-
-          {showMissionManager && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
-              onClick={() => setShowMissionManager(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white dark:bg-neutral-800 rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                    Mission Management
-                  </h2>
-                  <button
-                    onClick={() => setShowMissionManager(false)}
-                    className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <MissionManager />
               </motion.div>
             </motion.div>
           )}

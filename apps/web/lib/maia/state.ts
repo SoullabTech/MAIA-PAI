@@ -20,7 +20,7 @@ export interface JournalEntry {
 }
 
 export interface MaiaState {
-  currentView: 'mode-select' | 'journal-entry' | 'voice-journal' | 'reflection' | 'timeline' | 'search';
+  currentView: 'mode-select' | 'journal-entry' | 'voice-journal' | 'reflection' | 'timeline' | 'search' | 'oracle-conversation';
   selectedMode: JournalingMode | null;
   currentEntry: string;
   entries: JournalEntry[];

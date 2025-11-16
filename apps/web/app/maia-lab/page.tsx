@@ -2,6 +2,6 @@
 
 import MAIAExperimental from '@/components/maia/MAIAExperimental';
 
-export default function MAIAPage() {
+export default function MAIALabPage() {
   return <MAIAExperimental />;
 }
