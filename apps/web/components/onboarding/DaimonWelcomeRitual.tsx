@@ -9,17 +9,8 @@ interface DaimonWelcomeRitualProps {
   onComplete?: () => void;
 }
 
-interface ProfileData {
-  ageRange: string;
-  sex: string;
-}
-
 export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualProps) {
-  const [phase, setPhase] = useState<'intro' | 'profile' | 'transitioning'>('intro');
-  const [profileData, setProfileData] = useState<ProfileData>({
-    ageRange: '',
-    sex: ''
-  });
+  const [phase, setPhase] = useState<'intro' | 'transitioning'>('intro');
 
   const handleComplete = async () => {
     setPhase('transitioning');
@@ -28,10 +19,10 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
       await fetch('/api/auth/complete-onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profileData })
+        body: JSON.stringify({ userId, daimonIntroComplete: true })
       });
     } catch (error) {
-      console.warn('Failed to store onboarding data:', error);
+      console.warn('Failed to mark intro complete:', error);
     }
 
     setTimeout(() => {
@@ -42,8 +33,6 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
       }
     }, 800);
   };
-
-  const canProceed = profileData.ageRange && profileData.sex;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-sky-950 to-cyan-950 relative overflow-hidden">
@@ -79,16 +68,17 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                     when you're in the middle of them.
                   </p>
                   <p className="text-sky-200/90 text-base leading-relaxed font-light mt-4">
-                    First, a few details to get started.
+                    I don't give advice. I notice what's alive in your experience and ask questions
+                    that help you see it too.
                   </p>
                 </div>
 
                 <div className="text-center">
                   <button
-                    onClick={() => setPhase('profile')}
+                    onClick={handleComplete}
                     className="inline-flex items-center gap-2 px-8 py-3 bg-transparent border border-sky-400/30 text-sky-300 rounded-full font-light text-sm hover:border-sky-400/60 hover:text-sky-200 transition-all duration-300"
                   >
-                    Continue
+                    Let's begin
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -96,82 +86,6 @@ export function DaimonWelcomeRitual({ userId, onComplete }: DaimonWelcomeRitualP
                 <p className="text-sky-400/30 text-xs text-center font-light">
                   — MAIA
                 </p>
-              </motion.div>
-            )}
-
-            {phase === 'profile' && (
-              <motion.div
-                key="profile"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 1.02 }}
-                transition={{ duration: 0.6 }}
-                className="space-y-6"
-              >
-                <div className="w-12 h-12 mx-auto mb-6 opacity-60">
-                  <img src="/elementalHoloflower.svg" alt="MAIA" className="w-full h-full object-contain" />
-                </div>
-
-                <div className="space-y-4">
-                  {/* Age Range */}
-                  <div>
-                    <label className="block text-xs text-sky-300/60 mb-2 font-light tracking-wide">
-                      Age Range
-                    </label>
-                    <div className="flex gap-2 flex-wrap">
-                      {['18-24', '25-34', '35-44', '45-54', '55-64', '65+'].map((range) => (
-                        <button
-                          key={range}
-                          onClick={() => setProfileData(p => ({ ...p, ageRange: range }))}
-                          className={`px-3 py-1.5 rounded-full text-xs font-light transition-all ${
-                            profileData.ageRange === range
-                              ? 'bg-sky-500/20 text-sky-200 border border-sky-400/40'
-                              : 'bg-sky-500/5 text-sky-300/60 border border-sky-400/10 hover:border-sky-400/30'
-                          }`}
-                        >
-                          {range}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Sex */}
-                  <div>
-                    <label className="block text-xs text-sky-300/60 mb-2 font-light tracking-wide">
-                      Sex
-                    </label>
-                    <div className="flex gap-2 flex-wrap">
-                      {['Female', 'Male', 'Non-binary', 'Prefer not to say'].map((option) => (
-                        <button
-                          key={option}
-                          onClick={() => setProfileData(p => ({ ...p, sex: option }))}
-                          className={`px-3 py-1.5 rounded-full text-xs font-light transition-all ${
-                            profileData.sex === option
-                              ? 'bg-sky-500/20 text-sky-200 border border-sky-400/40'
-                              : 'bg-sky-500/5 text-sky-300/60 border border-sky-400/10 hover:border-sky-400/30'
-                          }`}
-                        >
-                          {option}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-center pt-4">
-                  <button
-                    onClick={handleComplete}
-                    disabled={!canProceed}
-                    className={`inline-flex items-center gap-2 px-8 py-3 rounded-full font-light text-sm transition-all duration-300 ${
-                      canProceed
-                        ? 'bg-transparent border border-sky-400/30 text-sky-300 hover:border-sky-400/60 hover:text-sky-200'
-                        : 'bg-sky-500/5 border border-sky-400/10 text-sky-400/30 cursor-not-allowed'
-                    }`}
-                  >
-                    Let's begin
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
               </motion.div>
             )}
 
