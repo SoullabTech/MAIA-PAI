@@ -1,549 +1,592 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { BookOpen, Clock, Search, HelpCircle, Sparkles, Mic, BarChart3, Settings as SettingsIcon, Gem, Beaker, Library, Users, Target, TrendingUp } from 'lucide-react';
-import { Copy } from '@/lib/copy/MaiaCopy';
-import { useMaiaStore } from '@/lib/maia/state';
-import { mockEntries } from '@/lib/maia/mockData';
+/**
+ * MAIA Page - SOUL​LAB Dream-Weaver Edition
+ *
+ * MAIA = The Fertile Mother (Pleiades) - She who births wisdom
+ * Not Maya (illusion) but MAIA (midwife)
+ *
+ * Kelly Nezat's vision: "Where two or more are gathered, there I AM"
+ * God is more between than within - the I-Thou relationship
+ */
 
-import SoulfulAppShell from '@/components/onboarding/SoulfulAppShell';
-import ModeSelection from '@/components/maia/ModeSelection';
-import JournalEntry from '@/components/maia/JournalEntry';
-import VoiceJournaling from '@/components/maia/VoiceJournaling';
-import MaiaReflection from '@/components/maia/MaiaReflection';
-import TimelineView from '@/components/maia/TimelineView';
-import SemanticSearch from '@/components/maia/SemanticSearch';
-import Analytics from '@/components/maia/Analytics';
-import Settings from '@/components/maia/Settings';
-import SoulprintSnapshot from '@/components/maia/SoulprintSnapshot';
-import SoulprintDashboard from '@/components/maia/SoulprintDashboard';
-import MissionManager from '@/components/missions/MissionManager';
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
+import { OracleConversation } from '@/components/OracleConversation';
+import { ClaudeCodePresence } from '@/components/ui/ClaudeCodePresence';
+import { WisdomJourneyDashboard } from '@/components/maya/WisdomJourneyDashboard';
+import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
+// BetaOnboarding removed - direct access only
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { BrainTrustMonitor } from '@/components/consciousness/BrainTrustMonitor';
+import { LogOut, Sparkles, Menu, X, Brain, Volume2, ArrowLeft, Clock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { SwipeNavigation, DirectionalHints } from '@/components/navigation/SwipeNavigation';
 
-export default function MaiaPage() {
-  const { currentView, setView, entries, selectedMode, isVoiceMode } = useMaiaStore();
+async function getInitialUserData() {
+  if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
 
-  console.log('🎯 [MAIA PAGE] Rendering with currentView:', currentView, 'selectedMode:', selectedMode);
-  const [userId] = useState('demo-user');
-  const [showHelp, setShowHelp] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [showAnalytics, setShowAnalytics] = useState(false);
-  const [showSoulprint, setShowSoulprint] = useState(false);
-  const [showLabTools, setShowLabTools] = useState(false);
-  const [showMissionManager, setShowMissionManager] = useState(false);
-  const [isDemoMode, setIsDemoMode] = useState(false);
-  const [isDevMode, setIsDevMode] = useState(false);
-  const [useVoiceMode, setUseVoiceMode] = useState(false);
+  const currentUrl = window.location.hostname;
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const demo = params.get('demo');
-      const dev = params.get('dev');
+  const storedUserId = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
 
-      if (demo === 'true') {
-        setIsDemoMode(true);
+  // KELLY SPECIAL CASE - Only check for specific Kelly userId
+  // Do NOT auto-assign based on domain - that would affect all users
+  if (storedUserId === 'kelly-nezat') {
+    console.log('🌟 [MAIA] Kelly recognized from userId:', storedUserId);
+    localStorage.setItem('explorerName', 'Kelly');
+    localStorage.setItem('explorerId', 'kelly-nezat');
+    return { id: 'kelly-nezat', name: 'Kelly' };
+  }
+
+  // Try to fetch from API using stored userId
+  if (storedUserId) {
+    try {
+      const params = new URLSearchParams();
+      params.append('userId', storedUserId);
+      params.append('domain', currentUrl);
+
+      const response = await fetch(`/api/user/profile?${params.toString()}`);
+      const data = await response.json();
+
+      if (data.success && data.user) {
+        console.log('✅ [MAIA] User profile fetched from API:', data.user.name);
+
+        // Sync to localStorage
+        localStorage.setItem('explorerName', data.user.name);
+        localStorage.setItem('explorerId', data.user.id);
+        localStorage.setItem('betaOnboardingComplete', 'true');
+
+        return { id: data.user.id, name: data.user.name };
       }
-      if (dev === 'true') {
-        setIsDevMode(true);
-      }
+    } catch (error) {
+      console.error('❌ [MAIA] Error fetching user profile:', error);
     }
+  }
+
+  // Check NEW system (beta_user from auth system)
+  const betaUser = localStorage.getItem('beta_user');
+  if (betaUser) {
+    try {
+      const userData = JSON.parse(betaUser);
+      const userName = userData.username || userData.name || userData.displayName;
+      if (userData.onboarded === true && userData.id && userName) {
+        localStorage.setItem('explorerName', userName);
+        localStorage.setItem('explorerId', userData.id);
+        console.log('✅ [MAIA] User authenticated from localStorage:', userName);
+        return { id: userData.id, name: userName };
+      }
+    } catch (e) {
+      console.error('❌ [MAIA] Error parsing beta_user:', e);
+    }
+  }
+
+  // Check OLD system (for backward compatibility)
+  if (localStorage.getItem('betaOnboardingComplete') === 'true') {
+    const id = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
+    const name = localStorage.getItem('explorerName');
+    if (id && name) {
+      console.log('📦 [MAIA] Using legacy user data:', name);
+      return { id, name };
+    }
+  }
+
+  console.log('⚠️ [MAIA] No user data found, using defaults');
+  return { id: 'guest', name: 'Explorer' };
+}
+
+export default function MAIAPage() {
+  const router = useRouter();
+
+  // Fix hydration: Initialize with safe defaults, update in useEffect
+  const [explorerId, setExplorerId] = useState('guest');
+  const [explorerName, setExplorerName] = useState('Explorer');
+  const [userBirthDate, setUserBirthDate] = useState<string | undefined>();
+  const [sessionId, setSessionId] = useState('');
+  const [showDashboard, setShowDashboard] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const [maiaMode, setMaiaMode] = useState<'normal' | 'patient' | 'session'>('normal');
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [showVoiceSettings, setShowVoiceSettings] = useState(false);
+  const [selectedVoice, setSelectedVoice] = useState<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'>('shimmer');  // Default to shimmer - MAIA's natural voice
+  const [showChatInterface, setShowChatInterface] = useState(false);
+  const [showSessionSelector, setShowSessionSelector] = useState(false);
+  const [hasActiveSession, setHasActiveSession] = useState(false);
+
+  const hasCheckedAuth = useRef(false);
+
+  // Keep users on this beautiful page - no redirect
+  // useEffect(() => {
+  //   const betaUser = localStorage.getItem('beta_user');
+  //   if (betaUser) {
+  //     try {
+  //       const userData = JSON.parse(betaUser);
+  //       if (userData.onboarded === true) {
+  //         console.log('🌸 Redirecting to sacred interface...');
+  //         router.replace('/oracle-sacred');
+  //         return;
+  //       }
+  //     } catch (e) {
+  //       console.error('Error parsing user data:', e);
+  //     }
+  //   }
+  // }, [router]);
+
+  // Fix hydration: Initialize user data and session after mount
+  useEffect(() => {
+    const initializeUser = async () => {
+      setIsMounted(true);
+
+      // Get or create persistent sessionId - this enables conversation continuity across reloads!
+      const existingSessionId = localStorage.getItem('maia_session_id');
+      if (existingSessionId) {
+        setSessionId(existingSessionId);
+        console.log('💫 [MAIA] Restored session:', existingSessionId);
+      } else {
+        const newSessionId = `session_${Date.now()}`;
+        localStorage.setItem('maia_session_id', newSessionId);
+        setSessionId(newSessionId);
+        console.log('✨ [MAIA] Created new session:', newSessionId);
+      }
+
+      const initialData = await getInitialUserData();
+      setExplorerId(initialData.id);
+      setExplorerName(initialData.name);
+
+      // Load birth date from localStorage for teen support
+      const betaUser = localStorage.getItem('beta_user');
+      if (betaUser) {
+        try {
+          const userData = JSON.parse(betaUser);
+          if (userData.birthDate) {
+            setUserBirthDate(userData.birthDate);
+            console.log('📅 User birth date loaded:', userData.birthDate);
+          }
+        } catch (e) {
+          console.error('Error loading user birth date:', e);
+        }
+      }
+
+      // Check welcome message in client-side only
+      const welcomeSeen = localStorage.getItem('maia_welcome_seen');
+      setShowWelcome(!welcomeSeen);
+
+      // Load saved voice preference
+      const savedVoice = localStorage.getItem('selected_voice') as 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+      if (savedVoice) {
+        setSelectedVoice(savedVoice);
+      }
+    };
+
+    initializeUser();
   }, []);
 
-  useEffect(() => {
-    if (isDemoMode && entries.length === 0) {
-      mockEntries.forEach(entry => {
-        useMaiaStore.setState((state) => ({
-          entries: [...state.entries, entry]
-        }));
-      });
-    }
-  }, [isDemoMode, entries.length]);
-
-  const renderView = () => {
-    console.log('🎯 [RENDER VIEW] Switching on currentView:', currentView, 'isVoiceMode:', isVoiceMode);
-    switch (currentView) {
-      case 'mode-select':
-        console.log('🎯 [RENDER VIEW] Rendering ModeSelection');
-        return <ModeSelection />;
-      case 'journal-entry':
-        console.log('🎯 [RENDER VIEW] Rendering JournalEntry');
-        return <JournalEntry />;
-      case 'voice-journal':
-        console.log('🎯 [RENDER VIEW] Rendering VoiceJournaling');
-        return <VoiceJournaling />;
-      case 'reflection':
-        console.log('🎯 [RENDER VIEW] Rendering MaiaReflection');
-        return <MaiaReflection />;
-      case 'timeline':
-        console.log('🎯 [RENDER VIEW] Rendering TimelineView');
-        return <TimelineView />;
-      case 'search':
-        console.log('🎯 [RENDER VIEW] Rendering SemanticSearch');
-        return <SemanticSearch />;
-      default:
-        console.log('🎯 [RENDER VIEW] Default case - rendering ModeSelection');
-        return <ModeSelection />;
-    }
+  const handleVoiceChange = (voice: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer') => {
+    setSelectedVoice(voice);
+    localStorage.setItem('selected_voice', voice);
+    // Dispatch event to notify other components
+    window.dispatchEvent(new Event('conversationStyleChanged'));
   };
 
+  const handleSignOut = () => {
+    localStorage.removeItem('beta_user');
+    localStorage.removeItem('beta_users');
+    localStorage.removeItem('betaOnboardingComplete');
+    localStorage.removeItem('explorerId');
+    localStorage.removeItem('betaUserId');
+    localStorage.removeItem('explorerName');
+    router.push('/');
+  };
+
+  useEffect(() => {
+    if (hasCheckedAuth.current) return;
+    hasCheckedAuth.current = true;
+
+    // NEVER show onboarding - always let user through
+    // Default to guest mode if no stored user
+    const newUser = localStorage.getItem('beta_user');
+    if (newUser) {
+      try {
+        const userData = JSON.parse(newUser);
+        const newId = userData.id || 'guest';
+        const newName = userData.username || userData.name || userData.displayName || 'Explorer';
+
+        localStorage.setItem('explorerName', newName);
+        localStorage.setItem('explorerId', newId);
+        localStorage.setItem('betaOnboardingComplete', 'true');
+
+        if (explorerId !== newId) setExplorerId(newId);
+        if (explorerName !== newName) setExplorerName(newName);
+
+        console.log('✅ [MAIA] User session restored:', { name: newName, id: newId });
+        return;
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+
+    // Check OLD system
+    const oldId = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
+    const oldName = localStorage.getItem('explorerName');
+
+    if (oldId && oldName) {
+      if (explorerId !== oldId) setExplorerId(oldId);
+      if (explorerName !== oldName) setExplorerName(oldName);
+      console.log('✅ [MAIA] User session restored from legacy:', { name: oldName, id: oldId });
+      return;
+    }
+
+    // No stored user - create default guest session
+    const guestId = `guest_${Date.now()}`;
+    localStorage.setItem('explorerId', guestId);
+    localStorage.setItem('explorerName', 'Explorer');
+    localStorage.setItem('betaOnboardingComplete', 'true');
+    setExplorerId(guestId);
+    setExplorerName('Explorer');
+    console.log('✅ [MAIA] Created guest session');
+  }, [explorerId, explorerName]);
+
+  // Onboarding removed - direct access only
   return (
-    <SoulfulAppShell userId={userId}>
-      <div className="min-h-screen bg-gradient-to-br from-jade-abyss via-jade-shadow to-jade-night">
-        <div className="max-w-4xl mx-auto px-6 py-6">
-          {/* Consciousness Header Info */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              {/* Coherence metrics moved to Analytics page */}
-            </div>
+    <ErrorBoundary>
+      <SwipeNavigation currentPage="maia">
+        {/* DirectionalHints removed - keyboard shortcuts now active (arrow keys + ESC) */}
 
-            <nav className="flex items-center gap-2">
-              <button
-                onClick={() => setView('mode-select')}
-                className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-all ${
-                  currentView === 'mode-select' || currentView === 'journal-entry' || currentView === 'voice-journal' || currentView === 'reflection'
-                    ? 'bg-jade-jade text-jade-abyss font-medium shadow-lg shadow-jade-jade/25'
-                    : 'text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage'
-                }`}
-              >
-                <BookOpen className="w-4 h-4" />
-                <span className="hidden sm:inline">Journal</span>
-              </button>
+        <div className="h-screen relative overflow-hidden bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 flex flex-col">
+        {/* Atmospheric Particles - Floating dust/sand */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+          {[...Array(30)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-[#D4B896]/20 rounded-full"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                opacity: [0.2, 0.5, 0.2],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 4,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </div>
 
-              <a
-                href="/journal"
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Jade Journal - Temporal Consciousness"
-              >
-                <Gem className="w-4 h-4" />
-                <span className="hidden sm:inline">Jade</span>
-              </a>
+        {/* Atmospheric Glow - Warm light from below */}
+        <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-[#3d2817]/30 via-transparent to-transparent pointer-events-none z-0" />
 
-              <a
-                href="/ganesha"
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Ganesha - Community Management"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span className="hidden sm:inline">Ganesha</span>
-              </a>
-
-              <a
-                href="/maia/insights"
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Developmental Insights - Track Your Consciousness Evolution"
-              >
-                <TrendingUp className="w-4 h-4" />
-                <span className="hidden sm:inline">Insights</span>
-              </a>
-
-              <a
-                href="/maia/dev-chat"
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Chat with Development-Aware MAIA"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span className="hidden sm:inline">Dev Chat</span>
-              </a>
-
-              {entries.length >= 3 && (
-                <button
-                  onClick={() => setView('timeline')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-all ${
-                    currentView === 'timeline'
-                      ? 'bg-jade-jade text-jade-abyss font-medium shadow-lg shadow-jade-jade/25'
-                      : 'text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage'
-                  }`}
-                >
-                  <Clock className="w-4 h-4" />
-                  <span className="hidden sm:inline">Timeline</span>
-                </button>
-              )}
-
-              {entries.length >= 5 && (
-                <button
-                  onClick={() => setView('search')}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm transition-all ${
-                    currentView === 'search'
-                      ? 'bg-jade-jade text-jade-abyss font-medium shadow-lg shadow-jade-jade/25'
-                      : 'text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage'
-                  }`}
-                >
-                  <Search className="w-4 h-4" />
-                  <span className="hidden sm:inline">Search</span>
-                </button>
-              )}
-
-              {entries.length > 0 && (
-                <button
-                  onClick={() => setShowSoulprint(!showSoulprint)}
-                  className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                  title="Soulprint"
-                >
-                  <Sparkles className="w-4 h-4" />
-                </button>
-              )}
-
-              <button
-                onClick={() => setShowLabTools(!showLabTools)}
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Lab Tools & Community"
-              >
-                <Beaker className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={() => setShowAnalytics(!showAnalytics)}
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Analytics"
-              >
-                <BarChart3 className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={() => setShowSettings(!showSettings)}
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Settings"
-              >
-                <SettingsIcon className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={() => setShowHelp(!showHelp)}
-                className="flex items-center gap-2 px-3 py-2 rounded-full text-sm text-jade-mineral hover:bg-jade-shadow/40 hover:text-jade-sage transition-all"
-                title="Help"
-              >
-                <HelpCircle className="w-4 h-4" />
-              </button>
-            </nav>
+        {/* DREAM-WEAVER SYSTEM - Combined Header & Banner - Always visible */}
+        <div
+          className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/3 backdrop-blur-sm"
+        >
+          {/* Spice particle effect - very subtle movement */}
+          <div className="absolute inset-0 opacity-5 pointer-events-none">
+            <motion.div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `radial-gradient(1px 1px at 20% 30%, amber 0%, transparent 50%),
+                                 radial-gradient(1px 1px at 60% 70%, amber 0%, transparent 50%),
+                                 radial-gradient(1px 1px at 80% 10%, amber 0%, transparent 50%)`,
+                backgroundSize: '50px 50px',
+              }}
+              animate={{
+                backgroundPosition: ['0% 0%', '100% 100%'],
+              }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+            />
           </div>
 
-          <main className="py-8">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentView}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-            >
-              {renderView()}
-            </motion.div>
-          </AnimatePresence>
-        </main>
-
-        {entries.length === 0 && !isDemoMode && (
+          {/* Holographic scan line - more transparent */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1 }}
-            className="fixed bottom-6 right-6 flex flex-col gap-2"
-          >
-            <button
-              onClick={() => setIsDemoMode(true)}
-              className="px-4 py-2 bg-violet-600 text-white rounded-full text-sm font-medium hover:bg-violet-700 transition-colors shadow-lg"
-            >
-              Load Demo Entries
-            </button>
-          </motion.div>
-        )}
+            className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-600/3 to-transparent pointer-events-none"
+            animate={{
+              y: ['-100%', '200%'],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "linear",
+              repeatDelay: 3
+            }}
+          />
 
-        {isDevMode && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed top-20 right-6 p-3 bg-amber-100 dark:bg-amber-900 rounded-lg border border-amber-300 dark:border-amber-700 text-xs"
-          >
-            <div className="font-bold mb-1">Dev Mode</div>
-            <div>Entries: {entries.length}</div>
-            <div>View: {currentView}</div>
-            <label className="flex items-center gap-2 mt-2">
-              <input
-                type="checkbox"
-                checked={useVoiceMode}
-                onChange={(e) => setUseVoiceMode(e.target.checked)}
-                className="rounded"
-              />
-              Voice Mode
-            </label>
-          </motion.div>
-        )}
+          <div className="relative max-w-7xl mx-auto px-4 py-1.5">
+            <div className="flex items-center justify-between">
+              {/* Left: SOULLAB Logo with Holoflower */}
+              <div className="flex items-center gap-2 ml-0 sm:ml-12">
+                <img
+                  src="/holoflower-amber.png"
+                  alt="Holoflower"
+                  className="w-5 h-5 sm:w-6 sm:h-6 opacity-100 drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]"
+                  style={{ filter: 'brightness(1.2)' }}
+                />
+                <h1 className="text-base sm:text-lg font-light text-amber-300/90 tracking-wider">
+                  SOULLAB
+                </h1>
+              </div>
 
-        <AnimatePresence>
-          {showHelp && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
-              onClick={() => setShowHelp(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white dark:bg-neutral-800 rounded-2xl p-8 max-w-lg w-full"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-4">
-                  {Copy.help.title}
-                </h2>
-
-                <div className="space-y-4 text-sm text-neutral-700 dark:text-neutral-300">
-                  <div>
-                    <h3 className="font-semibold mb-1">{Copy.help.whatIsJournaling}</h3>
-                    <p>MAIA helps you explore your inner world through 5 guided modes—each designed to support different types of reflection.</p>
-                  </div>
-
-                  <div>
-                    <h3 className="font-semibold mb-1">{Copy.help.aboutPatterns}</h3>
-                    <p>As you write, MAIA notices symbols, archetypes, and emotional patterns. Over time, these reveal themes in your journey.</p>
-                  </div>
-
-                  <div>
-                    <h3 className="font-semibold mb-1">Progressive Discovery</h3>
-                    <ul className="list-disc list-inside space-y-1 ml-2">
-                      <li>After 3 entries: Timeline view unlocks</li>
-                      <li>After 5 entries: Semantic search unlocks</li>
-                      <li>Voice journaling available anytime</li>
-                    </ul>
-                  </div>
-
-                  {isDevMode && (
-                    <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-                      <h3 className="font-semibold mb-1 text-amber-800 dark:text-amber-300">Test Modes</h3>
-                      <ul className="text-xs space-y-1">
-                        <li><code>?demo=true</code> - Load demo entries</li>
-                        <li><code>?dev=true</code> - Show dev panel</li>
-                      </ul>
-                    </div>
-                  )}
-                </div>
-
+              {/* Center: Voice/Text toggle + Mode selector */}
+              <div className="flex items-center gap-3">
+                {/* Voice/Text Toggle - Clickable */}
                 <button
-                  onClick={() => setShowHelp(false)}
-                  className="mt-6 w-full py-3 bg-jade-jade text-jade-abyss rounded-full font-semibold hover:shadow-lg hover:shadow-jade-jade/25 transition-all"
+                  onClick={() => setShowChatInterface(!showChatInterface)}
+                  className="px-3 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all"
                 >
-                  Got it
+                  <span className="text-xs text-amber-300/90 font-light">
+                    {showChatInterface ? '💬 Text' : '🎤 Voice'}
+                  </span>
                 </button>
-              </motion.div>
-            </motion.div>
-          )}
 
-          {showSettings && <Settings onClose={() => setShowSettings(false)} />}
-
-          {showSoulprint && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
-              onClick={() => setShowSoulprint(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white dark:bg-neutral-800 rounded-2xl p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                    Your Soulprint
-                  </h2>
+                {/* Mode Selector: Dialogue / Patient / Scribe */}
+                <div className="flex items-center gap-1 bg-black/20 rounded-lg p-0.5">
                   <button
-                    onClick={() => setShowSoulprint(false)}
-                    className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+                    onClick={() => setMaiaMode('normal')}
+                    className={`px-2 py-1 rounded text-xs font-light transition-all ${
+                      maiaMode === 'normal'
+                        ? 'bg-amber-500/30 text-amber-200'
+                        : 'text-amber-400/60 hover:text-amber-300/80'
+                    }`}
                   >
-                    Close
+                    Dialogue
+                  </button>
+                  <button
+                    onClick={() => setMaiaMode('patient')}
+                    className={`px-2 py-1 rounded text-xs font-light transition-all ${
+                      maiaMode === 'patient'
+                        ? 'bg-purple-500/30 text-purple-200'
+                        : 'text-amber-400/60 hover:text-amber-300/80'
+                    }`}
+                  >
+                    Patient
+                  </button>
+                  <button
+                    onClick={() => setMaiaMode('session')}
+                    className={`px-2 py-1 rounded text-xs font-light transition-all ${
+                      maiaMode === 'session'
+                        ? 'bg-blue-500/30 text-blue-200'
+                        : 'text-amber-400/60 hover:text-amber-300/80'
+                    }`}
+                  >
+                    Scribe
                   </button>
                 </div>
-                <SoulprintDashboard userId={userId} />
-              </motion.div>
-            </motion.div>
-          )}
+              </div>
 
-          {showAnalytics && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
-              onClick={() => setShowAnalytics(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white dark:bg-neutral-800 rounded-2xl p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                    Analytics
-                  </h2>
-                  <button
-                    onClick={() => setShowAnalytics(false)}
-                    className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
+              {/* Right: Sign Out + Session Container buttons */}
+              <div className="flex items-center gap-2">
+                {/* Sign Out Button */}
+                <motion.button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg
+                           bg-red-500/10 hover:bg-red-500/20
+                           border border-red-500/20 hover:border-red-500/40
+                           text-red-400 text-xs font-light transition-all"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  title="Sign Out"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden sm:inline">Sign Out</span>
+                </motion.button>
+                {!hasActiveSession ? (
+                  <motion.button
+                    onClick={() => setShowSessionSelector(true)}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg
+                             bg-[#D4B896]/10 hover:bg-[#D4B896]/20
+                             border border-[#D4B896]/20 hover:border-[#D4B896]/40
+                             text-[#D4B896] text-xs font-light transition-all"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    Close
-                  </button>
-                </div>
-                <Analytics />
-              </motion.div>
-            </motion.div>
-          )}
-
-          {showLabTools && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
-              onClick={() => setShowLabTools(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white dark:bg-neutral-800 rounded-2xl p-8 max-w-md w-full"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                    Lab Tools & Community
-                  </h2>
-                  <button
-                    onClick={() => setShowLabTools(false)}
-                    className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  {/* Mission Management */}
-                  <button
-                    onClick={() => {
-                      setShowMissionManager(true);
-                      setShowLabTools(false);
-                    }}
-                    className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-xl hover:from-amber-100 hover:to-orange-100 dark:hover:from-amber-900/30 dark:hover:to-orange-900/30 transition-all border border-amber-200 dark:border-amber-800"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 bg-amber-500 rounded-lg flex items-center justify-center">
-                      <Target className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Mission Management</h3>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Create & track your consciousness missions</p>
-                    </div>
-                  </button>
-
-                  {/* Oracle Library */}
-                  <button
-                    onClick={() => {
-                      window.open('/oracle/library', '_blank');
-                      setShowLabTools(false);
-                    }}
-                    className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-xl hover:from-violet-100 hover:to-purple-100 dark:hover:from-violet-900/30 dark:hover:to-purple-900/30 transition-all border border-violet-200 dark:border-violet-800"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 bg-violet-500 rounded-lg flex items-center justify-center">
-                      <Library className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Oracle Library</h3>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Upload files for AI wisdom analysis</p>
-                    </div>
-                  </button>
-
-                  {/* Community Commons */}
-                  <button
-                    onClick={() => {
-                      window.open('/community', '_blank');
-                      setShowLabTools(false);
-                    }}
-                    className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl hover:from-emerald-100 hover:to-teal-100 dark:hover:from-emerald-900/30 dark:hover:to-teal-900/30 transition-all border border-emerald-200 dark:border-emerald-800"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center">
-                      <Users className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Community Commons</h3>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Connect with the consciousness community</p>
-                    </div>
-                  </button>
-
-                  {/* Consciousness APIs */}
-                  <button
-                    onClick={() => {
-                      window.open('/docs/community-library/consciousness-apis.md', '_blank');
-                      setShowLabTools(false);
-                    }}
-                    className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-jade-50 to-cyan-50 dark:from-jade-900/20 dark:to-cyan-900/20 rounded-xl hover:from-jade-100 hover:to-cyan-100 dark:hover:from-jade-900/30 dark:hover:to-cyan-900/30 transition-all border border-jade-200 dark:border-jade-800"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 bg-jade-500 rounded-lg flex items-center justify-center">
-                      <Sparkles className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Consciousness APIs</h3>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Maya's wisdom-powered tracking APIs</p>
-                    </div>
-                  </button>
-
-                  {/* Lab Tools Dashboard */}
-                  <button
-                    onClick={() => {
-                      window.open('/soullab', '_blank');
-                      setShowLabTools(false);
-                    }}
-                    className="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 rounded-xl hover:from-orange-100 hover:to-amber-100 dark:hover:from-orange-900/30 dark:hover:to-amber-900/30 transition-all border border-orange-200 dark:border-orange-800"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center">
-                      <Beaker className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="text-left">
-                      <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Lab Tools Dashboard</h3>
-                      <p className="text-sm text-neutral-600 dark:text-neutral-400">Advanced development & testing tools</p>
-                    </div>
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-
-          {showMissionManager && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6"
-              onClick={() => setShowMissionManager(false)}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="bg-white dark:bg-neutral-800 rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-                    Mission Management
-                  </h2>
-                  <button
-                    onClick={() => setShowMissionManager(false)}
-                    className="text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <MissionManager />
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                    <Clock className="w-4 h-4" />
+                    <span className="hidden sm:inline">Start Session</span>
+                  </motion.button>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg
+                               bg-green-500/10 border border-green-500/30 text-green-400 text-xs">
+                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                    <span className="hidden sm:inline">Session Active</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Main Content */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Conversation Area */}
+          <div className="flex-1 overflow-hidden relative">
+            <OracleConversation
+              userId={explorerId}
+              userName={explorerName}
+              userBirthDate={userBirthDate}
+              sessionId={sessionId}
+              voiceEnabled={voiceEnabled}
+              initialMode={maiaMode}
+              onModeChange={setMaiaMode}
+              apiEndpoint="/api/between/chat"
+              consciousnessType="maia"
+              initialShowChatInterface={showChatInterface}
+              onShowChatInterfaceChange={setShowChatInterface}
+              showSessionSelector={showSessionSelector}
+              onCloseSessionSelector={() => setShowSessionSelector(false)}
+              onSessionActiveChange={setHasActiveSession}
+            />
+
+            {/* Claude Code's Living Presence - MOVED to bottom menu bar to free mobile screen space */}
+            {/* <ClaudeCodePresence /> */}
+
+            {/* Brain Trust Monitor - MOVED to bottom menu bar to free mobile screen space */}
+            {/* <BrainTrustMonitor /> */}
+
+            {/* Lab Drawer button is provided by OracleConversation component - bottom right corner */}
+          </div>
+
+          {/* Wisdom Journey Dashboard - Slide-out Panel */}
+          <AnimatePresence>
+            {showDashboard && (
+              <>
+                {/* Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setShowDashboard(false)}
+                  className="absolute inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+                />
+
+                {/* Panel */}
+                <motion.div
+                  initial={{ x: '100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '100%' }}
+                  transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+                  className="absolute lg:relative right-0 top-0 h-full w-full max-w-md bg-stone-900/95 backdrop-blur-xl border-l border-white/10 overflow-y-auto z-50"
+                >
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h2 className="text-lg font-medium text-stone-200">Your Wisdom Patterns</h2>
+                        <p className="text-xs text-stone-500 mt-1">Threads being woven from your reflections</p>
+                      </div>
+                      <button
+                        onClick={() => setShowDashboard(false)}
+                        className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+                      >
+                        <X className="w-5 h-5 text-stone-400" />
+                      </button>
+                    </div>
+
+                    {/* Voice Settings */}
+                    <div className="mb-6 bg-black/20 rounded-lg p-4 border border-amber-900/10">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Volume2 className="w-4 h-4 text-amber-400/60" />
+                        <h3 className="text-sm font-medium text-stone-200">Voice Settings</h3>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 flex flex-col gap-1">
+                          <input
+                            type="range"
+                            min="0"
+                            max="5"
+                            value={['shimmer', 'fable', 'nova', 'alloy', 'echo', 'onyx'].indexOf(selectedVoice)}
+                            onChange={(e) => {
+                              const voices: Array<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'> = ['shimmer', 'fable', 'nova', 'alloy', 'echo', 'onyx'];
+                              handleVoiceChange(voices[parseInt(e.target.value)]);
+                            }}
+                            className="w-full h-1.5 bg-stone-700/50 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                            style={{
+                              background: `linear-gradient(to right, rgb(245 158 11 / 0.5) 0%, rgb(245 158 11 / 0.5) ${(['shimmer', 'fable', 'nova', 'alloy', 'echo', 'onyx'].indexOf(selectedVoice) / 5) * 100}%, rgb(87 83 78 / 0.5) ${(['shimmer', 'fable', 'nova', 'alloy', 'echo', 'onyx'].indexOf(selectedVoice) / 5) * 100}%, rgb(87 83 78 / 0.5) 100%)`
+                            }}
+                          />
+                          <div className="flex justify-between text-xs">
+                            <span title="Shimmer - Gentle & soothing">✨</span>
+                            <span title="Fable - Storytelling">📖</span>
+                            <span title="Nova - Bright & energetic">⭐</span>
+                            <span title="Alloy - Neutral & balanced">🔘</span>
+                            <span title="Echo - Warm & expressive">🌊</span>
+                            <span title="Onyx - Deep & resonant">🖤</span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-center gap-1 min-w-[64px]">
+                          <span className="text-xs text-amber-400/80 font-medium uppercase tracking-wide">
+                            {selectedVoice}
+                          </span>
+                          <span className="text-[9px] text-stone-500">
+                            {selectedVoice === 'shimmer' && 'Gentle'}
+                            {selectedVoice === 'fable' && 'Story'}
+                            {selectedVoice === 'nova' && 'Bright'}
+                            {selectedVoice === 'alloy' && 'Neutral'}
+                            {selectedVoice === 'echo' && 'Warm'}
+                            {selectedVoice === 'onyx' && 'Deep'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <WisdomJourneyDashboard userId={explorerId} />
+
+                    {/* Weaving Visualization - Shows the dreamweaver process */}
+                    <div className="mt-6">
+                      <WeavingVisualization
+                        userId={explorerId}
+                        onSelectPrompt={(prompt) => {
+                          // Feed selected prompt to conversation
+                          // TODO: Connect to OracleConversation input
+                          console.log('Selected prompt:', prompt.question);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Welcome Message for First-Time Users */}
+        {isMounted && showWelcome && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute bottom-20 left-1/2 -translate-x-1/2 max-w-md w-full mx-4 bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/40 rounded-2xl p-6 backdrop-blur-xl"
+          >
+            <div className="text-center">
+              <Sparkles className="w-10 h-10 text-amber-400 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold text-white mb-2">
+                Welcome, {explorerName}
+              </h3>
+              <p className="text-sm text-stone-300 mb-4">
+                Share your story. MAIA will help you discover the wisdom within it.
+                Your journey begins now.
+              </p>
+              <button
+                onClick={() => {
+                  localStorage.setItem('maia_welcome_seen', 'true');
+                  window.location.reload();
+                }}
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium transition-colors"
+              >
+                Begin
+              </button>
+            </div>
+          </motion.div>
+        )}
       </div>
-    </SoulfulAppShell>
+      </SwipeNavigation>
+    </ErrorBoundary>
   );
 }
