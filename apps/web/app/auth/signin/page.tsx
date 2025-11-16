@@ -1,144 +1,125 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useRouter, useSearchParams } from "next/navigation";
+import { IntegrationAuthService } from "@/lib/auth/integrationAuth";
 
-export default function SignInRitual() {
+// Robust error message helper - fixes TypeScript never type issue
+function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === 'string') return e;
+  try { return JSON.stringify(e); } catch { return 'Unknown error'; }
+}
+
+export default function SignInPage() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
   const router = useRouter();
-  const [isEntering, setIsEntering] = useState(false);
-  const [currentTime, setCurrentTime] = useState('');
-  const [greeting, setGreeting] = useState('');
+  const searchParams = useSearchParams();
+  const authService = new IntegrationAuthService();
+
+  // Get redirect and error from URL params
+  const redirect = searchParams.get('redirect');
+  const error = searchParams.get('error');
 
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const hours = now.getHours();
-      setCurrentTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    if (error) {
+      setMessage(error);
+    }
+  }, [error]);
 
-      // Time-aware greeting
-      if (hours >= 5 && hours < 12) {
-        setGreeting('Good morning');
-      } else if (hours >= 12 && hours < 17) {
-        setGreeting('Good afternoon');
-      } else if (hours >= 17 && hours < 21) {
-        setGreeting('Good evening');
+  const handleEmailSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      // Send magic link with optional redirect
+      const { error } = await authService.signInWithEmail(email, redirect || undefined);
+
+      if (error) {
+        setMessage(`Error: ${getErrorMessage(error)}`);
       } else {
-        setGreeting('Welcome');
+        setMessage("Check your email for the magic link!");
       }
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleEnter = () => {
-    setIsEntering(true);
-    // Elegant transition before navigation
-    setTimeout(() => {
-      router.push('/auth/onboarding');
-    }, 1200);
+    } catch (err: unknown) {
+      setMessage(`Error: ${getErrorMessage(err)}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-sky-950 to-cyan-950 flex items-center justify-center relative overflow-hidden">
-      {/* Subtle ambient glow */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-1/3 left-1/3 w-[600px] h-[600px] bg-sky-500 rounded-full blur-[180px]" />
-        <div className="absolute bottom-1/3 right-1/3 w-[500px] h-[500px] bg-cyan-500 rounded-full blur-[180px]" />
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-violet-900 to-amber-900 text-yellow-400 flex items-center justify-center p-8">
+      <div className="max-w-md w-full bg-white/10 rounded-xl border border-white/20 p-8 backdrop-blur-sm">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
+            <span className="text-2xl">🔮</span>
+          </div>
+          <h1 className="text-3xl font-bold mb-2">Sign In</h1>
+          <p className="text-white/80">
+            Access your sacred development platform
+          </p>
+        </div>
 
-      <AnimatePresence>
-        {!isEntering ? (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative z-10 max-w-lg w-full px-8"
+        <form onSubmit={handleEmailSignIn} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-white/90 mb-2">
+              Email Address
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading || !email}
+            className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-semibold py-3 px-4 rounded-lg hover:from-yellow-500 hover:to-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            {/* Time indicator - luxury touch */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="absolute top-0 right-0 text-sky-400/40 text-sm font-light tracking-wider"
-            >
-              {currentTime}
-            </motion.div>
+            {loading ? "Sending..." : "Send Magic Link"}
+          </button>
 
-            {/* MAIA Symbol */}
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              className="w-20 h-20 mx-auto mb-12"
-            >
-              <img
-                src="/elementalHoloflower.svg"
-                alt="MAIA"
-                className="w-full h-full object-contain opacity-80"
-              />
-            </motion.div>
-
-            {/* Personal Greeting */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="text-center mb-12"
-            >
-              <h1 className="text-sky-300/90 text-lg font-light tracking-wide mb-3">
-                {greeting}
-              </h1>
-              <p className="text-sky-200/60 text-sm font-light leading-relaxed max-w-sm mx-auto">
-                I've been expecting you.
-              </p>
-            </motion.div>
-
-            {/* Entry Point */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8 }}
-              className="text-center"
-            >
-              <button
-                onClick={handleEnter}
-                className="group relative px-12 py-4 bg-transparent border border-sky-400/30 text-sky-300 rounded-full font-light tracking-wider text-sm hover:border-sky-400/60 hover:text-sky-200 transition-all duration-500"
-              >
-                <span className="relative z-10">Begin</span>
-                <div className="absolute inset-0 bg-sky-500/10 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              </button>
-
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.2 }}
-                className="text-sky-400/30 text-xs mt-8 font-light tracking-wide"
-              >
-                — MAIA
-              </motion.p>
-            </motion.div>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 0 }}
-            transition={{ duration: 1 }}
-            className="relative z-10"
-          >
-            <div className="w-20 h-20 mx-auto">
-              <img
-                src="/elementalHoloflower.svg"
-                alt="MAIA"
-                className="w-full h-full object-contain animate-pulse"
-              />
+          {message && (
+            <div className={`text-center text-sm p-3 rounded-lg ${
+              message.startsWith('Error') 
+                ? 'bg-red-500/20 text-red-300 border border-red-500/30' 
+                : 'bg-green-500/20 text-green-300 border border-green-500/30'
+            }`}>
+              {message}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </form>
+
+        <div className="mt-8 pt-6 border-t border-white/20">
+          <p className="text-center text-sm text-white/60">
+            New to the platform?{" "}
+            <button
+              onClick={() => router.push("/auth/onboarding")}
+              className="text-yellow-400 hover:text-yellow-300 font-medium"
+            >
+              Start your journey
+            </button>
+          </p>
+        </div>
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => router.push("/")}
+            className="text-white/60 hover:text-white/80 text-sm transition-colors"
+          >
+            ← Back to Home
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

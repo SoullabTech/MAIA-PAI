@@ -1,8 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { getSupabaseAdmin } from '@/lib/supabaseAdminClient';
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerAuth } from '@/lib/auth';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export interface LibraryFile {
   id: string;
@@ -77,7 +81,6 @@ export async function GET(req: NextRequest) {
     }
 
     // Build query based on filters
-    const supabase = getSupabaseAdmin();
     let query = supabase
       .from('user_files')
       .select('*')

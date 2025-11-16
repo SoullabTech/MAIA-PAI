@@ -1,12 +1,2 @@
-Force redeploy trigger - STYLED-JSX VERSION ALIGNMENT
-Timestamp: Fri Nov 15 17:00:00 EST 2025
-Commit: PINNED STYLED-JSX TO EXACT VERSION
-Status: STYLED-JSX VERSION CONFLICT RESOLVED
-
-VERSION ALIGNMENT COMPLETED:
-- Next.js 14.2.32 expects styled-jsx@5.1.1
-- Fixed apps/web/package.json: "styled-jsx": "5.1.1" (was ^5.1.6)
-- Added to root package.json: "styled-jsx": "5.1.1"
-- Verified consistent resolution: both now use 5.1.1
-
-This should resolve the "Cannot find module 'styled-jsx/style'" errors.# Deploy trigger Sun Nov 16 01:45:39 EST 2025
+Force redeploy trigger
+Timestamp: 2025-09-27T18:30:00Z

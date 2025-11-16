@@ -1,34 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-
-// Build-time guard to prevent client-side imports in server routes
-if (typeof window !== 'undefined') {
-  throw new Error('This is a server-side route');
-}
-
-// Dynamic imports to prevent build-time issues with client-side dependencies
-const getMayaChatModules = async () => {
-  const [
-    { PersonalOracleAgent },
-    { ApprenticeMayaTraining },
-    { maiaRealtimeMonitor },
-    { maiaMonitoring },
-    { betaAuth }
-  ] = await Promise.all([
-    import('@/lib/agents/PersonalOracleAgent'),
-    import('@/lib/maya/ApprenticeMayaTraining'),
-    import('@/lib/monitoring/MaiaRealtimeMonitor'),
-    import('@/lib/beta/MaiaMonitoring'),
-    import('@/lib/auth/BetaAuth')
-  ]);
-
-  return {
-    PersonalOracleAgent,
-    ApprenticeMayaTraining,
-    maiaRealtimeMonitor,
-    maiaMonitoring,
-    betaAuth
-  };
-};
+import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent'
+import { journalStorage } from '@/lib/storage/journal-storage'
+import { ApprenticeMayaTraining, TrainingExchange } from '@/lib/maya/ApprenticeMayaTraining'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
+import { maiaRealtimeMonitor } from '@/lib/monitoring/MaiaRealtimeMonitor'
+import { maiaMonitoring } from '@/lib/beta/MaiaMonitoring'
+import { betaAuth } from '@/lib/auth/BetaAuth'
 
 // Conversation style-specific prompt modifiers
 function getStyleModifier(style: string): string {
@@ -154,17 +131,6 @@ export async function POST(req: NextRequest) {
     // Accept either 'message' or 'content' field
     const userText = (message || content || '').trim()
 
-    // Get modules dynamically to avoid build issues
-    const {
-      PersonalOracleAgent,
-      secureAuth,
-      ApprenticeMayaTraining,
-      createServerSupabaseClient,
-      maiaRealtimeMonitor,
-      maiaMonitoring,
-      betaAuth
-    } = await getMayaChatModules();
-
     // 🔐 BETA AUTHENTICATION
     let requestUserId: string;
     if (userId) {
@@ -198,17 +164,7 @@ export async function POST(req: NextRequest) {
     const styleChangeAck = getStyleChangeAcknowledgment(previousStyle || '', conversationStyle || 'natural');
 
     // Fetch recent journal entries for context
-    let recentEntries: any[] = [];
-    try {
-      const authState = secureAuth.getAuthState();
-      if (authState.isAuthenticated && authState.encryptionContext) {
-        // Skip journal entries for now - pure chat mode
-      } else {
-        console.log('⚠️ No authentication context for journal access');
-      }
-    } catch (error) {
-      console.warn('Could not fetch journal entries:', error);
-    }
+    const recentEntries = journalStorage.getEntries(requestUserId).slice(0, 5)
 
     // Build journal context
     let journalContext = ''

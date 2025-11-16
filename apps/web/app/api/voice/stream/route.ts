@@ -1,10 +1,6 @@
 import { NextRequest } from 'next/server';
 
 // Stub DI container
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 function get<T>(token: any): T {
   return {} as T;
 }

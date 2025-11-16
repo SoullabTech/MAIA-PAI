@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient';
+import { createClientComponentClient } from '@/lib/supabase';
 import {
   LineChart,
   Line,
@@ -50,7 +50,7 @@ export default function ReflectionMetricsWidget() {
   const [metrics, setMetrics] = useState<ReflectionMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | 'all'>('7d');
-  const supabase = getBrowserSupabaseClient();
+  const supabase = createClientComponentClient();
 
   useEffect(() => {
     fetchMetrics();

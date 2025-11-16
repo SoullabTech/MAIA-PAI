@@ -1,93 +1,23 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import { ganeshaContacts } from '@/lib/ganesha/contacts';
+import { PrismaClient } from '@prisma/client';
 
-function createSupabaseAdmin() {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    console.warn('[BetaTesters API] Supabase environment variables not available during build');
-    return null;
-  }
-
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    }
-  );
-}
+const prisma = new PrismaClient();
 
 /**
  * GET /api/admin/beta-testers
- * Fetch all beta testers with referral data
+ * Fetch all beta testers
  */
 export async function GET() {
   try {
-    console.log('📊 Admin fetching beta testers with referral data...');
+    const testers = await prisma.betaTester.findMany({
+      orderBy: {
+        invitedAt: 'desc',
+      },
+    });
 
-    const supabaseAdmin = createSupabaseAdmin();
-    let testers = [];
-
-    if (supabaseAdmin) {
-      // Try to get data from Supabase beta_testers table
-      const { data: supabaseTesters, error } = await supabaseAdmin
-        .from('beta_testers')
-        .select(`
-          *,
-          referral_codes (
-            code,
-            is_used,
-            used_at,
-            used_by_user_id
-          )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (supabaseTesters && !error) {
-        console.log(`✅ Found ${supabaseTesters.length} beta testers in Supabase`);
-        testers = supabaseTesters.map(tester => ({
-          id: tester.user_id,
-          name: tester.full_name || tester.username,
-          email: tester.email,
-          status: tester.status || 'active',
-          invitedAt: tester.created_at,
-          totalReferrals: tester.total_referrals || 0,
-          referralCodes: tester.referral_codes || [],
-          onboardingCompleted: tester.onboarding_completed,
-          notes: tester.profile_data?.notes || ''
-        }));
-      } else {
-        console.warn('⚠️ No Supabase beta_testers data, falling back to Ganesha contacts');
-        // Fall through to Ganesha fallback below
-      }
-    } else {
-      console.warn('⚠️ Supabase not available, using Ganesha contacts only');
-    }
-
-    // Fallback to Ganesha contacts if no Supabase data or Supabase unavailable
-    if (testers.length === 0) {
-      testers = ganeshaContacts.map(contact => ({
-        id: contact.id,
-        name: contact.name,
-        email: contact.email,
-        status: 'invited',
-        invitedAt: contact.metadata?.invitedAt || new Date().toISOString(),
-        totalReferrals: 0,
-        referralCodes: [],
-        onboardingCompleted: false,
-        inviteCode: contact.metadata?.passcode,
-        notes: contact.metadata?.notes || ''
-      }));
-    }
-
-    console.log(`📋 Returning ${testers.length} beta testers to admin`);
     return NextResponse.json(testers);
-
   } catch (error) {
-    console.error('❌ Failed to fetch beta testers:', error);
+    console.error('Failed to fetch beta testers:', error);
     return NextResponse.json(
       { error: 'Failed to fetch beta testers' },
       { status: 500 }
@@ -97,12 +27,12 @@ export async function GET() {
 
 /**
  * POST /api/admin/beta-testers
- * Add a new beta tester with automatic referral code generation
+ * Add a new beta tester
  */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, notes } = body;
+    const { name, email, notes, accessLevel } = body;
 
     if (!name || !email) {
       return NextResponse.json(
@@ -111,72 +41,26 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log(`👤 Admin adding new beta tester: ${name} (${email})`);
-
-    const supabaseAdmin = createSupabaseAdmin();
-    if (!supabaseAdmin) {
-      return NextResponse.json(
-        { error: 'Database not available' },
-        { status: 503 }
-      );
-    }
-
-    // Generate user ID
-    const userId = `${name.toLowerCase().replace(/[^a-z]/g, '')}-${Date.now()}`;
-
-    // Insert into beta_testers table
-    const { data: tester, error } = await supabaseAdmin
-      .from('beta_testers')
-      .insert({
-        user_id: userId,
-        email: email,
-        username: name,
-        full_name: name,
-        onboarding_completed: false,
-        profile_data: { notes: notes || '' },
-        status: 'active'
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('❌ Error creating beta tester:', error);
-
-      if (error.code === '23505') { // Unique constraint violation
-        return NextResponse.json(
-          { error: 'Email already exists' },
-          { status: 409 }
-        );
-      }
-
-      return NextResponse.json(
-        { error: 'Failed to create beta tester' },
-        { status: 500 }
-      );
-    }
-
-    console.log(`✅ Created beta tester: ${tester.user_id}`);
-
-    // Generate referral codes
-    const { generateReferralCodes } = await import('@/lib/auth/BetaAuth');
-    const codes = await generateReferralCodes(userId, name, 10);
-
-    console.log(`🎫 Generated ${codes.length} referral codes for ${name}`);
-
-    return NextResponse.json({
-      success: true,
-      tester: {
-        id: tester.user_id,
-        name: tester.full_name,
-        email: tester.email,
-        status: tester.status,
-        referralCodes: codes
+    const tester = await prisma.betaTester.create({
+      data: {
+        name,
+        email,
+        notes,
+        accessLevel: accessLevel || 'standard',
       },
-      message: `Added ${name} with ${codes.length} referral codes`
     });
 
+    return NextResponse.json(tester);
   } catch (error: any) {
-    console.error('❌ Failed to create beta tester:', error);
+    console.error('Failed to create beta tester:', error);
+
+    if (error.code === 'P2002') {
+      return NextResponse.json(
+        { error: 'Email already exists' },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
       { error: 'Failed to create beta tester' },
       { status: 500 }

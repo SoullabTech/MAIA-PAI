@@ -6,10 +6,6 @@
  */
 
 import { NextRequest } from 'next/server';
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 
 export async function GET(request: NextRequest) {
   // Parse query parameters

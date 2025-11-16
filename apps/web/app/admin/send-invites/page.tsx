@@ -324,7 +324,7 @@ export default function SendInvites() {
       <div className="max-w-4xl mx-auto mt-8 bg-gray-800/50 rounded-lg p-6 border border-gray-700">
         <h3 className="font-semibold text-[#FFD700] mb-3">📧 Email Details</h3>
         <div className="space-y-2 text-sm text-gray-300">
-          <p><strong>From:</strong> Kelly @ Soullab &lt;soullab1@gmail.com&gt;</p>
+          <p><strong>From:</strong> Kelly @ Soullab &lt;kelly@soullab.life&gt;</p>
           <p><strong>Subject:</strong> ✨ Your MAIA Beta Invitation</p>
           <p><strong>Template:</strong> Beautiful dark-amber HTML with Spiralogic Diamond</p>
           <p><strong>CTA:</strong> Links to https://soullab.life/beta-entry</p>

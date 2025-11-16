@@ -8,12 +8,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Mark route as dynamic and use Node.js runtime for Supabase compatibility
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
-// Disable any caching/prerender
-export const revalidate = 0;
-
 export async function GET() {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

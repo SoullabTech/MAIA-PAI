@@ -4,10 +4,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { daimonicService } from '@/lib/services/DaimonicService';
+// Temporarily stub out backend imports that are excluded from build
+// import { DaimonicFacilitationService } from '../../../../backend/src/services/DaimonicFacilitationService';
 
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
+// Create service instance (stubbed)
+const daimonicService = {
+  processEncounter: async () => ({ response: 'Daimonic service not available in beta' })
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,15 +24,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create new daimonic encounter
-    const encounter = await daimonicService.createEncounter(userId, query);
+    // Facilitate daimonic encounter (stub for beta)
+    const result = await daimonicService.processEncounter();
 
     return NextResponse.json({
       success: true,
-      encounter: encounter.encounter,
-      guidance: encounter.guidance,
-      integration: encounter.integration,
-      nextSteps: encounter.nextSteps
+      data: {
+        narrative: result.response || 'Daimonic encounter service not available in beta',
+        othernessScore: 0,
+        primaryChannel: 'text',
+        engagementStrategy: 'reflective',
+        practicalGuidance: [],
+        mysticismWarnings: [],
+        ongoingPractices: [],
+        collectiveField: null
+      }
     });
 
   } catch (error) {
@@ -56,18 +65,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get user's encounter history
-    const encounters = await daimonicService.getEncounterHistory(userId);
+    // Get user's ongoing daimonic relationship status (stub for beta)
+    const status = { status: 'Service not available in beta', userId };
 
     return NextResponse.json({
       success: true,
-      encounters: encounters,
-      guidance: encounters.length > 0 ? "Your consciousness journey continues. Each encounter holds sacred wisdom." : "Your first daimon encounter awaits.",
-      integration: encounters.length > 0 ? [
-        "Reflect on your recent encounters",
-        "Practice the suggested integration methods",
-        "Notice how archetypal energies appear in your daily life"
-      ] : []
+      data: status
     });
 
   } catch (error) {

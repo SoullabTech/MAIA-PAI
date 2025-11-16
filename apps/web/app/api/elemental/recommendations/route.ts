@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSupabaseClient } from "../../../../lib/supabaseServerClient";
+import { createServerClient } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { apiClient, API_ENDPOINTS } from "../../../../lib/config";
 import { getSupabaseConfig } from "../../../../lib/config/supabase";
 
 // Type definitions for elemental content
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 interface ContentDeliveryContext {
   userId: string;
   currentStage: string;
@@ -39,7 +36,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = getServerSupabaseClient();
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      supabaseConfig.url,
+      supabaseConfig.anonKey,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+        },
+      },
+    );
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -173,7 +181,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getServerSupabaseClient();
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      supabaseConfig.url,
+      supabaseConfig.anonKey,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+        },
+      },
+    );
     const {
       data: { user },
     } = await supabase.auth.getUser();

@@ -2,12 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 // Temporarily stub out backend imports that are excluded from build
 // import { searchUserFiles } from '@/backend/src/services/IngestionQueue';
+import { OpenAI } from 'openai';
 
 // Stub searchUserFiles
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 const searchUserFiles = async (userId: string, query: string, limit: number) => {
   return [] as Array<{
     id: string;
@@ -22,6 +19,10 @@ const searchUserFiles = async (userId: string, query: string, limit: number) => 
     metadata?: any;
   }>;
 };
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
+});
 
 interface SearchResult {
   id: string;

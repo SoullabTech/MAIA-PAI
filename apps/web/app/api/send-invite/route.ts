@@ -496,7 +496,7 @@ This invitation was sent to you as part of our exclusive beta program.
     `.trim();
 
     const { data, error } = await resend.emails.send({
-      from: 'Kelly @ Soullab <soullab1@gmail.com>',
+      from: 'Kelly @ Soullab <kelly@soullab.life>',
       to: [email],
       subject: '✨ Your MAIA Beta Invitation',
       html: emailHtml,

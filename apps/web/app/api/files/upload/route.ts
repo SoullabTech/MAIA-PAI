@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { getSupabaseAdmin } from '@/lib/supabaseAdminClient';
+import { createClient } from '@supabase/supabase-js';
 // Temporarily stub out backend imports that are excluded from build
 // import { enqueueIngestion } from '@/backend/src/services/IngestionQueue';
+import { getServerSession } from 'next-auth';
 
 // Stub enqueueIngestion
 const enqueueIngestion = async (data: any) => {
@@ -12,6 +12,12 @@ const enqueueIngestion = async (data: any) => {
     ...data
   };
 };
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 // File size and type limits
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -74,7 +80,6 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
 
     // Upload to Supabase storage
-    const supabase = getSupabaseAdmin();
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('user-files')
       .upload(filePath, buffer, {

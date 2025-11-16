@@ -1,27 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Build-time guard to prevent client-side imports in server routes
-if (typeof window !== 'undefined') {
-  throw new Error('This is a server-side route');
-}
-
-// Dynamic imports to prevent build-time issues with client-side dependencies
-const getSearchModules = async () => {
-  const [
-    { semanticSearch },
-    { mem0 }
-  ] = await Promise.all([
-    import('@/lib/semantic/index'),
-    import('@/lib/memory/mem0')
-  ]);
-
-  return { semanticSearch, mem0 };
-};
-
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
+import { semanticSearch } from '@/lib/semantic/index';
+import { mem0 } from '@/lib/memory/mem0';
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,9 +12,6 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
-    // Get modules dynamically to avoid build issues
-    const { semanticSearch, mem0 } = await getSearchModules();
 
     const searchType = type || 'journal';
     const searchLimit = limit || 10;

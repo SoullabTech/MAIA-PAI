@@ -5,20 +5,14 @@ import { useTheme } from 'next-themes'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sun, Moon, Monitor } from 'lucide-react'
 import { saveUserTheme, getUserTheme, getLocalTheme, ThemePreference } from '@/lib/theme/userTheme'
-// No direct Supabase import - using API routes instead
+import { useUser } from '@/lib/supabase'
+import { createClientComponentClient } from '@/lib/supabase'
 
 export default function ThemeToggle() {
   const { theme, setTheme, systemTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [user, setUser] = useState<any>(null)
-
-  // Get user from auth context (no direct Supabase import)
-  useEffect(() => {
-    // For now, treat as anonymous user
-    // In the future, this could integrate with auth context
-    setUser(null)
-  }, [])
+  const user = useUser()
 
   // Initialize theme on mount
   useEffect(() => {
@@ -45,20 +39,26 @@ export default function ThemeToggle() {
     setSaving(true)
     
     try {
-      // Log theme change via API route (no direct Supabase import)
-      try {
-        await fetch('/api/user/theme', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            theme: newTheme,
-            previous: previousTheme,
-            timestamp: new Date().toISOString(),
-          }),
-        });
-      } catch (error) {
-        console.warn('Failed to log theme change:', error);
+      // Log theme change event
+      const supabase = createClientComponentClient()
+      const sessionId = sessionStorage.getItem('session_id') || 
+                        `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      
+      if (!sessionStorage.getItem('session_id')) {
+        sessionStorage.setItem('session_id', sessionId)
       }
+      
+      await supabase.from('event_logs').insert({
+        event_name: 'theme_changed',
+        session_id: sessionId,
+        user_id: user?.id || null,
+        payload: {
+          previous: previousTheme,
+          new: newTheme,
+          source: 'ThemeToggle',
+          timestamp: new Date().toISOString()
+        }
+      })
       
       if (user?.id) {
         // Save to Supabase for authenticated users
@@ -207,20 +207,26 @@ export function ThemeToggleMinimal() {
     
     setTheme(nextTheme)
     
-    // Log theme change via API route (no direct Supabase import)
-    try {
-      await fetch('/api/user/theme', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          theme: nextTheme,
-          previous: previousTheme,
-          timestamp: new Date().toISOString(),
-        }),
-      });
-    } catch (error) {
-      console.warn('Failed to log theme change:', error);
+    // Log theme change event
+    const supabase = createClientComponentClient()
+    const sessionId = sessionStorage.getItem('session_id') || 
+                      `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    
+    if (!sessionStorage.getItem('session_id')) {
+      sessionStorage.setItem('session_id', sessionId)
     }
+    
+    await supabase.from('event_logs').insert({
+      event_name: 'theme_changed',
+      session_id: sessionId,
+      user_id: user?.id || null,
+      payload: {
+        previous: previousTheme,
+        new: nextTheme,
+        source: 'ThemeToggleMinimal',
+        timestamp: new Date().toISOString()
+      }
+    })
     
     if (user?.id) {
       await saveUserTheme(user.id, nextTheme)

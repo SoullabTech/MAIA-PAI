@@ -7,6 +7,7 @@ import { ArrowLeft, Send, Sparkles } from 'lucide-react';
 import { Copy } from '@/lib/copy/MaiaCopy';
 import { useMaiaStore } from '@/lib/maia/state';
 import { JOURNALING_MODE_DESCRIPTIONS } from '@/lib/journaling/JournalingPrompts';
+import { getJournalingPrompt } from '@/lib/journaling/JournalingPrompts';
 import WritingConsciousness from '@/components/consciousness/WritingConsciousness';
 import NeuralFireSystem from '@/components/consciousness/NeuralFireSystem';
 import ConsciousnessVessel from '@/components/consciousness/ConsciousnessVessel';
@@ -113,13 +114,17 @@ export default function JournalEntry() {
     setProcessing(true);
 
     try {
+      const prompt = getJournalingPrompt(selectedMode, {
+        mode: selectedMode,
+        entry: currentEntry
+      });
+
       const response = await fetch('/api/journal/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          entry: currentEntry,  // Send the actual journal entry
-          mode: selectedMode,
-          userId: 'beta-user'
+          prompt,
+          mode: selectedMode
         })
       });
 

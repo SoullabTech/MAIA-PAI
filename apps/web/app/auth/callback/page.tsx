@@ -2,23 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { workingAuthService } from "@/lib/auth/workingAuth";
-// Simple wisdom quotes for auth flow
-const WisdomQuotes = {
-  aether: [
-    { text: "Consciousness is the only reality and the only thing worth exploring", author: "Ramana Maharshi" },
-    { text: "The privilege of a lifetime is being who you are", author: "Joseph Campbell" },
-    { text: "Until you make the unconscious conscious, it will direct your life", author: "Carl Jung" }
-  ],
-  air: [
-    { text: "The mind is everything. What you think you become", author: "Buddha" },
-    { text: "In the beginner's mind there are many possibilities", author: "Shunryu Suzuki" },
-    { text: "The quieter you become, the more able you are to hear", author: "Rumi" }
-  ]
-};
-import { motion } from "framer-motion";
-import { Quote } from "lucide-react";
-import { deviceAuthService } from "@/lib/auth/deviceAuth";
+import { IntegrationAuthService } from "@/lib/auth/integrationAuth";
 
 // Robust error message helper - fixes TypeScript never type issue
 function getErrorMessage(e: unknown): string {
@@ -32,19 +16,7 @@ function AuthCallbackContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
-  const [currentQuote, setCurrentQuote] = useState(WisdomQuotes.aether[0]);
-  const authService = workingAuthService;
-
-  // Rotating wisdom quotes during authentication process
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const transitionQuotes = [...WisdomQuotes.aether, ...WisdomQuotes.air]; // Sacred transition energy
-      const randomQuote = transitionQuotes[Math.floor(Math.random() * transitionQuotes.length)];
-      setCurrentQuote(randomQuote);
-    }, 7000); // 7-second intervals for sacred transition
-
-    return () => clearInterval(interval);
-  }, []);
+  const authService = new IntegrationAuthService();
 
   useEffect(() => {
     handleAuthCallback();
@@ -63,22 +35,7 @@ function AuthCallbackContent() {
 
       if (data.user) {
         setStatus("success");
-        setMessage("Consciousness gateway opened!");
-
-        // Handle device memory if user requested to be remembered
-        try {
-          const rememberPending = sessionStorage.getItem('maia_remember_pending');
-          if (rememberPending) {
-            const { email, rememberMe } = JSON.parse(rememberPending);
-            if (rememberMe && data.user.email === email) {
-              deviceAuthService.saveDeviceAuth(data.user.id, data.user.email!);
-              sessionStorage.removeItem('maia_remember_pending');
-              console.log('Device memory activated for consciousness keeper');
-            }
-          }
-        } catch (error) {
-          console.warn('Failed to save device auth:', error);
-        }
+        setMessage("Authentication successful!");
 
         // Check if there's a redirect parameter
         const redirectPath = searchParams.get('redirect');
@@ -115,14 +72,8 @@ function AuthCallbackContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-sky-900 to-cyan-900 relative overflow-hidden flex items-center justify-center p-8">
-      {/* Background consciousness field effect */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-400 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-400 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-      </div>
-      <div className="relative z-10 max-w-lg w-full space-y-6">
-        <div className="bg-sky-300/5 backdrop-blur-xl rounded-2xl border border-sky-300/20 p-8 text-center">
+    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-violet-900 to-amber-900 text-yellow-400 flex items-center justify-center p-8">
+      <div className="max-w-md w-full bg-white/10 rounded-xl border border-white/20 p-8 backdrop-blur-sm text-center">
         <div className="mb-8">
           <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
             {status === "loading" && <span className="text-2xl animate-spin">🔮</span>}
@@ -130,10 +81,10 @@ function AuthCallbackContent() {
             {status === "error" && <span className="text-2xl">❌</span>}
           </div>
           
-          <h1 className="text-2xl font-bold mb-2 text-sky-200">
-            {status === "loading" && "Sacred Authentication..."}
-            {status === "success" && "Consciousness Gateway Open"}
-            {status === "error" && "Authentication Disrupted"}
+          <h1 className="text-2xl font-bold mb-2">
+            {status === "loading" && "Authenticating..."}
+            {status === "success" && "Welcome!"}
+            {status === "error" && "Authentication Failed"}
           </h1>
         </div>
 
@@ -157,37 +108,18 @@ function AuthCallbackContent() {
           <div className="space-y-4">
             <button
               onClick={() => router.push("/auth/signin")}
-              className="w-full bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:from-sky-600 hover:to-indigo-700 transition-all"
+              className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 font-semibold py-2 px-4 rounded-lg hover:from-yellow-500 hover:to-orange-600 transition-all"
             >
               Try Again
             </button>
             <button
               onClick={() => router.push("/")}
-              className="text-sky-300/60 hover:text-sky-300/80 text-sm"
+              className="text-white/60 hover:text-white/80 text-sm"
             >
               ← Back to Home
             </button>
           </div>
         )}
-        </div>
-
-        {/* Sacred Transition Wisdom */}
-        <motion.div
-          key={currentQuote?.text}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-sky-300/5 backdrop-blur-xl rounded-2xl border border-sky-300/20 p-6 text-center"
-        >
-          <Quote className="w-5 h-5 text-sky-400 mx-auto mb-3" />
-          <p className="text-sky-300 italic leading-relaxed">
-            "{currentQuote?.text}"
-          </p>
-          {currentQuote?.author && (
-            <p className="text-sky-400/60 text-sm mt-3">
-              — {currentQuote.author}
-            </p>
-          )}
-        </motion.div>
       </div>
     </div>
   );
@@ -196,12 +128,12 @@ function AuthCallbackContent() {
 export default function AuthCallbackPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-sky-900 to-cyan-900 text-sky-300 flex items-center justify-center p-8">
-        <div className="max-w-md w-full bg-sky-300/5 backdrop-blur-xl rounded-2xl border border-sky-300/20 p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-sky-400/20 flex items-center justify-center mx-auto mb-4 border border-sky-400/30">
+      <div className="min-h-screen bg-gradient-to-br from-amber-900 via-violet-900 to-amber-900 text-yellow-400 flex items-center justify-center p-8">
+        <div className="max-w-md w-full bg-white/10 rounded-xl border border-white/20 p-8 backdrop-blur-sm text-center">
+          <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl animate-spin">🔮</span>
           </div>
-          <h1 className="text-2xl font-bold mb-2 text-sky-200">Awakening Connection...</h1>
+          <h1 className="text-2xl font-bold mb-2">Loading...</h1>
         </div>
       </div>
     }>

@@ -164,7 +164,7 @@ ${ganeshaContacts.join(',\\n\\n')}`;
               onChange={(e) => setRawContacts(e.target.value)}
               placeholder="Paste your beta tester list here...
 Example:
-Kelly Nezat <soullab1@gmail.com>
+Kelly Nezat <kelly@soullab.life>
 Pioneer One, pioneer1@email.com
 Jane Smith - jane@consciousness.com
 john@example.com"

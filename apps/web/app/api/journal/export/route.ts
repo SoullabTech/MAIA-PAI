@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSupabaseClient } from '@/lib/supabaseServerClient';
+import { obsidianJournalExporter, JournalEntry } from '@/lib/journaling/ObsidianJournalExporter';
+import { journalStorage } from '@/lib/storage/journal-storage';
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,48 +13,40 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'userId is required' },
-        { status: 400 }
-      );
-    }
+    const journalEntry: JournalEntry = {
+      id: `journal_${Date.now()}`,
+      userId: userId || 'beta-user',
+      mode,
+      entry,
+      reflection,
+      timestamp: new Date(),
+      element
+    };
 
-    const supabase = getServerSupabaseClient();
-    if (!supabase) {
-      return NextResponse.json(
-        { error: 'Database not configured' },
-        { status: 500 }
-      );
-    }
-
-    // Save journal entry to database directly
-    const { data, error } = await supabase
-      .from('journal_entries')
-      .insert({
-        user_id: userId,
-        mode,
-        prompt: entry,
-        response: reflection,
-        word_count: entry.split(/\s+/).length,
-        reflection_quality: 'auto-generated'
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Database error:', error);
-      return NextResponse.json(
-        { error: 'Failed to save journal entry' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      entryId: data.id,
-      message: 'Journal entry saved successfully'
+    journalStorage.addEntry({
+      id: journalEntry.id,
+      userId: journalEntry.userId,
+      mode: journalEntry.mode,
+      entry: journalEntry.entry,
+      reflection: journalEntry.reflection,
+      timestamp: journalEntry.timestamp.toISOString(),
+      element: journalEntry.element
     });
+
+    const result = await obsidianJournalExporter.exportJournalEntry(journalEntry);
+
+    if (result.success) {
+      return NextResponse.json({
+        success: true,
+        filePath: result.filePath,
+        message: 'Journal entry exported to Obsidian and saved to storage'
+      });
+    } else {
+      return NextResponse.json({
+        success: true,
+        message: 'Journal entry saved to storage (Obsidian export failed)'
+      });
+    }
 
   } catch (error) {
     console.error('Journal export error:', error);

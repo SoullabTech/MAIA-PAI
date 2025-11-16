@@ -1,12 +1,11 @@
-'use client';
 import dynamicImport from 'next/dynamic';
+
+// Force dynamic rendering - no static generation
+export const dynamic = 'force-dynamic';
 
 const MayaVoiceChat = dynamicImport(
   () => import('@/components/chat/MayaVoiceChat'),
-  {
-    ssr: false,
-    loading: () => <div className="flex items-center justify-center min-h-screen">Loading Maya...</div>
-  }
+  { ssr: false }
 );
 
 export default function MayaPage() {

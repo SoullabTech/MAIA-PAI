@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSupabaseClient } from "../../../lib/supabaseServerClient";
-
-export const runtime = 'nodejs'; // Force Node runtime for Supabase
-export const dynamic = 'force-dynamic';
-
-
+import { supabase } from "../../../lib/supabaseClient";
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,7 +13,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = getServerSupabaseClient();
     if (!supabase) {
       return NextResponse.json(
         { success: false, error: "Database not configured" },
@@ -73,7 +67,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const supabase = getServerSupabaseClient();
     if (!supabase) {
       return NextResponse.json(
         { success: false, error: "Database not configured" },

@@ -3,16 +3,7 @@
  * Unlocks audio context on first user interaction
  */
 
-// Safe analytics tracking with fallback
-async function trackAudioUnlock(success: boolean, data: any = {}): Promise<void> {
-  try {
-    const eventTracking = await import('@/lib/analytics/eventTracking');
-    return eventTracking.trackAudioUnlock(success, data);
-  } catch (error) {
-    // Fallback when analytics module is not available
-    console.log(`📊 [Audio] Unlock ${success ? 'succeeded' : 'failed'}:`, data);
-  }
-}
+import { trackAudioUnlock } from '@/lib/analytics/eventTracking';
 
 let audioUnlocked = false;
 let toastShown = false;

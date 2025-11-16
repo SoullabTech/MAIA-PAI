@@ -3,7 +3,7 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 import { useFeatureFlag } from "@/lib/feature-flags";
-import { useUizardTracking } from "@/components/metrics/uizard-metrics";
+import { useUizardTracking } from "@/components/analytics/uizard-metrics";
 
 // ========================================
 // UIZARD-ENHANCED CARD SYSTEM

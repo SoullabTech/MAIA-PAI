@@ -2,17 +2,10 @@ import Queue from 'bull';
 import { FileIngestionService } from '../services/FileIngestionService';
 import { createClient } from '@supabase/supabase-js';
 
-function createSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    console.warn('[FileProcessor] Supabase environment variables not available during build');
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey);
-}
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 // Configure Redis connection
 const redisConfig = {
@@ -42,15 +35,10 @@ fileProcessingQueue.process('process-file', async (job) => {
   console.log(`[FileProcessor] Starting processing for file ${fileId} (${filename})`);
   
   try {
-    const supabase = createSupabaseClient();
-    if (!supabase) {
-      throw new Error('Supabase client not available');
-    }
-
     // Update status to processing
     await supabase
       .from('user_files')
-      .update({
+      .update({ 
         status: 'processing',
         processing_started_at: new Date().toISOString()
       })
@@ -75,19 +63,16 @@ fileProcessingQueue.process('process-file', async (job) => {
 
   } catch (error) {
     console.error(`[FileProcessor] Error processing file ${fileId}:`, error);
-
+    
     // Update file status to failed
-    const supabaseClient = createSupabaseClient();
-    if (supabaseClient) {
-      await supabaseClient
-        .from('user_files')
-        .update({
-          status: 'failed',
-          error_message: error instanceof Error ? error.message : 'Unknown processing error',
-          processing_completed_at: new Date().toISOString()
-        })
-        .eq('id', fileId);
-    }
+    await supabase
+      .from('user_files')
+      .update({ 
+        status: 'failed',
+        error_message: error instanceof Error ? error.message : 'Unknown processing error',
+        processing_completed_at: new Date().toISOString()
+      })
+      .eq('id', fileId);
     
     throw error;
   }

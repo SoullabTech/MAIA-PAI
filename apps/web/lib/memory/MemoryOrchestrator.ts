@@ -1,21 +1,17 @@
 import { PrismaClient } from '@prisma/client';
 import { createClient } from '@supabase/supabase-js';
 import { searchUserFiles } from '../../backend/src/services/IngestionQueue';
-import { getOpenAIClient } from '../ai/openaiClient';
+import { OpenAI } from 'openai';
 
 const prisma = new PrismaClient();
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!,
+});
 
-function createSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    console.warn('[MemoryOrchestrator] Supabase environment variables not available during build');
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey);
-}
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export interface MemoryContext {
   session: ConversationTurn[];       // Last N turns
@@ -191,7 +187,6 @@ export class MemoryOrchestrator {
 
   private async generateQueryEmbedding(text: string): Promise<number[]> {
     try {
-      const openai = getOpenAIClient();
       const response = await openai.embeddings.create({
         model: 'text-embedding-3-small',
         input: text.substring(0, 8000),

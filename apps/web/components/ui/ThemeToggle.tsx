@@ -4,31 +4,49 @@ import { useTheme } from 'next-themes';
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { createClientComponentClient } from '@/lib/supabase';
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [previousTheme, setPreviousTheme] = useState<string | null>(null);
+  const supabase = createClientComponentClient();
 
   // Prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
     setPreviousTheme(theme || 'system');
-  }, [theme]);
+  }, []);
 
-  // Log theme changes via API route (no direct Supabase import)
+  // Log theme changes to Supabase
   const logThemeChange = async (newTheme: string) => {
     try {
-      // Call our API route instead of directly using Supabase
-      await fetch('/api/user/theme', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      // Get current user session if available
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // Log to event_logs table
+      await supabase.from('event_logs').insert({
+        event_name: 'theme_changed',
+        user_id: session?.user?.id || null,
+        metadata: {
           theme: newTheme,
           previous: previousTheme,
           timestamp: new Date().toISOString(),
-        }),
+        },
+        payload: {
+          new: newTheme,
+          previous: previousTheme,
+          session_id: session?.access_token?.substring(0, 8) || null,
+        }
       });
+
+      // Update user profile if logged in
+      if (session?.user?.id) {
+        await supabase
+          .from('profiles')
+          .update({ theme_preference: newTheme })
+          .eq('id', session.user.id);
+      }
     } catch (error) {
       console.warn('Failed to log theme change:', error);
     }

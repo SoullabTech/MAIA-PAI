@@ -3,9 +3,6 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { redirect } from 'next/navigation';
 import SacredMirror from '../../components/SacredMirror';
 
-// Force dynamic rendering for authenticated routes
-export const dynamic = 'force-dynamic';
-
 export const metadata = {
   title: 'Sacred Mirror - Spiralogic Oracle System',
   description: 'Where technology meets the sacred. Your personal oracle interface.',

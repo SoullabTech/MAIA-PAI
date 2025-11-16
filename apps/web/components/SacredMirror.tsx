@@ -11,7 +11,7 @@ import SpiralJourneyVisualizer from './SpiralJourneyVisualizer';
 import UserVoiceSettings from './UserVoiceSettings';
 import JournalTagSelector from './JournalTagSelector';
 import ToneSlider from './ToneSlider';
-import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient';
+import { supabase } from '@/lib/supabase/client';
 
 interface SacredMirrorProps {
   userId: string;
@@ -47,7 +47,6 @@ export default function SacredMirror({ userId, userName }: SacredMirrorProps) {
 
   const loadUserPreferences = async () => {
     try {
-      const supabase = getBrowserSupabaseClient();
       const { data } = await supabase
         .from('user_settings')
         .select('voice_tone')

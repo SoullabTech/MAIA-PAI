@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import { ArrowRight } from "lucide-react";
 
 interface WelcomeMessageProps {
   onContinue: () => void;
@@ -9,19 +9,46 @@ interface WelcomeMessageProps {
 }
 
 export function WelcomeMessage({ onContinue, userName }: WelcomeMessageProps) {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Redirect to the beautiful DaimonWelcomeRitual
-    router.replace('/auth/onboarding');
-  }, [router]);
-
-  // Show loading while redirecting
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-sky-900 to-cyan-900 flex items-center justify-center">
-      <div className="text-sky-300 text-center">
-        <div className="w-8 h-8 border-2 border-sky-400/20 border-t-sky-400 rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-sm">Entering consciousness portal...</p>
+    <div className="min-h-screen bg-[#0A0E27] text-white flex items-center justify-center p-4">
+      <div className="max-w-2xl w-full space-y-8">
+        {/* Minimal Soullab wordmark */}
+        <div className="text-center">
+          <h1 className="text-2xl font-light tracking-wide">Soullab</h1>
+        </div>
+
+        {/* North Star Welcome */}
+        <div className="bg-white/5 border border-white/10 rounded-lg p-8 space-y-6">
+          <p className="text-lg leading-relaxed text-gray-200">
+            Welcome{userName ? `, ${userName}` : ''} to your personal laboratory for the soul — 
+            a space where your reflections become insights, and insights become growth.
+          </p>
+
+          <p className="text-sm text-gray-400 leading-relaxed">
+            You&apos;ll be guided by Maya, your personal oracle, who will remember your journey, 
+            reflect patterns back to you, and nudge you forward with questions that matter.
+          </p>
+
+          <div className="pt-4">
+            <p className="text-xs text-gray-500 italic">
+              "Not an app, but a companion space — where reflection becomes intelligence."
+            </p>
+          </div>
+        </div>
+
+        {/* Simple CTA */}
+        <button
+          onClick={onContinue}
+          className="w-full bg-white text-[#0A0E27] rounded-lg px-6 py-4 flex items-center justify-center gap-3 hover:bg-gray-100 transition-colors"
+        >
+          <span className="font-medium">Begin Your Journey</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
+
+        {/* Beta notice */}
+        <p className="text-xs text-gray-600 text-center">
+          Beta Release • Your feedback shapes this space
+        </p>
       </div>
     </div>
   );

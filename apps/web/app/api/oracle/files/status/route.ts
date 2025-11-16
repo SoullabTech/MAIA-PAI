@@ -6,20 +6,11 @@ import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getServerAuth } from '@/lib/auth';
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
 
-// Lazy initialization to prevent build-time errors
-function getSupabaseClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !key) {
-    throw new Error('[File Status] Missing Supabase credentials');
-  }
-
-  return createClient(url, key);
-}
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function GET(request: NextRequest) {
   try {
@@ -36,7 +27,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Get file status and processing info
-    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('user_files')
       .select(`
@@ -131,7 +121,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('user_files')
       .select(`

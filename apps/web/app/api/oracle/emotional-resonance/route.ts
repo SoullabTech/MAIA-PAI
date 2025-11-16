@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Memory, EmotionalState, EmotionalTrend } from '@/lib/types';
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 
 export async function POST(request: NextRequest) {
   try {

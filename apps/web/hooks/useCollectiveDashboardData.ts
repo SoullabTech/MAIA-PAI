@@ -1,5 +1,3 @@
-'use client';
-
 import useSWR, { SWRConfiguration, useSWRConfig } from 'swr'
 import { z } from 'zod'
 

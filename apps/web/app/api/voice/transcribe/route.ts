@@ -4,15 +4,11 @@ import { join } from "path";
 // Removed backend dependencies that cause SQLite errors in Next.js context
 // import { memoryStore } from "@/backend/src/services/memory/MemoryStore";
 // import { llamaService } from "@/backend/src/services/memory/LlamaService";
-import { getOpenAIClient } from "@/lib/openai-client";
+import OpenAI from "openai";
 import { PrivacyAwareCognitiveVoiceProcessor } from "@/lib/maia/privacyAwareCognitiveVoice";
 
 
 // Stub memory store
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 const memoryStore = {
   isInitialized: false,
   init: async (dbPath: string) => {},
@@ -32,6 +28,7 @@ const llamaService = {
   process: async (text: string) => ({ processed: text }),
   processVoice: async (audio: any) => ({ transcript: 'Voice processing not available in beta' })
 };
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export async function POST(request: NextRequest) {
   try {
@@ -71,7 +68,6 @@ export async function POST(request: NextRequest) {
 
     try {
       // Transcribe with Whisper with word-level timestamps for cognitive analysis
-      const openai = getOpenAIClient();
       const { createReadStream } = await import("fs");
       const transcription = await openai.audio.transcriptions.create({
         file: createReadStream(tempFile),

@@ -86,15 +86,3 @@ export async function hasHearted(postId: string, userId: string): Promise<boolea
   const postHearts = hearts.get(postId) || new Set();
   return postHearts.has(userId);
 }
-
-// Export a unified storage object for compatibility
-export const communityStorage = {
-  createPost,
-  getPost,
-  getPosts,
-  deletePost,
-  createComment,
-  getComments,
-  toggleHeart,
-  hasHearted
-};

@@ -4,10 +4,6 @@ import { join } from "path";
 
 
 // Stub memory store
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 const memoryStore = {
   isInitialized: false,
   init: async (dbPath: string) => {},

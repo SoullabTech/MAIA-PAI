@@ -3,10 +3,6 @@ import { routeWithMAIA } from '@/lib/maia/maia-router';
 import { generateAdaptiveModulation, injectAdaptiveContext } from '@/lib/maia/adaptive-modulation';
 import { trackInteractionFeedback, getMetaphorRecommendations } from '@/lib/maia/feedback-hooks';
 import { soulprintMemory } from '@/lib/memory/soulprint';
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 
 export async function POST(request: NextRequest) {
   try {

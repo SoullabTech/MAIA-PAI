@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Star, Send, X } from 'lucide-react';
-import { betaTracker } from '@/lib/services/betaTracker';
+import { betaTracker } from '@/lib/analytics/betaTracker';
 
 interface QuickFeedbackProps {
   onClose?: () => void;

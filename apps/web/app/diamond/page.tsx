@@ -1,5 +1,3 @@
-'use client';
-
 import InteractiveDiamondSystem from '@/components/diamond/InteractiveDiamondSystem';
 
 export default function DiamondPage() {

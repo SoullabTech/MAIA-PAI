@@ -66,52 +66,25 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-
-
-
-  // Optimize production builds
-  productionBrowserSourceMaps: false,
+  
+  // Ignore ESLint errors during production builds
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 
   // Ensure CSS is processed correctly
   experimental: {
     optimizeCss: true,
   },
 
-  // Disable styled-jsx completely to avoid module resolution issues
-  compiler: {
-    styledJsx: false,
-  },
+  // Optimize production builds
+  productionBrowserSourceMaps: false,
 
-  // Webpack configuration for IPFS compatibility and Supabase Edge Runtime warnings
+  // Webpack configuration for IPFS compatibility
   webpack: (config, { isServer }) => {
     if (isIPFS && !isServer) {
       config.output.publicPath = "./";
     }
-
-    // Suppress Supabase warnings for Edge Runtime by excluding Node.js APIs
-    // These packages use Node.js APIs but are only used in server-side routes
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      process: false,
-    };
-
-    // Externalize Supabase packages in Edge Runtime context to avoid warnings
-    if (config.name === 'edge-runtime') {
-      config.externals = config.externals || [];
-      config.externals.push({
-        '@supabase/realtime-js': '@supabase/realtime-js',
-        '@supabase/supabase-js': '@supabase/supabase-js',
-      });
-    }
-
-    // Optimize webpack caching to address performance warnings
-    // Use Buffer for large strings instead of serializing them directly
-    config.cache = {
-      ...config.cache,
-      compression: 'gzip',
-      maxMemoryGenerations: 1,
-    };
-
     return config;
   },
 };

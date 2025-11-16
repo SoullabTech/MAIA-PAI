@@ -1,10 +1,10 @@
-'use client';
-import dynamicImport from 'next/dynamic';
+import AttunePanel from '@/components/onboarding/AttunePanel'
+import { Metadata } from 'next'
 
-const AttunePanel = dynamicImport(() => import('../../components/onboarding/AttunePanel'), {
-  ssr: false,
-  loading: () => <div className="flex items-center justify-center min-h-screen">Loading...</div>
-});
+export const metadata: Metadata = {
+  title: 'Attune | Soullab',
+  description: 'Customize your voice, style, and theme preferences'
+}
 
 export default function AttunePage() {
   return (

@@ -3,11 +3,13 @@
  * "Have I written about rebirth before?" → finds thematically similar entries
  */
 
-// import { secureJournalStorage, SecureJournalEntry } from '../storage/secure-journal-storage'; // DISABLED
-import { StoredJournalEntry } from '../storage/journal-storage';
+import { OpenAI } from 'openai';
+import { journalStorage, StoredJournalEntry } from '../storage/journal-storage';
 import { mem0, MemoryEntry } from '../memory/mem0';
-import { getOpenAIClient } from '../ai/openaiClient';
-import { secureAuth } from '../auth/secure-auth';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 export interface SemanticSearchResult {
   entries: Array<{
@@ -26,20 +28,7 @@ export class SemanticSearch {
     query: string,
     limit: number = 10
   ): Promise<SemanticSearchResult> {
-    // Check authentication and initialize secure storage
-    const authState = secureAuth.getAuthState();
-    if (!authState.isAuthenticated || !authState.encryptionContext) {
-      throw new Error('Authentication required for journal search');
-    }
-
-    // Initialize secure storage if needed
-    // DISABLED: Secure journal storage removed for build stability
-    // if (!secureJournalStorage.isInitialized()) {
-    //   await secureJournalStorage.initialize(authState.encryptionContext);
-    // }
-
-    // const entries = await secureJournalStorage.getEntries(userId);
-    const entries: any[] = [];
+    const entries = journalStorage.getEntries(userId);
 
     if (entries.length === 0) {
       return {
@@ -54,7 +43,7 @@ export class SemanticSearch {
 
     const scoredEntries = await Promise.all(
       entries.map(async (entry) => {
-        const entryText = `${entry.content}\nSymbols: ${entry.reflection?.symbols?.join(', ') || ''}\nArchetypes: ${entry.reflection?.archetypes?.join(', ') || ''}\nEmotion: ${entry.reflection?.emotionalTone || ''}`;
+        const entryText = `${entry.entry}\nSymbols: ${entry.reflection.symbols.join(', ')}\nArchetypes: ${entry.reflection.archetypes.join(', ')}\nEmotion: ${entry.reflection.emotionalTone}`;
         const entryEmbedding = await this.generateQueryEmbedding(entryText);
         const relevanceScore = this.cosineSimilarity(embeddings, entryEmbedding);
         const matchReason = await this.generateMatchReason(query, entry);
@@ -164,7 +153,6 @@ export class SemanticSearch {
 
   private async generateQueryEmbedding(text: string): Promise<number[]> {
     try {
-      const openai = getOpenAIClient();
       const response = await openai.embeddings.create({
         model: 'text-embedding-3-small',
         input: text.slice(0, 8000)
@@ -193,9 +181,9 @@ export class SemanticSearch {
     return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
   }
 
-  private async generateMatchReason(query: string, entry: any): Promise<string> {
-    const symbols = (entry.reflection?.symbols || []).slice(0, 3).join(', ');
-    const archetypes = (entry.reflection?.archetypes || []).slice(0, 2).join(', ');
+  private async generateMatchReason(query: string, entry: StoredJournalEntry): Promise<string> {
+    const symbols = entry.reflection.symbols.slice(0, 3).join(', ');
+    const archetypes = entry.reflection.archetypes.slice(0, 2).join(', ');
     return `Symbols: ${symbols}. Archetypes: ${archetypes}.`;
   }
 

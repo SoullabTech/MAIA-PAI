@@ -1,5 +1,4 @@
-// TEMPORARY DISABLE: Removing @supabase/ssr import for build testing
-// import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -32,11 +31,58 @@ export async function middleware(request: NextRequest) {
         return response;
       }
 
-      // TEMPORARY DISABLE: Skip auth check for build testing
-      console.warn('[Admin Middleware] Auth temporarily disabled for build testing');
+      // Create Supabase client for server-side auth check
+      const supabase = createServerClient(
+        supabaseUrl,
+        supabaseKey,
+        {
+          cookies: {
+            get(name: string) {
+              return request.cookies.get(name)?.value;
+            },
+            set(name: string, value: string, options: CookieOptions) {
+              request.cookies.set({
+                name,
+                value,
+                ...options,
+              });
+              response = NextResponse.next({
+                request: {
+                  headers: request.headers,
+                },
+              });
+              response.cookies.set({
+                name,
+                value,
+                ...options,
+              });
+            },
+            remove(name: string, options: CookieOptions) {
+              request.cookies.set({
+                name,
+                value: '',
+                ...options,
+              });
+              response = NextResponse.next({
+                request: {
+                  headers: request.headers,
+                },
+              });
+              response.cookies.set({
+                name,
+                value: '',
+                ...options,
+              });
+            },
+          },
+        }
+      );
 
-      // Skip auth check temporarily
-      if (false) { // Always allow for now
+      // Get authenticated user
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Check if user is authenticated and is admin
+      if (!user || !user.email || !ADMIN_EMAILS.includes(user.email.toLowerCase())) {
         // Redirect to sign in page
         const url = request.nextUrl.clone();
         url.pathname = '/auth/signin';

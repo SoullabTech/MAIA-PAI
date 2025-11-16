@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ToneStyleSelector from '@/components/onboarding/ToneStyleSelector'
 import ThemeToggle from '@/components/settings/ThemeToggle'
-import { getBrowserSupabaseClient } from '@/lib/supabaseBrowserClient'
+import { createClientComponentClient } from '@/lib/supabase'
 import { soullabColors } from '@/lib/theme/soullabColors'
 import { soullabGradients, toneGradients } from '@/lib/theme/soullabGradients'
 
@@ -42,7 +42,7 @@ export default function AttunePanel({ showPreview = true, onSettingsChange }: At
     theme: 'system'
   })
   const [isSaving, setIsSaving] = useState(false)
-  const supabase = getBrowserSupabaseClient()
+  const supabase = createClientComponentClient()
 
   // Load saved settings on mount
   useEffect(() => {

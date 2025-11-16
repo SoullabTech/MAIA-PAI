@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen } from 'lucide-react';
 import { JournalingMode, JOURNALING_MODE_DESCRIPTIONS } from '@/lib/journaling/JournalingPrompts';
 import HybridInput from '@/components/chat/HybridInput';
 import MaiaReflector from './MaiaReflector';
@@ -41,28 +40,27 @@ export default function JournalingPortal() {
     scrollToBottom();
   }, [entries]);
 
-  // Removed demo mode override - always start with mode selector
-  // useEffect(() => {
-  //   const handleDemoLoad = (event: CustomEvent) => {
-  //     const { mode, entry, reflection } = event.detail;
-  //     setSelectedMode(mode);
-  //     setShowModeSelector(false);
+  useEffect(() => {
+    const handleDemoLoad = (event: CustomEvent) => {
+      const { mode, entry, reflection } = event.detail;
+      setSelectedMode(mode);
+      setShowModeSelector(false);
 
-  //     const demoEntry: JournalEntry = {
-  //       id: `demo_${Date.now()}`,
-  //       mode,
-  //       entry,
-  //       timestamp: new Date(),
-  //       reflection,
-  //       isProcessing: false
-  //     };
+      const demoEntry: JournalEntry = {
+        id: `demo_${Date.now()}`,
+        mode,
+        entry,
+        timestamp: new Date(),
+        reflection,
+        isProcessing: false
+      };
 
-  //     setEntries(prev => [...prev, demoEntry]);
-  //   };
+      setEntries(prev => [...prev, demoEntry]);
+    };
 
-  //   window.addEventListener('demo:load', handleDemoLoad as EventListener);
-  //   return () => window.removeEventListener('demo:load', handleDemoLoad as EventListener);
-  // }, []);
+    window.addEventListener('demo:load', handleDemoLoad as EventListener);
+    return () => window.removeEventListener('demo:load', handleDemoLoad as EventListener);
+  }, []);
 
   const handleStartJournaling = (mode: JournalingMode) => {
     setSelectedMode(mode);
@@ -142,10 +140,9 @@ export default function JournalingPortal() {
 
   return (
     <SoulfulAppShell userId="beta-user">
-      {/* Removed demo/onboarding components to show pure journaling experience */}
-      {/* <FeatureDiscovery />
+      <FeatureDiscovery />
       <ContextualHelp />
-      <DemoMode /> */}
+      <DemoMode />
 
       <div className="flex flex-col h-screen relative overflow-hidden">
         {/* Cinematic Jade Environment */}

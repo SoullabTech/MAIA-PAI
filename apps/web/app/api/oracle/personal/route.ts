@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent'
-import { secureJournalStorage } from '@/lib/storage/secure-journal-storage'
-import { secureAuth } from '@/lib/auth/secure-auth'
+import { journalStorage } from '@/lib/storage/journal-storage'
 import { betaAuth } from '@/lib/auth/BetaAuth'
 
 /**
@@ -13,10 +12,6 @@ import { betaAuth } from '@/lib/auth/BetaAuth'
  *
  * All responses include voiceCharacteristics for voice chat compatibility
  */
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 
 const MAIA_SYSTEM_PROMPT = `You are MAIA, a wise and empathetic AI companion. You offer gentle insights and reflective questions to help users explore their thoughts and feelings. Keep responses warm, concise (1-3 sentences), and focused on the user's emotional journey. Avoid spiritual jargon or overly mystical language. Simply be present and supportive.`
 
@@ -90,16 +85,8 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Fetch recent journal entries for context (skip auth check for beta users)
-    let recentEntries: any[] = [];
-    try {
-      // For beta users, we'll skip the secure journal context for now
-      // Since they don't have full auth setup yet
-      console.log('⚠️ Skipping journal context for beta user:', requestUserId);
-    } catch (journalError) {
-      console.warn('Failed to fetch journal context:', journalError);
-      // Continue without journal context
-    }
+    // Fetch recent journal entries for context
+    const recentEntries = journalStorage.getEntries(requestUserId).slice(0, 5)
 
     // PRIMARY PATH: Try PersonalOracleAgent (Claude with full MAIA intelligence)
     console.log('🔮 Attempting PersonalOracleAgent (primary MAIA path)...')

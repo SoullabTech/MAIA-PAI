@@ -8,7 +8,6 @@ import { claudeBridge } from '@/lib/ai/ClaudeBridge';
 import { AfferentStreamGenerator } from '@/lib/ain/AfferentStreamGenerator';
 import { maiaRealtimeMonitor } from '@/lib/monitoring/MaiaRealtimeMonitor';
 import { maiaMonitoring } from '@/lib/beta/MaiaMonitoring';
-import { processContentForInsights } from '@/lib/services/UnifiedInsightEngine';
 
 export async function POST(req: NextRequest) {
   const startTime = Date.now();
@@ -90,21 +89,6 @@ export async function POST(req: NextRequest) {
         crossSessionLinks: recentSymbols.filter(s =>
           journalingResponse.symbols?.includes(s)
         )
-      });
-
-      // 🌀 UNIFIED INSIGHT ENGINE - Process journal for temporal consciousness
-      processContentForInsights(
-        entry,
-        'journal',
-        requestUserId,
-        {
-          element: detectElementFromMode(mode as JournalingMode),
-          emotionalTone: journalingResponse.emotionalTone,
-          sessionId,
-          date: new Date()
-        }
-      ).catch(error => {
-        console.error('⚠️ Insight processing failed (non-critical):', error);
       });
 
       // 📊 Track memory and pattern recognition
@@ -273,19 +257,4 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-/**
- * Map journaling mode to elemental quality for insight tracking
- */
-function detectElementFromMode(mode: JournalingMode): 'fire' | 'water' | 'earth' | 'air' | 'aether' {
-  const modeToElement: Record<JournalingMode, 'fire' | 'water' | 'earth' | 'air' | 'aether'> = {
-    free: 'aether',        // Open, unbounded consciousness
-    dream: 'water',        // Fluid, subconscious realm
-    emotional: 'water',    // Feeling, flow
-    shadow: 'fire',        // Transformative, alchemical
-    direction: 'air'       // Mental clarity, perspective
-  };
-
-  return modeToElement[mode] || 'aether';
 }

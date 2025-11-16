@@ -5,10 +5,6 @@ import path from 'path';
 import { OracleAgentService } from '../../../lib/services/OracleAgentService';
 
 // Storage options for beta testing
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 const STORAGE_TYPE = process.env.STORAGE_TYPE || 'json'; // 'json', 'sqlite', or 'memory'
 const DATA_PATH = path.join(process.cwd(), 'data');
 const USERS_FILE = path.join(DATA_PATH, 'users.json');

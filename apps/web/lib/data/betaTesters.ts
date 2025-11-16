@@ -29,7 +29,7 @@ export const betaTesters: BetaTester[] = [
   // Start with your email for testing
   {
     name: "Kelly Nezat",
-    email: "soullab1@gmail.com",
+    email: "kelly@soullab.life",
     joinDate: "2024-01-01",
     status: "active",
     tags: ["beta-tester", "founder"],

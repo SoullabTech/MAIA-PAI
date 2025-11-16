@@ -6,10 +6,6 @@ import { CreatePostPayload, FeedFilters } from '@/lib/community/types'
  * GET /api/community/posts
  * Fetch community feed with optional filters
  */
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams

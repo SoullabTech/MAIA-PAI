@@ -4,10 +4,6 @@ import { NextRequest, NextResponse } from 'next/server';
  * WebRTC unified interface endpoint for Maia Realtime API
  * Accepts SDP offer from browser, creates session with OpenAI
  */
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 export async function POST(req: NextRequest) {
   try {
     // Get SDP from browser

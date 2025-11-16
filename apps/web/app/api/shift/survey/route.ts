@@ -15,10 +15,6 @@ import { NextRequest, NextResponse } from 'next/server';
 // } from '../../../../backend/src/content/SHIFtExplicitSurvey';
 
 // Stub survey data
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 const SHIFT_EXPLICIT_SURVEY: any[] = [];
 const SURVEY_INSTRUCTIONS = 'Survey not available in beta';
 const SURVEY_SCALE_LABELS: any[] = [];

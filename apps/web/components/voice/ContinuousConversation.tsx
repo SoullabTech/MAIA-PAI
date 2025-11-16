@@ -3,7 +3,7 @@
 import React, { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Mic, MicOff, Loader2, Activity, Wifi, WifiOff } from "lucide-react";
 import VoiceFeedbackPrevention from "@/lib/voice/voice-feedback-prevention";
-// import { Analytics } from "../../lib/services/supabaseAnalytics"; // Disabled for Vercel build
+// import { Analytics } from "../../lib/analytics/supabaseAnalytics"; // Disabled for Vercel build
 
 interface ContinuousConversationProps {
   onTranscript: (text: string) => void;

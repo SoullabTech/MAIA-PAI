@@ -10,10 +10,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { CollectiveIntelligence, collective, Logger } from '@/lib/stubs/CollectiveIntelligence';
 
 // Using imported collective from stubs - backend imports excluded from build
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 
 type DashboardQueryParams = {
   window?: '1d' | '7d' | '30d';

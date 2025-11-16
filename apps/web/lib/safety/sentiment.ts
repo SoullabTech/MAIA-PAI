@@ -3,7 +3,11 @@
  * Protects sacred space while understanding emotional depth
  */
 
-import { getOpenAIClient } from '../ai/openaiClient';
+import { OpenAI } from 'openai';
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 export interface SentimentAnalysis {
   overall: 'positive' | 'neutral' | 'negative' | 'complex';
@@ -40,7 +44,6 @@ export interface ModerationResult {
 export class SentimentService {
   async analyzeSentiment(text: string): Promise<SentimentAnalysis> {
     try {
-      const openai = getOpenAIClient();
       const response = await openai.chat.completions.create({
         model: 'gpt-4',
         messages: [
@@ -95,7 +98,6 @@ Return a JSON object with:
         return this.getPassthroughResult();
       }
 
-      const openai = getOpenAIClient();
       const moderation = await openai.moderations.create({
         input: text
       });

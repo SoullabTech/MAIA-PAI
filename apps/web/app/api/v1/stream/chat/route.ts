@@ -1,20 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// Build-time guard to prevent client-side imports in server routes
-if (typeof window !== 'undefined') {
-  throw new Error('This is a server-side route');
-}
-
-// Dynamic imports to prevent build-time issues with client-side dependencies
-const getStreamChatModules = async () => {
-  const [
-    { PersonalOracleAgent }
-  ] = await Promise.all([
-    import('@/lib/agents/PersonalOracleAgent')
-  ]);
-
-  return { PersonalOracleAgent };
-};
+import { PersonalOracleAgent } from '@/lib/agents/PersonalOracleAgent';
+import { journalStorage } from '@/lib/storage/journal-storage';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -53,9 +39,6 @@ export async function POST(request: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          // Get modules dynamically to avoid build issues
-          const { PersonalOracleAgent } = await getStreamChatModules();
-
           sendSSE(controller, {
             type: 'metadata',
             metadata: {
@@ -65,9 +48,7 @@ export async function POST(request: NextRequest) {
             }
           });
 
-          // Fetch recent journal entries if user is authenticated
-          let recentEntries: any[] = [];
-          // Skip journal context for now - pure chat mode
+          const recentEntries = journalStorage.getEntries(userId).slice(0, 5);
 
           console.log('🌀 Starting streaming chat for:', { userId, messageLength: message.length });
 

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getOpenAIClient } from "@/lib/openai-client";
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 // Archetypal analysis templates
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 const ARCHETYPE_PROMPT = `You are Maya, a wise oracle who interprets human experiences through the lens of mythic archetypes. 
 
 Analyze the following memories and content through archetypal patterns. Consider these primary archetypes:
@@ -61,7 +61,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate archetypal insight using GPT-4
-    const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [

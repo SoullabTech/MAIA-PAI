@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BookOpen, TrendingUp, Mic, Search, BarChart3, Cpu, Home } from 'lucide-react';
+import { BookOpen, TrendingUp, Mic, Search, BarChart3 } from 'lucide-react';
 
 interface NavLink {
   href: string;
@@ -65,15 +65,6 @@ export default function JournalNavigation() {
 
   return (
     <nav className="flex items-center gap-1">
-      {/* Primary MAIA link */}
-      <Link
-        href="/maia"
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all bg-gradient-to-r from-yellow-600/80 to-amber-600/80 text-white hover:from-yellow-500 hover:to-amber-500 shadow-sm mr-2"
-      >
-        <Cpu className="h-4 w-4" />
-        <span className="hidden sm:inline">MAIA</span>
-      </Link>
-
       {NAV_LINKS.map((link) => {
         const unlocked = isUnlocked(link);
         const active = isActive(link.href);

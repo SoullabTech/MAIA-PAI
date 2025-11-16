@@ -1,17 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
-import { getOpenAIClient } from '../ai/openaiClient';
+import { OpenAI } from 'openai';
 
-function createSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
-  if (!supabaseUrl || !supabaseServiceKey) {
-    console.warn('[FileMemoryIntegration] Supabase environment variables not available during build');
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey);
-}
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!
+});
 
 export interface FileContext {
   fileId: string;
@@ -44,8 +41,8 @@ export class FileMemoryIntegration {
    * Retrieve relevant files based on query using semantic search
    */
   async retrieveRelevantFiles(
-    userId: string,
-    query: string,
+    userId: string, 
+    query: string, 
     options: FileSearchOptions = {}
   ): Promise<FileContext[]> {
     const {
@@ -54,17 +51,11 @@ export class FileMemoryIntegration {
       minRelevance = 0.75,
       includeMetadata = true
     } = options;
-
+    
     try {
-      const supabase = createSupabaseClient();
-      if (!supabase) {
-        console.warn('[FileMemoryIntegration] Supabase not available, returning empty file contexts');
-        return [];
-      }
-
       // Generate query embedding
       const queryEmbedding = await this.generateEmbedding(query);
-
+      
       // Search for similar file chunks with citation metadata
       const { data: relevantChunks, error } = await supabase.rpc(
         'match_file_embeddings',
@@ -217,12 +208,6 @@ export class FileMemoryIntegration {
    */
   async getFileStats(userId: string) {
     try {
-      const supabase = createSupabaseClient();
-      if (!supabase) {
-        console.warn('[FileMemoryIntegration] Supabase not available, returning default stats');
-        return { totalFiles: 0, totalChunks: 0, totalSize: 0, citationCount: 0 };
-      }
-
       const { data, error } = await supabase.rpc('get_file_stats', {
         target_user_id: userId
       });
@@ -406,12 +391,11 @@ export class FileMemoryIntegration {
   }
   
   private async generateEmbedding(text: string): Promise<number[]> {
-    const openai = getOpenAIClient();
     const response = await openai.embeddings.create({
       model: 'text-embedding-3-small',
       input: text.trim()
     });
-
+    
     return response.data[0].embedding;
   }
 }

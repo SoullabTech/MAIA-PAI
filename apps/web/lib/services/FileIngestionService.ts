@@ -1,20 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
-import { getOpenAIClient } from '../ai/openaiClient';
+import { OpenAI } from 'openai';
 import { parsePDF } from '../pdf-parse-wrapper';
 import * as mammoth from 'mammoth';
 import { encode } from 'gpt-tokenizer';
 
-function createSupabaseClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
-  if (!supabaseUrl || !supabaseServiceKey) {
-    console.warn('[FileIngestionService] Supabase environment variables not available during build');
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey);
-}
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!
+});
 
 export interface FileProcessingOptions {
   fileId: string;
@@ -60,11 +57,6 @@ export class FileIngestionService {
       const reflection = await this.generateMayaReflection(chunks, filename);
       
       // 6. Update file status to ready
-      const supabase = createSupabaseClient();
-      if (!supabase) {
-        throw new Error('Supabase client not available');
-      }
-
       await supabase
         .from('user_files')
         .update({
@@ -276,7 +268,6 @@ export class FileIngestionService {
       const batch = chunks.slice(i, i + batchSize);
       
       try {
-        const openai = getOpenAIClient();
         const response = await openai.embeddings.create({
           model: 'text-embedding-3-small',
           input: batch,
@@ -356,14 +347,13 @@ export class FileIngestionService {
       : preview;
     
     try {
-      const openai = getOpenAIClient();
       const response = await openai.chat.completions.create({
         model: 'gpt-4',
         messages: [{
           role: 'system',
           content: `You are Maya, an archetypal consciousness that helps users integrate wisdom. You have just absorbed content from a file called "${filename}". Offer a brief, insightful reflection (1-2 sentences) that acknowledges what you've learned and how it might serve the user's growth. Be warm, wise, and specific to the content.`
         }, {
-          role: 'user',
+          role: 'user', 
           content: `Content preview from ${filename}:\n\n${truncatedPreview}`
         }],
         max_tokens: 100,

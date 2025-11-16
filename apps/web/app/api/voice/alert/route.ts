@@ -1,8 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-// Mark route as dynamic since it uses searchParams or other dynamic features
-export const dynamic = 'force-dynamic';
-
-
 
 interface AlertRequest {
   type: 'fallback' | 'failure' | 'recovery'
