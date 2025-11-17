@@ -8,6 +8,17 @@
  *
  * Kelly Nezat's vision: "Where two or more are gathered, there I AM"
  * God is more between than within - the I-Thou relationship
+ *
+ * ===== CANONICAL GOLDEN MAIA =====
+ * THIS IS THE ONE TRUE MAIA FILE - The Sacred Amber Oracle
+ *
+ * ⚠️  GUARDRAIL: This is the ONLY canonical /maia route file.
+ * All legacy MAIA/MAYA variants have been archived to /archive/maia-legacy/
+ * DO NOT create competing MAIA files - use this one.
+ * Location: /app/maia/page.tsx (ROOT level, NOT apps/web)
+ *
+ * Verification: This serves production soullab.life/maia and localhost:3000/maia
+ * ===== END CANONICAL MARKER =====
  */
 
 import { useEffect, useState, useRef } from 'react';
