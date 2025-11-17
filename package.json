@@ -166,7 +166,7 @@
     "@types/react-dropzone": "^4.2.2",
     "@types/three": "^0.160.0",
     "autoprefixer": "^10.4.21",
-    "bcryptjs": "^2.4.3",
+    "bcryptjs": "^3.0.3",
     "capacitor-healthkit": "^0.2.1",
     "chalk": "^5.6.2",
     "chokidar": "^4.0.3",
