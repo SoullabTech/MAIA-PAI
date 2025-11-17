@@ -202,7 +202,7 @@
     "react-spring": "^9.7.3",
     "react-use-measure": "^2.1.7",
     "react-window": "^2.2.3",
-    "recharts": "^2.15.4",
+    "recharts": "^3.4.1",
     "resend": "^6.1.0",
     "simple-peer": "^9.11.1",
     "socket.io-client": "^4.5.0",
