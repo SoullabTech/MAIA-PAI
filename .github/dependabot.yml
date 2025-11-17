@@ -12,6 +12,17 @@ updates:
       - "security"
     commit-message:
       prefix: "🔒"
+    # Ignore breaking major version updates that require manual migration
+    ignore:
+      # Tailwind CSS v4 is a complete rewrite - requires full UI migration
+      - dependency-name: "tailwindcss"
+        update-types: ["version-update:semver-major"]
+      # Next.js v16+ requires testing before upgrade
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      # OpenAI SDK major versions may break voice integration
+      - dependency-name: "openai"
+        update-types: ["version-update:semver-major"]
     
   # Python dependencies - backend
   - package-ecosystem: "pip"
