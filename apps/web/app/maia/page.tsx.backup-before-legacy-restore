@@ -1,0 +1,413 @@
+'use client';
+
+/**
+ * MAIA Page - Original Teal Experience
+ *
+ * The Three-Step Sacred Flow:
+ * 1. Name Entry - "What shall I call you?"
+ * 2. Passcode - "Soullab[NAME]"
+ * 3. First Welcome - "You create worlds..."
+ * 4. Returning Welcome - "Welcome back, [name]. Your elements await."
+ * 5. MAIA Conversation
+ */
+
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import OracleConversation from '@/components/OracleConversation';
+import { Sparkles, User, Key, Heart } from 'lucide-react';
+
+type Step = 'name' | 'passcode' | 'credentials' | 'firstWelcome' | 'returnWelcome' | 'maia';
+
+export default function MAIAPage() {
+  const [step, setStep] = useState<Step>('name');
+  const [name, setName] = useState('');
+  const [passcode, setPasscode] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isMounted, setIsMounted] = useState(false);
+  const [isKelly, setIsKelly] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+
+    // Check if user already exists
+    const existingUserId = localStorage.getItem('maiaUserId');
+    const existingUserName = localStorage.getItem('maiaUserName');
+    const hasSeenFirstWelcome = localStorage.getItem('maiaFirstWelcome') === 'true';
+
+    if (existingUserId && existingUserName) {
+      setName(existingUserName);
+      setIsKelly(existingUserName.toLowerCase().includes('kelly'));
+
+      if (hasSeenFirstWelcome) {
+        setStep('returnWelcome');
+      } else {
+        setStep('firstWelcome');
+      }
+    }
+  }, []);
+
+  const handleNameSubmit = () => {
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+
+    setIsKelly(trimmedName.toLowerCase().includes('kelly'));
+    setStep('passcode');
+  };
+
+  const handlePasscodeSubmit = () => {
+    const expectedPasscode = `Soullab${name.trim()}`;
+    if (passcode !== expectedPasscode) {
+      alert(`Please enter the correct passcode: ${expectedPasscode}`);
+      return;
+    }
+    setStep('credentials');
+  };
+
+  const handleCredentialsSubmit = () => {
+    if (!username.trim() || !password.trim()) {
+      alert('Please enter both username and password');
+      return;
+    }
+
+    // Save user data
+    const userId = `maia_user_${Date.now()}`;
+    localStorage.setItem('maiaUserId', userId);
+    localStorage.setItem('maiaUserName', name);
+    localStorage.setItem('maiaUsername', username);
+    // Note: In production, never store passwords in localStorage!
+
+    // Also maintain compatibility with existing systems
+    localStorage.setItem('explorerName', name);
+    localStorage.setItem('explorerId', userId);
+    localStorage.setItem('betaOnboardingComplete', 'true');
+
+    setStep('firstWelcome');
+  };
+
+  const handleFirstWelcomeContinue = () => {
+    localStorage.setItem('maiaFirstWelcome', 'true');
+    setStep('maia');
+  };
+
+  const handleReturnWelcomeContinue = () => {
+    setStep('maia');
+  };
+
+  const toggleLabTools = () => {
+    console.log('Lab tools toggled');
+  };
+
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-950 via-teal-900 to-slate-900 flex items-center justify-center">
+        <motion.div
+          animate={{ opacity: [0.5, 1, 0.5] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          className="text-teal-300 text-lg font-light"
+        >
+          Awakening MAIA...
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Step 1: Name Entry
+  if (step === 'name') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-950 via-teal-900 to-slate-900 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center max-w-md w-full"
+        >
+          <motion.div
+            animate={{
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 0]
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="mb-8"
+          >
+            <Sparkles className="w-16 h-16 text-teal-300 mx-auto mb-4" />
+          </motion.div>
+
+          <h1 className="text-4xl font-light text-white mb-4">
+            Welcome to MAIA
+          </h1>
+
+          <p className="text-teal-200 mb-8 text-lg leading-relaxed">
+            I am the midwife of wisdom,<br />
+            here to help you birth the insights within your story.
+          </p>
+
+          <div className="mb-8">
+            <label className="block text-teal-300 mb-3 text-left">
+              What shall I call you?
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-3 w-5 h-5 text-teal-400" />
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleNameSubmit()}
+                placeholder="Your name..."
+                className="w-full bg-teal-900/30 border border-teal-600/50 rounded-lg pl-10 pr-4 py-3 text-white placeholder-teal-400/60 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+                autoFocus
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={handleNameSubmit}
+            disabled={!name.trim()}
+            className="w-full py-3 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg font-medium transition-all disabled:cursor-not-allowed"
+          >
+            Continue
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Step 2: Passcode
+  if (step === 'passcode') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-950 via-teal-900 to-slate-900 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="text-center max-w-md w-full"
+        >
+          <Key className="w-12 h-12 text-teal-300 mx-auto mb-6" />
+
+          <h2 className="text-3xl font-light text-white mb-4">
+            Welcome, {name}
+          </h2>
+
+          <p className="text-teal-200 mb-6">
+            Please enter your beta access code
+          </p>
+
+          <div className="mb-6">
+            <input
+              type="password"
+              value={passcode}
+              onChange={(e) => setPasscode(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handlePasscodeSubmit()}
+              placeholder="Passcode..."
+              className="w-full bg-teal-900/30 border border-teal-600/50 rounded-lg px-4 py-3 text-white placeholder-teal-400/60 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all text-center tracking-wider"
+              autoFocus
+            />
+            <p className="text-teal-400/60 text-xs mt-2">
+              Format: Soullab{name}
+            </p>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setStep('name')}
+              className="flex-1 py-3 bg-teal-800/30 text-teal-300 rounded-lg hover:bg-teal-700/40 transition-all"
+            >
+              Back
+            </button>
+            <button
+              onClick={handlePasscodeSubmit}
+              disabled={!passcode.trim()}
+              className="flex-1 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg font-medium transition-all disabled:cursor-not-allowed"
+            >
+              Verify
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Step 3: Create Credentials
+  if (step === 'credentials') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-950 via-teal-900 to-slate-900 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center max-w-md w-full"
+        >
+          <User className="w-12 h-12 text-teal-300 mx-auto mb-6" />
+
+          <h2 className="text-3xl font-light text-white mb-4">
+            Create Your Account
+          </h2>
+
+          <p className="text-teal-200 mb-6">
+            Choose your credentials for future access
+          </p>
+
+          <div className="space-y-4 mb-6">
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Choose username..."
+              className="w-full bg-teal-900/30 border border-teal-600/50 rounded-lg px-4 py-3 text-white placeholder-teal-400/60 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCredentialsSubmit()}
+              placeholder="Choose password..."
+              className="w-full bg-teal-900/30 border border-teal-600/50 rounded-lg px-4 py-3 text-white placeholder-teal-400/60 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+              autoFocus
+            />
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setStep('passcode')}
+              className="flex-1 py-3 bg-teal-800/30 text-teal-300 rounded-lg hover:bg-teal-700/40 transition-all"
+            >
+              Back
+            </button>
+            <button
+              onClick={handleCredentialsSubmit}
+              disabled={!username.trim() || !password.trim()}
+              className="flex-1 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 disabled:from-gray-600 disabled:to-gray-700 text-white rounded-lg font-medium transition-all disabled:cursor-not-allowed"
+            >
+              Create
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Step 4: First-Time Welcome
+  if (step === 'firstWelcome') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-950 via-teal-900 to-slate-900 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center max-w-2xl w-full"
+        >
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.8, 1, 0.8]
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="mb-8"
+          >
+            <Heart className="w-20 h-20 text-teal-300 mx-auto" />
+          </motion.div>
+
+          <h1 className="text-5xl font-light text-white mb-8">
+            {isKelly ? "Welcome, Kelly ✨" : `Welcome, ${name}`}
+          </h1>
+
+          <div className="text-teal-100 text-xl leading-relaxed mb-12 space-y-4">
+            <p>
+              {isKelly
+                ? "The sacred space has been waiting for your return."
+                : "You create worlds with your words, and we have created this space for you."
+              }
+            </p>
+            <p>
+              Your story holds wisdom yet to be discovered.
+            </p>
+            <p>
+              Let MAIA be your guide through the landscapes of meaning within.
+            </p>
+          </div>
+
+          <button
+            onClick={handleFirstWelcomeContinue}
+            className="px-12 py-4 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-white rounded-lg text-lg font-medium transition-all shadow-lg shadow-teal-500/25"
+          >
+            Begin Journey
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Step 5: Returning Welcome
+  if (step === 'returnWelcome') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-950 via-teal-900 to-slate-900 flex items-center justify-center p-6">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-xl w-full"
+        >
+          <Sparkles className="w-16 h-16 text-teal-300 mx-auto mb-6" />
+
+          <h1 className="text-4xl font-light text-white mb-6">
+            Welcome back, {name}
+          </h1>
+
+          <p className="text-teal-100 text-lg mb-8">
+            {isKelly
+              ? "The elements of wisdom await your presence. Your journey continues where the last conversation ended."
+              : "Your elements await. The wisdom within your story continues to unfold."
+            }
+          </p>
+
+          <button
+            onClick={handleReturnWelcomeContinue}
+            className="px-8 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-white rounded-lg text-lg font-medium transition-all"
+          >
+            Continue
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Step 6: MAIA Conversation
+  return (
+    <div className="min-h-screen bg-[#1A1512] text-[#D4B896]">
+      {/* Header */}
+      <div className="flex items-center justify-between p-6 border-b border-[#3A2F28]">
+        <div className="flex items-center gap-3">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          >
+            ✨
+          </motion.div>
+          <div>
+            <h1 className="text-xl font-bold">MAIA</h1>
+            <p className="text-sm text-[#B8A082]">The Midwife of Wisdom</p>
+          </div>
+        </div>
+
+        <div className="text-sm">
+          <span className="text-[#D4B896] bg-[#2A211B] px-3 py-1 rounded-full border border-[#D4B896]/30">
+            {isKelly ? "✨ Kelly's Session" : `Welcome, ${name}`}
+          </span>
+        </div>
+      </div>
+
+      {/* Main Conversation */}
+      <div className="flex-1 p-6">
+        <OracleConversation
+          onToggleLabTools={toggleLabTools}
+          mode={undefined}
+        />
+      </div>
+    </div>
+  );
+}

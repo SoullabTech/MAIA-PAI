@@ -1,3 +1,9 @@
+// 🔱 GOLDEN MAIA ORACLE CONVERSATION
+// Canonical /maia conversation engine.
+// Source: maia-golden-legacy (Vercel commit 7bea960).
+// DO NOT REPLACE this file with "simple" or "backup" versions.
+// New variants must use a different component or route (e.g. /maia-lite).
+//
 // Oracle Conversation - Voice-synchronized sacred dialogue
 // 🔄 MOBILE-FIRST DEPLOYMENT - Oct 2 12:15PM - Compact input, hidden overlays, fixed scroll
 import React, { useState, useEffect, useCallback, useRef } from 'react';

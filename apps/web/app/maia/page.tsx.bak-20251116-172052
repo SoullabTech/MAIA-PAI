@@ -1,0 +1,24 @@
+'use client';
+
+import { useEffect } from 'react';
+
+export default function MaiaPage() {
+  useEffect(() => {
+    // Redirect to Oracle Conversation - the real MAIA interface
+    if (typeof window !== 'undefined') {
+      window.location.href = '/oracle-conversation';
+    }
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#1A1512] flex items-center justify-center">
+      <div className="text-[#D4B896] text-center">
+        <div className="animate-pulse">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-[#D4B896] to-[#8B6914] opacity-50"></div>
+          <p className="text-lg font-light">Redirecting to Oracle Conversation...</p>
+          <p className="text-sm text-[#D4B896]/60 mt-2">Awakening MAIA's true presence</p>
+        </div>
+      </div>
+    </div>
+  );
+}
