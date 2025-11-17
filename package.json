@@ -214,7 +214,7 @@
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.160.1",
     "typescript": "5.3.3",
-    "uuid": "^9.0.1",
+    "uuid": "^13.0.0",
     "zustand": "^4.5.7"
   },
   "devDependencies": {
