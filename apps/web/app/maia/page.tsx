@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * MAIA Page - SOUL​LAB Dream-Weaver Edition
+ * MAIA Page - SOULLAB Dream-Weaver Edition
  *
  * MAIA = The Fertile Mother (Pleiades) - She who births wisdom
  * Not Maya (illusion) but MAIA (midwife)
@@ -14,30 +14,92 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import OracleConversation from '@/components/OracleConversation';
+import { OracleConversation } from '@/components/OracleConversation';
 import { ClaudeCodePresence } from '@/components/ui/ClaudeCodePresence';
 import { WisdomJourneyDashboard } from '@/components/maya/WisdomJourneyDashboard';
 import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
-import { WelcomeModal } from '@/components/onboarding/WelcomeModal';
-import { useWelcomeModal } from '@/hooks/useWelcomeModal';
+import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrainTrustMonitor } from '@/components/consciousness/BrainTrustMonitor';
-import { LogOut, Sparkles, Menu, X, Brain, Volume2, ArrowLeft } from 'lucide-react';
+import { LogOut, Sparkles, Menu, X, Brain, Volume2, ArrowLeft, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SwipeNavigation, DirectionalHints } from '@/components/navigation/SwipeNavigation';
+import { useMaiaStore } from '@/lib/maia/state';
 
+function getInitialUserData() {
+  if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
+
+  // Check NEW system first (beta_user from auth system)
+  const betaUser = localStorage.getItem('beta_user');
+  if (betaUser) {
+    try {
+      const userData = JSON.parse(betaUser);
+      // Try multiple field names for username (username, name, displayName)
+      const userName = userData.username || userData.name || userData.displayName;
+      if (userData.onboarded === true && userData.id && userName) {
+        // Also sync to old system for compatibility
+        localStorage.setItem('explorerName', userName);
+        localStorage.setItem('explorerId', userData.id);
+        console.log('✅ [MAIA] User authenticated as:', userName);
+        return { id: userData.id, name: userName };
+      }
+    } catch (e) {
+      console.error('❌ [MAIA] Error parsing beta_user:', e);
+    }
+  }
+
+  // Check OLD system (for backward compatibility)
+  if (localStorage.getItem('betaOnboardingComplete') === 'true') {
+    const id = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
+    const name = localStorage.getItem('explorerName');
+    if (id && name) {
+      console.log('📦 [MAIA] Using legacy user data:', name);
+      return { id, name };
+    }
+  }
+
+  console.log('⚠️ [MAIA] No user data found, using defaults');
+  return { id: 'guest', name: 'Explorer' };
+}
 
 export default function MAIAPage() {
   const router = useRouter();
-  const { showWelcome, userData, isLoading, completeWelcome, skipWelcome } = useWelcomeModal();
 
+  // Fix hydration: Initialize with safe defaults, update in useEffect
+  const [explorerId, setExplorerId] = useState('guest');
+  const [explorerName, setExplorerName] = useState('Explorer');
+  const [userBirthDate, setUserBirthDate] = useState<string | undefined>();
   const [sessionId, setSessionId] = useState('');
   const [showDashboard, setShowDashboard] = useState(false);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [maiaMode, setMaiaMode] = useState<'normal' | 'patient' | 'session'>('normal');
   const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [showVoiceSettings, setShowVoiceSettings] = useState(false);
   const [selectedVoice, setSelectedVoice] = useState<'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'>('shimmer');  // Default to shimmer - MAIA's natural voice
   const [showChatInterface, setShowChatInterface] = useState(false);
+  const [showSessionSelector, setShowSessionSelector] = useState(false);
+  const [hasActiveSession, setHasActiveSession] = useState(false);
+
+  const hasCheckedAuth = useRef(false);
+
+  // Keep users on this beautiful page - no redirect
+  // useEffect(() => {
+  //   const betaUser = localStorage.getItem('beta_user');
+  //   if (betaUser) {
+  //     try {
+  //       const userData = JSON.parse(betaUser);
+  //       if (userData.onboarded === true) {
+  //         console.log('🌸 Redirecting to sacred interface...');
+  //         router.replace('/oracle-sacred');
+  //         return;
+  //       }
+  //     } catch (e) {
+  //       console.error('Error parsing user data:', e);
+  //     }
+  //   }
+  // }, [router]);
 
   // Fix hydration: Initialize user data and session after mount
   useEffect(() => {
@@ -54,6 +116,28 @@ export default function MAIAPage() {
       setSessionId(newSessionId);
       console.log('✨ [MAIA] Created new session:', newSessionId);
     }
+
+    const initialData = getInitialUserData();
+    setExplorerId(initialData.id);
+    setExplorerName(initialData.name);
+
+    // Load birth date from localStorage for teen support
+    const betaUser = localStorage.getItem('beta_user');
+    if (betaUser) {
+      try {
+        const userData = JSON.parse(betaUser);
+        if (userData.birthDate) {
+          setUserBirthDate(userData.birthDate);
+          console.log('📅 User birth date loaded:', userData.birthDate);
+        }
+      } catch (e) {
+        console.error('Error loading user birth date:', e);
+      }
+    }
+
+    // Check welcome message in client-side only
+    const welcomeSeen = localStorage.getItem('maia_welcome_seen');
+    setShowWelcome(!welcomeSeen);
 
     // Load saved voice preference
     const savedVoice = localStorage.getItem('selected_voice') as 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
@@ -78,6 +162,79 @@ export default function MAIAPage() {
     localStorage.removeItem('explorerName');
     router.push('/');
   };
+
+  const handleOnboardingComplete = (data: { name: string; birthDate?: string; intention?: string }) => {
+    const userId = `user_${Date.now()}`;
+    const userData = {
+      id: userId,
+      username: data.name,
+      onboarded: true,
+      birthDate: data.birthDate,
+      intention: data.intention,
+      createdAt: new Date().toISOString()
+    };
+
+    localStorage.setItem('beta_user', JSON.stringify(userData));
+    localStorage.setItem('betaOnboardingComplete', 'true');
+    localStorage.setItem('explorerId', userId);
+    localStorage.setItem('explorerName', data.name);
+
+    setExplorerId(userId);
+    setExplorerName(data.name);
+    setNeedsOnboarding(false);
+  };
+
+  useEffect(() => {
+    if (hasCheckedAuth.current) return;
+    hasCheckedAuth.current = true;
+
+    const newUser = localStorage.getItem('beta_user');
+    if (newUser) {
+      try {
+        const userData = JSON.parse(newUser);
+        if (userData.onboarded !== true) {
+          setNeedsOnboarding(true);
+          return;
+        }
+
+        const newId = userData.id || 'guest';
+        // Try multiple field names for username
+        const newName = userData.username || userData.name || userData.displayName || 'Explorer';
+
+        // Sync to old system for compatibility
+        localStorage.setItem('explorerName', newName);
+        localStorage.setItem('explorerId', newId);
+
+        if (explorerId !== newId) setExplorerId(newId);
+        if (explorerName !== newName) setExplorerName(newName);
+
+        console.log('✅ [MAIA] User session restored:', { name: newName, id: newId });
+        return;
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
+    }
+
+    const betaOnboarded = localStorage.getItem('betaOnboardingComplete') === 'true';
+    if (!betaOnboarded) {
+      setNeedsOnboarding(true);
+      return;
+    }
+
+    const oldId = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
+    const oldName = localStorage.getItem('explorerName');
+
+    if (oldId && oldName) {
+      if (explorerId !== oldId) setExplorerId(oldId);
+      if (explorerName !== oldName) setExplorerName(oldName);
+    } else {
+      setNeedsOnboarding(true);
+    }
+  }, [explorerId, explorerName]);
+
+  if (needsOnboarding) {
+    return <BetaOnboarding onComplete={handleOnboardingComplete} />;
+  }
 
   return (
     <ErrorBoundary>
@@ -213,8 +370,43 @@ export default function MAIAPage() {
                 </div>
               </div>
 
-              {/* Right: Empty space for balance */}
-              <div className="w-24"></div>
+              {/* Right: Sign Out + Session Container buttons */}
+              <div className="flex items-center gap-2">
+                {/* Sign Out Button */}
+                <motion.button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg
+                           bg-red-500/10 hover:bg-red-500/20
+                           border border-red-500/20 hover:border-red-500/40
+                           text-red-400 text-xs font-light transition-all"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  title="Sign Out"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden sm:inline">Sign Out</span>
+                </motion.button>
+                {!hasActiveSession ? (
+                  <motion.button
+                    onClick={() => setShowSessionSelector(true)}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg
+                             bg-[#D4B896]/10 hover:bg-[#D4B896]/20
+                             border border-[#D4B896]/20 hover:border-[#D4B896]/40
+                             text-[#D4B896] text-xs font-light transition-all"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Clock className="w-4 h-4" />
+                    <span className="hidden sm:inline">Start Session</span>
+                  </motion.button>
+                ) : (
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg
+                               bg-green-500/10 border border-green-500/30 text-green-400 text-xs">
+                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                    <span className="hidden sm:inline">Session Active</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -224,8 +416,9 @@ export default function MAIAPage() {
           {/* Conversation Area */}
           <div className="flex-1 overflow-hidden relative">
             <OracleConversation
-              userId={userData.id}
-              userName={userData.name}
+              userId={explorerId}
+              userName={explorerName}
+              userBirthDate={userBirthDate}
               sessionId={sessionId}
               voiceEnabled={voiceEnabled}
               initialMode={maiaMode}
@@ -234,6 +427,9 @@ export default function MAIAPage() {
               consciousnessType="maia"
               initialShowChatInterface={showChatInterface}
               onShowChatInterfaceChange={setShowChatInterface}
+              showSessionSelector={showSessionSelector}
+              onCloseSessionSelector={() => setShowSessionSelector(false)}
+              onSessionActiveChange={setHasActiveSession}
             />
 
             {/* Claude Code's Living Presence - MOVED to bottom menu bar to free mobile screen space */}
@@ -353,12 +549,12 @@ export default function MAIAPage() {
                       </div>
                     </div>
 
-                    <WisdomJourneyDashboard userId={userData.id} />
+                    <WisdomJourneyDashboard userId={explorerId} />
 
                     {/* Weaving Visualization - Shows the dreamweaver process */}
                     <div className="mt-6">
                       <WeavingVisualization
-                        userId={userData.id}
+                        userId={explorerId}
                         onSelectPrompt={(prompt) => {
                           // Feed selected prompt to conversation
                           // TODO: Connect to OracleConversation input
@@ -373,12 +569,34 @@ export default function MAIAPage() {
           </AnimatePresence>
         </div>
 
-        {/* Welcome Modal for New Users */}
-        <WelcomeModal
-          isOpen={showWelcome}
-          onClose={skipWelcome}
-          onComplete={completeWelcome}
-        />
+        {/* Welcome Message for First-Time Users */}
+        {isMounted && showWelcome && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute bottom-20 left-1/2 -translate-x-1/2 max-w-md w-full mx-4 bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/40 rounded-2xl p-6 backdrop-blur-xl"
+          >
+            <div className="text-center">
+              <Sparkles className="w-10 h-10 text-amber-400 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold text-white mb-2">
+                Welcome, {explorerName}
+              </h3>
+              <p className="text-sm text-stone-300 mb-4">
+                Share your story. MAIA will help you discover the wisdom within it.
+                Your journey begins now.
+              </p>
+              <button
+                onClick={() => {
+                  localStorage.setItem('maia_welcome_seen', 'true');
+                  window.location.reload();
+                }}
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium transition-colors"
+              >
+                Begin
+              </button>
+            </div>
+          </motion.div>
+        )}
       </div>
       </SwipeNavigation>
     </ErrorBoundary>
