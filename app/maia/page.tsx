@@ -294,143 +294,110 @@ export default function MAIAPage() {
         {/* Atmospheric Glow - Warm light from below */}
         <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-[#3d2817]/30 via-transparent to-transparent pointer-events-none z-0" />
 
-        {/* DREAM-WEAVER SYSTEM - Combined Header & Banner - Always visible */}
-        <div
-          className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/3 backdrop-blur-sm"
-        >
-          {/* Spice particle effect - very subtle movement */}
-          <div className="absolute inset-0 opacity-5 pointer-events-none">
-            <motion.div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `radial-gradient(1px 1px at 20% 30%, amber 0%, transparent 50%),
-                                 radial-gradient(1px 1px at 60% 70%, amber 0%, transparent 50%),
-                                 radial-gradient(1px 1px at 80% 10%, amber 0%, transparent 50%)`,
-                backgroundSize: '50px 50px',
-              }}
-              animate={{
-                backgroundPosition: ['0% 0%', '100% 100%'],
-              }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-            />
-          </div>
+        {/* DUNE-STYLED ATMOSPHERIC HEADER */}
+        <div className="relative bg-gradient-to-b from-stone-950/95 via-stone-900/90 to-stone-950/95 backdrop-blur-xl border-b border-amber-900/20 shadow-2xl z-50">
+          {/* Subtle atmospheric glow */}
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-900/5 via-transparent to-amber-900/5"></div>
 
-          {/* Holographic scan line - more transparent */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-b from-transparent via-amber-600/3 to-transparent pointer-events-none"
-            animate={{
-              y: ['-100%', '200%'],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "linear",
-              repeatDelay: 3
-            }}
-          />
-
-          <div className="relative max-w-7xl mx-auto px-4 py-1.5">
-            <div className="flex items-center justify-between">
-              {/* Left: SOULLAB Logo with Holoflower */}
-              <div className="flex items-center gap-2 ml-0 sm:ml-12">
-                <img
-                  src="/holoflower-amber.png"
-                  alt="Holoflower"
-                  className="w-5 h-5 sm:w-6 sm:h-6 opacity-100 drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]"
-                  style={{ filter: 'brightness(1.2)' }}
-                />
-                <h1 className="text-base sm:text-lg font-light text-amber-300/90 tracking-wider">
-                  SOULLAB
-                </h1>
-              </div>
-
-              {/* Center: Voice/Text toggle + Mode selector */}
+          <div className="relative px-6 py-4">
+            <div className="flex justify-between items-center w-full">
+              {/* SOULLAB Brand */}
               <div className="flex items-center gap-3">
-                {/* Voice/Text Toggle - Clickable */}
-                <button
-                  onClick={() => setShowChatInterface(!showChatInterface)}
-                  className="px-3 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all"
-                >
-                  <span className="text-xs text-amber-300/90 font-light">
-                    {showChatInterface ? '💬 Text' : '🎤 Voice'}
-                  </span>
-                </button>
-
-                {/* Mode Selector: Dialogue / Patient / Scribe */}
-                <div className="flex items-center gap-1 bg-black/20 rounded-lg p-0.5">
-                  <button
-                    onClick={() => setMaiaMode('normal')}
-                    className={`px-2 py-1 rounded text-xs font-light transition-all ${
-                      maiaMode === 'normal'
-                        ? 'bg-amber-500/30 text-amber-200'
-                        : 'text-amber-400/60 hover:text-amber-300/80'
-                    }`}
-                  >
-                    Dialogue
-                  </button>
-                  <button
-                    onClick={() => setMaiaMode('patient')}
-                    className={`px-2 py-1 rounded text-xs font-light transition-all ${
-                      maiaMode === 'patient'
-                        ? 'bg-purple-500/30 text-purple-200'
-                        : 'text-amber-400/60 hover:text-amber-300/80'
-                    }`}
-                  >
-                    Patient
-                  </button>
-                  <button
-                    onClick={() => setMaiaMode('session')}
-                    className={`px-2 py-1 rounded text-xs font-light transition-all ${
-                      maiaMode === 'session'
-                        ? 'bg-blue-500/30 text-blue-200'
-                        : 'text-amber-400/60 hover:text-amber-300/80'
-                    }`}
-                  >
-                    Scribe
-                  </button>
+                <div className="text-xl font-bold bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 bg-clip-text text-transparent tracking-wider">
+                  SOULLAB
+                </div>
+                <div className="w-px h-6 bg-amber-800/40"></div>
+                <div className="text-xs text-amber-600/80 font-medium tracking-widest uppercase">
+                  MAIA ORACLE
                 </div>
               </div>
 
-              {/* Right: Sign Out + Session Container buttons */}
+              {/* Central Controls */}
               <div className="flex items-center gap-2">
-                {/* Sign Out Button */}
                 <motion.button
-                  onClick={handleSignOut}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg
-                           bg-red-500/10 hover:bg-red-500/20
-                           border border-red-500/20 hover:border-red-500/40
-                           text-red-400 text-xs font-light transition-all"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  title="Sign Out"
+                  className={`px-4 py-2 rounded-lg font-medium text-xs uppercase tracking-wide transition-all duration-300 backdrop-blur-sm border ${
+                    showChatInterface
+                      ? 'bg-gradient-to-r from-emerald-600/80 to-emerald-700/80 border-emerald-500/40 text-emerald-100 shadow-lg shadow-emerald-900/50'
+                      : 'bg-gradient-to-r from-blue-600/80 to-blue-700/80 border-blue-500/40 text-blue-100 shadow-lg shadow-blue-900/50'
+                  }`}
+                  onMouseDown={() => {
+                    setShowChatInterface(!showChatInterface);
+                  }}
                 >
-                  <LogOut className="w-4 h-4" />
-                  <span className="hidden sm:inline">Sign Out</span>
+                  <Volume2 className="w-3 h-3 inline mr-1" />
+                  {showChatInterface ? 'TEXT' : 'VOICE'}
                 </motion.button>
-                {!hasActiveSession ? (
-                  <motion.button
-                    onClick={() => setShowSessionSelector(true)}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg
-                             bg-[#D4B896]/10 hover:bg-[#D4B896]/20
-                             border border-[#D4B896]/20 hover:border-[#D4B896]/40
-                             text-[#D4B896] text-xs font-light transition-all"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Clock className="w-4 h-4" />
-                    <span className="hidden sm:inline">Start Session</span>
-                  </motion.button>
-                ) : (
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg
-                               bg-green-500/10 border border-green-500/30 text-green-400 text-xs">
-                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                    <span className="hidden sm:inline">Session Active</span>
-                  </div>
-                )}
+
+                <div className="w-px h-6 bg-amber-800/30"></div>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`px-4 py-2 rounded-lg font-medium text-xs uppercase tracking-wide transition-all duration-300 backdrop-blur-sm border ${
+                    maiaMode === 'normal'
+                      ? 'bg-gradient-to-r from-amber-600/90 to-amber-700/90 border-amber-500/50 text-amber-100 shadow-lg shadow-amber-900/50'
+                      : 'bg-gradient-to-r from-stone-700/60 to-stone-800/60 border-stone-600/30 text-stone-300 hover:border-amber-600/40 hover:text-amber-200'
+                  }`}
+                  onMouseDown={() => {
+                    setMaiaMode('normal');
+                  }}
+                >
+                  <Sparkles className="w-3 h-3 inline mr-1" />
+                  DIALOGUE
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`px-4 py-2 rounded-lg font-medium text-xs uppercase tracking-wide transition-all duration-300 backdrop-blur-sm border ${
+                    maiaMode === 'patient'
+                      ? 'bg-gradient-to-r from-purple-600/90 to-purple-700/90 border-purple-500/50 text-purple-100 shadow-lg shadow-purple-900/50'
+                      : 'bg-gradient-to-r from-stone-700/60 to-stone-800/60 border-stone-600/30 text-stone-300 hover:border-purple-600/40 hover:text-purple-200'
+                  }`}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Navigating to Kairos for patient mode');
+                    router.push('/kairos');
+                  }}
+                >
+                  <Brain className="w-3 h-3 inline mr-1" />
+                  PATIENT
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`px-4 py-2 rounded-lg font-medium text-xs uppercase tracking-wide transition-all duration-300 backdrop-blur-sm border ${
+                    maiaMode === 'session'
+                      ? 'bg-gradient-to-r from-teal-600/90 to-teal-700/90 border-teal-500/50 text-teal-100 shadow-lg shadow-teal-900/50'
+                      : 'bg-gradient-to-r from-stone-700/60 to-stone-800/60 border-stone-600/30 text-stone-300 hover:border-teal-600/40 hover:text-teal-200'
+                  }`}
+                  onMouseDown={() => {
+                    setMaiaMode('session');
+                    setShowSessionSelector(true);
+                  }}
+                >
+                  <Clock className="w-3 h-3 inline mr-1" />
+                  SCRIBE
+                </motion.button>
+              </div>
+
+              {/* Right Actions */}
+              <div className="flex items-center gap-2">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 py-2 rounded-lg font-medium text-xs uppercase tracking-wide transition-all duration-300 backdrop-blur-sm border bg-gradient-to-r from-rose-700/80 to-rose-800/80 border-rose-600/40 text-rose-100 hover:from-rose-600/80 hover:to-rose-700/80 shadow-lg shadow-rose-900/50"
+                  onMouseDown={() => {
+                    handleSignOut();
+                  }}
+                >
+                  <LogOut className="w-3 h-3 inline mr-1" />
+                  SIGN OUT
+                </motion.button>
               </div>
             </div>
           </div>
