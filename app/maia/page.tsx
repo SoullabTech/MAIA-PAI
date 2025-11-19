@@ -256,29 +256,6 @@ export default function MAIAPage() {
         {/* DirectionalHints removed - keyboard shortcuts now active (arrow keys + ESC) */}
 
         <div className="h-screen relative overflow-hidden bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 flex flex-col">
-        {/* Atmospheric Particles - Floating dust/sand */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-          {[...Array(30)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-[#D4B896]/20 rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0.2, 0.5, 0.2],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 4,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            />
-          ))}
-        </div>
 
         {/* Atmospheric Glow - Warm light from below */}
         <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-[#3d2817]/30 via-transparent to-transparent pointer-events-none z-0" />
@@ -416,7 +393,6 @@ export default function MAIAPage() {
                 ) : (
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg
                                bg-green-500/10 border border-green-500/30 text-green-400 text-xs">
-                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                     <span className="hidden sm:inline">Session Active</span>
                   </div>
                 )}
