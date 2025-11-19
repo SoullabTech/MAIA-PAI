@@ -1,0 +1,155 @@
+This is a point noted by several other scholars involved in the secularization
+debate. For example, Martin notes that “[s]ociology itself emerged as part of
+the process of secularization”, that secularization in turn can be seen as a guid-
+ing paradigm of the discipline, and that “[p]erhaps it [secularization theory]
+could be criticized as an ideological and philosophical imposition on history
+rather than an inference from history”.34 Similarly, Casanova concludes that
+“[w]e need to entertain seriously the proposition that secularization became
+a self-fulfilling prophecy in Europe” when enough people “accepted the basic
+premises of the theory of secularization”.35 In accordance with this, Bruce’s
+claim that the motivations of specific scholars are inconsequential36 cannot
+be accepted outright. As should be evident by this point, historiography (and
+other scholarly activities such as sociological analysis) is always subject to the
+bias of the researcher/interpreter. There is no truly objective analysis and the
+scholar always chooses his limited material from a much larger body of poten-
+tial data.37 Quantitative data, as used in much sociological research, is par-
+ticularly precarious in this regard, as it builds on simplified categories from
+the start and thus does not take into account the inherent contradictions and
+uncertainties of human communication. Further, secularization theory and
+the secularist discourses it is bound to are problematic in their very concep-
+tion and description of “religion”. First, as made clear already, the focus is on
+conventional religious institutions and their theological understandings. This
+means that the actual lived religion and interpretations of others than reli-
+gious professionals are accorded a secondary role. Second, and connected to
+the issue of theological understandings, on the individual level the focus is
+on “beliefs”. Beliefs are simply not measurable. What is measurable are claims
+and statements concerning beliefs. This might seem a petty matter, but the
+implications are quite real. First, “belief ” is a central factor in Christianity in
+ways that it simply is not in many other religions, and even in Christianity
+the primacy of belief could be claimed to be an issue of theological discourse.
+Orthopraxy would seem to be more common than orthodoxy in most reli-
+gions.38 Thus, measuring people’s relation to beliefs targets Christianity specif-
+ically, rather than religion and religiosity in general. If people’s understanding
+of religion is changing, then going by “old-school” approaches will not yield
+satisfactory results. People will respond to questionnaires according to domi-
+nant discourses, and including terms such as “belief ”, “God” and even “reli-
+gion” will not do if discourses on religion themselves are changing.
+
+
+
+ 34.   Martin, On Secularization, 17, 19.
+ 35.   Casanova, “Religion, European Secular Identities, and European Integration”, 84.
+ 36.   See Bruce, Religion in the Modern World, 52.
+ 37.   Von Stuckrad, Locations of Knowledge in Medieval and Early Modern Europe, 198–200.
+ 38.   This again demonstrates the theological bias in “old-school” approaches to religious stud-
+       ies. On this point, see Turner, “Religion in a Post-Secular Society”, 658.
+
+
+                                                                                            315
+kennet granholm
+
+
+
+THE POST-SECULAR
+
+“Post-secular” is fast becoming a key concept in the sociological study of reli-
+gion. Just as with the concept of secularization – and possibly even more
+so – there are many different ways in which the term is understood. This is
+unfortunately compounded by the vague and unreflected use which is com-
+mon, and there is thus a risk that “post-secular” will amount to little more
+than a new trend word with little actual theoretical content, much as was the
+case with the term “postmodern” in the 1980s and 1990s. There is in any case
+considerable need, as well as possibility, to develop and refine the concept.39
+   Tracing the origin and popularization of the term “post-secular” itself is
+made easy by using Google’s new “Ngram Viewer”, a database search engine
+that makes it possible to do keyword searches in a huge corpus of digitized
+books.40 The graph drawn by the program clearly shows that there are no
+occurrences of the word until the early 1950s, and only occasional occurrences
+then and around 1970 and 1980.41 Occurrences increase slowly in the 1990s,
+to go to a drastic upwards climb from 2005 onwards. This would appear to
+confirm Justin Beaumont’s comments on 2007 as the year when discussion of
+the post-secular entered the social scientific mainstream. He explicitly men-
+tions the publication of Charles Taylor’s A Secular Age, a collection of arti-
+cles dealing with “European postsecularism” in the online journal Eurozine,42
+and a special report on religion and public life published in The Economist.43
+Since then the academic discussion on the theme has intensified, evident in
+collected volumes such as Exploring the Postsecular.44
+   While the term post-secular saw some prior use in philosophy of religion
+and theology,45 two thinkers in particular are regarded as the main inspiration
+
+
+ 39. Cf. Moberg & Granholm, “The Concept of the Post-Secular”.
+ 40. See http://ngrams.googlelabs.com. A search on “postsecular” and “Postsecular”, between
+     the years 1900 and 2008 in the English-language corpus was done on 2 March 2011. The
+     “post-secular/Post-secular” form was not included because Ngram searches do not accept
+     hyphens. Of course, it should be noted that searches in the Ngram Viewer may not be per-
+     fectly reliable.
+ 41. One of the first occurrences of “postsecular” would seem to be in 1956 in Jean Pierre
+     Barricelli’s Dodecahedron: Collected Poems. The earliest scholarly occurrence would seem
+     to be in Martin E. Marty’s The New Shape of American Religion from 1959.
+ 42. Articles published in the journal from the mid-2000s dealing with “post-secular themes”
+     include Reemtsma, “Must We Respect Religiosity?” (2005); Hervieu-Léger, “The Role of
+     Religion in Establishing Social Cohesion” (2006); Eder & Bosetti, “Post-Secularism” (2006);
+     Habermas, “Die Dialektik der Säkularisierung” (2008). The journal also has a “focal point”
+     collection of articles dealing with the subject (see Eurozine, “Post-Secular Europe?”).
+ 43. Beaumont, “Transcending the Particular in Postsecular Cities”, 5.
+ 44. Molendijk et al., Exploring the Postsecular. It should be noted, however, that Exploring the
+     Postsecular is still one of the few volumes explicitly dedicated to the subject.
+ 45. E.g. Blond, Post-Secular Philosophy. For later works see e.g. Joas, Do We Need Religion?;
+     Smith & Whistler, After the Postsecular and the Postmodern.
+
+
+316
+                  the secular, the post - secular and the esoteric in the public sphere
+
+
+
+in social philosophy and the social sciences: Jürgen Habermas and Charles
+Taylor.46 The inclusion of Taylor may seem odd considering that in his work
+most often referred to in this context, the nearly 900-page long A Secular Age,
+the term post-secular occurs only once. Concerning the post-secular, Taylor
+writes:
+
+      I use this term not as designating an age in which the declines in
+      belief and practice of the last century would have been reversed,
+      because this doesn’t seem likely, at least for the moment; I rather
+      mean a time in which the hegemony of the mainstream master
+      narrative of secularization will be more and more challenged. This
+      I think is now happening.47
+
+While this fits well with my own understanding of the term, I would be hard
+pressed to call Taylor a theoretician of the term post-secular itself. His inclu-
+sion is understandable, though, as he accords religion an important role in
+secular society. He could thus be termed a post-secular thinker.
+   Whereas Taylor’s inclusion into the fold of theoreticians of the post-­
+secular is dubious, there can be no question of Habermas’s significance. For
+Habermas, a society being post-secular refers to “a change in consciousness” in
+relation to religion within it.48 This change is due mainly to three reasons: the
+role religion plays in global conflicts, which essentially “undermines the secu-
+laristic belief in the foreseeable disappearance of religion and robs the secular
+understanding of the world of any triumphal zest”; the growing influence of
+religion in national public spheres, as religious actors continue to influence
+public opinion and participate in public debate; and the “pluralism of ways
+of life” introduced by increasing immigration from non-European localities.49
+A post-secular society is essentially a secularized one, but with an awareness
+that it “has to ‘adjust itself to the continued existence of religious communi-
+ties in an increasingly secularized environment’”.50 Habermas also limits the
+discussion to “the affluent countries of Europe or countries such as Canada,
+Australia and New Zealand”, while explicitly leaving out the US as it has not
+experienced the same, earlier, lapse in religiosity.51
+   Commenting on Habermas’s work, Austin Harrington notes that the post-
+secular does not really deal with religion “returned to a position of renewed
+
+
+ 46. See Molendijk et al., “Preface”, ix. José Casanova is mentioned along with Habermas and
+     Taylor.
+ 47. Taylor, A Secular Age, 534–5.
+ 48. Habermas, “Notes on Post-Secular Society”, 20.
+ 49. Ibid., 20.
+ 50. Ibid., 21, 19.
+ 51. Ibid., 17. Leaving out the US is criticized by Dillon in “Can Post-Secular Society Tolerate
+     Religious Differences?”, 142.
+
+
+                                                                                           317
+kennet granholm

@@ -1,0 +1,157 @@
+Traditionally, this milieu was “located” in informal networks and flows that
+were in place long before the Internet, especially via books and periodicals,
+but also more broadly disseminated through suggested reading lists of occult
+groups, word-of-mouth and bulletin boards in occult shops, seminars, con-
+certs and fairs, and classified ads in magazines and newspapers. So, in a sense,
+the cultic milieu has always been mediatized and thus “deterritorialized”.4
+What the Internet offers is a new access point. Thus, the virtual realm has a
+potential to reterritorialize research aiming at “thick description”, just as it has
+affected the development of and recruitment to decentralized religious move-
+ments by providing new gateways.5
+   Turning to new types of material, the actual propagation of places of
+“online-religion” (new interactive environments) and tools of “religion-online”
+(traditional top-down communication) has to be seen in relation to specific
+offline interests, rhetorics of tradition, authority and legitimacy, and the real
+or imagined fears of pollution and dilution.6 This is a sound approach, and
+not new. What is new are the hybrid texts we find online, situated between
+text and speech, displaying interpretative practices which on the one hand
+construct a meaningful social order and on the other are conditioned by the
+same order – ideally in the form of “virtual ­community”. As the speech situ-
+ation is embedded in these sources in a unique way through the medium, it
+should be possible to see the negotiations, conflicts and tactics that encircle
+any text concretely expressed in these texts. In order to assess such commu-
+nity and authority building in a virtual environment, I will argue for a dis-
+cursive approach as a conduit between the traditional methodologies of the
+
+
+
+      Hammer, Claiming Knowledge; Hanegraaff, New Age Religion and Western Culture;
+      Jorgensen, The Esoteric Scene; Partridge, The Re-enchantment of the West, vol. 1.
+   4. This understanding of “territory” is anthropological and tied to issues of “glocalization”;
+      see Appadurai, Modernity at Large; Lyon, Jesus in Disneyland. On market models and
+      commodity networks, see e.g. Ezzy, “The Commodification of Witchcraft”; Ezzy, “White
+      Witches and Black Magic”; Heelas, Spiritualities of Life; Redden, “The New Age”. On the
+      importance of books, journals, and the media, see e.g. Aloi, “Rooted in the Occult Revival”;
+      Ezzy, “New Age Witchcraft?”. On older “networks” of books, see Owen Davies, Grimoires,
+      chapters 5–8.
+   5. Much has been done on cyber-paganism, see e.g. Cowan, Cyberhenge; Ezzy, “The Com­
+      modification of Witchcraft”. On the “technopagan” avant-garde, see e.g. Hadden & Cowan,
+      “Virtually Religious”; Erik Davis, Techgnosis, especially 190–225.
+   6. For a good summary of the state of affairs in researching these matters, see Dawson,
+      “Religion and the Internet”. The very useful distinction between “online-religion” and
+      “religion-online” is proposed in Helland, “Online-Religion/Religion-Online and Virtual
+      Communitas”; Helland, “Surfing for Salvation”. For recent studies with special relevance
+      to Religious Studies, I suggest Heidi Campbell, Exploring Religious Community Online;
+      Dawson & Cowan, Religion Online; Højsgaard & Warburg, Religion and Cyberspace; and
+      Karaflogka, E-religion.
+
+
+
+                                                                                             135
+jesper aagaard petersen
+
+
+
+history of religions and the various methodologies of “cyber-anthropology”.7
+This alternative should facilitate virtual fieldwork by softening the textual bias
+of historiography and the actor bias of participant observation.
+
+
+NEW CONTEXTS, NEW BOUNDARIES: CHARTING THE SATANIC MILIEU
+
+A standard web search for “Satan”, “Satanic” and “Satanism” produce hits in
+the millions, offering anything from Satan’s Cheerleaders to film clips outing
+President Obama’s “satanic agenda”. Broadly speaking, there are two main dis-
+courses on the satanic today, both of which can be located online. On the one
+hand, we have the various cultural narratives on Satan and Satanism, which
+form part of the “occultural” landscape of Western societies and are recycled
+in popular culture by moral entrepreneurs such as media commentators, con-
+spiracy bloggers and cult watch groups, and occasionally by adolescents and
+provocateurs.8 On the other hand, there are the satanic discourses among self-
+declared Satanists within a “satanic milieu”, appropriating the figure of Satan
+into identity work.9 This is a discursive subgroup within the cultic milieu com-
+prised of self-identified satanic “belief systems and their associated practices”,
+and includes “the collectivities, institutions, individuals, and media of com-
+munication associated with these beliefs”.10 It is the basic constituency and
+character of this milieu that is our first concern.
+   Rising out of the cultic milieu of 1960s California, Anton LaVey established
+the Church of Satan in 1966. In the “golden age” from 1966 to 1972, the High
+Priest and his church enjoyed a strong media presence, fully in tune with the
+general upsurge of interest in the occult and witchcraft, which stimulated the
+condensation of an autonomous satanic milieu out of the heterodox discourses
+at the time.11 However, as illustrated by even a ­cursory reading of biographic
+material, the church was never alone.12 As the Internet opened the floodgates
+in the 1990s, the quantity and visibility of material produced and distributed
+by alternatives to the Church of Satan underwent a drastic surge, transforming
+the satanic milieu itself into a more polyvocal entity through feedback loops.
+
+
+   7. As a young discipline, nomenclature is still under negotiation (cyber-anthropology, web-
+      nography, netnography, virtual ethnography); a good overview, with an extensive bibliogra-
+      phy, is provided by Markham & Baym, Internet Inquiry.
+   8. Petersen, “The Seeds of Satan”, 92. Cf. Partridge, The Re-enchantment of the West, vol. 2,
+      207–55; Petersen, “Smite Him Hip and Thigh”.
+   9. Petersen, “Introduction”, 3–6; Petersen, “The Seeds of Satan”, 92–3.
+ 10. Colin Campbell, “The Cult”, 122. I understand “belief ” as a dynamic, practised concept
+      rather than static substance; Petersen, “Introduction”, 3.
+ 11. Petersen, “Satanists and Nuts”; Petersen, “The Seeds of Satan”, 94–101. Cf. Barton, The
+      Church of Satan.
+ 12. For examples, see Aquino, The Church of Satan; Baddeley, Lucifer Rising, 100–113; Barton,
+      The Church of Satan, chapters 2 and 4; Mathews, Modern Satanism, chapter 5.
+
+
+136
+                                                                                from book to bit
+
+
+
+   In consequence, Satanism has become both a global deterritorialized phe-
+nomenon and reterritorialized in local contexts outside the United States and
+LaVey’s original church. First of all, clashes over the definition of Satanism
+itself have produced numerous small networks, communities, and organiza-
+tions, first through email discussion groups and Usenet (e.g. alt.satanism), and
+later through community groups (such as Yahoo and Google) and social net-
+work sites (especially Myspace and Facebook). Many have a website of their
+own and participate in the frequent “flame wars” that are so prevalent online.
+Second, even though LaVey’s Satanic Bible (1969) has stayed atop the status
+pile, it now has serious competition from Internet-based material and material
+promoted through the Web.13
+   To take the second issue first, the print-on-demand site Lulu.com offers a
+variety of Satanic material, such as Michael Ford’s Luciferian Witchcraft and
+Tsirk Susej’s The Demonic Bible, alongside Church of Satan-“approved” essay
+collections like James D. Sass’s Essays in Satanism. Books can of course also
+be bought through Amazon or independent publishers such as Stephen E.
+Flowers’s Rûna Raven. In the same vein, Michael Aquino’s massive e-books on
+the Church of Satan and the Temple of Set can be downloaded for free from
+the Temple website.14 Finally, some websites actually function as archives with
+material of both introductory and advanced nature, superseding any engage-
+ment with printed books.15
+   The uneasy connections between these examples point to the difficulty of
+establishing the boundaries of the satanic milieu and satanic discourse from
+both an insider and outsider perspective. Subjects such as witchcraft, demon-
+ology and Chaos Magick are discussed by many of these writers, and both
+Diane Vera and Joy of Satan link to a variety of neopagan, esoteric, and occult
+websites. In contrast, the Church of Satan’s disdain towards devil worshippers,
+neopagans and occultists is widely documented, even though LaVey frequently
+borrowed from them all.16 Thus the discourse of individual Satanists and even
+
+
+ 13. See Lewis, “Infernal Legitimacy”, 42, 44. Studies focusing on “cyber-Satanism” have been
+     few, arguably beginning with Roald E. Kristiansen’s now dated “Satan in Cyberspace”
+     (1995, updated 2001). Important sociological work has been done by James R. Lewis, espe-
+     cially on the basic demographics of Satanism today (e.g. “Who serves Satan?”, “Infernal
+     Legitimacy”, “Fit for the Devil”). Finally, there are a handful of local case studies making use
+     of Internet material and shorter, exploratory essays on Internet-Satanism, usually based on
+     a period of “surfing” and snowball-sampling sites, texts and images (e.g. Alisauskiene, “The
+     Peculiarities of Lithuanian Satanism”; Dyrendal, “Devilish Consumption”; Petersen, “Binary
+     Satanism”; Petersen, “The Seeds of Satan”; Ringvee, “Satanism in Estonia”; Sieg, “Angular
+     Momentum”; Smoczynski, “Cyber-Satanism and Imagined Satanism”).
+ 14. See ToS, “Temple of Set”.
+ 15. See e.g. JoS, “Joy of Satan”; Crabtree, “The Descriptions, Philosophies and Justification of
+     Satanism”; Vera, “Theistic Satanism”.
+ 16. Cf. Petersen, “Satanists and Nuts”, 226–32; Petersen, “‘We Demand Bedrock Knowledge’”;
+     Petersen, “The Seeds of Satan”. Cf. Chapter 4 of the present volume.
+
+
+                                                                                                137
+jesper aagaard petersen

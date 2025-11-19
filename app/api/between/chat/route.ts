@@ -26,6 +26,7 @@ import { getMAIASelfAnamnesis, loadMAIAEssence, saveMAIAEssence } from '@/lib/co
 import { searchWithResonance, type FieldReport } from '@/lib/consciousness/ResonanceField';
 import { claudeQueue } from '@/lib/api/claude-queue';
 import { usageTracker } from '@/lib/middleware/usage-tracker';
+import { getPromptForConversationStyle } from '@/lib/prompts/maya-prompts'; // 🏥 SCRIBE SUPERVISOR: Import supervisory prompts
 
 /**
  * POST /api/between/chat
@@ -52,6 +53,7 @@ export async function POST(request: NextRequest) {
     const isVoiceMode = body.isVoiceMode || false; // Voice mode = faster Essential tier
     const fieldState = body.fieldState || { depth: 0.7, active: true };
     const sessionTimeContext = body.sessionTimeContext; // { elapsedMinutes, remainingMinutes, totalMinutes, phase, systemPromptContext }
+    const conversationStyle = body.conversationStyle || 'walking'; // 🏥 SCRIBE SUPERVISOR: conversation mode (walking/classic/adaptive/her/scribe)
 
     // Map Oracle conversationHistory format to THE BETWEEN format
     // Oracle: [{ role: 'user'|'assistant', content: string }]
@@ -68,6 +70,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`🌀 [THE BETWEEN] Processing message from ${userId}`);
     console.log(`   Field depth: ${fieldState.depth}`);
+    console.log(`   Conversation style: ${conversationStyle}${conversationStyle === 'scribe' ? ' 🏥 [SUPERVISOR MODE]' : ''}`);
     if (sessionTimeContext) {
       console.log(`⏰ [SESSION TIME] ${sessionTimeContext.elapsedMinutes}/${sessionTimeContext.totalMinutes} min (${sessionTimeContext.phase})`);
     }
@@ -224,6 +227,7 @@ export async function POST(request: NextRequest) {
         userId,
         isVoiceMode,
         conversationHistory,
+        conversationStyle, // 🏥 SCRIBE SUPERVISOR: Pass conversation style for prompt selection
         recalibrationEvent,
         spiralDynamics,
         sessionThread,
@@ -252,6 +256,7 @@ export async function POST(request: NextRequest) {
       userId,
       isVoiceMode,
       conversationHistory,
+      conversationStyle, // 🏥 SCRIBE SUPERVISOR: Pass conversation style for prompt selection
       recalibrationEvent,
       spiralDynamics,
       sessionThread,
@@ -479,6 +484,7 @@ async function generateMAIAResponse({
   userId,
   isVoiceMode,
   conversationHistory,
+  conversationStyle,
   recalibrationEvent,
   spiralDynamics,
   sessionThread,
@@ -493,6 +499,7 @@ async function generateMAIAResponse({
   userId: string;
   isVoiceMode: boolean;
   conversationHistory: any[];
+  conversationStyle: string; // 🏥 SCRIBE SUPERVISOR: conversation mode (walking/classic/adaptive/her/scribe)
   recalibrationEvent: any;
   spiralDynamics: any;
   sessionThread: any;
@@ -513,7 +520,8 @@ async function generateMAIAResponse({
     lightweightMemory,
     maiaEssence,
     wisdomField,
-    sessionTimeContext
+    sessionTimeContext,
+    conversationStyle // 🏥 SCRIBE SUPERVISOR: conversation mode for prompt selection
   );
 
   // Build conversation messages
@@ -676,6 +684,7 @@ async function generateMAIAResponseStream({
   userId,
   isVoiceMode,
   conversationHistory,
+  conversationStyle,
   recalibrationEvent,
   spiralDynamics,
   sessionThread,
@@ -690,6 +699,7 @@ async function generateMAIAResponseStream({
   userId: string;
   isVoiceMode: boolean;
   conversationHistory: any[];
+  conversationStyle: string; // 🏥 SCRIBE SUPERVISOR: conversation mode for stream prompt selection
   recalibrationEvent: any;
   spiralDynamics: any;
   sessionThread: any;
@@ -710,7 +720,8 @@ async function generateMAIAResponseStream({
     lightweightMemory,
     maiaEssence,
     wisdomField,
-    sessionTimeContext
+    sessionTimeContext,
+    conversationStyle // 🏥 SCRIBE SUPERVISOR: conversation mode for stream prompt selection
   );
 
   // Prepare messages (same as non-streaming)
@@ -860,7 +871,8 @@ function buildBetweenSystemPrompt(
   lightweightMemory: LightweightMemoryContext,
   maiaEssence?: any,
   wisdomField?: FieldReport | null,
-  sessionTimeContext?: any
+  sessionTimeContext?: any,
+  conversationStyle?: string // 🏥 SCRIBE SUPERVISOR: conversation mode (walking/classic/adaptive/her/scribe)
 ): string {
 
   // Generate field guidance if resonance detected
@@ -882,6 +894,47 @@ function buildBetweenSystemPrompt(
 
   // Generate temporal awareness context (session time container)
   const temporalContext = sessionTimeContext?.systemPromptContext || '';
+
+  // 🏥 SCRIBE SUPERVISOR: Use supervisory prompt when in SCRIBE mode
+  if (conversationStyle === 'scribe') {
+    const supervisoryPrompt = getPromptForConversationStyle('scribe');
+    console.log(`🏥 [SUPERVISOR] Activating SCRIBE supervisory prompt`);
+
+    // Integrate supervisory prompt with field context
+    return `${supervisoryPrompt}
+
+${memoryPrompt}
+
+${temporalContext ? `
+═══════════════════════════════════════════════════════════════
+${temporalContext}
+═══════════════════════════════════════════════════════════════
+` : ''}
+
+═══════════════════════════════════════════════════════════════
+THE FIELD (current session state)
+═══════════════════════════════════════════════════════════════
+
+Depth: ${fieldState.depth}
+Quality: ${fieldState.quality || 'present'}
+${recalibrationEvent ? `Recalibration: ${recalibrationEvent.type} - witness this threshold, hold space for emergence` : ''}
+
+${spiralDynamics.currentStage ? `
+PROCESS AWARENESS:
+${spiralDynamics.dynamics}
+Human experience: "${spiralDynamics.humanExperience}"
+` : ''}
+
+${fieldGuidance ? `
+═══════════════════════════════════════════════════════════════
+FIELD GUIDANCE (archetypal resonance)
+═══════════════════════════════════════════════════════════════
+
+${fieldGuidance}
+` : ''}
+
+${wisdomPrompt}`;
+  }
 
   const basePrompt = `KNOW THYSELF
 

@@ -1,0 +1,95 @@
+Nagarjuna’s Reasoning
+Scholars are across the board on the relation of Nagarjuna’s arguments to
+logic—he is seen as doing everything from not understanding logic to
+denying logic altogether to advancing a new three-valued logic. Was he
+“obviously and profoundly distrustful of logic” (Huntington 2007: 111)?
+Did he reject the law of the excluded middle (Staal 1975: 39)? Did not his
+denial of one position logically commit Nagarjuna to holding the opposite
+position (which he also denies)? Did he “use logic to destroy logic”? Was
+he simply inconsistent or irrational—e.g., both affirming and denying the
+existence of entities, or claiming that what is dependently arisen cannot
+arise, or contradicting himself by resorting to a view to destroy all views?
+But the antirationalist position does not survive an examination of
+Nagarjuna’s works and the total context of each of his remarks. Nor is there
+anything in any of his works that suggests that he relegated rationality to the
+conventional level of truths or introduced a new multivalued logic. In fact,
+it appears from the structure of his arguments that he did not violate any of
+the basic laws of logic, nor was he in any other way irrational. In effect, in a
+reversal of what Parmenides used logic to do, Nagarjuna used reason to
+show that permanence is impossible and that all is changing, and he did so
+in an eminently rational way, including implicitly relying on both the law of
+the excluded middle and the law of noncontradiction.
+      Like most traditional people but unlike modern Western philosophers,
+Nagarjuna spoke of a conflict of properties, not statements—i.e., he said
+that something cannot be or have properties x and not-x or that x and not-x
+cannot be in the same place at the same time, not anything about the
+relation of statements. His focus was on the world, not the logic of
+statements. Many of Nagarjuna’s arguments proceed on the basis that x and
+not-x are mutually exclusive and that there is no third possibility. For
+example, he used the law of the noncontradiction in Mula-madhyamaka-
+karikas (“MK”) 8.7: “ ‘Real’ and ‘unreal’ are opposed to each other—how
+could they exist together simultaneously?” (see also MK 7.30, 21.3, 25.17,
+25.25–27). An entity (bhava) and its absence (abhava) cannot exist together
+(MK 25.14). So too, he utilizes the law of the excluded middle: “A mover is
+not stationary, just as a nonmover is not stationary. And other than a mover
+or a nonmover, what third possibility is stationary?” (MK 2.15; see also MK
+1.4, 2.8, 3.6, 4.6, 6.10, 8.1, 21.14).26 Indeed, Nagarjuna’s basic method of
+arguing fails if the contrast between x and not-x is not exclusive and
+exhaustive since his conclusion of emptiness (shunyata) as the only
+alternative to a world of self-existence (svabhava) would then not follow.
+So too, if Nagarjuna accepted that contradictions could state a truth, as Jay
+Garfield and Graham Priest (2003) contend, then again his argument would
+fail since the contradictions again would not be grounds to accept
+emptiness. That is, the only way Nagarjuna gets to emptiness is to eliminate
+self-existence, since he rejects advancing any independent positive
+arguments for emptiness, and so he has to remove all logical possibilities
+for self-existence—if a contradiction concerning self-existence affirms a
+truth, his arguments collapse.
+      Nagarjuna also employed the simplest form of an inference,
+recognized in the West as modus ponens (e.g., MK 19.6):
+
+     (1) If A, then B;
+     (2) A;
+     (3) Therefore, B.
+
+He also used the more complex modus tollens (e.g., MK 24.24, 27.7):
+
+     (1) If A, then B;
+     (2) Not B;
+     (3) Therefore, not A.
+
+For example, if (A) there were self-existence, then (B) there would be no
+change (since change of any kind is impossible for what is self-existent and
+thus permanent); but (not B) we see change; and so, (not A) there is no self-
+existence. Such reasoning is a staple of Western philosophy and logic.
+      But Richard Robinson thought that Nagarjuna violated one law of
+logic (1957: 297). Verse 13.7 of the Karikas reads: “If there were anything
+at all that is not empty, then there would be found something we can call
+‘empty.’ However, there is found nothing that is nonempty—how then can
+there be the ‘empty’?” This and other verses of the same form (MK 10.7,
+7.17) can be interpreted as violating the law of contraposition or the fallacy
+of the antecedent. It has this logical form:
+
+     (1) If A, then B;
+     (2) Not A;
+     (3) Therefore, not B.
+
+It has the same logical form as “If it is sunny today, it is not raining; it is not
+sunny today; therefore, it must be raining.” Obviously this is wrong—it can
+be cloudy but not raining. However, Nagarjuna’s verse can also be given a
+reading that does not violate logic: only something real (i.e., self-existent)
+exists and thus could in principle be empty; and since there is in fact
+nothing self-existent, there is no reality that could be empty. That is, the
+first line states a necessary requirement: for something to be empty, it must
+first be real—otherwise, there is nothing existent to be empty. Hence,
+premise (1) would read: “Only if A, then B.” (Sanskrit does not have a form
+to distinguish “if” from “only if.”) The conclusion then does logically
+follow: “If A is necessary for B, and there is no A, then there can be no B.”
+If so, the verse does not have the fallacious type of inference and does not
+violate any law of reasoning. In fact, it is a very rational approach.
+     Nagarjuna also used another form of inference to make a point (MK
+4.4, 13.4, 15.9, 20.1–2, 20.21, 21.9, 25.1–2, 27.21, 27.23–24).27 The form
+is:
+
+     (1) If A, then not B.
+     (2) If not-A, then not-B.

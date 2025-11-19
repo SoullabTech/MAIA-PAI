@@ -97,10 +97,22 @@ export class StreamingAudioQueue {
         this.playNext(); // Continue to next chunk even on error
       };
 
-      // Start playback
+      // Enhanced playback with graceful permission handling
       item.audio.play().catch((error) => {
-        console.error('❌ [StreamingQueue] Play failed:', error);
         this.feedbackPrevention.unregisterAudioElement(item.audio);
+
+        // Handle different types of audio errors gracefully
+        if (error.name === 'NotAllowedError') {
+          console.log('🔕 [StreamingQueue] Audio blocked by browser - text mode active');
+          // Don't spam the console with repeated permission errors
+          // User can manually enable audio via UI controls
+        } else if (error.name === 'AbortError') {
+          console.log('🛑 [StreamingQueue] Audio playback interrupted');
+        } else {
+          console.error('❌ [StreamingQueue] Play failed:', error.name, error.message);
+        }
+
+        // Continue to next chunk - text is still displayed
         resolve();
         this.playNext();
       });

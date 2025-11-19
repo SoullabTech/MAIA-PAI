@@ -1,0 +1,139 @@
+In this article, I will investigate how Anton Szandor LaVey (1930–97), who
+founded the Church of Satan in 1966, constructed a Satanic tradition in his
+texts, and to what use he put it.1 James R. Lewis has discussed how Satanists
+in the Church of Satan, after LaVey’s death, make reference to tradition.2 In
+that context, tradition is basically understood as the teaching established by
+their founder. What I shall look at here, however, is rather how LaVey himself
+makes ambiguous references to a supposed pre-existing Satanic tradition. I
+will present an interpretation of this based on LaVey’s overall ontology, and his
+view of religious and esoteric phenomena.
+    In an esoteric context, tradition will typically be invoked to provide legiti-
+macy, and there are, as Olav Hammer has shown, several ingrained esoteri-
+cist strategies for doing this.3 Naturally, use of tradition as a means to create
+legitimacy is not the exclusive domain of esotericism or religion. Nations,
+universities, companies and so on use this strategy frequently. But several of
+LaVey’s strategies for employing tradition harken back to approaches preva-
+lent in Western esotericism, and are instantly recognizable to a scholar of such
+ideas. As will be shown, he both utilizes historical predecessors in a way that
+is common within Western esotericism in general, and breaks with this com-
+mon usage in a way similar to what we can observe among Chaos Magicians.4
+
+
+   1. Satanic tradition, rather than Satanist tradition, is the more common emic term, which I
+      shall also use here. For further discussion of themes similar to those treated in this chapter,
+      see Petersen, “‘We Demand Bedrock Knowledge’”; Petersen, “The Seeds of Satan”.
+   2. Lewis, Legitimating New Religions, 103–22.
+   3. Hammer, Claiming Knowledge. On the creation of legitimacy using tradition in a Satanist
+      group (the Denmark-based Neo-Luciferian Church), see Faxneld, “The Strange Case of Ben
+      Kadosh”, 13–21.
+   4. See Chapter 5 of the present volume.
+
+
+
+72
+                                                   secret lineages and de facto satanists
+
+
+
+   LaVey discarded much of the old esoteric and Satanic material as useless
+and outdated, but he still emerges as dependent on it to a fairly large extent.
+This applies not only in the general sense that no creed is of course created
+ex nihilo, but also because LaVey explicitly calls on tradition to legitimate
+and, more importantly, playfully create the right atmosphere for his Satanic
+activities. I shall argue in this article that legitimation is not, as perhaps would
+be expected, the prime function of tradition for LaVey. Rather, he seems to
+deem tradition most useful for bringing about certain psychological effects in
+a framework where one practises the “willing suspension of disbelief ” (to use
+the term coined by Coleridge) in a limited context.
+   I will focus almost exclusively on core movement texts, with some addi-
+tional data from an interview I recently conducted with the current High
+Priest of the Church of Satan, Peter H. Gilmore, and occasional references to
+material on the Church of Satan’s website. In order to get a more complete
+view of the theme discussed here, it would be necessary to also talk to a great
+number of Church of Satan members and study views concerning tradition
+expressed on various Satanist Internet forums. What is presented here should
+therefore be considered groundwork for such a larger study, which would
+also take more into account the enactment and actual use of tradition among
+Satanists.
+   The material for this article is primarily LaVey’s two main works, The Satanic
+Bible (1969) and The Satanic Rituals (1972), and to some extent his two collec-
+tions of essays The Devil’s Notebook (1992) and Satan Speaks! (1998). The two
+books The Secret Life of a Satanist: The Authorized Biography of Anton LaVey
+(1990) and The Church of Satan (1990), both by Blanche Barton, who would
+later give birth to LaVey’s son, will also be scrutinized to see how tradition is
+constructed. When it comes to some of LaVey’s works, the question of author-
+ship is not uncomplicated. As is well known, The Satanic Bible contains a pro-
+logue borrowed from Ragnar Redbeard.5 Michael Aquino wrote some sections
+in The Satanic Rituals, and it has been claimed that Diane Hegarty, LaVey’s
+partner from 1960 to 1985, also contributed to his early texts.6 For the present
+article, I shall leave these questions aside and treat all LaVey’s works as writ-
+ten solely by him. Most readers will approach them as stemming straight from
+his pen, and this is perhaps more important in the end. Further, even if others
+may have ­contributed, LaVey edited their contributions and fitted them into
+his framework, thus making the end result “his” in all relevant senses.7
+
+
+
+   5. Lewis, Legitimating New Religions, 112.
+   6. Aquino, The Church of Satan, 52, 691. Aquino’s history of the church is a treasure trove of
+      information, but must be read with awareness of his falling out with LaVey.
+   7. Concerning the composing of The Satanic Bible and LaVey’s use of passages by other
+      authors, see Gallagher, “Sources, Sects and Scripture”.
+
+
+
+                                                                                              73
+per faxneld
+
+
+
+HOW OLD IS SATANISM?
+
+Having specialized in the early history of Satanism, I often get the question
+“How old is Satanism?” It seems appropriate to begin a chapter about Satanism
+and tradition by briefly answering this query, as it provides a necessary back-
+ground for the main discussion. If we understand the question as pertaining to
+how long there has been an unbroken explicitly Satanic tradition, in the sense
+of a group of people adhering to a teaching of that type, the answer is quite
+simple: an enduring tradition of Satanism was initiated in 1966, when Anton
+LaVey founded the Church of Satan.
+    The answer can be problematized in various ways, of course. First off, defi-
+nitions of Satanism and tradition need to be considered. In this section of the
+article I will use a fairly broad definition of Satanism, where the term desig-
+nates any more systematic and sustained celebration of Satan, as a symbolical
+or actually existing figure.8 A tradition, in turn, is here understood to be a set
+of more or less distinct ideas kept continuously alive by persons over a period
+of time spanning at least several decades.9
+    Even if no one prior to 1966 inaugurated a tradition that remains in exist-
+ence to this day, there were people who nourished an intense sympathy for the
+Devil long before LaVey. As early as the late eighteenth century we can find
+purely literary Satanists, but their sympathy for the Devil seldom extended
+beyond occasional outbursts of lauding Lucifer in a text or two.10 One excep-
+tion is the Polish Decadent author Stanislaw Przybyszewski (1868–1927),
+who both openly referred to himself as a Satanist and developed a Satanic
+Weltanschauung through a series of works in different genres (novels, short
+stories, essays in history, art criticism). He could be said to be the first “proper”
+Satanist, as his literary exploration of such sympathies also resulted in a spe-
+cific and lasting view of the world with Satan as its root metaphor.11 In the
+context of Western esotericism, one of the first to express unequivocal praise
+of Satan was H. P. Blavatsky, cofounder and front figure of the Theosophical
+Society, in her magnum opus The Secret Doctrine (1888). If her system is con-
+sidered as a whole, however, these ideas are peripheral.12 The first person
+to build an entire esoteric system around Satan, though ­admittedly a rather
+
+
+   8. This is basically the same definition proposed in Faxneld, Mörkrets Apostlar, xiv–xvi.
+   9. But see the discussion by Asprem and Granholm in Chapter 2 of this volume.
+ 10. As Peter Schock has shown, the English Romantics often labelled the “Satanic School” –
+      Byron and Shelley – were a lot more equivocal in their praise of Satan than is sometimes
+      assumed (and this goes for William Blake as well). Their attitude to Lucifer shifted through-
+      out their careers, and they also employed him as a symbol of wickedness on numerous
+      occasions (Schock, Romantic Satanism).
+ 11. On Przybyszewski’s Satanism, see Faxneld, “Witches, Nihilist Anarchism and Social
+      Darwinism”; Faxneld, Mörkrets Apostlar, 140–49. The standard biography is Klim,
+      Stanislaw Przybyszewski.
+ 12. Faxneld, Mörkrets Apostlar, 108–17.
+
+
+74
+                                                  secret lineages and de facto satanists

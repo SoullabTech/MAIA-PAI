@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { SPIRALOGIC_FACETS, getFacetById } from '@/data/spiralogic-facets';
-import { MotionOrchestrator, MotionState, CoherenceShift } from '../motion/MotionOrchestrator';
+import { MotionOrchestrator, MotionState, CoherenceShift } from '../../../../components/motion/MotionOrchestrator';
 
 interface SacredHoloflowerProps {
   activeFacetId?: string;

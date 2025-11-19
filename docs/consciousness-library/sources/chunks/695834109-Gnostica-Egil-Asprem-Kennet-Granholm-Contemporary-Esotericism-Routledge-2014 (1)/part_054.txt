@@ -1,0 +1,164 @@
+Since its emergence, the Internet has been used for religious purposes. The
+Pew Internet and American Life report for 2001 states that a quarter of the
+Americans who had access to the Internet used it for religious purposes, often
+information searching, accessing religious material or connecting to others of
+the same faith.40 In a similar report in 2004 this number had increased to 64
+per cent.41 There can be no doubt that for many, the Internet is a place where
+religion is alive and flourishing. Indeed, as Lorne L. Dawson notes, “Religion of
+every kind, big and small, old and new, mainstream and more exotic, is present
+online, and in great abundance.”42 Not surprisingly, this includes those who
+practise esoteric religions. In fact, as Stef Aupers remarks, recent studies have
+found that neopagans are more active on the Internet than any other religious
+group.43 Yet, being so active on the Internet has its challenges. Coming from
+a relatively new and individualistic religion, neopagans are not averse to reli-
+gious experimentation and change. Indeed, they are willing to take traditional
+forms of practice and adapt them for online use. As Dawson and Douglas
+Cowan note, “when covens go online – when they become ‘cybercovens’ …
+the notion of a coven [becomes] considerably more elastic”.44 Nonetheless,
+having the coven online is central to the religious practice of many neopagans.
+Community is the focus of many people who use the Internet for religious
+purposes. This communal orientation derives from the social networking
+aspect where the members do not just create individual social connections,
+but large social webs of interaction.45 Within the neopagan community, these
+cybercovens act as places where large social networks emerge, but still within
+boundaries. It is this boundary that psychologically contributes to the partici-
+pants understanding of the cybercoven as a sacred space, even if the interac-
+tion is through a website or online message boards.46 It is not only neopagans
+that view online community as fitting into their esoteric religious worldview.
+As Brown writes about the New Age channelling community:
+
+       The problem of Internet-based community, however, is that it is
+       both specialized and diluted. “Probably the first thing anybody
+       notices when they go online,” writes another believer in the Net’s
+       social magic, “is the community-building taking place all through
+       cyberspace”.47
+
+
+ 40. Larsen, CyberFaith. For more discussion on this, see Chapter 7 of the present volume.
+ 41. Clark et al., Faith Online.
+ 42. Dawson, “The Mediation of Religious Experience in Cyberspace”, 15.
+ 43. Aupers, “‘Where the Zeros Meet the Ones’”, 221.
+ 44. Dawson & Cowan, Religion Online, 2. See also Cowan, Cyberhenge, chapter 4, where he dis-
+     cusses cybercovens in depth.
+ 45. Heidi Campbell, Exploring Religious Community Online, 41.
+ 46. Cowan, Cyberhenge, 144.
+ 47. Michael F. Brown, The Channeling Zone, 125.
+
+
+170
+                                    accessing the astral with a monitor and mouse
+
+
+
+Brown continues by mentioning the way the community “consists of a shared
+identity rather than an enduring commitment to a circle of neighbors and
+kin”.48 This is central to social networking with groups that practice esoteric
+religion. Because their numbers are few and they are geographically scattered,
+the Internet acts as a way for individuals to create affinity communities with
+others who share the same interests and beliefs. Indeed, this is one of the pri-
+mary reasons why many cybercovens were created, to overcome geographic
+isolation of many solitary neopagans.49 Nevertheless, there are still significant
+barriers to creating a community through text and static images. While one
+may feel an affinity with those who share the same chat group or discussion
+board, the episodic interaction requires one to revisit frequently to see replies.
+While one may feel a sort of presence from the website that feeling can only
+get members so close. This is a barrier some have tried to overcome.
+
+
+ADDING THREE DIMENSIONS AND EMBODIMENT TO
+VIRTUAL ENVIRONMENTS AND WORLDS
+
+As mentioned previously, Erik Davis’s “Technopagans” essay frequently refers
+to cyberspace in terms similar to the astral plane. This is also the case of many
+others in the neopagan community. Cowan quotes Lisa McSherry as writing
+that cyberspace is “a technological doorway to the astral plane”.50 Yet, as he
+continues:
+
+        The hyperbole and exaggerated rhetoric in which so many claims
+        for the power of the Internet seem to come cloaked is met by the
+        reality that we are all ineluctably embodied, subject to the con-
+        straints of time and space, and that our ability to interact online is
+        hardly a global phenomenon.51
+
+This embodied state is a challenge to all those who wish to create community
+in cyberspace. The difficulty is that the medium of text and static graphics does
+not create an immersive experience. To meet this need, many have turned
+to three-dimensional virtual environments. One of the technopagans Davis
+interviewed, Mark Pesce, was on the forefront of meeting this challenge as he
+helped develop one of the first three-dimensional modelling languages used
+on the Internet. Called VRML (Virtual Reality Modeling Language), this lan-
+guage, developed in the mid-1990s, was one of the attempts to move beyond
+text and static images towards three-dimensional realms. However, the results
+
+ 48.   Ibid.
+ 49.   Cowan, Cyberhenge, 83–90.
+ 50.   Ibid., 1.
+ 51.   Ibid., 3.
+
+
+                                                                                 171
+john l . crow
+
+
+
+were very rudimentary and it has taken many years before computer graphics
+and computational abilities have allowed wide adoption of convincing three-
+dimensional realms. Gordon Calleja traces the evolution of virtual worlds
+and environments leading to modern, sophisticated systems.52 Building on
+the graduate work of Lisbeth Klastrup, he makes the important distinction
+between a virtual world and a virtual environment: “Virtual environments
+are computer generated domains which create a perception of space and per-
+mit modification through the exertion of agency.”53 These environments are
+then encapsulated in virtual worlds, which are “composite assemblages of per-
+sistent, multi-user virtual environments extending over a vast geographical
+expanse”.54 The distinction becomes one of agency. In virtual environments,
+the individual can exert agency to manipulate the environment, whereas
+on websites and discussion boards this type of manipulation is precluded.
+Secondly, the virtual world is a persistent, multi-user collection where virtual
+environments overlap creating a polyvalent system of interaction where each
+individual’s action becomes part of the environment for others.
+   Moving beyond websites with virtual reality dimensions as originally cre-
+ated by Pesce and others utilizing VRML technologies, Calleja traces the evo-
+lution of three-dimensional multi-user environments and worlds through
+text-based MUDs (multi-user domains/dimensions/dungeons) to sophisti-
+cated three-dimensional graphic realms. Beginning with MUDs, text-only
+environments with lists indicated the presence of others, and then moving
+towards more sophisticated systems with graphics and the ability to interact
+with others simultaneously, Calleja discusses MMOGs (massively multiplayer
+online games). These online games, accessed through commercial software,
+evolved on the Internet and attracted millions of players worldwide. While
+these virtual worlds were designed with episodic goals requiring collaboration,
+many players found other uses for the system. In MMOGs and MMORPGs
+(massively multiplayer online role-playing games), like World of Warcraft, par-
+ticipants look for information, help each other, or socialize via text and voice
+chat.55 In this way they often foster small communities. However, these virtual
+worlds impose teleology; one generally plays to win the game.
+   One example of a virtual world without teleology is Second Life. This is a
+three-dimensional virtual world where individuals are free to purchase ­digital
+property and supplies, build whatever they want, and travel wherever they
+like. The virtual world embodies participants with customizable avatars that
+allow changing of the skin, hair and eye colours, gender, clothes, and more.
+This ability to alter the appearance of the avatar is significant since, Craig D.
+Murray and Judith Sixsmith argue, participants in virtual worlds bring their
+
+ 52.   Calleja, “Virtual Worlds Today”.
+ 53.   Ibid., 14.
+ 54.   Ibid., 15.
+ 55.   Subrahmanyam & Greenfield, “Online Communication and Adolescent Relationships”, 122.
+
+
+172
+                                         accessing the astral with a monitor and mouse
+
+
+
+notions of race, gender, ethnicity and culture into the virtual.56 Moreover,
+participants understand the virtual environment from their own embodied
+perspective.
+
+        By drawing on our evolutionary history, VR [virtual reality] has
+        allowed our embodied reality to map onto our embodied experi-
+        ences in cyberspace. … the point of projection is at standing height.
+        The perspective offered to viewers mimics their experience in the
+        world, and viewers measure objects in the virtual environments as
+        they do in reality – that is, against their own bodies.57

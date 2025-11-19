@@ -1,0 +1,169 @@
+in ghosts was expressed by 38 per cent, astrology by 28 per cent and reincar-
+nation by 25 per cent of the total sample.21
+    As will be seen in the next section of this chapter, the term “extra-sensory
+perception” was coined by the founders of American experimental para­
+psychology in the 1930s, and it is, strictly speaking, an umbrella term for the
+parapsychological phenomena of anomalous perception. While there is no
+reason to suspect the general respondent of the Gallup polls to know all the
+niceties of parapsychological technical vocabulary, it is not surprising to find
+that both telepathy and clairvoyance score lower than general ESP, a class of
+which they are (technically speaking) subsets. Nevertheless, at 36 per cent
+(telepathy) and 32 per cent (clairvoyance) asserting belief in them, these are
+still very widespread paranormal beliefs on their own. A similar study from
+2005 confirms this general picture: leaving out beliefs that are clearly rooted
+in “traditional” religious worldviews, ESP is the number one paranormal phe-
+nomenon Americans believe in.22
+    Non-denominational paranormal beliefs are in other words widespread;
+this much we would already expect from their being part of the pop-occultural
+mainstream. But the Gallup statistics from 2001 have the additional advantage
+of being broken down by demographical factors, including educational level.
+This gives us a way to assess one major question: just how disenchanted are
+the educated elites?
+    Keeping the polls of the religious beliefs of scientists cited above firmly in
+mind, one would expect beliefs clearly connected to traditional religious com-
+munities and mythological frameworks to decrease somewhat with educa-
+tional level. Indeed the general tendency seems to be that less ambiguously
+“supernatural” beliefs, such as the belief in ghosts, haunted houses and com-
+munication with the dead, but also belief in astrology and extraterrestrial vis-
+its to Earth, generally decrease as the educational level increases from high
+school level towards college graduate and post-graduate level. Some inter-
+esting differences surface when we compare these generally quite heavily
+mythologized elements with less embedded parapsychological ones. Table
+16.1 shows the distribution of belief in the three core parapsychological phe-
+nomena included in the poll (ESP, telepathy and clairvoyance), and one ele-
+ment more typically associated with traditional church religion (“that people
+on this earth are sometimes possessed by the devil”). I have also included the
+
+     medical doctor who, with basis in countless controlled medical trials considers the placebo
+     effect to be a well-documented effect of self-healing would qualify as having a “paranormal
+     belief ”. However, belief in the reality of placebos should hardly classify as paranormal in this
+     context.
+ 21. For all the numbers, see Newport & Strausberg, “Americans’ Belief in Psychic and
+     Paranormal Phenomena Is up Over Last Decade”.
+ 22. This means leaving out “demonic possession”, which was more widespread than ESP in the
+     2005 poll (but, somewhat curiously, far from it in 2001). For the 2005 data, see David W.
+     Moore, “Three in Four Americans Believe in Paranormal”.
+
+
+336
+                                            psychic enchantments of the educated classes
+
+
+Table 16.1 Distribution of belief in three parapsychological beliefs and one “traditionally
+religious” belief over educational factors and self-reported importance of religion.
+
+Belief                      Education                      Importance of religion         Total
+                 Post-   College Some High        Very      Fairly   Not very
+               graduate graduate college school important important important
+                          only           or less
+Possession        32         35        41       46        55           28          14      41
+ESP               52         53        48       49        50           48          48      50
+Telepathy         41         38        36       35        35           37          41      36
+Clairvoyance      29         27        34       34        32           33          32      32
+Data show percentage of respondents confirming belief.
+Source: Newport & Strausberg, “Americans’ Belief in Psychic and Paranormal Phenomena Is up Over
+Last Decade”.
+
+
+
+­ istribution over two demographical factors (namely educational level and the
+d
+level of importance the respondent attributed to religion).
+    Belief in demonic possession has a clear negative correlation with higher
+education: whereas 46 per cent of those with only high school or less believed
+that the devil could sometimes possess human beings, the percentage
+decreases steadily as we move to demographical groups with college educa-
+tions. One may perhaps still be surprised to find that every third American
+with post-graduate education believes in demonic possession; however, pos-
+session is a standard part of American evangelical Christianity, and is not
+uncommon among Catholics or mainline Protestants either.23
+    It seems that the “international subculture composed of people with
+Western-type higher education”, also outside of the more restrictive class of
+“scientists”, are increasingly less likely to entertain the “traditional” supernatu-
+ral enchantments than the rest of the population is. What, then, about para-
+psychological beliefs? As we see in Table 16.1, belief in ESP is relatively stable
+around 50 per cent of the population for all educational groups, with the
+higher levels of education (college and post-graduate) actually scoring slightly
+higher than those with no education beyond high school. For telepathy, this
+tendency is even more marked, with a steady increase from 35 per cent of
+those with high school or less education, to a full 41 per cent of those with
+post-graduate educations expressing that telepathy is real. Belief in clairvoy-
+ance is also relatively stable, but more ambiguous in its relation to education;
+while college graduates generally are a few per cent less likely to believe than
+those with no college, post-graduates score higher than those with only gradu-
+ate level college education.
+    Besides the question of education, the importance attributed to religion
+by these respondents also gives us some valuable pointers. With possession
+
+ 23. See e.g. Cuneo, American Exorcism.
+
+
+                                                                                           337
+egil asprem
+
+
+
+the correlation with religious belief seems to be essential, as only 14 per cent
+of those who do not think religion is important believe in it. This is not the
+case for parapsychological beliefs. For ESP and clairvoyance, the importance
+attached to religion does not seem to predict belief: people are about as likely
+to believe in ESP whether they find religion important or not. For telepathy
+(which also correlated positively with education) we even notice a negative
+correlation with the expressed importance of religion, with 41 per cent of
+those expressing little interest in religion believing in telepathy, against 36 per
+cent in the general population. Thus we note with some interest that two cri-
+teria tend to increase likelihood of belief in telepathy, namely a high education
+and an expressed low interest in “religion”.
+
+
+Interpretations and problems
+
+These findings have not gone completely unnoticed by sociologists and psy-
+chologists interested in paranormal beliefs and religion. Paranormal beliefs are,
+as we have seen already, often subdivided into “religious” and “classic” types,
+where the first denotes elements that are “central to traditional Christian doc-
+trine”, whereas the latter are “commonly associated with the supernatural or
+the occult”.24 These two groups of paranormal belief correlate differently with
+social factors; while the “religious” type seems much more common among
+marginal groups and correlates with lower education and socio-economic sta-
+tus, the “classic” lacks any such pattern.25 In short, while relative deprivation
+largely correlates with the religious type, it does not help predict “classic para­
+normal beliefs”.
+   Related to the deprivation theory is the idea that belief in the paranormal
+and in “pseudosciences” is simply a matter of scientific illiteracy. If people
+know more about science, they will tend to believe less in the paranormal.
+Again, the data we have examined above do not support this interpretation.
+This has caused some concern for educationalists. For example, Massimo
+Pigliucci observed in the McGill Journal of Education in 2007 that
+
+      scientists and science educators often assume that a major reason
+      so many people believe in pseudoscience is that they do not know
+      enough science. However, although the latter is an accurate empir-
+      ical observation (most people do not know much about science), it
+      does not follow that scientific illiteracy is the cause of widespread
+      belief in all sorts of paranormal phenomena. If lack of scientific
+      knowledge is not the root cause, then more science education will
+      not necessarily solve, or even ameliorate, the problem. 26
+
+ 24. Rice, “Believe It Or Not”, 96–7.
+ 25. Ibid., 96; cf. Goode, Paranormal Beliefs.
+ 26. Pigliucci, “The Evolution–Creation Wars”, 291.
+
+338
+                                        psychic enchantments of the educated classes
+
+
+
+Pigliucci also takes note of the difference between the “religious” and “non-
+religious” based types of paranormal belief, and the discrepancy in how they
+relate to science education, suggesting that “This means factors other than just
+the general degree of education are at play.”27 From an educational perspective,
+Pigliucci argues that the resilience of paranormal beliefs (he is particularly dis-
+turbed by the fact that “one in every four or five of the most educated people
+in the most prosperous country in the world” believes in demonic possession)
+among the educated classes means that something is wrong with the educa-
+tional system itself. Based on his own surveys Pigliucci observes that science
+majors are much more likely to believe in paranormal phenomena than majors
+in psychology and philosophy, a difference which he attributes to differences
+in educational strategies. While philosophy and psychology majors “actually
+take courses on the scientific method and on critical thinking”,

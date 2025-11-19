@@ -50,6 +50,7 @@ const VALID_INVITE_CODES = [
   'SOULLAB-JUDE',  // Jude Epstein - Beta Tester
   'SOULLAB-MATT',  // Matthew O'Connor - Beta Tester
   'SOULLAB-MARIECHRISTINE',  // Marie-Christine Dreyfus - Beta Tester
+  'SOULLAB-NICOLE',  // Nicole Casbarro - Beta Tester
 
   // Founder access
   'SOULLAB'

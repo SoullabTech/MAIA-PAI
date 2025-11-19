@@ -1,0 +1,176 @@
+definitions – such as the one introduced by Antoine Faivre, which dominated
+the field in the 1990s – and instead adopted more inclusive perspectives. In
+this book we can see the coexistence of three main theoretical approaches
+that have all emerged during approximately the last half decade. Together they
+could be considered the groundwork for something of a “new paradigm” in the
+study of the esoteric in Western culture. Named after their main spokesper-
+sons, these are:
+
+  1. The von Stuckrad approach. Here the esoteric is used as an analytical
+     tool, consciously constructed by the scholar to investigate processes of
+     identity formation on the broader European religious and cultural field.
+     “The esoteric” becomes an instrument by which one can avoid the largely
+     untenable focus on more or less monolithic “traditions”, which seemingly
+     overshadow smaller developments, and instead examine the inherent
+     pluralism of European religious and cultural history. In von Stuckrad’s
+     application, the esoteric is construed to focus on discourses concerned
+     with the “secretive dialectic of concealment and revelation” and “perfect
+     knowledge”,30 regardless of which cultural fields these discourses might
+     show up in.
+  2. The Hanegraaff approach. As above, the focus is not on the esoteric
+     “in itself ”. Instead of stipulating an analytical construct, the focus is on
+     the complex historical processes which have themselves constructed
+     and created the notion of “the esoteric” in Western culture. Import­
+     ant to this “constructionist” approach are certain polemical processes
+     grounded in the Reformation and the Enlightenment projects, whereby
+     certain phenomena have been marginalized as “rejected knowledge”, and
+     thus become the source for later constructions of “esoteric” and “occult
+     tradition”, and later for the study of esotericism itself. As with the von
+     Stuckrad approach, this perspective can be used to shine light on the
+     complexities of European cultural and religious history which have typi-
+     cally remained veiled in earlier approaches.
+  3. The Partridge approach. In this approach, the focus is on contemporary
+     processes of cultural and religious change. Designed to analyse religious
+     expression in the present day rather than in distant historical periods,
+     the approach looks at how previously marginalized phenomena and
+     notions get popularized, and how the esoteric functions as part of an
+     occultural reservoir – operating mainly through popular culture – which
+     is used to construct beliefs, practices and identities. In this, the Partridge
+     approach is strongly embedded in social scientific theory and method,
+     whereas the previous ones are grounded in discourse theory and strict
+     historiographical research respectively.
+
+
+30. von Stuckrad, Locations of Knowledge in Medieval and Early Modern Europe, 67.
+
+
+                                                                                     23
+egil asprem and kennet granholm
+
+
+
+All three approaches derive from the mid-2000s. Von Stuckrad first presented
+his model in the article “Western Esotericism: Towards an Integrative Model
+of Interpretation” in 2005.31 Hanegraaff presented his in the article “Forbidden
+Knowledge: Anti-Esoteric Polemics and Academic Research”, also in 2005,
+which was further developed in a couple of articles32 before finding full
+expression in the book Esotericism and the Academy (2012). Partridge’s model
+is presented in his two-volume The Re-enchantment of the West in 2004/5.33
+All three explore novel ­theoretical and ­methodological avenues, opening up
+the study of the esoteric not only to religious studies, but also to other fields
+in the humanities and social sciences, thus providing, as the contributions in
+this volume demonstrate, broad analytical application. Furthermore, all three
+approaches steer away from providing a conventional substantial definition of
+the esoteric, instead going for more fluid and open-ended perspectives. This
+is also why the three approaches do not seem to clash, but rather complement
+one another, dealing with different areas and having different, though com-
+patible, applications. It is in this “new paradigm”, polyvalent and open-ended,
+as demonstrated in this volume, that the study of the esoteric has its greatest
+potential of contributing to and combining with other broader fields of schol-
+arly inquiry.
+
+
+
+
+ 31. See also von Stuckrad, Locations of Knowledge in Medieval and Early Modern Europe; von
+     Stuckrad, Western Esotericism.
+ 32. See Hanegraaff, “The Trouble with Images”; Hanegraaff, “The Birth of Esotericism from the
+     Spirit of Protestantism”.
+ 33. See also Chapter 6 in the present volume.
+
+
+24
+chapter 2
+
+CONSTRUCTING ESOTERICISMS
+SOCIOLOGICAL, HISTORICAL AND CRITICAL APPROACHES
+TO THE INVENTION OF TRADITION
+
+Egil Asprem and Kennet Granholm
+
+
+
+         [N]ovelty is no less novel for being able to dress up easily as
+         antiquity.1
+
+“Esotericism” is often linked with “tradition”. References to “hidden” or “peren-
+nial” traditions abound on the emic level, and often enough esotericism has
+itself been conceived of as constituting a “tradition” traceable through history.
+These two general tendencies hide a web of interrelated questions, which can
+be probed from the perspectives of sociology and history. In the present chap-
+ter, we chart some of the most important of these, aiming at a comprehensive
+overview of the problems surrounding the notion of “tradition” in the field of
+esotericism and pointing at ways to deal with them.
+   Our approach is therefore synthetic, and ploughs through several lay-
+ers of discussions. First, we discuss briefly the vague and problematic uses
+to which the term tradition is often put. This brings us to a discussion of
+attempts to operationalize the term in the context of sociology. We generally
+find that a lack of historical awareness is detrimental to sociological uses of
+“tradition”/”traditional”, although the more nuanced notion of “detraditionali-
+zation” and attendant processes does have some promise. After pointing out
+shortcomings of these conceptualizations of tradition, we turn to a critical
+constructivist approach emphasizing the inventedness of traditions. Drawing
+on the approach pioneered by Eric Hobsbawm,2 and the applications of similar
+approaches to religion by Olav Hammer and James Lewis,3 and to esotericism
+by Hammer,4 we recognize its strong critical potential and call for more sys-
+tematic scrutiny of the social, material, contextual and situated background
+
+   1.   Hobsbawm, “Introduction”, 5.
+   2.   Hobsbawm & Ranger, The Invention of Tradition.
+   3.   Lewis & Hammer, The Invention of Sacred Tradition.
+   4.   Hammer, Claiming Knowledge.
+
+
+                                                                              25
+egil asprem and kennet granholm
+
+
+
+of the construction and claim of tradition in esoteric discourses. Moving then
+from “etic” discussions of the application of concepts to the “emic” level, we
+review Wouter J. Hanegraaff ’s recent work5 on the formation of “esotericism”
+from changing discourses on knowledge and truth in European history, and
+draw out some implications for the study of tradition. As Hanegraaff also
+argues, the thesis has consequences for assessing the way scholars have con-
+strued their object of study in the twentieth century. We go on to discuss how
+the notion of an “esoteric/occult tradition” may in fact be seen as the result of
+these prior constructions of “ancient wisdom narratives” and their uses (pro
+and contra), sometimes with the overtones of perennialism still intact. These
+discussions culminate in a case study which emphasizes the co-production of
+tradition by scholars and practitioners: the construction of “shamanism” as a
+category by nationalistically driven folklorists, “religionist” historians of reli-
+gions and anthropologists “gone native”.
+   This is, however, not the only way in which scholars take part in construc-
+tion. Focusing also on those who have had no intention or desire to found new
+religious trends, and even been explicitly adverse to the idea, we argue that the
+very existence of our field and our strategic uses of terms such as “esotericism”
+in particular have facilitated, through grateful reception among practition-
+ers, a process by which “esotericism” is becoming an object in a sense which it
+arguably was not before. Finally, we round off our series of discussions by tak-
+ing a final look at the role of fiction and popular culture in constructing tradi-
+tion. Together, these latter points (the role of scholarship, fiction, and popular
+culture) mark out particularly important areas for the construction of tradi-
+tions in contemporary esotericism.
+
+
+THE MANY FACES OF TRADITION
+
+The term “tradition” has been associated with a large number of different
+meanings in both common speech and specialist literature. A plurality of con-
+ceptualizations of tradition exists in scholarly circles, often bound up in spe-
+cific disciplinary concerns and preferences. Starting with conceptualizations
+closest to general dictionary understandings, “tradition” can be described as:
+
+      [A]nything which is transmitted or handed down from the past to
+      the present … [including] all that a society of a given time pos-
+      sesses and which already existed when its present possessors came
+      upon it and which is not solely the product of physical processes in
+      the external world or exclusively the result of ecological and physi-
+      ological necessity.6
+
+   5. Hanegraaff, Esotericism and the Academy.
+   6. Shils, Tradition, 12.
+
+
+26
+                                                                     constructing esotericisms

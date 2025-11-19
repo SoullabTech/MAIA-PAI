@@ -1,0 +1,124 @@
+Rationality and Styles of Reasoning
+Most works by mystics, like most writings, do not contain developed
+arguments. Many are works of poetry. But mystics can write books of
+argument if the occasion calls for it, as shown by Shankara’s commentaries
+on the basic Hindu texts in which he takes on various opponents. In
+classical mystical traditions, appeal is often made to authoritative religious
+texts; this does undercut rationality since rationality is associated with first-
+hand experiences and reasoning, but it does not go so far as to make
+mystics’ reasoning irrational or illogical in structure. (It should be noted
+that mystical experiences are not considered means to “correct knowledge”
+in most Indian mystical schools, and as noted earlier, mystics in general do
+not appeal to their own experiences in arguments.) The important point here
+is that when mystics do construct arguments they do not defy logic. India
+also has a tradition of debates (vadas) over religious and related
+philosophical matters that includes pointing out alleged logical
+inconsistencies and conflicts with ordinary experiences in the doctrines of
+opponents (see Motilal 1998). (And it must be admitted that in the past such
+debates often included contests of miracle-working.) Buddhists such as
+Nagarjuna valued logical consistency and utilized such sophisticated
+arguments as reductio ad absurdum and the problem of infinite regression
+that rely on the law of noncontradiction to draw out logical inconsistencies.
+Thus, although the process of reasoning conflicts with actually having
+introvertive mystical experience at the same time and would at least
+interfere with receptivity in extrovertive mystical experiences, outside those
+experiences some mystics, as part of their mystical way of life, have written
+works advancing arguments for their understanding of what is experienced
+and against their opponents’ views that are logical in form.
+      But mystics are not typically trained in Aristotelian logic, although
+logic was part of the medieval Christian and Muslim curricula. Mystics will
+also use the styles of arguing and forms of formal presentation that are
+particular to their culture and era. The physical environment we have
+evolved in shapes our thinking and what we all consider real and
+reasonable; we all may also have evolved certain innate structures in our
+psyche. But cultures also shape what we consider reasonable and what
+styles of reasoning we adopt.5 If the social psychologist Richard Nisbett is
+correct, there is a basic difference between Western and East Asian ways of
+understanding and perceiving the natural world (2003). He is not saying
+that everyone in a given culture thinks the same way, but only that there are
+general cultural patterns of thinking: Westerners typically engage in
+“analytical thinking” that involves detaching an object from its context and
+categorizing objects by their attributes, whereas East Asians typically
+engage in “holistic thinking” that involves an orientation to context and
+environments as a whole. Analytical thinkers explain and predict in terms
+of rules governing an object’s attributes; holistic thinkers explain and
+predict in terms of the relation of an object to its context and to other
+objects. The former utilize chronological and historical relationships; the
+latter, causal patterns. The former are drawn to objects; the latter, to a
+perceptual field as a whole. The former decontextualize an object and
+manipulate its environment; the latter adjust themselves to their
+environment. The former try to understand the whole by how the parts
+work; the latter understand the parts by starting with the whole. The former
+see a logical contradiction between true and false; the latter see some merit
+on both sides and look for a middle way between them. The former
+naturally see distinct objects; the latter see a common substance. The
+former look for causes and agents; the latter, for relationships. The former
+come up with models simplifying how things work by removing things
+from their environment; the latter accept the complexity of the world.
+Western thinking fed Greek curiosity about how the world works and led
+naturally to the development of science; the latter are exemplified in
+Daoism and Zen. (Note that Nisbett does not place the origin of the holistic
+approach in mystical experiences or tie it in any way to such experiences.6)
+      There may be such broad cultural differences in how different people
+think and perceive particular to each culture.7 Such differences in outlooks
+would affect the premises and reasons in arguments. Moreover, every
+person may employ unique mental steps in his or her own reasoning. But
+the issue for rationality comes down to whether mystics must reject the
+basic rules of logic in how they reason. And they do not appear to do so.
+The early Buddhist Points of Contention (Kathavatthu) and Questions of
+King Milinda (Milindapanha) are good examples. In the latter, the questions
+posed by the Greek-influenced king often reflect a concern that Buddhist
+claims directly violate the law of noncontradiction. Questions are posed in
+the form of two-prong dilemmas, and the Buddhist monk Nagasena’s
+answers are implicitly based on the basic rules of logic. For example, he
+reconciled the apparently conflicting claims that the Buddha had no
+teachers and had five teachers by asserting that the Buddha did have
+teachers but none instructed the enlightening knowledge and thus he had no
+teacher of that (Mlp 235–36). Nagasena relied on similes in his arguments.
+That points to a difference in the style of argument, but many passages
+implicitly involve the law of the excluded middle in the form “If x, then y;
+if not-x, then not-y.” The arguments implicitly accept that these two options
+exhaust all the possibilities. We may not find all the reconciliations
+convincing—there is often no good reason to believe that arguments based
+on analogies or similes illuminate the subject being explained. But this is
+not to deny the logical structure of the arguments. The questions reveal an
+awareness of logically problematic aspects of mystical claims, and the
+answers reveal a rational response to them. Nothing in that text exhibits an
+“alternative logic” or cannot be explained to be logical.8 We may not agree
+with their premises, but the form of the arguments is logical by Western
+standards. Similarly, the Daoist Zhuangzi is not, as is often alleged, being
+“antirational” or “anti-intellectual” in using reason to show that reasoning
+cannot establish one limited point of view as absolute, universal, or
+otherwise uniquely grounded in reality. John of the Cross represented more
+than Christian mystics when he said in Ascent of Mount Carmel that “all
+matters must be regulated by reason save those of faith, which, though not
+contrary to reason, transcend it” (2.22.13).9 He also repeatedly used the
+principle that two contraries cannot coexist in the same subject (e.g., ibid.:
+1.4.2). Or as Abu Hamid al-Ghazali said, “Reason is God’s scale on earth.”
+So too, a “love” mystic such as Hadewijch of Antwerp can value reason as
+a “gift from God” and claim that “reason never deceives” while still
+claiming that the limited reason-guided life of virtue must be transcended.10
+      One Buddhist strategy that is regularly cited as a rejection of two-
+valued logic is the “four options” (catush-koti).11 It came up when the
+Buddha tried to remain silent to persistent questioning but finally responded
+by rejecting any answer to certain questions (such as whether the universe
+is eternal or not), claiming that none “fit the case” (upeti)—even though the
+options exhaust all the logical possibilities. Thus, to the question of whether
+the enlightened exist after death or not, the Buddha rejected as “Not so”
+(ma h’evam) the four options that the enlightened exists, does not exist,
+both exists and does not exist, and neither exists nor does not exist
+(Majjhima Nikaya 1.485–87, 2.166).12 This appears clearly to violate the
+law of noncontradiction, and numerous attempts have been made to show
+that it does not. But the reason that all four options are rejected is simple:
+when all factors of the phenomenal world (dharmas) are removed at death,
+there is no means of knowledge and thus no means of description (Sutta
+Nipata 1075–76). We might affirm the second option that the enlightened
+do not exist after death at least as the factors of the world do, but because of
+the mirror theory of language, an unenlightened listener might take any
+affirmative answer as referring to a “real” entity that exists or does not exist
+after death, and so the second option also must be denied. This style of
+argument is not irrational since it is perfectly reasonable for the Buddha to
+assume (under the thrall of the mirror theory of language) that any
+affirmative answer would be misleading because to describe x by predicate
+y or by the denial of y would still lead the listener to think in terms of y
+when y in fact does not apply and there is no real x.13 (More on this below.)

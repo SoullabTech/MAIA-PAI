@@ -1,0 +1,145 @@
+From the very birth of sociology in the mid-nineteenth century, the eventual
+demise of religion was seen as inevitable. In recent times, however, increasing
+numbers of sociologists, social commentators and social theorists have come
+to describe the current state of Europe as “post-secular”. What is suggested is
+not a straightforward “return of religion”, but rather an awareness of the con-
+tinued relevance of religion in secular societies, as well as changing percep-
+tions of what actually counts as religion, what functions it may have and where
+it can be located. Quite naturally, the post-secular should be conceived of as
+having relevance for the esoteric as well. In fact, if looking at new arenas of
+religion (and I am thinking in particular of popular culture), we might even be
+witnessing a popularization of the esoteric that is unprecedented in Western
+religious history.
+    In this chapter I will be looking at secularization theory, and link it to
+recent discussions on the post-secular. I will then address, somewhat briefly
+and introductorily, potential transformations and further effects on the eso-
+teric from both secularism and post-secularism. Finally, I will provide a few
+examples of the intersection of the secular, the post-secular and the esoteric
+on a particular genre of popular culture: science fiction film and television.
+
+
+SECULARIZATION THEORY
+
+The first thing to note when discussing secularization is that we are not deal-
+ing with a single theory. Rather, there are numerous distinct theories with
+different premises and focal points, and there has even been talk of a “secu-
+larization paradigm”.1 While it is difficult to untangle the complex that is the
+
+
+   1. Martin, On Secularization, 9; Bruce, God is Dead, 2.
+
+
+                                                                            309
+kennet granholm
+
+
+
+secularization paradigm, Paul Heelas and Linda Woodhead’s division into four
+main approaches to secularization is, while somewhat simplified, a good start-
+ing point.2 The approaches are:
+
+    •   the disappearance thesis;
+    •   the differentiation thesis;
+    •   the de-intensification thesis; and
+    •   the coexistence thesis.
+
+The meaning of the first and last of these approaches is more or less obvious,
+but the second and third may need some clarification. Somewhat simplified,
+the second approach indicates that religion, due to societal differentiation,
+becomes simply a subsystem among others, such as economy, science and
+education.3 Due to this, religion loses cultural and societal significance. The
+third approach posits that religion might remain a societal factor, but in a less-
+intense and essentially powerless form. What is common to all approaches is
+that secularization lessens the overall societal impact of religion, and weakens
+its influence on other societal spheres.4
+    As already mentioned, the idea of the disappearance of religion was at the
+core of sociology from the very start of the discipline, with authors such as
+August Comte, Karl Marx, Émile Durkheim and Max Weber all working on
+the basis of this supposition. However, the unfortunate fate of religion was
+stated as a simple fact, and it was not until the second half of the twentieth
+century that systematic theories of secularization started to be developed.5
+According to Karel Dobbelaere, these theories were developed on the basis of
+Emile Durkheim’s idea of societal differentiation, Max Weber’s idea of ration-
+alization, and Ferdinand Tönnies’s distinction of Gemeinschaft (community)
+and Gesellschaft (society).6 While it is correct to talk of a secularization para-
+digm, it would be erroneous to claim that the perspective was uncontested.
+The debate over the ­factuality of secularization has been ongoing since at least
+the 1960s,7 and it has often taken fairly ugly dimensions with different fac-
+tions regularly ridiculing each other in quite an unprofessional manner. The
+apparent resurgence of religion in the West in recent decades has lessened the
+overall appeal of secularization theories. For example, Peter Berger, who was
+
+   2. Woodhead & Heelas, “Secularization”, 307–8.
+   3. Dobbelaere, “The Meaning and Scope of Secularization”, 600–601.
+   4. Heelas, “The Spiritual Revolution”, 375.
+   5. Dobbelaere, “The Meaning and Scope of Secularization”, 599. For examples see Herberg,
+      “Religion in a Secularized Society” (1962/3); Berger & Luckmann, “Secularization and
+      Pluralism” (1966); Luckmann, The Invisible Religion (1967); Berger, The Sacred Canopy
+      (1967).
+   6. Dobbelaere, “The Meaning and Scope of Secularization”, 599.
+   7. For early critiques of secularization theories see e.g. Martin, “Towards Eliminating the
+      Concept of Secularization”; Shiner, “The Concept of Secularization in Empirical Research”.
+
+
+310
+                  the secular, the post - secular and the esoteric in the public sphere
+
+
+
+one of the first to develop a systematic secularization thesis, has come to claim
+that we are now witnessing a “de-secularization”.8
+   Current theories of secularization are very complex, something which
+opponents of secularization theory do not always acknowledge.9 The theories
+often involve several layers of analysis. Dobbelaere points to three distinct, but
+connected, levels: “the societal or macro-level, the organizational or meso-
+level, and the individual or micro-level”.10 On a societal level we may be dealing
+with the separation of Church and state, which in turn encourages organiza-
+tional differentiation where functions previously held by the Church organiza-
+tion are separated from it.11 The result is the formation of secular institutions
+dealing with e.g. medicine and education, as well as the creation of a separate
+realm for the religious. An example of organizational adjustment to the new
+societal conditions produced by secularization is the ecumenical activities of
+many churches, implying a tolerance on the level of the religious institution.12
+On the individual level we see the individualization and compartmentalization
+of religion, where religious belief and activity become separated from both
+the public sphere and the individual’s everyday life.13 José Casanova similarly
+identifies several elements of secularization theory, where the notion of soci-
+etal differentiation in modernity forms the core and, in Casanova’s opinion, an
+unassailable fact.14 The two sub-theories most often connected to this core are
+the decline and the ­privatization of religion.15 Casanova sees these three theo-
+ries as distinct, and the latter two as dubious.
+   Even with the diversity in the field, all secularization theory is united in the
+basic premise that “[t]o talk of secularization is to suppose that the present is
+less religious than the past”.16 Critics often argue that advocates of seculariza-
+tion theory overestimate the religiousness of the past, and there is some truth
+to this critique. Secularization theorists have at times based their estimates
+of the past on very scant empirical evidence. Peter Laslett, though a historian
+rather than a sociologist of religion, represents this in naming one of his books
+The World We Have Lost. Problematically, he asserts that:
+
+   8. Berger, The Sacred Canopy; cf. Berger, “Secularization and De-secularization”, 292. On
+      the other hand, there are scholars such as David Martin who criticized the concept of
+      secularization already in the 1960s (see Martin, “Towards Eliminating the Concept of
+      Secularization”), but who later developed a “general theory of secularization” (see Martin,
+      A General Theory of Secularization; Martin, On Secularization).
+   9. Bruce, God is Dead, 4–29, is perhaps the best example of the complexity of secularization
+      theory, and definitely too intricate to discuss in any detail in the present context.
+ 10. Dobbelaere, “The Meaning and Scope of Secularization”, 600.
+ 11. Ibid., 602–5.
+ 12. Ibid., 608.
+ 13. Ibid., 605–7.
+ 14. It should be noted, however, that Casanova has more recently discussed “de-­differentiation”.
+      See Casanova, “Rethinking Secularization”.
+ 15. Casanova, Public Religions in the Modern World, 19–20.
+ 16. Bruce, God is Dead, 45.
+
+
+                                                                                             311
+kennet granholm
+
+
+
+       All our ancestors were literal believers, all of the time. Their beliefs
+       were not only religious, of course, since they believed in witchcraft,
+       evil and benign, and gave credence to many propositions and prac-
+       tices condemned by theologians as heathen survivals.17

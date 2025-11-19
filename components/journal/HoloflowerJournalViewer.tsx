@@ -109,7 +109,7 @@ export function HoloflowerJournalViewer({ entries }: HoloflowerJournalViewerProp
                       day: 'numeric'
                     })}
                   </h3>
-                  <p className="text-white/60 text-sm">
+                  <p className="text-white/85 text-sm">
                     Coherence: {Math.round(entry.checkInData.coherence * 100)}%
                   </p>
                 </div>
@@ -157,7 +157,7 @@ export function HoloflowerJournalViewer({ entries }: HoloflowerJournalViewerProp
               onClick={() => setSelectedEntry(entry)}
             >
               <div className="text-center mb-3">
-                <p className="text-white/60 text-xs">
+                <p className="text-white/85 text-xs">
                   {new Date(entry.timestamp).toLocaleDateString()}
                 </p>
                 <p className="text-amber-400 text-xs">
@@ -208,7 +208,7 @@ export function HoloflowerJournalViewer({ entries }: HoloflowerJournalViewerProp
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {holoflowerEntries.slice(-6).map((entry, index) => (
                 <div key={index} className="flex items-center gap-4">
-                  <div className="text-white/60 text-sm min-w-[80px]">
+                  <div className="text-white/85 text-sm min-w-[80px]">
                     {new Date(entry.timestamp).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric'
@@ -261,7 +261,7 @@ export function HoloflowerJournalViewer({ entries }: HoloflowerJournalViewerProp
                   </div>
                   <button
                     onClick={() => setSelectedEntry(null)}
-                    className="text-white/60 hover:text-white text-2xl"
+                    className="text-white/85 hover:text-white text-2xl"
                   >
                     ×
                   </button>

@@ -35,6 +35,8 @@ import { BrainTrustMonitor } from '@/components/consciousness/BrainTrustMonitor'
 import { LogOut, Sparkles, Menu, X, Brain, Volume2, ArrowLeft, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SwipeNavigation, DirectionalHints } from '@/components/navigation/SwipeNavigation';
+import { HoloflowerMotion } from '@/components/sacred/HoloflowerMotion';
+import HoloflowerVoiceButton from '@/components/voice/HoloflowerVoiceButton';
 
 async function getInitialUserData() {
   if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
@@ -267,29 +269,7 @@ export default function MAIAPage() {
         {/* DirectionalHints removed - keyboard shortcuts now active (arrow keys + ESC) */}
 
         <div className="h-screen relative overflow-hidden bg-gradient-to-br from-stone-950 via-stone-900 to-stone-950 flex flex-col">
-        {/* Atmospheric Particles - Floating dust/sand */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-          {[...Array(30)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-[#D4B896]/20 rounded-full"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0.2, 0.5, 0.2],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 4,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            />
-          ))}
-        </div>
+        {/* Atmospheric Particles - REMOVED per user request */}
 
         {/* Atmospheric Glow - Warm light from below */}
         <div className="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-[#3d2817]/30 via-transparent to-transparent pointer-events-none z-0" />
@@ -303,6 +283,11 @@ export default function MAIAPage() {
             <div className="flex justify-between items-center w-full">
               {/* SOULLAB Brand */}
               <div className="flex items-center gap-3">
+                <img
+                  src="/holoflower-amber.png"
+                  alt="Holoflower"
+                  className="w-6 h-6 object-contain opacity-90 drop-shadow-[0_0_8px_rgba(251,146,60,0.6)] mt-2"
+                />
                 <div className="text-xl font-bold bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 bg-clip-text text-transparent tracking-wider">
                   SOULLAB
                 </div>
@@ -319,8 +304,8 @@ export default function MAIAPage() {
                   whileTap={{ scale: 0.95 }}
                   className={`px-4 py-2 rounded-lg font-medium text-xs uppercase tracking-wide transition-all duration-300 backdrop-blur-sm border ${
                     showChatInterface
-                      ? 'bg-gradient-to-r from-emerald-600/80 to-emerald-700/80 border-emerald-500/40 text-emerald-100 shadow-lg shadow-emerald-900/50'
-                      : 'bg-gradient-to-r from-blue-600/80 to-blue-700/80 border-blue-500/40 text-blue-100 shadow-lg shadow-blue-900/50'
+                      ? 'bg-gradient-to-r from-amber-600/90 to-amber-700/90 border-amber-500/50 text-amber-100 shadow-lg shadow-amber-900/50'
+                      : 'bg-gradient-to-r from-amber-500/90 to-amber-600/90 border-amber-400/50 text-amber-100 shadow-lg shadow-amber-900/50'
                   }`}
                   onMouseDown={() => {
                     setShowChatInterface(!showChatInterface);
@@ -353,18 +338,15 @@ export default function MAIAPage() {
                   whileTap={{ scale: 0.95 }}
                   className={`px-4 py-2 rounded-lg font-medium text-xs uppercase tracking-wide transition-all duration-300 backdrop-blur-sm border ${
                     maiaMode === 'patient'
-                      ? 'bg-gradient-to-r from-purple-600/90 to-purple-700/90 border-purple-500/50 text-purple-100 shadow-lg shadow-purple-900/50'
-                      : 'bg-gradient-to-r from-stone-700/60 to-stone-800/60 border-stone-600/30 text-stone-300 hover:border-purple-600/40 hover:text-purple-200'
+                      ? 'bg-gradient-to-r from-amber-600/90 to-amber-700/90 border-amber-500/50 text-amber-100 shadow-lg shadow-amber-900/50'
+                      : 'bg-gradient-to-r from-stone-700/60 to-stone-800/60 border-stone-600/30 text-stone-300 hover:border-amber-600/40 hover:text-amber-200'
                   }`}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('Navigating to Kairos for patient mode');
-                    router.push('/kairos');
+                  onMouseDown={() => {
+                    setMaiaMode('patient');
                   }}
                 >
                   <Brain className="w-3 h-3 inline mr-1" />
-                  PATIENT
+                  COUNSEL
                 </motion.button>
 
                 <motion.button
@@ -372,8 +354,8 @@ export default function MAIAPage() {
                   whileTap={{ scale: 0.95 }}
                   className={`px-4 py-2 rounded-lg font-medium text-xs uppercase tracking-wide transition-all duration-300 backdrop-blur-sm border ${
                     maiaMode === 'session'
-                      ? 'bg-gradient-to-r from-teal-600/90 to-teal-700/90 border-teal-500/50 text-teal-100 shadow-lg shadow-teal-900/50'
-                      : 'bg-gradient-to-r from-stone-700/60 to-stone-800/60 border-stone-600/30 text-stone-300 hover:border-teal-600/40 hover:text-teal-200'
+                      ? 'bg-gradient-to-r from-amber-600/90 to-amber-700/90 border-amber-500/50 text-amber-100 shadow-lg shadow-amber-900/50'
+                      : 'bg-gradient-to-r from-stone-700/60 to-stone-800/60 border-stone-600/30 text-stone-300 hover:border-amber-600/40 hover:text-amber-200'
                   }`}
                   onMouseDown={() => {
                     setMaiaMode('session');
@@ -390,7 +372,25 @@ export default function MAIAPage() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2 rounded-lg font-medium text-xs uppercase tracking-wide transition-all duration-300 backdrop-blur-sm border bg-gradient-to-r from-rose-700/80 to-rose-800/80 border-rose-600/40 text-rose-100 hover:from-rose-600/80 hover:to-rose-700/80 shadow-lg shadow-rose-900/50"
+                  className={`px-4 py-2 rounded-lg font-medium text-xs uppercase tracking-wide transition-all duration-300 backdrop-blur-sm border ${
+                    hasActiveSession
+                      ? 'bg-gradient-to-r from-amber-600/90 to-amber-700/90 border-amber-500/50 text-amber-100 shadow-lg shadow-amber-900/50'
+                      : 'bg-gradient-to-r from-stone-700/60 to-stone-800/60 border-stone-600/30 text-stone-300 hover:border-amber-600/40 hover:text-amber-200'
+                  }`}
+                  onMouseDown={() => {
+                    setShowSessionSelector(true);
+                  }}
+                >
+                  <Clock className="w-3 h-3 inline mr-1" />
+                  SESSION TIMER
+                </motion.button>
+
+                <div className="w-px h-6 bg-amber-800/30"></div>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 py-2 rounded-lg font-medium text-xs uppercase tracking-wide transition-all duration-300 backdrop-blur-sm border bg-gradient-to-r from-stone-700/80 to-stone-800/80 border-stone-600/40 text-stone-300 hover:border-amber-600/40 hover:text-amber-200 shadow-lg shadow-stone-900/50"
                   onMouseDown={() => {
                     handleSignOut();
                   }}
@@ -403,10 +403,23 @@ export default function MAIAPage() {
           </div>
         </div>
 
+        {/* Holoflower Voice Button - Upper Middle */}
+        <div className="relative z-40 flex justify-center pt-8 pb-4">
+          <HoloflowerVoiceButton
+            size={180}
+            onTranscript={(transcript) => console.log('🎤 Voice transcript:', transcript)}
+            onResponse={(response) => console.log('💫 MAIA response:', response)}
+            onModeChange={(mode) => console.log('🌸 Voice mode changed:', mode)}
+            className="drop-shadow-2xl"
+          />
+        </div>
+
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
           {/* Conversation Area */}
           <div className="flex-1 overflow-hidden relative">
+            {/* Sacred Holoflower Background - REMOVED per user request */}
+
             <OracleConversation
               userId={explorerId}
               userName={explorerName}

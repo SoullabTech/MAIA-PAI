@@ -1,0 +1,224 @@
+PHILOSOPHY
+     of
+ MYSTICISM
+PHILOSOPHY
+     of
+ MYSTICISM
+Raids on the Ineffable
+
+
+
+
+  Richard H. Jones
+Published by State University of New York Press, Albany
+
+© 2016 State University of New York
+
+All rights reserved
+
+Printed in the United States of America
+
+No part of this book may be used or reproduced in any manner whatsoever without written
+permission. No part of this book may be stored in a retrieval system or transmitted in any form or by
+any means including electronic, electrostatic, magnetic tape, mechanical, photocopying, recording, or
+otherwise without the prior permission in writing of the publisher.
+
+For information, contact State University of New York Press, Albany, NY
+www.sunypress.edu
+
+Production, Ryan Morris
+Marketing, Michael Campochiaro
+
+                       Library of Congress Cataloging-in-Publication Data
+
+Jones, Richard H., 1951–
+   Philosophy of mysticism : raids on the ineffable / Richard H. Jones.
+       pages cm
+Includes bibliographical references and index.
+   ISBN 978-1-4384-6119-9 (hardcover : alk. paper)
+   ISBN 978-1-4384-6120-5 (e-book)
+   1. Mysticism. I. Title.
+
+   B828.J73 2016
+   204’.2201—dc23 2015027728
+
+                                      10 9 8 7 6 5 4 3 2 1
+                             Contents
+
+
+
+Preface
+             Postmodernist Concerns
+             Methodological Issues
+             The Analytical Philosophical Approach
+
+1 Mysticism and Mystical Experiences
+             Mystical Experiences
+             Mystical Paths
+             Extrovertive Mystical Experiences
+             Mindfulness
+             Introvertive Mystical Experiences
+             Depth-Mystical Experiences
+             Mystical Enlightenment
+             A Typology of Mystical Experiences
+             Weighting Mystical Experiences
+
+2 Mystical Knowledge and Religious Ways of Life
+             Experience and Knowledge
+             Are There Genuine Mystical Experiences?
+             Attribution Theory
+             The Depth-Mystical Experience and Its Conceptualizations
+             Mystical Experiences and Mystical Ways of Life
+             Constructivism
+             Nonconstructivism
+             Constructivism and the Depth-Mystical Experience
+             Can the Constructivism Dispute be Resolved?
+              The Possibility of Mystical Insight
+
+3 Are Mystical Experiences Cognitive?
+             Can Nonmystics Judge the Veridicality of Mystical
+             Experiences?
+             What Can Mystics Claim to Know?
+             Mysticism and Empiricism
+             The Principle of Credulity
+             The Analogy to Sense-Perception
+             Problems of Justifying Specific Doctrinal Claims
+             The Limitation of Any Mystical Claim to Knowledge
+             Can Mystical Knowledge-Claims Be Compared?
+             Do Mystical Knowledge-Claims Genuinely Conflict?
+             Can One Mystical System Be Established as Best?
+             Is It Rational to Accept Mystical Knowledge-Claims?
+             “Properly Basic Beliefs”
+             Ultimate Decisions
+
+4 The Scientific Study of Mystics and Meditators
+              Scientific Study Versus Mystical Practices
+              Are New Theories of the Mind Needed?
+              Can Mystical Experiences Be Studied Scientifically?
+              Scientific Explanations of Mystical Experiences
+              Sociocultural Explanations of Mystical Experiences
+              Explaining Away Mystical Experiences
+              Problems with Sociocultural Explanations
+              Problems with Physiological Explanations
+              Do Natural Triggers Produce Mystical Experiences?
+              Natural Phenomena and Mystical Insights
+              The Compatibility Problem
+              Applying Occam’s Razor
+              Our Epistemic Situation
+              Is Naturalism or a Transcendent Alternative More Plausible?
+              The Neutrality of Science
+
+5 Mysticism and Metaphysics
+              Mystical Metaphysics
+              The Status of the World
+              The Nature of Transcendent Realities
+              Consciousness
+              The Self
+              The Question of Mystical Union
+              Mysticism and the Closure of Mystery
+
+6 Mysticism and Language
+             Ineffability
+             The Mirror Theory of Language
+             And Yet Mystics Continue to Talk
+             An Analogy
+             Silence
+             Positive Characterizations of Transcendent Realities
+             Mystical Utterances and Knowledge
+             Negation
+             Defending Mystical Discourse
+
+7 Mysticism and Rationality
+             Rationality and Styles of Reasoning
+             Paradox
+             Resolving Paradoxes
+             Understanding the Paradoxical
+             Nagarjuna’s Reasoning
+             Mysticism and the Question of Universal Reason
+
+8 Mysticism and Science
+             Scientific and Mystical Approaches to Reality
+             An Analogy
+             Beingness and Science
+             Mystical Experience Versus Scientific Measurement and
+             Theorizing
+             Indirect Avenues of Aid
+             Science, Mysticism, and the Natural World
+             The Difference in Content
+              Science and Mystical Metaphysics
+              Complementarity
+              Reconciling Mysticism and Science
+
+9 Mysticism and Morality
+             The Basic Question of Compatibility
+             Are Mystics Necessarily Moral?
+             Mystical Selflessness and the Presuppositions of Morality
+             Emotions, Values, and Beliefs
+             “You Are That”
+             A Metaphysics of Wholeness and Morality
+             Factual Beliefs, Values, and Mystical Experiences
+             “Beyond Good and Evil”
+             Will Any Actions Do?
+             Mystical Decision-Making
+             Mystical Selflessness and Morality
+
+Epilogue: The Demise of Mysticism Today
+              The Antimystical Climate Today
+              Accepting Mysticism Today
+              A Mystical Revolution?
+              A Thirst for Transcendence
+
+Notes
+
+References and Further Reading
+
+Index
+                                        Preface
+
+
+
+          The greatest blessings come to us through madness, when it is sent as a gift of the gods.
+          Heaven-sent madness is superior to man-made sanity.
+                                                                                           —Plato
+
+
+
+There are forces pulling and pushing against the study of mysticism today.
+On the one hand, the rise of spirituality has drawn attention to mysticism,
+and empirical research has suggested that mystical experiences may be
+much more common than is generally accepted (Hardy 1983; Hood 2006).
+Mystical experiences that occur either through cultivation or spontaneously
+are often considered by the experiencers as the defining moments of their
+lives. There also has been a recent surge of scientific interest in meditators
+and in the neural and pharmacological bases and causes of mystical
+experiences. On the other hand, there have been recent sex and money
+scandals involving “enlightened” Zen and Hindu teachers, and there is the
+general academic suspicion that mysticism is only a matter of subjectivity,
+deliberate obscurantism, and irrationality.
+     In Anglo-American philosophy, mysticism has remained a constant if
+minor topic within philosophy of religion. Not all questions in philosophy
+of mysticism are pertinent to more general philosophy, but many are
+important to philosophy of religion and to philosophy more generally. What
+is unique about mysticism is the purported contribution of exotic
+experiences to mystical claims. Are these experiences “objective” in the
+sense of revealing something about reality outside of the “subjective”
+individual mind? Do mystical experiences reveal truths about the universe
+that are not obtainable through science or reasoning about what other
+experiences reveal to us? Do they reinforce scientific truths? Or do they
+conflict with scientific truths? Or are they noncognitive and only a matter of
+emotion? How is it possible to claim that a fundamental reality is
+experienced when there is allegedly no experiencing subject or object
+experienced? Why do mystics have trouble expressing what is allegedly
+experienced in these experiences and not in ordinary cognitive experiences?
+Are mystics blatantly irrational, speaking what turns out to be only
+gibberish? Is morality ultimately grounded in mystical experiences, or are
+mystics necessarily selfish and thus not moral at all? With such questions as
+these, mysticism introduces issues not found in considering nonmystical
+experiences and general religious ways of life by themselves.
+      A current comprehensive treatment of the basic problems in this field
+is long overdue. No major comprehensive book on philosophy of mysticism
+has been published since Walter Stace’s Mysticism and Philosophy in 1960.
+The closest is the important collection of essays published by William
+Wainwright in 1981. Since then, a number of developments and new issues
+have arisen—in particular, those raised by postmodernism and scientific
+research.

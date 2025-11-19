@@ -1,0 +1,200 @@
+How, then, are we to grasp this proliferation of antagonistic inclusions and
+exclusions of Satanism online? Specifically, is there any validity to the unsub-
+stantiated “large, heterogeneous online community” postulated by Chris
+Mathews, echoing the inclusivist assertions of Venus Satanas and Corvis
+Nocturnum above?29 The temptation to appropriate an emic term and talk
+about a “satanic community” or “movement”, understood as a broad hetero-
+geneous social trajectory much like the “black” or “gay” community, should
+be anchored in empirical fact, as shown by the conflict between inclusive and
+exclusive viewpoints.
+    A starting point for analysis could be a representative list, which in essence
+charts a selection of observable groups and sites. What is possible online,
+though, is to utilize various free “webometric” meta-tools to expand the basic
+list with additional information. The very idea of a milieu is show-casing the
+interplay between abstract deterritorialized spaces within global flows of
+occulture, and local reterritorializations of the milieu, fixing flows in intelligi-
+ble localities. The Internet has much value in mapping both, and I have used
+three meta-communicative tools to answer three relevant questions:
+
+   • Who was responsible and when was the site established?
+   • How popular is the site and what is its reputation in the milieu?
+   • Who is connected to whom?
+
+The first list (see Table 7.1) provides basic registration data (date, registrant,
+and/or domain) for some well-known groups as well as relative newcom-
+ers and obscure sites. While I have tried to be representative, the countless
+offerings necessitate a selection based on more impressionistic criteria. After
+compiling the list, I have used the website Europe Registry’s WHOIS domain
+
+     pre-Internet “Satanic Bunco Sheet” in Barton, The Church of Satan, 125–8. For an updated
+     form, see Church of Satan, “Satanic Bunco Sheet” (briefly analysed in Petersen, “Binary
+     Satanism”, 600–601).
+ 29. Mathews, Modern Satanism, 91.
+
+
+                                                                                        141
+jesper aagaard petersen
+
+
+Table 7.1 Registration data for a selection of satanic/Left-Hand Path websites.
+
+Domain name                                  Registration Registrant (if applicable) and/or
+                                             date         domain server (if relevant)
+The Undercroft and Letters to the Devil –    1996          L. Ventrue/
+both hosted by www.satannet.com                            NS3.ninethirteen.com
+                                                           NS1.ninethirteen.com
+
+Church of Satan (Anton S. LaVey) –           1997          Peter H. Gilmore/
+www.churchofsatan.com                                      Central9.ninethirteen.com
+                                                           NS9.ninethirteen.com
+
+Temple of Set (Michael Aquino) –             1997          Robert Menschel/
+www.xeper.org and www.templeofset.org                      NS1.Xeper.org + NS2.Xeper.org
+
+First Satanic Church (Karla LaVey) –         1998          None* (FSC International)
+www.satanicchurch.com
+
+First Church of Satan (John Allee) –         1998          John Allee
+www.churchofsatan.org
+
+The 600 Club – www.the600club.com            1998          None* (The 600 Club)
+
+Purging Talon – www.purgingtalon.com         1999          Matt Paradise
+
+NocTifer’s Real Satanism site –              1999          Nagasiva Yronwode
+www.satanservice.org
+
+Radio Free Satan –                           2000          Shane Bugbee
+www.radiofreesatan.com
+
+Temple of the Vampire –                      2000          None* (TOTV)/
+www.vampiretemple.com                                      Central9.ninethirteen.com
+                                                           NS9.ninethirteen.com
+
+Vexen Crabtree’s Description,                2001          Simon Crabtree
+Philosophies and Justification of Satanism
+site – www.dpjs.co.uk
+
+Satanisk Forum – www.sataniskforum.dk        2001          A. O. Lap
+
+Diane Vera’s Theistic Satanism site –        2005          Diane Vera (Church of Azazel)
+www.theisticsatanism.com
+
+Joy of Satan – www.joyofsatan.org (also      2005          Andrea Dietrich (Maxine
+hosted on www.angelfire.com/empire/          (2003)†       Dietrich)/
+serpentis666)                                              NS1.joyofsatan.org
+                                                           NS2.joyofsatan.org
+
+Modern Church of Satan –                     2006          None*
+www.modernchurchofsatan.com
+
+
+
+142
+                                                                                from book to bit
+
+
+Domain name                                      Registration Registrant (if applicable) and/or
+                                                 date         domain server (if relevant)
+Stephen E. Flowers’s Rûna Raven                  2006           Stephen E. Flowers
+newsletter and community –
+www.edred.net
+
+Temple of the Black Light –             2007                    None*
+www.templeoftheblacklight.net/main.html
+
+Venus Satanas’s Theistic Satanism and            2007           Venus Satanas
+Magick site – www.spiritualsatanist.com
+
+Satanic Reds (Tani Jantsang ) –                  2009‡          Johnni Pedersen (J. Nymann)
+www.satanicreds.org
+* “None” refers to registrants with high privacy settings, which affect searches.
+†www.joyofsatan.com links directly to the angelfire website, as does most of the material on the
+joyofsatan.org site.
+‡ Satanic Reds recently moved from a geocities address – the group’s online birth is around 1997
+(see Satanic Reds, “The Roots of the Satanic Reds”; Lap and Wolf, “Satanismens Danske Rødder”, 14).
+Source: based on information collected from http://whois.europeregistry.com/displayWhois.php on
+15 November 2010.
+
+
+
+search to access domain registrars for information.30 Although the results are
+unsurprising, this method fixes the sites in time and place, something seldom
+given in the “here and now” of online production.
+   What do we learn? First, Internet Satanism predates 1996, but mainly as a
+text-based phenomenon. With the World Wide Web and the graphics-based
+web browsers introduced around 1993, usage gradually shifted from text to
+hypertext and image. We can see how the Church of Satan and the Temple of
+Set, as well as offshoots and affiliates, purchased domain names from the mid-
+1990s to establish a graphics-based online presence. The earliest community
+sites and message boards, satannet.com and the 600 club, were in place before
+1998 as well. Of course, a given start date does not guarantee activity, just as a
+given registration date is not an absolute start date; for example, the Church of
+Satan existed on www.coscentral.net/cos for at least two years before actually
+launching the present address. Conversely, the Satanic Reds had a geocities
+address for a decade before “upgrading”.
+   Second, turning to registrants, the geographical distribution is predomi-
+nantly American, but this is an artefact of both the Californian birthplace of
+modern Satanism and my sampling bias. Most names are well known in the
+milieu. Apart from providing email addresses and even offline addresses in
+some cases, a registrant search is helpful when following linkages between
+
+ 30. See http://whois.europeregistry.com/displayWhois.php. In some cases I have cross-
+     checked with www.betterwhois.com and www.whois.com, but neither work on non-­
+     American sites.
+
+
+                                                                                                143
+jesper aagaard petersen
+
+
+
+groups by biography, although, again, a given registrant is no guarantee for
+continued affiliation or the presence of large numbers. In the case of domain
+servers, many different websites are hosted on individual servers. Nevertheless,
+the Church of Satan, the Temple of Set and the Joy of Satan operate with
+name-specific domain servers; we can use this to see, for example, that the
+Church of Satan actually hosts the Undercroft, Letters to the Devil and the
+Temple of the Vampire, reinforcing the feeling of connection between these
+sites.31
+    Next, to gauge the respectability and popularity both within the milieu
+and in general, I have entered the same domains into Alexa’s Web informa-
+tion database.32 The list (Table 7.2) is sorted by traffic rank, a number “based
+on three months of aggregated historical traffic data from millions of Alexa
+Toolbar users and data obtained from other, diverse traffic data sources”.33
+By combining daily visitors and quarterly page views, the number gives us a
+clue to the relative popularity of the site over time compared to simple lists of
+unique page views. Nevertheless, data on sites with a traffic rank over 100,000
+are not entirely trustworthy, which applies to all the satanic and Left-Hand
+Path sites measured here. The only sites with some popularity are the Church
+of Satan and (somewhat paradoxically) Joy of Satan’s page base on the angel-
+fire network, and they are still very far from Scientology or YouTube. Most of
+these sites are decidedly “fringe”.
+    Similarly, the number of links to sites is wildly imprecise, as Alexa only
+counts links “from sites visited by users in the Alexa traffic panel. Links that
+were not seen by users in the Alexa traffic panel are not counted”.34 Accordingly,
+the numbers seem quite low. For this reason I have done another search on
+Yahoo’s site explorer, providing “inlink” data that seems intuitively more cor-
+rect. Both these inlinks and Alexa’s link numbers are from diverse sources,
+from Wikipedia and Facebook to other satanic sites, making the data some-
+what complicated to use uncritically. Nonetheless, used heuristically the rela-
+tions between the sites do say something significant about relative strength,
+network building, and authority whether we are working with one or the other
+data set. We could call it a reputation or saturation indicator. The Church of
+Satan scores high on both searches, indicating a stable network to this site.
+Anomalies include Vexen Crabtree’s site, The Joy of Satan, the Temple of the
+
+ 31. Additional information on the issue of servers can be found on RobTex’s Domain Name
+     System search at www.robtex.com/dns.
+ 32. www.alexa.com.
+ 33. Alexa, “About the Alexa Traffic Rankings”. I have chosen traffic rank over the more intui-
+     tively understandable “unique visitors” and “site views” stats from e.g. www.siteanalytics.
+     com because of this aggregate nature – by combining quarterly and daily activity, a rela-
+     tively stable number or rank is reached, which is all I need for comparison between my
+     chosen sites.
+ 34. I quote from the small drop-down explanation window next to the number. See also Alexa,
+     “Sites Linking In”.
+
+
+144
+                                                                         from book to bit

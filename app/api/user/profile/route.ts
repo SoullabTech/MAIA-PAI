@@ -1,107 +1,96 @@
-/**
- * User Profile API Route
- *
- * Server-side route to fetch user profile data from Supabase
- * This ensures proper data retrieval without localStorage dependency
- */
-
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+export const dynamic = 'force-dynamic';
+export const maxDuration = 10;
 
-export async function GET(request: NextRequest) {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
+
+export async function GET(req: Request) {
   try {
-    const searchParams = request.nextUrl.searchParams;
+    const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
     const domain = searchParams.get('domain');
 
     console.log('🔍 [User Profile API] Fetching profile for:', { userId, domain });
 
-    // MUST have userId to fetch profile
     if (!userId) {
       return NextResponse.json({
         success: false,
-        error: 'No userId provided'
+        error: 'Missing userId parameter'
       }, { status: 400 });
     }
 
-    // KELLY SPECIAL CASE - Check BEFORE database lookup
-    // Recognize Kelly on localhost or production domains
-    const isLocalhost = domain && (domain.includes('localhost') || domain.includes('127.0.0.1'));
-    const isProduction = domain && (domain.includes('soullab.life') || domain.includes('soullab.org'));
-
-    if ((isLocalhost || isProduction) && userId === 'kelly-nezat') {
-      console.log('🌟 [User Profile API] Kelly auto-recognized on domain:', domain);
+    // Handle guest users with non-UUID format
+    if (userId.startsWith('guest_')) {
+      console.log('👻 [User Profile API] Guest user detected, returning default profile');
       return NextResponse.json({
         success: true,
         user: {
-          id: 'kelly-nezat',
-          name: 'Kelly',
-          email: 'kelly@soullab.life',
-          onboarded: true
+          id: userId,
+          name: 'Explorer', // Default name for guest users
+          email: null,
+          domain: domain || 'localhost',
+          is_guest: true,
+          created_at: new Date().toISOString()
         }
       });
     }
 
-    // Fetch from Supabase
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // For UUID-formatted user IDs, attempt Supabase lookup
+    try {
+      const { data: user, error } = await supabase
+        .from('users')
+        .select('id, name, email, created_at')
+        .eq('id', userId)
+        .single();
 
-    const { data: userData, error: userError } = await supabase
-      .from('beta_users')
-      .select('id, email, timezone, referral_code, maya_instance, privacy_mode, evolution_level, onboarded')
-      .eq('id', userId)
-      .single();
-
-    if (userError || !userData) {
-      console.error('❌ [User Profile API] Error fetching user:', userError);
-      return NextResponse.json({
-        success: false,
-        error: 'User not found'
-      }, { status: 404 });
-    }
-
-    // Kelly special case - also check from database
-    if (userData.email === 'kelly@soullab.life') {
-      console.log('🌟 [User Profile API] Kelly recognized by email from DB');
-      return NextResponse.json({
-        success: true,
-        user: {
-          id: userData.id,
-          name: 'Kelly',
-          email: userData.email,
-          timezone: userData.timezone,
-          onboarded: userData.onboarded
-        }
-      });
-    }
-
-    // For other users, extract name from email or use generic
-    const nameFromEmail = userData.email?.split('@')[0] || null;
-    const capitalizedName = nameFromEmail
-      ? nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1)
-      : null;
-
-    console.log('✅ [User Profile API] User profile fetched:', {
-      id: userData.id,
-      name: capitalizedName,
-      email: userData.email
-    });
-
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: userData.id,
-        name: capitalizedName,
-        email: userData.email,
-        timezone: userData.timezone,
-        onboarded: userData.onboarded
+      if (error) {
+        console.log('❌ [User Profile API] Error fetching user:', error);
+        // Fall back to guest profile if user not found
+        return NextResponse.json({
+          success: true,
+          user: {
+            id: userId,
+            name: 'Explorer',
+            email: null,
+            domain: domain || 'localhost',
+            is_guest: true,
+            created_at: new Date().toISOString()
+          }
+        });
       }
-    });
+
+      console.log('✅ [User Profile API] User found:', user.name);
+      return NextResponse.json({
+        success: true,
+        user: {
+          ...user,
+          domain: domain || 'localhost',
+          is_guest: false
+        }
+      });
+
+    } catch (dbError) {
+      console.log('⚠️ [User Profile API] Database error, falling back to guest profile:', dbError);
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: userId,
+          name: 'Explorer',
+          email: null,
+          domain: domain || 'localhost',
+          is_guest: true,
+          created_at: new Date().toISOString()
+        }
+      });
+    }
 
   } catch (error) {
-    console.error('❌ [User Profile API] Unexpected error:', error);
+    console.error('💥 [User Profile API] Unexpected error:', error);
     return NextResponse.json({
       success: false,
       error: 'Internal server error'

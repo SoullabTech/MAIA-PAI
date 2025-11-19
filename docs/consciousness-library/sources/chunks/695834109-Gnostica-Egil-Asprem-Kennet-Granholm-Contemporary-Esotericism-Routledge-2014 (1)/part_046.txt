@@ -1,0 +1,152 @@
+Vampire, the Temple of Set, and NocTifer’s satanservice.org; otherwise, most
+sites are in the tens or hundreds, indicating a small integration both in the
+milieu and outside. Concluding on the basis of traffic rank and links we can
+say that most satanic and Left-Hand Path sites live in obscurity.
+    In an attempt to answer the final set of questions about connectivity, I used
+a third meta-communicative tool called Issue Crawler to perform “snowball”
+and “co-link” analyses on the sample which could be translated into a visible
+representation called a “cluster map”.35 Basically, a snowball analysis crawls a
+given set of sites for links and retains them; this can be done in up to three
+degrees of separation, resulting in enormous clusters of equivocal links and
+nodes. In contrast, a co-link analysis only retains outlinks that at least two
+starting points have in common, restricting the model to confirmed relations.
+The results are by far the most provisional, as I have yet to strike a balance of
+starting points in either mode to get a manageable model. The problem lies
+in the nature of Internet linking itself – all of my data sets were either too
+large and inclusive or too exclusive and limited, resulting in misleading charts.
+If too inclusive, as most snowball searches were, the data included irrelevant
+Facebook pages, porn sites, and other inappropriate links in unmanageable
+files of 60 or more megabytes (that is 40,000+ links and nodes, too large for
+modelling). If too exclusive, many interesting relations disappear because of
+the specificity of co-link measurement. Nevertheless, a more restricted map
+based on a co-link analysis of fourteen starting points is very useful, as it
+only charts significant links that are mutually supported, indicating a certain
+amount of commonality.
+    Although a model created with Issue Crawler looks confusing at first
+glance, some of the nodes are recognizable sites from the previous lists. Other
+sites are expected, like the Ontario Consultants on Religious Tolerance (www.­
+religioustolerance.org) who have written extensively and fairly about Satanism,
+and the Feral House–Coopstuff connection to the Church of Satan (via pub-
+lisher Adam Parfrey and the artist Coop, both affiliated with the Church of
+Satan). In addition, when perusing the “extract URLs” result file behind
+the model, we find that angelfire.com covers Diane Vera and Joy of Satan,
+­geocities.com covers the old Satanic Reds site, and so on. All the same, many
+ of my starting points are absent, which is surprising when taking the inlinks
+ provided in Table 7.2 into account. A high number of links to the site does
+ not guarantee a central place or even a node in the cluster map, indicating
+ that sites such as Vexen Crabtree’s or Venus Satanas’s have a reputation (i.e.
+ inlinks) outside the satanic milieu in a narrow sense. Looked at in another way
+by correlating with Table 7.1, of the websites established before 2000, only the
+First Satanic Church, First Church of Satan and the 600 club are absent; after
+2001, only Diane Vera, Joy of Satan and Satanic Reds are present, and only
+
+ 35. The program can be found at www.issuecrawler.net. The following description is based on
+     the website’s instructions and Bainbridge, “Expanding the Use of the Internet”.
+
+
+                                                                                       145
+Table 7.2 Traffic ranking data on a small selection of satanic/Left-Hand Path websites.
+
+Domain name                                           Type                                Traffic rank   Links to the site   Inlinks – Yahoo
+                                                                                          – Alexa        – Alexa
+Church of Satan www.churchofsatan.com                 Website                              189,260           585                   33,053
+
+Vexen Crabtree www.dpjs.co.uk/index.html              Archive                              638,054            94                      572
+
+Venus Satanas www.spiritualsatanist.com               Website with blog                    823,751            29                      640
+
+Modern Church of Satan                                Website with message board           890,559              3                     115
+www.modernchurchofsatan.com
+
+Purging Talon www.purgingtalon.com                    Media website with blog             1,042,576           98                      972
+
+Joy of Satan                                          Website with community sites
+www.joyofsatan.org                                                                        1,043,688           28                     1505
+www.angelfire.com/empire/serpentis666                                                       230,947           (0)                      49
+
+Temple of the Vampire www.vampiretemple.com           Website with community              1,254,593           (65)                   4961
+
+First Church of Satan www.churchofsatan.org           Archive                             1,280,688           84                      768
+
+Temple of Set www.xeper.org                           Website, archive                    1,298,692         (100)                    9469
+
+Diane Vera www.theisticsatanism.com                   Website                             1,490,341           46                      422
+
+Undercroft, Letters to the Devil www.satannet.com     Community sites (closed and open) 1,526,325             52                      569
+The 600 Club www.the600club.com                               Community site                            1,633,231                (26)                         285
+
+Temple of the Black Light                                     Website, archive                          1,889,509                (27)                         299
+www.templeoftheblacklight.net/main.html
+
+NocTifer www.satanservice.org                                 Website                                   2,198,730                 71                       10,448
+
+First Satanic Church                                          Website, links to the600club.com          2,689,478                 32                          180
+www.satanicchurch.com                                         as community
+
+Stephen E. Flowers www.edred.net                              Community and archive                     5,695,414                 20                          115
+
+Radio Free Satan www.radiofreesatan.com                       Radio station                             6,636,606                 36                          766
+
+Satanisk Forum www.sataniskforum.dk                           Website with message board                8,186,840                   9                          77
+
+Satanic Reds www.satanicreds.org                              Website, archive                            No data                   1                            6
+
+Scientology International www.scientology.org                 For comparison – website and                  32,760             1228                        34,432
+                                                              forum
+
+YouTube www.youtube.com                                       For comparison – video sharing                      3         686,159                8,546,000,000
+Sources: traffic rank (measuring aggregate traffic based on average daily visitors and average quarterly page views) and the number of links to the site are both based on
+information gained from www.alexa.com on 18 November 2010. Note that lower traffic rank indicates higher activity. For comparison, I have provided inlink numbers
+from Yahoo’s site explorer at www.siteexplorer.search.yahoo.com for the same date.
+jesper aagaard petersen
+
+
+
+by proxy (through host domains and not their individual sites). So duration
+seems to play a role. On the other hand, many of the nodes are not associated
+directly with Satanism (like otohq.org, Ordo Templi Orientis’s now-defunct
+directory) or not operational, limiting the explanatory power if relying too
+heavily on the map alone.
+    Is there a “large, heterogeneous online community” of Satanists, as Chris
+Mathews, Venus Satanas and Corvis Nocturnum claim, or is there rather a
+bunch of loose networks with one dominant community, as Peter Gilmore
+asserts? The cluster map indicates that relations and networks of communica-
+tion do exist. Correlated with Tables 7.1 and 7.2, we do see actual community
+sites, but little to confirm any community in the singular. Combined with a
+little surfing on these sites, it is obvious that networks are established by link-
+age; for example, Diane Vera links to blog and forum networks, and Satanic
+Reds lists “members” and affiliates.36 But little interlinkage is done. Twelve of
+the nineteen sites I have analysed do not even show up on a co-link analysis,
+indicating that little is done to build or strengthen the network into a mutual
+practised community or movement of interest. In fact, using “community” in
+the singular glosses over (or completely ignores) the struggles and conflicts
+inherent in actual delimitations of “community” between the various groups
+and actors. It would seem that heterogeneous communities in the plural do
+develop both online and offline, but mostly around relatively homogeneous
+social entities, such as the ideologies, worldviews, and practices of organ-
+ized satanic groups with specific texts, spokespersons and interpretations.
+This is visible in the cluster map confirming the gist, if not the conclusion, of
+Gilmore’s argument discussed earlier. For the wider cultural context and the
+ephemeral networks within, “milieu” is in fact a much better term.
+    This substitution is not done to criticize the veracity of perceived feelings
+of togetherness or the authenticity of emotional, ethical, and aesthetic com-
+munion between satanic seekers. Rather, it is to emphasize the discursive
+nature of these emotions and cognitions, and the basic imaginary nature of
+communities and currents. Thus I do not reject the basic understanding of
+modern Satanism as a cohesive current, but I do claim that this cohesion is
+of a second order far less communitarian and far more fuzzy than implied in
+terms like “community” and “movement” in the singular.37 In contrast, “milieu”
+acts as an aggregate noun demarcating certain ideological and symbolic inter-
+ests and shared patterns of consumption, and it should be understood as a
+mid-level analytical concept between the general “occulture”, or boundary cul-
+ture between margin and mainstream, and distinct communities, groups and
+organizations within it.
+
+ 36. On Vera’s networking, see Vera, “Theistic Satanism”. On Satanic Reds, see Satanic Reds,
+     “Member Sites”. Most of the 19 member sites are defunct or have not been updated for
+     three or more years.
+ 37. See Petersen, “Introduction”, 4–6.
+
+
+148
+                                                                            from book to bit

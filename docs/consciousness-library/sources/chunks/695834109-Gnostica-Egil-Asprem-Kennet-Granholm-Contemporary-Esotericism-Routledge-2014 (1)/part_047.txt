@@ -1,0 +1,153 @@
+Based on Benedict Anderson’s influential idea of imagined communities,
+Derek Foster proposes that all communities larger than face-to-face net-
+works must be imagined.38 Hence it is complicated navigations of recognition
+between the public and the private, the subjective and the collective, that cre-
+ates (produces) the community: “That which holds a virtual community intact
+is the subjective criterion of togetherness, a feeling of connectedness that con-
+fers a sense of belonging. Virtual communities require much more than the
+mere act of connection itself.”39 The “more” hinted at is of course intentional
+communication and interpretative practice.40 While there may be an imagined
+“Satanic community” which has a social reality for some inclusive-minded
+Satanists, the model shows little performance of this community outside a
+narrowly defined “we” and a lot of resistance from other sectors of the milieu.
+Accordingly, we should be very careful not to homogenize and simplify the
+Internet or milieu as singular entities as “a multiplicity of cultural phenomena”
+is contained within these concepts.41
+    People tend to cluster in networks around discourses and practices shar-
+ing specific themes, even if they move from one to the next in their search for
+knowledge and experiences. There are thus various levels of “we-­information”
+and a choice of avenues of “togetherness” and “antipathy” from which to build
+communities in the plural, all of which are distributed and amplified by the
+virtual realm. The early “frontier” of deterritorialized online Satanism has
+been both strengthened and weakened by the gradual reterritorialization of
+Satanisms online in the past decade, limiting heterodoxy and constructing
+boundaries to establish a semblance of dominance. All the websites discussed
+have “border zones”, whether it is a guestbook, a forum, or user-generated
+content, stimulating conflict within and between local domains. To under-
+stand such communities and authorities online, we have to understand the
+“morphology” of discourse online, something enacted in speech – or writing.
+This brings us back to the doorstep of the text. We will now turn to some
+interesting ways of re-assessing the text-centric methodology of historiogra-
+phy in light of these “webnographic” reflections.
+
+
+
+
+ 38. Foster, “Community and Identity”.
+ 39. Ibid., 29. See also Appadurai, Modernity at Large, 178–9, whose notion of “locality” as a
+     phenomenological concept is tied to the concept of “neighborhood” (both virtual and spa-
+     tial) as “situated communities”.
+ 40. Foster, “Community and Identity”, 34–35. Forster refers to Jürgen Habermas’s central posi-
+     tioning of the speech act and concludes the article with the comment: “Perhaps then, the
+     fullest understanding of the term [virtual community] is gained by grounding it in the com-
+     municative act itself ”.
+ 41. Markham, “The Internet as a Research Context”, 360. See also Kendall, “Recontextualizing
+     ‘Cyberspace’”, who suggests four research contexts eminently applicable to the study of
+     milieus.
+
+
+                                                                                           149
+jesper aagaard petersen
+
+
+
+FROM BOOK TO BIT: A BRIEF ASIDE ON TEXTUAL GENETICS
+
+To assess textual practice online we must revisit the issue of inferences from
+oral, written, ritual, or pictorial expressions to individual or collective systems
+of belief. Tord Olsson convincingly argues that we have to be extremely careful
+when analysing utterances as representations, as the adherents of a given reli-
+gion do not necessarily believe what they are saying and doing, because what
+they are saying and doing is context-dependent. In other words, we cannot
+expect the multitude of divergent expressions of a religion to be systematically
+connected in an isolate, coherent system implanted in people’s heads or in the
+culture shared by them. This is especially clear with representations of gods
+which “are conditioned by genre and speech situation”42 and may appear radi-
+cally different in different contexts: anthropomorphic and concrete in myths
+associated with a narrative situation, and pantheistic and abstract in hymns
+related to a situation of praise. “[D]ifferent understandings dominate in differ-
+ent speech contexts; … given conceptions find expression in given genres”.43
+Accordingly, it is prudent to include reflections of the formal traits of aesthetic
+and communicative genres in the analysis of religious expressions.
+   These constructivist rules of thumb do not become any less relevant when
+we address sources found on the Internet. I see at least two avenues of appli-
+cation in the present context. First, we can apply genre dependency of gods
+directly, noting that how Satan (and other sinister beings) is understood must
+be related to genre and speech context. Whether Satan is a metaphor, a sym-
+bol or a real entity is partly dependent upon the dogmatic stance of the group
+or person in question, but also upon the conduit in which this “belief sys-
+tem” is communicated – reflexive essays, mythical narratives and (especially)
+hymns, prayer and ritual texts such as invocations.
+   Secondly, and more importantly here, genre-dependency and speech con-
+texts can be applied more broadly as a theoretical reorientation of how we
+view texts. This is not so much about the nature of gods as about how Olsson’s
+insights on oral literature can be applied to “hypertext” and new media prac-
+tices. Basically, online texts constitute a new genre. I will focus on a partic-
+ularly interesting example, namely the “posts” and “threads” on message or
+discussion boards, which is both a common form of community software and
+an accessible field for research. Here we move from fixed text consumption to
+fluid text production and to the discursive negotiations of ideology, identity,
+and community in hybrid texts. An analysis of these floating hybrids between
+text and speech should be mindful of the hybridity of both the isolate post and
+the thread as a whole, as well as the relation between threads and other types
+of text and performance. The specific boundaries must be placed pragmatically
+
+
+ 42. Olsson, “Verbal Representation of Religious Beliefs”, 91.
+ 43. Ibid., 82–83.
+
+
+150
+                                                                          from book to bit
+
+
+
+in relation to the concrete research programme; it is the dialogical aspect
+which is of interest here – it is never sufficient to analyse a single post.
+    “Texts” are not only referential, content-oriented and fixed, and “speech” is
+not only performance. However, thought of as generic extremes on a contin-
+uum, these types could illustrate different aspects of the functionality of com-
+munication – primarily the asynchronous and the synchronous on one hand
+and the mediate and the immediate on the other.44 “Posts” and “threads” could
+be placed on this continuum as expressions between “chat” and “email”, on a
+scale going from text to speech. In his analysis of “cybertalk”, Norman Denzin
+makes similar connections through his concept of “performance speech” – a
+text which, when in the form of a thread, is messy, dialogical, immediate, situ-
+ated, and constantly reinterpreted, as speech; but which is precisely also a text
+because it is written and therefore more unambiguous, proofread and thought
+through beforehand.45 As such, “performance speech” is an enacted, hybrid
+text revealing the immediacy of speech and the “mediacy” or fixation of writ-
+ing, and thus the provisional and intermittent character of communication.
+The written dialogue is in other words “betwixt and between”, at once produc-
+ing community and fixating meaning, including and excluding, which is espe-
+cially useful in an analysis attempting to correlate structure and actor, system
+and practice, or speech situation and expression. Let us have a look at a spe-
+cific example.
+
+
+AUTHORITY AND HYBRID TEXTS: DISCUSSING “RITUAL” ON
+SATANIC FORUM’S MESSAGE BOARD
+
+      [Sp34k:] *makes a lovely curtsy* A-hoy out there land crabs … I
+      have been thinking “Many Satanists say that they go through dif-
+      ferent rituals and achieve a greater power/force within themselves
+      when they perform it/When it is performed” Well, I am curious
+      and want to know how the rituals YOU perform are done “if you
+      perform rituals” And how does one achieve this “strength”?46
+
+This is the first post in a thread on the Danish Satanisk Forum Message Board,
+an official public discussion board established in 2002 by the organization
+Satanisk Forum (Satanic Forum) to facilitate interaction between members
+and accommodate guests.47 “Sp34k” asks the other participants about their
+
+
+ 44. See e.g. Simeon J. Yates, “Researching Internet Interaction”, 96–7.
+ 45. Denzin, “Cybertalk and the Method of Instances”, 111–112.
+ 46. SFO, “Ritual=Styrke”. Posted 25 October 2005. All posts are translated by the present
+     author. I have tried to convey the free style of grammar and punctuation.
+ 47. I have previously discussed Satanisk Forum in Petersen, “Binary”, 600–606; and Petersen,
+     “‘We Demand Bedrock Knowledge’”, 99–102.
+
+
+                                                                                        151
+jesper aagaard petersen

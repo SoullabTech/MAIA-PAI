@@ -1,0 +1,143 @@
+His point is that whether there is A or not-A, there is no B. For example,
+whether (A) there is self-existence or (not-A) not, (B) change is not
+possible: if something is self-existent, it is permanent and so there can be
+not change; if there is no self-existence, then nothing real exists, and so
+there is nothing that could change. Either way, there is nothing “real” that
+could change, and so there is no “real” change.
+     Nagarjuna also employed the “four options” form noted above
+concerning the Buddha’s teachings (MK 1.1, 12.1, 18.8, 22.11–12, 25.15–
+18, 25.22–23, 27.13, 27.20). Here he denies x exists, x does not exist, x both
+exists and does not exist, and x neither exists nor does not exist.
+Philosophers have spilled a lot of ink applying symbolic logic to
+Nagarjuna’s four denials to try to keep them from being paradoxical. Does
+not the denial of the first option logically commit the holder to the second?
+How can someone deny that something neither exists nor does not exist?
+The denial of the fourth option makes Nagarjuna look as if he is denying
+the basic law of noncontradiction. But the efforts to reconstruct the four
+options through modern symbolic logic to save Nagarjuna make him too
+sophisticated. (This is not to deny that symbolic logic can show that his
+conclusions are logically valid [see Jones 1993a: 260–61 n. 6]. But showing
+that is not the same as claiming that that is how Nagarjuna actually
+reasoned.) More importantly, such arguments miss the point: Nagarjuna is
+trying to state that we cannot think of anything in terms of self-existence.
+He uses the form of the four options simply to try to cover all positive and
+negative possibilities—i.e., he is saying there are no other possible options,
+and so we cannot think of any phenomenon in terms of “self-existence” in
+any way. He wants to cover all possibilities so that all claims involving self-
+existence in different contexts are eliminated, and thus emptiness—i.e., the
+absence of anything self-existent—is established by default as the only
+logical alternative.
+      And it can be shown easily and without resorting to technical rules that
+the four options approach is not logically contradictory. Consider again the
+fact mentioned in the last chapter that numbers do not have color. If
+someone asks what color the number 4 is, we might say “It is not blue, not a
+color other than blue, not both blue and another color, nor neither blue nor
+another color.” All four denials are true and consistent since numbers do not
+have color. The denial of any option does not logically commit someone to
+any other position on the color of four. We might think that the last option
+applies—“neither blue nor another color” (and thus is transparent)—but in
+Nagarjuna’s framework, as long as we are thinking in terms of color we are
+on the wrong track regarding the nature of numbers, i.e., as objects to which
+color terms could apply. So too, with the four options regarding whether
+something “exists”: to Nagarjuna, only something that is self-existent can
+exist or not exist, but as long as we are thinking of phenomena in terms of
+self-existence, we do not understand the true nature of reality but are
+thinking along conventional lines and thus in terms that cannot apply. To
+expand Bertrand Russell’s example of “The present King of France is bald”:
+it is wrong to answer “yes” or “no” or that “he is both bald and not bald” or
+that “he is neither bald nor not bald,” since he does not exist. To use the
+Buddhist analogy, it is like asking what direction a flame goes when a fire
+goes out—any answer shows that we are thinking along the wrong lines
+(i.e., that the flame still exists). So too, for Nagarjuna, only an entity
+existing by self-existence could be the subject of the four options, and the
+denial of all four options is consistent if there are no self-existent realities.
+      In sum, all Nagarjuna is saying is that the subject to each option does
+not exist. In addition, he treats the fourth alternative as a type of thing—if
+nirvana is neither an entity nor a nonentity, then it cannot be a “neither-an-
+entity-or-a-nonentity” (MK 25.16). Such an entity is the kind of entity that
+contrasts with the third option: if we can establish something that is “x-and-
+not-x,” then we can establish what contrasts with it—something that is
+“neither-x-nor-not-x” (e.g., MK 27.18, 27.28). Nagarjuna is arguing that the
+denial of x depends on there being x in the first place, and so if we cannot
+establish x as real (i.e., self-existent), we cannot establish its absence (i.e., a
+not-x) or a conjunction of the two (x-and-“not-x”) or the conjunction of
+their absences (neither-x-nor-“not-x”). The third option can be established
+only if the first two options can be (MK 5.6, 12.9), and the fourth could be
+established only if we could establish the third alternative (MK 25.15,
+27.18, 27.28). Thus, since x is not real to begin with, none of the other
+options are possible. In addition, Nagarjuna would also add that we must
+reject the third option because x-and-not-x would be a composite of
+opposites, but opposites cannot exist together in the same place (e.g., light
+and dark [MK 25.14]). Thus, nothing more is needed to explain the four
+options than Nagarjuna’s general method of interconnecting terms. Indeed,
+by focusing instead on possible logical reconstructions of the four options,
+philosophers are missing how the arguments actually proceed—in short,
+they miss Nagarjuna’s actual reasoning entirely.
+      A related point is that in MK 18.8 the four options are not denied.
+Nagarjuna says: “Everything is real, and everything is unreal; everything is
+both real and unreal; everything is neither real nor unreal.” The third option
+appears to violate the law of the noncontradiction and the fourth the law of
+the excluded middle. But (following the later Madhyamika Chandrakirti)
+this can be made consistent by means of the Buddhist doctrine of two types
+of truths, conventional and ultimate: “Every entity is real from the
+conventional point of view [MK 7.24], and every entity is unreal from the
+ultimate point of view [MK 15.4]; every entity is both conventionally real
+and ultimately unreal; every entity is neither ultimately real nor
+conventionally unreal.” Entities are not real from the point of view of their
+true ontic status (i.e., they are not self-existent and thus not real), but the
+configurations of the factors of the experienced world (dharmas) are in fact
+part of the conventional world, and so Nagarjuna is not irrational in
+affirming both claims. Conversely, for Nagarjuna the that-ness (tattva) of
+the phenomenal realm is real from the ontologically correct point of view,
+but it is not an entity and thus is nonexistent from a conventional point of
+view. In the classic Indian example, a rope seen as a snake is indeed both
+real (the rope) and totally unreal (the snake) at the same time. All this
+removes any suggestion of paradox or irrationality.
+      Thus, the apparent paradoxicality can be explained away. Certainly we
+should not immediately jump to the conclusion that a thinker from another
+culture and era is irrational simply from the form of his writings. Nor
+should we ascribe to Nagarjuna the state of the art in philosophical logic
+from our own culture and era. The question is not whether a given verse is
+contradictory in form, but whether the thought behind his expressions has a
+consistent content in terms of his beliefs. And if we can paraphrase
+consistently what Nagarjuna writes, then his thought may in fact be rational.
+If so, then the fact that the idea can also be stated illogically is irrelevant.28
+For example, if I am standing in a doorway between two rooms with one
+foot in each room, I can state this paradoxically: “I am in this room and not
+in this room” or “I am in two rooms at once” (see Priest 2004: 28). But I
+can also state the situation more completely without paradox: “I am
+partially in one room and partially in another.” Genuine paradox occurs
+only if I claim “I am entirely in two different rooms at the same time.” But
+this statement is not only paradoxical but false and no one believes it. That
+the situation can be stated incompletely and inaccurately as a paradox is
+irrelevant—the true situation can be stated clearly and consistently. And the
+same applies to the situation with Nagarjuna’s seemingly paradoxical
+passages: we do not have to torture what he says to see that what he writes
+is logical within his framework of beliefs.
+      In sum, Nagarjuna’s arguments are rational and logical. And we can
+understand his points without trying to make him into a twenty-first-century
+Oxford logician. This is not to say that his arguments are convincing (see
+Jones 2104b: 171–76), but only that they are not irrational: an argument
+may be logically sound in the sense that a conclusion logically follows from
+the premises without the premises being acceptable to us. So too, not all
+mistakes in reasoning are logical fallacies. But there is no need to import
+modern theories of alternative logics or to accept that some irresolvably
+contradictory statements actually make intelligible claims to make
+Nagarjuna’s works understandable. Nor was Nagarjuna “using reason to
+destroy reason”—he was trying to show by rather rigorous conceptual
+analysis and the use of rigorous logical reasoning that any metaphysical
+system that affirms self-existing, permanent entities involves
+inconsistencies with what we see actually happening in the world and thus
+cannot be held. Indeed, logic and the avoidance of contradictions are
+absolutely central to how his arguments proceed.
+      Also note that he did this without appeal to mystical experiences: he
+appealed to the conflict of his opponents’ alleged claims with ordinary
+experience, but he never appealed to other types of experiences. However,
+this does not mean that he was not a mystic: his arguments are addressed to
+other Buddhist and Hindu theorists, but his works overall show that his aim
+was to clear the mind of the unenlightened of the process of projecting
+concepts onto phenomenal reality (prapancha) in order that they may
+experience the real that-ness (tattva) of the phenomenal world as it truly is
+(yathabhutam), thereby freeing the listeners from the suffering that ensues
+when we try to force reality to conform to our preconceived ideas of
+discrete “real” entities and from the desires driving rebirth.

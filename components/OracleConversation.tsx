@@ -8,6 +8,7 @@ import { Paperclip, X, Copy, BookOpen, Clock } from 'lucide-react';
 import { ContinuousConversation, ContinuousConversationRef } from '../apps/web/components/voice/ContinuousConversation';
 import { SacredHoloflower } from './sacred/SacredHoloflower';
 import { RhythmHoloflower } from './liquid/RhythmHoloflower';
+import { HoloflowerMotion } from './sacred/HoloflowerMotion';
 import { ConversationalRhythm, type RhythmMetrics } from '@/lib/liquid/ConversationalRhythm';
 import { EnhancedVoiceMicButton } from './ui/EnhancedVoiceMicButton';
 import AdaptiveVoiceMicButton from './ui/AdaptiveVoiceMicButton';
@@ -107,6 +108,8 @@ interface OracleConversationProps {
   showSessionSelector?: boolean; // Control session selector from parent (header button)
   onCloseSessionSelector?: () => void; // Notify parent to close session selector
   onSessionActiveChange?: (active: boolean) => void; // Notify parent of session active state
+  apiEndpoint?: string; // API endpoint for oracle chat
+  consciousnessType?: string; // Type of consciousness (e.g., "maia")
   onMessageAdded?: (message: ConversationMessage) => void;
   onSessionEnd?: (reason?: string) => void;
 }
@@ -157,6 +160,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
   showSessionSelector = false,
   onCloseSessionSelector,
   onSessionActiveChange,
+  apiEndpoint = '/api/between/chat', // Default API endpoint
+  consciousnessType = 'maia', // Default consciousness type
   onMessageAdded,
   onSessionEnd
 }) => {
@@ -493,8 +498,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // This effect will be moved after state declarations to avoid hoisting issues
 
-  // Voice mode always enabled (Realtime only)
-  const conversationMode = 'voice'; // Locked to voice mode - no chat toggle
+  // Dynamic conversation mode based on interface state
+  const conversationMode = showChatInterface ? 'chat' : 'voice'; // Toggle between voice and chat modes
 
   // Responsive holoflower size (state declared earlier at line 169)
   useEffect(() => {
@@ -1140,13 +1145,28 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       });
     } catch (error) {
       console.error('❌ Failed to enable audio:', error);
-      // More helpful error message
-      toast.error('Audio initialization failed. Please try refreshing the page.', {
-        duration: 5000,
-        position: 'top-center'
-      });
-      // Still clear the permission screen to let user proceed
+
+      // Graceful fallback: Automatically switch to text mode
+      setAudioEnabled(false);
+      setShowChatInterface(true);
       setNeedsIOSAudioPermission(false);
+
+      // Check error type for more specific messaging
+      if (error instanceof Error && error.name === 'NotAllowedError') {
+        // User explicitly denied permission
+        toast.info('Audio access denied. Switched to text mode. Use the voice/text toggle to try again.', {
+          duration: 6000,
+          position: 'top-center'
+        });
+      } else {
+        // General audio failure
+        toast.info('Audio unavailable. Using text mode instead. Use the voice/text toggle to retry audio.', {
+          duration: 5000,
+          position: 'top-center'
+        });
+      }
+
+      console.log('🔄 Graceful fallback: Switched to text mode due to audio failure');
     }
   }, [audioEnabled]);
 
@@ -1523,7 +1543,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       console.log('📤 Sending text message to API:', { cleanedText, userId, sessionId });
 
       // Get user's conversation style preference
-      const conversationStyle = ConversationStylePreference.get();
+      // Override with 'scribe' mode when in SCRIBE/COUNSEL mode for supervisory functionality
+      const baseConversationStyle = ConversationStylePreference.get();
+      const conversationStyle = initialMode === 'patient' ? 'scribe' : baseConversationStyle;
 
       // 🧠 BARDIC MEMORY: Detect crystallization (Fire-Air alignment)
       // Wait for pattern recognition to complete if it's running
@@ -1569,6 +1591,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
           userName: userName || 'Explorer',
           sessionId,
           isVoiceMode: !showChatInterface, // Voice mode = faster Essential tier
+          conversationStyle, // 🏥 SCRIBE SUPERVISOR: Activates supervisory prompts when in COUNSEL mode
           fieldState: {
             active: true,
             depth: 0.7,
@@ -2850,400 +2873,17 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         }}
         style={{ willChange: 'auto' }}
       >
-        {/* Holoflower container - smaller, upper-left, visible but not dominating */}
-        <div className="flex items-center justify-center"
-             style={{
-               width: holoflowerSize,
-               height: holoflowerSize,
-               background: 'transparent',
-               overflow: 'visible',
-               pointerEvents: 'none'  // Allow clicks to pass through to parent
-             }}>
-          {/* 🌊 LIQUID AI - Rhythm-aware Holoflower pulses with conversational rhythm */}
-          <RhythmHoloflower
-            rhythmMetrics={rhythmMetrics}
-            size={holoflowerSize}
-            interactive={false}
-            showLabels={false}
-            motionState={currentMotionState}
-            coherenceShift={coherenceShift}
-            isListening={isListening}
-            isProcessing={isProcessing}
-            isResponding={isResponding}
-            showBreakthrough={showBreakthrough}
-            voiceAmplitude={voiceAmplitude}
-            isMaiaSpeaking={isResponding || isAudioPlaying}
-            dimmed={conversationMode === 'chat' || messages.filter(m => !m.id.startsWith('greeting-')).length > 0}
-          />
-
-          {/* Central Holoflower Logo with Glow and Sparkles */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            {/* Minimal glow - almost imperceptible */}
-            <motion.div
-              className={`absolute flex items-center justify-center pointer-events-none ${
-                showChatInterface || messages.filter(m => !m.id.startsWith('greeting-')).length > 0
-                  ? 'opacity-0'  // Invisible when text present
-                  : 'opacity-10'  // Barely visible when listening
-              }`}
-              animate={{
-                scale: [1, 1.1, 1],
-                opacity: showChatInterface || messages.length > 0 ? 0 : [0.05, 0.1, 0.05]
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <div
-                className="w-32 h-32 rounded-full"
-                style={{
-                  background: 'radial-gradient(circle, rgba(212, 184, 150, 0.15) 0%, transparent 60%)',
-                  filter: 'blur(40px)',
-                  transform: 'translate(0, 0)'
-                }}
-              />
-            </motion.div>
-
-            {/* Holoflower Image - Amber radiance */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-              <img
-                src="/holoflower-amber.png"
-                alt="Holoflower"
-                className="object-contain opacity-80 drop-shadow-[0_0_15px_rgba(251,146,60,0.7)]"
-                style={{
-                  width: `${holoflowerSize * 0.85}px`,
-                  height: `${holoflowerSize * 0.85}px`,
-                  filter: 'brightness(1.3)',
-                }}
-              />
-            </div>
-
-            {/* Sparkles emanating from center - ULTRA SLOW & EPHEMERAL */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              {/* Main radial sparkles - slower drift */}
-              {[...Array(12)].map((_, i) => (
-                <motion.div
-                  key={`sparkle-${i}`}
-                  className="absolute w-0.5 h-0.5 bg-white/80 rounded-full"
-                  style={{
-                    filter: 'blur(0.5px)'
-                  }}
-                  animate={{
-                    x: [0, Math.cos(i * Math.PI / 6) * 100],
-                    y: [0, Math.sin(i * Math.PI / 6) * 100],
-                    opacity: [0, 0.7, 0.3, 0],
-                    scale: [0, 1.2, 0.8, 0]
-                  }}
-                  transition={{
-                    duration: 10 + Math.random() * 5, // 10-15 seconds
-                    repeat: Infinity,
-                    delay: i * 1.5 + Math.random() * 5, // Very sporadic
-                    ease: "easeInOut",
-                    repeatDelay: Math.random() * 5 // Long pauses
-                  }}
-                />
-              ))}
-              
-              {/* Spiraling sparkles - dreamy drift */}
-              {[...Array(16)].map((_, i) => {
-                const angle = (i * Math.PI * 2) / 16;
-                const spiralRotation = i * 30;
-                const randomDuration = 12 + Math.random() * 6; // 12-18 seconds
-                const randomDelay = Math.random() * 10; // 0-10 second random delay
-                return (
-                  <motion.div
-                    key={`sparkle-spiral-${i}`}
-                    className="absolute w-0.5 h-0.5 rounded-full"
-                    style={{
-                      background: 'radial-gradient(circle, rgba(255,255,200,0.9) 0%, transparent 70%)',
-                      filter: 'blur(0.3px)'
-                    }}
-                    animate={{
-                      x: [
-                        0,
-                        Math.cos(angle) * 20,
-                        Math.cos(angle + 0.5) * 50,
-                        Math.cos(angle + 1) * 80,
-                        Math.cos(angle + 1.5) * 100
-                      ],
-                      y: [
-                        0,
-                        Math.sin(angle) * 20,
-                        Math.sin(angle + 0.5) * 50,
-                        Math.sin(angle + 1) * 80,
-                        Math.sin(angle + 1.5) * 100
-                      ],
-                      opacity: [0, 0.6, 0.4, 0.2, 0],
-                      scale: [0, 1, 0.8, 0.5, 0],
-                      rotate: [0, spiralRotation]
-                    }}
-                    transition={{
-                      duration: randomDuration,
-                      repeat: Infinity,
-                      delay: randomDelay + i * 0.5,
-                      ease: "easeInOut",
-                      repeatDelay: Math.random() * 8 // Very long pauses
-                    }}
-                  />
-                );
-              })}
-              
-              {/* Tiny twinkling sparkles - ultra gentle */}
-              {[...Array(25)].map((_, i) => (
-                <motion.div
-                  key={`sparkle-tiny-${i}`}
-                  className="absolute w-px h-px rounded-full"
-                  style={{
-                    left: `${35 + Math.random() * 30}%`,
-                    top: `${35 + Math.random() * 30}%`,
-                    background: 'white',
-                    boxShadow: '0 0 2px rgba(255,255,255,0.5)'
-                  }}
-                  animate={{
-                    opacity: [0, 0, Math.random() * 0.6 + 0.2, 0, 0],
-                    scale: [0, 0, Math.random() + 0.5, 0, 0],
-                  }}
-                  transition={{
-                    duration: 8 + Math.random() * 7, // 8-15 seconds
-                    repeat: Infinity,
-                    delay: Math.random() * 15, // 0-15 second random start
-                    ease: "easeInOut",
-                    repeatDelay: Math.random() * 10, // Very long pauses between twinkles
-                    times: [0, 0.3, 0.5, 0.7, 1] // Quick twinkle in the middle
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Voice Visualizer - User's voice (amber plasma field with radial gradients) */}
-            {isMounted && !showChatInterface && voiceEnabled && voiceMicRef.current?.isListening && (
-              <motion.div
-                className="absolute inset-0 pointer-events-none flex items-center justify-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {/* Multiple amber plasma field layers - ENHANCED VISIBILITY */}
-                {[...Array(3)].map((_, i) => (
-                  <motion.div
-                    key={`voice-field-${i}`}
-                    className="absolute rounded-full"
-                    style={{
-                      width: `${300 + i * 150}px`,
-                      height: `${300 + i * 150}px`,
-                      background: i === 0
-                        ? 'radial-gradient(circle, rgba(251, 191, 36, 0.6) 0%, rgba(251, 191, 36, 0.25) 50%, transparent 100%)'
-                        : i === 1
-                        ? 'radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, rgba(245, 158, 11, 0.15) 50%, transparent 100%)'
-                        : 'radial-gradient(circle, rgba(217, 119, 6, 0.3) 0%, rgba(217, 119, 6, 0.08) 50%, transparent 100%)',
-                      filter: `blur(${12 + i * 6}px)`,
-                    }}
-                    animate={{
-                      scale: [1, 1.1, 1],
-                      opacity: [0.85 - i * 0.15, 0.6, 0.85 - i * 0.15],
-                    }}
-                    transition={{
-                      duration: 5 + i * 2,
-                      repeat: Infinity,
-                      delay: i * 0.8,
-                      ease: [0.42, 0, 0.58, 1]
-                    }}
-                  />
-                ))}
-
-                {/* Audio level responsive center field glow - only show for strong speech */}
-                {/* Accessibility: High threshold (0.5) + exponential smoothing prevents keyboard flashing (seizure risk) */}
-                {smoothedAudioLevel > 0.5 && (
-                  <motion.div
-                    className="absolute rounded-full"
-                    style={{
-                      width: '280px',
-                      height: '280px',
-                      background: 'radial-gradient(circle, rgba(251, 191, 36, 0.35) 0%, rgba(251, 191, 36, 0.1) 60%, transparent 100%)',
-                      filter: 'blur(18px)',
-                    }}
-                    animate={{
-                      scale: 1 + smoothedAudioLevel * 0.15,
-                      opacity: 0.4 + smoothedAudioLevel * 0.15,
-                    }}
-                    transition={{
-                      duration: 0.8,
-                      ease: "easeInOut"
-                    }}
-                  />
-                )}
-              </motion.div>
-            )}
-
-            {/* Voice Visualizer - MAIA's voice - ENHANCED VISIBILITY */}
-            {(isResponding || isAudioPlaying) && (
-              <motion.div
-                className="absolute inset-0 pointer-events-none flex items-center justify-center"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                {/* Golden pulsing glow layers - MUCH MORE VISIBLE */}
-                {[...Array(3)].map((_, i) => (
-                  <motion.div
-                    key={`maya-glow-${i}`}
-                    className="absolute rounded-full"
-                    style={{
-                      width: `${280 + i * 120}px`,
-                      height: `${280 + i * 120}px`,
-                      background: i === 0
-                        ? 'radial-gradient(circle, rgba(212, 184, 150, 0.55) 0%, rgba(212, 184, 150, 0.2) 60%, transparent 100%)'
-                        : i === 1
-                        ? 'radial-gradient(circle, rgba(196, 168, 134, 0.4) 0%, rgba(196, 168, 134, 0.12) 60%, transparent 100%)'
-                        : 'radial-gradient(circle, rgba(180, 152, 118, 0.25) 0%, rgba(180, 152, 118, 0.06) 60%, transparent 100%)',
-                      filter: `blur(${18 + i * 8}px)`,
-                    }}
-                    animate={{
-                      scale: [1, 1.15, 1],
-                      opacity: [0.4, 0.2, 0.4],
-                    }}
-                    transition={{
-                      duration: 2.5 + i * 0.5,
-                      repeat: Infinity,
-                      delay: i * 0.4,
-                      ease: "easeInOut"
-                    }}
-                  />
-                ))}
-
-                {/* Subtle inner glow */}
-                <motion.div
-                  className="absolute rounded-full"
-                  style={{
-                    width: '200px',
-                    height: '200px',
-                    background: 'radial-gradient(circle, rgba(212, 184, 150, 0.15) 0%, transparent 60%)',
-                    filter: 'blur(30px)',
-                  }}
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.3, 0.5, 0.3],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                />
-              </motion.div>
-            )}
-
-            {/* Status text below holoflower */}
-            {isMounted && !showChatInterface && voiceEnabled && (
-              <div className="absolute bottom-[-110px] left-1/2 transform -translate-x-1/2 text-center">
-                {/* Elemental Mode Indicator - TEMPORARILY DISABLED
-                {voiceMicRef.current?.elementalMode && (
-                  <motion.div
-                    className="absolute -top-10 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-full backdrop-blur-sm"
-                    style={{
-                      backgroundColor: `${voiceMicRef.current.elementalMode === 'fire' ? 'rgba(239, 68, 68, 0.2)' :
-                        voiceMicRef.current.elementalMode === 'water' ? 'rgba(107, 155, 209, 0.2)' :
-                        voiceMicRef.current.elementalMode === 'earth' ? 'rgba(161, 98, 7, 0.2)' :
-                        voiceMicRef.current.elementalMode === 'air' ? 'rgba(212, 184, 150, 0.2)' :
-                        'rgba(147, 51, 234, 0.2)'}`,
-                      border: `1px solid ${voiceMicRef.current.elementalMode === 'fire' ? 'rgba(239, 68, 68, 0.4)' :
-                        voiceMicRef.current.elementalMode === 'water' ? 'rgba(107, 155, 209, 0.4)' :
-                        voiceMicRef.current.elementalMode === 'earth' ? 'rgba(161, 98, 7, 0.4)' :
-                        voiceMicRef.current.elementalMode === 'air' ? 'rgba(212, 184, 150, 0.4)' :
-                        'rgba(147, 51, 234, 0.4)'}`
-                    }}
-                  >
-                    <span className="text-xs font-medium" style={{
-                      color: voiceMicRef.current.elementalMode === 'fire' ? '#ef4444' :
-                        voiceMicRef.current.elementalMode === 'water' ? '#6B9BD1' :
-                        voiceMicRef.current.elementalMode === 'earth' ? '#a16207' :
-                        voiceMicRef.current.elementalMode === 'air' ? '#D4B896' :
-                        '#9333ea'
-                    }}>
-                      {voiceMicRef.current.elementalMode === 'fire' ? '🔥 Fire' :
-                        voiceMicRef.current.elementalMode === 'water' ? '💧 Water' :
-                        voiceMicRef.current.elementalMode === 'earth' ? '🌍 Earth' :
-                        voiceMicRef.current.elementalMode === 'air' ? '🌬️ Air' :
-                        '✨ Aether'}
-                    </span>
-                  </motion.div>
-                )} */}
-                {/* Status messages - Processing state takes priority */}
-                <AnimatePresence mode="wait">
-                  {(isResponding || isAudioPlaying || isProcessing) && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{
-                        opacity: [0.7, 1, 0.7],
-                        y: 0,
-                        scale: [0.98, 1, 0.98]
-                      }}
-                      transition={{
-                        opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-                        scale: { duration: 2, repeat: Infinity, ease: "easeInOut" }
-                      }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="text-amber-300/95 text-sm font-medium drop-shadow-[0_0_10px_rgba(252,211,77,0.6)]"
-                    >
-                      {isProcessing && !isResponding && !isAudioPlaying ? '✨ Thinking...' :
-                       isResponding && !isAudioPlaying ? '🎵 Preparing voice...' :
-                       '💫 Speaking...'}
-                    </motion.div>
-                  )}
-                  {voiceMicRef.current?.isListening && !isResponding && !isAudioPlaying && !isProcessing && (
-                    <div className="flex flex-col items-center gap-2">
-                      <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{
-                          opacity: [0.8, 1, 0.8],
-                          y: 0
-                        }}
-                        transition={{
-                          opacity: { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
-                        }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="text-emerald-300/95 text-sm font-medium drop-shadow-[0_0_8px_rgba(110,231,183,0.5)]"
-                      >
-                        🎤 Listening...
-                      </motion.div>
-                      {/* Keep Recording button - subtle, only when recording */}
-                      {voiceMicRef.current?.isRecording && (
-                        <motion.button
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 0.7, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.9 }}
-                          whileHover={{ opacity: 1, scale: 1.05 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            voiceMicRef.current?.extendRecording();
-                          }}
-                          className="px-3 py-1 text-xs bg-emerald-500/20 text-emerald-300/90 rounded-full backdrop-blur-sm
-                                   border border-emerald-400/30 hover:bg-emerald-500/30 hover:border-emerald-400/50
-                                   transition-all duration-200 drop-shadow-[0_0_6px_rgba(110,231,183,0.3)]"
-                        >
-                          ⏱️ Keep Recording
-                        </motion.button>
-                      )}
-                    </div>
-                  )}
-                  {!voiceMicRef.current?.isListening && !isResponding && !isAudioPlaying && !isProcessing && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="text-amber-300/95 text-sm font-medium drop-shadow-[0_0_8px_rgba(252,211,77,0.5)]"
-                    >
-                      Click to activate
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
-
-            {/* OLD BUTTON REMOVED - Holoflower itself is now clickable */}
-          </div>
-        </div>
+        {/* 🌸 DOUBLE HOLOFLOWER ANIMATION - Sacred geometries with voice responsiveness */}
+        <HoloflowerMotion
+          state={currentMotionState}
+          coherenceLevel={coherenceLevel}
+          shadowPetals={shadowPetals}
+          voiceActive={isListening || isResponding}
+          elements={[]}
+          isUserSpeaking={isListening}
+          isMaiaSpeaking={isResponding}
+          conversationMode={realtimeMode}
+        />
       </motion.div>
         </TransformationalPresence>
       </div>
@@ -3746,7 +3386,51 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {/* Floating Quick Settings Button */}
       {/* QuickSettingsButton removed - now in bottom nav bar */}
 
-      {/* Voice/Chat Mode Switcher - REMOVED: Always use Realtime voice mode */}
+      {/* Voice/Chat Mode Switcher - RESTORED for toggle functionality */}
+      <div className="fixed top-4 left-4 z-50">
+        <button
+          onClick={async () => {
+            if (showChatInterface) {
+              // Switching to voice mode - try to enable audio
+              try {
+                await enableAudio();
+                setShowChatInterface(false);
+                toast.success('Switched to voice mode', {
+                  duration: 2000,
+                  position: 'top-center'
+                });
+              } catch (error) {
+                // enableAudio will handle fallback automatically
+                console.log('Audio failed, staying in text mode');
+              }
+            } else {
+              // Switching to text mode
+              setShowChatInterface(true);
+              toast.info('Switched to text mode', {
+                duration: 2000,
+                position: 'top-center'
+              });
+            }
+          }}
+          className={`px-4 py-2 rounded-full backdrop-blur-sm border transition-all duration-300 ${
+            showChatInterface
+              ? 'bg-amber-500/20 border-amber-500/40 text-amber-200'
+              : 'bg-purple-500/20 border-purple-500/40 text-purple-200'
+          } hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black/50 ${
+            showChatInterface ? 'focus:ring-amber-500' : 'focus:ring-purple-500'
+          }`}
+          title={`Switch to ${showChatInterface ? 'Voice' : 'Text'} mode`}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-sm">
+              {showChatInterface ? '🎤 Voice' : '💬 Text'}
+            </span>
+            {!audioEnabled && !showChatInterface && (
+              <span className="text-xs opacity-60">(Audio disabled)</span>
+            )}
+          </div>
+        </button>
+      </div>
 
       {/* Soulprint Metrics Widget - DISABLED: Causing 400 errors when userId not authenticated */}
       {/* {userId && <SoulprintMetricsWidget userId={userId} />} */}
@@ -3971,13 +3655,6 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         onSkip={handleClosingRitualSkip}
       />
 
-      {/* Toggle button for rhythm debug - always visible */}
-      <button
-        onClick={() => setShowRhythmDebug(!showRhythmDebug)}
-        className="fixed bottom-20 right-4 bg-amber-500/20 hover:bg-amber-500/40 text-amber-400 px-3 py-2 rounded-lg text-xs z-50"
-      >
-        🌊 {showRhythmDebug ? 'Hide' : 'Show'} Rhythm
-      </button>
     </div>
   );
 };
