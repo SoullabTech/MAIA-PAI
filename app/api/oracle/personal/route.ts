@@ -12,13 +12,10 @@ import { unifiedIntelligenceEngine } from '@/lib/intelligence/UnifiedIntelligenc
 import { morphoresonantField } from '@/lib/consciousness/MorphoresonantFieldInterface';
 import { getConsciousnessPrompt } from '@/lib/consciousness/DualConsciousnessSystem';
 import { detectSyzygy, getSyzygyResponseTiming } from '@/lib/consciousness/SyzygyDetector';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, isSovereignModeEnabled } from '@/lib/supabase';
 
-// Initialize Supabase client for file retrieval
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Initialize sovereign-aware Supabase client for file retrieval
+const supabase = createClient();
 
 // Initialize UNIFIED consciousness (26-year spiral completion)
 let maiaConsciousness: ReturnType<typeof getMAIAConsciousness> | null = null;

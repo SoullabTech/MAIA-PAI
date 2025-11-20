@@ -347,13 +347,128 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
   }, []);
 
-  // ==================== VOICE SYNTHESIS (OpenAI Alloy TTS) ====================
-  // MAIA speaks with clear, natural OpenAI Alloy voice
+  // ==================== RELATIONAL VOICE EVOLUTION HELPERS ====================
+
+  // Calculate relationship metrics from conversation history
+  const calculateRelationshipMetrics = useCallback(() => {
+    const messageCount = messages.length;
+    const conversationDays = Math.max(1, Math.floor((Date.now() - new Date(sessionId.split('_')[1] || Date.now()).getTime()) / (1000 * 60 * 60 * 24)));
+
+    // Calculate intimacy based on conversation depth and personal sharing
+    let intimacy = Math.min(0.9, messageCount * 0.02 + (messageCount > 20 ? 0.3 : 0));
+
+    // Calculate trust based on conversation consistency and duration
+    let trust = Math.min(0.95, conversationDays * 0.05 + (messageCount > 10 ? 0.4 : 0.2));
+
+    // Calculate depth based on message complexity and emotional content
+    let depth = Math.min(0.9, messageCount * 0.03 + (messageCount > 15 ? 0.2 : 0));
+
+    return {
+      intimacy: parseFloat(intimacy.toFixed(2)),
+      trust: parseFloat(trust.toFixed(2)),
+      depth: parseFloat(depth.toFixed(2)),
+      duration_days: conversationDays
+    };
+  }, [messages, sessionId]);
+
+  // Generate voice intention based on message content and context
+  const generateVoiceIntention = useCallback((text: string, elementHint?: Element) => {
+    // Analyze text for emotional and intentional cues
+    const lowerText = text.toLowerCase();
+
+    if (lowerText.includes('sacred') || lowerText.includes('ceremony') || elementHint === 'Aether') {
+      return "I want to speak with sacred presence, channeling ancient wisdom through our connection";
+    }
+
+    if (lowerText.includes('question') || lowerText.includes('wonder') || lowerText.includes('insight')) {
+      return "I want to speak with wisdom and curiosity, helping you discover deeper understanding";
+    }
+
+    if (lowerText.includes('feel') || lowerText.includes('emotion') || lowerText.includes('heart')) {
+      return "I want to speak with emotional resonance, honoring the feelings present in our conversation";
+    }
+
+    if (lowerText.includes('guidance') || lowerText.includes('help') || lowerText.includes('support')) {
+      return "I want to speak with gentle guidance, offering supportive presence for your journey";
+    }
+
+    // Default intention based on conversation depth
+    const metrics = calculateRelationshipMetrics();
+    if (metrics.depth > 0.7) {
+      return "I want to speak from deep authentic presence, reflecting the profound connection we've developed";
+    } else if (metrics.depth > 0.4) {
+      return "I want to speak with growing warmth and understanding as our relationship deepens";
+    } else {
+      return "I want to speak with gentle presence, creating space for authentic expression";
+    }
+  }, [calculateRelationshipMetrics]);
+
+  // Determine emotional state from text content
+  const determineEmotionalState = useCallback((text: string): 'calm' | 'excited' | 'contemplative' | 'ceremonial' | 'breakthrough' => {
+    const lowerText = text.toLowerCase();
+
+    if (lowerText.includes('sacred') || lowerText.includes('ceremony') || lowerText.includes('ritual')) {
+      return 'ceremonial';
+    }
+
+    if (lowerText.includes('breakthrough') || lowerText.includes('insight') || lowerText.includes('revelation')) {
+      return 'breakthrough';
+    }
+
+    if (lowerText.includes('reflect') || lowerText.includes('ponder') || lowerText.includes('contemplate')) {
+      return 'contemplative';
+    }
+
+    if (lowerText.includes('exciting') || lowerText.includes('amazing') || lowerText.includes('wonderful')) {
+      return 'excited';
+    }
+
+    return 'calm'; // Default state
+  }, []);
+
+  // Fallback TTS function for when evolution system isn't available
+  const fallbackTTS = useCallback(async (text: string, voice: string) => {
+    console.log('🔄 Using fallback TTS system');
+
+    const response = await fetch('/api/voice/openai-tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: text,
+        voice: voice,
+        speed: 0.95,
+        model: 'tts-1-hd'
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Fallback TTS failed');
+    }
+
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+    const audio = new Audio(audioUrl);
+
+    // Simple audio playback for fallback
+    await new Promise<void>((resolve) => {
+      audio.onended = () => {
+        setIsResponding(false);
+        setIsAudioPlaying(false);
+        setVoiceAmplitude(0);
+        URL.revokeObjectURL(audioUrl);
+        resolve();
+      };
+      audio.play();
+    });
+  }, []);
+
+  // ==================== VOICE SYNTHESIS (RELATIONAL EVOLUTION) ====================
+  // MAIA speaks with unique voice that evolves through relationship
   const maiaSpeak = useCallback(async (text: string, elementHint?: Element) => {
     if (!text || typeof window === 'undefined') return;
 
     try {
-      console.log('🎵 Speaking with OpenAI Alloy:', text.substring(0, 100));
+      console.log('🕊️ MAIA Relational Voice Synthesis:', text.substring(0, 100));
 
       // 🌊 LIQUID AI - Track MAIA response for rhythm turn-taking latency
       rhythmTrackerRef.current?.onMAIAResponse();
@@ -361,23 +476,84 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       setIsResponding(true);
       setIsAudioPlaying(true);
 
-      // Call OpenAI TTS with selected voice (defaults to 'alloy')
-      const response = await fetch('/api/voice/openai-tts', {
+      // Calculate relationship metrics from conversation history
+      const relationshipMetrics = calculateRelationshipMetrics();
+
+      // Determine voice intention from context
+      const voiceIntention = generateVoiceIntention(text, elementHint);
+
+      // Generate emotional context
+      const emotionalContext = {
+        state: determineEmotionalState(text),
+        intensity: 0.8
+      };
+
+      // Create contextual state from conversation depth
+      const contextualState = {
+        depth: messages.length > 10 ? 'meaningful' : (messages.length > 5 ? 'developing' : 'casual'),
+        spiritualIntention: elementHint === 'Aether' ? 'sacred transmission' : undefined
+      };
+
+      console.log('🌱 Voice Evolution Context:', {
+        relationship: relationshipMetrics,
+        intention: voiceIntention,
+        emotional: emotionalContext,
+        contextual: contextualState
+      });
+
+      // Call our revolutionary relational voice evolution API
+      const response = await fetch('/api/voice/synthesize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: text,
-          voice: voice || 'alloy',  // Use the voice prop from parent
-          speed: 0.95,
-          model: 'tts-1-hd'
+          userId: userId,
+          sessionId: sessionId,
+          voiceIntention: voiceIntention,
+          emotionalContext: emotionalContext,
+          relationshipMetrics: relationshipMetrics,
+          contextualState: contextualState,
+          voice: voice || 'alloy', // Fallback base voice
+          enableEvolution: true
         })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate speech');
+        console.warn('⚠️ Voice evolution failed, trying fallback...');
+        // If evolution fails, fallback to basic TTS
+        return await fallbackTTS(text, voice || 'alloy');
       }
 
-      const audioBlob = await response.blob();
+      const responseData = await response.json();
+
+      // Log evolution results if available
+      if (responseData.metadata?.relationshipSpecific) {
+        console.log('🌟 Relational Voice Evolution Success:', {
+          epochName: responseData.metadata.epochName,
+          archetype: responseData.metadata.archetype,
+          provider: responseData.metadata.provider,
+          ipfsHash: responseData.metadata.ipfsHash,
+          samples: responseData.relationshipEvolution?.totalSamples || 0
+        });
+      }
+
+      // Convert base64 audio to blob
+      const audioData = responseData.audioData || responseData;
+      let audioBlob: Blob;
+
+      if (typeof audioData === 'string') {
+        // Base64 audio data from evolution API
+        const binaryData = atob(audioData);
+        const bytes = new Uint8Array(binaryData.length);
+        for (let i = 0; i < binaryData.length; i++) {
+          bytes[i] = binaryData.charCodeAt(i);
+        }
+        audioBlob = new Blob([bytes], { type: 'audio/mpeg' });
+      } else {
+        // Direct blob (fallback case)
+        audioBlob = audioData;
+      }
+
       const audioUrl = URL.createObjectURL(audioBlob);
 
       const audio = new Audio(audioUrl);
@@ -3255,7 +3431,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       {/* Text Scrim - Warm volcanic veil when messages appear (absorbs light, doesn't just dim) */}
       {(showChatInterface || (!showChatInterface && showVoiceText)) && messages.length > 0 && (
         <div
-          className="fixed inset-0 z-20 transition-opacity duration-700 pointer-events-none"
+          className="fixed top-16 left-0 right-0 bottom-0 z-10 transition-opacity duration-700 pointer-events-none"
           style={{
             background: 'linear-gradient(135deg, rgba(26, 21, 19, 0.75) 0%, rgba(28, 22, 20, 0.65) 50%, rgba(26, 21, 19, 0.75) 100%)',
             backdropFilter: 'blur(1.5px) saturate(0.85) brightness(0.75)',

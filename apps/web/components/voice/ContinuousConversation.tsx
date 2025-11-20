@@ -65,6 +65,10 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
   const networkErrorCount = useRef<number>(0);
   const lastNetworkErrorTime = useRef<number>(0);
 
+  // CIRCUIT BREAKER: Prevent endless restart loops
+  const lastRestartTime = useRef<number>(0);
+  const restartCount = useRef<number>(0);
+
   // 🎯 ADAPTIVE SILENCE DETECTION - Monitor audio levels for natural speech pauses
   const isSpeakingNowRef = useRef(false); // Track if user is actively speaking based on audio levels
   const silenceStartTimeRef = useRef<number>(0); // When silence began
@@ -281,6 +285,32 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
         recognitionTimeoutRef.current = null;
       }
 
+      // CIRCUIT BREAKER: Prevent endless restart loops
+      const now = Date.now();
+      if (!lastRestartTime.current) {
+        lastRestartTime.current = now;
+        restartCount.current = 1;
+      } else {
+        // If restarting within 10 seconds, increment counter
+        if (now - lastRestartTime.current < 10000) {
+          restartCount.current++;
+        } else {
+          // Reset counter if it's been more than 10 seconds
+          restartCount.current = 1;
+          lastRestartTime.current = now;
+        }
+      }
+
+      // If we've restarted more than 10 times in 10 seconds, stop listening entirely
+      if (restartCount.current > 10) {
+        console.log('🚨 [CIRCUIT BREAKER] Too many restarts, stopping listening to prevent infinite loop');
+        setIsListening(false);
+        isListeningRef.current = false;
+        setIsRecording(false);
+        isRecordingRef.current = false;
+        return;
+      }
+
       // CRITICAL: Prevent infinite restart loop
       // Check if already restarting to prevent multiple simultaneous attempts
       if (isRestartingRef.current) {
@@ -304,7 +334,7 @@ export const ContinuousConversation = forwardRef<ContinuousConversationRef, Cont
           ? Math.min(300 * Math.pow(2, networkErrorCount.current - 1), 5000)
           : 300;
 
-        console.log(`🔄 [onend] Will restart recognition after ${backoffDelay}ms delay (errors: ${networkErrorCount.current})...`);
+        console.log(`🔄 [onend] Will restart recognition after ${backoffDelay}ms delay (errors: ${networkErrorCount.current}, restart #${restartCount.current})...`);
         isRestartingRef.current = true;
 
         setTimeout(() => {
