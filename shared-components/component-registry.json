@@ -1,0 +1,168 @@
+{
+  "registry": {
+    "SageTealWelcome": {
+      "status": "BLESSED",
+      "path": "shared-components/onboarding/SageTealWelcome.tsx",
+      "originalPath": "MAIA-SOVEREIGN/apps/web/components/welcome/SageTealWelcome.tsx",
+      "category": "onboarding",
+      "description": "The sacred amber-tinted glass morphism welcome interface with holoflower emanation",
+      "createdDate": "2025-01-20",
+      "lastVerified": "2025-01-20",
+      "keyFeatures": [
+        "Amber-tinted glass container with backdrop-blur",
+        "Rotating holoflower with emanation effects",
+        "Elemental question rotation",
+        "Sacred typography with proper font weights",
+        "Teal gradient background matching original design",
+        "Smooth Framer Motion transitions"
+      ],
+      "dependencies": [
+        "framer-motion",
+        "react"
+      ],
+      "urls": {
+        "testPage": "/test-welcome",
+        "demo": "http://localhost:3001/test-welcome"
+      },
+      "verificationNotes": "Confirmed exact match to original design screenshots. User verified: 'this is definitely it!'",
+      "gitCommit": "d8aa0c47"
+    },
+    "TealWelcomeFlow": {
+      "status": "TESTED",
+      "path": "shared-components/onboarding/TealWelcomeFlow.tsx",
+      "category": "onboarding",
+      "description": "Teal gradient 'Welcome Kelly' interface with glass morphism",
+      "createdDate": "2025-01-20",
+      "lastVerified": "2025-01-20",
+      "keyFeatures": [
+        "Teal radial gradient background",
+        "Glass morphism card container",
+        "Staggered animation reveals",
+        "Beautiful typography with proper weights",
+        "Infinity symbol ending",
+        "Two-step flow with smooth transitions"
+      ],
+      "dependencies": [
+        "framer-motion",
+        "react"
+      ],
+      "verificationNotes": "Created during component recreation session. Matches visual requirements but not as perfectly polished as SageTealWelcome.",
+      "gitCommit": "d8aa0c47"
+    },
+    "CompleteWelcomeFlow": {
+      "status": "TESTED",
+      "path": "shared-components/onboarding/CompleteWelcomeFlow.tsx",
+      "category": "onboarding",
+      "description": "Master orchestrator component managing all 5 welcome interfaces",
+      "createdDate": "2025-01-20",
+      "lastVerified": "2025-01-20",
+      "keyFeatures": [
+        "State management for 5 welcome screens",
+        "Smooth transitions between interfaces",
+        "Completion callback handling",
+        "Composable architecture"
+      ],
+      "dependencies": [
+        "react",
+        "all welcome interface components"
+      ],
+      "urls": {
+        "testPage": "/welcome-flow",
+        "demo": "http://localhost:3001/welcome-flow"
+      },
+      "verificationNotes": "Successfully orchestrates the full welcome journey",
+      "gitCommit": "d8aa0c47"
+    },
+    "SecondWelcomeInterface": {
+      "status": "TESTED",
+      "path": "shared-components/onboarding/SecondWelcomeInterface.tsx",
+      "category": "onboarding",
+      "description": "Navy consciousness exploration intro screen",
+      "createdDate": "2025-01-20",
+      "lastVerified": "2025-01-20",
+      "keyFeatures": [
+        "Navy gradient background",
+        "Consciousness exploration messaging",
+        "Gentle introduction to MAIA's purpose"
+      ],
+      "dependencies": [
+        "framer-motion",
+        "react"
+      ],
+      "gitCommit": "d8aa0c47"
+    },
+    "ThirdWelcomeInterface": {
+      "status": "TESTED",
+      "path": "shared-components/onboarding/ThirdWelcomeInterface.tsx",
+      "category": "onboarding",
+      "description": "Privacy & learning explanation screen",
+      "createdDate": "2025-01-20",
+      "lastVerified": "2025-01-20",
+      "keyFeatures": [
+        "Privacy-focused messaging",
+        "Learning pattern explanation",
+        "Trust-building content"
+      ],
+      "dependencies": [
+        "framer-motion",
+        "react"
+      ],
+      "gitCommit": "d8aa0c47"
+    },
+    "FourthWelcomeInterface": {
+      "status": "TESTED",
+      "path": "shared-components/onboarding/FourthWelcomeInterface.tsx",
+      "category": "onboarding",
+      "description": "Consciousness landscape exploration screen",
+      "createdDate": "2025-01-20",
+      "lastVerified": "2025-01-20",
+      "keyFeatures": [
+        "Consciousness landscape metaphor",
+        "Collaborative exploration messaging",
+        "Journey preparation"
+      ],
+      "dependencies": [
+        "framer-motion",
+        "react"
+      ],
+      "gitCommit": "d8aa0c47"
+    },
+    "FifthWelcomeInterface": {
+      "status": "TESTED",
+      "path": "shared-components/onboarding/FifthWelcomeInterface.tsx",
+      "category": "onboarding",
+      "description": "Final 'Enter MAIA' screen with large call-to-action",
+      "createdDate": "2025-01-20",
+      "lastVerified": "2025-01-20",
+      "keyFeatures": [
+        "Large 'Enter MAIA' call-to-action",
+        "Final transition to main interface",
+        "Ceremonial completion"
+      ],
+      "dependencies": [
+        "framer-motion",
+        "react"
+      ],
+      "gitCommit": "d8aa0c47"
+    }
+  },
+  "metadata": {
+    "lastUpdated": "2025-01-20T18:46:46Z",
+    "totalComponents": 7,
+    "statusCounts": {
+      "BLESSED": 1,
+      "TESTED": 6,
+      "ARCHETYPAL": 0,
+      "EXPERIMENTAL": 0,
+      "DEPRECATED": 0
+    },
+    "syncTargets": [
+      "MAIA-PAI",
+      "MAIA-SOVEREIGN",
+      "MAIA-PAI-SOVEREIGN",
+      "maia-sovereign-production"
+    ],
+    "backupLocation": "backups/components_*",
+    "preservationNotes": "These components represent the culmination of beautiful interface design work that must never be lost. Each component has been tested and verified for visual accuracy and functionality."
+  }
+}
