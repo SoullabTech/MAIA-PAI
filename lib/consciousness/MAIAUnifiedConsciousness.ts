@@ -29,7 +29,7 @@ import { IntellectualPropertyEngine } from '../intellectual-property-engine';
 import { ElementalOracle2Bridge } from '../elemental-oracle-2-bridge';
 import { ApprenticeMayaTraining } from '../maya/ApprenticeMayaTraining';
 import { maiaKnowledgeBase } from '../oracle/MaiaKnowledgeBase';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase';
 
 // Behavioral hardening filters
 import { finalizeMaiaReply } from './filters/fieldLanguage';
