@@ -132,7 +132,7 @@ export function SoulfulOnboarding({ initialName }: { initialName: string }) {
       console.log('Saved locally only');
     }
 
-    router.push('/oracle-sacred');
+    router.push('/welcome');
   };
 
   const renderStep = () => {
@@ -951,7 +951,7 @@ export function SoulfulOnboarding({ initialName }: { initialName: string }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#1a1f3a] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 flex items-center justify-center px-4">
       <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.02]">
         <svg viewBox="0 0 1000 1000" className="w-full h-full">
           <circle cx="500" cy="500" r="400" fill="none" stroke="#F6AD55" strokeWidth="0.5" strokeDasharray="4 4" />

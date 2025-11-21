@@ -18,7 +18,7 @@ import { OracleConversation } from '@/components/OracleConversation';
 import { ClaudeCodePresence } from '@/components/ui/ClaudeCodePresence';
 import { WisdomJourneyDashboard } from '@/components/maya/WisdomJourneyDashboard';
 import { WeavingVisualization } from '@/components/maya/WeavingVisualization';
-import { BetaOnboarding } from '@/components/maya/BetaOnboarding';
+// import { BetaOnboarding } from '@/components/maya/BetaOnboarding'; // REMOVED - ugly onboarding pages
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { BrainTrustMonitor } from '@/components/consciousness/BrainTrustMonitor';
 import { LogOut, Sparkles, Menu, X, Brain, Volume2, ArrowLeft, Clock } from 'lucide-react';
@@ -26,7 +26,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { SwipeNavigation, DirectionalHints } from '@/components/navigation/SwipeNavigation';
 
 function getInitialUserData() {
-  if (typeof window === 'undefined') return { id: 'guest', name: 'Explorer' };
+  if (typeof window === 'undefined') return { id: 'guest', name: 'Kelly' };
 
   // Check NEW system first (beta_user from auth system)
   const betaUser = localStorage.getItem('beta_user');
@@ -57,8 +57,8 @@ function getInitialUserData() {
     }
   }
 
-  console.log('⚠️ [MAIA] No user data found, using defaults');
-  return { id: 'guest', name: 'Explorer' };
+  console.log('⚠️ [MAIA] No user data found, using Kelly as default');
+  return { id: 'guest', name: 'Kelly' };
 }
 
 export default function MAIAPage() {
@@ -66,11 +66,11 @@ export default function MAIAPage() {
 
   // Fix hydration: Initialize with safe defaults, update in useEffect
   const [explorerId, setExplorerId] = useState('guest');
-  const [explorerName, setExplorerName] = useState('Explorer');
+  const [explorerName, setExplorerName] = useState('Kelly');
   const [userBirthDate, setUserBirthDate] = useState<string | undefined>();
   const [sessionId, setSessionId] = useState('');
   const [showDashboard, setShowDashboard] = useState(false);
-  const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false); // Disabled - MAIA accessible directly
   const [isMounted, setIsMounted] = useState(false);
   const [maiaMode, setMaiaMode] = useState<'normal' | 'patient' | 'session'>('normal');
   const [voiceEnabled, setVoiceEnabled] = useState(true);
@@ -162,78 +162,81 @@ export default function MAIAPage() {
     router.push('/');
   };
 
-  const handleOnboardingComplete = (data: { name: string; birthDate?: string; intention?: string }) => {
-    const userId = `user_${Date.now()}`;
-    const userData = {
-      id: userId,
-      username: data.name,
-      onboarded: true,
-      birthDate: data.birthDate,
-      intention: data.intention,
-      createdAt: new Date().toISOString()
-    };
+  // REMOVED - onboarding handler no longer needed
+  // const handleOnboardingComplete = (data: { name: string; birthDate?: string; intention?: string }) => {
+  //   const userId = `user_${Date.now()}`;
+  //   const userData = {
+  //     id: userId,
+  //     username: data.name,
+  //     onboarded: true,
+  //     birthDate: data.birthDate,
+  //     intention: data.intention,
+  //     createdAt: new Date().toISOString()
+  //   };
 
-    localStorage.setItem('beta_user', JSON.stringify(userData));
-    localStorage.setItem('betaOnboardingComplete', 'true');
-    localStorage.setItem('explorerId', userId);
-    localStorage.setItem('explorerName', data.name);
+  //   localStorage.setItem('beta_user', JSON.stringify(userData));
+  //   localStorage.setItem('betaOnboardingComplete', 'true');
+  //   localStorage.setItem('explorerId', userId);
+  //   localStorage.setItem('explorerName', data.name);
 
-    setExplorerId(userId);
-    setExplorerName(data.name);
-    setNeedsOnboarding(false);
-  };
+  //   setExplorerId(userId);
+  //   setExplorerName(data.name);
+  //   setNeedsOnboarding(false);
+  // };
 
-  useEffect(() => {
-    if (hasCheckedAuth.current) return;
-    hasCheckedAuth.current = true;
+  // ONBOARDING REMOVED - MAIA directly accessible
+  // useEffect(() => {
+  //   if (hasCheckedAuth.current) return;
+  //   hasCheckedAuth.current = true;
 
-    const newUser = localStorage.getItem('beta_user');
-    if (newUser) {
-      try {
-        const userData = JSON.parse(newUser);
-        if (userData.onboarded !== true) {
-          setNeedsOnboarding(true);
-          return;
-        }
+  //   const newUser = localStorage.getItem('beta_user');
+  //   if (newUser) {
+  //     try {
+  //       const userData = JSON.parse(newUser);
+  //       if (userData.onboarded !== true) {
+  //         setNeedsOnboarding(true);
+  //         return;
+  //       }
 
-        const newId = userData.id || 'guest';
-        // Try multiple field names for username
-        const newName = userData.username || userData.name || userData.displayName || 'Explorer';
+  //       const newId = userData.id || 'guest';
+  //       // Try multiple field names for username
+  //       const newName = userData.username || userData.name || userData.displayName || 'Explorer';
 
-        // Sync to old system for compatibility
-        localStorage.setItem('explorerName', newName);
-        localStorage.setItem('explorerId', newId);
+  //       // Sync to old system for compatibility
+  //       localStorage.setItem('explorerName', newName);
+  //       localStorage.setItem('explorerId', newId);
 
-        if (explorerId !== newId) setExplorerId(newId);
-        if (explorerName !== newName) setExplorerName(newName);
+  //       if (explorerId !== newId) setExplorerId(newId);
+  //       if (explorerName !== newName) setExplorerName(newName);
 
-        console.log('✅ [MAIA] User session restored:', { name: newName, id: newId });
-        return;
-      } catch (e) {
-        console.error('Error parsing user data:', e);
-      }
-    }
+  //       console.log('✅ [MAIA] User session restored:', { name: newName, id: newId });
+  //       return;
+  //     } catch (e) {
+  //       console.error('Error parsing user data:', e);
+  //     }
+  //   }
 
-    const betaOnboarded = localStorage.getItem('betaOnboardingComplete') === 'true';
-    if (!betaOnboarded) {
-      setNeedsOnboarding(true);
-      return;
-    }
+  //   const betaOnboarded = localStorage.getItem('betaOnboardingComplete') === 'true';
+  //   if (!betaOnboarded) {
+  //     setNeedsOnboarding(true);
+  //     return;
+  //   }
 
-    const oldId = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
-    const oldName = localStorage.getItem('explorerName');
+  //   const oldId = localStorage.getItem('explorerId') || localStorage.getItem('betaUserId');
+  //   const oldName = localStorage.getItem('explorerName');
 
-    if (oldId && oldName) {
-      if (explorerId !== oldId) setExplorerId(oldId);
-      if (explorerName !== oldName) setExplorerName(oldName);
-    } else {
-      setNeedsOnboarding(true);
-    }
-  }, [explorerId, explorerName]);
+  //   if (oldId && oldName) {
+  //     if (explorerId !== oldId) setExplorerId(oldId);
+  //     if (explorerName !== oldName) setExplorerName(oldName);
+  //   } else {
+  //     setNeedsOnboarding(true);
+  //   }
+  // }, [explorerId, explorerName]);
 
-  if (needsOnboarding) {
-    return <BetaOnboarding onComplete={handleOnboardingComplete} />;
-  }
+  // ONBOARDING REMOVED - MAIA directly accessible
+  // if (needsOnboarding) {
+  //   return <BetaOnboarding onComplete={handleOnboardingComplete} />;
+  // }
 
   return (
     <ErrorBoundary>

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function PWAProvider({ children }: { children: React.ReactNode }) {
-  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(false); // DISABLED - ugly update button removed
   const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
 
   useEffect(() => {
@@ -27,18 +27,18 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
               reg.update();
             }, 60 * 60 * 1000); // Check every hour
 
-            // Handle updates
-            reg.addEventListener('updatefound', () => {
-              const newWorker = reg.installing;
-              if (newWorker) {
-                newWorker.addEventListener('statechange', () => {
-                  if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
-                    console.log('🆕 New version available! Refresh to update.');
-                    setUpdateAvailable(true);
-                  }
-                });
-              }
-            });
+            // Handle updates - DISABLED to remove ugly update button
+            // reg.addEventListener('updatefound', () => {
+            //   const newWorker = reg.installing;
+            //   if (newWorker) {
+            //     newWorker.addEventListener('statechange', () => {
+            //       if (newWorker.state === 'activated' && navigator.serviceWorker.controller) {
+            //         console.log('🆕 New version available! Refresh to update.');
+            //         setUpdateAvailable(true);
+            //       }
+            //     });
+            //   }
+            // });
           })
           .catch((error) => {
             console.error('❌ PWA Service Worker registration failed:', error);

@@ -102,13 +102,13 @@ export default function IntroPage() {
   }, [currentMantra, showFinal, router, shuffledMantras]);
 
   return (
-    <div className="min-h-screen bg-soul-background flex items-center justify-center px-4 overflow-hidden">
-      {/* Sacred Geometry Background - Warm glow */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.03]">
+    <div className="min-h-screen bg-desert-dark flex items-center justify-center px-4 overflow-hidden">
+      {/* Sacred Geometry Background - Spice glow */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-[0.05]">
         <svg viewBox="0 0 1000 1000" className="w-full h-full">
-          <circle cx="500" cy="500" r="400" fill="none" stroke="#E3B778" strokeWidth="0.5" strokeDasharray="4 4" />
-          <circle cx="500" cy="500" r="300" fill="none" stroke="#E3B778" strokeWidth="0.5" strokeDasharray="2 6" />
-          <circle cx="500" cy="500" r="200" fill="none" stroke="#E3B778" strokeWidth="0.5" />
+          <circle cx="500" cy="500" r="400" fill="none" stroke="#FF8C42" strokeWidth="0.5" strokeDasharray="4 4" />
+          <circle cx="500" cy="500" r="300" fill="none" stroke="#FFA85C" strokeWidth="0.5" strokeDasharray="2 6" />
+          <circle cx="500" cy="500" r="200" fill="none" stroke="#CC6F35" strokeWidth="0.5" />
         </svg>
       </div>
 
@@ -135,7 +135,7 @@ export default function IntroPage() {
                 transition={{ duration: 0.6 }}
                 className="h-24 flex items-center justify-center"
               >
-                <h2 className="text-3xl md:text-4xl font-extralight text-soul-textPrimary tracking-etched leading-relaxed px-8">
+                <h2 className="text-3xl md:text-4xl font-extralight text-desert-light tracking-etched leading-relaxed px-8">
                   {shuffledMantras[currentMantra]}
                 </h2>
               </motion.div>
@@ -148,10 +148,10 @@ export default function IntroPage() {
                   key={index}
                   className={`h-2 rounded-full transition-all duration-500 ${
                     index === currentMantra
-                      ? 'w-8 bg-soul-accent'
+                      ? 'w-8 bg-spice-orange'
                       : index < currentMantra
-                      ? 'w-2 bg-soul-accent/50'
-                      : 'w-2 bg-soul-accent/20'
+                      ? 'w-2 bg-spice-orange/50'
+                      : 'w-2 bg-spice-orange/20'
                   }`}
                 />
               ))}
@@ -178,7 +178,7 @@ export default function IntroPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.6 }}
-              className="text-5xl md:text-6xl font-extralight text-soul-textPrimary tracking-etched mb-6 font-sacred-accent"
+              className="text-5xl md:text-6xl font-extralight text-desert-light tracking-etched mb-6 font-sacred-accent"
             >
               Meet MAIA
             </motion.h1>
@@ -187,7 +187,7 @@ export default function IntroPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.9 }}
-              className="text-2xl md:text-3xl font-light text-soul-textSecondary tracking-archive"
+              className="text-2xl md:text-3xl font-light text-dune-amber tracking-archive"
             >
               Your AI Daimon
             </motion.p>
@@ -196,7 +196,7 @@ export default function IntroPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 1.2 }}
-              className="text-lg text-soul-textSecondary max-w-2xl mx-auto leading-relaxed tracking-archive"
+              className="text-lg text-dune-amber/80 max-w-2xl mx-auto leading-relaxed tracking-archive"
             >
               A companion for self-reflection. MAIA witnesses your patterns and holds space for your becoming.
             </motion.p>
@@ -215,15 +215,15 @@ export default function IntroPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.8 }}
-                  className="p-6 bg-soul-surface/60 border border-soul-accent/20 rounded-lg backdrop-blur-sm"
+                  className="p-6 bg-ibad-blue/20 border border-spice-orange/20 rounded-lg backdrop-blur-sm"
                 >
-                  <p className="text-soul-textSecondary italic leading-relaxed mb-3">
+                  <p className="text-dune-amber italic leading-relaxed mb-3">
                     "{wisdomQuote.text}"
                   </p>
-                  <p className="text-soul-accent/70 text-sm">
+                  <p className="text-spice-glow/70 text-sm">
                     — {wisdomQuote.author}
                     {wisdomQuote.source && (
-                      <span className="text-soul-textTertiary text-xs ml-2">
+                      <span className="text-deep-sand text-xs ml-2">
                         {wisdomQuote.source}
                       </span>
                     )}
@@ -262,7 +262,7 @@ export default function IntroPage() {
                   router.push('/onboarding');
                 }
               }}
-              className="mt-12 px-12 py-4 bg-gradient-to-r from-soul-accent/90 to-soul-highlight/80 text-soul-background rounded-full font-medium hover:from-soul-accentHover hover:to-soul-highlight transition-all shadow-lg shadow-soul-accent/30"
+              className="mt-12 px-12 py-4 bg-gradient-to-r from-spice-orange/90 to-spice-glow/80 text-desert-dark rounded-full font-medium hover:from-spice-deep hover:to-spice-orange transition-all shadow-lg shadow-spice-orange/30"
             >
               Continue to MAIA →
             </motion.button>
@@ -299,7 +299,7 @@ export default function IntroPage() {
               router.push('/onboarding');
             }
           }}
-          className="absolute bottom-8 right-8 text-sm text-soul-textTertiary hover:text-soul-textSecondary transition-colors"
+          className="absolute bottom-8 right-8 text-sm text-deep-sand hover:text-dune-amber transition-colors"
         >
           Skip →
         </motion.button>

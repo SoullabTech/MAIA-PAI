@@ -105,13 +105,28 @@ async function captureTrainingExchange(
 
 export async function POST(req: Request) {
   try {
+    const requestBody = await req.json();
     const {
-      messages,
+      messages: rawMessages,
+      message: singleMessage,
+      userName,
       element = 'aether',
       userId,
       sessionId,
       conversationMode = DEFAULT_CONVERSATION_STYLE
-    } = await req.json();
+    } = requestBody;
+
+    // Handle both message formats: messages array OR single message
+    let messages: Array<{role: string, content: string}>;
+    if (rawMessages) {
+      // Standard format with messages array
+      messages = rawMessages;
+    } else if (singleMessage) {
+      // OracleConversation.tsx format with single message
+      messages = [{ role: 'user', content: singleMessage }];
+    } else {
+      throw new Error('No message or messages provided');
+    }
 
     // Get the appropriate prompt for the conversation mode
     const basePrompt = getPromptForMode(conversationMode);

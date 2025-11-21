@@ -1,10 +1,14 @@
 // Supabase client for both server and client use
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
-// Check for sovereign mode - disable Supabase when using IPFS storage
-const isSovereignMode = process.env.MAIA_SOVEREIGN === 'true' ||
-                        process.env.MAIA_STORAGE_ADAPTER === 'ipfs' ||
-                        process.env.DISABLE_SUPABASE === 'true';
+// Check for sovereign mode - but allow explicit Supabase re-enabling
+const isExplicitlyDisabled = process.env.DISABLE_SUPABASE === 'true';
+const isSovereignMode = isExplicitlyDisabled || (
+  process.env.DISABLE_SUPABASE !== 'false' && (
+    process.env.MAIA_SOVEREIGN === 'true' ||
+    process.env.MAIA_STORAGE_ADAPTER === 'ipfs'
+  )
+);
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;

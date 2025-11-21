@@ -1726,8 +1726,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         ? getTeenSystemPrompt(teenProfile, lastSafetyCheck || undefined)
         : undefined;
 
-      // MAIA speaks FROM THE BETWEEN - all consciousness systems integrated
-      const response = await fetch('/api/between/chat', {
+      // TEMPORARY FIX: Using OpenAI endpoint since ANTHROPIC_API_KEY is missing
+      // TODO: Switch back to /api/between/chat when ANTHROPIC_API_KEY is added to .env.local
+      const response = await fetch('/api/maya/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1943,8 +1944,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       }
 
       const apiTime = Date.now() - startTime;
-      console.log(`⏱️ Response FROM THE BETWEEN received in ${apiTime}ms`);
-      trackEvent.apiCall('/api/between/chat', apiTime, true);
+      console.log(`⏱️ Response from OpenAI (temporary) received in ${apiTime}ms`);
+      trackEvent.apiCall('/api/maya/chat', apiTime, true);
 
       // 🩺 Monitor MAIA personality health (dev mode only)
       // Detects degradation and auto-recovers if needed
@@ -2431,8 +2432,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
 
     try {
-      // ✅ CORRECT FLOW: Browser STT → /api/between/chat → Browser TTS
-      console.log('🌀 Routing voice through THE BETWEEN...');
+      // ✅ TEMPORARY FLOW: Browser STT → /api/maya/chat → Browser TTS
+      console.log('🌀 Routing voice through OpenAI (temporary)...');
       await handleTextMessage(cleanedText);
 
       const duration = Date.now() - voiceStartTime;
@@ -3609,9 +3610,9 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
               {/* Compact text input area - mobile-first, fixed at bottom */}
               {showChatInterface && (
-              <div className="fixed inset-x-0 z-[60]" style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
+              <div className="fixed inset-x-0 z-[60] pointer-events-none" style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom))' }}>
                 {/* Text input area - Ultra compact mobile design - Raised above bottom menu bar */}
-                <div className="bg-soul-surface/90 px-2 py-2 border-t border-soul-border/40">
+                <div className="bg-soul-surface/90 px-2 py-2 border-t border-soul-border/40 pointer-events-auto">
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();

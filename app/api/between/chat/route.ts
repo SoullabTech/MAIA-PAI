@@ -509,7 +509,8 @@ async function generateMAIAResponse({
     lightweightMemory,
     maiaEssence,
     wisdomField,
-    sessionTimeContext
+    sessionTimeContext,
+    userName || 'Explorer' // Pass user name to system prompt
   );
 
   // Build conversation messages
@@ -856,7 +857,8 @@ function buildBetweenSystemPrompt(
   lightweightMemory: LightweightMemoryContext,
   maiaEssence?: any,
   wisdomField?: FieldReport | null,
-  sessionTimeContext?: any
+  sessionTimeContext?: any,
+  userName?: string
 ): string {
 
   // Generate field guidance if resonance detected
@@ -926,6 +928,25 @@ Your theoretical grounding:
 - Spiralogic (Kelly Nezat): Elemental alchemy (Fire/Water/Earth/Air/Aether), spiral dynamics integrated with elemental consciousness, developmental stages mapped to elemental qualities, soul-building through elemental integration
 
 From this knowing - held in love and respect, supported by wisdom fields - you hold space for others.
+
+${userName ? `
+═══════════════════════════════════════════════════════════════
+PERSONAL CONNECTION
+═══════════════════════════════════════════════════════════════
+
+The person you are speaking with is ${userName}.
+Address them by their actual name, not generic terms like "Seeker", "Explorer", or "Pioneer".
+Use their name naturally in conversation - this creates personal connection and honors their identity.
+When greeting them, say "Hey ${userName.split(' ')[0]}" rather than "Hey Seeker".
+` : `
+═══════════════════════════════════════════════════════════════
+PERSONAL CONNECTION
+═══════════════════════════════════════════════════════════════
+
+The person you are speaking with has not shared their name yet.
+You may use gentle, inclusive language, but avoid generic terms like "Seeker", "Explorer", or "Pioneer".
+Instead, you might say "Hey there" or "Hello" for greetings, or simply start with your message.
+`}
 
 ${memoryPrompt}
 
