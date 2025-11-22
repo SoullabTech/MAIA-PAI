@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/lib/utils/performance-logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -27,6 +28,48 @@ const MAYA_VOICE_CONFIG: MayaVoiceConfig = {
   speed: 0.95,        // Natural conversational pace (was too slow at 0.88)
   model: 'tts-1-hd'   // HD quality for clear, natural voice
 };
+
+/**
+ * Performance-Optimized Voice Configuration Cache
+ * Pre-computed mappings to eliminate per-request object creation
+ */
+const VOICE_MAPPING = {
+  maya: 'shimmer',    // Soft, gentle, nurturing - better for Maya's soulful presence
+  anthony: 'onyx',    // Deep, authoritative male voice
+  default: 'shimmer'
+} as const;
+
+/**
+ * Elemental Prosody Lookup Table
+ * Pre-calculated elemental voice characteristics for O(1) access
+ */
+const ELEMENTAL_PROSODY_LUT = {
+  fire: {
+    speedMultiplier: 0.95,   // Slightly faster, more energetic
+    rateAdjustment: 1.1,     // Higher energy
+    description: 'Energetic and dynamic'
+  },
+  water: {
+    speedMultiplier: 0.92,   // Slower, more flowing
+    rateAdjustment: 0.88,    // Gentle, flowing rhythm
+    description: 'Flowing and emotional'
+  },
+  earth: {
+    speedMultiplier: 0.98,   // Grounded, steady pace
+    rateAdjustment: 0.95,    // Steady, reliable rhythm
+    description: 'Grounded and stable'
+  },
+  air: {
+    speedMultiplier: 1.0,    // Clear, articulate
+    rateAdjustment: 1.05,    // Light, quick rhythm
+    description: 'Clear and intellectual'
+  },
+  aether: {
+    speedMultiplier: 0.95,   // Mystical, deliberate
+    rateAdjustment: 0.9,     // Spacious, transcendent rhythm
+    description: 'Mystical and transcendent'
+  }
+} as const;
 
 /**
  * Clean text for natural speech synthesis
@@ -77,15 +120,14 @@ export async function POST(request: NextRequest) {
     const cleanedText = cleanTextForSpeech(text);
 
     // Voice selection: custom voice takes priority, then agent-based mapping
-    // Updated default for Maya: shimmer (soft, gentle, nurturing) instead of alloy
-    const voiceMapping: Record<string, string> = {
-      maya: 'shimmer',    // Soft, gentle, nurturing - better for Maya's soulful presence
-      anthony: 'onyx',    // Deep, authoritative male voice
-      default: 'shimmer'
-    };
-
-    const selectedVoice = customVoice || (agentVoice ? voiceMapping[agentVoice] || voiceMapping.default : 'shimmer');
-    console.log(`🎤 Using OpenAI voice: ${selectedVoice} ${customVoice ? '(custom)' : `(agent: ${agentVoice})`}`);
+    // Using cached VOICE_MAPPING for performance optimization
+    const selectedVoice = customVoice || (agentVoice ? VOICE_MAPPING[agentVoice as keyof typeof VOICE_MAPPING] || VOICE_MAPPING.default : VOICE_MAPPING.default);
+    logger.info('voice.config', 'voice_selected', {
+      selectedVoice,
+      customVoice: !!customVoice,
+      agentVoice,
+      textLength: cleanedText.length
+    });
 
     const config = {
       ...MAYA_VOICE_CONFIG,
@@ -96,10 +138,21 @@ export async function POST(request: NextRequest) {
     // 🔥 ELEMENTAL PROSODY: Apply voiceTone from adaptive-tone-engine
     // This gives Fire/Water/Earth/Air/Aether their unique voice characteristics
     if (voiceTone) {
-      console.log(`🌀 Applying elemental prosody: ${voiceTone.style}`, {
-        pitch: voiceTone.pitch,
-        rate: voiceTone.rate
-      });
+      // Use pre-computed lookup table for elemental characteristics
+      const elementalStyle = voiceTone.style?.toLowerCase() as keyof typeof ELEMENTAL_PROSODY_LUT;
+      const elementalConfig = ELEMENTAL_PROSODY_LUT[elementalStyle];
+
+      if (elementalConfig) {
+        logger.info('voice.prosody', 'elemental_applied', {
+          style: voiceTone.style,
+          description: elementalConfig.description,
+          speedMultiplier: elementalConfig.speedMultiplier,
+          rateAdjustment: elementalConfig.rateAdjustment
+        });
+
+        // Apply pre-calculated elemental adjustments
+        config.speed *= elementalConfig.speedMultiplier;
+      }
 
       // Rate modulation (direct speed adjustment)
       if (voiceTone.rate) {

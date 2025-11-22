@@ -270,30 +270,67 @@ export const voiceProfiles: VoiceProfile[] = [
 ];
 
 /**
- * Voice Selection Helpers
+ * Performance-Optimized Voice Profile Caching
+ * Pre-computed Maps for O(1) lookup performance
+ */
+const voiceProfilesById = new Map(voiceProfiles.map(profile => [profile.id, profile]));
+
+const voiceProfilesByCategory = voiceProfiles.reduce((acc, profile) => {
+  if (!acc.has(profile.category)) acc.set(profile.category, []);
+  acc.get(profile.category)!.push(profile);
+  return acc;
+}, new Map<VoiceCategory, VoiceProfile[]>());
+
+const voiceProfilesByProvider = voiceProfiles.reduce((acc, profile) => {
+  if (!acc.has(profile.provider)) acc.set(profile.provider, []);
+  acc.get(profile.provider)!.push(profile);
+  return acc;
+}, new Map<VoiceProvider, VoiceProfile[]>());
+
+const voiceProfilesByMask = voiceProfiles.reduce((acc, profile) => {
+  profile.masks.forEach(mask => {
+    if (!acc.has(mask)) acc.set(mask, []);
+    acc.get(mask)!.push(profile);
+  });
+  return acc;
+}, new Map<ElementalMask, VoiceProfile[]>());
+
+// Pre-sorted profiles by unlock level for efficient filtering
+const voiceProfilesByLevel = voiceProfiles
+  .slice()
+  .sort((a, b) => (a.unlockLevel || 0) - (b.unlockLevel || 0));
+
+/**
+ * Voice Selection Helpers (Performance-Optimized)
+ * Replaced O(n) array searches with O(1) Map lookups
  */
 export const getVoiceProfile = (id: string): VoiceProfile | undefined => {
-  return voiceProfiles.find(profile => profile.id === id);
+  return voiceProfilesById.get(id);
 };
 
 export const getVoicesByCategory = (category: VoiceCategory): VoiceProfile[] => {
-  return voiceProfiles.filter(profile => profile.category === category);
+  return voiceProfilesByCategory.get(category) || [];
 };
 
 export const getVoicesByProvider = (provider: VoiceProvider): VoiceProfile[] => {
-  return voiceProfiles.filter(profile => profile.provider === provider);
+  return voiceProfilesByProvider.get(provider) || [];
 };
 
 export const getAvailableVoices = (userLevel: number = 0): VoiceProfile[] => {
-  return voiceProfiles.filter(profile =>
-    (profile.unlockLevel || 0) <= userLevel
-  );
+  // Optimized: early termination using pre-sorted array
+  const result: VoiceProfile[] = [];
+  for (const profile of voiceProfilesByLevel) {
+    if ((profile.unlockLevel || 0) <= userLevel) {
+      result.push(profile);
+    } else {
+      break; // Early termination - profiles are sorted by level
+    }
+  }
+  return result;
 };
 
 export const getVoicesWithMask = (mask: ElementalMask): VoiceProfile[] => {
-  return voiceProfiles.filter(profile =>
-    profile.masks.includes(mask)
-  );
+  return voiceProfilesByMask.get(mask) || [];
 };
 
 /**
