@@ -274,6 +274,12 @@ export default function MAIAPage() {
         {/* DREAM-WEAVER SYSTEM - Combined Header & Banner - Always visible */}
         <div
           className="flex-shrink-0 relative overflow-hidden bg-gradient-to-r from-black/20 via-amber-950/5 to-black/20 border-b border-amber-900/3 backdrop-blur-sm z-50"
+          style={{
+            /* Safari-specific fixes for header button interaction */
+            WebkitTransform: 'translateZ(0)',
+            transform: 'translateZ(0)',
+            isolation: 'isolate'
+          }}
         >
           {/* Spice particle effect - very subtle movement */}
           <div className="absolute inset-0 opacity-5 pointer-events-none">
@@ -326,11 +332,36 @@ export default function MAIAPage() {
               </div>
 
               {/* Center: Voice/Text toggle + Mode selector */}
-              <div className="flex items-center gap-3">
+              <div
+                className="flex items-center gap-3"
+                style={{
+                  /* Safari-specific fixes for button container */
+                  position: 'relative',
+                  zIndex: 100,
+                  isolation: 'isolate',
+                  pointerEvents: 'auto'
+                }}
+              >
                 {/* Voice/Text Toggle - Clickable */}
                 <button
                   onClick={() => setShowChatInterface(!showChatInterface)}
-                  className="px-3 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all"
+                  role="button"
+                  aria-label={showChatInterface ? 'Switch to Voice Mode' : 'Switch to Text Mode'}
+                  className="px-3 py-1 rounded-md bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all clickable"
+                  style={{
+                    /* Safari-specific button fixes */
+                    WebkitTouchCallout: 'none',
+                    WebkitUserSelect: 'none',
+                    touchAction: 'manipulation',
+                    minWidth: '44px',
+                    minHeight: '44px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    isolation: 'isolate',
+                    pointerEvents: 'auto',
+                    zIndex: '50'
+                  }}
                 >
                   <span className="text-xs text-amber-300/90 font-light">
                     {showChatInterface ? '💬 Text' : '🎤 Voice'}
@@ -338,34 +369,83 @@ export default function MAIAPage() {
                 </button>
 
                 {/* Mode Selector: Dialogue / Patient / Scribe */}
-                <div className="flex items-center gap-1 bg-black/20 rounded-lg p-0.5">
+                <div
+                  className="flex items-center gap-1 bg-black/20 rounded-lg p-0.5"
+                  style={{
+                    /* Safari container fix */
+                    isolation: 'isolate',
+                    pointerEvents: 'auto'
+                  }}
+                >
                   <button
                     onClick={() => setMaiaMode('normal')}
-                    className={`px-2 py-1 rounded text-xs font-light transition-all ${
+                    role="button"
+                    aria-label="Switch to Dialogue Mode"
+                    className={`px-2 py-1 rounded text-xs font-light transition-all clickable ${
                       maiaMode === 'normal'
                         ? 'bg-amber-500/30 text-amber-200'
                         : 'text-amber-400/60 hover:text-amber-300/80'
                     }`}
+                    style={{
+                      /* Safari button fixes */
+                      minWidth: '44px',
+                      minHeight: '44px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      touchAction: 'manipulation',
+                      WebkitTouchCallout: 'none',
+                      pointerEvents: 'auto',
+                      zIndex: '50'
+                    }}
                   >
                     Dialogue
                   </button>
                   <button
                     onClick={() => setMaiaMode('patient')}
-                    className={`px-2 py-1 rounded text-xs font-light transition-all ${
+                    role="button"
+                    aria-label="Switch to Patient Mode"
+                    className={`px-2 py-1 rounded text-xs font-light transition-all clickable ${
                       maiaMode === 'patient'
                         ? 'bg-purple-500/30 text-purple-200'
                         : 'text-amber-400/60 hover:text-amber-300/80'
                     }`}
+                    style={{
+                      /* Safari button fixes */
+                      minWidth: '44px',
+                      minHeight: '44px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      touchAction: 'manipulation',
+                      WebkitTouchCallout: 'none',
+                      pointerEvents: 'auto',
+                      zIndex: '50'
+                    }}
                   >
                     Patient
                   </button>
                   <button
                     onClick={() => setMaiaMode('session')}
-                    className={`px-2 py-1 rounded text-xs font-light transition-all ${
+                    role="button"
+                    aria-label="Switch to Scribe Mode"
+                    className={`px-2 py-1 rounded text-xs font-light transition-all clickable ${
                       maiaMode === 'session'
                         ? 'bg-blue-500/30 text-blue-200'
                         : 'text-amber-400/60 hover:text-amber-300/80'
                     }`}
+                    style={{
+                      /* Safari button fixes */
+                      minWidth: '44px',
+                      minHeight: '44px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      touchAction: 'manipulation',
+                      WebkitTouchCallout: 'none',
+                      pointerEvents: 'auto',
+                      zIndex: '50'
+                    }}
                   >
                     Scribe
                   </button>
@@ -373,7 +453,15 @@ export default function MAIAPage() {
               </div>
 
               {/* Right: Sign Out + Session Container buttons */}
-              <div className="flex items-center gap-2">
+              <div
+                className="flex items-center gap-2"
+                style={{
+                  /* Safari-specific fixes for right button container */
+                  position: 'relative',
+                  zIndex: 100,
+                  isolation: 'isolate'
+                }}
+              >
                 {/* Sign Out Button */}
                 <motion.button
                   onClick={handleSignOut}
