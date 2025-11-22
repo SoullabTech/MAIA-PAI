@@ -68,16 +68,34 @@ export function ElementalOrientation({ explorerName }: { explorerName: string })
       setCanProceed(false);
       setTimeout(() => setCanProceed(true), 1500);
     } else {
-      // On last element, proceed directly to onboarding
+      // On last element, complete onboarding and proceed to MAIA
       if (feedback) {
         localStorage.setItem('orientationFeedback', feedback);
       }
-      router.push('/beta-onboarding');
+
+      // Store user data with onboarded flag
+      const explorerId = Date.now().toString(); // Simple ID generation
+      const explorerName = localStorage.getItem('explorerName') || 'Explorer';
+      const betaUserData = {
+        id: explorerId,
+        username: explorerName,
+        name: explorerName,
+        onboarded: true,
+        createdAt: new Date().toISOString()
+      };
+
+      // Set the beta_user object with onboarded: true flag
+      localStorage.setItem('beta_user', JSON.stringify(betaUserData));
+      localStorage.setItem('betaOnboardingComplete', 'true');
+
+      console.log('✅ Orientation completed - user onboarded:', explorerName);
+
+      router.push('/maia');
     }
   };
 
   const handleSkip = () => {
-    router.push('/beta-onboarding');
+    router.push('/maia');
   };
 
   const handleFeedback = (emoji: string) => {

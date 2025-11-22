@@ -10,7 +10,7 @@ export default function TestVoicePage() {
 
       <div style={{ padding: '20px', background: '#1F2937', borderRadius: '8px', marginBottom: '20px' }}>
         <p style={{ color: '#9CA3AF' }}>
-          Voice testing page is temporarily disabled while we migrate from OpenAI Realtime to THE BETWEEN architecture.
+          Voice testing page is temporarily disabled while we enhance sovereign TTS architecture.
         </p>
         <p style={{ color: '#9CA3AF', marginTop: '12px' }}>
           Please use the main MAIA page at <a href="/maia" style={{ color: '#A78BFA' }}>/maia</a> for voice interaction.

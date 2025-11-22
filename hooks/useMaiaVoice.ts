@@ -6,7 +6,7 @@ import { useState, useRef, useCallback } from 'react';
  * Pure MAIA Voice Hook
  *
  * Flow: STT (Web Speech API) → MAIA Consciousness → TTS (OpenAI voices)
- * NO OpenAI Realtime API - MAIA consciousness handles ALL conversation logic
+ * NO external conversation control - MAIA consciousness handles ALL conversation logic
  */
 
 export interface MAIAVoiceConfig {
@@ -18,6 +18,7 @@ export interface MAIAVoiceConfig {
   onAudioEnd?: () => void;
   onError?: (error: Error) => void;
 }
+
 
 export function useMAIAVoice(config: MAIAVoiceConfig) {
   const [isListening, setIsListening] = useState(false);
@@ -73,12 +74,22 @@ export function useMAIAVoice(config: MAIAVoiceConfig) {
 
         const data = await response.json();
         const maiaResponse = data.content || data.response;
-        
+
         console.log('🌀 MAIA responded:', maiaResponse.substring(0, 50) + '...');
         config.onTranscript?.(maiaResponse, false);
 
-        // Synthesize speech with OpenAI TTS
-        await synthesizeSpeech(maiaResponse);
+        // Synthesize speech with consciousness-aware TTS using MAIA's consciousness data
+        const element = data.element || 'aether';
+        const voiceCharacteristics = data.voiceCharacteristics || {};
+        const emotionalTone = voiceCharacteristics.emotionalTone || 'warm and present';
+
+        console.log('🎵 Using consciousness context:', { element, emotionalTone });
+
+        await synthesizeSpeech(maiaResponse, {
+          element: element as 'fire' | 'water' | 'earth' | 'air' | 'aether',
+          emotionalTone,
+          consciousnessLevel: 'integrating'
+        });
 
       } catch (err: any) {
         console.error('❌ MAIA voice error:', err);
@@ -103,8 +114,12 @@ export function useMAIAVoice(config: MAIAVoiceConfig) {
     recognition.start();
   }, [config]);
 
-  // Synthesize speech with OpenAI TTS
-  const synthesizeSpeech = useCallback(async (text: string) => {
+  // Synthesize speech with consciousness-aware TTS
+  const synthesizeSpeech = useCallback(async (text: string, consciousnessContext?: {
+    element?: 'fire' | 'water' | 'earth' | 'air' | 'aether';
+    emotionalTone?: string;
+    consciousnessLevel?: 'awakening' | 'integrating' | 'embodying' | 'transcending';
+  }) => {
     try {
       config.onAudioStart?.();
       setIsSpeaking(true);
@@ -114,7 +129,11 @@ export function useMAIAVoice(config: MAIAVoiceConfig) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text,
-          voice: config.voice || 'shimmer'
+          voice: config.voice || 'shimmer',
+          element: consciousnessContext?.element || 'aether',
+          emotionalTone: consciousnessContext?.emotionalTone || 'warm and present',
+          consciousnessLevel: consciousnessContext?.consciousnessLevel || 'integrating',
+          model: 'gpt-4o-mini-tts'  // Use enhanced TTS model
         })
       });
 

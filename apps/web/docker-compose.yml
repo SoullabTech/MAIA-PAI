@@ -1,0 +1,132 @@
+# Docker Compose for MAIA - Complete Self-Hosting Stack
+# Provides complete Vercel independence for the Spiralogic Oracle system
+
+version: '3.8'
+
+services:
+  # Main MAIA Web Application
+  maia-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: maia-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # Database configuration (using external Supabase for now)
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      # AI/Oracle configuration
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - MEM0_API_KEY=${MEM0_API_KEY}
+      # Voice configuration
+      - ELEVENLABS_VOICE_ID=${ELEVENLABS_VOICE_ID}
+      - ELEVENLABS_VOICE_ID_ANTHONY=${ELEVENLABS_VOICE_ID_ANTHONY}
+      - ELEVENLABS_VOICE_ID_AUNT_ANNIE=${ELEVENLABS_VOICE_ID_AUNT_ANNIE}
+      - ELEVENLABS_VOICE_ID_EMILY=${ELEVENLABS_VOICE_ID_EMILY}
+      # Security
+      - JWT_SECRET=${JWT_SECRET}
+      # Performance and caching
+      - REDIS_URL=redis://redis:6379
+      # Oracle system configuration
+      - USE_PERSONAL_ORACLE=${USE_PERSONAL_ORACLE}
+      - USE_SESAME=${USE_SESAME}
+      - SESAME_ENABLED=${SESAME_ENABLED}
+      - ORCHESTRATOR=${ORCHESTRATOR}
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - redis
+      - nginx
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis for caching and session management
+  redis:
+    image: redis:7-alpine
+    container_name: maia-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  # Nginx reverse proxy for SSL termination and load balancing
+  nginx:
+    image: nginx:alpine
+    container_name: maia-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - maia-web
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  # Optional: Local database for complete independence (commented out - using Supabase)
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: maia-postgres
+  #   environment:
+  #     - POSTGRES_DB=maia
+  #     - POSTGRES_USER=maia_user
+  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #     - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U maia_user -d maia"]
+  #     interval: 30s
+  #     timeout: 5s
+  #     retries: 3
+
+  # Watchtower for automatic updates (optional)
+  watchtower:
+    image: containrrr/watchtower
+    container_name: maia-watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_SCHEDULE=0 30 2 * * *  # Daily at 2:30 AM
+      - WATCHTOWER_INCLUDE_STOPPED=true
+    restart: unless-stopped
+
+volumes:
+  redis_data:
+    driver: local
+  postgres_data:
+    driver: local
+
+networks:
+  default:
+    name: maia-network
+    driver: bridge

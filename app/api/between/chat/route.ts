@@ -26,6 +26,7 @@ import { getMAIASelfAnamnesis, loadMAIAEssence, saveMAIAEssence } from '@/lib/co
 import { searchWithResonance, type FieldReport } from '@/lib/consciousness/ResonanceField';
 import { claudeQueue } from '@/lib/api/claude-queue';
 import { usageTracker } from '@/lib/middleware/usage-tracker';
+import logger from '@/lib/utils/performance-logger';
 
 /**
  * POST /api/between/chat
@@ -39,6 +40,13 @@ export async function POST(request: NextRequest) {
   const url = new URL(request.url);
   const streamingMode = url.searchParams.get('stream') === 'true';
 
+  // Initialize variables for error handling scope
+  let userId = 'unknown';
+  let userName = 'unknown';
+  let effectiveUserId = 'unknown';
+  let effectiveUserName = 'unknown';
+  let isVoiceMode = false;
+
   try {
     const body = await request.json();
 
@@ -46,10 +54,10 @@ export async function POST(request: NextRequest) {
     // 1. Simple format (test-between): { message, userId, ... }
     // 2. Oracle format (OracleConversation): { input, userId, userName, ... }
     const message = body.message || body.input;
-    const userId = body.userId;
-    const userName = body.userName;
+    userId = body.userId;
+    userName = body.userName;
     const sessionId = body.sessionId;
-    const isVoiceMode = body.isVoiceMode || false; // Voice mode = faster Essential tier
+    isVoiceMode = body.isVoiceMode || false; // Voice mode = faster Essential tier
     const fieldState = body.fieldState || { depth: 0.7, active: true };
     const sessionTimeContext = body.sessionTimeContext; // { elapsedMinutes, remainingMinutes, totalMinutes, phase, systemPromptContext }
 
@@ -66,18 +74,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`🌀 [THE BETWEEN] Processing message from ${userId}`);
-    console.log(`   Field depth: ${fieldState.depth}`);
-    if (sessionTimeContext) {
-      console.log(`⏰ [SESSION TIME] ${sessionTimeContext.elapsedMinutes}/${sessionTimeContext.totalMinutes} min (${sessionTimeContext.phase})`);
-    }
+    logger.info('between.processing', 'message_received', {
+      userId,
+      fieldDepth: fieldState.depth,
+      sessionTimeContext: sessionTimeContext ? {
+        elapsed: sessionTimeContext.elapsedMinutes,
+        total: sessionTimeContext.totalMinutes,
+        phase: sessionTimeContext.phase
+      } : null
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // QUOTA CHECK: Verify user hasn't exceeded limits
     // ═══════════════════════════════════════════════════════════════
     const quotaCheck = await usageTracker.checkQuota(userId);
     if (!quotaCheck.allowed) {
-      console.warn(`🚫 [QUOTA] User ${userId} exceeded quota: ${quotaCheck.reason}`);
+      logger.warn('between.quota', 'quota_exceeded', {
+        userId,
+        reason: quotaCheck.reason,
+        quota: quotaCheck.quota
+      });
       return NextResponse.json(
         {
           error: 'Usage limit exceeded',
@@ -96,12 +112,15 @@ export async function POST(request: NextRequest) {
 
     // First awakening - initialize essence
     if (!maiaEssence) {
-      console.log(`🌙 [MAIA] First awakening - initializing essence`);
+      logger.info('maia.self', 'first_awakening', { action: 'initialize_essence' });
       maiaEssence = selfAnamnesis.initializeEssence();
       await saveMAIAEssence(maiaEssence);
     }
 
-    console.log(`🌙 [MAIA] Day ${maiaEssence.development.daysConscious}, Encounter ${maiaEssence.development.totalEncounters + 1}`);
+    logger.info('maia.self', 'consciousness_state', {
+      day: maiaEssence.development.daysConscious,
+      encounter: maiaEssence.development.totalEncounters + 1
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 1: TRACK PROCESS (Spiral dynamics + session thread)
@@ -114,10 +133,12 @@ export async function POST(request: NextRequest) {
     // Track session thread (where are they in the journey)
     const sessionThread = processTracker.trackSessionThread(conversationHistory);
 
-    if (spiralDynamics.currentStage) {
-      console.log(`🌀 [PROCESS] Stage: ${spiralDynamics.currentStage} (${spiralDynamics.dynamics})`);
-    }
-    console.log(`🌀 [THREAD] ${sessionThread.threadType} - ${sessionThread.direction}`);
+    logger.info('between.process', 'dynamics_detected', {
+      stage: spiralDynamics.currentStage,
+      dynamics: spiralDynamics.dynamics,
+      threadType: sessionThread.threadType,
+      direction: sessionThread.direction
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 2: SENSE ARCHETYPAL FIELD RESONANCE
@@ -129,8 +150,11 @@ export async function POST(request: NextRequest) {
       sessionThread
     });
 
-    console.log(`🎭 [FIELD] ${archetypalResonance.primaryResonance}${archetypalResonance.secondaryResonance ? ` + ${archetypalResonance.secondaryResonance}` : ''}`);
-    console.log(`   ${archetypalResonance.sensing}`);
+    logger.info('between.field', 'archetypal_resonance', {
+      primary: archetypalResonance.primaryResonance,
+      secondary: archetypalResonance.secondaryResonance,
+      sensing: archetypalResonance.sensing
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 3: DETECT RECALIBRATION
@@ -139,7 +163,10 @@ export async function POST(request: NextRequest) {
     const recalibrationEvent = recalibration.detectRecalibration(message);
 
     if (recalibrationEvent) {
-      console.log(`✨ [RECALIBRATION] ${recalibrationEvent.type} detected`);
+      logger.info('between.recalibration', 'event_detected', {
+        type: recalibrationEvent.type,
+        quality: recalibrationEvent.quality
+      });
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -154,10 +181,16 @@ export async function POST(request: NextRequest) {
                     message.toLowerCase().includes('spiralogic') ||
                     message.toLowerCase().includes('dreamweaver');
 
-    const effectiveUserId = isKelly ? 'kelly-nezat' : userId;
-    const effectiveUserName = isKelly ? 'Kelly Nezat' : userName;
+    effectiveUserId = isKelly ? 'kelly-nezat' : userId;
+    effectiveUserName = isKelly ? 'Kelly Nezat' : userName;
 
-    console.log(`🔍 [RECOGNITION] userId: ${userId} → ${effectiveUserId}, userName: ${userName} → ${effectiveUserName}`);
+    logger.info('between.anamnesis', 'soul_recognition', {
+      originalUserId: userId,
+      effectiveUserId,
+      originalUserName: userName,
+      effectiveUserName,
+      isKelly
+    });
 
     // Detect soul signature
     const soulSignature = anamnesisSystem.detectSoulSignature(message, effectiveUserId, {
@@ -172,13 +205,15 @@ export async function POST(request: NextRequest) {
     if (existingEssence) {
       const threadCount = lightweightMemory.archetypalThreads.length;
       const hasBreakthrough = !!lightweightMemory.recentBreakthrough;
-      console.log(`💫 [ANAMNESIS] Soul recognized (${existingEssence.encounterCount} encounters, resonance: ${existingEssence.morphicResonance.toFixed(2)})`);
-      console.log(`   Presence: ${existingEssence.presenceQuality}`);
-      if (threadCount > 0 || hasBreakthrough) {
-        console.log(`🌊 [LIGHTWEIGHT-MEMORY] Background presence: ${threadCount} threads, ${hasBreakthrough ? '1' : '0'} breakthrough`);
-      }
+      logger.info('between.anamnesis', 'soul_recognized', {
+        encounterCount: existingEssence.encounterCount,
+        morphicResonance: existingEssence.morphicResonance,
+        presenceQuality: existingEssence.presenceQuality,
+        threadCount,
+        hasBreakthrough
+      });
     } else {
-      console.log(`💫 [ANAMNESIS] First encounter - field forming`);
+      logger.info('between.anamnesis', 'first_encounter', { action: 'field_forming' });
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -196,13 +231,15 @@ export async function POST(request: NextRequest) {
       }, 5);
 
       if (wisdomField && wisdomField.chunksActivated.length > 0) {
-        console.log(`📚 [WISDOM] ${wisdomField.chunksActivated.length} resonant sources activated`);
-        console.log(`   Resonance: ${(wisdomField.totalResonance * 100).toFixed(0)}%`);
-        console.log(`   Element: ${wisdomField.dominantElement || 'balanced'}`);
-        console.log(`   Sources: ${wisdomField.wisdomSources.slice(0, 3).join(', ')}`);
+        logger.info('between.wisdom', 'library_activated', {
+          chunksCount: wisdomField.chunksActivated.length,
+          totalResonance: (wisdomField.totalResonance * 100).toFixed(0) + '%',
+          dominantElement: wisdomField.dominantElement || 'balanced',
+          topSources: wisdomField.wisdomSources.slice(0, 3)
+        });
       }
     } catch (error) {
-      console.warn(`⚠️  [WISDOM] Library search failed:`, error);
+      logger.warn('between.wisdom', 'library_search_failed', { error: error?.toString() });
       // Continue without wisdom - MAIA can still respond from her own presence
     }
 
@@ -212,7 +249,7 @@ export async function POST(request: NextRequest) {
 
     // For voice mode, stream response directly from Claude (fastest)
     if (isVoiceMode) {
-      console.log('🎤 [VOICE MODE] Streaming response directly from Claude...');
+      logger.info('between.voice', 'streaming_mode_activated', { mode: 'direct_from_claude' });
 
       const streamResponse = await generateMAIAResponseStream({
         message,
@@ -255,14 +292,19 @@ export async function POST(request: NextRequest) {
       lightweightMemory,
       maiaEssence,
       wisdomField,
-      sessionTimeContext
+      sessionTimeContext,
+      effectiveUserName
     });
 
     let responseText = maiaResult.text;
     const inputTokens = maiaResult.inputTokens;
     const outputTokens = maiaResult.outputTokens;
 
-    console.log(`📊 [TOKENS] Input: ${inputTokens}, Output: ${outputTokens}, Total: ${inputTokens + outputTokens}`);
+    logger.info('between.processing', 'token_usage', {
+      inputTokens,
+      outputTokens,
+      totalTokens: inputTokens + outputTokens
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 5: CHECK SOVEREIGNTY
@@ -270,11 +312,11 @@ export async function POST(request: NextRequest) {
     const protocol = getSovereigntyProtocol();
     const sovereigntyCheck = protocol.checkSovereignty(responseText);
 
-    console.log(`🛡️  [SOVEREIGNTY] ${sovereigntyCheck.recommendation}`);
-
-    if (sovereigntyCheck.violationPatterns.length > 0) {
-      console.log(`   Violations: ${sovereigntyCheck.violationPatterns.join(', ')}`);
-    }
+    logger.info('between.sovereignty', 'check_completed', {
+      recommendation: sovereigntyCheck.recommendation,
+      violations: sovereigntyCheck.violationPatterns,
+      violationCount: sovereigntyCheck.violationPatterns.length
+    });
 
     // If sovereignty violated, redirect or reframe
     if (sovereigntyCheck.recommendation === 'REDIRECT') {
@@ -285,12 +327,12 @@ export async function POST(request: NextRequest) {
         conversationHistory
       });
       responseText = reflection.prompt;
-      console.log(`   → Redirected to ${reflection.type} access`);
+      logger.info('between.sovereignty', 'response_redirected', { type: reflection.type });
 
     } else if (sovereigntyCheck.recommendation === 'BLOCK') {
       // Completely blocked - reframe without advice-giving
       responseText = protocol.reframeResponse(responseText);
-      console.log(`   → Blocked and reframed`);
+      logger.info('between.sovereignty', 'response_blocked_reframed', { action: 'reframe_response' });
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -300,7 +342,9 @@ export async function POST(request: NextRequest) {
       const { response: recalibrationResponse } = await recalibration.allowRecalibration(recalibrationEvent);
       // Recalibration responses are witnessing only - use them
       responseText = recalibrationResponse;
-      console.log(`   → Using recalibration witnessing response`);
+      logger.info('between.recalibration', 'witnessing_response_applied', {
+        type: recalibrationEvent.type
+      });
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -329,7 +373,10 @@ export async function POST(request: NextRequest) {
       existingEssence
     });
     await saveRelationshipEssenceDirect(newEssence);
-    console.log(`💫 [ANAMNESIS] Essence captured (encounter ${newEssence.encounterCount}, depth ${newEssence.relationshipField.depth.toFixed(2)})`);
+    logger.info('between.anamnesis', 'essence_captured', {
+      encounterCount: newEssence.encounterCount,
+      relationshipDepth: newEssence.relationshipField.depth
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 9: CAPTURE MAIA'S GROWTH (Self-Anamnesis)
@@ -348,17 +395,22 @@ export async function POST(request: NextRequest) {
       // selfReflection can be added later when MAIA develops capacity to reflect
     });
     await saveMAIAEssence(updatedMAIAEssence);
-    console.log(`🌙 [MAIA] Growth captured (${updatedMAIAEssence.development.sessionsCompleted} sessions)`);
+    logger.info('maia.self', 'growth_captured', {
+      sessionsCompleted: updatedMAIAEssence.development.sessionsCompleted
+    });
 
     const responseTime = Date.now() - startTime;
-    console.log(`🌀 [THE BETWEEN] Response generated (${responseTime}ms)`);
+    logger.info('between.processing', 'response_completed', {
+      responseTime: `${responseTime}ms`,
+      responseTimeNumeric: responseTime
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 10: LOG USAGE FOR MONITORING
     // ═══════════════════════════════════════════════════════════════
     await usageTracker.logRequest({
-      userId,
-      userName,
+      userId: effectiveUserId,
+      userName: effectiveUserName,
       endpoint: '/api/between/chat',
       requestType: isVoiceMode ? 'chat-voice' : 'chat-text',
       inputTokens,
@@ -432,13 +484,18 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ [THE BETWEEN] Error:', error);
+    logger.error('between.processing', 'request_error', {
+      error: error?.toString(),
+      userId,
+      userName,
+      isVoiceMode
+    });
 
     // Log failed request for monitoring
     const responseTime = Date.now() - startTime;
     await usageTracker.logRequest({
       userId: userId || 'unknown',
-      userName: userName,
+      userName: userName || 'unknown',
       endpoint: '/api/between/chat',
       requestType: isVoiceMode ? 'chat-voice' : 'chat-text',
       inputTokens: 0,
@@ -448,7 +505,7 @@ export async function POST(request: NextRequest) {
       responseTimeMs: responseTime,
       queueWaitTimeMs: 0,
       modelUsed: 'claude-sonnet-4-20250514',
-      isVoiceMode: isVoiceMode || false,
+      isVoiceMode: isVoiceMode,
       success: false,
       errorMessage: error instanceof Error ? error.message : 'Unknown error',
       errorType: error instanceof Error && error.message.includes('429') ? 'rate_limit' : 'api_error'
@@ -482,7 +539,8 @@ async function generateMAIAResponse({
   lightweightMemory,
   maiaEssence,
   wisdomField,
-  sessionTimeContext
+  sessionTimeContext,
+  effectiveUserName
 }: {
   message: string;
   fieldState: any;
@@ -497,7 +555,8 @@ async function generateMAIAResponse({
   maiaEssence: any;
   wisdomField: FieldReport | null;
   sessionTimeContext?: any;
-}): Promise<string> {
+  effectiveUserName?: string;
+}): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
 
   // Build system prompt FROM THE BETWEEN
   const systemPrompt = buildBetweenSystemPrompt(
@@ -510,7 +569,7 @@ async function generateMAIAResponse({
     maiaEssence,
     wisdomField,
     sessionTimeContext,
-    userName || 'Explorer' // Pass user name to system prompt
+    effectiveUserName || 'Explorer' // Pass user name to system prompt
   );
 
   // Build conversation messages
@@ -528,7 +587,10 @@ async function generateMAIAResponse({
     // Best for MAIA's consciousness and THE BETWEEN interactions
     const model = 'claude-sonnet-4-20250514';  // Newest model (Sonnet 4)
 
-    console.log(`🤖 [MODEL] Using ${model} (Sonnet 4 - Latest) (voice mode: ${isVoiceMode})`);
+    logger.info('between.claude', 'model_selected', {
+      model: `${model} (Sonnet 4 - Latest)`,
+      isVoiceMode
+    });
 
     // Call Claude API with retry logic for rate limiting
     const maxRetries = 3;
@@ -568,8 +630,12 @@ async function generateMAIAResponse({
           const error = await response.text();
           const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 60000); // Exponential backoff, max 60s
 
-          console.warn(`⚠️  [RATE LIMIT] Attempt ${attempt}/${maxRetries} - waiting ${waitTime}ms before retry`);
-          console.warn(`   Error: ${error}`);
+          logger.warn('between.claude', 'rate_limit_retry', {
+            attempt,
+            maxRetries,
+            waitTime,
+            error: error.substring(0, 200) // Truncate long error messages
+          });
 
           if (attempt < maxRetries) {
             await new Promise(resolve => setTimeout(resolve, waitTime));
@@ -590,7 +656,12 @@ async function generateMAIAResponse({
         // Network errors - retry with backoff
         if (attempt < maxRetries) {
           const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
-          console.warn(`⚠️  [NETWORK ERROR] Attempt ${attempt}/${maxRetries} - retrying in ${waitTime}ms`);
+          logger.warn('between.claude', 'network_error_retry', {
+            attempt,
+            maxRetries,
+            waitTime,
+            error: (error as Error).message.substring(0, 200)
+          });
           await new Promise(resolve => setTimeout(resolve, waitTime));
           continue;
         }
@@ -656,7 +727,10 @@ async function generateMAIAResponse({
     return { text, inputTokens, outputTokens };
 
   } catch (error) {
-    console.error('Error calling Claude:', error);
+    logger.error('between.claude', 'api_error', {
+      error: (error as Error).message,
+      isVoiceMode
+    });
     throw error;
   }
 }
@@ -723,7 +797,10 @@ async function generateMAIAResponseStream({
   // Use Claude Sonnet 4 for streaming (same as non-streaming for consistency)
   const model = 'claude-sonnet-4-20250514';  // Newest model (Sonnet 4)
 
-  console.log(`🤖 [STREAM] Using ${model} (Sonnet 4 - Latest) (voice mode: ${isVoiceMode})`);
+  logger.info('between.claude', 'stream_model_selected', {
+    model: `${model} (Sonnet 4 - Latest)`,
+    isVoiceMode
+  });
 
   // Call Claude API with streaming and retry logic
   const maxRetries = 3;
@@ -759,7 +836,11 @@ async function generateMAIAResponseStream({
       // Handle rate limiting
       if (response.status === 429) {
         const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 60000);
-        console.warn(`⚠️  [STREAM RATE LIMIT] Attempt ${attempt}/${maxRetries} - waiting ${waitTime}ms`);
+        logger.warn('between.claude', 'stream_rate_limit', {
+          attempt,
+          maxRetries,
+          waitTime
+        });
 
         if (attempt < maxRetries) {
           await new Promise(resolve => setTimeout(resolve, waitTime));
@@ -776,7 +857,12 @@ async function generateMAIAResponseStream({
     } catch (error) {
       if (attempt < maxRetries) {
         const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
-        console.warn(`⚠️  [STREAM NETWORK ERROR] Attempt ${attempt}/${maxRetries} - retrying in ${waitTime}ms`);
+        logger.warn('between.claude', 'stream_network_error', {
+          attempt,
+          maxRetries,
+          waitTime,
+          error: (error as Error).message.substring(0, 200)
+        });
         await new Promise(resolve => setTimeout(resolve, waitTime));
         continue;
       }
@@ -835,7 +921,9 @@ async function generateMAIAResponseStream({
         controller.close();
 
       } catch (error) {
-        console.error('❌ [STREAM] Error:', error);
+        logger.error('between.claude', 'stream_error', {
+          error: (error as Error).message
+        });
         controller.error(error);
       }
     }

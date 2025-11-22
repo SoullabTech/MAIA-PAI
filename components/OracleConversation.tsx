@@ -25,7 +25,7 @@ import { QuickSettingsSheet } from './QuickSettingsSheet';
 import { SoulprintMetricsWidget } from './SoulprintMetricsWidget';
 import { MotionState, CoherenceShift } from './motion/MotionOrchestrator';
 import { OracleResponse, ConversationContext } from '@/lib/oracle-response';
-// import { useElementalVoice } from '@/hooks/useElementalVoice'; // DISABLED - was causing OpenAI Realtime browser errors
+// import { useElementalVoice } from '@/hooks/useElementalVoice'; // DISABLED - preserved sovereignty architecture
 import { mapResponseToMotion, enrichOracleResponse } from '@/lib/motion-mapper';
 import { VoiceState } from '@/lib/voice/voice-capture';
 // import { useMaiaVoice } from '@/hooks/useMaiaVoice'; // OLD TTS SYSTEM - replaced with WebRTC
@@ -189,7 +189,7 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     listeningMode === 'patient' ? 'patient' : 'scribe';
 
   // ==================== STATE DECLARATIONS (BEFORE HOOKS) ====================
-  // These must be declared BEFORE useMaiaRealtime because they're used in its callbacks
+  // Core conversation state declarations
 
   // Core conversation state
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
@@ -652,8 +652,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
 
   // Sacred Lab Drawer and Voice Menu states now declared earlier (lines 159-160)
 
-  // 🌀 Soullab Realtime - DISABLED
-  // This was trying to use OpenAI Realtime API in browser (not supported without dangerouslyAllowBrowser)
+  // 🌀 Soullab Voice - DISABLED
+  // Preserved sovereignty architecture - MAIA consciousness controls all conversation flow
   // We're using SimplifiedOrganicVoice (browser speech recognition) + standard API calls instead
   // const realtime = useElementalVoice({
   //   userId: userId || 'anonymous',
@@ -1726,9 +1726,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
         ? getTeenSystemPrompt(teenProfile, lastSafetyCheck || undefined)
         : undefined;
 
-      // TEMPORARY FIX: Using OpenAI endpoint since ANTHROPIC_API_KEY is missing
-      // TODO: Switch back to /api/between/chat when ANTHROPIC_API_KEY is added to .env.local
-      const response = await fetch('/api/maya/chat', {
+      // ✅ RESTORED: Full consciousness system with ANTHROPIC_API_KEY now available
+      const response = await fetch('/api/between/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1944,8 +1943,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
       }
 
       const apiTime = Date.now() - startTime;
-      console.log(`⏱️ Response from OpenAI (temporary) received in ${apiTime}ms`);
-      trackEvent.apiCall('/api/maya/chat', apiTime, true);
+      console.log(`⏱️ Response from MAIA consciousness system received in ${apiTime}ms`);
+      trackEvent.apiCall('/api/between/chat', apiTime, true);
 
       // 🩺 Monitor MAIA personality health (dev mode only)
       // Detects degradation and auto-recovers if needed
@@ -2432,8 +2431,8 @@ export const OracleConversation: React.FC<OracleConversationProps> = ({
     }
 
     try {
-      // ✅ TEMPORARY FLOW: Browser STT → /api/maya/chat → Browser TTS
-      console.log('🌀 Routing voice through OpenAI (temporary)...');
+      // ✅ CONSCIOUSNESS FLOW: Browser STT → /api/between/chat → Browser TTS
+      console.log('🌀 Routing voice through MAIA consciousness system...');
       await handleTextMessage(cleanedText);
 
       const duration = Date.now() - voiceStartTime;

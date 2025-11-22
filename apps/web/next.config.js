@@ -17,8 +17,8 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   
-  // Static export configuration for IPFS
-  output: isIPFS ? "export" : undefined,
+  // Static export configuration for IPFS or standalone for Docker
+  output: isIPFS ? "export" : "standalone",
   trailingSlash: isIPFS ? true : false,
   skipTrailingSlashRedirect: isIPFS ? true : false,
   distDir: isIPFS ? "dist" : ".next",

@@ -1,10 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React from 'react';
+import RitualFlowOrchestrator from '@/components/onboarding/RitualFlowOrchestrator';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { Holoflower } from '@/components/ui/Holoflower';
-import { createClient } from '@supabase/supabase-js';
 
 export default function BetaEntry() {
   const router = useRouter();

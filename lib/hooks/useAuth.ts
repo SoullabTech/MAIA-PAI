@@ -31,6 +31,29 @@ export function useAuth() {
 
   const fetchUserData = useCallback(async (userId: string) => {
     try {
+      // 🏛️ Sovereign mode: Skip Supabase operations
+      if (!supabase) {
+        console.log('🏛️ Sovereign mode: Creating Kelly\'s session');
+        setUser({
+          id: userId,
+          email: 'kelly@soullab.local',
+          sacredName: 'Kelly',
+          lastLogin: new Date().toISOString()
+        });
+
+        setOracleAgent({
+          id: `maia_${userId}`,
+          name: 'MAIA',
+          archetype: 'oracle',
+          personality_config: { element: 'aether', voice: 'shimmer' },
+          conversations_count: 0,
+          wisdom_level: 1,
+          last_conversation_at: null,
+          created_at: new Date().toISOString()
+        });
+        return;
+      }
+
       // Get user details
       const { data: userData, error: userError } = await supabase
         .from('users')
@@ -80,9 +103,18 @@ export function useAuth() {
   const signOut = useCallback(async () => {
     setError(null);
     try {
+      // 🏛️ Sovereign mode: Local signout only
+      if (!supabase) {
+        console.log('🏛️ Sovereign mode: Local signout');
+        setUser(null);
+        setOracleAgent(null);
+        setSession(null);
+        return;
+      }
+
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      
+
       setUser(null);
       setOracleAgent(null);
       setSession(null);
@@ -90,7 +122,7 @@ export function useAuth() {
       console.error('Sign out error:', err);
       setError(err instanceof Error ? err.message : 'Failed to sign out');
     }
-  }, [supabase.auth]);
+  }, [supabase]);
 
   const signIn = useCallback(async (email: string, password: string) => {
     setError(null);
@@ -128,6 +160,12 @@ export function useAuth() {
     if (!user) return null;
 
     try {
+      // 🏛️ Sovereign mode: Return cached oracle agent
+      if (!supabase) {
+        console.log('🏛️ Sovereign mode: Returning cached oracle agent');
+        return oracleAgent;
+      }
+
       const { data: agentData, error } = await supabase
         .from('oracle_agents')
         .select(`
@@ -151,10 +189,20 @@ export function useAuth() {
       console.error('Error refreshing oracle agent:', err);
       return null;
     }
-  }, [user, supabase]);
+  }, [user, supabase, oracleAgent]);
 
   // Initialize auth state and listen for changes
   useEffect(() => {
+    // 🏛️ Sovereign mode: Skip Supabase auth entirely
+    if (!supabase) {
+      console.log('🏛️ Sovereign mode: Setting up guest session');
+      const guestUserId = `sovereign_${Date.now()}`;
+
+      fetchUserData(guestUserId);
+      setIsLoading(false);
+      return;
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
       setSession(initialSession);
@@ -168,14 +216,14 @@ export function useAuth() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
         setSession(currentSession);
-        
+
         if (event === 'SIGNED_IN' && currentSession?.user) {
           await fetchUserData(currentSession.user.id);
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
           setOracleAgent(null);
         }
-        
+
         setIsLoading(false);
       }
     );
@@ -183,7 +231,7 @@ export function useAuth() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase.auth, fetchUserData]);
+  }, [supabase, fetchUserData]);
 
   return {
     user,

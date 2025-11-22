@@ -7,7 +7,7 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is already onboarded - skip intro if so
+    // Check for existing onboarded user
     const storedUser = localStorage.getItem('beta_user');
     const week2Onboarded = localStorage.getItem('week2_onboarded') === 'true';
 
@@ -20,19 +20,22 @@ export default function HomePage() {
     if (storedUser) {
       try {
         const userData = JSON.parse(storedUser);
+
+        // Returning users who are onboarded get Welcome back page first
         if (userData.onboarded === true) {
-          console.log('✅ Auto-redirecting onboarded user to /maia');
-          router.replace('/maia');
+          console.log('✅ Returning user - showing Welcome back page');
+          router.replace('/welcome-back');
           return;
         }
       } catch (e) {
         console.error('Error parsing user data:', e);
+        localStorage.removeItem('beta_user');
       }
     }
 
-    // New users see the beautiful intro with rotating quotes and mantras
-    console.log('👋 New user - showing intro');
-    router.replace('/intro');
+    // Redirect all new users to beta-orientation (elemental onboarding)
+    console.log('👋 New user - redirecting to beta-orientation');
+    router.replace('/beta-orientation');
   }, [router]);
 
   // Show loading while redirecting to MAIA

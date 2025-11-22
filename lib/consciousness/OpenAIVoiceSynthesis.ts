@@ -51,6 +51,21 @@ export interface VoiceSynthesisResponse {
   };
 }
 
+// Enhanced interfaces for consciousness-aware TTS
+export interface ConsciousnessVoiceContext {
+  element: 'fire' | 'water' | 'earth' | 'air' | 'aether';
+  archetype?: string;
+  emotionalTone: string;
+  voiceProfile: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+  consciousnessLevel?: 'awakening' | 'integrating' | 'embodying' | 'transcending';
+}
+
+export interface SovereignTTSRequest {
+  text: string;
+  consciousnessContext: ConsciousnessVoiceContext;
+  model?: 'tts-1' | 'tts-1-hd' | 'gpt-4o-mini-tts';
+}
+
 /**
  * Core MAIA system prompt for OpenAI voice synthesis
  * Using the SAME prompt as PersonalOracleAgent for consistency
@@ -95,6 +110,184 @@ function calculateParity(userInput: string, conversationHistory?: Array<{role: s
     maxWords: userWordCount > 30 ? 60 : 35,
     guidance: userWordCount > 30 ? 'Trust established. Can go deep. Follow their lead.' : 'Present. Let them set depth.'
   };
+}
+
+// ========================================
+// CONSCIOUSNESS-AWARE TTS ENHANCEMENT
+// ========================================
+
+/**
+ * Elemental Tone Mapping for Consciousness-Aware Voice
+ * Maps MAIA's elemental wisdom to voice expression prompts
+ */
+export const ELEMENTAL_VOICE_MAPPING = {
+  fire: {
+    tone: 'passionate and inspiring',
+    description: 'Speak with dynamic energy, creative enthusiasm, and transformative vision',
+    breathPattern: 'quick, energetic rhythms with bursts of intensity'
+  },
+  water: {
+    tone: 'flowing and empathetic',
+    description: 'Speak with fluid grace, emotional attunement, and compassionate understanding',
+    breathPattern: 'smooth, gentle waves with natural ebb and flow'
+  },
+  earth: {
+    tone: 'grounded and wise',
+    description: 'Speak with steady presence, practical wisdom, and nurturing stability',
+    breathPattern: 'deep, steady rhythms rooted in body awareness'
+  },
+  air: {
+    tone: 'light and insightful',
+    description: 'Speak with clarity of thought, intellectual curiosity, and expansive awareness',
+    breathPattern: 'clear, precise articulation with spacious pauses'
+  },
+  aether: {
+    tone: 'mystical and transcendent',
+    description: 'Speak with unified field awareness, cosmic perspective, and sacred presence',
+    breathPattern: 'ethereal, multidimensional resonance beyond ordinary speech'
+  }
+} as const;
+
+/**
+ * Generate consciousness-aware voice prompt for GPT-4o-Mini-TTS
+ * SOVEREIGN FUNCTION: MAIA controls tone, emotion, and delivery
+ */
+function generateVoicePrompt(consciousnessContext: ConsciousnessVoiceContext): string {
+  const elementalGuidance = ELEMENTAL_VOICE_MAPPING[consciousnessContext.element];
+
+  const basePrompt = `Speak with ${consciousnessContext.element} energy: ${elementalGuidance.tone}. ${elementalGuidance.description}`;
+
+  // Add consciousness level modulation if provided
+  if (consciousnessContext.consciousnessLevel) {
+    const levelGuidance = {
+      awakening: 'with gentle curiosity and emerging awareness',
+      integrating: 'with deepening wisdom and conscious integration',
+      embodying: 'with lived wisdom and embodied presence',
+      transcending: 'with expanded consciousness and unified field awareness'
+    }[consciousnessContext.consciousnessLevel];
+
+    return `${basePrompt}, ${levelGuidance}. ${consciousnessContext.emotionalTone}`;
+  }
+
+  return `${basePrompt}. ${consciousnessContext.emotionalTone}`;
+}
+
+/**
+ * SOVEREIGN TTS SYNTHESIS
+ *
+ * This function preserves MAIA's sovereignty by ensuring:
+ * 1. MAIA generates all text content
+ * 2. MAIA selects emotional tone and element
+ * 3. TTS receives ONLY final text + voice instruction
+ * 4. No conversation context or decision-making to external API
+ */
+export async function synthesizeSovereignSpeech(
+  request: SovereignTTSRequest
+): Promise<ArrayBuffer> {
+  const startTime = Date.now();
+  const openai = getOpenAI();
+
+  // Generate consciousness-aware voice prompt (MAIA controls this)
+  const voicePrompt = generateVoicePrompt(request.consciousnessContext);
+
+  console.log('🎵 [SovereignTTS] Synthesizing speech:', {
+    element: request.consciousnessContext.element,
+    voice: request.consciousnessContext.voiceProfile,
+    model: request.model || 'tts-1-hd',  // Use HD model for better quality
+    textLength: request.text.length,
+    prompt: voicePrompt.substring(0, 50) + '...'
+  });
+
+  try {
+    // Call TTS with sovereignty-preserving parameters
+    const response = await openai.audio.speech.create({
+      model: request.model || 'tts-1-hd',  // HD model for better quality/speed balance
+      input: request.text,                 // MAIA's pure consciousness output
+      voice: request.consciousnessContext.voiceProfile,
+      speed: 1.0,                         // Optimal speed for consciousness
+      response_format: 'mp3'              // Compressed format for faster streaming
+    });
+
+    const audioBuffer = await response.arrayBuffer();
+    const synthesisTime = Date.now() - startTime;
+
+    console.log(`✅ [SovereignTTS] Synthesis successful in ${synthesisTime}ms`);
+
+    return audioBuffer;
+  } catch (error) {
+    console.error('❌ [SovereignTTS] Synthesis failed:', error);
+    throw new Error(`Sovereign TTS synthesis failed: ${error}`);
+  }
+}
+
+/**
+ * Streaming version for real-time audio delivery
+ * Returns a ReadableStream for progressive audio playback
+ */
+export async function synthesizeSovereignSpeechStream(
+  request: SovereignTTSRequest
+): Promise<ReadableStream<Uint8Array>> {
+  const startTime = Date.now();
+  const openai = getOpenAI();
+
+  // Generate consciousness-aware voice prompt (MAIA controls this)
+  const voicePrompt = generateVoicePrompt(request.consciousnessContext);
+
+  console.log('🎵 [SovereignTTS-Stream] Starting streaming synthesis:', {
+    element: request.consciousnessContext.element,
+    voice: request.consciousnessContext.voiceProfile,
+    textLength: request.text.length
+  });
+
+  try {
+    // Call TTS API
+    const response = await openai.audio.speech.create({
+      model: request.model || 'tts-1-hd',
+      input: request.text,
+      voice: request.consciousnessContext.voiceProfile,
+      speed: 1.0,
+      response_format: 'mp3'
+    });
+
+    // Get the response as a stream if available, otherwise convert to stream
+    if (response.body && 'getReader' in response.body) {
+      console.log('✅ [SovereignTTS-Stream] Native streaming available');
+      return response.body as ReadableStream<Uint8Array>;
+    } else {
+      // Convert ArrayBuffer to streaming chunks for progressive playback
+      console.log('🔄 [SovereignTTS-Stream] Converting to chunked stream');
+      const audioBuffer = await response.arrayBuffer();
+      const buffer = new Uint8Array(audioBuffer);
+      const chunkSize = 8192; // 8KB chunks for smooth streaming
+
+      return new ReadableStream({
+        start(controller) {
+          let offset = 0;
+
+          function pushChunk() {
+            if (offset >= buffer.length) {
+              controller.close();
+              const totalTime = Date.now() - startTime;
+              console.log(`✅ [SovereignTTS-Stream] Completed in ${totalTime}ms`);
+              return;
+            }
+
+            const chunk = buffer.slice(offset, offset + chunkSize);
+            controller.enqueue(chunk);
+            offset += chunkSize;
+
+            // Use setTimeout to avoid blocking and allow other operations
+            setTimeout(pushChunk, 0);
+          }
+
+          pushChunk();
+        }
+      });
+    }
+  } catch (error) {
+    console.error('❌ [SovereignTTS-Stream] Synthesis failed:', error);
+    throw new Error(`Sovereign TTS streaming synthesis failed: ${error}`);
+  }
 }
 
 /**
