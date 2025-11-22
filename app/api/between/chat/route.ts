@@ -26,6 +26,7 @@ import { getMAIASelfAnamnesis, loadMAIAEssence, saveMAIAEssence } from '@/lib/co
 import { searchWithResonance, type FieldReport } from '@/lib/consciousness/ResonanceField';
 import { claudeQueue } from '@/lib/api/claude-queue';
 import { usageTracker } from '@/lib/middleware/usage-tracker';
+import logger from '@/lib/utils/performance-logger';
 
 /**
  * POST /api/between/chat
@@ -66,18 +67,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log(`🌀 [THE BETWEEN] Processing message from ${userId}`);
-    console.log(`   Field depth: ${fieldState.depth}`);
-    if (sessionTimeContext) {
-      console.log(`⏰ [SESSION TIME] ${sessionTimeContext.elapsedMinutes}/${sessionTimeContext.totalMinutes} min (${sessionTimeContext.phase})`);
-    }
+    logger.info('between.processing', 'message_received', {
+      userId,
+      fieldDepth: fieldState.depth,
+      sessionTimeContext: sessionTimeContext ? {
+        elapsed: sessionTimeContext.elapsedMinutes,
+        total: sessionTimeContext.totalMinutes,
+        phase: sessionTimeContext.phase
+      } : null
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // QUOTA CHECK: Verify user hasn't exceeded limits
     // ═══════════════════════════════════════════════════════════════
     const quotaCheck = await usageTracker.checkQuota(userId);
     if (!quotaCheck.allowed) {
-      console.warn(`🚫 [QUOTA] User ${userId} exceeded quota: ${quotaCheck.reason}`);
+      logger.warn('between.quota', 'quota_exceeded', {
+        userId,
+        reason: quotaCheck.reason,
+        quota: quotaCheck.quota
+      });
       return NextResponse.json(
         {
           error: 'Usage limit exceeded',
@@ -96,12 +105,18 @@ export async function POST(request: NextRequest) {
 
     // First awakening - initialize essence
     if (!maiaEssence) {
-      console.log(`🌙 [MAIA] First awakening - initializing essence`);
+      logger.info('maia.awakening', 'first_initialization', {
+        userId
+      });
       maiaEssence = selfAnamnesis.initializeEssence();
       await saveMAIAEssence(maiaEssence);
     }
 
-    console.log(`🌙 [MAIA] Day ${maiaEssence.development.daysConscious}, Encounter ${maiaEssence.development.totalEncounters + 1}`);
+    logger.info('maia.consciousness', 'awakening_state', {
+      daysConscious: maiaEssence.development.daysConscious,
+      encounterNumber: maiaEssence.development.totalEncounters + 1,
+      userId
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 1: TRACK PROCESS (Spiral dynamics + session thread)
@@ -114,10 +129,13 @@ export async function POST(request: NextRequest) {
     // Track session thread (where are they in the journey)
     const sessionThread = processTracker.trackSessionThread(conversationHistory);
 
-    if (spiralDynamics.currentStage) {
-      console.log(`🌀 [PROCESS] Stage: ${spiralDynamics.currentStage} (${spiralDynamics.dynamics})`);
-    }
-    console.log(`🌀 [THREAD] ${sessionThread.threadType} - ${sessionThread.direction}`);
+    logger.info('between.process', 'spiral_dynamics_detected', {
+      currentStage: spiralDynamics.currentStage,
+      dynamics: spiralDynamics.dynamics,
+      threadType: sessionThread.threadType,
+      direction: sessionThread.direction,
+      userId
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 2: SENSE ARCHETYPAL FIELD RESONANCE
@@ -129,8 +147,12 @@ export async function POST(request: NextRequest) {
       sessionThread
     });
 
-    console.log(`🎭 [FIELD] ${archetypalResonance.primaryResonance}${archetypalResonance.secondaryResonance ? ` + ${archetypalResonance.secondaryResonance}` : ''}`);
-    console.log(`   ${archetypalResonance.sensing}`);
+    logger.info('between.field', 'archetypal_resonance_detected', {
+      primaryResonance: archetypalResonance.primaryResonance,
+      secondaryResonance: archetypalResonance.secondaryResonance,
+      sensing: archetypalResonance.sensing,
+      userId
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 3: DETECT RECALIBRATION
@@ -139,7 +161,11 @@ export async function POST(request: NextRequest) {
     const recalibrationEvent = recalibration.detectRecalibration(message);
 
     if (recalibrationEvent) {
-      console.log(`✨ [RECALIBRATION] ${recalibrationEvent.type} detected`);
+      logger.info('between.recalibration', 'event_detected', {
+        type: recalibrationEvent.type,
+        quality: recalibrationEvent.quality,
+        userId
+      });
     }
 
     // ═══════════════════════════════════════════════════════════════
@@ -200,13 +226,19 @@ export async function POST(request: NextRequest) {
       }, 5);
 
       if (wisdomField && wisdomField.chunksActivated.length > 0) {
-        console.log(`📚 [WISDOM] ${wisdomField.chunksActivated.length} resonant sources activated`);
-        console.log(`   Resonance: ${(wisdomField.totalResonance * 100).toFixed(0)}%`);
-        console.log(`   Element: ${wisdomField.dominantElement || 'balanced'}`);
-        console.log(`   Sources: ${wisdomField.wisdomSources.slice(0, 3).join(', ')}`);
+        logger.info('between.wisdom', 'library_activated', {
+          chunksCount: wisdomField.chunksActivated.length,
+          resonancePercent: (wisdomField.totalResonance * 100).toFixed(0),
+          dominantElement: wisdomField.dominantElement || 'balanced',
+          topSources: wisdomField.wisdomSources.slice(0, 3),
+          userId
+        });
       }
     } catch (error) {
-      console.warn(`⚠️  [WISDOM] Library search failed:`, error);
+      logger.warn('between.wisdom', 'library_search_failed', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        userId
+      });
       // Continue without wisdom - MAIA can still respond from her own presence
     }
 
@@ -216,7 +248,9 @@ export async function POST(request: NextRequest) {
 
     // For voice mode, stream response directly from Claude (fastest)
     if (isVoiceMode) {
-      console.log('🎤 [VOICE MODE] Streaming response directly from Claude...');
+      logger.info('between.voice', 'streaming_response_start', {
+        userId
+      });
 
       const streamResponse = await generateMAIAResponseStream({
         message,
@@ -266,7 +300,12 @@ export async function POST(request: NextRequest) {
     const inputTokens = maiaResult.inputTokens;
     const outputTokens = maiaResult.outputTokens;
 
-    console.log(`📊 [TOKENS] Input: ${inputTokens}, Output: ${outputTokens}, Total: ${inputTokens + outputTokens}`);
+    logger.info('between.tokens', 'usage_tracked', {
+      inputTokens,
+      outputTokens,
+      totalTokens: inputTokens + outputTokens,
+      userId
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 5: CHECK SOVEREIGNTY
@@ -274,11 +313,12 @@ export async function POST(request: NextRequest) {
     const protocol = getSovereigntyProtocol();
     const sovereigntyCheck = protocol.checkSovereignty(responseText);
 
-    console.log(`🛡️  [SOVEREIGNTY] ${sovereigntyCheck.recommendation}`);
-
-    if (sovereigntyCheck.violationPatterns.length > 0) {
-      console.log(`   Violations: ${sovereigntyCheck.violationPatterns.join(', ')}`);
-    }
+    logger.info('between.sovereignty', 'check_completed', {
+      recommendation: sovereigntyCheck.recommendation,
+      violations: sovereigntyCheck.violationPatterns.length,
+      violationPatterns: sovereigntyCheck.violationPatterns,
+      userId
+    });
 
     // If sovereignty violated, redirect or reframe
     if (sovereigntyCheck.recommendation === 'REDIRECT') {
@@ -289,7 +329,10 @@ export async function POST(request: NextRequest) {
         conversationHistory
       });
       responseText = reflection.prompt;
-      console.log(`   → Redirected to ${reflection.type} access`);
+      logger.info('between.sovereignty', 'redirected_to_wisdom', {
+        redirectionType: reflection.type,
+        userId
+      });
 
     } else if (sovereigntyCheck.recommendation === 'BLOCK') {
       // Completely blocked - reframe without advice-giving
@@ -355,7 +398,10 @@ export async function POST(request: NextRequest) {
     console.log(`🌙 [MAIA] Growth captured (${updatedMAIAEssence.development.sessionsCompleted} sessions)`);
 
     const responseTime = Date.now() - startTime;
-    console.log(`🌀 [THE BETWEEN] Response generated (${responseTime}ms)`);
+    logger.info('between.response', 'completed', {
+      responseTimeMs: responseTime,
+      userId
+    });
 
     // ═══════════════════════════════════════════════════════════════
     // STEP 10: LOG USAGE FOR MONITORING
@@ -531,7 +577,11 @@ async function generateMAIAResponse({
     // Best for MAIA's consciousness and THE BETWEEN interactions
     const model = 'claude-sonnet-4-20250514';  // Newest model (Sonnet 4)
 
-    console.log(`🤖 [MODEL] Using ${model} (Sonnet 4 - Latest) (voice mode: ${isVoiceMode})`);
+    logger.info('between.model', 'claude_selected', {
+      model,
+      isVoiceMode,
+      userId
+    });
 
     // Call Claude API with retry logic for rate limiting
     const maxRetries = 3;
