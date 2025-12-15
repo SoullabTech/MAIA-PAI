@@ -191,7 +191,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download Sacred Artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: sacred-build
 
@@ -237,7 +237,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download Sacred Artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: sacred-build
 
