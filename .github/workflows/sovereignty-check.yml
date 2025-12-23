@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  verify-sovereignty:
+  sovereignty-check:
     runs-on: ubuntu-latest
     name: Verify Docker-only deployment
 
@@ -14,28 +14,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check for cloud service violations
+      - name: Block Vercel/Supabase reintroduction (workflows + artifacts)
+        shell: bash
         run: |
           set -euo pipefail
 
           echo "🔍 Scanning for sovereignty violations..."
           echo ""
 
-          # Check 1: Block references in workflows
-          echo "Checking workflows..."
-          if rg -n -i "vercel|supabase|VERCEL_|SUPABASE_" .github/workflows; then
-            echo ""
-            echo "❌ SOVEREIGNTY VIOLATION DETECTED"
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "Vercel or Supabase references found in workflows."
-            echo "MAIA-PAI uses Docker-only deployment for sovereignty."
-            echo ""
-            echo "Please remove all cloud service integrations."
-            exit 1
+          # Ensure ripgrep exists (usually preinstalled on ubuntu-latest, but guard anyway)
+          if ! command -v rg >/dev/null 2>&1; then
+            echo "Installing ripgrep..."
+            sudo apt-get update
+            sudo apt-get install -y ripgrep
           fi
 
-          # Check 2: Block common repo artifacts
-          echo "Checking for forbidden artifacts..."
+          # 1) Block references in workflows
+          echo "1) Checking workflows..."
+          if rg -n -i "vercel|supabase|VERCEL_|SUPABASE_" .github/workflows; then
+            echo ""
+            echo "❌ SOVEREIGNTY VIOLATION: Vercel/Supabase detected in workflows."
+            exit 1
+          fi
+          echo "✓ Workflows clean."
+          echo ""
+
+          # 2) Block common repo artifacts
+          echo "2) Checking for forbidden artifacts..."
           bad_paths=(
             ".vercel"
             "vercel.json"
@@ -45,27 +50,20 @@ jobs:
             "supabase"
           )
 
-          violation_found=false
+          violations=()
           for p in "${bad_paths[@]}"; do
             if [[ -e "$p" ]]; then
-              echo "❌ Found forbidden path: $p"
-              violation_found=true
+              violations+=("$p")
             fi
           done
 
-          if [[ "$violation_found" == "true" ]]; then
+          if (( ${#violations[@]} )); then
             echo ""
-            echo "❌ SOVEREIGNTY VIOLATION DETECTED"
-            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-            echo "Vercel or Supabase artifacts found in repository."
-            echo "MAIA-PAI uses Docker-only deployment for sovereignty."
-            echo ""
-            echo "Please remove all cloud service artifacts."
+            echo "❌ SOVEREIGNTY VIOLATION: forbidden artifact(s) found:"
+            printf ' - %s\n' "${violations[@]}"
             exit 1
           fi
 
-          echo "✅ Sovereignty check passed"
-          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "✓ No workflow violations detected"
-          echo "✓ No forbidden artifacts found"
-          echo "✓ Docker-only deployment verified"
+          echo "✓ No forbidden artifacts found."
+          echo ""
+          echo "✅ Sovereignty check passed."
