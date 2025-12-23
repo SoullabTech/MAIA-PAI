@@ -30,7 +30,7 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           newman run tests/postman/soullab-smoke-tests.postman_collection.json \
-            --env-var "BASE_URL=${{ secrets.STAGING_URL || 'https://spiralogic-oracle-staging.vercel.app' }}" \
+            --env-var "BASE_URL=${{ secrets.STAGING_URL }}" \
             --reporters cli,json \
             --reporter-json-export newman-results.json
 
@@ -38,7 +38,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           newman run tests/postman/soullab-smoke-tests.postman_collection.json \
-            --env-var "BASE_URL=${{ secrets.PRODUCTION_URL || 'https://spiralogic-oracle.vercel.app' }}" \
+            --env-var "BASE_URL=${{ secrets.PRODUCTION_URL }}" \
             --reporters cli,json \
             --reporter-json-export newman-results.json
 

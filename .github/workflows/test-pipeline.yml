@@ -57,9 +57,6 @@ jobs:
       
       - name: Setup test environment
         run: |
-          echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> $GITHUB_ENV
-          echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> $GITHUB_ENV
           echo "ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}" >> $GITHUB_ENV
       
       - name: Run ${{ matrix.test-type }} tests
@@ -69,7 +66,7 @@ jobs:
           elif [ "${{ matrix.test-type }}" = "persistence" ]; then
             npm run test:persistence
           else
-            npm run test -- --testPathIgnorePatterns="sacred-pipeline|supabase-persistence"
+            npm run test -- --testPathIgnorePatterns="sacred-pipeline"
           fi
       
       - name: Upload coverage
@@ -105,8 +102,6 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       
       - name: Run E2E tests
@@ -134,9 +129,6 @@ jobs:
       
       - name: Build production bundle
         run: npm run build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       
       - name: Analyze bundle size
         run: |
@@ -153,47 +145,6 @@ jobs:
             echo "Build size exceeds ${MAX_SIZE_MB}MB!"
             exit 1
           fi
-
-  # Deploy to Vercel (only on main branch)
-  deploy-preview:
-    name: Deploy Preview
-    runs-on: ubuntu-latest
-    needs: [test-suite, e2e-tests]
-    if: github.event_name == 'pull_request'
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Deploy to Vercel Preview
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          scope: ${{ secrets.VERCEL_ORG_ID }}
-          
-  deploy-production:
-    name: Deploy Production
-    runs-on: ubuntu-latest
-    needs: [test-suite, e2e-tests, performance-check]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Deploy to Vercel Production
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          scope: ${{ secrets.VERCEL_ORG_ID }}
-      
-      - name: Notify deployment
-        run: |
-          echo "✅ Deployed to production successfully!"
-          echo "URL: https://spiralogic-oracle-system.vercel.app"
 
   # Security Scan
   security-scan:

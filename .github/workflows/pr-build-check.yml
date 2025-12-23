@@ -47,8 +47,6 @@ jobs:
         run: |
           npm run build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NODE_ENV: production
 
       - name: 🧪 Run tests
@@ -175,52 +173,3 @@ jobs:
           base: ${{ github.event.pull_request.base.sha }}
           head: HEAD
         continue-on-error: true
-
-  vercel-preview:
-    name: Vercel Preview Check
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: 📥 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 🚀 Check Vercel configuration
-        run: |
-          if [ -f "vercel.json" ]; then
-            echo "✅ vercel.json found"
-            cat vercel.json
-          else
-            echo "⚠️ vercel.json not found"
-          fi
-          
-          if [ -f ".vercelignore" ]; then
-            echo "✅ .vercelignore found"
-          else
-            echo "⚠️ .vercelignore not found"
-          fi
-
-      - name: 📝 Add deployment readiness comment
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const body = `## 🚀 Vercel Deployment Readiness
-            
-            **Configuration files:**
-            - vercel.json: ✅ Found
-            - .vercelignore: ✅ Found
-            - next.config.js: ✅ Configured
-            
-            **Preview URL:** Will be available after merge
-            
-            **Environment variables required:**
-            - NEXT_PUBLIC_SUPABASE_URL
-            - NEXT_PUBLIC_SUPABASE_ANON_KEY
-            - Additional secrets should be configured in Vercel dashboard
-            `
-            
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body
-            })
