@@ -154,3 +154,7 @@ oracle-backend/
 
 # Liquid AI - only ignore venv, keep source files
 liquid_test/
+
+# macOS AppleDouble metadata
+**/._*
+**/.!*
