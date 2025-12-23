@@ -16,9 +16,14 @@ jobs:
 
       - name: Check for cloud service violations
         run: |
-          echo "🔍 Scanning workflows for sovereignty violations..."
+          set -euo pipefail
 
-          if rg -i "vercel|supabase|VERCEL_|SUPABASE_" .github/workflows; then
+          echo "🔍 Scanning for sovereignty violations..."
+          echo ""
+
+          # Check 1: Block references in workflows
+          echo "Checking workflows..."
+          if rg -n -i "vercel|supabase|VERCEL_|SUPABASE_" .github/workflows; then
             echo ""
             echo "❌ SOVEREIGNTY VIOLATION DETECTED"
             echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -29,7 +34,38 @@ jobs:
             exit 1
           fi
 
+          # Check 2: Block common repo artifacts
+          echo "Checking for forbidden artifacts..."
+          bad_paths=(
+            ".vercel"
+            "vercel.json"
+            ".vercelignore"
+            "_vercelignore"
+            ".vercel-build-trigger"
+            "supabase"
+          )
+
+          violation_found=false
+          for p in "${bad_paths[@]}"; do
+            if [[ -e "$p" ]]; then
+              echo "❌ Found forbidden path: $p"
+              violation_found=true
+            fi
+          done
+
+          if [[ "$violation_found" == "true" ]]; then
+            echo ""
+            echo "❌ SOVEREIGNTY VIOLATION DETECTED"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "Vercel or Supabase artifacts found in repository."
+            echo "MAIA-PAI uses Docker-only deployment for sovereignty."
+            echo ""
+            echo "Please remove all cloud service artifacts."
+            exit 1
+          fi
+
           echo "✅ Sovereignty check passed"
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-          echo "No cloud service dependencies detected."
-          echo "Docker-only deployment verified."
+          echo "✓ No workflow violations detected"
+          echo "✓ No forbidden artifacts found"
+          echo "✓ Docker-only deployment verified"
