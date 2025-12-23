@@ -1,0 +1,35 @@
+name: Sovereignty Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify-sovereignty:
+    runs-on: ubuntu-latest
+    name: Verify Docker-only deployment
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for cloud service violations
+        run: |
+          echo "🔍 Scanning workflows for sovereignty violations..."
+
+          if rg -i "vercel|supabase|VERCEL_|SUPABASE_" .github/workflows; then
+            echo ""
+            echo "❌ SOVEREIGNTY VIOLATION DETECTED"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "Vercel or Supabase references found in workflows."
+            echo "MAIA-PAI uses Docker-only deployment for sovereignty."
+            echo ""
+            echo "Please remove all cloud service integrations."
+            exit 1
+          fi
+
+          echo "✅ Sovereignty check passed"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "No cloud service dependencies detected."
+          echo "Docker-only deployment verified."
